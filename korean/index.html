@@ -1,38 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>韓文 · Body</title>
-  <link rel="stylesheet" href="../assets/site.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8f3">
+  <meta name="description" content="從韓文字母到進階表達，搭配讀音、情境對話與練習，建立自己的韓文學習路線。">
+  <title>韓文學堂 · Body</title>
+  <link rel="stylesheet" href="../learning/learning.css?v=d4549db00371">
+  <script type="module" src="../learning/app.js?v=df7ca76c9340"></script>
 </head>
-<body>
-<div class="wrap">
-  <a class="back" href="../">← Body</a>
-  <header class="page-title">
-    <h1>韓文</h1>
-    <p>한국어 · 子音母音從頭開始</p>
-  </header>
-  <section>
-    <div class="sec-head"><h2>課程</h2><span class="count">準備中</span></div>
-    <div class="grid">
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>子音與母音</h3>
-        <p>韓文字母怎麼寫、怎麼唸</p>
-      </div>
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>拼音規則</h3>
-        <p>收尾音與連音</p>
-      </div>
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>生活會話</h3>
-        <p>打招呼、自我介紹</p>
-      </div>
-    </div>
-  </section>
-</div>
+<body data-page="course" data-language="ko">
+  <a class="skip-link" href="#main-content">跳到主要內容</a>
+  <div id="app">
+    <main class="initial-loading" id="main-content">
+      <a href="../" class="initial-brand">Body<span>語言學習室</span></a>
+      <div class="loading-mark" aria-hidden="true">あ<span>한</span></div>
+      <h1>韓文學堂</h1>
+      <p>正在打開你的學習筆記…</p>
+      <noscript><p>請開啟 JavaScript，使用課程、練習與學習紀錄。</p><a href="../">返回 Body 首頁</a></noscript>
+    </main>
+  </div>
+  <div id="live-toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

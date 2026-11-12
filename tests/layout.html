@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Body · 響應式畫面檢查</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#e8ece3;color:#263c31;font:14px/1.5 system-ui,sans-serif}header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:13px 20px;background:#fff;border-bottom:1px solid #dbe2d2}h1{font-size:15px;margin:0 12px 0 0}label{display:flex;align-items:center;gap:6px;font-size:12px}select,a{font:inherit;color:inherit}select{border:1px solid #d9e0d2;padding:6px;border-radius:8px;background:white}main{overflow:auto;padding:20px;min-height:calc(100vh - 60px)}iframe{border:1px solid #cbd5c0;border-radius:12px;background:#f7f8f3;display:block;margin:auto;box-shadow:0 10px 30px #263d3115;width:390px;height:844px}
+  </style>
+</head>
+<body>
+  <header><h1>Body · 畫面檢查</h1><label for="screen">畫面寬度<select id="screen"><option value="360">手機 360</option><option value="390" selected>手機 390</option><option value="768">平板 768</option><option value="1024">平板 1024</option><option value="1280">桌面 1280</option></select></label><label for="page">頁面<select id="page"><option value="japanese/">日文學堂</option><option value="korean/">韓文學堂</option><option value="vocabulary/">今日單字</option><option value="progress/">學習進度</option><option value="japanese/?lesson=ja-01">日文第一課</option><option value="korean/?lesson=ko-30">韓文進階課</option></select></label><a href="../">回到 Body</a></header>
+  <main><iframe id="preview" title="Body 學習頁面預覽" src="../japanese/"></iframe></main>
+  <script>
+    const preview = document.getElementById('preview');
+    document.getElementById('screen').addEventListener('change', event => { preview.style.width = event.target.value + 'px'; });
+    document.getElementById('page').addEventListener('change', event => { preview.src = '../' + event.target.value; });
+  </script>
+</body>
+</html>
