@@ -1,4 +1,4 @@
-這份檔案是從 [andy32012/xitian](https://github.com/andy32012/xitian) 複製到 Body 網站的 `comic/` 子目錄，供 GitHub Pages 使用。原專案與網域 xitian.page 沒有改動。
+這份檔案是從 [andy32012/xitian](https://github.com/andy32012/xitian) 複製到 Body 網站的 `comic/` 子目錄。自訂網域 xitian.page 已改接到這個 Body 網站；原專案內容保留未刪。
 
 # 西天｜xitian.page
 
