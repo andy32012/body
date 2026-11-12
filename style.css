@@ -121,6 +121,19 @@ a.tile {
   letter-spacing: 0.01em;
 }
 
+.badge-live {
+  color: #567347;
+  background: #eaf1e3;
+}
+
+.tile-vocab { background: #fffaf0; }
+.tile-progress { background: #f3f8ef; }
+
+a.tile:focus-visible {
+  outline: 3px solid #55734c;
+  outline-offset: 4px;
+}
+
 .is-placeholder {
   background: #f7f7f8;
 }

@@ -1,38 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>日文 · Body</title>
-  <link rel="stylesheet" href="../assets/site.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8f3">
+  <meta name="description" content="從五十音到進階表達，跟著有例句、情境對話與解析的日文課程，一步一步開口。">
+  <title>日文學堂 · Body</title>
+  <link rel="stylesheet" href="../learning/learning.css?v=d4549db00371">
+  <script type="module" src="../learning/app.js?v=df7ca76c9340"></script>
 </head>
-<body>
-<div class="wrap">
-  <a class="back" href="../">← Body</a>
-  <header class="page-title">
-    <h1>日文</h1>
-    <p>日本語 · 一筆一畫寫給你看，配道地發音</p>
-  </header>
-  <section>
-    <div class="sec-head"><h2>課程</h2><span class="count">準備中</span></div>
-    <div class="grid">
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>平假名</h3>
-        <p>あ行到わ行，筆順和發音</p>
-      </div>
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>片假名</h3>
-        <p>外來語常用的寫法</p>
-      </div>
-      <div class="card soon">
-        <span class="tag soon">準備中</span>
-        <h3>生活會話</h3>
-        <p>打招呼、點餐、問路</p>
-      </div>
-    </div>
-  </section>
-</div>
+<body data-page="course" data-language="ja">
+  <a class="skip-link" href="#main-content">跳到主要內容</a>
+  <div id="app">
+    <main class="initial-loading" id="main-content">
+      <a href="../" class="initial-brand">Body<span>語言學習室</span></a>
+      <div class="loading-mark" aria-hidden="true">あ<span>한</span></div>
+      <h1>日文學堂</h1>
+      <p>正在打開你的學習筆記…</p>
+      <noscript><p>請開啟 JavaScript，使用課程、練習與學習紀錄。</p><a href="../">返回 Body 首頁</a></noscript>
+    </main>
+  </div>
+  <div id="live-toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>
