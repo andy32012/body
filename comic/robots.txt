@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://andy32012.github.io/body/comic/sitemap.xml
