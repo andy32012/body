@@ -135,10 +135,27 @@ a.tile {
 
 .tile-comic {
   grid-column: 1 / -1;
-  min-height: 168px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.85)),
-    linear-gradient(145deg, #f3e6d4 0%, #f7f1ea 55%, #fff 100%);
+  min-height: 200px;
+  justify-content: flex-end;
+  background: #1d1d1f url("assets/comic-cover.jpg") center 30% / cover no-repeat;
+  color: #fff;
+}
+
+.tile-comic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.72) 100%);
+  pointer-events: none;
+}
+
+.tile-comic .copy {
+  position: relative;
+  z-index: 1;
+}
+
+.tile-comic .copy p {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .tile-hero {
