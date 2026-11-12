@@ -133,7 +133,7 @@ function renderCourse() {
   const all = courseLessons(language);
   const done = doneCount(all, state);
   const upcoming = nextLesson(language, state);
-  const started = !!state.lessons[upcoming.id];
+  const started = all.some(lesson => !!state.lessons[lesson.id]);
   const savedCount = state.favoriteLessons.filter(id => lessonById[id]?.language === language).length;
   const wordCount = words.filter(word => word.language === language).length;
   return `<section class="hero"><div class="hero-copy"><p class="eyebrow">${language === 'ja' ? 'JAPANESE' : 'KOREAN'} · YOUR LEARNING JOURNEY</p><h1>${language === 'ja' ? '把第一句<span class="hero-language">日文</span>，<br>變成日常。' : '從 <span class="hero-language">안녕하세요</span>，<br>聊到你的世界。'}</h1><p class="hero-description">${language === 'ja' ? '從五十音到進階表達，用有情境的例句和小練習，<br>一步一步，把想說的話說出來。' : '從子音、母音到自然對話，把每一個小小的理解，<br>慢慢拼成自己的韓文能力。'}</p><div class="hero-actions"><a class="btn primary" href="${lessonUrl(upcoming)}" data-lesson="${upcoming.id}">${icon('book', 'sm')}${done === all.length ? '回顧課程' : started ? '繼續學習' : '開始第一課'}${icon('arrow', 'sm')}</a><button class="btn text" data-action="course-tab" data-tab="alphabet">先認識${language === 'ja' ? '五十音' : '韓文字母'} ${icon('arrow', 'sm')}</button></div></div>${courseArt()}</section>
