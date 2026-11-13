@@ -32,12 +32,15 @@ test('先前四週的普通練習少會延長估計間隔，累爆不推進', ()
     sessions:['2026-11-24','2026-12-01','2026-12-08','2026-12-15'].map(day=>({day,energy:'normal'}))})
   assert.deepEqual(projected.filter(d=>d.kind==='lesson').map(d=>d.day),['2026-12-22','2026-12-29'])
 })
-test('下一個月保留推算過程，未加入課程無法超前排入', () => {
+test('42 個單元都有教材，單元 7 之後接著排單元 8；全部做完後不再排新課', () => {
   const ready = projectCalendar({...base,from:'2027-02-20',to:'2027-02-23'})
   assert.equal(ready[0].unit,7)
   assert.equal(ready[0].lessonDay,6)
-  assert.equal(ready.at(-1)?.kind,'future')
-  assert.equal(ready.at(-1)?.unit,null)
+  assert.equal(ready.find(d=>d.kind==='lesson'&&d.unit===8)?.lessonDay,1)
+  const finished = projectCalendar({...base,cursor:42*6,today:'2027-03-01',from:'2027-03-01',to:'2027-03-06',ranges:[]})
+  assert.ok(finished.every(d=>d.kind!=='lesson'))
+  assert.equal(curriculum.units.length,42)
+  assert.ok(curriculum.units.every(u=>u.days.length===6&&u.checkpoint.length===3&&u.backup.length===5))
 })
 test('全年實習與國考共 547 天，寒暑假維持每天 2 分鐘，沒有新課', () => {
   const ranges = [

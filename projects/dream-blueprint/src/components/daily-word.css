@@ -1,8 +1,10 @@
 /* The card keeps one dark look in both themes because it always sits on a photograph. */
 .daily-word-veil {position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:rgba(3,6,12,.72);backdrop-filter:blur(7px);animation:daily-word-veil .25s ease-out}
 .daily-word-card {position:relative;isolation:isolate;overflow:hidden;width:min(100%,440px);aspect-ratio:1/1;max-height:calc(100dvh - 32px);display:grid;grid-template-rows:auto 1fr auto auto;border-radius:22px;border:1px solid rgba(255,255,255,.16);background:#070b14;color:#fff;box-shadow:0 30px 80px rgba(0,0,0,.55);outline:none;animation:daily-word-rise .35s cubic-bezier(.2,.8,.2,1)}
-.daily-word-photo {position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover}
-.daily-word-card::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,.62) 0%,rgba(5,8,16,.28) 34%,rgba(5,8,16,.74) 72%,rgba(5,8,16,.93) 100%)}
+.daily-word-photo {position:absolute;inset:0;z-index:-3;width:100%;height:100%;object-fit:cover}
+
+.daily-word-photo.over {z-index:-2}
+.daily-word-card::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,.5) 0%,rgba(5,8,16,.16) 34%,rgba(5,8,16,.62) 72%,rgba(5,8,16,.9) 100%)}
 .daily-word-top {display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0 22px}
 .daily-word-label {display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.2em;color:#f4c589}
 .daily-word-label i {width:22px;height:1px;background:#f4c589}
