@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "夢想藍圖",
+  "short_name": "夢想藍圖",
+  "description": "從今天的一句英文，走向成為美國註冊護理師的夢想。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1025",
+  "theme_color": "#10162f",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
