@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getScreeningQueue, isKnownWord, officialWords, wordKey } from '../src/lib/vocab'
+import { dailyQueue, dailyTarget } from '../src/lib/dailyWords'
 import wordParts from '../src/data/medical-parts.json'
 
 test('六級條目和醫護構詞都有可離線的中文釋義', () => {
   assert.deepEqual([1,2,3,4,5,6].map(level => officialWords.filter(w => w.level === level).length),
-    [1001,1002,1002,1002,1002,1001])
+    [1002,1002,1002,1002,1002,1002])
   assert.ok(officialWords.every(w => w.zh.trim()))
   assert.equal(new Set(wordParts.map(entry => entry.part)).size, 60)
 })
@@ -25,7 +26,19 @@ test('認得、待學及同義表記都從新字快篩排除', () => {
 test('相同進度保留快篩順序；做完一個就接下一個', () => {
   const initial = getScreeningQueue([],[],[])
   const next = getScreeningQueue([initial[0].en],[],[])
-  assert.equal(initial.length,2003)
+  assert.equal(initial.length,2004)
   assert.equal(initial[1].en,next[0].en)
-  assert.equal(next.length,2002)
+  assert.equal(next.length,2003)
+})
+
+test('今日單字從最低級開始，分過類的字不再出現；考週預設只排一個', () => {
+  const first = dailyQueue([],[])
+  assert.equal(first[0].level,1)
+  assert.equal(first.length,6012)
+  const next = dailyQueue([first[0].en],[first[1].en])
+  assert.equal(next[0].en,first[2].en)
+  assert.equal(dailyTarget({},false,'2026-11-24'),8)
+  assert.equal(dailyTarget({'daily-word.count':'15'},false,'2026-11-24'),15)
+  assert.equal(dailyTarget({'daily-word.count':'15'},true,'2026-11-14'),1)
+  assert.equal(dailyTarget({'daily-word.more.2026-11-14':'1'},true,'2026-11-14'),8)
 })

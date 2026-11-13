@@ -113,7 +113,7 @@ export default function VocabScreen({state, update}: PageProps) {
       </div>}
 
     <details><summary>詞表來源</summary>
-      <p>大考中心 111 學年度起適用的高中英文參考詞彙表共六級，本版收錄 6,010 個詞條。快篩內建第 1、2 級的 2,003 個詞條，中文釋義另行整理。</p>
+      <p>大考中心 111 學年度起適用的高中英文參考詞彙表共六級，本版收錄 6,012 個詞條。快篩內建第 1、2 級的 2,004 個詞條，中文釋義另行整理。</p>
       <a href="https://www.ceec.edu.tw/xmdoc?xsmsid=0K213553204833715309" target="_blank" rel="noreferrer">大考中心詞表</a> · <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noreferrer">中文詞義來源</a>
     </details>
   </section>

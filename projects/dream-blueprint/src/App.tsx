@@ -19,6 +19,8 @@ import History from './pages/History'
 import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
+import DailyWord from './components/DailyWord'
+import { seenKey } from './lib/dailyWords'
 
 type View = Page | 'library' | 'cosmos'
 type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string}
@@ -76,8 +78,8 @@ function Week({state,today}:{state:AppState,today:string}) {
     <div className="week-legend"><span><i className="done-key"/>已練習</span><span><i className="today-key"/>今天</span><span><Moon size={11}/>休息日</span></div>
   </section>
 }
-function Home(props:PageProps & {today:string, start:(e:Energy)=>void}) {
-  const {state,update,today,start}=props
+function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:()=>void}) {
+  const {state,update,today,start,openWord}=props
   const phase=activePeriod(today,state.settings.periods)
   const maintenance= today>='2028-02-01'&&today<='2029-07-31' && (phase==='exam'||phase==='internship')
   const goal=nextAction(state), days=new Set(state.sessions.map(s=>s.day)).size
@@ -95,6 +97,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void}) {
         <div className="hero-number"><strong>{days}</strong><span>天</span></div>
         <p>{heroCue}</p>
         <button type="button" className="launch" onClick={()=>{const dock=document.getElementById('practice-dock');dock?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});dock?.focus({preventScroll:true})}}><Play size={16} fill="currentColor"/>準備今日練習<ArrowRight size={16}/></button>
+        <button type="button" className="word-chip" onClick={openWord}><Star size={14}/>今日單字</button>
       </div>
     </section>
     <div className="overview-row">
@@ -115,6 +118,8 @@ function App() {
   const {state,update,storageError}=useAppStore()
   const [route, changeRoute]=useState(readRoute)
   const [today,changeDay]=useState(dayKey)
+  const [wordOpen,setWordOpen]=useState(false)
+  const closeWord=()=>{setWordOpen(false);update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})}
   const navigate=(p:Page)=>setView(p==='practice'?'library':p)
   const start=(e:Energy)=>setView('practice',e)
   const page=route.view==='rivals'&&!state.settings.rivalsEnabled?'today':route.view
@@ -157,8 +162,9 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><h1>英文練習</h1><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><h1>英文練習</h1><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
     </div></div>
+    {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div>
 }
