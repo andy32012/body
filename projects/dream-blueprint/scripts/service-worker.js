@@ -69,6 +69,18 @@ self.addEventListener("fetch", event => {
     return;
   }
   const key = request.mode === "navigate" && !coreURLs.has(url.href) ? shell : url.href;
+  if (request.mode === "navigate" && key === shell) {
+    // Online opens see the published HTML; offline opens use one fully installed release.
+    event.respondWith((async () => {
+      let response;
+      try {
+        response = await fetch(shell, { cache: "no-cache", signal: AbortSignal.timeout(4000) });
+        if (response.ok && response.headers.get("Content-Type")?.includes("text/html")) return response;
+      } catch { /* Offline or slow connection. */ }
+      return (await (await caches.open(coreName)).match(shell)) || response || Response.error();
+    })());
+    return;
+  }
   if (coreURLs.has(key)) {
     event.respondWith((async () => (await (await caches.open(coreName)).match(key)) || fetch(request))());
   }
@@ -100,6 +112,7 @@ async function manageGallery(download, send) {
 self.addEventListener("message", event => {
   const action = event.data?.type;
   if (action === "PRIME_COVER" && photos.has(fallback)) {
+    event.source?.postMessage({ type: "APP_SHELL", script: config.entry });
     event.waitUntil(caches.open(galleryName).then(cache => savePhoto(fallback, cache)).catch(() => {}));
     return;
   }

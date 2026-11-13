@@ -1,7 +1,19 @@
 if ("serviceWorker" in navigator && window.isSecureContext) {
   const scriptUrl = new URL("./sw.js", document.currentScript.src);
   navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" }).then(registration => {
-    // The next navigation uses the new shell. Avoid reloading a learner's open exercise.
+    // A hash route changes within the same document. Switch releases only when
+    // the learner has chosen to leave the current view, never during an answer.
+    const entry = document.querySelector('script[type="module"][src]')?.src;
+    let nextRelease = false;
+    navigator.serviceWorker.addEventListener("message", event => {
+      if (event.source !== navigator.serviceWorker.controller || event.data?.type !== "APP_SHELL") return;
+      const nextEntry = event.data.script;
+      nextRelease = Boolean(entry && nextEntry && new URL(nextEntry, scriptUrl).href !== entry);
+    });
+    const view = url => new URL(url).hash.slice(1).split("/")[0] || "today";
+    window.addEventListener("hashchange", event => {
+      if (nextRelease && view(event.oldURL) !== view(event.newURL)) window.location.reload();
+    });
     const primeCover = () => {
       const controller = navigator.serviceWorker.controller;
       if (!controller) return;

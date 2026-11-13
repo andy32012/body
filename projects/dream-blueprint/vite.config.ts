@@ -64,6 +64,7 @@ function offlineApp(): Plugin {
         }
       }
       const config = {
+        entry: files.find(file => /^assets\/index-[\w-]+\.js$/.test(file)),
         version: version.digest("hex").slice(0, 16),
         core: files.filter(file => !(file in gallery)),
         gallery,
