@@ -1,0 +1,297 @@
+.pl-page {
+  --pl-line: var(--space-border, var(--line));
+  --pl-text: var(--muted);
+  --pl-tint: color-mix(in srgb, #9e91e5 10%, transparent);
+  --pl-accent: #9a87dd;
+  width: 100%;
+  min-width: 0;
+  line-height: 1.6;
+}
+.pl-page * {
+  box-sizing: border-box;
+}
+.pl-page h1,
+.pl-page h2,
+.pl-page h3,
+.pl-page p {
+  margin: 0;
+}
+.pl-page h1 {
+  font-size: clamp(1.85rem, 5vw, 2.8rem);
+  letter-spacing: 0.03em;
+}
+.pl-page h2 {
+  font-size: 1.15rem;
+}
+.pl-page h3 {
+  font-size: 1rem;
+}
+.pl-page small,
+.pl-fine,
+.pl-note,
+.pl-status {
+  color: var(--pl-text);
+}
+.pl-title,
+.pl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+.pl-title {
+  padding: 0.25rem 0;
+}
+.pl-orbit {
+  font-size: 2rem;
+  color: var(--pl-accent);
+}
+.pl-note {
+  background: var(--space-reading, var(--panel));
+  border-radius: 8px;
+  padding: .4rem .65rem;
+  font-size: 0.85rem;
+  max-width: 68ch;
+}
+.pl-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--space-card, var(--panel));
+  border: 1px solid var(--pl-line);
+  border-radius: 14px;
+  padding: 4px;
+  margin: 1.2rem 0;
+}
+.pl-page button,
+.pl-page input,
+.pl-page select {
+  font: inherit;
+}
+.pl-page button,
+.pl-page summary {
+  cursor: pointer;
+}
+.pl-switch button,
+.pl-controls button,
+.pl-cell,
+.pl-year,
+.pl-month-links button,
+.pl-outline,
+.pl-add button,
+.pl-replan button {
+  border: 1px solid var(--pl-line);
+  color: inherit;
+  background: transparent;
+  border-radius: 10px;
+}
+.pl-switch button {
+  padding: 0.5rem 0.3rem;
+  flex: 1;
+  border: 0;
+  font-weight: 600;
+}
+.pl-switch button[aria-pressed="true"] {
+  background: #66549b;
+  color: white;
+}
+.pl-panel {
+  margin: 1rem 0 0;
+  box-shadow: var(--space-shadow, none);
+  background: var(--space-card, var(--panel));
+  border: 1px solid var(--pl-line);
+  border-radius: 20px;
+  padding: clamp(14px, 3vw, 24px);
+}
+.pl-head small,
+.pl-fine,
+.pl-status {
+  font-size: 0.78rem;
+}
+.pl-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+.pl-controls button,
+.pl-outline,
+.pl-month-links button,
+.pl-add button,
+.pl-replan button {
+  min-height: 38px;
+  padding: 0.25rem 0.65rem;
+}
+.pl-controls button:first-child,
+.pl-controls button:last-child {
+  font-size: 1.25rem;
+}
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  margin: 0.8rem 0;
+}
+.pl-week {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--pl-text);
+  padding: 0.2rem 0;
+}
+.pl-cell {
+  padding: 0.22rem 0;
+  min-height: 47px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.3;
+}
+.pl-cell small {
+  font-size: 0.64rem;
+  min-height: 1em;
+}
+.pl-cell.lesson,
+.pl-cell.done {
+  background: color-mix(in srgb, #a49af8 13%, transparent);
+}
+.pl-cell.today b {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.pl-cell[aria-pressed="true"] {
+  border-color: var(--pl-accent);
+  background: color-mix(in srgb, #a49af8 23%, transparent);
+}
+.pl-day {
+  padding: 0.65rem 0.8rem;
+  border-left: 3px solid var(--pl-accent);
+  background: var(--pl-tint);
+  border-radius: 0 8px 8px 0;
+}
+.pl-day p {
+  font-size: 0.88rem;
+}
+.pl-page .pl-fine {
+  margin-top: 0.7rem;
+}
+.pl-goal {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--pl-line);
+  padding: 0.7rem 0;
+  font-size: 0.94rem;
+  cursor: pointer;
+}
+.pl-goal input {
+  accent-color: var(--pl-accent);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin: 0.17rem 0;
+}
+.pl-track {
+  font-size: 0.78rem;
+  border-radius: 5px;
+  background: var(--pl-tint);
+  padding: 0.12rem 0.3rem;
+  white-space: nowrap;
+}
+.pl-add {
+  margin-top: 0.7rem;
+}
+.pl-add summary {
+  font-size: 0.88rem;
+}
+.pl-add form,
+.pl-replan {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+}
+.pl-add label,
+.pl-replan label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+.pl-page select,
+.pl-page input:not([type="checkbox"]) {
+  background: var(--space-field, var(--panel));
+  color: inherit;
+  border: 1px solid var(--pl-line);
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  max-width: 100%;
+  min-width: 0;
+}
+.pl-page select option {
+  color: var(--text);
+  background: var(--panel);
+}
+.pl-year {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--pl-line);
+  border-radius: 0;
+  text-align: left;
+  padding: 0.75rem 0;
+}
+.pl-year strong {
+  flex: 1;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+}
+.pl-year span {
+  font-size: 0.8rem;
+  color: var(--pl-text);
+}
+.pl-years {
+  margin-top: 0.6rem;
+}
+.pl-month-links,
+.pl-replan-row div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.pl-month-links {
+  padding: 0.6rem 0;
+}
+.pl-replan-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--pl-line);
+  gap: 0.4rem;
+  padding: 0.5rem 0;
+}
+.pl-replan button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pl-page .pl-status {
+  min-height: 1em;
+  margin: 0.5rem 0;
+}
+.pl-jump {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--pl-text);
+  margin: 0.65rem 0;
+}
+.pl-page .pl-jump input {
+  padding: 0.2rem 0.4rem;
+}
+.pl-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pl-page .pl-month-outlook {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--pl-line);
+}

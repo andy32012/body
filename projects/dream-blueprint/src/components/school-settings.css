@@ -1,0 +1,16 @@
+.school-settings { display: grid; gap: .5rem; min-width: 0; }
+.school-settings details { border: 1px solid color-mix(in srgb,currentColor 17%,transparent); border-radius: 12px; padding: .8rem 1rem; }
+.school-settings details > details { margin-bottom: .6rem; }
+.school-settings summary { cursor: pointer; font-weight: 650; padding: .18rem 0; }
+.school-settings p,.school-settings li { line-height: 1.6; }
+.school-settings h4 { margin: 1rem 0 .5rem; }
+.school-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,9rem),1fr)); gap: .8rem; margin: .8rem 0; }
+.school-grid label { display: grid; align-content: start; gap: .3rem; min-width: 0; font-size: .88rem; }
+.school-grid input,.school-grid select { min-width: 0; width: 100%; max-width: 100%; font: inherit; }
+.school-settings .school-list { list-style: none; padding: 0; margin: .6rem 0; }
+.school-list li { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; padding: .35rem 0; }
+.school-list li > span,.school-list li > label { flex: 1 1 9rem; min-width: 0; }
+.school-settings .school-check { display: flex; flex-direction: row; align-items: center; gap: .4rem; }
+.school-check input { width: 1rem; height: 1rem; flex: none; }
+.school-settings button + button { margin-inline-start: .3rem; }
+.school-form { margin: .7rem 0; }

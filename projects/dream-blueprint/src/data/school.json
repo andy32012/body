@@ -1,0 +1,315 @@
+{
+  "verifiedOn": "2026-11-13",
+  "schoolName": "弘光科技大學",
+  "program": "日四技護理系",
+  "className": "二年丙班",
+  "studentStatus": "轉學生",
+  "term": "115-1",
+  "requiredCredits": 128,
+  "acceptedCredits": 28,
+  "transferCourses": 13,
+  "currentCourses": 9,
+  "currentCredits": 21,
+  "weeklyPeriods": 23,
+  "graduation": "待系辦確認",
+  "firstStep": "問系辦：基護最早何時補修、最早能排哪一梯基護實習",
+  "notes": [
+    "基本護理學與基本護理學實作各 2 學分，本學期尚未選到。",
+    "基本護理學實習 2 學分列在畢業檢核，正式選課結果未列入。",
+    "實習醫院、梯次、報到日待確認。原規劃 2029 年 6 月畢業，實際日期待系辦確認。"
+  ],
+  "classes": [],
+  "study": [
+    {
+      "weekday": 0,
+      "minutes": 0,
+      "time": ""
+    },
+    {
+      "weekday": 1,
+      "minutes": 2,
+      "time": ""
+    },
+    {
+      "weekday": 2,
+      "minutes": 8,
+      "time": ""
+    },
+    {
+      "weekday": 3,
+      "minutes": 2,
+      "time": ""
+    },
+    {
+      "weekday": 4,
+      "minutes": 8,
+      "time": ""
+    },
+    {
+      "weekday": 5,
+      "minutes": 0,
+      "time": ""
+    },
+    {
+      "weekday": 6,
+      "minutes": 8,
+      "time": ""
+    }
+  ],
+  "events": [
+    {
+      "id": "exam-20261119",
+      "day": "2026-11-19",
+      "label": "內外科段考",
+      "kind": "考試"
+    },
+    {
+      "id": "pharmacology-20261119",
+      "day": "2026-11-19",
+      "label": "藥理段考（依英文課表）",
+      "kind": "考試"
+    },
+    {
+      "id": "winter-20270117",
+      "day": "2027-01-17",
+      "label": "寒假開始",
+      "kind": "假期"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "s1-1",
+      "group": "正在補修",
+      "label": "中文閱讀與書寫（一）",
+      "done": false
+    },
+    {
+      "id": "s2-1",
+      "group": "大一待修",
+      "label": "基本護理學",
+      "done": false
+    },
+    {
+      "id": "s2-2",
+      "group": "大一待修",
+      "label": "基本護理學實作",
+      "done": false
+    },
+    {
+      "id": "s2-3",
+      "group": "大一待修",
+      "label": "生物化學",
+      "done": false
+    },
+    {
+      "id": "s2-4",
+      "group": "大一待修",
+      "label": "英文（一）",
+      "done": false
+    },
+    {
+      "id": "s2-5",
+      "group": "大一待修",
+      "label": "職場專業英文簡報",
+      "done": false
+    },
+    {
+      "id": "s2-6",
+      "group": "大一待修",
+      "label": "中文閱讀與書寫（二）",
+      "done": false
+    },
+    {
+      "id": "s2-7",
+      "group": "大一待修",
+      "label": "人文精神（一）",
+      "done": false
+    },
+    {
+      "id": "s2-8",
+      "group": "大一待修",
+      "label": "創意概論",
+      "done": false
+    },
+    {
+      "id": "s2-9",
+      "group": "大一待修",
+      "label": "民主與法治",
+      "done": false
+    },
+    {
+      "id": "s2-10",
+      "group": "大一待修",
+      "label": "歷史與文明",
+      "done": false
+    },
+    {
+      "id": "s2-11",
+      "group": "大一待修",
+      "label": "服務學習（一）",
+      "done": false
+    },
+    {
+      "id": "s3-1",
+      "group": "本學期修讀",
+      "label": "藥理學",
+      "done": false
+    },
+    {
+      "id": "s3-2",
+      "group": "本學期修讀",
+      "label": "病理學",
+      "done": false
+    },
+    {
+      "id": "s3-3",
+      "group": "本學期修讀",
+      "label": "身體評估及實作",
+      "done": false
+    },
+    {
+      "id": "s3-4",
+      "group": "本學期修讀",
+      "label": "內外科護理學及實作（一）",
+      "done": false
+    },
+    {
+      "id": "s3-5",
+      "group": "本學期修讀",
+      "label": "人文精神（二）",
+      "done": false
+    },
+    {
+      "id": "s4-1",
+      "group": "本學期待補選",
+      "label": "基本護理學實習",
+      "done": false
+    },
+    {
+      "id": "s4-2",
+      "group": "本學期待補選",
+      "label": "服務學習（二）",
+      "done": false
+    },
+    {
+      "id": "s5-1",
+      "group": "大二下",
+      "label": "內外科護理學及實作（二）",
+      "done": false
+    },
+    {
+      "id": "s5-2",
+      "group": "大二下",
+      "label": "醫療與生命倫理",
+      "done": false
+    },
+    {
+      "id": "s5-3",
+      "group": "大二下",
+      "label": "研究及實證護理概論",
+      "done": false
+    },
+    {
+      "id": "s5-4",
+      "group": "大二下",
+      "label": "創新思維與應用",
+      "done": false
+    },
+    {
+      "id": "s6-1",
+      "group": "大三上",
+      "label": "社區衛生護理學",
+      "done": false
+    },
+    {
+      "id": "s6-2",
+      "group": "大三上",
+      "label": "精神衛生護理學",
+      "done": false
+    },
+    {
+      "id": "s6-3",
+      "group": "大三上",
+      "label": "婦產科護理學及實作",
+      "done": false
+    },
+    {
+      "id": "s6-4",
+      "group": "大三上",
+      "label": "兒科護理學及實作",
+      "done": false
+    },
+    {
+      "id": "s7-1",
+      "group": "大三下",
+      "label": "內外科護理學實習（一）",
+      "done": false
+    },
+    {
+      "id": "s7-2",
+      "group": "大三下",
+      "label": "內外科護理學實習（二）",
+      "done": false
+    },
+    {
+      "id": "s7-3",
+      "group": "大三下",
+      "label": "兒科護理學實習",
+      "done": false
+    },
+    {
+      "id": "s7-4",
+      "group": "大三下",
+      "label": "婦產科護理學實習",
+      "done": false
+    },
+    {
+      "id": "s8-1",
+      "group": "大四",
+      "label": "社區衛生護理學實習",
+      "done": false
+    },
+    {
+      "id": "s8-2",
+      "group": "大四",
+      "label": "精神衛生護理學實習",
+      "done": false
+    },
+    {
+      "id": "s8-3",
+      "group": "大四",
+      "label": "護理行政",
+      "done": false
+    },
+    {
+      "id": "s9-1",
+      "group": "畢業條件",
+      "label": "服務學習時數還差 20 小時",
+      "done": false
+    },
+    {
+      "id": "s9-2",
+      "group": "畢業條件",
+      "label": "英文檢定",
+      "done": false
+    },
+    {
+      "id": "s9-3",
+      "group": "畢業條件",
+      "label": "資訊檢定",
+      "done": false
+    },
+    {
+      "id": "s9-4",
+      "group": "畢業條件",
+      "label": "勞作教育",
+      "done": false
+    },
+    {
+      "id": "s9-5",
+      "group": "畢業條件",
+      "label": "系專業能力",
+      "done": false
+    }
+  ]
+}

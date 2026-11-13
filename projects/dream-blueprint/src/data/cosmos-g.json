@@ -1,0 +1,122 @@
+[
+  {
+    "id": "g01",
+    "title": "渦狀星系 M51",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0506a/",
+    "credit": "NASA, ESA, S. Beckwith (STScI), and The Hubble Heritage Team (STScI/AURA)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g01.webp",
+    "focus": "49% 49%"
+  },
+  {
+    "id": "g02",
+    "title": "棒旋星系 NGC 1300",
+    "category": "星系",
+    "source": "https://esahubble.org/images/opo0501a/",
+    "credit": "NASA, ESA, and The Hubble Heritage Team (STScI/AURA)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g02.webp",
+    "focus": "52% 50%"
+  },
+  {
+    "id": "g03",
+    "title": "草帽星系 M104",
+    "category": "星系",
+    "source": "https://esahubble.org/images/opo0328a/",
+    "credit": "NASA/ESA and The Hubble Heritage Team (STScI/AURA)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g03.webp",
+    "focus": "49% 52%"
+  },
+  {
+    "id": "g04",
+    "title": "觸鬚星系",
+    "category": "星系",
+    "source": "https://esahubble.org/images/potw1345a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡 WFC3、哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g04.webp",
+    "focus": "51% 49%"
+  },
+  {
+    "id": "g05",
+    "title": "雪茄星系 M82",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0604a/",
+    "credit": "NASA, ESA and the Hubble Heritage Team (STScI/AURA). Acknowledgment: J. Gallagher (University of Wisconsin), M. Mountain (STScI) and P. Puxley (NSF).",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g05.webp",
+    "focus": "49% 51%"
+  },
+  {
+    "id": "g06",
+    "title": "風車星系 M101",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0602a/",
+    "credit": "Image: European Space Agency & NASA Acknowledgements: Project Investigators for the original Hubble data: K.D. Kuntz (GSFC), F. Bresolin (University of Hawaii), J. Trauger (JPL), J. Mould (NOAO), and Y.-H. Chu (University of Illinois, Urbana) Image processing: Davide De Martin (ESA/Hubble) CFHT image: Canada-France-Hawaii Telescope/J.-C. Cuillandre/Coelum NOAO image: George Jacoby, Bruce Bohannan, Mark Hanna/NOAO/AURA/NSF",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/g06.webp",
+    "focus": "48% 48%"
+  },
+  {
+    "id": "g07",
+    "title": "半人馬座 A 星系",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic1110a/",
+    "credit": "NASA, ESA, and the Hubble Heritage (STScI/AURA)-ESA/Hubble Collaboration. Acknowledgment: R. O’Connell (University of Virginia) and the WFC3 Scientific Oversight Committee",
+    "instrument": "哈伯太空望遠鏡 WFC3",
+    "image": "cosmos/g07.webp",
+    "focus": "50% 51%"
+  },
+  {
+    "id": "g08",
+    "title": "史蒂芬五重星系",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0910i/",
+    "credit": "NASA, ESA and the Hubble SM4 ERO Team",
+    "instrument": "哈伯太空望遠鏡 WFC3",
+    "image": "cosmos/g08.webp",
+    "focus": "50% 49%"
+  },
+  {
+    "id": "g09",
+    "title": "側視星系 NGC 5866",
+    "category": "星系",
+    "source": "https://esahubble.org/images/opo0624a/",
+    "credit": "NASA, ESA, and The Hubble Heritage Team (STScI/AURA)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g09.webp",
+    "focus": "50% 47%"
+  },
+  {
+    "id": "g10",
+    "title": "棒旋星系 NGC 1672",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0706a/",
+    "credit": "NASA, ESA",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g10.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "g11",
+    "title": "英仙座 A 星系 NGC 1275",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0817a/",
+    "credit": "NASA, ESA and Andy Fabian (University of Cambridge, UK)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g11.webp",
+    "focus": "49% 48%"
+  },
+  {
+    "id": "g12",
+    "title": "透鏡狀星系 NGC 7049",
+    "category": "星系",
+    "source": "https://esahubble.org/images/heic0905a/",
+    "credit": "NASA, ESA and W. Harris (McMaster University, Ontario, Canada)",
+    "instrument": "哈伯太空望遠鏡 ACS",
+    "image": "cosmos/g12.webp",
+    "focus": "51% 50%"
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "s01",
+    "title": "珠寶盒疏散星團",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/heic0913a/",
+    "credit": "NASA/ESA and Jesús Maíz Apellániz (Instituto de Astrofísica de Andalucía, Spain)",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s01.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s02",
+    "title": "南門二雙星",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw1635a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s02.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s03",
+    "title": "寶瓶座球狀星團 M72",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw2516a/",
+    "credit": "ESA/Hubble & NASA, A. Sarajedini, G. Piotto, M. Libralato",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s03.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s04",
+    "title": "比鄰星",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw1343a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s04.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s05",
+    "title": "大麥哲倫星系雙星團 NGC 1850",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/heic0108a/",
+    "credit": "ESA, NASA and Martino Romaniello (European Southern Observatory, Germany)",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s05.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s06",
+    "title": "天狼星與白矮伴星",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/heic0516a/",
+    "credit": "NASA, ESA, H. Bond (STScI), and M. Barstow (University of Leicester)",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s06.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s07",
+    "title": "韋斯特倫德 1 星團",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw1710a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s07.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s08",
+    "title": "飛馬座球狀星團 M15",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw1107a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s08.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s09",
+    "title": "韋斯特倫德 2 星團",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/heic1509c/",
+    "credit": "NASA, ESA, the Hubble Heritage Team (STScI/AURA), A. Nota (ESA/STScI), and the Westerlund 2 Science Team",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s09.webp",
+    "focus": "50% 50%"
+  },
+  {
+    "id": "s10",
+    "title": "人馬座星團 Terzan 5",
+    "category": "恆星與星團",
+    "source": "https://esahubble.org/images/potw1121a/",
+    "credit": "ESA/Hubble & NASA",
+    "instrument": "哈伯太空望遠鏡",
+    "image": "cosmos/s10.webp",
+    "focus": "50% 50%"
+  }
+]

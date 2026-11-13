@@ -4,6 +4,21 @@
 
 漫畫、內外科護理和語言學習的入口網站。
 
+## 網站導覽
+
+| 區域 | 入口 |
+| --- | --- |
+| 漫畫 | [《西天》線上閱讀](https://xitian.page/comic/) |
+| 護理 | [內科黑板課](https://xitian.page/nursing/) |
+| 語言 | [日文學堂](https://xitian.page/japanese/) · [韓文學堂](https://xitian.page/korean/) · [英文課規劃](https://xitian.page/english/) |
+| 日韓學習工具 | [今日單字與複習](https://xitian.page/vocabulary/) · [學習進度](https://xitian.page/progress/) |
+| 護理英文與赴美計畫 | [夢想藍圖](https://xitian.page/dream/) |
+
+### 維護夢想藍圖
+
+完整原始碼、教材與測試放在 [projects/dream-blueprint](./projects/dream-blueprint/)，操作方式見[專案說明](./projects/dream-blueprint/README.md)。更新 App 時請在該資料夾安裝依賴、測試並建置，將產出的靜態檔案發佈到根目錄的 [dream](./dream/) 資料夾。Body 首頁和日韓學習室沿用下方原有的維護方式。
+
+
 - `index.html`、`style.css`：Body 首頁（方塊拼貼）
 - `comic/`：《西天》線上漫畫
 - `nursing/`：內科黑板課目錄（心臟、血液、免疫、腫瘤）

@@ -1,0 +1,18 @@
+.vocab-area { display: grid; gap: .8rem; min-width: 0; }
+.vocab-area p { line-height: 1.6; }
+.vocab-tabs { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.vocab-area button { cursor: pointer; padding: .55rem .8rem; color: inherit; font: inherit; background: transparent; border: 1px solid currentColor; border-radius: .7rem; }
+.vocab-tabs [aria-pressed="true"] { background: #7953b530; }
+.vocab-panel { display: grid; justify-items: start; gap: .55rem; }
+.vocab-panel article { margin: .3rem 0; }
+.vocab-panel p { margin: .15rem 0 .45rem; }
+.vocab-term { display: block; font-size: 1.35rem; line-height: 1.5; overflow-wrap: anywhere; }
+.vocab-area details { font-size: .88rem; }
+.vocab-area details summary { cursor:pointer; }
+.vocab-area a { color:inherit; text-underline-offset: 3px; }
+.vocab-results { list-style:none; display:grid; gap:.5rem; width:100%; padding:0; margin:.25rem 0; }
+.vocab-results li { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.45rem; border-bottom:1px solid #8976ab50; padding:.4rem 0; }
+.vocab-results li span { min-width:0; overflow-wrap:anywhere; }
+.vocab-results button { flex:none; }
+.vocab-panel input,.vocab-panel select { max-width:100%; color:inherit; background:transparent; border:1px solid currentColor; padding:.5rem; border-radius:.4rem; }
+.vocab-panel select option { color:CanvasText; background:Canvas; }

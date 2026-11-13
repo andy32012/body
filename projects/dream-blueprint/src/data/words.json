@@ -1,0 +1,482 @@
+[
+  {
+    "id": "w-001",
+    "topic": "疼痛",
+    "en": "pain",
+    "zh": "疼痛",
+    "example": "Where do you feel the pain?",
+    "exampleZh": "你覺得哪裡痛？"
+  },
+  {
+    "id": "w-002",
+    "topic": "疼痛",
+    "en": "hurt",
+    "zh": "痛",
+    "example": "Does your back hurt?",
+    "exampleZh": "你的背會痛嗎？"
+  },
+  {
+    "id": "w-003",
+    "topic": "疼痛",
+    "en": "sharp",
+    "zh": "尖銳的",
+    "example": "Is it a sharp pain?",
+    "exampleZh": "是刺痛嗎？"
+  },
+  {
+    "id": "w-004",
+    "topic": "疼痛",
+    "en": "dull",
+    "zh": "悶悶的",
+    "example": "I have a dull ache in my knee.",
+    "exampleZh": "我的膝蓋悶悶地痛。"
+  },
+  {
+    "id": "w-005",
+    "topic": "疼痛",
+    "en": "sore",
+    "zh": "痠痛的",
+    "example": "My arm feels sore.",
+    "exampleZh": "我的手臂覺得痠痛。"
+  },
+  {
+    "id": "w-006",
+    "topic": "疼痛",
+    "en": "back",
+    "zh": "背部",
+    "example": "My back hurts when I sit.",
+    "exampleZh": "我坐著的時候背會痛。"
+  },
+  {
+    "id": "w-007",
+    "topic": "疼痛",
+    "en": "knee",
+    "zh": "膝蓋",
+    "example": "Which knee hurts?",
+    "exampleZh": "哪一邊的膝蓋痛？"
+  },
+  {
+    "id": "w-008",
+    "topic": "疼痛",
+    "en": "point",
+    "zh": "指出",
+    "example": "Can you point to the spot?",
+    "exampleZh": "你可以指出那個位置嗎？"
+  },
+  {
+    "id": "w-009",
+    "topic": "疼痛",
+    "en": "worse",
+    "zh": "更嚴重的",
+    "example": "Is the pain worse now?",
+    "exampleZh": "現在更痛了嗎？"
+  },
+  {
+    "id": "w-010",
+    "topic": "疼痛",
+    "en": "better",
+    "zh": "好一些",
+    "example": "Does your arm feel better?",
+    "exampleZh": "你的手臂有好一點嗎？"
+  },
+  {
+    "id": "w-011",
+    "topic": "心臟血管",
+    "en": "heart",
+    "zh": "心臟",
+    "example": "I can feel my heart beating fast.",
+    "exampleZh": "我感覺到自己的心跳很快。"
+  },
+  {
+    "id": "w-012",
+    "topic": "心臟血管",
+    "en": "chest",
+    "zh": "胸部",
+    "example": "Does your chest hurt?",
+    "exampleZh": "你的胸口會痛嗎？"
+  },
+  {
+    "id": "w-013",
+    "topic": "心臟血管",
+    "en": "pulse",
+    "zh": "脈搏",
+    "example": "May I check your pulse?",
+    "exampleZh": "我可以量你的脈搏嗎？"
+  },
+  {
+    "id": "w-014",
+    "topic": "心臟血管",
+    "en": "wrist",
+    "zh": "手腕",
+    "example": "May I touch your wrist?",
+    "exampleZh": "我可以碰你的手腕嗎？"
+  },
+  {
+    "id": "w-015",
+    "topic": "心臟血管",
+    "en": "blood pressure",
+    "zh": "血壓",
+    "example": "I wrote down your blood pressure.",
+    "exampleZh": "我記下了你的血壓。"
+  },
+  {
+    "id": "w-016",
+    "topic": "心臟血管",
+    "en": "cuff",
+    "zh": "壓脈帶",
+    "example": "Is the cuff too tight?",
+    "exampleZh": "壓脈帶太緊了嗎？"
+  },
+  {
+    "id": "w-017",
+    "topic": "心臟血管",
+    "en": "tight",
+    "zh": "緊的",
+    "example": "My sleeve is too tight.",
+    "exampleZh": "我的袖子太緊了。"
+  },
+  {
+    "id": "w-018",
+    "topic": "身體評估",
+    "en": "dizzy",
+    "zh": "頭暈的",
+    "example": "Do you feel dizzy now?",
+    "exampleZh": "你現在覺得頭暈嗎？"
+  },
+  {
+    "id": "w-019",
+    "topic": "身體評估",
+    "en": "breath",
+    "zh": "一口氣；呼吸",
+    "example": "I feel short of breath.",
+    "exampleZh": "我覺得喘不過氣。"
+  },
+  {
+    "id": "w-020",
+    "topic": "身體評估",
+    "en": "ankle",
+    "zh": "腳踝",
+    "example": "My left ankle feels stiff.",
+    "exampleZh": "我的左腳踝覺得僵硬。"
+  },
+  {
+    "id": "w-021",
+    "topic": "用藥溝通",
+    "en": "medicine",
+    "zh": "藥",
+    "example": "Do you take any medicine at home?",
+    "exampleZh": "你在家有服用藥物嗎？"
+  },
+  {
+    "id": "w-022",
+    "topic": "用藥溝通",
+    "en": "tablet",
+    "zh": "藥錠",
+    "example": "The tablet is small.",
+    "exampleZh": "這顆藥錠很小。"
+  },
+  {
+    "id": "w-023",
+    "topic": "用藥溝通",
+    "en": "capsule",
+    "zh": "膠囊",
+    "example": "The capsule is in the box.",
+    "exampleZh": "膠囊在盒子裡。"
+  },
+  {
+    "id": "w-024",
+    "topic": "用藥溝通",
+    "en": "label",
+    "zh": "標籤",
+    "example": "May I see the label?",
+    "exampleZh": "我可以看一下標籤嗎？"
+  },
+  {
+    "id": "w-025",
+    "topic": "用藥溝通",
+    "en": "dose",
+    "zh": "一劑；一次的劑量",
+    "example": "When was your last dose?",
+    "exampleZh": "你上一次用藥是什麼時候？"
+  },
+  {
+    "id": "w-026",
+    "topic": "用藥溝通",
+    "en": "allergy",
+    "zh": "過敏",
+    "example": "Do you have any drug allergies?",
+    "exampleZh": "你有任何藥物過敏嗎？"
+  },
+  {
+    "id": "w-027",
+    "topic": "用藥溝通",
+    "en": "list",
+    "zh": "清單",
+    "example": "I have a list of my medicines.",
+    "exampleZh": "我有一份自己的用藥清單。"
+  },
+  {
+    "id": "w-028",
+    "topic": "用藥溝通",
+    "en": "swallow",
+    "zh": "吞下",
+    "example": "Is it hard to swallow?",
+    "exampleZh": "吞嚥有困難嗎？"
+  },
+  {
+    "id": "w-029",
+    "topic": "用藥溝通",
+    "en": "bottle",
+    "zh": "瓶子",
+    "example": "The bottle is on the table.",
+    "exampleZh": "瓶子在桌上。"
+  },
+  {
+    "id": "w-030",
+    "topic": "用藥溝通",
+    "en": "name",
+    "zh": "名稱；名字",
+    "example": "What is the name of this medicine?",
+    "exampleZh": "這個藥叫什麼名字？"
+  },
+  {
+    "id": "w-031",
+    "topic": "癌症照護",
+    "en": "cancer",
+    "zh": "癌症",
+    "example": "She has questions about cancer care.",
+    "exampleZh": "她有一些關於癌症照護的問題。"
+  },
+  {
+    "id": "w-032",
+    "topic": "癌症照護",
+    "en": "treatment",
+    "zh": "治療",
+    "example": "How did you feel after treatment?",
+    "exampleZh": "治療後你覺得怎麼樣？"
+  },
+  {
+    "id": "w-033",
+    "topic": "癌症照護",
+    "en": "tired",
+    "zh": "累的",
+    "example": "I felt tired yesterday.",
+    "exampleZh": "我昨天覺得很累。"
+  },
+  {
+    "id": "w-034",
+    "topic": "癌症照護",
+    "en": "appetite",
+    "zh": "食慾",
+    "example": "How is your appetite today?",
+    "exampleZh": "你今天的食慾如何？"
+  },
+  {
+    "id": "w-035",
+    "topic": "癌症照護",
+    "en": "nausea",
+    "zh": "噁心感",
+    "example": "When did the nausea start?",
+    "exampleZh": "噁心感是什麼時候開始的？"
+  },
+  {
+    "id": "w-036",
+    "topic": "癌症照護",
+    "en": "rest",
+    "zh": "休息",
+    "example": "I need a little rest.",
+    "exampleZh": "我需要休息一下。"
+  },
+  {
+    "id": "w-037",
+    "topic": "癌症照護",
+    "en": "visit",
+    "zh": "探訪；就診",
+    "example": "My sister will visit today.",
+    "exampleZh": "我姊姊今天會來探望我。"
+  },
+  {
+    "id": "w-038",
+    "topic": "癌症照護",
+    "en": "blanket",
+    "zh": "毯子",
+    "example": "Would you like another blanket?",
+    "exampleZh": "你想再多一條毯子嗎？"
+  },
+  {
+    "id": "w-039",
+    "topic": "病理與檢驗",
+    "en": "sample",
+    "zh": "檢體；樣本",
+    "example": "The sample has a label.",
+    "exampleZh": "這份檢體上有標籤。"
+  },
+  {
+    "id": "w-040",
+    "topic": "病理與檢驗",
+    "en": "tissue",
+    "zh": "組織",
+    "example": "This is a tissue sample.",
+    "exampleZh": "這是一份組織檢體。"
+  },
+  {
+    "id": "w-041",
+    "topic": "病理與檢驗",
+    "en": "cell",
+    "zh": "細胞",
+    "example": "We looked at cells in class.",
+    "exampleZh": "我們在課堂上觀察了細胞。"
+  },
+  {
+    "id": "w-042",
+    "topic": "病理與檢驗",
+    "en": "blood",
+    "zh": "血液",
+    "example": "This is a blood sample.",
+    "exampleZh": "這是一份血液檢體。"
+  },
+  {
+    "id": "w-043",
+    "topic": "病理與檢驗",
+    "en": "report",
+    "zh": "報告",
+    "example": "The report is ready.",
+    "exampleZh": "報告已經好了。"
+  },
+  {
+    "id": "w-044",
+    "topic": "病理與檢驗",
+    "en": "result",
+    "zh": "結果",
+    "example": "When will I get the results?",
+    "exampleZh": "我什麼時候會拿到結果？"
+  },
+  {
+    "id": "w-045",
+    "topic": "病理與檢驗",
+    "en": "test",
+    "zh": "檢查；檢驗",
+    "example": "What time is the test?",
+    "exampleZh": "檢查是幾點？"
+  },
+  {
+    "id": "w-046",
+    "topic": "病理與檢驗",
+    "en": "lab",
+    "zh": "實驗室；檢驗室",
+    "example": "The sample is in the lab.",
+    "exampleZh": "這份檢體在檢驗室。"
+  },
+  {
+    "id": "w-047",
+    "topic": "日常溝通",
+    "en": "feel",
+    "zh": "感覺",
+    "example": "How do you feel now?",
+    "exampleZh": "你現在覺得怎麼樣？"
+  },
+  {
+    "id": "w-048",
+    "topic": "日常溝通",
+    "en": "need",
+    "zh": "需要",
+    "example": "Do you need help?",
+    "exampleZh": "你需要幫忙嗎？"
+  },
+  {
+    "id": "w-049",
+    "topic": "日常溝通",
+    "en": "before",
+    "zh": "在……之前",
+    "example": "I felt cold before lunch.",
+    "exampleZh": "我在午餐前覺得冷。"
+  },
+  {
+    "id": "w-050",
+    "topic": "日常溝通",
+    "en": "after",
+    "zh": "在……之後",
+    "example": "I slept after lunch.",
+    "exampleZh": "我午餐後睡了一覺。"
+  },
+  {
+    "id": "w-051",
+    "topic": "日常溝通",
+    "en": "water",
+    "zh": "水",
+    "example": "I would like some water.",
+    "exampleZh": "我想喝點水。"
+  },
+  {
+    "id": "w-052",
+    "topic": "日常溝通",
+    "en": "today",
+    "zh": "今天",
+    "example": "Who is your nurse today?",
+    "exampleZh": "今天照顧你的護理師是誰？"
+  },
+  {
+    "id": "w-053",
+    "topic": "日常溝通",
+    "en": "again",
+    "zh": "再一次",
+    "example": "Could you say that again?",
+    "exampleZh": "你可以再說一次嗎？"
+  },
+  {
+    "id": "w-054",
+    "topic": "日常溝通",
+    "en": "slowly",
+    "zh": "慢慢地",
+    "example": "Could you speak more slowly?",
+    "exampleZh": "你可以說慢一點嗎？"
+  },
+  {
+    "id": "w-055",
+    "topic": "日常溝通",
+    "en": "understand",
+    "zh": "理解",
+    "example": "I understand your question.",
+    "exampleZh": "我聽懂你的問題了。"
+  },
+  {
+    "id": "w-056",
+    "topic": "日常溝通",
+    "en": "question",
+    "zh": "問題",
+    "example": "Do you have a question?",
+    "exampleZh": "你有問題想問嗎？"
+  },
+  {
+    "id": "w-057",
+    "topic": "病房溝通",
+    "en": "nurse",
+    "zh": "護理師",
+    "example": "Your nurse is here.",
+    "exampleZh": "照顧你的護理師來了。"
+  },
+  {
+    "id": "w-058",
+    "topic": "病房溝通",
+    "en": "patient",
+    "zh": "病人",
+    "example": "The patient is resting.",
+    "exampleZh": "這位病人正在休息。"
+  },
+  {
+    "id": "w-059",
+    "topic": "病房溝通",
+    "en": "call button",
+    "zh": "呼叫鈴按鈕",
+    "example": "Can you reach the call button?",
+    "exampleZh": "你碰得到呼叫鈴按鈕嗎？"
+  },
+  {
+    "id": "w-060",
+    "topic": "病房溝通",
+    "en": "room",
+    "zh": "房間；病室",
+    "example": "I am in my room.",
+    "exampleZh": "我在自己的房間裡。"
+  }
+]

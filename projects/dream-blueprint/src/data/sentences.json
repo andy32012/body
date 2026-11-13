@@ -1,0 +1,882 @@
+[
+  {
+    "id": "s-001",
+    "topic": "病房溝通",
+    "zh": "這位病人醒著。",
+    "grammar": [
+      "be 動詞"
+    ],
+    "hints": [
+      "看看主詞後面連接狀態的動詞。",
+      "單數的這位病人要搭配 is。"
+    ],
+    "reference": [
+      "This patient is awake."
+    ],
+    "why": "awake 表示醒著，前面用 is 連接主詞。",
+    "newWords": [
+      {
+        "en": "patient",
+        "zh": "病人"
+      }
+    ]
+  },
+  {
+    "id": "s-002",
+    "topic": "疼痛",
+    "zh": "你哪裡痛？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "檢查看看，問的位置放在句子哪裡？",
+      "問地點用 where，接著用 do you 加原形動詞。"
+    ],
+    "reference": [
+      "Where do you feel the pain?"
+    ],
+    "why": "where 問位置，feel the pain 是感覺到疼痛。",
+    "newWords": [
+      {
+        "en": "pain",
+        "zh": "疼痛"
+      }
+    ]
+  },
+  {
+    "id": "s-003",
+    "topic": "疼痛",
+    "zh": "你的背會痛嗎？",
+    "grammar": [
+      "現在簡單式疑問句"
+    ],
+    "hints": [
+      "看看主詞和問句開頭的助動詞。",
+      "your back 是單數，問句用 does，後面的動詞留原形。"
+    ],
+    "reference": [
+      "Does your back hurt?"
+    ],
+    "why": "does 已經配合單數主詞變化，hurt 保持原形。",
+    "newWords": [
+      {
+        "en": "hurt",
+        "zh": "痛"
+      }
+    ]
+  },
+  {
+    "id": "s-004",
+    "topic": "疼痛",
+    "zh": "這是一陣刺痛。",
+    "grammar": [
+      "冠詞"
+    ],
+    "hints": [
+      "檢查疼痛前面的形容詞和冠詞。",
+      "這裡在說一陣特定的痛，sharp 前面可以用 a。"
+    ],
+    "reference": [
+      "It is a sharp pain."
+    ],
+    "why": "a sharp pain 指一陣尖銳的痛。",
+    "newWords": [
+      {
+        "en": "sharp",
+        "zh": "尖銳的"
+      }
+    ]
+  },
+  {
+    "id": "s-005",
+    "topic": "疼痛",
+    "zh": "我的手臂覺得痠痛。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "檢查主詞是單數還是複數。",
+      "主詞 my arm 是單數，現在式的 feel 字尾加 s。"
+    ],
+    "reference": [
+      "My arm feels sore."
+    ],
+    "why": "feel 後面接狀態，sore 是痠痛的。",
+    "newWords": [
+      {
+        "en": "sore",
+        "zh": "痠痛的"
+      }
+    ]
+  },
+  {
+    "id": "s-006",
+    "topic": "疼痛",
+    "zh": "你可以指出哪裡痛嗎？",
+    "grammar": [
+      "情態動詞"
+    ],
+    "hints": [
+      "檢查表示能不能的詞和後面的動詞。",
+      "用 can you 開頭，接動詞原形；指出位置用 point to。"
+    ],
+    "reference": [
+      "Can you point to where it hurts?"
+    ],
+    "why": "can 後面接原形。where it hurts 表示疼痛的位置。",
+    "newWords": [
+      {
+        "en": "point",
+        "zh": "指出"
+      }
+    ]
+  },
+  {
+    "id": "s-007",
+    "topic": "疼痛",
+    "zh": "我的左膝蓋會痛。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "看看是哪一個部位在痛。",
+      "只有一個膝蓋，現在式 hurt 的字尾要變化。"
+    ],
+    "reference": [
+      "My left knee hurts."
+    ],
+    "why": "my left knee 是單數，動詞用 hurts。",
+    "newWords": [
+      {
+        "en": "knee",
+        "zh": "膝蓋"
+      }
+    ]
+  },
+  {
+    "id": "s-008",
+    "topic": "疼痛",
+    "zh": "你的背有好一點嗎？",
+    "grammar": [
+      "比較級"
+    ],
+    "hints": [
+      "檢查「好一點」的說法。",
+      "feel 後面可以用 good 的比較級 better。"
+    ],
+    "reference": [
+      "Does your back feel better?"
+    ],
+    "why": "feel better 表示感覺有改善。",
+    "newWords": [
+      {
+        "en": "better",
+        "zh": "好一些"
+      }
+    ]
+  },
+  {
+    "id": "s-009",
+    "topic": "心臟血管",
+    "zh": "我可以量你的脈搏嗎？",
+    "grammar": [
+      "請求許可"
+    ],
+    "hints": [
+      "檢查這句是誰想徵求許可。",
+      "開頭可以用 may I，後面接原形動詞。"
+    ],
+    "reference": [
+      "May I check your pulse?"
+    ],
+    "why": "May I check ...? 是先徵求對方同意的問法。",
+    "newWords": [
+      {
+        "en": "pulse",
+        "zh": "脈搏"
+      }
+    ]
+  },
+  {
+    "id": "s-010",
+    "topic": "心臟血管",
+    "zh": "我的右手腕會痛。",
+    "grammar": [
+      "形容詞位置"
+    ],
+    "hints": [
+      "檢查方向詞放在身體部位的前面還是後面。",
+      "「右手腕」用 right wrist，整個主詞是單數。"
+    ],
+    "reference": [
+      "My right wrist hurts."
+    ],
+    "why": "right 放在 wrist 前面，動詞用 hurts。",
+    "newWords": [
+      {
+        "en": "wrist",
+        "zh": "手腕"
+      }
+    ]
+  },
+  {
+    "id": "s-011",
+    "topic": "心臟血管",
+    "zh": "我記下了你的血壓。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "檢查已做完的動作要用哪個時態。",
+      "「記下」用 write down，write 的過去式是 wrote。"
+    ],
+    "reference": [
+      "I wrote down your blood pressure."
+    ],
+    "why": "wrote down 表示已經記下來。",
+    "newWords": [
+      {
+        "en": "blood pressure",
+        "zh": "血壓"
+      }
+    ]
+  },
+  {
+    "id": "s-012",
+    "topic": "心臟血管",
+    "zh": "這個壓脈帶太緊了。",
+    "grammar": [
+      "程度副詞"
+    ],
+    "hints": [
+      "檢查表示「太……」的字放在哪裡。",
+      "太緊用 too tight，單數的 cuff 配 is。"
+    ],
+    "reference": [
+      "This cuff is too tight."
+    ],
+    "why": "too 放在形容詞前面，表示程度超過合適範圍。",
+    "newWords": [
+      {
+        "en": "cuff",
+        "zh": "壓脈帶"
+      }
+    ]
+  },
+  {
+    "id": "s-013",
+    "topic": "身體評估",
+    "zh": "你現在覺得頭暈嗎？",
+    "grammar": [
+      "現在簡單式疑問句"
+    ],
+    "hints": [
+      "檢查用來問感受的動詞。",
+      "用 do you feel 加上描述感受的形容詞。"
+    ],
+    "reference": [
+      "Do you feel dizzy now?"
+    ],
+    "why": "dizzy 表示頭暈，feel dizzy 就是覺得頭暈。",
+    "newWords": [
+      {
+        "en": "dizzy",
+        "zh": "頭暈的"
+      }
+    ]
+  },
+  {
+    "id": "s-014",
+    "topic": "心臟血管",
+    "zh": "我昨天胸口痛。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "檢查「昨天」對動詞時態的影響。",
+      "hurt 的原形和過去式拼法相同。"
+    ],
+    "reference": [
+      "My chest hurt yesterday."
+    ],
+    "why": "yesterday 指過去。hurt 在這裡是過去式。",
+    "newWords": [
+      {
+        "en": "chest",
+        "zh": "胸部"
+      }
+    ]
+  },
+  {
+    "id": "s-015",
+    "topic": "用藥溝通",
+    "zh": "你在家有服用藥物嗎？",
+    "grammar": [
+      "現在簡單式疑問句"
+    ],
+    "hints": [
+      "檢查看看問的是平時的習慣還是此刻的動作。",
+      "問平時有沒有服藥，可用 do you take any medicine。"
+    ],
+    "reference": [
+      "Do you take any medicine at home?"
+    ],
+    "why": "take medicine 表示服藥，at home 表示在家。",
+    "newWords": [
+      {
+        "en": "medicine",
+        "zh": "藥"
+      }
+    ]
+  },
+  {
+    "id": "s-016",
+    "topic": "用藥溝通",
+    "zh": "這顆藥錠很小。",
+    "grammar": [
+      "be 動詞"
+    ],
+    "hints": [
+      "檢查指的是一顆還是好幾顆。",
+      "this tablet 是單數，用 is 連接形容詞。"
+    ],
+    "reference": [
+      "This tablet is small."
+    ],
+    "why": "small 描述藥錠的大小。",
+    "newWords": [
+      {
+        "en": "tablet",
+        "zh": "藥錠"
+      }
+    ]
+  },
+  {
+    "id": "s-017",
+    "topic": "用藥溝通",
+    "zh": "盒子裡有兩顆膠囊。",
+    "grammar": [
+      "單複數"
+    ],
+    "hints": [
+      "檢查數量對名詞和動詞的影響。",
+      "兩顆用 two capsules，兩個以上的存在句用 there are。"
+    ],
+    "reference": [
+      "There are two capsules in the box."
+    ],
+    "why": "capsule 是可數名詞，two 後面用複數。",
+    "newWords": [
+      {
+        "en": "capsule",
+        "zh": "膠囊"
+      }
+    ]
+  },
+  {
+    "id": "s-018",
+    "topic": "用藥溝通",
+    "zh": "我可以看一下標籤嗎？",
+    "grammar": [
+      "冠詞"
+    ],
+    "hints": [
+      "檢查指的是眼前哪一張標籤。",
+      "雙方知道是哪一張標籤，可用 the label。"
+    ],
+    "reference": [
+      "May I see the label?"
+    ],
+    "why": "may I see 用來詢問是否能看一下。",
+    "newWords": [
+      {
+        "en": "label",
+        "zh": "標籤"
+      }
+    ]
+  },
+  {
+    "id": "s-019",
+    "topic": "用藥溝通",
+    "zh": "你有任何藥物過敏嗎？",
+    "grammar": [
+      "名詞複數"
+    ],
+    "hints": [
+      "檢查過敏的複數拼法。",
+      "allergy 的複數要把 y 改成 ies。"
+    ],
+    "reference": [
+      "Do you have any drug allergies?"
+    ],
+    "why": "any drug allergies 用來詢問有沒有藥物過敏。",
+    "newWords": [
+      {
+        "en": "allergy",
+        "zh": "過敏"
+      }
+    ]
+  },
+  {
+    "id": "s-020",
+    "topic": "用藥溝通",
+    "zh": "吞嚥有困難嗎？",
+    "grammar": [
+      "不定詞"
+    ],
+    "hints": [
+      "檢查形容詞後面如何接動作。",
+      "用 is it hard to 加上動詞原形。"
+    ],
+    "reference": [
+      "Is it hard to swallow?"
+    ],
+    "why": "hard to swallow 表示難以吞嚥。",
+    "newWords": [
+      {
+        "en": "swallow",
+        "zh": "吞下"
+      }
+    ]
+  },
+  {
+    "id": "s-021",
+    "topic": "癌症照護",
+    "zh": "我昨天覺得很累。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "檢查句中的時間和動詞。",
+      "feel 的過去式是 felt。"
+    ],
+    "reference": [
+      "I felt very tired yesterday."
+    ],
+    "why": "昨天的感受用 felt，tired 描述人的狀態。",
+    "newWords": [
+      {
+        "en": "tired",
+        "zh": "累的"
+      }
+    ]
+  },
+  {
+    "id": "s-022",
+    "topic": "癌症照護",
+    "zh": "你今天的食慾如何？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "檢查詢問狀態的疑問詞。",
+      "問狀態用 how，後面接 is your appetite。"
+    ],
+    "reference": [
+      "How is your appetite today?"
+    ],
+    "why": "how 在這裡詢問食慾的狀況。",
+    "newWords": [
+      {
+        "en": "appetite",
+        "zh": "食慾"
+      }
+    ]
+  },
+  {
+    "id": "s-023",
+    "topic": "癌症照護",
+    "zh": "噁心感是什麼時候開始的？",
+    "grammar": [
+      "過去式疑問句"
+    ],
+    "hints": [
+      "檢查問時間的詞和助動詞。",
+      "用 when did，start 留原形。"
+    ],
+    "reference": [
+      "When did the nausea start?"
+    ],
+    "why": "did 已表達過去，後面的 start 不再變化。",
+    "newWords": [
+      {
+        "en": "nausea",
+        "zh": "噁心感"
+      }
+    ]
+  },
+  {
+    "id": "s-024",
+    "topic": "癌症照護",
+    "zh": "我需要休息一下。",
+    "grammar": [
+      "不可數名詞"
+    ],
+    "hints": [
+      "檢查「一點」如何搭配休息。",
+      "rest 在這裡指休息，用 a little 表示少量。"
+    ],
+    "reference": [
+      "I need a little rest."
+    ],
+    "why": "a little rest 表示休息一下。",
+    "newWords": [
+      {
+        "en": "rest",
+        "zh": "休息"
+      }
+    ]
+  },
+  {
+    "id": "s-025",
+    "topic": "癌症照護",
+    "zh": "我的姊姊今天會來探望我。",
+    "grammar": [
+      "未來式"
+    ],
+    "hints": [
+      "檢查表示未來的詞後面接什麼。",
+      "用 will 加原形動詞 visit。"
+    ],
+    "reference": [
+      "My sister will visit me today."
+    ],
+    "why": "visit me 就是來探望我。",
+    "newWords": [
+      {
+        "en": "visit",
+        "zh": "探訪；就診"
+      }
+    ]
+  },
+  {
+    "id": "s-026",
+    "topic": "癌症照護",
+    "zh": "你想再多一條毯子嗎？",
+    "grammar": [
+      "禮貌問句"
+    ],
+    "hints": [
+      "檢查詢問對方意願的句型。",
+      "用 would you like，另一條用 another 加單數名詞。"
+    ],
+    "reference": [
+      "Would you like another blanket?"
+    ],
+    "why": "another blanket 表示再一條毯子。",
+    "newWords": [
+      {
+        "en": "blanket",
+        "zh": "毯子"
+      }
+    ]
+  },
+  {
+    "id": "s-027",
+    "topic": "病理與檢驗",
+    "zh": "這份檢體上有標籤。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "檢查主詞和「有」的動詞。",
+      "this sample 是單數，have 要改成 has。"
+    ],
+    "reference": [
+      "This sample has a label."
+    ],
+    "why": "a label 表示一張標籤。",
+    "newWords": [
+      {
+        "en": "sample",
+        "zh": "檢體；樣本"
+      }
+    ]
+  },
+  {
+    "id": "s-028",
+    "topic": "病理與檢驗",
+    "zh": "這是一份組織檢體。",
+    "grammar": [
+      "冠詞"
+    ],
+    "hints": [
+      "檢查一份檢體前面的冠詞。",
+      "tissue 的開頭是子音音素，前面用 a。"
+    ],
+    "reference": [
+      "This is a tissue sample."
+    ],
+    "why": "tissue sample 表示組織檢體。",
+    "newWords": [
+      {
+        "en": "tissue",
+        "zh": "組織"
+      }
+    ]
+  },
+  {
+    "id": "s-029",
+    "topic": "病理與檢驗",
+    "zh": "我們昨天在課堂上觀察了細胞。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "檢查觀察的動作是否已經發生。",
+      "look at 是看，昨天做的事用 looked at。"
+    ],
+    "reference": [
+      "We looked at cells in class yesterday."
+    ],
+    "why": "cells 是多個細胞，in class 表示在課堂上。",
+    "newWords": [
+      {
+        "en": "cell",
+        "zh": "細胞"
+      }
+    ]
+  },
+  {
+    "id": "s-030",
+    "topic": "病理與檢驗",
+    "zh": "報告已經好了。",
+    "grammar": [
+      "be 動詞"
+    ],
+    "hints": [
+      "檢查表示「已備妥」的形容詞如何連接主詞。",
+      "ready 是形容詞，單數的 report 要配 is。"
+    ],
+    "reference": [
+      "The report is ready."
+    ],
+    "why": "is ready 表示目前已經備妥。",
+    "newWords": [
+      {
+        "en": "report",
+        "zh": "報告"
+      }
+    ]
+  },
+  {
+    "id": "s-031",
+    "topic": "病理與檢驗",
+    "zh": "這份血液檢體在檢驗室。",
+    "grammar": [
+      "位置介系詞"
+    ],
+    "hints": [
+      "檢查表示在某個空間裡的介系詞。",
+      "在檢驗室裡用 in the lab。"
+    ],
+    "reference": [
+      "The blood sample is in the lab."
+    ],
+    "why": "blood sample 指血液檢體，is in 表示所在位置。",
+    "newWords": [
+      {
+        "en": "lab",
+        "zh": "實驗室；檢驗室"
+      }
+    ]
+  },
+  {
+    "id": "s-032",
+    "topic": "日常溝通",
+    "zh": "你今天覺得怎麼樣？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "檢查要問的是感受還是地點。",
+      "問感受可用 how do you feel。"
+    ],
+    "reference": [
+      "How do you feel today?"
+    ],
+    "why": "how 問狀態，today 表示今天。",
+    "newWords": [
+      {
+        "en": "feel",
+        "zh": "感覺"
+      }
+    ]
+  },
+  {
+    "id": "s-033",
+    "topic": "日常溝通",
+    "zh": "你需要幫忙嗎？",
+    "grammar": [
+      "現在簡單式疑問句"
+    ],
+    "hints": [
+      "檢查主詞 you 前面的助動詞。",
+      "現在式問句用 do you，need 留原形。"
+    ],
+    "reference": [
+      "Do you need help?"
+    ],
+    "why": "help 在這裡指協助，可以直接接在 need 後面。",
+    "newWords": [
+      {
+        "en": "need",
+        "zh": "需要"
+      }
+    ]
+  },
+  {
+    "id": "s-034",
+    "topic": "日常溝通",
+    "zh": "我在午餐前覺得冷。",
+    "grammar": [
+      "時間介系詞"
+    ],
+    "hints": [
+      "檢查事情發生在午餐的哪一側。",
+      "午餐以前用 before lunch。"
+    ],
+    "reference": [
+      "I felt cold before lunch."
+    ],
+    "why": "用 felt 描述當時的感受，before 表示在……之前。",
+    "newWords": [
+      {
+        "en": "before",
+        "zh": "在……之前"
+      }
+    ]
+  },
+  {
+    "id": "s-035",
+    "topic": "日常溝通",
+    "zh": "我午餐後睡了一覺。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "檢查「睡」的時態。",
+      "sleep 的過去式是 slept，餐後用 after lunch。"
+    ],
+    "reference": [
+      "I slept after lunch."
+    ],
+    "why": "slept 描述已經發生的睡眠。",
+    "newWords": [
+      {
+        "en": "after",
+        "zh": "在……之後"
+      }
+    ]
+  },
+  {
+    "id": "s-036",
+    "topic": "日常溝通",
+    "zh": "你可以再說一次嗎？",
+    "grammar": [
+      "禮貌請求"
+    ],
+    "hints": [
+      "檢查「再一次」放在哪裡。",
+      "用 could you say that，加上 again 表示再一次。"
+    ],
+    "reference": [
+      "Could you say that again?"
+    ],
+    "why": "could you 加原形動詞是禮貌的請求。",
+    "newWords": [
+      {
+        "en": "again",
+        "zh": "再一次"
+      }
+    ]
+  },
+  {
+    "id": "s-037",
+    "topic": "日常溝通",
+    "zh": "你可以說慢一點嗎？",
+    "grammar": [
+      "副詞比較級"
+    ],
+    "hints": [
+      "檢查修飾「說」這個動作的詞。",
+      "slowly 描述說話的速度，加 more 表示慢一點。"
+    ],
+    "reference": [
+      "Could you speak more slowly?"
+    ],
+    "why": "speak more slowly 表示用比較慢的速度說。",
+    "newWords": [
+      {
+        "en": "slowly",
+        "zh": "慢慢地"
+      }
+    ]
+  },
+  {
+    "id": "s-038",
+    "topic": "日常溝通",
+    "zh": "你有問題想問嗎？",
+    "grammar": [
+      "冠詞"
+    ],
+    "hints": [
+      "檢查單數的可數名詞前面。",
+      "question 是可數名詞，單說一個問題時前面用 a。"
+    ],
+    "reference": [
+      "Do you have a question?"
+    ],
+    "why": "have a question 表示有一個問題。",
+    "newWords": [
+      {
+        "en": "question",
+        "zh": "問題"
+      }
+    ]
+  },
+  {
+    "id": "s-039",
+    "topic": "病房溝通",
+    "zh": "照顧你的護理師來了。",
+    "grammar": [
+      "所有格"
+    ],
+    "hints": [
+      "檢查「你的」如何放在護理師前面。",
+      "用 your nurse，現在已經到了可用 is here。"
+    ],
+    "reference": [
+      "Your nurse is here."
+    ],
+    "why": "your nurse 指照顧你的護理師。",
+    "newWords": [
+      {
+        "en": "nurse",
+        "zh": "護理師"
+      }
+    ]
+  },
+  {
+    "id": "s-040",
+    "topic": "病房溝通",
+    "zh": "你碰得到呼叫鈴按鈕嗎？",
+    "grammar": [
+      "情態動詞"
+    ],
+    "hints": [
+      "檢查表示能力的問句開頭。",
+      "用 can you 加上 reach，後面放要碰的東西。"
+    ],
+    "reference": [
+      "Can you reach the call button?"
+    ],
+    "why": "reach 表示手伸過去碰得到。",
+    "newWords": [
+      {
+        "en": "call button",
+        "zh": "呼叫鈴按鈕"
+      }
+    ]
+  }
+]

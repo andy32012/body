@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { getScreeningQueue, isKnownWord, officialWords, wordKey } from '../src/lib/vocab'
+import wordParts from '../src/data/medical-parts.json'
+
+test('六級條目和醫護構詞都有可離線的中文釋義', () => {
+  assert.deepEqual([1,2,3,4,5,6].map(level => officialWords.filter(w => w.level === level).length),
+    [1001,1002,1002,1002,1002,1001])
+  assert.ok(officialWords.every(w => w.zh.trim()))
+  assert.equal(new Set(wordParts.map(entry => entry.part)).size, 60)
+})
+
+test('認得、待學及同義表記都從新字快篩排除', () => {
+  assert.ok(isKnownWord(' Gloves ', ['glove(s)']))
+  assert.ok(isKnownWord('a/an', ['AN']))
+  assert.ok(isKnownWord('argument',['argue(argument)']))
+  const imported = [{en:'gloves', zh:'手套'},{en:'contrast agent',zh:'顯影劑'}]
+  const queue = getScreeningQueue(['glove'], ['contrast agent'], imported)
+  assert.ok(queue.every(w => w.level === 1 || w.level === 2))
+  assert.ok(!queue.some(w => wordKey(w.en) === wordKey('gloves')))
+  assert.ok(!queue.some(w => w.en === 'contrast agent'))
+  assert.equal(getScreeningQueue([],[],[{en:'glove',zh:'手套'}]).filter(w => wordKey(w.en) === wordKey('gloves')).length,1)
+})
+
+test('相同進度保留快篩順序；做完一個就接下一個', () => {
+  const initial = getScreeningQueue([],[],[])
+  const next = getScreeningQueue([initial[0].en],[],[])
+  assert.equal(initial.length,2003)
+  assert.equal(initial[1].en,next[0].en)
+  assert.equal(next.length,2002)
+})

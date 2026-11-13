@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "type": "字首",
+    "part": "hyper-",
+    "meaning": "過高、過多",
+    "example": "hyperglycemia",
+    "translation": "高血糖"
+  },
+  {
+    "id": 2,
+    "type": "字首",
+    "part": "hypo-",
+    "meaning": "過低、不足",
+    "example": "hypoglycemia",
+    "translation": "低血糖"
+  },
+  {
+    "id": 3,
+    "type": "字首",
+    "part": "tachy-",
+    "meaning": "快",
+    "example": "tachycardia",
+    "translation": "心搏過速"
+  },
+  {
+    "id": 4,
+    "type": "字首",
+    "part": "brady-",
+    "meaning": "慢",
+    "example": "bradycardia",
+    "translation": "心搏過緩"
+  },
+  {
+    "id": 5,
+    "type": "字首",
+    "part": "dys-",
+    "meaning": "困難、異常",
+    "example": "dysphagia",
+    "translation": "吞嚥困難"
+  },
+  {
+    "id": 6,
+    "type": "字首",
+    "part": "anti-",
+    "meaning": "對抗",
+    "example": "antiviral",
+    "translation": "抗病毒的"
+  },
+  {
+    "id": 7,
+    "type": "字首",
+    "part": "pre-",
+    "meaning": "之前",
+    "example": "preoperative",
+    "translation": "手術前的"
+  },
+  {
+    "id": 8,
+    "type": "字首",
+    "part": "post-",
+    "meaning": "之後",
+    "example": "postoperative",
+    "translation": "手術後的"
+  },
+  {
+    "id": 9,
+    "type": "字首",
+    "part": "sub-",
+    "meaning": "下方",
+    "example": "subcutaneous",
+    "translation": "皮下的"
+  },
+  {
+    "id": 10,
+    "type": "字首",
+    "part": "intra-",
+    "meaning": "內部",
+    "example": "intravenous",
+    "translation": "靜脈內的"
+  },
+  {
+    "id": 11,
+    "type": "字首",
+    "part": "inter-",
+    "meaning": "之間",
+    "example": "intercostal",
+    "translation": "肋間的"
+  },
+  {
+    "id": 12,
+    "type": "字首",
+    "part": "peri-",
+    "meaning": "周圍",
+    "example": "pericardium",
+    "translation": "心包膜"
+  },
+  {
+    "id": 13,
+    "type": "字首",
+    "part": "endo-",
+    "meaning": "內部",
+    "example": "endocardium",
+    "translation": "心內膜"
+  },
+  {
+    "id": 14,
+    "type": "字首",
+    "part": "epi-",
+    "meaning": "上方、表面",
+    "example": "epidermis",
+    "translation": "表皮"
+  },
+  {
+    "id": 15,
+    "type": "字首",
+    "part": "hemi-",
+    "meaning": "半",
+    "example": "hemiplegia",
+    "translation": "半身癱瘓"
+  },
+  {
+    "id": 16,
+    "type": "字首",
+    "part": "poly-",
+    "meaning": "多",
+    "example": "polyuria",
+    "translation": "多尿"
+  },
+  {
+    "id": 17,
+    "type": "字首",
+    "part": "oligo-",
+    "meaning": "少",
+    "example": "oliguria",
+    "translation": "少尿"
+  },
+  {
+    "id": 18,
+    "type": "字首",
+    "part": "neo-",
+    "meaning": "新",
+    "example": "neonatal",
+    "translation": "新生兒的"
+  },
+  {
+    "id": 19,
+    "type": "字首",
+    "part": "bi-",
+    "meaning": "二、雙",
+    "example": "bilateral",
+    "translation": "雙側的"
+  },
+  {
+    "id": 20,
+    "type": "字首",
+    "part": "trans-",
+    "meaning": "穿過、跨越",
+    "example": "transdermal",
+    "translation": "經皮的"
+  },
+  {
+    "id": 21,
+    "type": "字根",
+    "part": "cardi/o",
+    "meaning": "心臟",
+    "example": "cardiology",
+    "translation": "心臟學"
+  },
+  {
+    "id": 22,
+    "type": "字根",
+    "part": "hepat/o",
+    "meaning": "肝臟",
+    "example": "hepatitis",
+    "translation": "肝炎"
+  },
+  {
+    "id": 23,
+    "type": "字根",
+    "part": "nephr/o",
+    "meaning": "腎臟",
+    "example": "nephritis",
+    "translation": "腎炎"
+  },
+  {
+    "id": 24,
+    "type": "字根",
+    "part": "pulmon/o",
+    "meaning": "肺",
+    "example": "pulmonary",
+    "translation": "肺部的"
+  },
+  {
+    "id": 25,
+    "type": "字根",
+    "part": "gastr/o",
+    "meaning": "胃",
+    "example": "gastritis",
+    "translation": "胃炎"
+  },
+  {
+    "id": 26,
+    "type": "字根",
+    "part": "neur/o",
+    "meaning": "神經",
+    "example": "neuritis",
+    "translation": "神經炎"
+  },
+  {
+    "id": 27,
+    "type": "字根",
+    "part": "dermat/o",
+    "meaning": "皮膚",
+    "example": "dermatitis",
+    "translation": "皮膚炎"
+  },
+  {
+    "id": 28,
+    "type": "字根",
+    "part": "oste/o",
+    "meaning": "骨",
+    "example": "osteocyte",
+    "translation": "骨細胞"
+  },
+  {
+    "id": 29,
+    "type": "字根",
+    "part": "arthr/o",
+    "meaning": "關節",
+    "example": "arthritis",
+    "translation": "關節炎"
+  },
+  {
+    "id": 30,
+    "type": "字根",
+    "part": "my/o",
+    "meaning": "肌肉",
+    "example": "myalgia",
+    "translation": "肌肉痛"
+  },
+  {
+    "id": 31,
+    "type": "字根",
+    "part": "hemat/o",
+    "meaning": "血液",
+    "example": "hematology",
+    "translation": "血液學"
+  },
+  {
+    "id": 32,
+    "type": "字根",
+    "part": "cyt/o",
+    "meaning": "細胞",
+    "example": "cytology",
+    "translation": "細胞學"
+  },
+  {
+    "id": 33,
+    "type": "字根",
+    "part": "enter/o",
+    "meaning": "腸",
+    "example": "enteritis",
+    "translation": "腸炎"
+  },
+  {
+    "id": 34,
+    "type": "字根",
+    "part": "rhin/o",
+    "meaning": "鼻",
+    "example": "rhinitis",
+    "translation": "鼻炎"
+  },
+  {
+    "id": 35,
+    "type": "字根",
+    "part": "ot/o",
+    "meaning": "耳",
+    "example": "otitis",
+    "translation": "耳炎"
+  },
+  {
+    "id": 36,
+    "type": "字根",
+    "part": "ophthalm/o",
+    "meaning": "眼",
+    "example": "ophthalmology",
+    "translation": "眼科學"
+  },
+  {
+    "id": 37,
+    "type": "字根",
+    "part": "phleb/o",
+    "meaning": "靜脈",
+    "example": "phlebitis",
+    "translation": "靜脈炎"
+  },
+  {
+    "id": 38,
+    "type": "字根",
+    "part": "thromb/o",
+    "meaning": "血栓",
+    "example": "thrombosis",
+    "translation": "血栓形成"
+  },
+  {
+    "id": 39,
+    "type": "字根",
+    "part": "splen/o",
+    "meaning": "脾臟",
+    "example": "splenomegaly",
+    "translation": "脾腫大"
+  },
+  {
+    "id": 40,
+    "type": "字根",
+    "part": "trache/o",
+    "meaning": "氣管",
+    "example": "tracheostomy",
+    "translation": "氣管造口術"
+  },
+  {
+    "id": 41,
+    "type": "字尾",
+    "part": "-itis",
+    "meaning": "發炎",
+    "example": "bronchitis",
+    "translation": "支氣管炎"
+  },
+  {
+    "id": 42,
+    "type": "字尾",
+    "part": "-ectomy",
+    "meaning": "切除術",
+    "example": "appendectomy",
+    "translation": "闌尾切除術"
+  },
+  {
+    "id": 43,
+    "type": "字尾",
+    "part": "-emia",
+    "meaning": "血液狀況",
+    "example": "anemia",
+    "translation": "貧血"
+  },
+  {
+    "id": 44,
+    "type": "字尾",
+    "part": "-pnea",
+    "meaning": "呼吸",
+    "example": "apnea",
+    "translation": "呼吸暫停"
+  },
+  {
+    "id": 45,
+    "type": "字尾",
+    "part": "-algia",
+    "meaning": "疼痛",
+    "example": "neuralgia",
+    "translation": "神經痛"
+  },
+  {
+    "id": 46,
+    "type": "字尾",
+    "part": "-megaly",
+    "meaning": "增大",
+    "example": "cardiomegaly",
+    "translation": "心臟擴大"
+  },
+  {
+    "id": 47,
+    "type": "字尾",
+    "part": "-pathy",
+    "meaning": "疾病、病變",
+    "example": "neuropathy",
+    "translation": "神經病變"
+  },
+  {
+    "id": 48,
+    "type": "字尾",
+    "part": "-penia",
+    "meaning": "減少、缺乏",
+    "example": "leukopenia",
+    "translation": "白血球減少"
+  },
+  {
+    "id": 49,
+    "type": "字尾",
+    "part": "-plegia",
+    "meaning": "癱瘓",
+    "example": "paraplegia",
+    "translation": "下半身癱瘓"
+  },
+  {
+    "id": 50,
+    "type": "字尾",
+    "part": "-malacia",
+    "meaning": "軟化",
+    "example": "osteomalacia",
+    "translation": "骨軟化症"
+  },
+  {
+    "id": 51,
+    "type": "字尾",
+    "part": "-sclerosis",
+    "meaning": "硬化",
+    "example": "arteriosclerosis",
+    "translation": "動脈硬化"
+  },
+  {
+    "id": 52,
+    "type": "字尾",
+    "part": "-scopy",
+    "meaning": "以器械觀察",
+    "example": "endoscopy",
+    "translation": "內視鏡檢查"
+  },
+  {
+    "id": 53,
+    "type": "字尾",
+    "part": "-stomy",
+    "meaning": "造口術",
+    "example": "colostomy",
+    "translation": "結腸造口術"
+  },
+  {
+    "id": 54,
+    "type": "字尾",
+    "part": "-tomy",
+    "meaning": "切開術",
+    "example": "tracheotomy",
+    "translation": "氣管切開術"
+  },
+  {
+    "id": 55,
+    "type": "字尾",
+    "part": "-plasty",
+    "meaning": "修補、整形術",
+    "example": "angioplasty",
+    "translation": "血管成形術"
+  },
+  {
+    "id": 56,
+    "type": "字尾",
+    "part": "-rrhea",
+    "meaning": "流出、分泌",
+    "example": "rhinorrhea",
+    "translation": "流鼻水"
+  },
+  {
+    "id": 57,
+    "type": "字尾",
+    "part": "-phagia",
+    "meaning": "進食、吞嚥",
+    "example": "dysphagia",
+    "translation": "吞嚥困難"
+  },
+  {
+    "id": 58,
+    "type": "字尾",
+    "part": "-uria",
+    "meaning": "尿液狀況",
+    "example": "hematuria",
+    "translation": "血尿"
+  },
+  {
+    "id": 59,
+    "type": "字尾",
+    "part": "-cyte",
+    "meaning": "細胞",
+    "example": "leukocyte",
+    "translation": "白血球"
+  },
+  {
+    "id": 60,
+    "type": "字尾",
+    "part": "-logy",
+    "meaning": "研究、學科",
+    "example": "pathology",
+    "translation": "病理學"
+  }
+]

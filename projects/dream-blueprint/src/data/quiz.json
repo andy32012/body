@@ -1,0 +1,402 @@
+[
+  {
+    "id": "q-001",
+    "kind": "vocabulary",
+    "en": "I feel dizzy.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我覺得冷。",
+      "我覺得頭暈。",
+      "我覺得口渴。"
+    ],
+    "answerIndex": 1,
+    "explanation": "dizzy 描述頭暈的感覺。"
+  },
+  {
+    "id": "q-002",
+    "kind": "vocabulary",
+    "en": "Where does it hurt?",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "你痛多久了？",
+      "現在還痛嗎？",
+      "你哪裡痛？"
+    ],
+    "answerIndex": 2,
+    "explanation": "where 問的是位置。"
+  },
+  {
+    "id": "q-003",
+    "kind": "vocabulary",
+    "en": "I need some water.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我需要喝點水。",
+      "我剛喝過水。",
+      "我帶了一些水。"
+    ],
+    "answerIndex": 0,
+    "explanation": "need 表達現在的需要。"
+  },
+  {
+    "id": "q-004",
+    "kind": "vocabulary",
+    "en": "Take a slow breath.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "屏住呼吸。",
+      "呼吸快一點。",
+      "慢慢呼吸一次。"
+    ],
+    "answerIndex": 2,
+    "explanation": "slow 指動作緩慢，a breath 指一次呼吸。"
+  },
+  {
+    "id": "q-005",
+    "kind": "vocabulary",
+    "en": "Press the call button.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "接起電話。",
+      "按一下呼叫鈴。",
+      "關掉鬧鐘。"
+    ],
+    "answerIndex": 1,
+    "explanation": "call button 是請工作人員來幫忙的按鈕。"
+  },
+  {
+    "id": "q-006",
+    "kind": "vocabulary",
+    "en": "The pain started yesterday.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "昨天開始痛。",
+      "昨天就不痛了。",
+      "今天才開始痛。"
+    ],
+    "answerIndex": 0,
+    "explanation": "started 表達開始，yesterday 指昨天。"
+  },
+  {
+    "id": "q-007",
+    "kind": "vocabulary",
+    "en": "I feel sick to my stomach.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我覺得肚子餓。",
+      "我覺得噁心想吐。",
+      "我已經吐過了。"
+    ],
+    "answerIndex": 1,
+    "explanation": "feel sick to my stomach 描述噁心的感覺。"
+  },
+  {
+    "id": "q-008",
+    "kind": "vocabulary",
+    "en": "Please sit up.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "請往後退。",
+      "請坐起來。",
+      "請站起來。"
+    ],
+    "answerIndex": 1,
+    "explanation": "sit up 指把上半身抬起來坐好。"
+  },
+  {
+    "id": "q-009",
+    "kind": "vocabulary",
+    "en": "The wound is on my left leg.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "傷口在我的右腿。",
+      "傷口在我的左手。",
+      "傷口在我的左腿。"
+    ],
+    "answerIndex": 2,
+    "explanation": "wound 是傷口，left leg 是左腿。"
+  },
+  {
+    "id": "q-010",
+    "kind": "vocabulary",
+    "en": "Tell me if it hurts.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "如果會痛，請告訴我。",
+      "請告訴我你在哪裡。",
+      "請告訴我現在幾點。"
+    ],
+    "answerIndex": 0,
+    "explanation": "if 在這裡表示「如果」，hurts 表示「會痛」。"
+  },
+  {
+    "id": "q-011",
+    "kind": "vocabulary",
+    "en": "I am allergic to this medicine.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我需要這個藥。",
+      "我忘了這個藥。",
+      "我對這個藥過敏。"
+    ],
+    "answerIndex": 2,
+    "explanation": "be allergic to 表達對某樣東西過敏。"
+  },
+  {
+    "id": "q-012",
+    "kind": "vocabulary",
+    "en": "My throat feels dry.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我覺得胸口悶。",
+      "我覺得喉嚨乾。",
+      "我覺得肩膀痠。"
+    ],
+    "answerIndex": 1,
+    "explanation": "throat 是喉嚨，dry 是乾的。"
+  },
+  {
+    "id": "q-013",
+    "kind": "vocabulary",
+    "en": "Check the label first.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "先看一下標籤。",
+      "先看一下日曆。",
+      "先看一下病床。"
+    ],
+    "answerIndex": 0,
+    "explanation": "label 是標籤，first 表示先做這一步。"
+  },
+  {
+    "id": "q-014",
+    "kind": "vocabulary",
+    "en": "Is it better after you rest?",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "休息前有好一點嗎？",
+      "休息後有好一點嗎？",
+      "你想再休息一下嗎？"
+    ],
+    "answerIndex": 1,
+    "explanation": "after you rest 表示休息之後。"
+  },
+  {
+    "id": "q-015",
+    "kind": "vocabulary",
+    "en": "I take one tablet every morning.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我今天早上吃了兩顆藥錠。",
+      "我每天早上吃一顆藥錠。",
+      "我每天晚上吃一顆藥錠。"
+    ],
+    "answerIndex": 1,
+    "explanation": "one tablet 是一顆藥錠，every morning 是每天早上。"
+  },
+  {
+    "id": "q-016",
+    "kind": "vocabulary",
+    "en": "Do you have a cough?",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "你有發燒嗎？",
+      "你有頭痛嗎？",
+      "你有咳嗽嗎？"
+    ],
+    "answerIndex": 2,
+    "explanation": "a cough 在這句話裡指咳嗽這個症狀。"
+  },
+  {
+    "id": "q-017",
+    "kind": "vocabulary",
+    "en": "The pain is getting worse.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "疼痛愈來愈嚴重。",
+      "疼痛已經消失。",
+      "疼痛正在減輕。"
+    ],
+    "answerIndex": 0,
+    "explanation": "getting worse 表示程度比之前嚴重。"
+  },
+  {
+    "id": "q-018",
+    "kind": "vocabulary",
+    "en": "Could you say that again?",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "你現在聽得見嗎？",
+      "可以慢慢寫嗎？",
+      "可以再說一次嗎？"
+    ],
+    "answerIndex": 2,
+    "explanation": "say that again 是請對方再說一次。"
+  },
+  {
+    "id": "q-019",
+    "kind": "vocabulary",
+    "en": "Point to the sore spot.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "請按住傷口。",
+      "請指出痠痛的地方。",
+      "請畫出你的身高。"
+    ],
+    "answerIndex": 1,
+    "explanation": "point to 是用手指向，sore spot 指痠痛的部位。"
+  },
+  {
+    "id": "q-020",
+    "kind": "vocabulary",
+    "en": "I will be back soon.",
+    "zh": "選出這句英文的意思。",
+    "options": [
+      "我很快就回來。",
+      "我剛才回來了。",
+      "我下週會回來。"
+    ],
+    "answerIndex": 0,
+    "explanation": "will 表達接下來的行動，soon 表示不久之後。"
+  },
+  {
+    "id": "q-021",
+    "kind": "nursing",
+    "en": "Which vital sign counts breaths per minute?",
+    "zh": "哪一項生命徵象以每分鐘呼吸次數表示？",
+    "options": [
+      "脈搏速率",
+      "呼吸速率",
+      "血壓"
+    ],
+    "answerIndex": 1,
+    "explanation": "數一分鐘內呼吸的次數，就能記錄呼吸速率。",
+    "source": "https://medlineplus.gov/ency/article/002341.htm"
+  },
+  {
+    "id": "q-022",
+    "kind": "nursing",
+    "en": "Which unit is used for blood pressure?",
+    "zh": "血壓用哪個單位記錄？",
+    "options": [
+      "每分鐘次數（次／分）",
+      "毫米汞柱（mmHg）",
+      "攝氏度（°C）"
+    ],
+    "answerIndex": 1,
+    "explanation": "血壓以毫米汞柱表示，記錄時分為收縮壓與舒張壓。",
+    "source": "https://medlineplus.gov/ency/article/002341.htm"
+  },
+  {
+    "id": "q-023",
+    "kind": "nursing",
+    "en": "Which device measures body temperature?",
+    "zh": "哪種器材用來測量體溫？",
+    "options": [
+      "血壓計",
+      "脈搏血氧計",
+      "體溫計"
+    ],
+    "answerIndex": 2,
+    "explanation": "體溫計用來量體溫，台灣常用攝氏度記錄。",
+    "source": "https://medlineplus.gov/ency/article/002341.htm"
+  },
+  {
+    "id": "q-024",
+    "kind": "nursing",
+    "en": "What does SpO₂ on a pulse oximeter estimate?",
+    "zh": "脈搏血氧計上的 SpO₂ 估計哪個數值？",
+    "options": [
+      "動脈血氧飽和度",
+      "血液二氧化碳分壓",
+      "血紅素濃度"
+    ],
+    "answerIndex": 0,
+    "explanation": "SpO₂ 是利用光學訊號估計的動脈血氧飽和度，以百分比表示。",
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+  },
+  {
+    "id": "q-025",
+    "kind": "nursing",
+    "en": "What can interfere with a fingertip pulse oximeter reading?",
+    "zh": "哪個因素會干擾指尖脈搏血氧計的讀值？",
+    "options": [
+      "用攝氏度記錄體溫",
+      "戴了一副眼鏡",
+      "受測指甲上有深色指甲油"
+    ],
+    "answerIndex": 2,
+    "explanation": "深色指甲油會阻擋儀器發出的光，影響讀值。",
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+  },
+  {
+    "id": "q-026",
+    "kind": "nursing",
+    "en": "How does a fingertip pulse oximeter obtain a reading?",
+    "zh": "指夾式脈搏血氧計如何取得讀值？",
+    "options": [
+      "分析抽出的靜脈血",
+      "偵測穿過指尖的光",
+      "測量指尖溫度"
+    ],
+    "answerIndex": 1,
+    "explanation": "儀器量測穿過指尖的光，再以訊號估計血氧飽和度。",
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+  },
+  {
+    "id": "q-027",
+    "kind": "nursing",
+    "en": "When should hands be cleaned after glove removal?",
+    "zh": "照護後脫下手套，要在何時執行手部衛生？",
+    "options": [
+      "脫下後立刻執行",
+      "等到下班前",
+      "等到下一次手套破損時"
+    ],
+    "answerIndex": 0,
+    "explanation": "雙手在脫手套的過程中有接觸汙染物的風險，脫下後要立刻執行手部衛生。",
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+  },
+  {
+    "id": "q-028",
+    "kind": "nursing",
+    "en": "How should visibly dirty hands be cleaned?",
+    "zh": "雙手有看得見的髒汙時，要怎麼清潔？",
+    "options": [
+      "只用乾紙巾擦拭",
+      "用肥皂和水洗手",
+      "只換一副手套"
+    ],
+    "answerIndex": 1,
+    "explanation": "雙手有明顯髒汙時，用肥皂和水洗手以去除髒汙。",
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+  },
+  {
+    "id": "q-029",
+    "kind": "nursing",
+    "en": "When is hand hygiene needed for an aseptic task?",
+    "zh": "執行無菌操作時，要在何時先做好手部衛生？",
+    "options": [
+      "等處置全部結束後才做",
+      "開始無菌操作前",
+      "等手上出現明顯髒汙後才做"
+    ],
+    "answerIndex": 1,
+    "explanation": "無菌操作前先執行手部衛生，降低將微生物帶入處置部位的風險。",
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+  },
+  {
+    "id": "q-030",
+    "kind": "nursing",
+    "en": "What is needed when moving from a soiled site to a clean site on the same patient?",
+    "zh": "照護同一人時，從汙染部位轉向清潔部位要做什麼？",
+    "options": [
+      "用原本的手套直接接觸清潔部位",
+      "等整個照護結束後才清潔雙手",
+      "轉換前執行手部衛生"
+    ],
+    "answerIndex": 2,
+    "explanation": "照護部位從汙染轉為清潔時，要先執行手部衛生。戴著手套時要先脫掉。",
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+  }
+]

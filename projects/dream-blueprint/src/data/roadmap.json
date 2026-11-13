@@ -1,0 +1,236 @@
+{
+  "verified": "2026-11-13",
+  "stations": [
+    {
+      "id": 1,
+      "title": "修完護理學系課程",
+      "description": "在下方查看已確認的基護安排。你的學籍與修課紀錄來自 2026 年 11 月 13 日的校務系統查詢。",
+      "parallel": [
+        5
+      ],
+      "fees": "學雜費及實習費以該學期繳費單為準。",
+      "tasks": [],
+      "sources": [
+        {
+          "title": "弘光科技大學護理系公告",
+          "url": "https://nur.hk.edu.tw/"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "取得台灣護理師執照",
+      "description": "依你的規劃，護理系畢業、實習期滿及格後，考取台灣護理師資格，再到台灣醫院工作。依報考年度簡章核對應考資格及日期。",
+      "parallel": [
+        3,
+        5
+      ],
+      "fees": "依當次考選部簡章、衛福部領證及執業登記公告核對。",
+      "tasks": [
+        "領取畢業證書並確認實習期滿及格",
+        "依當次簡章報名護理師考試",
+        "通過考試並取得護理師證書",
+        "就職前辦理執業登記"
+      ],
+      "sources": [
+        {
+          "title": "考選部・護理師考試資格",
+          "url": "https://wwwc.moex.gov.tw/main/exam/wFrmPropertyDetail.aspx?c=114170&m=7482"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "申請紐約州考試資格",
+      "description": "境外護理學歷適用紐約州教育廳第五路徑。學歷可用 TruMerit 紐約州驗證服務，或由學校填 Form 2F、連同正式成績單直送州教育廳。非英文成績單依規定翻譯。已持台灣護理師執照時，由發照機關驗證。",
+      "parallel": [
+        4,
+        5,
+        6
+      ],
+      "fees": "州執照與首次登記共 143 美元。學歷驗證、翻譯及課程費另計。",
+      "tasks": [
+        "依護照核對英文姓名拼法",
+        "完成認可的感染控制及兒虐辨識與通報課程，或確認適用豁免",
+        "線上送出申請表 Form 1 並繳費",
+        "擇一路徑送學歷驗證，有境外護理執照時安排執照驗證",
+        "向 Pearson 登記考試，待州教育廳核定資格並收到考試授權（ATT）"
+      ],
+      "sources": [
+        {
+          "title": "紐約州教育廳・境外護理學歷申請路徑",
+          "url": "https://www.op.nysed.gov/professions/registered-professional-nursing/license-requirements/pathway-5"
+        },
+        {
+          "title": "紐約州教育廳・考試授權順序",
+          "url": "https://www.op.nysed.gov/professions/registered-professional-nursing/frequently-asked-questions"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "通過美國護理師執照考試",
+      "description": "NCLEX-RN 採電腦適性測驗，你的紐約州路徑以英文應試。台灣設有國際考場。收到考試授權後，在授權有效期限內預約並應試。2024 年首次應試者中，國際學歷組 59,062 人、通過率 53.81%；美國學歷組 186,686 人、通過率 91.16%。這些是群體統計，無法推算個人結果。",
+      "parallel": [
+        3,
+        5,
+        6
+      ],
+      "fees": "美國執照考試報名費為 200 美元，2027 年 2 月 1 日起為 350 美元。在台灣預約另收 150 美元國際考場費及適用稅金。以報名日公告為準。",
+      "tasks": [
+        "讀最新考試計畫並練習英文護理題",
+        "核對授權期限與護照姓名",
+        "預約合適考場並應試",
+        "查收州主管機關的正式結果"
+      ],
+      "sources": [
+        {
+          "title": "NCLEX・考試資格及台灣考場",
+          "url": "https://www.nclex.com/faqs.page"
+        },
+        {
+          "title": "NCLEX・報名及國際考場費",
+          "url": "https://nclex.com/fees-payment/"
+        },
+        {
+          "title": "NCSBN・2024 年考生統計",
+          "url": "https://www.ncsbn.org/public-files/NCLEX_Stats_2024_Q4_Passrates.pdf"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "完成英文檢定與職業資格審查",
+      "description": "VisaScreen 是赴美醫事工作者的資格審查，與州執照分別辦理。它核對學歷、曾持有的執照、護理知識及英語能力。可用 NCLEX-RN 或 TruMerit 資格考證明護理知識。選擇考場版本；TruMerit 不收在家考成績。",
+      "parallel": [
+        1,
+        3,
+        4,
+        6
+      ],
+      "fees": "依選擇的語言考試、TruMerit 申請及文件寄送費用核算。",
+      "tasks": [
+        "選一種檢定，依各科門檻練習",
+        "依能力及送件時程預約考場版並安排正式送分",
+        "整理學歷、執照及護理考試文件",
+        "查收 VisaScreen 證書並記錄效期"
+      ],
+      "sources": [
+        {
+          "title": "美國衛生資源與服務署・2026 年 5 月 12 日英語門檻",
+          "url": "https://www.hrsa.gov/office-global-health/foreign-healthcare-worker-requirements"
+        },
+        {
+          "title": "TruMerit・VisaScreen 認證與考場規定",
+          "url": "https://www.trumerit.org/services/certification/visascreen-visa-credentials-assessment/"
+        }
+      ],
+      "scores": [
+        [
+          "雅思學術組（IELTS Academic）",
+          "總分 6.5、口說 7"
+        ],
+        [
+          "托福網路考試（TOEFL iBT）",
+          "總分 4.5、口說 4.5，讀、聽、寫各 3.5"
+        ],
+        [
+          "醫護英語考試（OET）",
+          "口說 360、閱讀 340、寫作 350、聽力 320"
+        ],
+        [
+          "培生學術英文（PTE Academic）",
+          "總分 55、口說 76，讀、寫、聽各 62"
+        ],
+        [
+          "密西根英語測驗（MET）",
+          "總分 58、口說 59"
+        ],
+        [
+          "劍橋英語（B2 First／C1 Advanced／C2 Proficiency）",
+          "總分 169、口說 194"
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "title": "累積臨床經驗，找美國雇主",
+      "description": "在台灣工作期間，用實際臨床經驗練習英文面試。醫院直聘時與醫療機構簽約；派遣時與人力公司簽約，再到指定機構工作。媒合公司也能協助直聘。",
+      "parallel": [
+        3,
+        4,
+        5
+      ],
+      "fees": "比對書面合約中的搬遷、簽證及提前離職費用，確認付款人與條件。",
+      "tasks": [
+        "整理英文履歷與臨床經驗",
+        "練習以英文回答面試題",
+        "核對雇主、工作州與實際工作地點",
+        "簽約前確認服務年限、提前離職及費用分擔"
+      ],
+      "sources": [
+        {
+          "title": "國際招募倫理聯盟・招募方式與合約指南",
+          "url": "https://www.cgfnsalliance.org/wp-content/uploads/2024/05/Alliance-Recruitment-Guide-May-2024.pdf"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "辦理 EB-3 職業移民",
+      "description": "首次採護理師 Schedule A 路徑時，雇主正式遞交完整 I-140 的日期是優先日期，以收件通知為準。每月依類別、歸屬地及公告表格查詢。截止日會前進、停留或倒退，無法據此預告赴美年份。",
+      "parallel": [
+        5,
+        6
+      ],
+      "fees": "依案件核對雇主申請費、移民簽證費、體檢費及移民費。",
+      "tasks": [
+        "與雇主確認 I-140 送件及收件通知",
+        "記下優先日期，定期查看簽證公告",
+        "依國家簽證中心通知繳費、填 DS-260 並備妥文件及職業資格證明",
+        "接到面談通知後安排指定體檢，攜帶所需文件到台北 AIT 面談"
+      ],
+      "sources": [
+        {
+          "title": "美國移民法規・職業移民優先日期",
+          "url": "https://www.ecfr.gov/current/title-8/chapter-I/subchapter-B/part-204/subpart-A/section-204.5"
+        },
+        {
+          "title": "美國國務院・每月簽證公告",
+          "url": "https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin.html"
+        },
+        {
+          "title": "美國國務院・台北面談與指定體檢",
+          "url": "https://travel.state.gov/content/travel/en/us-visas/Supplements/Supplements_by_Post/TAI-Taipei.html"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "抵達美國，開始執業",
+      "expectation": "我的期望：2033–2034 年",
+      "description": "實際抵達時間取決於畢業時間、考試和當時的移民排期。入境後確認社會安全卡與雇主報到資料。工作州與原發照州不同時，依工作州要求申請執業授權，取得資格後上班。",
+      "parallel": [
+        6,
+        7
+      ],
+      "fees": "跨州執照申請與驗證費依工作州護理主管機關公告。",
+      "tasks": [
+        "核對入境文件及美國收件地址",
+        "確認移民簽證申請時是否已併辦社會安全碼，依情況追蹤或申請",
+        "確認工作州有效執業授權",
+        "完成雇主報到與到職訓練"
+      ],
+      "sources": [
+        {
+          "title": "美國社會安全署・移民簽證併辦社會安全碼",
+          "url": "https://www.ssa.gov/faqs/en/questions/KA-10040.html"
+        },
+        {
+          "title": "NCSBN・各州執照與跨州申請",
+          "url": "https://www.ncsbn.org/nursing-regulation/licensure.page"
+        }
+      ]
+    }
+  ]
+}
