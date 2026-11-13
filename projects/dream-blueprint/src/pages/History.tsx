@@ -40,7 +40,7 @@ function PracticeCalendar({ sessions, today }: { sessions: Sessions; today: stri
     select(next === today.slice(0, 7) ? today : next + "-01");
   }
 
-  return <section className="history-section">
+  return <section className="history-section history-month">
     <div className="history-row">
       <h2>{first.getFullYear()} 年 {first.getMonth() + 1} 月</h2>
       <div className="history-controls">
@@ -48,7 +48,7 @@ function PracticeCalendar({ sessions, today }: { sessions: Sessions; today: stri
         <button type="button" onClick={() => move(1)} aria-label="下個月" disabled={month >= today.slice(0, 7)}>›</button>
       </div>
     </div>
-    <p className="history-note">這個月練了 {activeDays} 天。有星點的日期可以查看當天紀錄。</p>
+    <p className="history-note">本月練習 {activeDays} 天。點選日期查看紀錄。</p>
     <div className="history-calendar">
       {weekdays.map(label => <span key={label} className="history-weekday">{label}</span>)}
       {Array.from({ length: offset }, (_, i) => <span aria-hidden="true" key={"empty" + i} />)}
@@ -75,14 +75,16 @@ function WeeklyChart({ sessions, today }: { sessions: Sessions; today: string })
     const end = addDays(from, 6);
     return { from, count: [...days].filter(day => from <= day && day <= end).length };
   });
-  return <section className="history-section">
+  const total = weeks.reduce((sum, week) => sum + week.count, 0);
+  return <section className="history-section history-trend">
     <h2>最近 12 週</h2>
-    <p className="history-note">每一欄是一週，數字是實際練習的天數。</p>
+    <p className="history-trend-total"><strong>{total}</strong> 天有練習</p>
+    <p className="history-note">每週練習天數</p>
     <ol className="history-bars">
       {weeks.map(({ from, count }, i) => <li key={from} aria-label={from + " 起，練習 " + count + " 天"} title={from + " 起，" + count + " 天"}>
         <small aria-hidden="true">{count}</small>
         <div className="history-bar-track" aria-hidden="true">{count > 0 && <div className="history-bar-fill" style={{ height: (count / 7) * 100 + "%" }} />}</div>
-        <small aria-hidden="true">{i === 0 ? "起始" : i === 11 ? "本週" : ""}</small>
+        <small aria-hidden="true">{i === 0 ? Number(from.slice(5, 7)) + "/" + Number(from.slice(8)) : i === 11 ? "本週" : ""}</small>
       </li>)}
     </ol>
   </section>;
@@ -115,7 +117,7 @@ function GrammarHistory({ sessions }: { sessions: Sessions }) {
       categories["練習中"].push(tag);
     }
   });
-  return <section className="history-section">
+  return <section className="history-section history-grammar">
     <h2>文法星圖</h2>
     <p className="history-note">兩次相隔至少四天，都能自己答對的文法點會標成「穩了」。</p>
     {history.size === 0 ? <p>完成中翻英並自評後，這裡會出現你練過的文法點。</p> :
@@ -139,21 +141,24 @@ export default function History({ state }: PageProps) {
   const continuity = attendance(sessions, today, settings.restDays, settings.periods);
   const pastSeason = seasonHistory(state)[0];
   return <div className="history-page">
-    <header><h1>練習紀錄</h1><p>每一天來練過的，都留在這裡。</p></header>
-    <section className="history-section">
-      <h2>累計練習</h2>
-      <div className="history-count"><strong>{days}</strong><span>天</span></div>
+    <header className="history-hero">
+      <img src="./cosmos/g03.webp" alt="" className="history-galaxy" onError={event => { event.currentTarget.hidden = true; }} />
+      <div className="history-hero-copy">
+        <h1>練習紀錄</h1>
+        <p className="history-count"><span>累計練習</span><strong>{days}</strong><span>天</span></p>
+      </div>
       <dl className="history-stats">
-        <div><dt>學過的單字</dt><dd>{words} 個</dd></div>
-        <div><dt>說過的句子</dt><dd>{spoken} 句</dd></div>
-        <div><dt>完成中翻英</dt><dd>{translated} 句</dd></div>
+        <div><dt>學過的單字</dt><dd>{words}<small> 個</small></dd></div>
+        <div><dt>說過的句子</dt><dd>{spoken}<small> 句</small></dd></div>
+        <div><dt>完成中翻英</dt><dd>{translated}<small> 句</small></dd></div>
       </dl>
-    </section>
+    </header>
+    <div className="history-grid">
     <PracticeCalendar sessions={sessions} today={today} />
     <WeeklyChart sessions={sessions} today={today} />
     <GrammarHistory sessions={sessions} />
     {state.curriculum.stableUnits.length>0 && <section className="history-section"><h2>單元回想</h2><p className="history-note">隔三個單元回想舊句。連續兩次想不起來的單元會優先複習。</p>{state.curriculum.stableUnits.map(id=><span key={id} className="history-chip">單元 {id} · {getRetentionStatus(state.notes,id)}</span>)}</section>}
-    <section className="history-section">
+    <section className="history-section history-recall">
       <h2>隔幾天，還記得嗎？</h2>
       <p>{delayed.length ? "相隔至少四天再複習且未看答案，共 " + delayed.length + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
         {delayed.length > 0 && <strong> {Math.round(recalled / delayed.length * 100)}%</strong>}</p>
@@ -167,5 +172,6 @@ export default function History({ state }: PageProps) {
       <p>連續練習 {continuity.streak} 天 · 請假卡 {continuity.leave} 張</p>
       <p className="history-note">每累計練七天獲得一張請假卡，最多保留兩張。休息日、考週和實習不會打斷連續紀錄。</p>
     </details>}
+    </div>
   </div>;
 }

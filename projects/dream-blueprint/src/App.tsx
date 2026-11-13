@@ -11,7 +11,7 @@ import { activePeriod, addDays, dayKey, daysBetween, weekKey, type Energy } from
 import planData from './data/plan.json'
 import roadmap from './data/roadmap.json'
 import Plan, { type PlanTab } from './pages/Plan'
-import Practice, { PracticeLibrary } from './pages/Practice'
+import Practice, { PracticeCover, PracticeLibrary } from './pages/Practice'
 import PracticeDock from './components/PracticeDock'
 import WorkloadRecommendation from './components/WorkloadRecommendation'
 import Rivals from './pages/Rivals'
@@ -162,7 +162,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><h1>英文練習</h1><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>

@@ -152,17 +152,21 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
     );
   }
   const practicedDays = new Set(state.sessions.map((session) => session.day));
+  const plannedLessons = calendar.filter(entry => entry.kind === "lesson").length;
+  const heroDetail = tab === "calendar"
+    ? `${Number(month.slice(5))} 月預排 ${plannedLessons} 天課程`
+    : tab === "timeline"
+      ? `${plan.years[0].year} — ${plan.years[plan.years.length - 1].year}`
+      : "從學校課程到赴美就業";
   return (
     <main className="pl-page">
       <header className="pl-title">
+        <img className="pl-rings" src="./cosmos/p12.webp" alt="" onError={e => { e.currentTarget.hidden = true; }} />
         <div>
           <h1>計畫星圖</h1>
+          <p className="pl-note">{heroDetail}</p>
         </div>
-        <span aria-hidden="true" className="pl-orbit">
-          ✧
-        </span>
       </header>
-      <p className="pl-note">{plan.notice}</p>
       <div className="pl-switch" aria-label="計畫檢視">
         {(
           [
@@ -180,15 +184,21 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
           </button>
         ))}
       </div>
-      {tab === "map" && <Roadmap {...props} />}
+      {tab === "map" && (
+        <>
+          <Roadmap {...props} />
+          <p className="pl-planning-note">{plan.notice}</p>
+        </>
+      )}
       {tab === "timeline" && (
-        <section className="pl-panel">
+        <section className="pl-panel pl-timeline">
           <div className="pl-head">
             <div>
               <h2>年度時間軸</h2>
               <small>{plan.statusLabel}</small>
             </div>
           </div>
+          <p className="pl-planning-note">{plan.notice}</p>
           <div className="pl-years">
             {plan.years.map((y) => (
               <article key={y.year}>
@@ -239,7 +249,8 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
       )}
       {tab === "calendar" && (
         <>
-          <section className="pl-panel">
+          <div className="pl-calendar-layout">
+          <section className="pl-panel pl-calendar">
             <div className="pl-head">
               <div>
                 <small>英文課表預排</small>
@@ -320,11 +331,16 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                 );
               })}
             </div>
-            <div className="pl-day">
-              <small>
-                {Number(selected.slice(5, 7))} 月 {Number(selected.slice(-2))}{" "}
-                日 · 星期{"日一二三四五六"[asDate(selected).getDay()]}
-              </small>
+            <p className="pl-fine">
+              依最近四週的進度預排。考週、實習和休息日保留原進度。
+            </p>
+          </section>
+          <section className="pl-day" aria-live="polite">
+            <header className="pl-date-stamp">
+              <time dateTime={selected}>{Number(selected.slice(5, 7))} 月 <b>{Number(selected.slice(-2))}</b> 日</time>
+              <span>星期{"日一二三四五六"[asDate(selected).getDay()]}</span>
+            </header>
+            <div className="pl-agenda">
               <h3>
                 {practicedDays.has(selected)
                   ? "已留下練習紀錄"
@@ -343,10 +359,8 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                 <small>原課表安排 · {selectedEntry.original}</small>
               )}
             </div>
-            <p className="pl-fine">
-              依最近四週的進度預排。考週、實習和休息日保留原進度。
-            </p>
           </section>
+          </div>
           <section className="pl-panel">
             <div className="pl-head">
               <div>

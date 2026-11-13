@@ -100,7 +100,6 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
         </label>
         <button type="button" className="daily-word-done" onClick={onClose}>好，進去練習</button>
       </div>}
-      <span className="daily-word-credit">{photo.title} · {photo.credit}</span>
     </div>
   </div>
 }

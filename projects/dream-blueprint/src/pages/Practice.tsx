@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
@@ -57,11 +58,23 @@ const marks: [Mark, string][] = [
 ];
 const levels = { low: "累爆", normal: "普通", high: "有電" };
 const anchor = sentences[0];
+
+export function PracticeCover({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <header className="pr-cover">
+      <img className="pr-cover-photo" src="./cosmos/n01.webp" alt="" />
+      <div className="pr-cover-copy">{children}<h1>{title}</h1></div>
+    </header>
+  );
+}
+
 function Translation({
   sentence,
   onMark,
   checkpoint,
+  preparation,
 }: {
+  preparation?: ReactNode;
   sentence: Sentence;
   onMark: (mark: Mark, revealed: boolean) => void;
   checkpoint: boolean;
@@ -95,6 +108,7 @@ function Translation({
           <span key={tag}>{tag}</span>
         ))}
       </div>
+      {preparation}
       <label className="pr-field">
         我的英文
         <textarea
@@ -442,46 +456,30 @@ function PracticeSession({
   }
   return (
     <section className="practice-page">
-      <div className="pr-bar">
-        <button onClick={() => navigate("today")}>‹ 回今天</button>
-        <span className="pr-step">{levels[energy]}練習</span>
-      </div>
-      <div className="pr-pane">
-        {phase !== "done" && (
-          <div className="pr-step">
-            {current.review
-              ? "舊句複習"
-              : "單元 " + current.unit + " · 第 " + current.day + " 天"}
-            　{current.checkpoint && pos + 1 + " / " + current.items.length}
-          </div>
-        )}
+      <PracticeCover title={levels[energy] + "練習"}>
+        <button type="button" className="pr-back" onClick={() => navigate("today")}>
+          <ChevronLeft size={16} aria-hidden="true"/>回今天
+        </button>
+      </PracticeCover>
+      <div className="pr-pane pr-session" data-phase={phase}>
+        <div className="pr-session-meta">
+          <span className="pr-stage-icon" aria-hidden="true">
+            {phase === "write" ? <PenLine size={17}/> : phase === "sound" ? <Headphones size={17}/> : <Check size={17}/>}
+          </span>
+          <span>{current.review ? "舊句複習" : "單元 " + current.unit + " · 第 " + current.day + " 天"}</span>
+          {phase !== "done" && current.checkpoint && <span className="pr-item-index">{pos + 1} / {current.items.length}</span>}
+        </div>
         {phase === "write" && (
           <>
             {energy === "low" && state.settings.why && (
               <p>{state.settings.why}</p>
             )}
             {current.freshReview && (
-              <div className="pr-hint">
-                還沒有個人複習卡。說一句你已經會的英文，就可以收工。
-                <div>
-                  <button onClick={() => finish(true)}>
-                    我複習了自己熟悉的一句
-                  </button>
-                </div>
+              <div className="pr-recall">
+                <h2 className="pr-question">說一句你已經會的英文。</h2>
+                <p>還沒有個人複習卡，今天說完這一句就可以收工。</p>
+                <button className="pr-main" onClick={() => finish(true)}>我複習了自己熟悉的一句</button>
               </div>
-            )}
-            {!current.review && current.day === 1 && current.rule && (
-              <section className="pr-hint">
-                <strong>{current.title}</strong>
-                <p>{current.rule}</p>
-                {current.examples.map((en, i) => (
-                  <p key={en}>
-                    <span lang="en">{en}</span>
-                    <br />
-                    {current.examplesZh[i]}
-                  </p>
-                ))}
-              </section>
             )}
             {!current.review && current.day === 5 && (
               <details className="pr-tools">
@@ -521,6 +519,18 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
+                preparation={!current.review && current.day === 1 && current.rule && (
+                  <section className="pr-rule">
+                    <strong>{current.title}</strong>
+                    <p>{current.rule}</p>
+                    {current.examples.length > 0 && <details className="pr-tools" open>
+                      <summary>看例句</summary>
+                      {current.examples.map((en, i) => (
+                        <p key={en}><span lang="en">{en}</span><br/>{current.examplesZh[i]}</p>
+                      ))}
+                    </details>}
+                  </section>
+                )}
                 onMark={mark}
               />
             )}
@@ -825,7 +835,7 @@ function Extras({
     setSee(false);
   }
   return (
-    <section className="pr-pane">
+    <section className="pr-pane pr-extras">
       <h2>自選加練</h2>
       <div className="pr-options">
         {(
