@@ -3,6 +3,24 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
+import { photos } from "./src/lib/cosmos";
+
+function photoPublication(): Plugin {
+  const escapeHTML = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return {
+    name: "photo-publication",
+    transformIndexHtml(html, context) {
+      if (!context.filename.endsWith("publication.html")) {
+        return [{ tag: "link", attrs: { rel: "license", href: "./publication.html" }, injectTo: "head" }];
+      }
+      const items = photos.map(photo =>
+        `<li><h2>${escapeHTML(photo.title)}</h2><p>${escapeHTML(photo.credit)}</p><p><a href="${escapeHTML(photo.source)}">原始影像</a> · <a href="${escapeHTML(photo.licenseUrl)}">${escapeHTML(photo.license)}</a></p></li>`
+      );
+      return html.replace("<!--photo-records-->", () => items.join("\n"));
+    }
+  };
+}
 
 async function listBuildFiles(directory: string, prefix = ""): Promise<string[]> {
   const files: string[] = [];
@@ -23,7 +41,8 @@ function offlineApp(): Plugin {
     name: "dream-blueprint-offline",
     configResolved(resolved) { root = resolved.root; },
     apply: "build",
-    transformIndexHtml() {
+    transformIndexHtml(_html, context) {
+      if (context.filename.endsWith("publication.html")) return;
       return [
         { tag: "link", attrs: { rel: "manifest", href: "./manifest.webmanifest" }, injectTo: "head" },
         { tag: "link", attrs: { rel: "apple-touch-icon", href: "./icon-192.png" }, injectTo: "head" },
@@ -58,7 +77,8 @@ function offlineApp(): Plugin {
 
 export default defineConfig({
   base: "./",
-  plugins: [react(), offlineApp()],
+  plugins: [react(), photoPublication(), offlineApp()],
+  build: { rollupOptions: { input: ["index.html", "publication.html"] } },
   server: { host: "0.0.0.0" },
   preview: { host: "0.0.0.0" }
 });

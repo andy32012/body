@@ -65,17 +65,3 @@
   .flight-deck .hero-number strong {font-size:58px;}
 }
 @media(prefers-reduced-transparency:reduce){.application {--space-card:var(--panel);--space-reading:var(--panel);--space-rail:var(--rail);}}
-
-.background-credit {
-  width:fit-content;
-  max-width:100%;
-  margin:20px 0 0;
-  padding:4px 7px;
-  background:rgba(5,12,24,.68);
-  color:#e8ebf2;
-  border-radius:4px;
-  font-size:.73rem;
-  line-height:1.6;
-  overflow-wrap:anywhere;
-}
-.background-credit a {color:inherit;text-underline-offset:2px;}

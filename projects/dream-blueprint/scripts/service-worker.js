@@ -68,7 +68,7 @@ self.addEventListener("fetch", event => {
     })());
     return;
   }
-  const key = request.mode === "navigate" ? shell : url.href;
+  const key = request.mode === "navigate" && !coreURLs.has(url.href) ? shell : url.href;
   if (coreURLs.has(key)) {
     event.respondWith((async () => (await (await caches.open(coreName)).match(key)) || fetch(request))());
   }

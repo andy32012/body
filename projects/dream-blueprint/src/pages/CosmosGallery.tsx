@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, Expand, ExternalLink, Images, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
+import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, Expand, Images, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
 import { categories, photos, photoUrl, type AstroPhoto } from '../lib/cosmos'
 import { downloadGalleryOffline, getGalleryOfflineStatus } from '../lib/offlineGallery'
 import type { PageProps } from '../lib/store'
@@ -87,7 +87,6 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   const [target, setTarget] = useState<string>('today')
   const [notice, setNotice] = useState('')
   const index = group.findIndex(item => item.id === photo.id)
-  const credits = photo as AstroPhoto & {license?:string;licenseUrl?:string}
   const route = destinations.find(([id]) => id === target)!
   const pinned = state.notes['cosmos.pin.'+target]
   const currentTitle = photos.find(item => item.id === pinned)?.title
@@ -132,12 +131,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
           <button type="button" className="cg-step next" aria-label="下一張" onClick={() => move(1)}><ArrowRight/></button></>}
       </div>
       <div className="cg-caption">
-        <div className="cg-citation"><h2 id="cg-view-title">{photo.title}</h2><p>{photo.instrument}</p>
-          <small>影像致謝 · {photo.credit}</small>
-          <div className="cg-source"><a href={photo.source} target="_blank" rel="noreferrer">原始影像與出處 <ExternalLink size={13}/></a>
-            {credits.licenseUrl ? <a href={credits.licenseUrl} target="_blank" rel="noreferrer">{credits.license || '影像授權條款'} <ExternalLink size={13}/></a> :
-              <span>{credits.license || '授權依原始影像標示'}</span>}</div>
-        </div>
+        <h2 id="cg-view-title">{photo.title}</h2>
         <div className="cg-placement"><label htmlFor="cg-destination">頁面背景</label>
           <select id="cg-destination" value={target} onChange={e => {setTarget(e.target.value);setNotice('')}}>
             {destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
@@ -169,7 +163,7 @@ export default function CosmosGallery(props:GalleryProps) {
     <div className="cg-grid">{group.map((photo,i) => <button type="button" className={'cg-card'+(i===0?' cg-lead':'')}
       key={photo.id} onClick={() => setSelected(photo)} aria-label={'放大查看'+photo.title}>
       <div className="cg-image"><GalleryImage key={photo.id} photo={photo}/><span className="cg-zoom" aria-hidden="true"><Expand size={16}/></span></div>
-      <div className="cg-card-caption"><span>{photo.category}</span><h2>{photo.title}</h2><small className="cg-card-credit">影像致謝 · {photo.credit}</small></div>
+      <div className="cg-card-caption"><span>{photo.category}</span><h2>{photo.title}</h2></div>
     </button>)}</div>
     {selected && <Viewer {...props} photo={selected} group={group} change={setSelected} close={() => {setSelected(undefined);props.onViewerClose?.()}}/>}
   </section>

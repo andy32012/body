@@ -87,6 +87,7 @@ test("子目錄安裝、核心離線與更新不連帶刪除其他網站及圖�
   const html = (await read("index.html")).toString();
   assert.match(html, /href="\.\/manifest.webmanifest"/);
   assert.match(html, /src="\.\/register-sw.js"/);
+  assert.ok(html.includes('rel="license" href="./publication.html"'));
   const app = await browserHarness();
   const unrelated = "dream-blueprint:https://example.test/other/:old";
   await app.caches.open(unrelated);
@@ -102,6 +103,9 @@ test("子目錄安裝、核心離線與更新不連帶刪除其他網站及圖�
   assert.equal(app.controls.claimed, true);
   app.controls.offline = true;
   assert.equal(await (await app.request("./", "navigate")).text(), html);
+  const publication = (await read("publication.html")).toString();
+  assert.equal(await (await app.request("publication.html", "navigate")).text(), publication);
+  assert.equal((publication.match(/<li><h2>/g) || []).length, Object.keys(app.config.gallery).length);
   for (const asset of await readdir(path.join(dist, "assets"))) {
     if (asset.endsWith(".map")) continue;
     assert.ok((await (await app.request("assets/" + asset)).arrayBuffer()).byteLength, asset);

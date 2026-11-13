@@ -1,5 +1,5 @@
 .cg-gallery { max-width:1400px; margin:auto; }
-.cg-head, .cg-view-toolbar, .cg-source, .cg-pin-buttons { display:flex; align-items:center; }
+.cg-head, .cg-view-toolbar, .cg-pin-buttons { display:flex; align-items:center; }
 .cg-head { justify-content:space-between; gap:16px; margin-bottom:22px; }
 .cg-head h1 { margin:0; font-size:clamp(29px,3vw,44px); font-weight:640; letter-spacing:.06em; }
 .cg-head p { margin:7px 0 0; color:var(--muted); letter-spacing:.08em; font-size:.88rem; }
@@ -40,12 +40,7 @@
 .cg-img-error { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; color:#c7cfe2; font-size:.78rem; }
 .cg-img-error button { background:#1c263e; border:1px solid #72809a; color:white; border-radius:7px; padding:8px 12px; }
 .cg-caption { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:20px; padding:19px 22px 24px; }
-.cg-citation h2 { font-size:clamp(20px,2vw,29px); line-height:1.4; margin:0; }
-.cg-citation p { margin:5px 0 9px; color:var(--muted); font-size:.9rem; }
-.cg-citation small { color:var(--muted); font-size:.76rem; line-height:1.5; overflow-wrap:anywhere; }
-.cg-source { flex-wrap:wrap; gap:7px 14px; margin-top:10px; }
-.cg-source a,.cg-source span { font-size:.78rem; line-height:1.6; }
-.cg-source a svg { vertical-align:-2px; }
+.cg-caption h2 { font-size:clamp(20px,2vw,29px); line-height:1.4; margin:0; }
 .cg-placement { display:grid; gap:6px; align-content:start; min-width:0; }
 .cg-placement label { font-size:.79rem; font-weight:650; }
 .cg-placement select { padding:8px 10px; border-radius:6px; }
@@ -113,15 +108,6 @@
 @media(max-width:850px) {
   .cg-card.cg-lead {grid-row:auto;min-height:0;aspect-ratio:2.1}
 }
-.cg-card-credit {
-  display:block;
-  margin-top:6px;
-  font-size:.74rem;
-  line-height:1.5;
-  color:var(--muted);
-  overflow-wrap:anywhere;
-}
-.cg-lead .cg-card-credit { color:#e0dfeb; }
 .cg-lead .cg-card-caption {
   background:linear-gradient(0deg,#070914ed 0%,#070914b3 70%,transparent);
   padding-top:32px;

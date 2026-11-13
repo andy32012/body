@@ -3,65 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f6f4ef">
+  <meta name="theme-color" content="#101115">
   <title>Body｜漫畫、語言學習、護理與夢想藍圖</title>
-  <meta name="description" content="閱讀《西天》漫畫、學習日英韓語、上護理黑板課，或進入夢想藍圖開始今天的練習。">
-  <link rel="stylesheet" href="style.css?v=7c374c51ee38">
+  <meta name="description" content="閱讀《西天》漫畫，練日文、英文、韓文，或從護理教室與夢想藍圖開始今天的學習。">
+  <link rel="stylesheet" href="style.css?v=a410600a1ce2">
   <script type="module" src="learning/home.js?v=8b3169027ef7"></script>
 </head>
 <body>
   <a class="skip" href="#content">跳到主要內容</a>
-  <div class="page">
-    <header class="masthead">
-      <h1 class="brand"><span class="book" aria-hidden="true"></span>Body</h1>
-      <nav aria-label="首頁分類">
-        <a href="#comic">漫畫</a><a href="#languages">語言學習</a><a href="#nursing">護理</a><a href="#dream">夢想藍圖</a>
-      </nav>
+  <div class="frame">
+    <header>
+      <h1><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Body</h1>
+      <nav aria-label="首頁分類"><a href="#comic">漫畫</a><a href="#languages">語言學習</a><a href="#nursing">護理</a><a href="#dream">夢想藍圖</a></nav>
     </header>
-    <main id="content">
-      <div class="heading"><p>閱讀與學習</p><span aria-hidden="true"></span></div>
-      <div class="directory">
-        <section id="comic" class="panel comic" aria-labelledby="comic-title">
-          <img class="backdrop" src="assets/comic-cover.jpg" width="800" height="420" alt="" fetchpriority="high">
-          <div class="photo-copy">
-            <h2 id="comic-title">漫畫</h2>
-            <p class="work">西天</p>
-            <p class="synopsis">第一章〈望川鎮的失蹤者〉</p>
-            <a class="action" href="./comic/">閱讀漫畫 <span aria-hidden="true">→</span></a>
-          </div>
-        </section>
-        <section id="languages" class="panel languages" aria-labelledby="languages-title">
-          <h2 id="languages-title">語言學習</h2>
-          <div class="courses">
-            <a href="japanese/"><b lang="ja" aria-hidden="true">あ</b><strong>日文</strong></a>
-            <a href="english/"><b lang="en" aria-hidden="true">Aa</b><strong>英文</strong><small>籌備中</small></a>
-            <a href="korean/"><b lang="ko" aria-hidden="true">한</b><strong>韓文</strong></a>
-          </div>
-          <div class="study-links">
-            <a href="vocabulary/"><strong>今日單字</strong><small id="daily-word-summary">日文與韓文 · 每日 10 張字卡</small><span aria-hidden="true">→</span></a>
-            <a href="progress/"><strong>學習進度</strong><small id="learning-progress-summary">課程與複習紀錄</small><span aria-hidden="true">→</span></a>
-          </div>
-        </section>
-        <section id="nursing" class="panel nursing" aria-labelledby="nursing-title">
-          <div class="trace" aria-hidden="true"></div>
-          <div class="photo-copy">
-            <h2 id="nursing-title">護理</h2>
-            <p class="work">內科黑板課</p>
-            <p class="synopsis">從左心與右心衰竭開始。</p>
-            <a class="action" href="nursing/">進入護理教室 <span aria-hidden="true">→</span></a>
-          </div>
-        </section>
-        <section id="dream" class="panel dream" aria-labelledby="dream-title">
-          <img class="backdrop" src="dream/cosmos/p01.webp" loading="lazy" alt="">
-          <div class="photo-copy">
-            <h2 id="dream-title">夢想藍圖</h2>
-            <p class="work">我的赴美護理計畫</p>
-            <p class="synopsis">每日英文練習與護理師生涯規劃。</p>
-            <a class="action" href="./dream/">開啟夢想藍圖 <span aria-hidden="true">→</span></a>
-          </div>
-          <a class="credit" href="https://science.nasa.gov/photojournal/saturn-four-years-on/">土星攝影 · NASA/JPL/Space Science Institute</a>
-        </section>
-      </div>
+    <main id="content" class="board">
+      <section id="languages" class="languages" aria-labelledby="lang-heading">
+        <div class="hello-panel">
+          <h2 id="lang-heading">語言學習</h2>
+          <p class="greeting"><span lang="en">Hello.</span><span class="reply">哈囉</span></p>
+        </div>
+        <div class="course-row">
+          <a class="tile course ja" href="japanese/"><span class="glyph" aria-hidden="true" lang="ja">あ</span><span class="course-label">日文</span><span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="tile course en" href="english/"><span class="glyph" aria-hidden="true" lang="en">Aa</span><span class="course-label">英文 <small>籌備中</small></span><span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="tile course ko" href="korean/"><span class="glyph" aria-hidden="true" lang="ko">한</span><span class="course-label">韓文</span><span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <a id="comic" class="tile comic" href="./comic/">
+        <img src="comic/assets/hero-tall.webp" width="900" height="1599" alt="" fetchpriority="high">
+        <h2>漫畫</h2><span class="open" aria-hidden="true">↗</span>
+        <div class="comic-copy"><strong>西天</strong><p>第一章〈望川鎮的失蹤者〉</p></div>
+      </a>
+
+      <a class="tile vocab tool" href="vocabulary/">
+        <span class="cards" aria-hidden="true"><i></i><b>字</b></span>
+        <div><h2>今日單字</h2><p id="daily-word-summary">日文與韓文 · 每日 10 張字卡</p></div>
+      </a>
+
+      <a class="tile progress tool" href="progress/">
+        <span class="steps" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div><h2>學習進度</h2><p id="learning-progress-summary">課程與複習紀錄</p></div>
+      </a>
+
+      <a id="dream" class="tile dream" href="./dream/">
+        <img src="dream/cosmos/p01.webp" width="1480" height="716" alt="" loading="lazy">
+        <div class="feature-copy"><h2>夢想藍圖</h2><p>我的赴美護理計畫</p></div>
+        <span class="open" aria-hidden="true">↗</span>
+      </a>
+
+      <a id="nursing" class="tile nursing" href="nursing/">
+        <span class="pulse" aria-hidden="true"></span>
+        <div class="feature-copy"><h2>護理</h2><p>內科黑板課</p></div>
+        <span class="open" aria-hidden="true">↗</span>
+      </a>
+
+      <a class="practice" href="dream/#library"><span aria-hidden="true" class="chat"><i></i></span><strong>英文練習</strong><span class="practice-arrow" aria-hidden="true">→</span></a>
     </main>
   </div>
 </body>

@@ -29,12 +29,3 @@ export function UniverseBackground({sky}:{sky:BackgroundState}) {
     <div className="universe-scrim"/>
   </div>
 }
-
-export function BackgroundCredit({sky}:{sky:BackgroundState}) {
-  if (sky.unavailable) return null
-  const photo = sky.shown
-  return <footer className="background-credit">
-    背景攝影 · <a href={photo.source} target="_blank" rel="noreferrer">{photo.credit}</a>
-    {' · '}<a href={photo.licenseUrl} target="_blank" rel="noreferrer">{photo.license}</a>
-  </footer>
-}
