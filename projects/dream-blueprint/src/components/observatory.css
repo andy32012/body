@@ -39,19 +39,57 @@
 .application .orbit-card p,.application .dock-list dd,.application .dock-words {color:var(--text);}
 .application .desktop-content {max-width:1250px;padding-inline:clamp(24px,4.5vw,78px);}
 .application .global-head {margin-bottom:22px;}
-.flight-deck {min-width:0;}
-.flight-deck .hero-body {
-  width:fit-content;max-width:100%;padding:18px 24px 20px;border-radius:15px;
-  background:linear-gradient(115deg,rgba(6,15,25,.72),rgba(8,16,28,.49));
-  border:1px solid rgba(229,239,255,.26);box-shadow:0 12px 36px #02071735;
-  backdrop-filter:blur(5px);color:white;
+.flight-deck {
+  position:relative; isolation:isolate; overflow:hidden; min-width:0;
+  display:flex; align-items:center; min-height:clamp(252px,22vw,316px);
+  border:1px solid #68758375; border-radius:22px; color:white;
+  background:linear-gradient(110deg,#060b13 5%,#0d1521 56%,#020508);
+  box-shadow:0 12px 35px #02050b35;
 }
-.flight-deck .hero-label {color:#fff0d2;font-size:12px;}
-.hero-dash {width:18px;height:1px;background:#f3c37d;}
-.flight-deck .hero-number strong {font-weight:500;line-height:1.03;font-size:clamp(66px,6vw,94px);}
-.flight-deck .hero-number>span {color:#fbf6ef;}
-.flight-deck .hero-body>p {max-width:31em;color:#fff;font-size:14px;margin:10px 0 14px;}
-.flight-deck .launch {min-height:41px;background:#f7e2bf;border-color:#f9e9ce;color:#2b2016;}
+.flight-photo {
+  position:absolute; z-index:-1; top:50%; right:-2%;
+  width:65%; height:145%; transform:translateY(-48%); object-fit:cover;
+  object-position:center 33%; mix-blend-mode:screen; pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent,#000 22%);
+}
+.flight-deck .hero-body {max-width:57%; padding:clamp(22px,2.8vw,42px);}
+.flight-deck .hero-label {color:#f4ddbb; font-size:13px;}
+.hero-dash {width:22px; height:1px; background:#edb66b;}
+.flight-deck .hero-number {gap:10px; margin-top:5px;}
+.flight-deck .hero-number strong {font-weight:550; font-size:clamp(62px,6.45vw,100px); line-height:1.02;}
+.flight-deck .hero-number>span {font-size:19px; color:#f2ede4;}
+.flight-deck .hero-body>p {max-width:27em; margin:8px 0 17px; font-size:14px; color:#ebe8e3;}
+.flight-deck .launch {min-height:44px; padding:10px 16px; background:#fff2da; color:#241b11; border:0; border-radius:10px;}
+.flight-deck .launch:hover {background:white;}
+.home-stack .overview-row {grid-template-columns:minmax(0,1.06fr) minmax(0,1fr); gap:16px;}
+.home-stack .next-card,.home-stack .week-card {border-radius:20px; padding:clamp(19px,2.1vw,31px);}
+.home-stack .next-card {
+  isolation:isolate; overflow:hidden; position:relative; color:#242132; border-color:#ffffff80;
+  background:radial-gradient(ellipse at 99% 0,#fff2b9 0%,transparent 39%),
+    radial-gradient(ellipse at 98% 63%,#dfb9f7 0%,transparent 54%),
+    linear-gradient(105deg,#fbfafc 5%,#f1eefd 65%,#d9d1fc);
+}
+.home-stack .next-card .section-head h2 {font-size:12px; font-weight:650; letter-spacing:.12em; color:#4c415a;}
+.home-stack .next-card h3 {max-width:75%; font-size:clamp(21px,2.1vw,31px); line-height:1.4; letter-spacing:0; margin:10px 0 7px; color:#25212d; overflow-wrap:anywhere;}
+.home-stack .next-card p {max-width:81%; font-size:13px; line-height:1.65; color:#494150;}
+.home-stack .next-action {margin-top:15px; padding:8px 13px; min-height:40px; border-radius:9px; background:#272232; color:white; font-size:13px; font-weight:600;}
+.home-stack .next-action:hover {background:#463953;}
+.route-emblem {
+  position:absolute; z-index:-1; top:clamp(19px,2.1vw,31px); right:clamp(17px,2.1vw,31px);
+  display:grid; place-items:center; width:clamp(40px,4.1vw,59px); aspect-ratio:1;
+  border-radius:50%; color:#40304f; background:#fffc; box-shadow:0 7px 22px #7d5d9524;
+}
+.home-stack .week-card {
+  --panel:#172331; --line:#546272; --muted:#c3cdd3; --mint:#a6e8cd; --lav:#f2cd8e; --bg:#0c1824;
+  display:flex; flex-direction:column; justify-content:space-between; gap:11px;
+  background:radial-gradient(ellipse at 87% -35%,#31555b,transparent 75%),linear-gradient(125deg,#14212c,#111923);
+  border-color:#71858c80;
+}
+.home-stack .week-card .section-head h2 {color:#f7faf8;}
+.home-stack .week-card .week-tally {color:#d4e4df;}
+.home-stack .week-card .week-tally b {font-size:20px;}
+.home-stack .week-card .week-legend {margin-top:3px;}
+.home-stack :is(.launch,.next-action):focus-visible {outline:3px solid #699beb; outline-offset:4px;}
 .application .library-page>h1,.application .settings-page>header h1,.application .history-page>header h1,.application .pl-title h1,.application .race-page>h1,.application .cg-head h1 {color:white;text-shadow:var(--space-head-shadow);}
 .application .cg-head p,.application .cg-offline small {color:white;text-shadow:var(--space-head-shadow);}
 .application .cg-filters {background:var(--space-card);border:1px solid var(--space-border);border-radius:12px;padding:8px;}
@@ -60,8 +98,14 @@
 @media(max-width:760px){
   .application .desktop-content {padding:16px 17px calc(88px + env(safe-area-inset-bottom));}
   .application .global-head {margin-bottom:15px;}
-  .flight-deck .hero-body {max-width:96%;padding:14px 17px 16px;border-radius:13px;}
-  .flight-deck .hero-body>p {font-size:13px;max-width:240px;}
-  .flight-deck .hero-number strong {font-size:58px;}
+  .home-stack .overview-row {grid-template-columns:minmax(0,1fr); gap:13px;}
+  .flight-deck {min-height:253px; border-radius:19px;}
+  .flight-deck .hero-body {max-width:69%; padding:19px 16px;}
+  .flight-deck .hero-body>p {max-width:17em; font-size:13px; text-shadow:0 1px 4px #000;}
+  .flight-photo {width:71%; right:-14%; height:126%; object-position:50% 25%; mask-image:linear-gradient(90deg,transparent,#000 46%);}
+  .flight-deck .hero-number strong {font-size:65px;}
+  .flight-deck .hero-label {font-size:12px;}
+  .home-stack .next-card h3 {max-width:78%;}
+  .home-stack .week-card {gap:8px;}
 }
 @media(prefers-reduced-transparency:reduce){.application {--space-card:var(--panel);--space-reading:var(--panel);--space-rail:var(--rail);}}

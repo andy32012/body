@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
-  Check, ChevronRight, Compass, Flag,
+  Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Play, Settings2, Star, Sun,
   Telescope, Trophy, Images,
 } from 'lucide-react'
@@ -89,6 +89,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void}) {
     regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天從一句中翻英開始，接著用同一句聽和說。'
   return <div className="home-stack">
     <section className="flight-deck" aria-label="今日練習">
+      <img className="flight-photo" src="./cosmos/p06.webp" alt="" aria-hidden="true" onError={event=>{event.currentTarget.hidden=true}}/>
       <div className="hero-body">
         <div className="hero-label"><span aria-hidden="true" className="hero-dash"/>累計練習</div>
         <div className="hero-number"><strong>{days}</strong><span>天</span></div>
@@ -98,9 +99,10 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void}) {
     </section>
     <div className="overview-row">
       <section className="orbit-card next-card">
-        <div className="section-head"><span className="card-symbol amber"><Flag size={18}/></span><h2>下一步</h2><span className="step-context"><i/>夢想線</span></div>
+        <div className="section-head"><h2>夢想星圖 · 下一步</h2></div>
+        <span className="route-emblem" aria-hidden="true"><RouteIcon size={29} strokeWidth={1.65}/></span>
         <h3>{goal.title}</h3><p>{goal.detail}</p>
-        <button type="button" onClick={()=>setView('plan','map')} className="next-action"><ArrowRight size={14}/>{goal.action}</button>
+        <button type="button" onClick={()=>setView('plan','map')} className="next-action">{goal.action}<ArrowRight size={15} aria-hidden="true"/></button>
       </section>
       <Week state={state} today={today}/>
     </div>

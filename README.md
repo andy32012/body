@@ -30,6 +30,7 @@
 - `english/`：英文課規劃頁（準備中）
 - `learning/`：日韓共用介面、教材、朗讀與本機學習紀錄
 - `assets/site.css`：內頁共用樣式
+- `assets/earth-epic.webp`：首頁地球影像取自 [NASA DSCOVR/EPIC First Light](https://epic.gsfc.nasa.gov/galleries/2015/first_light)，已縮放並轉為 WebP。
 
 黑板課的字會照筆順一筆一畫寫出來，圖邊講邊畫，同時播放語音講解。語音事先生成好放在各課的 `audio/` 資料夾，網頁播放時不連任何 API，也沒有存放任何金鑰。
 

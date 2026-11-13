@@ -27,7 +27,11 @@ nav a { display: grid; place-items: center; min-height: 44px; padding: 0 2px; co
 nav a:hover { color: white; text-decoration: underline; text-underline-offset: 5px; }
 .board {
   container-type: inline-size; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-template-areas: "lang lang lang comic comic vocab" "lang lang lang comic comic progress" "dream dream dream nursing nursing practice";
+  grid-template-areas:
+    "dream dream dream dream dream dream"
+    "lang lang lang comic comic vocab"
+    "lang lang lang comic comic progress"
+    "nursing nursing nursing nursing nursing practice";
   gap: var(--gap);
 }
 .tile, .hello-panel { position: relative; isolation: isolate; overflow: hidden; border-radius: var(--radius); }
@@ -35,12 +39,29 @@ nav a:hover { color: white; text-decoration: underline; text-underline-offset: 5
 .tile img { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 section[id], a[id] { scroll-margin-top: 10px; }
 .languages { grid-area: lang; display: grid; grid-template-rows: 1fr auto; gap: var(--gap); }
-.hello-panel { min-height: clamp(194px, 19vw, 252px); background: radial-gradient(ellipse at 95% 115%, #efbcff, transparent 63%), linear-gradient(120deg, #eee9ff, #cfc6ff 70%, #ccacfc); color: #271b45; padding: var(--pad); }
+.hello-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: clamp(194px, 17vw, 220px);
+  padding: var(--pad);
+  color: #231d2e;
+  background:
+    radial-gradient(ellipse at 100% 0%, #e4ef9a 0%, transparent 43%),
+    radial-gradient(ellipse at 91% 34%, #f0bad9 5%, transparent 52%),
+    radial-gradient(ellipse at 76% 105%, #b8a8fa 5%, transparent 57%),
+    #fbf8fc;
+}
 .hello-panel h2, .comic h2 { font-size: clamp(16px, 1.6vw, 22px); letter-spacing: .02em; }
-.greeting { position: absolute; left: var(--pad); right: var(--pad); bottom: 11%; display: flex; align-items: flex-end; justify-content: center; gap: clamp(10px, 2vw, 28px); }
-.greeting [lang] { font-family: Inter, "Arial Rounded MT Bold", Arial, sans-serif; font-weight: 800; font-size: clamp(84px, 10.1cqw, 124px); line-height: .94; letter-spacing: -.087em; color: #5228ae; background: linear-gradient(155deg, #9336f9 8%, #5921ba 41%, #37206f 76%, #533caa); background-clip: text; -webkit-text-fill-color: transparent; }
-.reply { position: relative; align-self: flex-start; margin-top: 3px; padding: .22em .55em .28em; border-radius: 1em; background: #f4ffbb; color: #312840; font-weight: 750; font-size: clamp(20px, 2.7cqw, 34px); line-height: 1.35; transform: rotate(8deg); box-shadow: 0 7px 13px #58357a22, inset 0 2px 1px #fff8; }
-.reply::after { content: ""; position: absolute; bottom: -.12em; left: .5em; width: .33em; height: .3em; background: #f4ffbb; clip-path: polygon(20% 0, 100% 0, 0 100%); }
+.greeting { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: clamp(12px, 2cqw, 25px); }
+.greeting [lang] {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-weight: 650;
+  font-size: clamp(68px, 8.4cqw, 104px);
+  line-height: 1.05;
+  letter-spacing: -.075em;
+}
+.reply { font-size: clamp(20px, 2.3cqw, 30px); font-weight: 550; }
 .course-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--gap); }
 .course { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 1; padding: clamp(12px, 1.6vw, 23px); }
 .glyph { position: absolute; inset: 6% 0 23%; display: grid; place-items: center; font-weight: 700; font-size: clamp(50px, 6.7cqw, 83px); line-height: 1; }
@@ -75,15 +96,51 @@ section[id], a[id] { scroll-margin-top: 10px; }
 .steps i:nth-child(1) { height: 36%; }
 .steps i:nth-child(2) { height: 65%; }
 .steps i:nth-child(3) { height: 96%; }
-.dream, .nursing { display: flex; align-items: flex-end; padding: var(--pad); color: #fff; min-height: clamp(188px, 17vw, 228px); }
-.dream { grid-area: dream; background: #060813; border: 1px solid #373841; }
-.dream img { width: 84%; left: auto; object-fit: contain; object-position: right center; }
-.dream::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #0d1021 0, #0d1021c2 29%, transparent 67%), linear-gradient(0deg, #0b0e17a6, transparent 58%); }
+.dream, .nursing { display: flex; color: #fff; padding: var(--pad); }
+.dream {
+  grid-area: dream;
+  align-items: center;
+  min-height: clamp(218px, 19vw, 264px);
+  padding: clamp(22px, 3.4cqw, 44px);
+  border: 1px solid #36373e;
+  background: #020304;
+}
+.dream img {
+  width: clamp(560px, 68%, 800px);
+  height: auto;
+  inset: 45% -5% auto auto;
+  transform: translateY(-50%);
+}
+.dream::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, #030407 7%, #030407ee 31%, #05070d35 59%, transparent 77%);
+}
+.dream .feature-copy { max-width: 53%; }
+.dream .feature-copy h2 { font-size: clamp(34px, 4.1cqw, 54px); letter-spacing: -.045em; }
+.dream .feature-copy p { color: #d8dbe1; margin-top: 6px; }
+.hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 39px;
+  margin-top: 17px;
+  padding: 7px 14px;
+  border-radius: 9px;
+  background: #f8f8f6;
+  color: #181a20;
+  font-size: 14px;
+  font-weight: 650;
+}
+.hero-action span { font-family: Arial, sans-serif; }
+.nursing { align-items: center; min-height: clamp(156px, 13vw, 194px); }
 .feature-copy h2 { font-size: clamp(26px, 3.4cqw, 42px); line-height: 1.25; letter-spacing: -.055em; }
 .feature-copy p { margin-top: 3px; }
 .nursing { grid-area: nursing; background: radial-gradient(ellipse at 74% 25%, #23605c, transparent 65%), #173b38; }
 .nursing::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(#7db8a519 1px, transparent 1px), linear-gradient(90deg, #7db8a519 1px, transparent 1px); background-size: 19px 19px; }
-.pulse { position: absolute; z-index: -1; left: 13%; width: 89%; height: 47%; top: 10%; background: #91ffcf; clip-path: polygon(0 62%,19% 62%,24% 48%,29% 62%,37% 62%,41% 71%,48% 2%,52% 90%,59% 60%,70% 60%,76% 41%,82% 60%,100% 60%,100% 63%,81% 63%,76% 47%,71% 63%,60% 63%,51.5% 100%,47.5% 17%,41.5% 79%,36.5% 65%,28% 65%,24% 54%,20% 65%,0 65%); }
+.pulse { position: absolute; z-index: -1; right: -2%; width: 65%; height: 59%; top: 20%; background: #91ffcf; clip-path: polygon(0 62%,19% 62%,24% 48%,29% 62%,37% 62%,41% 71%,48% 2%,52% 90%,59% 60%,70% 60%,76% 41%,82% 60%,100% 60%,100% 63%,81% 63%,76% 47%,71% 63%,60% 63%,51.5% 100%,47.5% 17%,41.5% 79%,36.5% 65%,28% 65%,24% 54%,20% 65%,0 65%); }
 .practice { grid-area: practice; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4%; aspect-ratio: 1; width: 100%; align-self: center; border-radius: 50%; color: #452641; background: radial-gradient(ellipse at 35% 21%, #fff0fb, #efcde5 66%, #c8a4c8); }
 .practice strong { font-size: clamp(15px, 1.6vw, 22px); }
 .chat { display: grid; place-items: center; position: relative; width: 35%; aspect-ratio: 1.48; background: #8b4980; border-radius: 32%; margin-bottom: 3%; }
@@ -100,7 +157,10 @@ section[id], a[id] { scroll-margin-top: 10px; }
 }
 @media (max-width: 880px) {
   .frame { max-width: 730px; }
-  .board { grid-template-columns: repeat(3,minmax(0,1fr)); grid-template-areas: "lang lang lang" "comic comic vocab" "comic comic progress" "dream dream dream" "nursing nursing practice"; }
+  .board {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    grid-template-areas: "dream dream dream" "lang lang lang" "comic comic vocab" "comic comic progress" "nursing nursing practice";
+  }
   .hello-panel { min-height: clamp(160px, 31cqw, 210px); }
   .greeting [lang] { font-size: clamp(70px, 19cqw, 120px); }
   .reply { font-size: clamp(19px, 5.7cqw, 35px); }
@@ -110,7 +170,10 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .progress .steps { height: clamp(30px, 9cqw, 58px); }
   .feature-copy h2 { font-size: clamp(25px, 7cqw, 38px); }
   .comic-copy strong { font-size: clamp(43px, 10.7cqw, 65px); }
-  .dream, .nursing { min-height: clamp(143px, 29cqw, 195px); }
+  .dream { min-height: clamp(190px, 35cqw, 225px); }
+  .dream img { width: 77%; min-width: 310px; right: -12%; }
+  .nursing { min-height: clamp(143px, 29cqw, 195px); align-items: flex-end; }
+  .pulse { width: 85%; height: 43%; top: 12%; }
 }
 @media (max-width: 520px) {
   :root { --gap: 9px; --radius: 18px; --pad: 16px; }
@@ -120,7 +183,13 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .mark { width: 16px; height: 16px; }
   nav { gap: clamp(4px, 1.7vw, 9px); }
   nav a { font-size: 12px; }
-  .greeting { bottom: 16%; }
+  .dream { padding: 18px; }
+  .dream img { width: 97%; min-width: 265px; right: -30%; top: 38%; }
+  .dream::before { background: linear-gradient(90deg, #030407 1%, #030407cc 38%, #03040733 70%, transparent); }
+  .dream .feature-copy { max-width: 63%; }
+  .dream .feature-copy h2 { font-size: 30px; }
+  .dream .feature-copy p { font-size: 13px; }
+  .hero-action { font-size: 13px; margin-top: 12px; }
   .course { padding: 10px; border-radius: 15px; }
   .course small { font-size: 9px; }
   .arrow { font-size: 12px; right: 8%; bottom: 10%; }
@@ -132,5 +201,5 @@ section[id], a[id] { scroll-margin-top: 10px; }
 }
 @media (forced-colors: active) {
   .tile, .practice, .hello-panel { border: 1px solid CanvasText; }
-  .greeting [lang] { -webkit-text-fill-color: CanvasText; }
+  .hero-action { border: 1px solid ButtonText; }
 }
