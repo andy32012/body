@@ -3,6 +3,8 @@ import test from 'node:test'
 import { getScreeningQueue, isKnownWord, officialWords, wordKey } from '../src/lib/vocab'
 import { dailyQueue, dailyTarget, dailyWordPhoto } from '../src/lib/dailyWords'
 import { photos } from '../src/lib/cosmos'
+import passages from '../src/data/passages.json'
+import { doneKey, levelProgress, nextPassage, redoKey } from '../src/lib/passages'
 import wordParts from '../src/data/medical-parts.json'
 
 test('六級條目和醫護構詞都有可離線的中文釋義', () => {
@@ -51,4 +53,17 @@ test('今日單字每 56 個字看完整組實拍照，回頭看同一個字會�
     assert.deepEqual(new Set(sequence.slice(i, i + photos.length)), catalogue)
   }
   assert.equal(dailyWordPhoto(officialWords[38].en).id, sequence[38])
+})
+
+test('7000 單短文：六級共 1,476 段，第 1 級每段都有參考翻譯；做完的不再出現，標記不會的排到最後', () => {
+  assert.equal(passages.length,1476)
+  assert.equal(new Set(passages.map(p=>p.id)).size,1476)
+  const first = passages.filter(p=>p.level===1)
+  assert.equal(first.length,235)
+  assert.ok(first.every(p=>p.en && p.en.length>20 && p.words))
+  assert.equal(nextPassage(passages,1,{},{})?.id,'L1-A01')
+  assert.equal(nextPassage(passages,1,{[doneKey('L1-A01')]:true},{})?.id,'L1-A02')
+  assert.equal(nextPassage(passages,1,{},{[redoKey('L1-A01')]:'1'})?.id,'L1-A02')
+  assert.equal(nextPassage(passages,1,{},{},[],'Z')?.id,'L1-Z01')
+  assert.deepEqual(levelProgress(passages,1,{[doneKey('L1-A01')]:true}),{done:1,total:235})
 })

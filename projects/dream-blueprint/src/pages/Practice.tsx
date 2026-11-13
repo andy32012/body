@@ -1,6 +1,7 @@
 import ScenePhoto from "../components/ScenePhoto";
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
+import PassageLibrary from "../components/PassageLibrary";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
@@ -722,7 +723,7 @@ function Extras({
   onActivity?: PageProps["update"];
 }) {
   const [mode, setMode] = useState<
-    "words" | "listen" | "quiz" | "screen" | "translate"
+    "words" | "listen" | "quiz" | "screen" | "translate" | "passage"
   >("words");
   const [limit] = useState(() => {
     const reviewed = new Set(
@@ -844,6 +845,7 @@ function Extras({
             ["words", "單字複習"],
             ["listen", "句子跟讀"],
             ["translate", "中翻英"],
+            ["passage", "7000 單短文"],
             ["quiz", "選擇題"],
             ["screen", "單字快篩"],
           ] as const
@@ -853,7 +855,8 @@ function Extras({
               !quiet ||
               key === "listen" ||
               key === "words" ||
-              key === "translate",
+              key === "translate" ||
+              key === "passage",
           )
           .map(([key, label]) => (
             <button
@@ -947,6 +950,9 @@ function Extras({
             <p>第一次完成句子練習後，就能回來複習。</p>
           )}
         </div>
+      )}
+      {mode === "passage" && (
+        <PassageLibrary state={state} onActivity={onActivity} />
       )}
       {mode === "quiz" && !quiet && (
         <div className="pr-stack">

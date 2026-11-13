@@ -314,3 +314,11 @@
   .library-page > .pr-cover { min-height: 110px; }
   .library-page .dock-preview { padding: .8rem; }
 }
+.passage-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: .9rem; color: var(--practice-secondary); }
+.passage-head label { display: inline-flex; align-items: center; gap: .45rem; }
+.passage-head select { min-height: 40px; }
+.passage-count { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+.passage-count b { color: var(--practice-accent); font-size: 1.1rem; }
+.passage-text { font-size: clamp(1.15rem, 2.2vw, 1.45rem); line-height: 1.85; margin: .3rem 0 0; overflow-wrap: anywhere; }
+.passage-note { color: var(--practice-secondary); font-size: .92rem; }
+.passage-library .pr-reference p[lang="en"] { font-size: 1.08rem; line-height: 1.7; }
