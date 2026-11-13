@@ -19,7 +19,7 @@
 完整原始碼、教材與測試放在 [projects/dream-blueprint](./projects/dream-blueprint/)，操作方式見[專案說明](./projects/dream-blueprint/README.md)。更新 App 時請在該資料夾安裝依賴、測試並建置，將產出的靜態檔案發佈到根目錄的 [dream](./dream/) 資料夾。Body 首頁和日韓學習室沿用下方原有的維護方式。
 
 
-- `index.html`、`style.css`：Body 首頁（方塊拼貼）
+- `index.html`、`style.css`：Body 首頁（漫畫、語言學習、護理、夢想藍圖）
 - `comic/`：《西天》線上漫畫
 - `nursing/`：內科黑板課目錄（心臟、血液、免疫、腫瘤）
   - `nursing/heart-failure/`：心衰竭：左 vs 右

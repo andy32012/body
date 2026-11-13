@@ -1,123 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Body</title>
-  <meta name="description" content="漫畫、內外科護理與日英韓語言學習，都在 Body。">
-  <link rel="stylesheet" href="style.css?v=e1004def475e">
+  <meta name="theme-color" content="#f6f4ef">
+  <title>Body｜漫畫、語言學習、護理與夢想藍圖</title>
+  <meta name="description" content="閱讀《西天》漫畫、學習日英韓語、上護理黑板課，或進入夢想藍圖開始今天的練習。">
+  <link rel="stylesheet" href="style.css?v=7c374c51ee38">
   <script type="module" src="learning/home.js?v=8b3169027ef7"></script>
 </head>
 <body>
+  <a class="skip" href="#content">跳到主要內容</a>
   <div class="page">
-    <header class="top">
-      <p class="wordmark">Body</p>
+    <header class="masthead">
+      <h1 class="brand"><span class="book" aria-hidden="true"></span>Body</h1>
+      <nav aria-label="首頁分類">
+        <a href="#comic">漫畫</a><a href="#languages">語言學習</a><a href="#nursing">護理</a><a href="#dream">夢想藍圖</a>
+      </nav>
     </header>
-
-    <main class="bento">
-      <a class="tile tile-comic" href="./comic/">
-        <span class="copy">
-          <h2>漫畫</h2>
-          <p>西天｜線上漫畫</p>
-        </span>
-      </a>
-
-      <a class="tile tile-internal" href="nursing/">
-        <span class="icon icon-rose" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none">
-            <path d="M16 26s-8.2-5.4-10.4-10.1C4.3 13.2 5.2 9.2 8.6 8.2c2.1-.6 4.1.3 5.4 1.9 1.3-1.6 3.3-2.5 5.4-1.9 3.4 1 4.3 5 2.9 7.7C24.2 20.6 16 26 16 26z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="copy">
-          <h2>內科</h2>
-          <p>黑板課 · 4 個主題</p>
-        </span>
-      </a>
-
-      <div class="tile tile-surgery is-placeholder">
-        <span class="badge">準備中</span>
-        <span class="icon icon-slate" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none">
-            <path d="M19.2 6.8l6 6M8.6 23.4l-2.2 4M8.6 23.4L21.8 10.2a3.1 3.1 0 0 1 4.4 4.4L13 25.8H8.6v-2.4z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="copy">
-          <h2>外科</h2>
-          <p>課程即將推出</p>
-        </span>
+    <main id="content">
+      <div class="heading"><p>閱讀與學習</p><span aria-hidden="true"></span></div>
+      <div class="directory">
+        <section id="comic" class="panel comic" aria-labelledby="comic-title">
+          <img class="backdrop" src="assets/comic-cover.jpg" width="800" height="420" alt="" fetchpriority="high">
+          <div class="photo-copy">
+            <h2 id="comic-title">漫畫</h2>
+            <p class="work">西天</p>
+            <p class="synopsis">第一章〈望川鎮的失蹤者〉</p>
+            <a class="action" href="./comic/">閱讀漫畫 <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section id="languages" class="panel languages" aria-labelledby="languages-title">
+          <h2 id="languages-title">語言學習</h2>
+          <div class="courses">
+            <a href="japanese/"><b lang="ja" aria-hidden="true">あ</b><strong>日文</strong></a>
+            <a href="english/"><b lang="en" aria-hidden="true">Aa</b><strong>英文</strong><small>籌備中</small></a>
+            <a href="korean/"><b lang="ko" aria-hidden="true">한</b><strong>韓文</strong></a>
+          </div>
+          <div class="study-links">
+            <a href="vocabulary/"><strong>今日單字</strong><small id="daily-word-summary">日文與韓文 · 每日 10 張字卡</small><span aria-hidden="true">→</span></a>
+            <a href="progress/"><strong>學習進度</strong><small id="learning-progress-summary">課程與複習紀錄</small><span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section id="nursing" class="panel nursing" aria-labelledby="nursing-title">
+          <div class="trace" aria-hidden="true"></div>
+          <div class="photo-copy">
+            <h2 id="nursing-title">護理</h2>
+            <p class="work">內科黑板課</p>
+            <p class="synopsis">從左心與右心衰竭開始。</p>
+            <a class="action" href="nursing/">進入護理教室 <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section id="dream" class="panel dream" aria-labelledby="dream-title">
+          <img class="backdrop" src="dream/cosmos/p01.webp" loading="lazy" alt="">
+          <div class="photo-copy">
+            <h2 id="dream-title">夢想藍圖</h2>
+            <p class="work">我的赴美護理計畫</p>
+            <p class="synopsis">每日英文練習與護理師生涯規劃。</p>
+            <a class="action" href="./dream/">開啟夢想藍圖 <span aria-hidden="true">→</span></a>
+          </div>
+          <a class="credit" href="https://science.nasa.gov/photojournal/saturn-four-years-on/">土星攝影 · NASA/JPL/Space Science Institute</a>
+        </section>
       </div>
-
-      <div class="tile tile-hero">
-        <p class="hero-kicker">學習入口</p>
-        <h1>Body</h1>
-        <p class="hero-sub">漫畫、內外科與語言，收在同一頁</p>
-        <p class="hero-sub"><a href="./dream/" style="color: #152339; font-weight: 650;">夢想藍圖 · 護理英文與赴美計畫</a></p>
-      </div>
-
-      <div class="tile tile-langs">
-        <span class="icon icon-light" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="10.5" stroke="currentColor" stroke-width="1.7"/>
-            <path d="M16 5.5v21M5.5 16h21M8.2 9.8c2.4 1.8 5 2.7 7.8 2.7s5.4-.9 7.8-2.7M8.2 22.2c2.4-1.8 5-2.7 7.8-2.7s5.4.9 7.8 2.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="copy">
-          <h2>學語言</h2>
-          <p>日文 · 英文 · 韓文</p>
-        </span>
-      </div>
-
-      <a class="tile tile-jp" href="japanese/">
-        <span class="glyph">あ</span>
-        <span class="copy">
-          <h2>日文</h2>
-          <p>五十音 → 進階 · 30 堂課</p>
-        </span>
-      </a>
-
-      <a class="tile tile-en" href="english/">
-        <span class="glyph">A</span>
-        <span class="copy">
-          <h2>英文</h2>
-          <p>護理英文</p>
-        </span>
-      </a>
-
-      <a class="tile tile-kr" href="korean/">
-        <span class="glyph">한</span>
-        <span class="copy">
-          <h2>韓文</h2>
-          <p>韓文字母 → 進階 · 30 堂課</p>
-        </span>
-      </a>
-
-      <a class="tile tile-vocab" href="vocabulary/">
-        <span class="badge badge-live">每天一點點</span>
-        <span class="icon icon-amber" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none">
-            <rect x="7" y="6.5" width="18" height="19" rx="2.4" stroke="currentColor" stroke-width="1.7"/>
-            <path d="M11.5 13.2h9M11.5 17.5h9M11.5 21.8h5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="copy">
-          <h2>今日單字</h2>
-          <p id="daily-word-summary">日文與韓文 · 每日 10 張字卡</p>
-        </span>
-      </a>
-
-      <a class="tile tile-progress" href="progress/">
-        <span class="badge badge-live">我的學習筆記</span>
-        <span class="icon icon-green" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="10.5" stroke="#d8d8dd" stroke-width="2.4"/>
-            <path d="M16 5.5a10.5 10.5 0 0 1 9.1 15.7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="copy">
-          <h2>學習進度</h2>
-          <p id="learning-progress-summary">課程、收藏與每天的小小累積</p>
-        </span>
-      </a>
     </main>
   </div>
 </body>

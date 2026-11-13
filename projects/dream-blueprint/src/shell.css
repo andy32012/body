@@ -68,11 +68,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 .hero-number strong {font-family:"DM Sans","Segoe UI",sans-serif;font-size:clamp(67px,5.5vw,90px);font-weight:550;letter-spacing:-.07em;line-height:1.02;font-variant-numeric:tabular-nums;color:#fff}
 .hero-number>span {color:#e2d8ee;font-size:21px;font-weight:500}
 .hero-body>p {color:#ded8ee;font-size:14px;margin:10px 0 19px;line-height:1.5}
-.hero-acts {display:flex;align-items:center;gap:18px}
+
 .launch {display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:10px 15px;border:1px solid #dfd0ff;border-radius:8px;color:#292038;background:#d1bafa;font-size:13px;letter-spacing:.02em;font-weight:700;box-shadow:0 4px 16px #100a3040}
 .launch svg:first-child {width:12px}
 .launch:hover {background:#e0ceff}
-.preview-link {display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#e4ddee;text-decoration:none}
+
 .overview-row,.practice-dock {display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:18px;align-items:stretch}
 .orbit-card,.dock-panel {min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 4px 10px #00000008}
 .section-head {display:flex;align-items:center;gap:10px}
@@ -120,7 +120,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 .plan-strip>span:nth-child(2){display:grid;gap:4px}.plan-strip strong {font-weight:580;font-size:13px}.plan-strip small{color:var(--muted);font-size:12px}.plan-strip>svg{margin-left:auto;color:var(--lav);flex:none}
 .library-page>h1{margin:0 0 20px}.mobile-brand,.mobile-nav{display:none}
 @media(min-width:1600px){.desktop-content{padding-top:42px}.orbit-card,.dock-panel{padding:24px 27px}}
-@media(max-width:1100px) and (min-width:761px){.sidebar{width:184px;padding-inline:12px}.viewport{margin-left:184px}.desktop-content{padding-inline:23px}.orbit-card,.dock-panel{padding:16px}.hero-body{max-width:70%}.hero-acts{gap:12px}.overview-row,.practice-dock{gap:12px}.exam-offer{flex-wrap:wrap}.destination-strong{font-size:12px}}
+@media(max-width:1100px) and (min-width:761px){.sidebar{width:184px;padding-inline:12px}.viewport{margin-left:184px}.desktop-content{padding-inline:23px}.orbit-card,.dock-panel{padding:16px}.hero-body{max-width:70%}.overview-row,.practice-dock{gap:12px}.exam-offer{flex-wrap:wrap}.destination-strong{font-size:12px}}
 @media(max-width:760px){
   .sidebar{display:none}.viewport{margin-left:0}.desktop-content{padding:16px 16px calc(85px + env(safe-area-inset-bottom))}
   .mobile-brand{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:11px 16px;background:var(--rail)}
@@ -128,7 +128,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
   .global-head{margin-bottom:15px;gap:9px}.global-head h1{font-size:26px}.global-head p{font-size:11px;margin-top:4px}.heading-spark{font-size:14px}.header-controls{gap:6px}.theme-switch{width:30px;height:30px}.phase-pill{font-size:10px;padding:6px 8px}
   .home-stack{gap:13px}
   .hero-body{padding:17px 18px;max-width:86%}.hero-label{font-size:11px}.hero-number strong{font-size:63px}.hero-number>span{font-size:17px}.hero-body>p{font-size:12px;max-width:185px;margin:7px 0 12px}
-  .hero-coordinate{display:none}.hero-acts{gap:10px}.launch{font-size:12px;padding:8px 11px;gap:6px}.preview-link{font-size:11px}
+  .hero-coordinate{display:none}.launch{font-size:12px;padding:8px 11px;gap:6px}
   .overview-row,.practice-dock{grid-template-columns:1fr;gap:13px}.orbit-card,.dock-panel{border-radius:13px;padding:16px}
   .next-card h3{font-size:17px;margin-top:9px}.next-action{margin-top:9px}.section-head h2,.dock-title{font-size:16px}
   .week-card{padding-block:14px}.week-track{margin-top:9px}.week-legend{margin-top:8px}
@@ -140,4 +140,4 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:0s!important}}
 
 
-.hero-map {border:0;padding:6px 0;background:transparent;font:inherit;font-size:12px}.library-page>.practice-dock{grid-template-columns:1fr}.library-page>.practice-dock .dock-choices{max-width:600px}.library-page>.practice-dock .dock-launch{max-width:330px}
+.library-page>.practice-dock{grid-template-columns:1fr}.library-page>.practice-dock .dock-choices{max-width:600px}.library-page>.practice-dock .dock-launch{max-width:330px}

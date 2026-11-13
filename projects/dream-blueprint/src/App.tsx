@@ -18,7 +18,7 @@ import Rivals from './pages/Rivals'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
-import { UniverseBackground, PhotoCaption, PhotoCollections, useObservatory, type SkyControls } from './components/Observatory'
+import { UniverseBackground, BackgroundCredit, useObservatory } from './components/Observatory'
 
 type View = Page | 'library' | 'cosmos'
 type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string}
@@ -76,7 +76,7 @@ function Week({state,today}:{state:AppState,today:string}) {
     <div className="week-legend"><span><i className="done-key"/>已練習</span><span><i className="today-key"/>今天</span><span><Moon size={11}/>休息日</span></div>
   </section>
 }
-function Home(props:PageProps & {today:string, start:(e:Energy)=>void, sky:SkyControls}) {
+function Home(props:PageProps & {today:string, start:(e:Energy)=>void}) {
   const {state,update,today,start}=props
   const phase=activePeriod(today,state.settings.periods)
   const maintenance= today>='2028-02-01'&&today<='2029-07-31' && (phase==='exam'||phase==='internship')
@@ -88,16 +88,13 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, sky:SkyCo
   const heroCue=maintenance?'這段維持期已排進計畫，每天只需複習 2 分鐘。':hadBreak?'回來就好，從你熟悉的一句話接著練。':
     regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天從一句中翻英開始，接著用同一句聽和說。'
   return <div className="home-stack">
-    <section className="flight-deck" aria-label="今日練習與宇宙背景">
+    <section className="flight-deck" aria-label="今日練習">
       <div className="hero-body">
         <div className="hero-label"><span aria-hidden="true" className="hero-dash"/>累計練習</div>
         <div className="hero-number"><strong>{days}</strong><span>天</span></div>
         <p>{heroCue}</p>
-        <div className="hero-acts"><button type="button" className="launch" onClick={()=>{const dock=document.getElementById('practice-dock');dock?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});dock?.focus({preventScroll:true})}}><Play size={16} fill="currentColor"/>準備今日練習<ArrowRight size={16}/></button>
-        <button type="button" className="preview-link hero-map" onClick={()=>setView('plan','map')}>探索星圖<ArrowUpRight size={14}/></button></div>
+        <button type="button" className="launch" onClick={()=>{const dock=document.getElementById('practice-dock');dock?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});dock?.focus({preventScroll:true})}}><Play size={16} fill="currentColor"/>準備今日練習<ArrowRight size={16}/></button>
       </div>
-      <PhotoCaption sky={props.sky}/>
-      <PhotoCollections sky={props.sky}/>
     </section>
     <div className="overview-row">
       <section className="orbit-card next-card">
@@ -157,9 +154,9 @@ function App() {
       <div className="header-controls"><button className="phase-pill" title="編輯目前時期" onClick={()=>setView('settings')}><i/>{status}{until&&daysBetween(today,until)<32?' · 還有 '+(daysBetween(today,until)+1)+' 天':''}</button>
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
-      {page!=='today' && <div className="secondary-sky"><PhotoCaption sky={sky}/></div>}
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} sky={sky}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><h1>英文練習</h1><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><h1>英文練習</h1><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
+      <BackgroundCredit sky={sky}/>
     </div></div>
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div>

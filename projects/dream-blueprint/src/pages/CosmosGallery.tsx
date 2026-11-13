@@ -83,6 +83,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   photo:AstroPhoto; group:AstroPhoto[]; change:(photo:AstroPhoto)=>void; close:()=>void
 }) {
   const ref = useRef<HTMLDialogElement>(null)
+  const closeButton = useRef<HTMLButtonElement>(null)
   const [target, setTarget] = useState<string>('today')
   const [notice, setNotice] = useState('')
   const index = group.findIndex(item => item.id === photo.id)
@@ -95,6 +96,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
     change(group[(index+n+group.length)%group.length])
   }
   function choose(daily:boolean) {
+    closeButton.current?.focus({preventScroll:true})
     update(prev => {
       const notes = {...prev.notes}
       if (daily) delete notes['cosmos.pin.'+target]
@@ -123,7 +125,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
     }}>
     <div className="cg-view-inner">
       <div className="cg-view-toolbar"><span><Images size={16}/> {photo.category} <i/> {index+1} / {group.length}</span>
-        <button type="button" className="cg-icon" aria-label="關閉大圖" autoFocus onClick={close}><X size={21}/></button></div>
+        <button ref={closeButton} type="button" className="cg-icon" aria-label="關閉大圖" autoFocus onClick={close}><X size={21}/></button></div>
       <div className="cg-view-picture">
         <GalleryImage key={photo.id} photo={photo} large/>
         {group.length > 1 && <><button type="button" className="cg-step prev" aria-label="上一張" onClick={() => move(-1)}><ArrowLeft/></button>
