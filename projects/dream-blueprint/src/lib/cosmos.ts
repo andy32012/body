@@ -36,12 +36,4 @@ export const photos: AstroPhoto[] = [...new Set([...opening,...interleaved])]
 export const photoUrl = (photo:AstroPhoto) => './'+photo.image
 export const firstOfflinePhoto = photos.find(photo=>photo.id==='n01')!
 
-const pageOffsets:Record<string,number> = {today:0,library:1,plan:2,history:3,rivals:4,settings:5,cosmos:6}
-const dayNumber = (day:string) => Math.floor(Date.parse(day+'T00:00:00Z') / 86400000)
-export function dailyPhoto(page:string, day:string, startedDay:string, pin?:string): AstroPhoto {
-  const fixed = photos.find(photo=>photo.id===pin)
-  if (fixed) return fixed
-  const elapsed = Math.max(0, dayNumber(day)-dayNumber(startedDay))
-  return photos[(elapsed + (pageOffsets[page] ?? 0)) % photos.length]
-}
 

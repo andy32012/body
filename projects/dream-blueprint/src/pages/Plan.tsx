@@ -1,3 +1,4 @@
+import ScenePhoto from "../components/ScenePhoto";
 import { useState } from "react";
 import type { PageProps } from "../lib/store";
 import { dayKey } from "../lib/progress";
@@ -161,7 +162,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   return (
     <main className="pl-page">
       <header className="pl-title">
-        <img className="pl-rings" src="./cosmos/p12.webp" alt="" onError={e => { e.currentTarget.hidden = true; }} />
+        <ScenePhoto className="pl-photo" />
         <div>
           <h1>計畫星圖</h1>
           <p className="pl-note">{heroDetail}</p>

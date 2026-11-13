@@ -4,7 +4,7 @@ export function seedOf(text: string) {
   for (const c of text) n = Math.imul(n ^ c.charCodeAt(0), 16777619)
   return n >>> 0
 }
-function random(seed: number) {
+export function seededRandom(seed: number) {
   let a = seed || 1
   return () => {
     a |= 0; a = (a + 0x6d2b79f5) | 0
@@ -28,15 +28,13 @@ const palettes: [string, string, string[]][] = [
   ['#03050a', '#0a1430', ['#3a6af0', '#30c0d0', '#a0a0ff']],
   ['#070707', '#1e1e2a', ['#c8c8e8', '#8090d0', '#e0b090']],
 ]
-export const skyCount = palettes.length * 9
-
 /** Paints a sky into the canvas. The same seed always gives the same picture. */
 export function paintSky(canvas: HTMLCanvasElement, seed: number) {
   const size = 720
   canvas.width = size; canvas.height = size
   const g = canvas.getContext('2d')
   if (!g) return
-  const next = random(seed)
+  const next = seededRandom(seed)
   const [deep, mid, clouds] = palettes[seed % palettes.length]
   const layout = Math.floor(seed / palettes.length) % 9
   const base = g.createLinearGradient(0, 0, size * (0.3 + next() * 0.7), size)

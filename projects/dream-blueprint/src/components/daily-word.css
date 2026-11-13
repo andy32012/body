@@ -4,7 +4,7 @@
 .daily-word-photo {position:absolute;inset:0;z-index:-3;width:100%;height:100%;object-fit:cover}
 
 .daily-word-photo.over {z-index:-2}
-.daily-word-card::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,.5) 0%,rgba(5,8,16,.16) 34%,rgba(5,8,16,.62) 72%,rgba(5,8,16,.9) 100%)}
+.daily-word-card::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#060a13e6 0%,#060a13c9 35%,#060a1352 76%,transparent 100%),linear-gradient(0deg,#060a13e6 0%,#060a1342 35%,transparent 72%)}
 .daily-word-top {display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0 22px}
 .daily-word-label {display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.2em;color:#f4c589}
 .daily-word-label i {width:22px;height:1px;background:#f4c589}

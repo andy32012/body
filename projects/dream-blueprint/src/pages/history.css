@@ -20,15 +20,14 @@
   border-radius: 22px;
   box-shadow: var(--space-shadow);
 }
-.history-galaxy {
+.history-photo {
   position: absolute;
   z-index: -2;
   top: 0;
-  right: -4%;
+  right: 0;
   width: 71%;
   height: 80%;
   object-fit: cover;
-  object-position: 52% 47%;
   mask-image: linear-gradient(90deg, transparent, #000 32%);
 }
 .history-hero::after {
@@ -113,7 +112,7 @@
 @container (max-width: 660px) {
   .history-grid { grid-template-columns: minmax(0, 1fr); }
   .history-hero-copy { padding-top: 20px; }
-  .history-galaxy { width: 84%; right: -20%; object-position: 56% center; }
+  .history-photo { width: 73%; }
   .history-trend .history-trend-total { margin-bottom: .35rem; }
   .history-hero::after { background: linear-gradient(90deg, #0c191ef5 6%, #0c191eb0 35%, transparent 78%), linear-gradient(0deg, #0b1518 22%, transparent 65%); }
 }

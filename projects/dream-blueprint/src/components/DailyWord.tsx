@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RotateCcw, Volume2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, newCard } from '../lib/progress'
-import { photos, photoUrl } from '../lib/cosmos'
+import RotatingPhoto from './RotatingPhoto'
 import { paintSky, seedOf } from '../lib/starfield'
 import { wordKey } from '../lib/vocab'
-import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, doneKey, moreKey } from '../lib/dailyWords'
+import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -18,9 +18,9 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   const queue = useMemo(() => dailyQueue(state.knownWords, state.learningWords),
     [state.knownWords, state.learningWords])
   const word = done < target ? queue[0] : undefined
-  // Every word gets its own background: one word in three uses a catalogue photo, the rest a generated sky.
-  const seed = seedOf(word ? word.en : 'done' + today)
-  const photo = seed % 3 === 0 ? photos[Math.floor(seed / 3) % photos.length] : undefined
+  const imageKey = word?.en ?? 'done' + today
+  const seed = seedOf(imageKey)
+  const photo = dailyWordPhoto(imageKey)
   const sky = useRef<HTMLCanvasElement>(null)
   useEffect(() => { if (sky.current) paintSky(sky.current, seed) }, [seed])
   const [reveal, setReveal] = useState(false)
@@ -67,8 +67,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   return <div className="daily-word-veil" role="dialog" aria-modal="true" aria-label="今日單字" onClick={onClose}>
     <div className="daily-word-card" ref={card} tabIndex={-1} onClick={event => event.stopPropagation()}>
       <canvas className="daily-word-photo" ref={sky} aria-hidden="true" />
-      {photo && <img key={photo.id} className="daily-word-photo over" src={photoUrl(photo)} alt="" aria-hidden="true"
-        onError={event => { event.currentTarget.hidden = true }} />}
+      <RotatingPhoto className="daily-word-photo over" photo={photo}/>
       <div className="daily-word-top">
         <span className="daily-word-label"><i aria-hidden="true" />今日單字</span>
         <button type="button" className="daily-word-close" aria-label="關閉今日單字" onClick={onClose}><X size={18} /></button>

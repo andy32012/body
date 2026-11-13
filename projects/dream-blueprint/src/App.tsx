@@ -1,3 +1,4 @@
+import ScenePhoto, { SceneFeatureContext } from './components/ScenePhoto'
 import { useEffect, useState } from 'react'
 import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
@@ -91,7 +92,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
     regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天從一句中翻英開始，接著用同一句聽和說。'
   return <div className="home-stack">
     <section className="flight-deck" aria-label="今日練習">
-      <img className="flight-photo" src="./cosmos/p06.webp" alt="" aria-hidden="true" onError={event=>{event.currentTarget.hidden=true}}/>
+      <ScenePhoto className="flight-photo" />
       <div className="hero-body">
         <div className="hero-label"><span aria-hidden="true" className="hero-dash"/>累計練習</div>
         <div className="hero-number"><strong>{days}</strong><span>天</span></div>
@@ -124,7 +125,7 @@ function App() {
   const start=(e:Energy)=>setView('practice',e)
   const page=route.view==='rivals'&&!state.settings.rivalsEnabled?'today':route.view
   const active=page==='practice'?'library':page
-  const sky=useObservatory(state,today,active)
+  const sky=useObservatory(page,state.notes['cosmos.pin.'+active])
   useEffect(()=>{
     const handle=()=>{changeRoute(readRoute());window.scrollTo(0,0)}
     const clock=()=>changeDay(dayKey())
@@ -146,8 +147,8 @@ function App() {
   const until=sorted[0]?.end
   const status=phase==='exam'&&today>='2029-02-01'&&today<='2029-07-31'?'國考衝刺':phases[phase]
   const titleNav=(l:typeof links[number],mobile=false)=><button type="button" key={l.id} className={(active===l.id?'nav-link current':'nav-link')} aria-current={active===l.id?'page':undefined} onClick={()=>setView(l.id)}><l.icon size={mobile?20:19}/><span>{mobile?l.mobile:l.title}</span>{!mobile&&active===l.id&&<i/>}</button>
-  return <div className="application" data-theme={state.settings.theme} data-view={page}>
-    <UniverseBackground sky={sky}/>
+  return <SceneFeatureContext.Provider value={sky?.feature}><div className="application" data-theme={state.settings.theme} data-view={page}>
+    <UniverseBackground photo={sky?.background}/>
     <a className="skip-link" href="#content" onClick={e=>{e.preventDefault();document.getElementById('content')?.focus()}}>跳到主要內容</a>
     <aside className="sidebar"><Brand/><div className="sidebar-rule"/>
       <nav aria-label="主要導覽">{available.map(l=>titleNav(l))}</nav>
@@ -166,7 +167,7 @@ function App() {
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
-  </div>
+  </div></SceneFeatureContext.Provider>
 }
 export default App
 

@@ -47,10 +47,10 @@
   box-shadow:0 12px 35px #02050b35;
 }
 .flight-photo {
-  position:absolute; z-index:-1; top:50%; right:-2%;
-  width:65%; height:145%; transform:translateY(-48%); object-fit:cover;
-  object-position:center 33%; mix-blend-mode:screen; pointer-events:none;
-  mask-image:linear-gradient(90deg,transparent,#000 22%);
+  position:absolute; z-index:-1; top:0; right:0;
+  width:65%; height:100%; object-fit:cover;
+  pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent,#0005 27%,#000 62%);
 }
 .flight-deck .hero-body {max-width:57%; padding:clamp(22px,2.8vw,42px);}
 .flight-deck .hero-label {color:#f4ddbb; font-size:13px;}
@@ -102,7 +102,7 @@
   .flight-deck {min-height:253px; border-radius:19px;}
   .flight-deck .hero-body {max-width:69%; padding:19px 16px;}
   .flight-deck .hero-body>p {max-width:17em; font-size:13px; text-shadow:0 1px 4px #000;}
-  .flight-photo {width:71%; right:-14%; height:126%; object-position:50% 25%; mask-image:linear-gradient(90deg,transparent,#000 46%);}
+  .flight-photo {width:61%; mask-image:linear-gradient(90deg,transparent,#0004 35%,#000 76%);}
   .flight-deck .hero-number strong {font-size:65px;}
   .flight-deck .hero-label {font-size:12px;}
   .home-stack .next-card h3 {max-width:78%;}

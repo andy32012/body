@@ -1,4 +1,14 @@
 import { officialWords, wordKey } from './vocab'
+import { createSceneDeck } from './backgroundRotation'
+import { seedOf } from './starfield'
+
+const wordPhotos = createSceneDeck(seedOf('daily-word'))
+const wordIndices = new Map(officialWords.map((word, index) => [word.en, index]))
+
+export function dailyWordPhoto(key: string) {
+  const index = wordIndices.get(key) ?? seedOf(key)
+  return wordPhotos[index % wordPhotos.length]
+}
 
 export const DAILY_CHOICES = [5, 8, 10, 15] as const
 export const DEFAULT_DAILY = 8

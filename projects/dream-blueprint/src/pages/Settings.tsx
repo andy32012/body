@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { BookA, BookOpen, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, ListChecks, Moon, SlidersHorizontal, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
+import { BookA, BookOpen, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
+import ScenePhoto from '../components/ScenePhoto'
 import SchoolSettings from '../components/SchoolSettings'
 import VocabScreen from '../components/VocabScreen'
 import quizBank from '../data/quiz.json'
@@ -158,7 +159,7 @@ export default function Settings(props: PageProps) {
           <button type="button" aria-pressed={s.theme === 'light'} onClick={()=>set('theme','light')}><Sun size={16} aria-hidden="true" />淺色</button>
         </div>
       </div>
-      <div className="set-dial" aria-hidden="true"><SlidersHorizontal strokeWidth={1.6} /></div>
+      <div className="set-dial" aria-hidden="true"><ScenePhoto className="set-dial-photo" /></div>
     </header>
     <div className="set-groups">
     <section className="set-group" aria-labelledby="set-learning-heading">

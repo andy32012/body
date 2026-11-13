@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getScreeningQueue, isKnownWord, officialWords, wordKey } from '../src/lib/vocab'
-import { dailyQueue, dailyTarget } from '../src/lib/dailyWords'
-import { seedOf, skyCount } from '../src/lib/starfield'
+import { dailyQueue, dailyTarget, dailyWordPhoto } from '../src/lib/dailyWords'
+import { photos } from '../src/lib/cosmos'
 import wordParts from '../src/data/medical-parts.json'
 
 test('六級條目和醫護構詞都有可離線的中文釋義', () => {
@@ -44,10 +44,11 @@ test('今日單字從最低級開始，分過類的字不再出現；考週預�
   assert.equal(dailyTarget({'daily-word.more.2026-11-14':'1'},true,'2026-11-14'),8)
 })
 
-test('單字卡背景：前 300 個單字至少有 100 種不同的星圖或照片', () => {
-  const kinds = new Set(officialWords.slice(0,300).map(w => {
-    const seed = seedOf(w.en)
-    return seed % 3 === 0 ? 'photo' + (Math.floor(seed / 3) % 56) : 'sky' + (seed % skyCount)
-  }))
-  assert.ok(kinds.size >= 100, String(kinds.size))
+test('今日單字每 56 個字看完整組實拍照，回頭看同一個字會配回同一張', () => {
+  const catalogue = new Set(photos.map(photo => photo.id))
+  const sequence = officialWords.map(word => dailyWordPhoto(word.en).id)
+  for (let i = 0; i + photos.length <= sequence.length; i += photos.length) {
+    assert.deepEqual(new Set(sequence.slice(i, i + photos.length)), catalogue)
+  }
+  assert.equal(dailyWordPhoto(officialWords[38].en).id, sequence[38])
 })

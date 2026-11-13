@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, ChevronDown, Expand, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
+import { useSceneFeature } from '../components/ScenePhoto'
 import { categories, photos, photoUrl, type AstroPhoto } from '../lib/cosmos'
 import { downloadGalleryOffline, getGalleryOfflineStatus } from '../lib/offlineGallery'
 import type { PageProps } from '../lib/store'
@@ -98,15 +99,15 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
     setNotice('')
     change(group[(index+n+group.length)%group.length])
   }
-  function choose(daily:boolean) {
+  function choose(automatic:boolean) {
     closeButton.current?.focus({preventScroll:true})
     update(prev => {
       const notes = {...prev.notes}
-      if (daily) delete notes['cosmos.pin.'+target]
+      if (automatic) delete notes['cosmos.pin.'+target]
       else notes['cosmos.pin.'+target] = photo.id
       return {...prev,notes}
     })
-    setNotice(daily ? route[1]+'已切換成每日更換。' : '已將「'+photo.title+'」設為'+route[1]+'背景。')
+    setNotice(automatic ? route[1]+'背景已恢復自動輪替。' : '已將「'+photo.title+'」設為'+route[1]+'背景。')
   }
   useEffect(() => {
     const dialog = ref.current!
@@ -163,8 +164,8 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
               {destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
             </select>
             <div className="cg-pin-buttons"><button type="button" onClick={() => choose(false)} disabled={pinned === photo.id}><Pin size={14}/>設為這張</button>
-              <button type="button" onClick={() => choose(true)} disabled={!pinned}><RotateCw size={14}/>每日更換</button></div>
-            <small role="status">{notice || (currentTitle ? '目前固定 · '+currentTitle : '目前每日更換')}</small>
+              <button type="button" onClick={() => choose(true)} disabled={!pinned}><RotateCw size={14}/>自動輪替</button></div>
+            <small role="status">{notice || (currentTitle ? '目前固定 · '+currentTitle : '目前自動輪替')}</small>
           </div>
         </details>
       </div>
@@ -175,6 +176,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
 type GalleryProps = PageProps & {initialPhotoId?:string; onViewerClose?:()=>void}
 
 export default function CosmosGallery(props:GalleryProps) {
+  const feature = useSceneFeature()
   const [category,setCategory] = useState('')
   const [selected,setSelected] = useState<AstroPhoto | undefined>(() => photos.find(photo => photo.id === props.initialPhotoId))
   useEffect(() => {
@@ -182,7 +184,8 @@ export default function CosmosGallery(props:GalleryProps) {
     const requested = photos.find(photo => photo.id === props.initialPhotoId)
     if (requested) {setCategory('');setSelected(requested)}
   }, [props.initialPhotoId])
-  const group = category ? photos.filter(photo => photo.category === category) : photos
+  const collection = feature ? [feature, ...photos.filter(photo => photo.id !== feature.id)] : photos
+  const group = category ? photos.filter(photo => photo.category === category) : collection
   return <section className="cg-gallery">
     <header className="cg-head"><div><h1>宇宙圖鑑</h1><p>{photos.length} 張天文觀測影像</p></div><OfflineLibrary/></header>
     <div className="cg-filters" role="group" aria-label="影像分類">{['',...categories].map(cat =>

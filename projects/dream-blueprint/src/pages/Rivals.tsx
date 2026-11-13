@@ -1,3 +1,4 @@
+import ScenePhoto from "../components/ScenePhoto";
 import { useEffect, useState } from 'react';
 import type { PageProps } from '../lib/store';
 import { dailyRacePoints, raceBoard, rivalLine, type Situation } from '../lib/rivals';
@@ -25,7 +26,7 @@ export default function Rivals({state}:PageProps) {
   const strength=state.settings.taunt;
   return <section className="race-page">
     <header className="race-hero">
-      <img className="race-stars" src="./cosmos/s01.webp" alt="" onError={event => { event.currentTarget.hidden = true; }}/>
+      <ScenePhoto className="race-photo" />
       <div className="race-intro">
         <p className="race-week">{board.week.replaceAll('-','.')} — {weekEnd.slice(5).replace('-','.')}</p>
         <h1>星際排行榜</h1>

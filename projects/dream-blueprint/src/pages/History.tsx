@@ -1,3 +1,4 @@
+import ScenePhoto from "../components/ScenePhoto";
 import { useState } from "react";
 import { addDays, attendance, dayKey, weekKey } from "../lib/progress";
 import { seasonHistory } from "../lib/rivals";
@@ -142,7 +143,7 @@ export default function History({ state }: PageProps) {
   const pastSeason = seasonHistory(state)[0];
   return <div className="history-page">
     <header className="history-hero">
-      <img src="./cosmos/g03.webp" alt="" className="history-galaxy" onError={event => { event.currentTarget.hidden = true; }} />
+      <ScenePhoto className="history-photo" />
       <div className="history-hero-copy">
         <h1>練習紀錄</h1>
         <p className="history-count"><span>累計練習</span><strong>{days}</strong><span>天</span></p>

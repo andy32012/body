@@ -1,3 +1,4 @@
+import ScenePhoto from "../components/ScenePhoto";
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import curriculum from "../data/curriculum.json";
@@ -62,7 +63,7 @@ const anchor = sentences[0];
 export function PracticeCover({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <header className="pr-cover">
-      <img className="pr-cover-photo" src="./cosmos/n01.webp" alt="" />
+      <ScenePhoto className="pr-cover-photo" />
       <div className="pr-cover-copy">{children}<h1>{title}</h1></div>
     </header>
   );

@@ -13,9 +13,9 @@
   gap:22px; padding:clamp(22px,3.4vw,44px);
   background:#151020; border:1px solid #645571; color:#fff8ff;
 }
-.race-stars {
+.race-photo {
   position:absolute; z-index:-2; top:0; right:0; width:76%; height:100%;
-  object-fit:cover; object-position:center 48%;
+  object-fit:cover;
 }
 .race-hero::before {
   content:""; position:absolute; z-index:-1; inset:0;
@@ -69,9 +69,10 @@
 @media (max-width:620px) {
   .race-page {gap:12px;}
   .race-hero {display:block; padding:18px; border-radius:18px;}
-  .race-stars {width:72%; height:66%; object-position:47% center;}
+  .race-photo {width:72%; height:66%;}
+  .race-hero::before {background:linear-gradient(90deg,#151020 8%,#21132bf2 36%,#23172baf 65%,#1b112524 90%),linear-gradient(0deg,#171021 35%,transparent 75%);}
   .race-intro {position:relative;}
-  .race-description {max-width:19em; font-size:.875rem;}
+  .race-description {max-width:min(70%,19em); font-size:.875rem;}
   .race-summary {display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 9px; margin-top:16px; padding:10px 12px; border-radius:12px;}
   .race-summary .race-metric {font-size:1.65rem;}
   .race-list li {grid-template-columns:2ch 1.9rem minmax(0,1fr) max-content; padding:11px 5px; gap:7px;}
