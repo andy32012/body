@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, Expand, Images, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
+import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, ChevronDown, Expand, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
 import { categories, photos, photoUrl, type AstroPhoto } from '../lib/cosmos'
 import { downloadGalleryOffline, getGalleryOfflineStatus } from '../lib/offlineGallery'
 import type { PageProps } from '../lib/store'
@@ -10,7 +10,7 @@ const destinations = [
   ['plan', '夢想星圖'], ['history', '航行紀錄'], ['rivals', '星際排行榜'], ['settings', '設定'], ['cosmos', '宇宙圖鑑'],
 ] as const
 
-function GalleryImage({ photo, large = false }: {photo:AstroPhoto; large?:boolean}) {
+function GalleryImage({ photo, large = false, eager = false }: {photo:AstroPhoto; large?:boolean; eager?:boolean}) {
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -26,7 +26,7 @@ function GalleryImage({ photo, large = false }: {photo:AstroPhoto; large?:boolea
   </span>
   return <>
     {large && !loaded && <span className="cg-img-error" role="status"><LoaderCircle className="cg-spin" size={18}/>正在載入影像</span>}
-    <img key={attempt} src={photoUrl(photo)} alt={large ? photo.title : ''} loading={large ? 'eager' : 'lazy'}
+    <img key={attempt} src={photoUrl(photo)} alt={large ? photo.title : ''} loading={large || eager ? 'eager' : 'lazy'}
       style={{objectPosition:photo.focus}} onLoad={() => setLoaded(true)} onError={() => setFailed(true)}/>
   </>
 }
@@ -70,13 +70,16 @@ function OfflineLibrary() {
     }
   }
   const done = progress.total > 0 && progress.done === progress.total
-  return <div className="cg-offline">
+  return <details className="cg-offline">
+    <summary><ArrowDownToLine size={16} aria-hidden="true"/>離線圖庫</summary>
+    <div className="cg-download-panel">
     <button type="button" className="cg-soft-button" disabled={busy || done || !online || !supported} onClick={download}>
       {done ? <Check size={16}/> : busy ? <LoaderCircle size={16} className="cg-spin"/> : <ArrowDownToLine size={16}/>}
       {done ? '全庫可離線瀏覽' : busy ? '正在下載' : '保存全圖庫供離線瀏覽'}
     </button>
     <small role="status">{!online && '目前離線。'}{!supported ? '使用正式 HTTPS 網址可保存全圖庫。' : message || (progress.total && (busy || progress.done > 0) ? '已保存 '+progress.done+' / '+progress.total+' 個檔案' : '')}</small>
-  </div>
+    </div>
+  </details>
 }
 
 function Viewer({ photo, group, change, close, state, update }: PageProps & {
@@ -84,6 +87,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
 }) {
   const ref = useRef<HTMLDialogElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
+  const swipeStart = useRef<{x:number;y:number} | null>(null)
   const [target, setTarget] = useState<string>('today')
   const [notice, setNotice] = useState('')
   const index = group.findIndex(item => item.id === photo.id)
@@ -123,23 +127,46 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
       if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') {e.preventDefault();move(e.key === 'ArrowLeft' ? -1 : 1)}
     }}>
     <div className="cg-view-inner">
-      <div className="cg-view-toolbar"><span><Images size={16}/> {photo.category} <i/> {index+1} / {group.length}</span>
-        <button ref={closeButton} type="button" className="cg-icon" aria-label="關閉大圖" autoFocus onClick={close}><X size={21}/></button></div>
-      <div className="cg-view-picture">
+      <div className="cg-view-toolbar">
+        <span>{photo.category}</span>
+        <button ref={closeButton} type="button" className="cg-icon" aria-label="關閉大圖" autoFocus onClick={close}><X size={21}/></button>
+      </div>
+      <div className="cg-view-picture"
+        onTouchStart={event => {
+          const point = event.touches[0]
+          swipeStart.current = event.touches.length === 1 ? {x:point.clientX,y:point.clientY} : null
+        }}
+        onTouchCancel={() => { swipeStart.current = null }}
+        onTouchEnd={event => {
+          const start = swipeStart.current
+          swipeStart.current = null
+          if (!start || event.touches.length || group.length < 2) return
+          const dx = event.changedTouches[0].clientX - start.x
+          const dy = event.changedTouches[0].clientY - start.y
+          if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)*1.5) move(dx < 0 ? 1 : -1)
+        }}>
         <GalleryImage key={photo.id} photo={photo} large/>
-        {group.length > 1 && <><button type="button" className="cg-step prev" aria-label="上一張" onClick={() => move(-1)}><ArrowLeft/></button>
-          <button type="button" className="cg-step next" aria-label="下一張" onClick={() => move(1)}><ArrowRight/></button></>}
       </div>
       <div className="cg-caption">
-        <h2 id="cg-view-title">{photo.title}</h2>
-        <div className="cg-placement"><label htmlFor="cg-destination">頁面背景</label>
-          <select id="cg-destination" value={target} onChange={e => {setTarget(e.target.value);setNotice('')}}>
-            {destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
-          </select>
-          <div className="cg-pin-buttons"><button type="button" onClick={() => choose(false)} disabled={pinned === photo.id}><Pin size={14}/>設為這張</button>
-            <button type="button" onClick={() => choose(true)} disabled={!pinned}><RotateCw size={14}/>每日更換</button></div>
-          <small role="status">{notice || (currentTitle ? '目前固定 · '+currentTitle : '目前每日更換')}</small>
+        <div className="cg-caption-row">
+          <h2 id="cg-view-title">{photo.title}</h2>
+          <div className="cg-paging">
+            <button type="button" className="cg-step" aria-label="上一張" onClick={() => move(-1)} disabled={group.length < 2}><ArrowLeft size={18}/></button>
+            <span>{index+1} / {group.length}</span>
+            <button type="button" className="cg-step" aria-label="下一張" onClick={() => move(1)} disabled={group.length < 2}><ArrowRight size={18}/></button>
+          </div>
         </div>
+        <details className="cg-background">
+          <summary><Pin size={14} aria-hidden="true"/>頁面背景<ChevronDown size={14} aria-hidden="true"/></summary>
+          <div className="cg-placement"><label htmlFor="cg-destination">套用頁面</label>
+            <select id="cg-destination" value={target} onChange={e => {setTarget(e.target.value);setNotice('')}}>
+              {destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
+            </select>
+            <div className="cg-pin-buttons"><button type="button" onClick={() => choose(false)} disabled={pinned === photo.id}><Pin size={14}/>設為這張</button>
+              <button type="button" onClick={() => choose(true)} disabled={!pinned}><RotateCw size={14}/>每日更換</button></div>
+            <small role="status">{notice || (currentTitle ? '目前固定 · '+currentTitle : '目前每日更換')}</small>
+          </div>
+        </details>
       </div>
     </div>
   </dialog>
@@ -159,11 +186,12 @@ export default function CosmosGallery(props:GalleryProps) {
   return <section className="cg-gallery">
     <header className="cg-head"><div><h1>宇宙圖鑑</h1><p>{photos.length} 張天文觀測影像</p></div><OfflineLibrary/></header>
     <div className="cg-filters" role="group" aria-label="影像分類">{['',...categories].map(cat =>
-      <button type="button" key={cat} aria-pressed={category === cat} onClick={() => setCategory(cat)}>{cat || '全部'}<small>{cat ? photos.filter(photo => photo.category === cat).length : photos.length}</small></button>)}</div>
+      <button type="button" key={cat} aria-pressed={category === cat} onClick={() => setCategory(cat)}>{cat || '全部'}</button>)}</div>
     <div className="cg-grid">{group.map((photo,i) => <button type="button" className={'cg-card'+(i===0?' cg-lead':'')}
       key={photo.id} onClick={() => setSelected(photo)} aria-label={'放大查看'+photo.title}>
-      <div className="cg-image"><GalleryImage key={photo.id} photo={photo}/><span className="cg-zoom" aria-hidden="true"><Expand size={16}/></span></div>
-      <div className="cg-card-caption"><span>{photo.category}</span><h2>{photo.title}</h2></div>
+      <span className="cg-image"><GalleryImage key={photo.id} photo={photo} eager={i===0}/></span>
+      <span className="cg-card-caption">{i===0 && <small>{photo.category}</small>}<strong>{photo.title}</strong></span>
+      {i===0 && <span className="cg-zoom" aria-hidden="true"><Expand size={16}/></span>}
     </button>)}</div>
     {selected && <Viewer {...props} photo={selected} group={group} change={setSelected} close={() => {setSelected(undefined);props.onViewerClose?.()}}/>}
   </section>

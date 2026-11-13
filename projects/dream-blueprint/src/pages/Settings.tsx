@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { BookA, BookOpen, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, ListChecks, Moon, SlidersHorizontal, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
 import SchoolSettings from '../components/SchoolSettings'
 import VocabScreen from '../components/VocabScreen'
 import quizBank from '../data/quiz.json'
@@ -57,8 +58,15 @@ export function parseVocabulary(input: string): ImportedWord[] {
   return [...words.values()]
 }
 
-function Panel({title, hint, children, open = false}: {title:string; hint?:string; children:ReactNode; open?:boolean}) {
-  return <details className="set-panel" open={open || undefined}><summary><span>{title}{hint && <small>{hint}</small>}</span><span className="set-caret" aria-hidden="true">⌄</span></summary><div className="set-body">{children}</div></details>
+function Panel({ title, hint, icon: Icon, children }: { title: string; hint?: string; icon: LucideIcon; children: ReactNode }) {
+  return <details className="set-panel">
+    <summary>
+      <span className="set-symbol" aria-hidden="true"><Icon size={20} strokeWidth={1.7} /></span>
+      <span className="set-name">{title}{hint && <small>{hint}</small>}</span>
+      <ChevronDown className="set-caret" size={18} aria-hidden="true" />
+    </summary>
+    <div className="set-body">{children}</div>
+  </details>
 }
 
 import { exportBackup, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
@@ -142,8 +150,20 @@ export default function Settings(props: PageProps) {
     } catch (e) { announce(mode, e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。') }
   }
   return <main className="settings-page">
-    <header><h1>設定</h1></header>
-    <Panel title="我的學習節奏" hint="時期、練習日與朗讀速度" open>
+    <header className="set-hero">
+      <div className="set-hero-copy">
+        <h1>設定</h1>
+        <div className="set-appearance" role="group" aria-label="外觀">
+          <button type="button" aria-pressed={s.theme === 'dark'} onClick={()=>set('theme','dark')}><Moon size={16} aria-hidden="true" />深色</button>
+          <button type="button" aria-pressed={s.theme === 'light'} onClick={()=>set('theme','light')}><Sun size={16} aria-hidden="true" />淺色</button>
+        </div>
+      </div>
+      <div className="set-dial" aria-hidden="true"><SlidersHorizontal strokeWidth={1.6} /></div>
+    </header>
+    <div className="set-groups">
+    <section className="set-group" aria-labelledby="set-learning-heading">
+      <h2 id="set-learning-heading">學習與學校</h2>
+    <Panel title="我的學習節奏" icon={CalendarDays} hint={periodNames[activePeriod(today,s.periods)]+' · 練習日與朗讀速度'}>
       <div><h3>學期每週安排</h3><div className="set-week">{weekdays.map((day, i) =>
         <label key={day}>週{day}<select aria-label={'星期'+day+'練習安排'} value={s.regularDays.includes(i)?'normal':s.restDays.includes(i)?'rest':'low'} onChange={e=>{
           const choice=e.target.value
@@ -168,37 +188,44 @@ export default function Settings(props: PageProps) {
       </div>
       <label>英文朗讀速度<select value={s.speechRate} onChange={e=>set('speechRate',Number(e.target.value))}>{[...new Set([0.65,0.8,0.9,1,1.15,s.speechRate])].sort((a,b)=>a-b).map(n=><option key={n} value={n}>{n} 倍速</option>)}</select></label>
     </Panel>
-    <Panel title="我的出發點" hint="記下出發的原因與實習安排">
+    <Panel icon={Telescope} title="我的出發點" hint="記下出發的原因與實習安排">
       <label>為什麼出發<textarea rows={3} maxLength={50000} value={why} onChange={e=>setWhy(e.target.value)} placeholder="用一到三句話，留給累了的自己。" /></label>
       <button type="button" onClick={()=>{set('why',why.trim()); announce('why','已儲存出發的原因。')}}>儲存出發的原因</button>{status('why')}
       <label>已確認的基護實習時段<input aria-label="已確認的基護實習時段" value={s.internshipSeason} onChange={e=>set('internshipSeason',e.target.value)} /></label>
       <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={reply} onChange={e=>setReply(e.target.value)} placeholder="有確切梯次或報到日期時，可以記在這裡。" /></label>
       <button type="button" onClick={()=>{update(prev=>({...prev,settings:{...prev.settings,officeReply:reply.trim(),officeAsked:prev.settings.officeAsked||!!reply.trim()}})); announce('office','已儲存系辦回覆。')}}>儲存系辦回覆</button>{status('office')}
     </Panel>
-    <Panel title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings regularDays={s.regularDays} school={state.school} onChange={school=>update(prev=>({...prev,school}))}/></Panel>
-    <Panel title="顯示與對手" hint="外觀、排行榜與紀錄">
-      <label>外觀<select value={s.theme} onChange={e=>set('theme',e.target.value as SettingsData['theme'])}><option value="dark">深色星空</option><option value="light">淺色星空</option></select></label>
-      <label className="set-toggle"><span>顯示模擬對手排行榜<small>對手都是模擬角色，分數在這台裝置計算。</small></span><input type="checkbox" checked={s.rivalsEnabled} onChange={e=>set('rivalsEnabled',e.target.checked)}/></label>
-      {s.rivalsEnabled && <label>對手的嗆聲強度<select value={s.taunt} onChange={e=>set('taunt', e.target.value as SettingsData['taunt'])}><option value="off">關</option><option value="gentle">普通</option><option value="bold">毒舌</option></select></label>}
-      <label className="set-toggle"><span>在紀錄頁顯示連續天數與請假卡</span><input type="checkbox" checked={s.showStreak} onChange={e=>set('showStreak',e.target.checked)}/></label>
-    </Panel>
-    <Panel title="匯入我的單字表" hint={'已匯入 '+state.customWords.length+' 個單字'}>
+    <Panel icon={GraduationCap} title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings regularDays={s.regularDays} school={state.school} onChange={school=>update(prev=>({...prev,school}))}/></Panel>
+    </section>
+    <section className="set-group set-data" aria-labelledby="set-data-heading">
+      <h2 id="set-data-heading">單字與資料</h2>
+    <Panel icon={BookA} title="匯入我的單字表" hint={'已匯入 '+state.customWords.length+' 個單字'}>
       <p>每行一個單字，可接中文和級別。支援貼上文字、逗號分隔檔與試算表複製的欄位。</p>
       <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text} onChange={e=>setText(e.target.value)} /></label>
       <label>這一批單字<select value={wordMode} onChange={e=>setWordMode(e.target.value as 'learn' | 'known')}><option value="learn">加入想學的清單</option><option value="known">已經認得，略過新字練習</option></select></label>
       <input type="file" ref={wordInput} hidden accept=".csv,.tsv,.txt,text/plain,text/csv" onChange={e=>{void readFile(e.target.files?.[0],'words');e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" onClick={saveVocabulary}>匯入單字</button></div>{status('words')}
     </Panel>
-    {!(["exam","internship"].includes(activePeriod(today,s.periods))) && <Panel title="第 1、2 級單字快篩" hint="認得的單字直接略過"><VocabScreen {...props} /></Panel>}
-    <Panel title="備份與還原" hint="把進度存成檔案，換手機也帶得走">
+    {!(["exam","internship"].includes(activePeriod(today,s.periods))) && <Panel icon={ListChecks} title="第 1、2 級單字快篩" hint="認得的單字直接略過"><VocabScreen {...props} /></Panel>}
+    <Panel icon={Flag} title="我標記的題目" hint={'共 '+state.flagged.length+' 題'}>{state.flagged.length?<div className="set-list">{state.flagged.map(id=><div key={id}><span>題號 {id}<small>{quizBank.find(q=>q.id===id)?.en}</small></span><button type="button" onClick={()=>update(prev=>({...prev,flagged:prev.flagged.filter(item=>item!==id)}))}>取消標記</button></div>)}</div>:<p>練習時按「這題怪怪的」，題號就會留在這裡。</p>}</Panel>
+    <Panel icon={DatabaseBackup} title="備份與還原" hint="把進度存成檔案，換手機也帶得走">
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
       <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void readFile(e.target.files?.[0],'backup');e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
       {backup && <div className="set-restore"><b>用這份備份取代目前進度？</b><p>還原會包含原本的課表、學習紀錄和設定。</p>
         <div className="set-actions"><button type="button" onClick={()=>{restoreBackup(exportBackup(backup));setWhy(backup.settings.why);setReply(backup.settings.officeReply);setBackup(null);announce('backup','進度和設定已還原。')}}>確認還原</button><button type="button" onClick={()=>{setBackup(null); announce('backup','已保留目前進度。')}}>取消</button></div></div>}{status('backup')}
     </Panel>
-    <Panel title="我標記的題目" hint={'共 '+state.flagged.length+' 題'}>{state.flagged.length?<div className="set-list">{state.flagged.map(id=><div key={id}><span>題號 {id}<small>{quizBank.find(q=>q.id===id)?.en}</small></span><button type="button" onClick={()=>update(prev=>({...prev,flagged:prev.flagged.filter(item=>item!==id)}))}>取消標記</button></div>)}</div>:<p>練習時按「這題怪怪的」，題號就會留在這裡。</p>}</Panel>
-    <Panel title="使用說明與資料來源"><h3>兩分鐘也算一天</h3><p>兩分鐘能幫你留住習慣。要達到英文檢定分數，仍需在負荷穩定時逐步增加聽、說、讀、寫的練習。</p><p>每天依手機當地時間凌晨 4 點換日。普通或有電完成後，課表往前一天。累爆只練舊內容。</p><h3>資料來源</h3><p>課程與學籍依你提供的藍圖更新，修課和實習安排以校方公告為準。</p>{sourceLinks.map(([name,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{name} ↗</a>)}</Panel>
+    </section>
+    <section className="set-group set-preferences" aria-labelledby="set-preferences-heading">
+      <h2 id="set-preferences-heading">偏好與說明</h2>
+    <Panel icon={Trophy} title="顯示與對手" hint="排行榜、對手語氣與連續紀錄">
+      <label className="set-toggle"><span>顯示模擬對手排行榜<small>對手都是模擬角色，分數在這台裝置計算。</small></span><input type="checkbox" checked={s.rivalsEnabled} onChange={e=>set('rivalsEnabled',e.target.checked)}/></label>
+      {s.rivalsEnabled && <label>對手的嗆聲強度<select value={s.taunt} onChange={e=>set('taunt', e.target.value as SettingsData['taunt'])}><option value="off">關</option><option value="gentle">普通</option><option value="bold">毒舌</option></select></label>}
+      <label className="set-toggle"><span>在紀錄頁顯示連續天數與請假卡</span><input type="checkbox" checked={s.showStreak} onChange={e=>set('showStreak',e.target.checked)}/></label>
+    </Panel>
+    <Panel icon={BookOpen} title="使用說明與資料來源" hint="練習規則與赴美護理資料"><h3>兩分鐘也算一天</h3><p>兩分鐘能幫你留住習慣。要達到英文檢定分數，仍需在負荷穩定時逐步增加聽、說、讀、寫的練習。</p><p>每天依手機當地時間凌晨 4 點換日。普通或有電完成後，課表往前一天。累爆只練舊內容。</p><h3>資料來源</h3><p>課程與學籍依你提供的藍圖更新，修課和實習安排以校方公告為準。</p>{sourceLinks.map(([name,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{name} ↗</a>)}</Panel>
+    </section>
+    </div>
   </main>
 }
 

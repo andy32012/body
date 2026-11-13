@@ -1,0 +1,80 @@
+.race-page {
+  display:grid; grid-template-columns:minmax(0,1fr); gap:16px;
+  width:100%; max-width:1080px; margin-inline:auto;
+  font-variant-numeric:tabular-nums; line-height:1.55;
+}
+.race-page :is(h1,h2,p,ol,dl,dd) {margin:0;}
+.race-page :is(.race-hero,.race-standings,.race-scoring) {
+  min-width:0; border-radius:21px; box-shadow:var(--space-shadow); overflow:hidden;
+}
+.race-hero {
+  position:relative; isolation:isolate; grid-column:1/-1;
+  display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end;
+  gap:22px; padding:clamp(22px,3.4vw,44px);
+  background:#151020; border:1px solid #645571; color:#fff8ff;
+}
+.race-stars {
+  position:absolute; z-index:-2; top:0; right:0; width:76%; height:100%;
+  object-fit:cover; object-position:center 48%;
+}
+.race-hero::before {
+  content:""; position:absolute; z-index:-1; inset:0;
+  background:linear-gradient(90deg,#151020 5%,#21132bed 30%,#23172b8a 56%,#1b11253b 78%),linear-gradient(0deg,#171021aa,transparent 70%);
+}
+.race-week {font-size:.85rem; font-weight:600; letter-spacing:.07em; color:#f7d9a5;}
+.race-hero h1 {margin:.4rem 0 .45rem; font-size:clamp(30px,3.5vw,48px); letter-spacing:-.035em; line-height:1.2;}
+.race-description {max-width:21em; color:#efe8f3; font-size:.94rem;}
+.race-summary {
+  flex:0 1 13.5rem; min-width:0; padding:15px 20px;
+  background:linear-gradient(120deg,#292033f5,#21192ff5); color:#f4eaf9;
+  border:1px solid #8b7195; border-radius:15px; font-size:.88rem;
+}
+.race-summary .race-metric {font-size:clamp(30px,3.35vw,46px); font-weight:700; color:#ffdda1; line-height:1.22; margin:.15rem 0;}
+.race-metric small {font-size:.95rem;}
+.race-standings,.race-scoring {padding:clamp(16px,2vw,26px);}
+.race-standings {background:var(--space-reading,var(--panel)); border:1px solid var(--space-border,var(--line));}
+.race-page h2 {font-size:clamp(20px,2vw,26px); line-height:1.3; margin-bottom:15px;}
+.race-list {display:grid; gap:0; padding:0; list-style:none;}
+.race-list li {
+  display:grid; grid-template-columns:2ch 2.55rem minmax(0,1fr) max-content;
+  align-items:center; gap:clamp(7px,1.2vw,17px); padding:14px 9px;
+}
+.race-list li + li {border-top:1px solid var(--line);}
+.race-list li.self {border:1px solid #957c50; border-radius:13px; background:var(--race-self,#322b24);}
+.race-list li.self + li {border-top-color:transparent;}
+:root[data-theme=light] .race-list li.self {--race-self:#fff3dc;}
+.rival-rank {font-size:.86rem; font-weight:700; color:var(--muted);}
+.rival-portrait {display:grid; place-items:center; width:100%; aspect-ratio:1; border:1px solid; border-radius:50%; font-weight:700;}
+.rival-who {min-width:0; overflow-wrap:anywhere;}
+.rival-name {font-size:1rem; font-weight:700;}
+.rival-brief,.rival-voice {font-size:.88rem; line-height:1.55; color:var(--muted);}
+.rival-points {white-space:nowrap; text-align:right;}
+.rival-points strong {font-size:1.4rem;}
+.rival-points small {font-size:.78rem;}
+.race-scoring {background:linear-gradient(120deg,#fff8ea,#f4e4d3 68%,#e8d8ec); color:#342839; border:1px solid #e4d3cd;}
+.race-scoring dl {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; margin-bottom:1rem;}
+.race-scoring dl div+div {padding-left:.65rem; border-left:1px solid #baaaa6;}
+.race-scoring dt {font-size:.85rem; color:#5b4952;}
+.race-scoring dd {font-size:clamp(23px,2.6vw,33px); font-weight:700; line-height:1.3;}
+.race-scoring dd small {font-size:.78rem; font-weight:500;}
+.race-scoring details {border-top:1px solid #baaaa6;}
+.race-scoring summary {padding:12px 0 6px; min-height:44px; cursor:pointer; font-weight:650;}
+.race-scoring details p {font-size:.92rem; margin-top:.5rem;}
+.race-scoring :focus-visible {outline:2px solid #6b4478; outline-offset:1px;}
+@media (min-width:1050px) {
+  .race-page {grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); align-items:start;}
+  .race-hero {min-height:192px;}
+  .race-scoring:only-of-type {grid-column:1/-1;}
+}
+@media (max-width:620px) {
+  .race-page {gap:12px;}
+  .race-hero {display:block; padding:18px; border-radius:18px;}
+  .race-stars {width:72%; height:66%; object-position:47% center;}
+  .race-intro {position:relative;}
+  .race-description {max-width:19em; font-size:.875rem;}
+  .race-summary {display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 9px; margin-top:16px; padding:10px 12px; border-radius:12px;}
+  .race-summary .race-metric {font-size:1.65rem;}
+  .race-list li {grid-template-columns:2ch 1.9rem minmax(0,1fr) max-content; padding:11px 5px; gap:7px;}
+  .rival-points strong {font-size:1.2rem;}
+  .race-page h2 {margin-bottom:11px;}
+}

@@ -59,6 +59,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 .phase-pill {font-size:12px;font-weight:580;gap:8px;letter-spacing:.05em;color:var(--mint);border:1px solid color-mix(in srgb,var(--mint) 30%,var(--bg));border-radius:30px;background:color-mix(in srgb,var(--mint) 6%,var(--bg));padding:7px 11px;white-space:nowrap}
 .phase-pill i {background:var(--mint);height:6px;width:6px;border-radius:50%;box-shadow:0 0 7px #82d5b04a}
 .icon-control {width:34px;height:34px;border:1px solid var(--line);border-radius:50%;color:var(--muted);background:var(--panel)}
+.back-context {display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
 .back-home {gap:7px;border:0;color:var(--muted);padding:6px 0;font-size:13px}
 .home-stack {display:grid;gap:18px}
 .hero-body {padding:24px clamp(24px,2.7vw,45px);max-width:67%}
@@ -137,6 +138,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
   .mobile-nav .nav-link{display:flex;flex:1;align-items:center;justify-content:center;gap:3px;flex-direction:column;width:auto;padding:7px 0;border:none;border-radius:8px;font-size:10px;line-height:1.5}
   .mobile-nav .nav-link.current{background:transparent;color:var(--lav)}.mobile-nav .nav-link.current svg{filter:drop-shadow(0 0 6px #ad8ae750)}
 }
+@media(max-width:420px){.back-home .back-context{display:none}.back-home{white-space:nowrap}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:0s!important}}
 
 

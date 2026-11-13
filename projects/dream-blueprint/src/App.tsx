@@ -157,7 +157,7 @@ function App() {
     </aside>
     <div className="viewport"><div className="mobile-brand"><Brand/><button className="icon-control" aria-label="設定" onClick={()=>setView('settings')}><Settings2 size={20}/></button></div>
     <div className="desktop-content" id="content" tabIndex={-1}>
-      <header className="global-head"><div>{page==='today'?<><h1>今日航行</h1><p><CalendarDays size={14}/>{dateText}</p></>:<button className="back-home" onClick={()=>setView('today')}><Compass size={16}/> 今日航行 <ChevronRight size={14}/> {pageName}</button>}</div>
+      <header className="global-head"><div>{page==='today'?<><h1>今日航行</h1><p><CalendarDays size={14}/>{dateText}</p></>:<button className="back-home" onClick={()=>setView('today')}><Compass size={16}/> 今日航行 <span className="back-context"><ChevronRight size={14}/> {pageName}</span></button>}</div>
       <div className="header-controls"><button className="phase-pill" title="編輯目前時期" onClick={()=>setView('settings')}><i/>{status}{until&&daysBetween(today,until)<32?' · 還有 '+(daysBetween(today,until)+1)+' 天':''}</button>
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
