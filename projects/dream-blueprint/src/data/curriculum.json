@@ -861,67 +861,66 @@
         {
           "id": "u1-d5",
           "day": 5,
-          "zh": "我們是護理師，不是醫師。",
+          "zh": "我們是學生，不是老師。",
           "grammar": [
             "be 動詞現在式"
           ],
           "hints": [
             "看表示職業的名詞，和前面的主詞數量是否一致。",
-            "we 配 are；護理師與醫師在這裡都指多人。"
+            "we 配 are；學生和老師都是多人，名詞用複數。"
           ],
           "reference": [
-            "We are nurses, not doctors.",
-            "We're nurses, not doctors."
+            "We are students, not teachers."
           ],
           "why": "主詞 we 用 are；我們有好幾個人，兩個職業名詞都用複數。",
           "newWords": [
             {
-              "en": "doctor",
-              "zh": "醫師",
-              "example": "The doctor is here.",
-              "exampleZh": "醫師在這裡。",
-              "source": "nursing",
-              "level": 1
-            },
-            {
-              "en": "room",
-              "zh": "房間",
-              "example": "The room is quiet.",
-              "exampleZh": "這間房很安靜。",
+              "en": "teacher",
+              "zh": "老師",
+              "example": "She is a teacher.",
+              "exampleZh": "她是老師。",
               "source": "level1",
               "level": 1
             },
             {
-              "en": "bed",
-              "zh": "床",
-              "example": "This bed is clean.",
-              "exampleZh": "這張床很乾淨。",
+              "en": "class",
+              "zh": "班級、課",
+              "example": "Our class is big.",
+              "exampleZh": "我們班很大。",
+              "source": "level1",
+              "level": 1
+            },
+            {
+              "en": "friend",
+              "zh": "朋友",
+              "example": "He is my friend.",
+              "exampleZh": "他是我的朋友。",
               "source": "level1",
               "level": 1
             }
           ],
           "words": [
             {
-              "en": "doctor",
-              "zh": "醫師",
-              "example": "The doctor is here.",
-              "exampleZh": "醫師在這裡。",
-              "source": "nursing",
-              "level": 1
-            },
-            {
-              "en": "room",
-              "zh": "房間",
-              "example": "The room is quiet.",
-              "exampleZh": "這間房很安靜。",
+              "en": "teacher",
+              "zh": "老師",
+              "example": "She is a teacher.",
+              "exampleZh": "她是老師。",
               "source": "level1",
               "level": 1
             },
             {
-              "en": "bed",
-              "zh": "床",
-              "example": "This bed is clean.",
-              "exampleZh": "這張床很乾淨。",
+              "en": "class",
+              "zh": "班級、課",
+              "example": "Our class is big.",
+              "exampleZh": "我們班很大。",
+              "source": "level1",
+              "level": 1
+            },
+            {
+              "en": "friend",
+              "zh": "朋友",
+              "example": "He is my friend.",
+              "exampleZh": "他是我的朋友。",
               "source": "level1",
               "level": 1
             }
@@ -930,17 +929,16 @@
             {
               "id": "u1-d5",
               "day": 5,
-              "zh": "我們是護理師，不是醫師。",
+              "zh": "我們是學生，不是老師。",
               "grammar": [
                 "be 動詞現在式"
               ],
               "hints": [
                 "看表示職業的名詞，和前面的主詞數量是否一致。",
-                "we 配 are；護理師與醫師在這裡都指多人。"
+                "we 配 are；學生和老師都是多人，名詞用複數。"
               ],
               "reference": [
-                "We are nurses, not doctors.",
-                "We're nurses, not doctors."
+                "We are students, not teachers."
               ],
               "why": "主詞 we 用 are；我們有好幾個人，兩個職業名詞都用複數。",
               "newWords": []
@@ -974,8 +972,8 @@
           ],
           "listening": [
             {
-              "en": "We are nurses.",
-              "zh": "我們是護理師。"
+              "en": "We are students, not teachers.",
+              "zh": "我們是學生，不是老師。"
             },
             {
               "en": "The doctor is in the room.",
@@ -1068,16 +1066,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "We are nurses.",
-              "zh": "我們是護理師。"
+              "en": "He is thirsty.",
+              "zh": "他很渴。"
             },
             {
-              "en": "The doctor is in the room.",
-              "zh": "醫師在房間裡。"
+              "en": "Are you cold?",
+              "zh": "你會冷嗎？"
             },
             {
-              "en": "The patient is awake.",
-              "zh": "病人醒著。"
+              "en": "I am not tired.",
+              "zh": "我不累。"
             }
           ]
         }
@@ -1196,17 +1194,16 @@
         {
           "id": "u1-r4",
           "day": 6,
-          "zh": "這間病房很安靜。",
+          "zh": "這間教室很安靜。",
           "grammar": [
             "be 動詞現在式"
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "一間教室是單數，用 is。"
           ],
           "reference": [
-            "This ward is quiet.",
-            "It is quiet in this ward."
+            "This classroom is quiet."
           ],
           "why": "I 用 am。You、we、they 和複數用 are；he、she、it 和其他單數用 is。否定在 be 動詞後加 not；問句把 be 動詞移到主詞前。",
           "newWords": []
@@ -1288,17 +1285,16 @@
         {
           "id": "u1-r4",
           "day": 6,
-          "zh": "這間病房很安靜。",
+          "zh": "這間教室很安靜。",
           "grammar": [
             "be 動詞現在式"
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "一間教室是單數，用 is。"
           ],
           "reference": [
-            "This ward is quiet.",
-            "It is quiet in this ward."
+            "This classroom is quiet."
           ],
           "why": "I 用 am。You、we、they 和複數用 are；he、she、it 和其他單數用 is。否定在 be 動詞後加 not；問句把 be 動詞移到主詞前。",
           "newWords": []
@@ -1984,38 +1980,36 @@
         {
           "id": "u2-c1",
           "day": 6,
-          "zh": "這是一顆藥。",
+          "zh": "這是一顆蘋果。",
           "grammar": [
             "名詞單複數、a／an"
           ],
           "hints": [
             "檢查看到一顆藥時名詞前面要放什麼。",
-            "pill 的開頭音是子音，前面用 a。"
+            "apple 的開頭是母音，前面放 an。"
           ],
           "reference": [
-            "This is a pill.",
-            "This is a tablet."
+            "This is an apple."
           ],
-          "why": "單數 pill 以子音開頭，用 a。",
+          "why": "apple 以母音開頭，用 an。",
           "newWords": [],
           "words": [],
           "sentences": [
             {
               "id": "u2-c1",
               "day": 6,
-              "zh": "這是一顆藥。",
+              "zh": "這是一顆蘋果。",
               "grammar": [
                 "名詞單複數、a／an"
               ],
               "hints": [
                 "檢查看到一顆藥時名詞前面要放什麼。",
-                "pill 的開頭音是子音，前面用 a。"
+                "apple 的開頭是母音，前面放 an。"
               ],
               "reference": [
-                "This is a pill.",
-                "This is a tablet."
+                "This is an apple."
               ],
-              "why": "單數 pill 以子音開頭，用 a。",
+              "why": "apple 以母音開頭，用 an。",
               "newWords": []
             },
             {
@@ -2058,16 +2052,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "I see two children.",
-              "zh": "我看見兩個小孩。"
+              "en": "This is an apple.",
+              "zh": "這是一顆蘋果。"
             },
             {
-              "en": "They are scared.",
-              "zh": "他們很害怕。"
+              "en": "These gloves are cold.",
+              "zh": "這些手套很冰。"
             },
             {
-              "en": "Their father is with them.",
-              "zh": "他們的爸爸陪著他們。"
+              "en": "His feet are cold.",
+              "zh": "他的腳很冰。"
             }
           ]
         }
@@ -2076,19 +2070,18 @@
         {
           "id": "u2-c1",
           "day": 6,
-          "zh": "這是一顆藥。",
+          "zh": "這是一顆蘋果。",
           "grammar": [
             "名詞單複數、a／an"
           ],
           "hints": [
             "檢查看到一顆藥時名詞前面要放什麼。",
-            "pill 的開頭音是子音，前面用 a。"
+            "apple 的開頭是母音，前面放 an。"
           ],
           "reference": [
-            "This is a pill.",
-            "This is a tablet."
+            "This is an apple."
           ],
-          "why": "單數 pill 以子音開頭，用 a。",
+          "why": "apple 以母音開頭，用 an。",
           "newWords": []
         },
         {
@@ -3011,17 +3004,16 @@
             {
               "id": "u3-c2",
               "day": 6,
-              "zh": "這位醫師在病房裡。",
+              "zh": "老師在教室裡。",
               "grammar": [
                 "the"
               ],
               "hints": [
                 "這裡說的是哪一位醫師、哪一間病房？",
-                "用 the 指雙方知道的人和地方。"
+                "雙方都知道是哪位老師、哪間教室，兩個都用 the。"
               ],
               "reference": [
-                "The doctor is in the room.",
-                "The doctor is in the ward."
+                "The teacher is in the classroom."
               ],
               "why": "在談特定的人和地方，兩者都用 the。",
               "newWords": []
@@ -3048,16 +3040,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "This is a mask.",
-              "zh": "這是一個口罩。"
+              "en": "Is the window closed?",
+              "zh": "窗戶是關著的嗎？"
             },
             {
-              "en": "The mask is dirty.",
-              "zh": "這個口罩是髒的。"
+              "en": "The teacher is in the classroom.",
+              "zh": "老師在教室裡。"
             },
             {
-              "en": "A new mask is in the box.",
-              "zh": "盒子裡有一個新口罩。"
+              "en": "The bottle is empty.",
+              "zh": "這個瓶子是空的。"
             }
           ],
           "glossary": [
@@ -3090,17 +3082,16 @@
         {
           "id": "u3-c2",
           "day": 6,
-          "zh": "這位醫師在病房裡。",
+          "zh": "老師在教室裡。",
           "grammar": [
             "the"
           ],
           "hints": [
             "這裡說的是哪一位醫師、哪一間病房？",
-            "用 the 指雙方知道的人和地方。"
+            "雙方都知道是哪位老師、哪間教室，兩個都用 the。"
           ],
           "reference": [
-            "The doctor is in the room.",
-            "The doctor is in the ward."
+            "The teacher is in the classroom."
           ],
           "why": "在談特定的人和地方，兩者都用 the。",
           "newWords": []
@@ -3164,17 +3155,16 @@
         {
           "id": "u3-r3",
           "day": 6,
-          "zh": "床單是濕的嗎？",
+          "zh": "毛巾是濕的嗎？",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "問句把 is 放前面；特定的毛巾用 the。"
           ],
           "reference": [
-            "Is the sheet wet?",
-            "Is the bed sheet wet?"
+            "Is the towel wet?"
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -3182,17 +3172,17 @@
         {
           "id": "u3-r4",
           "day": 6,
-          "zh": "護理師在門邊。",
+          "zh": "我媽媽在門邊。",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "門是雙方都看得到的那一扇，用 the。"
           ],
           "reference": [
-            "The nurse is by the door.",
-            "The nurse is beside the door."
+            "My mom is by the door.",
+            "My mother is by the door."
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -3200,17 +3190,17 @@
         {
           "id": "u3-r5",
           "day": 6,
-          "zh": "那條毯子在床上。",
+          "zh": "那隻貓在沙發上。",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "指特定的沙發，用 the。"
           ],
           "reference": [
-            "The blanket is on the bed.",
-            "That blanket is on the bed."
+            "The cat is on the sofa.",
+            "That cat is on the sofa."
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -3256,17 +3246,16 @@
         {
           "id": "u3-r3",
           "day": 6,
-          "zh": "床單是濕的嗎？",
+          "zh": "毛巾是濕的嗎？",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "問句把 is 放前面；特定的毛巾用 the。"
           ],
           "reference": [
-            "Is the sheet wet?",
-            "Is the bed sheet wet?"
+            "Is the towel wet?"
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -3274,17 +3263,17 @@
         {
           "id": "u3-r4",
           "day": 6,
-          "zh": "護理師在門邊。",
+          "zh": "我媽媽在門邊。",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "門是雙方都看得到的那一扇，用 the。"
           ],
           "reference": [
-            "The nurse is by the door.",
-            "The nurse is beside the door."
+            "My mom is by the door.",
+            "My mother is by the door."
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -3292,17 +3281,17 @@
         {
           "id": "u3-r5",
           "day": 6,
-          "zh": "那條毯子在床上。",
+          "zh": "那隻貓在沙發上。",
           "grammar": [
             "the"
           ],
           "hints": [
             "看看哪個人或物已經說過，或是雙方都知道。",
-            "想想讀者能不能指出是哪一個。若能指出來，在名詞前用 the。"
+            "指特定的沙發，用 the。"
           ],
           "reference": [
-            "The blanket is on the bed.",
-            "That blanket is on the bed."
+            "The cat is on the sofa.",
+            "That cat is on the sofa."
           ],
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
@@ -4050,16 +4039,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "She eats after class.",
-              "zh": "她下課後吃東西。"
+              "en": "He walks every day.",
+              "zh": "他每天走路。"
             },
             {
-              "en": "She washes her cup.",
-              "zh": "她洗她的杯子。"
+              "en": "The patient rests at home.",
+              "zh": "這位病人在家休息。"
             },
             {
-              "en": "She puts it on the desk.",
-              "zh": "她把它放在書桌上。"
+              "en": "We eat breakfast at seven.",
+              "zh": "我們在七點吃早餐。"
             }
           ]
         }
@@ -5040,16 +5029,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "Does he eat breakfast?",
-              "zh": "他吃早餐嗎？"
+              "en": "Do you like tea?",
+              "zh": "你喜歡茶嗎？"
             },
             {
-              "en": "He eats bread every morning.",
-              "zh": "他每天早上吃麵包。"
+              "en": "She does not eat meat.",
+              "zh": "她不吃肉。"
             },
             {
-              "en": "He does not drink milk.",
-              "zh": "他不喝牛奶。"
+              "en": "Does he need help?",
+              "zh": "他需要幫忙嗎？"
             }
           ]
         }
@@ -6031,16 +6020,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "The room is dark.",
-              "zh": "房間很暗。"
+              "en": "I am washing my hands.",
+              "zh": "我正在洗手。"
             },
             {
-              "en": "He is not sleeping.",
-              "zh": "他沒有在睡覺。"
+              "en": "He is reading a book.",
+              "zh": "他正在讀一本書。"
             },
             {
-              "en": "He is listening to music.",
-              "zh": "他正在聽音樂。"
+              "en": "Are you eating lunch?",
+              "zh": "你們正在吃午餐嗎？"
             }
           ]
         }
@@ -7024,16 +7013,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "It was cold this morning.",
-              "zh": "今天早上很冷。"
+              "en": "She was in the ward a moment ago.",
+              "zh": "她剛才在病房。"
             },
             {
-              "en": "I was cold at school.",
-              "zh": "我在學校時覺得冷。"
+              "en": "We were busy yesterday.",
+              "zh": "我們昨天很忙。"
             },
             {
-              "en": "I am warm now.",
-              "zh": "我現在暖和了。"
+              "en": "Were you tired last night?",
+              "zh": "你昨晚累嗎？"
             }
           ]
         }
@@ -7170,17 +7159,16 @@
         {
           "id": "u7-r5",
           "day": 6,
-          "zh": "病人昨晚醒著。",
+          "zh": "我弟弟昨晚醒著。",
           "grammar": [
             "be 動詞過去式"
           ],
           "hints": [
             "找時間線索，再檢查主詞和 be 動詞。",
-            "過去的狀態用 was 或 were。遇到 you 或複數用 were，I 和其他單數用 was。"
+            "單數主詞描述昨晚的狀態，用 was。"
           ],
           "reference": [
-            "The patient was awake last night.",
-            "Last night the patient was awake."
+            "My brother was awake last night."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": []
@@ -7262,17 +7250,16 @@
         {
           "id": "u7-r5",
           "day": 6,
-          "zh": "病人昨晚醒著。",
+          "zh": "我弟弟昨晚醒著。",
           "grammar": [
             "be 動詞過去式"
           ],
           "hints": [
             "找時間線索，再檢查主詞和 be 動詞。",
-            "過去的狀態用 was 或 were。遇到 you 或複數用 were，I 和其他單數用 was。"
+            "單數主詞描述昨晚的狀態，用 was。"
           ],
           "reference": [
-            "The patient was awake last night.",
-            "Last night the patient was awake."
+            "My brother was awake last night."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": []
@@ -7883,17 +7870,17 @@
         {
           "id": "u8-r1",
           "day": 4,
-          "zh": "我們昨天幫助了那位病人。",
+          "zh": "我們昨天幫助了那位老奶奶。",
           "grammar": [
             "過去式（規則動詞）"
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "過去的事，規則動詞字尾加 -ed。"
+            "help 是規則動詞，過去式加 -ed。"
           ],
           "reference": [
-            "We helped the patient yesterday.",
-            "We helped that patient yesterday."
+            "We helped the old lady yesterday.",
+            "We helped the old woman yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": []
@@ -7936,17 +7923,17 @@
         {
           "id": "u8-r4",
           "day": 6,
-          "zh": "她昨天待在醫院。",
+          "zh": "她昨天待在家。",
           "grammar": [
             "過去式（規則動詞）"
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "過去的事，規則動詞字尾加 -ed。"
+            "stay 加 -ed。"
           ],
           "reference": [
-            "She stayed in the hospital yesterday.",
-            "She stayed at the hospital yesterday."
+            "She stayed home yesterday.",
+            "She stayed at home yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": []
@@ -7974,17 +7961,17 @@
         {
           "id": "u8-r1",
           "day": 4,
-          "zh": "我們昨天幫助了那位病人。",
+          "zh": "我們昨天幫助了那位老奶奶。",
           "grammar": [
             "過去式（規則動詞）"
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "過去的事，規則動詞字尾加 -ed。"
+            "help 是規則動詞，過去式加 -ed。"
           ],
           "reference": [
-            "We helped the patient yesterday.",
-            "We helped that patient yesterday."
+            "We helped the old lady yesterday.",
+            "We helped the old woman yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": []
@@ -8027,17 +8014,17 @@
         {
           "id": "u8-r4",
           "day": 6,
-          "zh": "她昨天待在醫院。",
+          "zh": "她昨天待在家。",
           "grammar": [
             "過去式（規則動詞）"
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "過去的事，規則動詞字尾加 -ed。"
+            "stay 加 -ed。"
           ],
           "reference": [
-            "She stayed in the hospital yesterday.",
-            "She stayed at the hospital yesterday."
+            "She stayed home yesterday.",
+            "She stayed at home yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": []
@@ -8428,7 +8415,7 @@
         {
           "id": "u9-d5",
           "day": 5,
-          "zh": "他昨天跌倒，然後打電話給護理師。",
+          "zh": "他昨天跌倒，然後打電話給他媽媽。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
@@ -8437,8 +8424,8 @@
             "fall 的過去式是 fell；call 是規則動詞。"
           ],
           "reference": [
-            "He fell yesterday and called the nurse.",
-            "He fell down yesterday and called the nurse."
+            "He fell yesterday and called his mom.",
+            "He fell down yesterday and called his mother."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": [
@@ -8451,12 +8438,12 @@
               "level": 1
             },
             {
-              "en": "fever",
-              "zh": "發燒",
-              "example": "He has a fever.",
-              "exampleZh": "他發燒了。",
-              "source": "level2",
-              "level": 2
+              "en": "mom",
+              "zh": "媽媽",
+              "example": "My mom is at home.",
+              "exampleZh": "我媽媽在家。",
+              "source": "nursing",
+              "level": 4
             }
           ],
           "words": [
@@ -8469,19 +8456,19 @@
               "level": 1
             },
             {
-              "en": "fever",
-              "zh": "發燒",
-              "example": "He has a fever.",
-              "exampleZh": "他發燒了。",
-              "source": "level2",
-              "level": 2
+              "en": "mom",
+              "zh": "媽媽",
+              "example": "My mom is at home.",
+              "exampleZh": "我媽媽在家。",
+              "source": "nursing",
+              "level": 4
             }
           ],
           "sentences": [
             {
               "id": "u9-d5",
               "day": 5,
-              "zh": "他昨天跌倒，然後打電話給護理師。",
+              "zh": "他昨天跌倒，然後打電話給他媽媽。",
               "grammar": [
                 "過去式（不規則動詞）"
               ],
@@ -8490,8 +8477,8 @@
                 "fall 的過去式是 fell；call 是規則動詞。"
               ],
               "reference": [
-                "He fell yesterday and called the nurse.",
-                "He fell down yesterday and called the nurse."
+                "He fell yesterday and called his mom.",
+                "He fell down yesterday and called his mother."
               ],
               "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
               "newWords": []
@@ -8500,8 +8487,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "He fell yesterday and called the nurse.",
-              "zh": "他昨天跌倒，然後打電話給護理師。"
+              "en": "He fell yesterday and called his mom.",
+              "zh": "他昨天跌倒，然後打電話給他媽媽。"
             },
             {
               "en": "The patient slept well last night.",
@@ -8520,17 +8507,17 @@
         {
           "id": "u9-c1",
           "day": 6,
-          "zh": "我昨天看到那位醫師。",
+          "zh": "我昨天看到那位老師。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "see 的過去式是 saw。"
           ],
           "reference": [
-            "I saw the doctor yesterday.",
-            "I saw that doctor yesterday."
+            "I saw the teacher yesterday.",
+            "I saw that teacher yesterday."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": [],
@@ -8539,17 +8526,17 @@
             {
               "id": "u9-c1",
               "day": 6,
-              "zh": "我昨天看到那位醫師。",
+              "zh": "我昨天看到那位老師。",
               "grammar": [
                 "過去式（不規則動詞）"
               ],
               "hints": [
                 "先確認是過去的事，再想這個動詞是不是不規則。",
-                "不規則動詞的過去式要直接記，不加 -ed。"
+                "see 的過去式是 saw。"
               ],
               "reference": [
-                "I saw the doctor yesterday.",
-                "I saw that doctor yesterday."
+                "I saw the teacher yesterday.",
+                "I saw that teacher yesterday."
               ],
               "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
               "newWords": []
@@ -8593,8 +8580,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "I saw the doctor yesterday.",
-              "zh": "我昨天看到那位醫師。"
+              "en": "I saw the teacher yesterday.",
+              "zh": "我昨天看到那位老師。"
             },
             {
               "en": "She drank some water.",
@@ -8611,17 +8598,17 @@
         {
           "id": "u9-c1",
           "day": 6,
-          "zh": "我昨天看到那位醫師。",
+          "zh": "我昨天看到那位老師。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "see 的過去式是 saw。"
           ],
           "reference": [
-            "I saw the doctor yesterday.",
-            "I saw that doctor yesterday."
+            "I saw the teacher yesterday.",
+            "I saw that teacher yesterday."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
@@ -8666,16 +8653,16 @@
         {
           "id": "u9-r1",
           "day": 4,
-          "zh": "我給了他一個口罩。",
+          "zh": "我給了他一本書。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "give 的過去式是 gave。"
           ],
           "reference": [
-            "I gave him a mask."
+            "I gave him a book."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
@@ -8736,16 +8723,16 @@
         {
           "id": "u9-r5",
           "day": 6,
-          "zh": "護理師告訴了我。",
+          "zh": "我朋友告訴了我。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "tell 的過去式是 told。"
           ],
           "reference": [
-            "The nurse told me."
+            "My friend told me."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
@@ -8755,16 +8742,16 @@
         {
           "id": "u9-r1",
           "day": 4,
-          "zh": "我給了他一個口罩。",
+          "zh": "我給了他一本書。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "give 的過去式是 gave。"
           ],
           "reference": [
-            "I gave him a mask."
+            "I gave him a book."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
@@ -8825,16 +8812,16 @@
         {
           "id": "u9-r5",
           "day": 6,
-          "zh": "護理師告訴了我。",
+          "zh": "我朋友告訴了我。",
           "grammar": [
             "過去式（不規則動詞）"
           ],
           "hints": [
             "先確認是過去的事，再想這個動詞是不是不規則。",
-            "不規則動詞的過去式要直接記，不加 -ed。"
+            "tell 的過去式是 told。"
           ],
           "reference": [
-            "The nurse told me."
+            "My friend told me."
           ],
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
@@ -10226,17 +10213,17 @@
         {
           "id": "u11-r1",
           "day": 4,
-          "zh": "我們明天會去醫院。",
+          "zh": "我們明天會去海邊。",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "will 後面接原形 go。"
           ],
           "reference": [
-            "We will go to the hospital tomorrow.",
-            "We are going to the hospital tomorrow."
+            "We will go to the beach tomorrow.",
+            "We are going to the beach tomorrow."
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -10244,17 +10231,17 @@
         {
           "id": "u11-r2",
           "day": 5,
-          "zh": "你今晚會吃藥嗎？",
+          "zh": "你今晚會看電影嗎？",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "Will 放最前面，後面接原形。"
           ],
           "reference": [
-            "Will you take the medicine tonight?",
-            "Will you take your medicine tonight?"
+            "Will you watch a movie tonight?",
+            "Are you going to watch a movie tonight?"
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -10297,16 +10284,16 @@
         {
           "id": "u11-r5",
           "day": 6,
-          "zh": "手術下週會開始。",
+          "zh": "演唱會下週會開始。",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "will 後面接原形 start。"
           ],
           "reference": [
-            "The surgery will start next week."
+            "The concert will start next week."
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -10316,17 +10303,17 @@
         {
           "id": "u11-r1",
           "day": 4,
-          "zh": "我們明天會去醫院。",
+          "zh": "我們明天會去海邊。",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "will 後面接原形 go。"
           ],
           "reference": [
-            "We will go to the hospital tomorrow.",
-            "We are going to the hospital tomorrow."
+            "We will go to the beach tomorrow.",
+            "We are going to the beach tomorrow."
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -10334,17 +10321,17 @@
         {
           "id": "u11-r2",
           "day": 5,
-          "zh": "你今晚會吃藥嗎？",
+          "zh": "你今晚會看電影嗎？",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "Will 放最前面，後面接原形。"
           ],
           "reference": [
-            "Will you take the medicine tonight?",
-            "Will you take your medicine tonight?"
+            "Will you watch a movie tonight?",
+            "Are you going to watch a movie tonight?"
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -10387,16 +10374,16 @@
         {
           "id": "u11-r5",
           "day": 6,
-          "zh": "手術下週會開始。",
+          "zh": "演唱會下週會開始。",
           "grammar": [
             "未來式"
           ],
           "hints": [
             "找時間線索，確認是還沒發生的事。",
-            "未來用 will 或 be going to，後面接原形動詞。"
+            "will 後面接原形 start。"
           ],
           "reference": [
-            "The surgery will start next week."
+            "The concert will start next week."
           ],
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
@@ -11685,17 +11672,17 @@
             {
               "id": "u13-c3",
               "day": 6,
-              "zh": "她早上在診所工作。",
+              "zh": "她早上在咖啡店工作。",
               "grammar": [
                 "時間和地點的介系詞"
               ],
               "hints": [
                 "找出句子裡的時間或地點，想它是哪一種。",
-                "幾點 at、星期幾 on、月份年份 in；裡面 in、表面 on、某個點 at。"
+                "地點一個點用 at；早上用 in。"
               ],
               "reference": [
-                "She works at the clinic in the morning.",
-                "She works in the clinic in the morning."
+                "She works at a coffee shop in the morning.",
+                "She works at the coffee shop in the morning."
               ],
               "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
               "newWords": []
@@ -11712,8 +11699,8 @@
               "zh": "我們星期三見。"
             },
             {
-              "en": "She works at the clinic in the morning.",
-              "zh": "她早上在診所工作。"
+              "en": "She works at a coffee shop in the morning.",
+              "zh": "她早上在咖啡店工作。"
             }
           ]
         }
@@ -11757,17 +11744,17 @@
         {
           "id": "u13-c3",
           "day": 6,
-          "zh": "她早上在診所工作。",
+          "zh": "她早上在咖啡店工作。",
           "grammar": [
             "時間和地點的介系詞"
           ],
           "hints": [
             "找出句子裡的時間或地點，想它是哪一種。",
-            "幾點 at、星期幾 on、月份年份 in；裡面 in、表面 on、某個點 at。"
+            "地點一個點用 at；早上用 in。"
           ],
           "reference": [
-            "She works at the clinic in the morning.",
-            "She works in the clinic in the morning."
+            "She works at a coffee shop in the morning.",
+            "She works at the coffee shop in the morning."
           ],
           "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
           "newWords": []
@@ -11847,16 +11834,16 @@
         {
           "id": "u13-r5",
           "day": 6,
-          "zh": "我昨天去了診所。",
+          "zh": "我昨天去了超市。",
           "grammar": [
             "時間和地點的介系詞"
           ],
           "hints": [
             "找出句子裡的時間或地點，想它是哪一種。",
-            "幾點 at、星期幾 on、月份年份 in；裡面 in、表面 on、某個點 at。"
+            "去某地用 to。"
           ],
           "reference": [
-            "I went to the clinic yesterday."
+            "I went to the supermarket yesterday."
           ],
           "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
           "newWords": []
@@ -11936,16 +11923,16 @@
         {
           "id": "u13-r5",
           "day": 6,
-          "zh": "我昨天去了診所。",
+          "zh": "我昨天去了超市。",
           "grammar": [
             "時間和地點的介系詞"
           ],
           "hints": [
             "找出句子裡的時間或地點，想它是哪一種。",
-            "幾點 at、星期幾 on、月份年份 in；裡面 in、表面 on、某個點 at。"
+            "去某地用 to。"
           ],
           "reference": [
-            "I went to the clinic yesterday."
+            "I went to the supermarket yesterday."
           ],
           "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
           "newWords": []
@@ -13397,16 +13384,17 @@
         {
           "id": "u15-r5",
           "day": 6,
-          "zh": "她的血壓比上週高。",
+          "zh": "今天的氣溫比上週高。",
           "grammar": [
             "比較級和最高級"
           ],
           "hints": [
             "看是兩個在比，還是三個以上裡面最怎樣。",
-            "兩個相比用比較級加 than；最怎樣用 the 加最高級。"
+            "high 的比較級是 higher，後面用 than。"
           ],
           "reference": [
-            "Her blood pressure is higher than last week."
+            "The temperature today is higher than last week.",
+            "Today's temperature is higher than last week."
           ],
           "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
           "newWords": []
@@ -13486,16 +13474,17 @@
         {
           "id": "u15-r5",
           "day": 6,
-          "zh": "她的血壓比上週高。",
+          "zh": "今天的氣溫比上週高。",
           "grammar": [
             "比較級和最高級"
           ],
           "hints": [
             "看是兩個在比，還是三個以上裡面最怎樣。",
-            "兩個相比用比較級加 than；最怎樣用 the 加最高級。"
+            "high 的比較級是 higher，後面用 than。"
           ],
           "reference": [
-            "Her blood pressure is higher than last week."
+            "The temperature today is higher than last week.",
+            "Today's temperature is higher than last week."
           ],
           "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
           "newWords": []
@@ -14006,16 +13995,16 @@
             {
               "id": "u16-c3",
               "day": 6,
-              "zh": "誰是你的醫師？",
+              "zh": "誰是你最好的朋友？",
               "grammar": [
                 "疑問詞問句"
               ],
               "hints": [
                 "先選對疑問詞，再照問句的順序排。",
-                "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+                "問人用 Who。"
               ],
               "reference": [
-                "Who is your doctor?"
+                "Who is your best friend?"
               ],
               "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
               "newWords": []
@@ -14032,8 +14021,8 @@
               "zh": "他昨天去了哪裡？"
             },
             {
-              "en": "Who is your doctor?",
-              "zh": "誰是你的醫師？"
+              "en": "Who is your best friend?",
+              "zh": "誰是你最好的朋友？"
             }
           ]
         }
@@ -14077,16 +14066,16 @@
         {
           "id": "u16-c3",
           "day": 6,
-          "zh": "誰是你的醫師？",
+          "zh": "誰是你最好的朋友？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+            "問人用 Who。"
           ],
           "reference": [
-            "Who is your doctor?"
+            "Who is your best friend?"
           ],
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
@@ -14114,16 +14103,16 @@
         {
           "id": "u16-r2",
           "day": 5,
-          "zh": "手術是什麼時候？",
+          "zh": "派對是什麼時候？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+            "問時間用 When。"
           ],
           "reference": [
-            "When is the surgery?"
+            "When is the party?"
           ],
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
@@ -14149,16 +14138,16 @@
         {
           "id": "u16-r4",
           "day": 6,
-          "zh": "你會痛多久？",
+          "zh": "電影有多長？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+            "問長度用 How long。"
           ],
           "reference": [
-            "How long does the pain last?"
+            "How long is the movie?"
           ],
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
@@ -14204,16 +14193,16 @@
         {
           "id": "u16-r2",
           "day": 5,
-          "zh": "手術是什麼時候？",
+          "zh": "派對是什麼時候？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+            "問時間用 When。"
           ],
           "reference": [
-            "When is the surgery?"
+            "When is the party?"
           ],
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
@@ -14239,16 +14228,16 @@
         {
           "id": "u16-r4",
           "day": 6,
-          "zh": "你會痛多久？",
+          "zh": "電影有多長？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "疑問詞放最前面，後面接 be 動詞或 do、does、did 再接主詞。"
+            "問長度用 How long。"
           ],
           "reference": [
-            "How long does the pain last?"
+            "How long is the movie?"
           ],
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
@@ -14872,17 +14861,16 @@
         {
           "id": "u17-r1",
           "day": 4,
-          "zh": "她頭暈，所以她坐下了。",
+          "zh": "她很累，所以她坐下了。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "結果用 so。"
           ],
           "reference": [
-            "She was dizzy, so she sat down.",
-            "She felt dizzy, so she sat down."
+            "She was tired, so she sat down."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14890,17 +14878,16 @@
         {
           "id": "u17-r2",
           "day": 5,
-          "zh": "我洗了手，而且戴了口罩。",
+          "zh": "我洗了碗，而且倒了垃圾。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "and 接兩個過去的動作。"
           ],
           "reference": [
-            "I washed my hands and put on a mask.",
-            "I washed my hands and wore a mask."
+            "I washed the dishes and took out the trash."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14908,17 +14895,17 @@
         {
           "id": "u17-r3",
           "day": 6,
-          "zh": "他想吃東西，但是他覺得噁心。",
+          "zh": "他想去，但是他沒有錢。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "轉折用 but。"
           ],
           "reference": [
-            "He wants to eat, but he feels nauseous.",
-            "He wants to eat, but he has nausea."
+            "He wants to go, but he does not have money.",
+            "He wants to go, but he doesn't have any money."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14943,17 +14930,16 @@
         {
           "id": "u17-r5",
           "day": 6,
-          "zh": "藥很苦，但是你必須吃。",
+          "zh": "咖啡很苦，但是我喜歡。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "轉折用 but。"
           ],
           "reference": [
-            "The medicine is bitter, but you must take it.",
-            "The medicine is bitter, but you have to take it."
+            "The coffee is bitter, but I like it."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14963,17 +14949,16 @@
         {
           "id": "u17-r1",
           "day": 4,
-          "zh": "她頭暈，所以她坐下了。",
+          "zh": "她很累，所以她坐下了。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "結果用 so。"
           ],
           "reference": [
-            "She was dizzy, so she sat down.",
-            "She felt dizzy, so she sat down."
+            "She was tired, so she sat down."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14981,17 +14966,16 @@
         {
           "id": "u17-r2",
           "day": 5,
-          "zh": "我洗了手，而且戴了口罩。",
+          "zh": "我洗了碗，而且倒了垃圾。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "and 接兩個過去的動作。"
           ],
           "reference": [
-            "I washed my hands and put on a mask.",
-            "I washed my hands and wore a mask."
+            "I washed the dishes and took out the trash."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -14999,17 +14983,17 @@
         {
           "id": "u17-r3",
           "day": 6,
-          "zh": "他想吃東西，但是他覺得噁心。",
+          "zh": "他想去，但是他沒有錢。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "轉折用 but。"
           ],
           "reference": [
-            "He wants to eat, but he feels nauseous.",
-            "He wants to eat, but he has nausea."
+            "He wants to go, but he does not have money.",
+            "He wants to go, but he doesn't have any money."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -15034,17 +15018,16 @@
         {
           "id": "u17-r5",
           "day": 6,
-          "zh": "藥很苦，但是你必須吃。",
+          "zh": "咖啡很苦，但是我喜歡。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
             "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "轉折用 but。"
           ],
           "reference": [
-            "The medicine is bitter, but you must take it.",
-            "The medicine is bitter, but you have to take it."
+            "The coffee is bitter, but I like it."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -15667,17 +15650,17 @@
         {
           "id": "u18-r2",
           "day": 5,
-          "zh": "如果會痛，請告訴我。",
+          "zh": "如果你有問題，請告訴我。",
           "grammar": [
             "when／before／after／if"
           ],
           "hints": [
             "找出哪一件事先、哪一件事後，或哪一句是條件。",
-            "when、before、after、if 後面講未來的事也用現在式。"
+            "if 後面用現在式。"
           ],
           "reference": [
-            "Please tell me if it hurts.",
-            "If it hurts, please tell me."
+            "Please tell me if you have a question.",
+            "If you have any questions, please tell me."
           ],
           "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
           "newWords": []
@@ -15720,17 +15703,17 @@
         {
           "id": "u18-r5",
           "day": 6,
-          "zh": "當他咳嗽的時候，他的胸口會痛。",
+          "zh": "當他累的時候，他會很安靜。",
           "grammar": [
             "when／before／after／if"
           ],
           "hints": [
             "找出哪一件事先、哪一件事後，或哪一句是條件。",
-            "when、before、after、if 後面講未來的事也用現在式。"
+            "when 後面接句子，用現在式。"
           ],
           "reference": [
-            "When he coughs, his chest hurts.",
-            "His chest hurts when he coughs."
+            "When he is tired, he is very quiet.",
+            "He is very quiet when he is tired."
           ],
           "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
           "newWords": []
@@ -15758,17 +15741,17 @@
         {
           "id": "u18-r2",
           "day": 5,
-          "zh": "如果會痛，請告訴我。",
+          "zh": "如果你有問題，請告訴我。",
           "grammar": [
             "when／before／after／if"
           ],
           "hints": [
             "找出哪一件事先、哪一件事後，或哪一句是條件。",
-            "when、before、after、if 後面講未來的事也用現在式。"
+            "if 後面用現在式。"
           ],
           "reference": [
-            "Please tell me if it hurts.",
-            "If it hurts, please tell me."
+            "Please tell me if you have a question.",
+            "If you have any questions, please tell me."
           ],
           "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
           "newWords": []
@@ -15811,17 +15794,17 @@
         {
           "id": "u18-r5",
           "day": 6,
-          "zh": "當他咳嗽的時候，他的胸口會痛。",
+          "zh": "當他累的時候，他會很安靜。",
           "grammar": [
             "when／before／after／if"
           ],
           "hints": [
             "找出哪一件事先、哪一件事後，或哪一句是條件。",
-            "when、before、after、if 後面講未來的事也用現在式。"
+            "when 後面接句子，用現在式。"
           ],
           "reference": [
-            "When he coughs, his chest hurts.",
-            "His chest hurts when he coughs."
+            "When he is tired, he is very quiet.",
+            "He is very quiet when he is tired."
           ],
           "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
           "newWords": []
@@ -16333,17 +16316,17 @@
             {
               "id": "u19-c3",
               "day": 6,
-              "zh": "你以前動過手術嗎？",
+              "zh": "你去過日本嗎？",
               "grammar": [
                 "現在完成式"
               ],
               "hints": [
                 "看這件事是不是從以前延續到現在，或是到目前為止的經驗。",
-                "have 或 has 加過去分詞；一段時間用 for，起點用 since。"
+                "Have 放前面；去過用 been to。"
               ],
               "reference": [
-                "Have you ever had surgery?",
-                "Have you had surgery before?"
+                "Have you ever been to Japan?",
+                "Have you been to Japan before?"
               ],
               "why": "have 或 has 加過去分詞，表示從以前到現在的經驗、持續或剛完成。for 加一段時間，since 加起點。he、she、it 用 has。否定是 have not、has not；問句把 Have、Has 放前面。",
               "newWords": []
@@ -16360,8 +16343,8 @@
               "zh": "他在這間醫院工作五年了。"
             },
             {
-              "en": "Have you ever had surgery?",
-              "zh": "你以前動過手術嗎？"
+              "en": "Have you ever been to Japan?",
+              "zh": "你去過日本嗎？"
             }
           ]
         }
@@ -16406,17 +16389,17 @@
         {
           "id": "u19-c3",
           "day": 6,
-          "zh": "你以前動過手術嗎？",
+          "zh": "你去過日本嗎？",
           "grammar": [
             "現在完成式"
           ],
           "hints": [
             "看這件事是不是從以前延續到現在，或是到目前為止的經驗。",
-            "have 或 has 加過去分詞；一段時間用 for，起點用 since。"
+            "Have 放前面；去過用 been to。"
           ],
           "reference": [
-            "Have you ever had surgery?",
-            "Have you had surgery before?"
+            "Have you ever been to Japan?",
+            "Have you been to Japan before?"
           ],
           "why": "have 或 has 加過去分詞，表示從以前到現在的經驗、持續或剛完成。for 加一段時間，since 加起點。he、she、it 用 has。否定是 have not、has not；問句把 Have、Has 放前面。",
           "newWords": []
@@ -16444,16 +16427,16 @@
         {
           "id": "u19-r2",
           "day": 5,
-          "zh": "她從星期一就頭痛。",
+          "zh": "她從星期一就很忙。",
           "grammar": [
             "現在完成式"
           ],
           "hints": [
             "看這件事是不是從以前延續到現在，或是到目前為止的經驗。",
-            "have 或 has 加過去分詞；一段時間用 for，起點用 since。"
+            "has 加 been；起點用 since。"
           ],
           "reference": [
-            "She has had a headache since Monday."
+            "She has been busy since Monday."
           ],
           "why": "have 或 has 加過去分詞，表示從以前到現在的經驗、持續或剛完成。for 加一段時間，since 加起點。he、she、it 用 has。否定是 have not、has not；問句把 Have、Has 放前面。",
           "newWords": []
@@ -16534,16 +16517,16 @@
         {
           "id": "u19-r2",
           "day": 5,
-          "zh": "她從星期一就頭痛。",
+          "zh": "她從星期一就很忙。",
           "grammar": [
             "現在完成式"
           ],
           "hints": [
             "看這件事是不是從以前延續到現在，或是到目前為止的經驗。",
-            "have 或 has 加過去分詞；一段時間用 for，起點用 since。"
+            "has 加 been；起點用 since。"
           ],
           "reference": [
-            "She has had a headache since Monday."
+            "She has been busy since Monday."
           ],
           "why": "have 或 has 加過去分詞，表示從以前到現在的經驗、持續或剛完成。for 加一段時間，since 加起點。he、she、it 用 has。否定是 have not、has not；問句把 Have、Has 放前面。",
           "newWords": []
@@ -17202,17 +17185,17 @@
         {
           "id": "u20-r1",
           "day": 4,
-          "zh": "你吃過這個藥嗎？",
+          "zh": "你吃過臭豆腐嗎？",
           "grammar": [
             "現在完成式和過去式的差別"
           ],
           "hints": [
             "找句子裡有沒有明確的過去時間。",
-            "有明確過去時間用過去式；沒有、而且跟現在有關用現在完成式。"
+            "沒有明確時間、問經驗，用現在完成式。"
           ],
           "reference": [
-            "Have you ever taken this medicine?",
-            "Have you taken this medicine before?"
+            "Have you ever eaten stinky tofu?",
+            "Have you ever tried stinky tofu?"
           ],
           "why": "句子裡有明確的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。",
           "newWords": []
@@ -17237,17 +17220,17 @@
         {
           "id": "u20-r3",
           "day": 6,
-          "zh": "她已經出院了。",
+          "zh": "她已經回家了。",
           "grammar": [
             "現在完成式和過去式的差別"
           ],
           "hints": [
             "找句子裡有沒有明確的過去時間。",
-            "有明確過去時間用過去式；沒有、而且跟現在有關用現在完成式。"
+            "跟現在有關的結果，用現在完成式。"
           ],
           "reference": [
-            "She has been discharged.",
-            "She has already been discharged."
+            "She has gone home.",
+            "She has already gone home."
           ],
           "why": "句子裡有明確的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。",
           "newWords": []
@@ -17292,17 +17275,17 @@
         {
           "id": "u20-r1",
           "day": 4,
-          "zh": "你吃過這個藥嗎？",
+          "zh": "你吃過臭豆腐嗎？",
           "grammar": [
             "現在完成式和過去式的差別"
           ],
           "hints": [
             "找句子裡有沒有明確的過去時間。",
-            "有明確過去時間用過去式；沒有、而且跟現在有關用現在完成式。"
+            "沒有明確時間、問經驗，用現在完成式。"
           ],
           "reference": [
-            "Have you ever taken this medicine?",
-            "Have you taken this medicine before?"
+            "Have you ever eaten stinky tofu?",
+            "Have you ever tried stinky tofu?"
           ],
           "why": "句子裡有明確的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。",
           "newWords": []
@@ -17327,17 +17310,17 @@
         {
           "id": "u20-r3",
           "day": 6,
-          "zh": "她已經出院了。",
+          "zh": "她已經回家了。",
           "grammar": [
             "現在完成式和過去式的差別"
           ],
           "hints": [
             "找句子裡有沒有明確的過去時間。",
-            "有明確過去時間用過去式；沒有、而且跟現在有關用現在完成式。"
+            "跟現在有關的結果，用現在完成式。"
           ],
           "reference": [
-            "She has been discharged.",
-            "She has already been discharged."
+            "She has gone home.",
+            "She has already gone home."
           ],
           "why": "句子裡有明確的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。",
           "newWords": []
@@ -17866,17 +17849,16 @@
             {
               "id": "u21-c2",
               "day": 6,
-              "zh": "他被送到醫院。",
+              "zh": "他被叫到辦公室。",
               "grammar": [
                 "被動語態"
               ],
               "hints": [
                 "先想主詞是做動作的，還是被做的。",
-                "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+                "過去被動，was 加過去分詞。"
               ],
               "reference": [
-                "He was taken to the hospital.",
-                "He was sent to the hospital."
+                "He was called to the office."
               ],
               "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
               "newWords": []
@@ -17884,17 +17866,16 @@
             {
               "id": "u21-c3",
               "day": 6,
-              "zh": "這些藥是每天給的。",
+              "zh": "這些盤子每天都會洗。",
               "grammar": [
                 "被動語態"
               ],
               "hints": [
                 "先想主詞是做動作的，還是被做的。",
-                "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+                "現在的習慣被動，are 加過去分詞。"
               ],
               "reference": [
-                "These medicines are given every day.",
-                "These medications are given daily."
+                "These plates are washed every day."
               ],
               "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
               "newWords": []
@@ -17907,12 +17888,12 @@
               "zh": "門是鎖著的。"
             },
             {
-              "en": "He was taken to the hospital.",
-              "zh": "他被送到醫院。"
+              "en": "He was called to the office.",
+              "zh": "他被叫到辦公室。"
             },
             {
-              "en": "These medicines are given every day.",
-              "zh": "這些藥是每天給的。"
+              "en": "These plates are washed every day.",
+              "zh": "這些盤子每天都會洗。"
             }
           ]
         }
@@ -17938,17 +17919,16 @@
         {
           "id": "u21-c2",
           "day": 6,
-          "zh": "他被送到醫院。",
+          "zh": "他被叫到辦公室。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "過去被動，was 加過去分詞。"
           ],
           "reference": [
-            "He was taken to the hospital.",
-            "He was sent to the hospital."
+            "He was called to the office."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -17956,17 +17936,16 @@
         {
           "id": "u21-c3",
           "day": 6,
-          "zh": "這些藥是每天給的。",
+          "zh": "這些盤子每天都會洗。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "現在的習慣被動，are 加過去分詞。"
           ],
           "reference": [
-            "These medicines are given every day.",
-            "These medications are given daily."
+            "These plates are washed every day."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -17993,16 +17972,16 @@
         {
           "id": "u21-r2",
           "day": 5,
-          "zh": "病歷是護理師寫的。",
+          "zh": "這封信是我奶奶寫的。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "過去被動加 by。"
           ],
           "reference": [
-            "The chart was written by the nurse."
+            "This letter was written by my grandmother."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -18027,17 +18006,16 @@
         {
           "id": "u21-r4",
           "day": 6,
-          "zh": "她的血壓每四小時量一次。",
+          "zh": "這間教室每天打掃一次。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "現在被動，is cleaned。"
           ],
           "reference": [
-            "Her blood pressure is checked every four hours.",
-            "Her blood pressure is taken every four hours."
+            "This classroom is cleaned once a day."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -18045,17 +18023,17 @@
         {
           "id": "u21-r5",
           "day": 6,
-          "zh": "手術被取消了。",
+          "zh": "比賽被取消了。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "過去被動，was canceled。"
           ],
           "reference": [
-            "The surgery was canceled.",
-            "The surgery was cancelled."
+            "The game was canceled.",
+            "The game was cancelled."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -18082,16 +18060,16 @@
         {
           "id": "u21-r2",
           "day": 5,
-          "zh": "病歷是護理師寫的。",
+          "zh": "這封信是我奶奶寫的。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "過去被動加 by。"
           ],
           "reference": [
-            "The chart was written by the nurse."
+            "This letter was written by my grandmother."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -18116,17 +18094,16 @@
         {
           "id": "u21-r4",
           "day": 6,
-          "zh": "她的血壓每四小時量一次。",
+          "zh": "這間教室每天打掃一次。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "現在被動，is cleaned。"
           ],
           "reference": [
-            "Her blood pressure is checked every four hours.",
-            "Her blood pressure is taken every four hours."
+            "This classroom is cleaned once a day."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -18134,17 +18111,17 @@
         {
           "id": "u21-r5",
           "day": 6,
-          "zh": "手術被取消了。",
+          "zh": "比賽被取消了。",
           "grammar": [
             "被動語態"
           ],
           "hints": [
             "先想主詞是做動作的，還是被做的。",
-            "被動是 be 動詞加過去分詞；時間決定 be 動詞用現在還是過去。"
+            "過去被動，was canceled。"
           ],
           "reference": [
-            "The surgery was canceled.",
-            "The surgery was cancelled."
+            "The game was canceled.",
+            "The game was cancelled."
           ],
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
@@ -19285,7 +19262,7 @@
         {
           "id": "u23-d5",
           "day": 5,
-          "zh": "手術後休息很重要。",
+          "zh": "每天運動很重要。",
           "grammar": [
             "there is／there are 和 it 當主詞"
           ],
@@ -19294,8 +19271,7 @@
             "用 It is 加形容詞加 to 加原形。"
           ],
           "reference": [
-            "It is important to rest after surgery.",
-            "It is important to rest after the surgery."
+            "It is important to exercise every day."
           ],
           "why": "「某個地方有…」用 There is 加單數或不可數、There are 加複數。過去用 There was、There were。講天氣、時間、距離，或後面才說真正的事情時，用 It 當主詞。",
           "newWords": [
@@ -19308,12 +19284,12 @@
               "level": 1
             },
             {
-              "en": "swelling",
-              "zh": "腫脹",
-              "example": "There is some swelling.",
-              "exampleZh": "有一些腫脹。",
-              "source": "nursing",
-              "level": 4
+              "en": "exercise",
+              "zh": "運動",
+              "example": "I exercise every day.",
+              "exampleZh": "我每天運動。",
+              "source": "level1",
+              "level": 1
             }
           ],
           "words": [
@@ -19326,19 +19302,19 @@
               "level": 1
             },
             {
-              "en": "swelling",
-              "zh": "腫脹",
-              "example": "There is some swelling.",
-              "exampleZh": "有一些腫脹。",
-              "source": "nursing",
-              "level": 4
+              "en": "exercise",
+              "zh": "運動",
+              "example": "I exercise every day.",
+              "exampleZh": "我每天運動。",
+              "source": "level1",
+              "level": 1
             }
           ],
           "sentences": [
             {
               "id": "u23-d5",
               "day": 5,
-              "zh": "手術後休息很重要。",
+              "zh": "每天運動很重要。",
               "grammar": [
                 "there is／there are 和 it 當主詞"
               ],
@@ -19347,8 +19323,7 @@
                 "用 It is 加形容詞加 to 加原形。"
               ],
               "reference": [
-                "It is important to rest after surgery.",
-                "It is important to rest after the surgery."
+                "It is important to exercise every day."
               ],
               "why": "「某個地方有…」用 There is 加單數或不可數、There are 加複數。過去用 There was、There were。講天氣、時間、距離，或後面才說真正的事情時，用 It 當主詞。",
               "newWords": []
@@ -19357,8 +19332,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "It is important to rest after surgery.",
-              "zh": "手術後休息很重要。"
+              "en": "It is important to exercise every day.",
+              "zh": "每天運動很重要。"
             },
             {
               "en": "There is some blood on the dressing.",
@@ -19552,16 +19527,17 @@
         {
           "id": "u23-r3",
           "day": 6,
-          "zh": "傷口周圍有腫脹嗎？",
+          "zh": "冰箱裡有牛奶嗎？",
           "grammar": [
             "there is／there are 和 it 當主詞"
           ],
           "hints": [
             "看句子是在說「某處有某物」，還是在說天氣、時間或評價一件事。",
-            "有…用 There is 或 There are；天氣、時間和「做…很…」用 It。"
+            "不可數名詞的問句用 Is there any。"
           ],
           "reference": [
-            "Is there any swelling around the wound?"
+            "Is there any milk in the fridge?",
+            "Is there any milk in the refrigerator?"
           ],
           "why": "「某個地方有…」用 There is 加單數或不可數、There are 加複數。過去用 There was、There were。講天氣、時間、距離，或後面才說真正的事情時，用 It 當主詞。",
           "newWords": []
@@ -19642,16 +19618,17 @@
         {
           "id": "u23-r3",
           "day": 6,
-          "zh": "傷口周圍有腫脹嗎？",
+          "zh": "冰箱裡有牛奶嗎？",
           "grammar": [
             "there is／there are 和 it 當主詞"
           ],
           "hints": [
             "看句子是在說「某處有某物」，還是在說天氣、時間或評價一件事。",
-            "有…用 There is 或 There are；天氣、時間和「做…很…」用 It。"
+            "不可數名詞的問句用 Is there any。"
           ],
           "reference": [
-            "Is there any swelling around the wound?"
+            "Is there any milk in the fridge?",
+            "Is there any milk in the refrigerator?"
           ],
           "why": "「某個地方有…」用 There is 加單數或不可數、There are 加複數。過去用 There was、There were。講天氣、時間、距離，或後面才說真正的事情時，用 It 當主詞。",
           "newWords": []
@@ -20281,17 +20258,17 @@
         {
           "id": "u24-r1",
           "day": 4,
-          "zh": "她有時候頭痛。",
+          "zh": "她有時候會遲到。",
           "grammar": [
             "頻率和時間的說法"
           ],
           "hints": [
             "先看是「多常」還是「幾次」。",
-            "頻率副詞放一般動詞前、be 動詞後；次數的說法放句尾。"
+            "sometimes 放在 be 動詞前後都可以。"
           ],
           "reference": [
-            "She sometimes has headaches.",
-            "Sometimes she has a headache."
+            "She is sometimes late.",
+            "Sometimes she is late."
           ],
           "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
@@ -20352,16 +20329,16 @@
         {
           "id": "u24-r5",
           "day": 6,
-          "zh": "這個藥一天吃三次。",
+          "zh": "我一週打三次籃球。",
           "grammar": [
             "頻率和時間的說法"
           ],
           "hints": [
             "先看是「多常」還是「幾次」。",
-            "頻率副詞放一般動詞前、be 動詞後；次數的說法放句尾。"
+            "次數的說法放句尾。"
           ],
           "reference": [
-            "Take this medicine three times a day."
+            "I play basketball three times a week."
           ],
           "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
@@ -20371,17 +20348,17 @@
         {
           "id": "u24-r1",
           "day": 4,
-          "zh": "她有時候頭痛。",
+          "zh": "她有時候會遲到。",
           "grammar": [
             "頻率和時間的說法"
           ],
           "hints": [
             "先看是「多常」還是「幾次」。",
-            "頻率副詞放一般動詞前、be 動詞後；次數的說法放句尾。"
+            "sometimes 放在 be 動詞前後都可以。"
           ],
           "reference": [
-            "She sometimes has headaches.",
-            "Sometimes she has a headache."
+            "She is sometimes late.",
+            "Sometimes she is late."
           ],
           "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
@@ -20442,16 +20419,16 @@
         {
           "id": "u24-r5",
           "day": 6,
-          "zh": "這個藥一天吃三次。",
+          "zh": "我一週打三次籃球。",
           "grammar": [
             "頻率和時間的說法"
           ],
           "hints": [
             "先看是「多常」還是「幾次」。",
-            "頻率副詞放一般動詞前、be 動詞後；次數的說法放句尾。"
+            "次數的說法放句尾。"
           ],
           "reference": [
-            "Take this medicine three times a day."
+            "I play basketball three times a week."
           ],
           "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
@@ -21691,17 +21668,17 @@
         {
           "id": "u26-c1",
           "day": 6,
-          "zh": "我認識一位會說日文的醫師。",
+          "zh": "我有一個會說日文的朋友。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明人用 who，動詞配合 friend。"
           ],
           "reference": [
-            "I know a doctor who speaks Japanese.",
-            "I know a doctor that can speak Japanese."
+            "I have a friend who speaks Japanese.",
+            "I have a friend that can speak Japanese."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": [],
@@ -21710,17 +21687,17 @@
             {
               "id": "u26-c1",
               "day": 6,
-              "zh": "我認識一位會說日文的醫師。",
+              "zh": "我有一個會說日文的朋友。",
               "grammar": [
                 "關係子句"
               ],
               "hints": [
                 "找出要補充說明的是哪個名詞，是人還是東西。",
-                "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+                "說明人用 who，動詞配合 friend。"
               ],
               "reference": [
-                "I know a doctor who speaks Japanese.",
-                "I know a doctor that can speak Japanese."
+                "I have a friend who speaks Japanese.",
+                "I have a friend that can speak Japanese."
               ],
               "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
               "newWords": []
@@ -21746,17 +21723,17 @@
             {
               "id": "u26-c3",
               "day": 6,
-              "zh": "住在 3 號床的那位病人很累。",
+              "zh": "坐在我旁邊的那個男生很高。",
               "grammar": [
                 "關係子句"
               ],
               "hints": [
                 "找出要補充說明的是哪個名詞，是人還是東西。",
-                "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+                "who 子句緊跟在 boy 後面，主要動詞是 is。"
               ],
               "reference": [
-                "The patient who is in bed 3 is tired.",
-                "The patient in bed 3 is tired."
+                "The boy who sits next to me is tall.",
+                "The boy who is sitting next to me is tall."
               ],
               "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
               "newWords": []
@@ -21765,16 +21742,16 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "I know a doctor who speaks Japanese.",
-              "zh": "我認識一位會說日文的醫師。"
+              "en": "I have a friend who speaks Japanese.",
+              "zh": "我有一個會說日文的朋友。"
             },
             {
               "en": "That is the room that I want.",
               "zh": "那是我想要的房間。"
             },
             {
-              "en": "The patient who is in bed 3 is tired.",
-              "zh": "住在 3 號床的那位病人很累。"
+              "en": "The boy who sits next to me is tall.",
+              "zh": "坐在我旁邊的那個男生很高。"
             }
           ]
         }
@@ -21783,17 +21760,17 @@
         {
           "id": "u26-c1",
           "day": 6,
-          "zh": "我認識一位會說日文的醫師。",
+          "zh": "我有一個會說日文的朋友。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明人用 who，動詞配合 friend。"
           ],
           "reference": [
-            "I know a doctor who speaks Japanese.",
-            "I know a doctor that can speak Japanese."
+            "I have a friend who speaks Japanese.",
+            "I have a friend that can speak Japanese."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21819,17 +21796,17 @@
         {
           "id": "u26-c3",
           "day": 6,
-          "zh": "住在 3 號床的那位病人很累。",
+          "zh": "坐在我旁邊的那個男生很高。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "who 子句緊跟在 boy 後面，主要動詞是 is。"
           ],
           "reference": [
-            "The patient who is in bed 3 is tired.",
-            "The patient in bed 3 is tired."
+            "The boy who sits next to me is tall.",
+            "The boy who is sitting next to me is tall."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21839,17 +21816,16 @@
         {
           "id": "u26-r1",
           "day": 4,
-          "zh": "他是幫我開刀的醫師。",
+          "zh": "她是教我英文的老師。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明人用 who。"
           ],
           "reference": [
-            "He is the doctor who did my surgery.",
-            "He is the doctor who operated on me."
+            "She is the teacher who teaches me English."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21857,17 +21833,17 @@
         {
           "id": "u26-r2",
           "day": 5,
-          "zh": "我吃了你給我的藥。",
+          "zh": "我吃了你給我的蛋糕。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明東西用 that，可以省略。"
           ],
           "reference": [
-            "I took the medicine that you gave me.",
-            "I took the medicine you gave me."
+            "I ate the cake that you gave me.",
+            "I ate the cake you gave me."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21893,16 +21869,17 @@
         {
           "id": "u26-r4",
           "day": 6,
-          "zh": "這是會讓你想睡的藥。",
+          "zh": "這是會讓你笑的電影。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明東西用 that。"
           ],
           "reference": [
-            "This is a medicine that makes you sleepy."
+            "This is a movie that will make you laugh.",
+            "This is a movie that makes you laugh."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21910,17 +21887,17 @@
         {
           "id": "u26-r5",
           "day": 6,
-          "zh": "你有任何會過敏的食物嗎？",
+          "zh": "你有任何不吃的食物嗎？",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "that 子句說明 food。"
           ],
           "reference": [
-            "Is there any food that you are allergic to?",
-            "Are there any foods you are allergic to?"
+            "Is there any food that you do not eat?",
+            "Are there any foods you don't eat?"
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21930,17 +21907,16 @@
         {
           "id": "u26-r1",
           "day": 4,
-          "zh": "他是幫我開刀的醫師。",
+          "zh": "她是教我英文的老師。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明人用 who。"
           ],
           "reference": [
-            "He is the doctor who did my surgery.",
-            "He is the doctor who operated on me."
+            "She is the teacher who teaches me English."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21948,17 +21924,17 @@
         {
           "id": "u26-r2",
           "day": 5,
-          "zh": "我吃了你給我的藥。",
+          "zh": "我吃了你給我的蛋糕。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明東西用 that，可以省略。"
           ],
           "reference": [
-            "I took the medicine that you gave me.",
-            "I took the medicine you gave me."
+            "I ate the cake that you gave me.",
+            "I ate the cake you gave me."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -21984,16 +21960,17 @@
         {
           "id": "u26-r4",
           "day": 6,
-          "zh": "這是會讓你想睡的藥。",
+          "zh": "這是會讓你笑的電影。",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "說明東西用 that。"
           ],
           "reference": [
-            "This is a medicine that makes you sleepy."
+            "This is a movie that will make you laugh.",
+            "This is a movie that makes you laugh."
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -22001,17 +21978,17 @@
         {
           "id": "u26-r5",
           "day": 6,
-          "zh": "你有任何會過敏的食物嗎？",
+          "zh": "你有任何不吃的食物嗎？",
           "grammar": [
             "關係子句"
           ],
           "hints": [
             "找出要補充說明的是哪個名詞，是人還是東西。",
-            "說明人用 who 或 that；說明東西用 which 或 that；子句緊跟在名詞後面。"
+            "that 子句說明 food。"
           ],
           "reference": [
-            "Is there any food that you are allergic to?",
-            "Are there any foods you are allergic to?"
+            "Is there any food that you do not eat?",
+            "Are there any foods you don't eat?"
           ],
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
@@ -22685,17 +22662,17 @@
         {
           "id": "u27-r5",
           "day": 6,
-          "zh": "可以告訴我你痛多久了嗎？",
+          "zh": "可以告訴我你住在這裡多久了嗎？",
           "grammar": [
             "間接問句"
           ],
           "hints": [
             "先找出藏在句子裡的那個問題。",
-            "間接問句用「疑問詞加主詞加動詞」的順序，不倒裝。"
+            "how long 後面是 you have lived，不倒裝。"
           ],
           "reference": [
-            "Can you tell me how long you have had the pain?",
-            "Could you tell me how long you have had this pain?"
+            "Can you tell me how long you have lived here?",
+            "Could you tell me how long you have lived here?"
           ],
           "why": "把問句放進另一句裡（Can you tell me…、Do you know…、I do not know…）時，後面要變回一般句子的順序：疑問詞加主詞加動詞，不用 do、does、did。沒有疑問詞的用 if 或 whether。",
           "newWords": []
@@ -22774,17 +22751,17 @@
         {
           "id": "u27-r5",
           "day": 6,
-          "zh": "可以告訴我你痛多久了嗎？",
+          "zh": "可以告訴我你住在這裡多久了嗎？",
           "grammar": [
             "間接問句"
           ],
           "hints": [
             "先找出藏在句子裡的那個問題。",
-            "間接問句用「疑問詞加主詞加動詞」的順序，不倒裝。"
+            "how long 後面是 you have lived，不倒裝。"
           ],
           "reference": [
-            "Can you tell me how long you have had the pain?",
-            "Could you tell me how long you have had this pain?"
+            "Can you tell me how long you have lived here?",
+            "Could you tell me how long you have lived here?"
           ],
           "why": "把問句放進另一句裡（Can you tell me…、Do you know…、I do not know…）時，後面要變回一般句子的順序：疑問詞加主詞加動詞，不用 do、does、did。沒有疑問詞的用 if 或 whether。",
           "newWords": []
@@ -24184,17 +24161,17 @@
         {
           "id": "u29-r2",
           "day": 5,
-          "zh": "如果傷口流血，請壓住它。",
+          "zh": "如果下雨，帶一把傘。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式；結果用祈使句。"
           ],
           "reference": [
-            "If the wound bleeds, press on it.",
-            "If the wound bleeds, please apply pressure."
+            "If it rains, take an umbrella.",
+            "Take an umbrella if it rains."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24202,17 +24179,17 @@
         {
           "id": "u29-r3",
           "day": 6,
-          "zh": "除非醫師說可以，否則不要吃東西。",
+          "zh": "除非你完成作業，否則不能玩遊戲。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "unless 後面用現在式。"
           ],
           "reference": [
-            "Do not eat unless the doctor says it is okay.",
-            "Don't eat unless the doctor says you can."
+            "You cannot play games unless you finish your homework.",
+            "You can't play games unless you finish your homework."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24220,17 +24197,16 @@
         {
           "id": "u29-r4",
           "day": 6,
-          "zh": "如果你太快站起來，你會頭暈。",
+          "zh": "如果你太晚睡，你明天會很累。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式，結果用 will。"
           ],
           "reference": [
-            "If you stand up too fast, you will feel dizzy.",
-            "You will get dizzy if you stand up too quickly."
+            "If you go to bed too late, you will be tired tomorrow."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24238,16 +24214,16 @@
         {
           "id": "u29-r5",
           "day": 6,
-          "zh": "如果他發燒，我們會給他藥。",
+          "zh": "如果她來，我們會一起吃晚餐。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式 comes，結果用 will。"
           ],
           "reference": [
-            "If he has a fever, we will give him medicine."
+            "If she comes, we will have dinner together."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24275,17 +24251,17 @@
         {
           "id": "u29-r2",
           "day": 5,
-          "zh": "如果傷口流血，請壓住它。",
+          "zh": "如果下雨，帶一把傘。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式；結果用祈使句。"
           ],
           "reference": [
-            "If the wound bleeds, press on it.",
-            "If the wound bleeds, please apply pressure."
+            "If it rains, take an umbrella.",
+            "Take an umbrella if it rains."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24293,17 +24269,17 @@
         {
           "id": "u29-r3",
           "day": 6,
-          "zh": "除非醫師說可以，否則不要吃東西。",
+          "zh": "除非你完成作業，否則不能玩遊戲。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "unless 後面用現在式。"
           ],
           "reference": [
-            "Do not eat unless the doctor says it is okay.",
-            "Don't eat unless the doctor says you can."
+            "You cannot play games unless you finish your homework.",
+            "You can't play games unless you finish your homework."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24311,17 +24287,16 @@
         {
           "id": "u29-r4",
           "day": 6,
-          "zh": "如果你太快站起來，你會頭暈。",
+          "zh": "如果你太晚睡，你明天會很累。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式，結果用 will。"
           ],
           "reference": [
-            "If you stand up too fast, you will feel dizzy.",
-            "You will get dizzy if you stand up too quickly."
+            "If you go to bed too late, you will be tired tomorrow."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24329,16 +24304,16 @@
         {
           "id": "u29-r5",
           "day": 6,
-          "zh": "如果他發燒，我們會給他藥。",
+          "zh": "如果她來，我們會一起吃晚餐。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
           "hints": [
             "找出條件是哪一句，結果是哪一句。",
-            "if 那一句用現在式，結果那一句用 will 或祈使句。"
+            "if 用現在式 comes，結果用 will。"
           ],
           "reference": [
-            "If he has a fever, we will give him medicine."
+            "If she comes, we will have dinner together."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
@@ -24852,17 +24827,17 @@
             {
               "id": "u30-c3",
               "day": 6,
-              "zh": "病人否認有任何過敏。",
+              "zh": "他說他不喜歡咖啡。",
               "grammar": [
                 "轉述"
               ],
               "hints": [
                 "先找出是誰說的，再找出他說的內容。",
-                "say 後面直接接內容；tell 後面要先接人。"
+                "says 後面接完整句子。"
               ],
               "reference": [
-                "The patient denies any allergies.",
-                "The patient denies having any allergies."
+                "He says he does not like coffee.",
+                "He says that he doesn't like coffee."
               ],
               "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
@@ -24879,8 +24854,8 @@
               "zh": "他告訴我他昨晚沒睡。"
             },
             {
-              "en": "The patient denies any allergies.",
-              "zh": "病人否認有任何過敏。"
+              "en": "He says he does not like coffee.",
+              "zh": "他說他不喜歡咖啡。"
             }
           ]
         }
@@ -24925,17 +24900,17 @@
         {
           "id": "u30-c3",
           "day": 6,
-          "zh": "病人否認有任何過敏。",
+          "zh": "他說他不喜歡咖啡。",
           "grammar": [
             "轉述"
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "say 後面直接接內容；tell 後面要先接人。"
+            "says 後面接完整句子。"
           ],
           "reference": [
-            "The patient denies any allergies.",
-            "The patient denies having any allergies."
+            "He says he does not like coffee.",
+            "He says that he doesn't like coffee."
           ],
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
@@ -24963,16 +24938,17 @@
         {
           "id": "u30-r2",
           "day": 5,
-          "zh": "護理師告訴他不要吃東西。",
+          "zh": "媽媽告訴我不要晚回家。",
           "grammar": [
             "轉述"
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "say 後面直接接內容；tell 後面要先接人。"
+            "tell 加人加 not to 加原形。"
           ],
           "reference": [
-            "The nurse told him not to eat."
+            "My mom told me not to come home late.",
+            "Mom told me not to come home late."
           ],
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
@@ -24998,17 +24974,17 @@
         {
           "id": "u30-r4",
           "day": 6,
-          "zh": "病人說疼痛是 7 分。",
+          "zh": "她說那部電影很好看。",
           "grammar": [
             "轉述"
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "say 後面直接接內容；tell 後面要先接人。"
+            "said 後面的動詞往過去退一步。"
           ],
           "reference": [
-            "The patient says the pain is seven out of ten.",
-            "The patient reports the pain as seven out of ten."
+            "She said the movie was good.",
+            "She said that the movie was great."
           ],
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
@@ -25054,16 +25030,17 @@
         {
           "id": "u30-r2",
           "day": 5,
-          "zh": "護理師告訴他不要吃東西。",
+          "zh": "媽媽告訴我不要晚回家。",
           "grammar": [
             "轉述"
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "say 後面直接接內容；tell 後面要先接人。"
+            "tell 加人加 not to 加原形。"
           ],
           "reference": [
-            "The nurse told him not to eat."
+            "My mom told me not to come home late.",
+            "Mom told me not to come home late."
           ],
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
@@ -25089,17 +25066,17 @@
         {
           "id": "u30-r4",
           "day": 6,
-          "zh": "病人說疼痛是 7 分。",
+          "zh": "她說那部電影很好看。",
           "grammar": [
             "轉述"
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "say 後面直接接內容；tell 後面要先接人。"
+            "said 後面的動詞往過去退一步。"
           ],
           "reference": [
-            "The patient says the pain is seven out of ten.",
-            "The patient reports the pain as seven out of ten."
+            "She said the movie was good.",
+            "She said that the movie was great."
           ],
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
@@ -25794,16 +25771,17 @@
         {
           "id": "u31-r5",
           "day": 6,
-          "zh": "病人一直在抱怨頭痛。",
+          "zh": "我弟弟一直在玩手機。",
           "grammar": [
             "現在完成進行式"
           ],
           "hints": [
             "看動作是不是從過去一直持續到現在。",
-            "have 或 has 加 been 加動詞 ing。"
+            "has been 加 playing。"
           ],
           "reference": [
-            "The patient has been complaining of a headache."
+            "My brother has been playing on his phone.",
+            "My brother has been playing with his phone."
           ],
           "why": "have 或 has 加 been 加動詞 ing，強調一個動作從以前一直持續到現在，而且可能還在繼續。常和 for、since、how long 一起用。",
           "newWords": []
@@ -25885,16 +25863,17 @@
         {
           "id": "u31-r5",
           "day": 6,
-          "zh": "病人一直在抱怨頭痛。",
+          "zh": "我弟弟一直在玩手機。",
           "grammar": [
             "現在完成進行式"
           ],
           "hints": [
             "看動作是不是從過去一直持續到現在。",
-            "have 或 has 加 been 加動詞 ing。"
+            "has been 加 playing。"
           ],
           "reference": [
-            "The patient has been complaining of a headache."
+            "My brother has been playing on his phone.",
+            "My brother has been playing with his phone."
           ],
           "why": "have 或 has 加 been 加動詞 ing，強調一個動作從以前一直持續到現在，而且可能還在繼續。常和 for、since、how long 一起用。",
           "newWords": []
@@ -26535,16 +26514,16 @@
         {
           "id": "u32-r3",
           "day": 6,
-          "zh": "他住院前已經發燒三天了。",
+          "zh": "他搬來台中之前已經學了三年日文。",
           "grammar": [
             "過去完成式"
           ],
           "hints": [
             "找出兩件過去的事裡哪一件先發生。",
-            "先發生的用 had 加過去分詞，後發生的用過去式。"
+            "先學日文，用 had studied。"
           ],
           "reference": [
-            "He had had a fever for three days before he was admitted."
+            "He had studied Japanese for three years before he moved to Taichung."
           ],
           "why": "had 加過去分詞，表示在過去某個時間點或某件事「之前」就已經發生的事。兩件過去的事裡，先發生的用過去完成式，後發生的用過去式。",
           "newWords": []
@@ -26626,16 +26605,16 @@
         {
           "id": "u32-r3",
           "day": 6,
-          "zh": "他住院前已經發燒三天了。",
+          "zh": "他搬來台中之前已經學了三年日文。",
           "grammar": [
             "過去完成式"
           ],
           "hints": [
             "找出兩件過去的事裡哪一件先發生。",
-            "先發生的用 had 加過去分詞，後發生的用過去式。"
+            "先學日文，用 had studied。"
           ],
           "reference": [
-            "He had had a fever for three days before he was admitted."
+            "He had studied Japanese for three years before he moved to Taichung."
           ],
           "why": "had 加過去分詞，表示在過去某個時間點或某件事「之前」就已經發生的事。兩件過去的事裡，先發生的用過去完成式，後發生的用過去式。",
           "newWords": []
@@ -27944,16 +27923,17 @@
             {
               "id": "u34-c2",
               "day": 6,
-              "zh": "他明天會出院。",
+              "zh": "作業明天會發回來。",
               "grammar": [
                 "助動詞的被動"
               ],
               "hints": [
                 "先確認主詞是「被做」的，再看要用哪個助動詞。",
-                "助動詞加 be 加過去分詞。"
+                "will be 加過去分詞。"
               ],
               "reference": [
-                "He will be discharged tomorrow."
+                "The homework will be given back tomorrow.",
+                "The homework will be returned tomorrow."
               ],
               "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
               "newWords": []
@@ -27984,8 +27964,8 @@
               "zh": "這個藥不可以壓碎。"
             },
             {
-              "en": "He will be discharged tomorrow.",
-              "zh": "他明天會出院。"
+              "en": "The homework will be given back tomorrow.",
+              "zh": "作業明天會發回來。"
             },
             {
               "en": "The report must be finished by Friday.",
@@ -28016,16 +27996,17 @@
         {
           "id": "u34-c2",
           "day": 6,
-          "zh": "他明天會出院。",
+          "zh": "作業明天會發回來。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "will be 加過去分詞。"
           ],
           "reference": [
-            "He will be discharged tomorrow."
+            "The homework will be given back tomorrow.",
+            "The homework will be returned tomorrow."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28053,17 +28034,17 @@
         {
           "id": "u34-r1",
           "day": 4,
-          "zh": "這個藥應該放在冰箱。",
+          "zh": "牛奶應該放在冰箱。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "should be 加 kept。"
           ],
           "reference": [
-            "This medicine should be kept in the refrigerator.",
-            "This medication should be stored in the fridge."
+            "Milk should be kept in the fridge.",
+            "The milk should be kept in the refrigerator."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28071,16 +28052,16 @@
         {
           "id": "u34-r2",
           "day": 5,
-          "zh": "病人每兩小時必須翻身一次。",
+          "zh": "植物必須每天澆水。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "must be 加 watered。"
           ],
           "reference": [
-            "The patient must be turned every two hours."
+            "The plants must be watered every day."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28088,17 +28069,17 @@
         {
           "id": "u34-r3",
           "day": 6,
-          "zh": "血壓應該在給藥前量。",
+          "zh": "手機應該在上課前關掉。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "should be 加 turned off。"
           ],
           "reference": [
-            "The blood pressure should be checked before the medicine is given.",
-            "Blood pressure should be taken before giving the medication."
+            "Phones should be turned off before class.",
+            "Your phone should be turned off before class."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28123,17 +28104,17 @@
         {
           "id": "u34-r5",
           "day": 6,
-          "zh": "傷口明天會由醫師檢查。",
+          "zh": "考卷明天會由老師改完。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "will be 加過去分詞，加 by。"
           ],
           "reference": [
-            "The wound will be checked by the doctor tomorrow.",
-            "The wound will be examined by the doctor tomorrow."
+            "The tests will be graded by the teacher tomorrow.",
+            "The test papers will be checked by the teacher tomorrow."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28143,17 +28124,17 @@
         {
           "id": "u34-r1",
           "day": 4,
-          "zh": "這個藥應該放在冰箱。",
+          "zh": "牛奶應該放在冰箱。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "should be 加 kept。"
           ],
           "reference": [
-            "This medicine should be kept in the refrigerator.",
-            "This medication should be stored in the fridge."
+            "Milk should be kept in the fridge.",
+            "The milk should be kept in the refrigerator."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28161,16 +28142,16 @@
         {
           "id": "u34-r2",
           "day": 5,
-          "zh": "病人每兩小時必須翻身一次。",
+          "zh": "植物必須每天澆水。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "must be 加 watered。"
           ],
           "reference": [
-            "The patient must be turned every two hours."
+            "The plants must be watered every day."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28178,17 +28159,17 @@
         {
           "id": "u34-r3",
           "day": 6,
-          "zh": "血壓應該在給藥前量。",
+          "zh": "手機應該在上課前關掉。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "should be 加 turned off。"
           ],
           "reference": [
-            "The blood pressure should be checked before the medicine is given.",
-            "Blood pressure should be taken before giving the medication."
+            "Phones should be turned off before class.",
+            "Your phone should be turned off before class."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28213,17 +28194,17 @@
         {
           "id": "u34-r5",
           "day": 6,
-          "zh": "傷口明天會由醫師檢查。",
+          "zh": "考卷明天會由老師改完。",
           "grammar": [
             "助動詞的被動"
           ],
           "hints": [
             "先確認主詞是「被做」的，再看要用哪個助動詞。",
-            "助動詞加 be 加過去分詞。"
+            "will be 加過去分詞，加 by。"
           ],
           "reference": [
-            "The wound will be checked by the doctor tomorrow.",
-            "The wound will be examined by the doctor tomorrow."
+            "The tests will be graded by the teacher tomorrow.",
+            "The test papers will be checked by the teacher tomorrow."
           ],
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
@@ -28881,16 +28862,17 @@
         {
           "id": "u35-r4",
           "day": 6,
-          "zh": "護理師相信病人說的是實話。",
+          "zh": "我相信他說的是實話。",
           "grammar": [
             "名詞子句"
           ],
           "hints": [
             "找出主要動詞後面那一整句的內容。",
-            "that 後面接一個有主詞、有動詞的完整句子。"
+            "believe 後面接 that 加完整句子。"
           ],
           "reference": [
-            "The nurse believes that the patient is telling the truth."
+            "I believe that he is telling the truth.",
+            "I believe he is telling the truth."
           ],
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": []
@@ -28898,17 +28880,16 @@
         {
           "id": "u35-r5",
           "day": 6,
-          "zh": "你覺得這個藥有效嗎？",
+          "zh": "你覺得明天會下雨嗎？",
           "grammar": [
             "名詞子句"
           ],
           "hints": [
             "找出主要動詞後面那一整句的內容。",
-            "that 後面接一個有主詞、有動詞的完整句子。"
+            "Do you think 後面接完整句子。"
           ],
           "reference": [
-            "Do you think this medicine is working?",
-            "Do you think the medicine works?"
+            "Do you think it will rain tomorrow?"
           ],
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": []
@@ -28971,16 +28952,17 @@
         {
           "id": "u35-r4",
           "day": 6,
-          "zh": "護理師相信病人說的是實話。",
+          "zh": "我相信他說的是實話。",
           "grammar": [
             "名詞子句"
           ],
           "hints": [
             "找出主要動詞後面那一整句的內容。",
-            "that 後面接一個有主詞、有動詞的完整句子。"
+            "believe 後面接 that 加完整句子。"
           ],
           "reference": [
-            "The nurse believes that the patient is telling the truth."
+            "I believe that he is telling the truth.",
+            "I believe he is telling the truth."
           ],
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": []
@@ -28988,17 +28970,16 @@
         {
           "id": "u35-r5",
           "day": 6,
-          "zh": "你覺得這個藥有效嗎？",
+          "zh": "你覺得明天會下雨嗎？",
           "grammar": [
             "名詞子句"
           ],
           "hints": [
             "找出主要動詞後面那一整句的內容。",
-            "that 後面接一個有主詞、有動詞的完整句子。"
+            "Do you think 後面接完整句子。"
           ],
           "reference": [
-            "Do you think this medicine is working?",
-            "Do you think the medicine works?"
+            "Do you think it will rain tomorrow?"
           ],
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": []
@@ -29620,17 +29601,16 @@
         {
           "id": "u36-r2",
           "day": 5,
-          "zh": "昨天給的藥沒有效。",
+          "zh": "昨天買的麵包已經壞了。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "麵包是被買的，用 bought。"
           ],
           "reference": [
-            "The medicine given yesterday did not work.",
-            "The medication given yesterday didn't work."
+            "The bread bought yesterday has gone bad."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -29638,17 +29618,17 @@
         {
           "id": "u36-r3",
           "day": 6,
-          "zh": "我認識那個說日文的護理師。",
+          "zh": "我認識那個在彈吉他的男生。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "男生自己在彈，用 playing。"
           ],
           "reference": [
-            "I know the nurse speaking Japanese.",
-            "I know the nurse who speaks Japanese."
+            "I know the boy playing the guitar.",
+            "I know the boy who is playing the guitar."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -29656,17 +29636,17 @@
         {
           "id": "u36-r4",
           "day": 6,
-          "zh": "昨天開的抗生素還沒有到。",
+          "zh": "上週寄的包裹還沒有到。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "包裹是被寄的，用 sent。"
           ],
           "reference": [
-            "The antibiotic ordered yesterday has not arrived yet.",
-            "The antibiotics ordered yesterday have not arrived yet."
+            "The package sent last week has not arrived yet.",
+            "The package sent last week hasn't arrived yet."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -29710,17 +29690,16 @@
         {
           "id": "u36-r2",
           "day": 5,
-          "zh": "昨天給的藥沒有效。",
+          "zh": "昨天買的麵包已經壞了。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "麵包是被買的，用 bought。"
           ],
           "reference": [
-            "The medicine given yesterday did not work.",
-            "The medication given yesterday didn't work."
+            "The bread bought yesterday has gone bad."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -29728,17 +29707,17 @@
         {
           "id": "u36-r3",
           "day": 6,
-          "zh": "我認識那個說日文的護理師。",
+          "zh": "我認識那個在彈吉他的男生。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "男生自己在彈，用 playing。"
           ],
           "reference": [
-            "I know the nurse speaking Japanese.",
-            "I know the nurse who speaks Japanese."
+            "I know the boy playing the guitar.",
+            "I know the boy who is playing the guitar."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -29746,17 +29725,17 @@
         {
           "id": "u36-r4",
           "day": 6,
-          "zh": "昨天開的抗生素還沒有到。",
+          "zh": "上週寄的包裹還沒有到。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
             "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "包裹是被寄的，用 sent。"
           ],
           "reference": [
-            "The antibiotic ordered yesterday has not arrived yet.",
-            "The antibiotics ordered yesterday have not arrived yet."
+            "The package sent last week has not arrived yet.",
+            "The package sent last week hasn't arrived yet."
           ],
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
@@ -31165,17 +31144,17 @@
         {
           "id": "u38-r1",
           "day": 4,
-          "zh": "他因為疼痛而睡不著。",
+          "zh": "他因為噪音而睡不著。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "because of 後面接名詞。"
           ],
           "reference": [
-            "He could not sleep because of the pain.",
-            "He couldn't sleep due to the pain."
+            "He could not sleep because of the noise.",
+            "He couldn't sleep due to the noise."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31201,17 +31180,17 @@
         {
           "id": "u38-r3",
           "day": 6,
-          "zh": "她沒有吃早餐，因此覺得頭暈。",
+          "zh": "她錯過了公車，因此上課遲到。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "As a result 或 Therefore 放第二句開頭。"
           ],
           "reference": [
-            "She did not eat breakfast. As a result, she felt dizzy.",
-            "She didn't eat breakfast. Therefore, she felt dizzy."
+            "She missed the bus. As a result, she was late for class.",
+            "She missed the bus. Therefore, she was late for class."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31219,17 +31198,17 @@
         {
           "id": "u38-r4",
           "day": 6,
-          "zh": "檢查因為設備問題而延後。",
+          "zh": "演唱會因為颱風而延後。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "due to 接名詞。"
           ],
           "reference": [
-            "The test was delayed due to an equipment problem.",
-            "The test was postponed because of an equipment problem."
+            "The concert was delayed due to the typhoon.",
+            "The concert was postponed because of the typhoon."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31237,17 +31216,17 @@
         {
           "id": "u38-r5",
           "day": 6,
-          "zh": "脫水可能導致低血壓。",
+          "zh": "睡不夠可能導致注意力不集中。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "can lead to 接結果。"
           ],
           "reference": [
-            "Dehydration can lead to low blood pressure.",
-            "Dehydration can cause low blood pressure."
+            "Not getting enough sleep can lead to poor concentration.",
+            "Lack of sleep can cause poor concentration."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31257,17 +31236,17 @@
         {
           "id": "u38-r1",
           "day": 4,
-          "zh": "他因為疼痛而睡不著。",
+          "zh": "他因為噪音而睡不著。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "because of 後面接名詞。"
           ],
           "reference": [
-            "He could not sleep because of the pain.",
-            "He couldn't sleep due to the pain."
+            "He could not sleep because of the noise.",
+            "He couldn't sleep due to the noise."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31293,17 +31272,17 @@
         {
           "id": "u38-r3",
           "day": 6,
-          "zh": "她沒有吃早餐，因此覺得頭暈。",
+          "zh": "她錯過了公車，因此上課遲到。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "As a result 或 Therefore 放第二句開頭。"
           ],
           "reference": [
-            "She did not eat breakfast. As a result, she felt dizzy.",
-            "She didn't eat breakfast. Therefore, she felt dizzy."
+            "She missed the bus. As a result, she was late for class.",
+            "She missed the bus. Therefore, she was late for class."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31311,17 +31290,17 @@
         {
           "id": "u38-r4",
           "day": 6,
-          "zh": "檢查因為設備問題而延後。",
+          "zh": "演唱會因為颱風而延後。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "due to 接名詞。"
           ],
           "reference": [
-            "The test was delayed due to an equipment problem.",
-            "The test was postponed because of an equipment problem."
+            "The concert was delayed due to the typhoon.",
+            "The concert was postponed because of the typhoon."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31329,17 +31308,17 @@
         {
           "id": "u38-r5",
           "day": 6,
-          "zh": "脫水可能導致低血壓。",
+          "zh": "睡不夠可能導致注意力不集中。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "due to 和 because of 接名詞；because 接句子；therefore 放第二句開頭。"
+            "can lead to 接結果。"
           ],
           "reference": [
-            "Dehydration can lead to low blood pressure.",
-            "Dehydration can cause low blood pressure."
+            "Not getting enough sleep can lead to poor concentration.",
+            "Lack of sleep can cause poor concentration."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
@@ -31855,17 +31834,17 @@
             {
               "id": "u39-c3",
               "day": 6,
-              "zh": "她的心跳維持一樣。",
+              "zh": "價格維持一樣。",
               "grammar": [
                 "描述數字的變化"
               ],
               "hints": [
                 "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-                "from A to B 是起點到終點；by 是變化的量。"
+                "remain 或 stay the same。"
               ],
               "reference": [
-                "Her heart rate remained the same.",
-                "Her heart rate stayed the same."
+                "The price remained the same.",
+                "The price stayed the same."
               ],
               "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
               "newWords": []
@@ -31882,8 +31861,8 @@
               "zh": "疼痛從 8 分降到 3 分。"
             },
             {
-              "en": "Her heart rate remained the same.",
-              "zh": "她的心跳維持一樣。"
+              "en": "The price remained the same.",
+              "zh": "價格維持一樣。"
             }
           ]
         }
@@ -31928,17 +31907,17 @@
         {
           "id": "u39-c3",
           "day": 6,
-          "zh": "她的心跳維持一樣。",
+          "zh": "價格維持一樣。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "remain 或 stay the same。"
           ],
           "reference": [
-            "Her heart rate remained the same.",
-            "Her heart rate stayed the same."
+            "The price remained the same.",
+            "The price stayed the same."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -31948,17 +31927,17 @@
         {
           "id": "u39-r1",
           "day": 4,
-          "zh": "血糖從 90 升到 180。",
+          "zh": "房租從一萬升到一萬兩千。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "rose from A to B。"
           ],
           "reference": [
-            "The blood sugar rose from 90 to 180.",
-            "The blood sugar went up from 90 to 180."
+            "The rent rose from 10,000 to 12,000.",
+            "The rent went up from 10,000 to 12,000."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -31966,17 +31945,17 @@
         {
           "id": "u39-r2",
           "day": 5,
-          "zh": "病人數在冬天會增加。",
+          "zh": "遊客人數在夏天會增加。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "現在式描述規律，increases。"
           ],
           "reference": [
-            "The number of patients increases in winter.",
-            "The number of patients goes up in the winter."
+            "The number of tourists increases in summer.",
+            "The number of visitors goes up in the summer."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -31984,17 +31963,17 @@
         {
           "id": "u39-r3",
           "day": 6,
-          "zh": "他的體溫稍微上升了。",
+          "zh": "氣溫稍微下降了。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "dropped 或 fell，加 slightly。"
           ],
           "reference": [
-            "His temperature rose slightly.",
-            "His temperature went up a little."
+            "The temperature dropped slightly.",
+            "The temperature went down a little."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32020,17 +31999,17 @@
         {
           "id": "u39-r5",
           "day": 6,
-          "zh": "血氧維持在 98%。",
+          "zh": "我的成績維持在八十分。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "remained at 加數字。"
           ],
           "reference": [
-            "The oxygen saturation remained at 98 percent.",
-            "The oxygen level stayed at 98 percent."
+            "My grade remained at eighty.",
+            "My score stayed at 80."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32040,17 +32019,17 @@
         {
           "id": "u39-r1",
           "day": 4,
-          "zh": "血糖從 90 升到 180。",
+          "zh": "房租從一萬升到一萬兩千。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "rose from A to B。"
           ],
           "reference": [
-            "The blood sugar rose from 90 to 180.",
-            "The blood sugar went up from 90 to 180."
+            "The rent rose from 10,000 to 12,000.",
+            "The rent went up from 10,000 to 12,000."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32058,17 +32037,17 @@
         {
           "id": "u39-r2",
           "day": 5,
-          "zh": "病人數在冬天會增加。",
+          "zh": "遊客人數在夏天會增加。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "現在式描述規律，increases。"
           ],
           "reference": [
-            "The number of patients increases in winter.",
-            "The number of patients goes up in the winter."
+            "The number of tourists increases in summer.",
+            "The number of visitors goes up in the summer."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32076,17 +32055,17 @@
         {
           "id": "u39-r3",
           "day": 6,
-          "zh": "他的體溫稍微上升了。",
+          "zh": "氣溫稍微下降了。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "dropped 或 fell，加 slightly。"
           ],
           "reference": [
-            "His temperature rose slightly.",
-            "His temperature went up a little."
+            "The temperature dropped slightly.",
+            "The temperature went down a little."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32112,17 +32091,17 @@
         {
           "id": "u39-r5",
           "day": 6,
-          "zh": "血氧維持在 98%。",
+          "zh": "我的成績維持在八十分。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "from A to B 是起點到終點；by 是變化的量。"
+            "remained at 加數字。"
           ],
           "reference": [
-            "The oxygen saturation remained at 98 percent.",
-            "The oxygen level stayed at 98 percent."
+            "My grade remained at eighty.",
+            "My score stayed at 80."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -32801,17 +32780,17 @@
         {
           "id": "u40-r5",
           "day": 6,
-          "zh": "舉例來說，洗手可以預防感染。",
+          "zh": "舉例來說，走路可以讓你更健康。",
           "grammar": [
             "表達意見、把回答講長"
           ],
           "hints": [
             "照「意見、理由、例子」的順序想。",
-            "先說 In my opinion 或 I think，再用 because 給理由，再用 For example 舉例。"
+            "For example 加逗號，再接完整句子。"
           ],
           "reference": [
-            "For example, washing your hands can prevent infection.",
-            "For instance, hand washing can prevent infections."
+            "For example, walking can make you healthier.",
+            "For instance, walking can keep you healthy."
           ],
           "why": "口說檢定要把回答講長：先講意見（I think、In my opinion、I believe），再講理由（because、The main reason is that），再舉例（For example、For instance），最後收尾（That is why…）。同意和不同意可以說 I agree that…、I do not agree that…。",
           "newWords": []
@@ -32893,17 +32872,17 @@
         {
           "id": "u40-r5",
           "day": 6,
-          "zh": "舉例來說，洗手可以預防感染。",
+          "zh": "舉例來說，走路可以讓你更健康。",
           "grammar": [
             "表達意見、把回答講長"
           ],
           "hints": [
             "照「意見、理由、例子」的順序想。",
-            "先說 In my opinion 或 I think，再用 because 給理由，再用 For example 舉例。"
+            "For example 加逗號，再接完整句子。"
           ],
           "reference": [
-            "For example, washing your hands can prevent infection.",
-            "For instance, hand washing can prevent infections."
+            "For example, walking can make you healthier.",
+            "For instance, walking can keep you healthy."
           ],
           "why": "口說檢定要把回答講長：先講意見（I think、In my opinion、I believe），再講理由（because、The main reason is that），再舉例（For example、For instance），最後收尾（That is why…）。同意和不同意可以說 I agree that…、I do not agree that…。",
           "newWords": []
@@ -33391,16 +33370,17 @@
             {
               "id": "u41-c2",
               "day": 6,
-              "zh": "她有發燒和頭痛。",
+              "zh": "她感冒了，還有點頭痛。",
               "grammar": [
                 "冠詞進階"
               ],
               "hints": [
                 "先判斷是泛指、特指，還是固定說法。",
-                "泛指的複數和不可數名詞不加冠詞；特指加 the；症狀 a fever、a cold、a headache 要加 a。"
+                "a cold 和 a headache 都要加 a。"
               ],
               "reference": [
-                "She has a fever and a headache."
+                "She has a cold and a slight headache.",
+                "She has a cold and a little headache."
               ],
               "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school、in hospital 這類固定說法不加。",
               "newWords": []
@@ -33431,8 +33411,8 @@
               "zh": "我每天晚上十一點睡覺。"
             },
             {
-              "en": "She has a fever and a headache.",
-              "zh": "她有發燒和頭痛。"
+              "en": "She has a cold and a slight headache.",
+              "zh": "她感冒了，還有點頭痛。"
             },
             {
               "en": "The sun is strong today.",
@@ -33462,16 +33442,17 @@
         {
           "id": "u41-c2",
           "day": 6,
-          "zh": "她有發燒和頭痛。",
+          "zh": "她感冒了，還有點頭痛。",
           "grammar": [
             "冠詞進階"
           ],
           "hints": [
             "先判斷是泛指、特指，還是固定說法。",
-            "泛指的複數和不可數名詞不加冠詞；特指加 the；症狀 a fever、a cold、a headache 要加 a。"
+            "a cold 和 a headache 都要加 a。"
           ],
           "reference": [
-            "She has a fever and a headache."
+            "She has a cold and a slight headache.",
+            "She has a cold and a little headache."
           ],
           "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school、in hospital 這類固定說法不加。",
           "newWords": []
@@ -33570,17 +33551,16 @@
         {
           "id": "u41-r5",
           "day": 6,
-          "zh": "這是醫院裡最大的病房。",
+          "zh": "這是城市裡最高的大樓。",
           "grammar": [
             "冠詞進階"
           ],
           "hints": [
             "先判斷是泛指、特指，還是固定說法。",
-            "泛指的複數和不可數名詞不加冠詞；特指加 the；症狀 a fever、a cold、a headache 要加 a。"
+            "最高級加 the。"
           ],
           "reference": [
-            "This is the biggest ward in the hospital.",
-            "This is the largest ward in the hospital."
+            "This is the tallest building in the city."
           ],
           "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school、in hospital 這類固定說法不加。",
           "newWords": []
@@ -33661,17 +33641,16 @@
         {
           "id": "u41-r5",
           "day": 6,
-          "zh": "這是醫院裡最大的病房。",
+          "zh": "這是城市裡最高的大樓。",
           "grammar": [
             "冠詞進階"
           ],
           "hints": [
             "先判斷是泛指、特指，還是固定說法。",
-            "泛指的複數和不可數名詞不加冠詞；特指加 the；症狀 a fever、a cold、a headache 要加 a。"
+            "最高級加 the。"
           ],
           "reference": [
-            "This is the biggest ward in the hospital.",
-            "This is the largest ward in the hospital."
+            "This is the tallest building in the city."
           ],
           "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school、in hospital 這類固定說法不加。",
           "newWords": []
@@ -34274,17 +34253,17 @@
         {
           "id": "u42-r1",
           "day": 4,
-          "zh": "我會幫你打針。",
+          "zh": "我會幫你拍照。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "拍照的搭配是 take a picture。"
           ],
           "reference": [
-            "I will give you an injection.",
-            "I am going to give you a shot."
+            "I will take a picture for you.",
+            "I will take a photo of you."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
@@ -34292,17 +34271,17 @@
         {
           "id": "u42-r2",
           "day": 5,
-          "zh": "她下週要動手術。",
+          "zh": "她下週要搬家。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "搬家是 move 或 move house。"
           ],
           "reference": [
-            "She will have surgery next week.",
-            "She is going to have surgery next week."
+            "She will move next week.",
+            "She is going to move next week."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
@@ -34346,17 +34325,17 @@
         {
           "id": "u42-r5",
           "day": 6,
-          "zh": "我每天照顧五位病人。",
+          "zh": "我每天照顧我妹妹。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "照顧用 look after 或 take care of。"
           ],
           "reference": [
-            "I look after five patients every day.",
-            "I take care of five patients every day."
+            "I look after my little sister every day.",
+            "I take care of my younger sister every day."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
@@ -34366,17 +34345,17 @@
         {
           "id": "u42-r1",
           "day": 4,
-          "zh": "我會幫你打針。",
+          "zh": "我會幫你拍照。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "拍照的搭配是 take a picture。"
           ],
           "reference": [
-            "I will give you an injection.",
-            "I am going to give you a shot."
+            "I will take a picture for you.",
+            "I will take a photo of you."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
@@ -34384,17 +34363,17 @@
         {
           "id": "u42-r2",
           "day": 5,
-          "zh": "她下週要動手術。",
+          "zh": "她下週要搬家。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "搬家是 move 或 move house。"
           ],
           "reference": [
-            "She will have surgery next week.",
-            "She is going to have surgery next week."
+            "She will move next week.",
+            "She is going to move next week."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
@@ -34438,17 +34417,17 @@
         {
           "id": "u42-r5",
           "day": 6,
-          "zh": "我每天照顧五位病人。",
+          "zh": "我每天照顧我妹妹。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
           "hints": [
             "想想這個意思平常是跟哪個動詞或小字一起用。",
-            "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
+            "照顧用 look after 或 take care of。"
           ],
           "reference": [
-            "I look after five patients every day.",
-            "I take care of five patients every day."
+            "I look after my little sister every day.",
+            "I take care of my younger sister every day."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []

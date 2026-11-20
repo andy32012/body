@@ -67,3 +67,15 @@ test('7000 單短文：六級共 1,476 段，第 1 級每段都有參考翻譯�
   assert.equal(nextPassage(passages,1,{},{},[],'Z')?.id,'L1-Z01')
   assert.deepEqual(levelProgress(passages,1,{[doneKey('L1-A01')]:true}),{done:1,total:235})
 })
+
+test('交接內容：寫出目前單元、今天這句與教法；沒有紀錄時也能產生', async () => {
+  const { createInitialState } = await import('../src/lib/store')
+  const { handoffText } = await import('../src/lib/handoff')
+  const state = createInitialState('2026-11-20')
+  state.curriculum = { ...state.curriculum, unit: 1, day: 4 }
+  const text = handoffText(state, '2026-11-20')
+  assert.ok(text.includes('單元 1（be 動詞現在式）第 4 天'))
+  assert.ok(text.includes('她的血壓很高'))
+  assert.ok(text.includes('不要先給答案'))
+  assert.ok(text.includes('還沒有作答紀錄'))
+})
