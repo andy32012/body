@@ -164,8 +164,9 @@ export function LessonExpress({ lesson, draftKey, pattern, onCorrected, onSave, 
     {zh ? <p className="ls-help">{p.zh}</p> : <button type="button" className="pr-link ls-zh-toggle" onClick={() => setZh(true)}>看中文說明</button>}
     {p.chart && <MiniChart chart={p.chart} />}
     {p.scaffold && <ol className="ls-scaffold" aria-label="回答的順序">{p.scaffold.map(s => <li key={s} lang="en">{s}</li>)}</ol>}
+    {p.scaffold && !answer.trim() && <button type="button" className="pr-link ls-zh-toggle" onClick={() => { const t = p.scaffold!.map(x => x.replace(/…$/, ' ')).join('\n'); setAnswer(t); writeDraft(draftKey, t) }}>用這個順序開頭</button>}
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼，三句左右"
+      <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼"
         onChange={e => { setAnswer(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
     <div className="pr-actions">
