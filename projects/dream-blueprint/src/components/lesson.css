@@ -48,3 +48,7 @@
 @media (max-width: 460px) {
   .ls-steps li { font-size: .72rem; }
 }
+.ls-helps { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .5rem; }
+.ls-helps span { color: var(--practice-secondary); font-size: .88rem; }
+.practice-page .ls-helps button { min-height: 34px; padding: .25rem .75rem; border-radius: 999px; font-size: .86rem; }
+.practice-page .ls-helps button[aria-pressed=true] { border-color: var(--practice-accent); color: var(--practice-ink); }

@@ -42,13 +42,15 @@ function parse(text: string): Result | null {
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, mode = 'translate' }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, mode = 'translate', restore }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
-  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number) => void; mode?: 'translate' | 'open'
+  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result) => void; mode?: 'translate' | 'open'
+  /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
+  restore?: { answer: string; result: Result }
 }) {
   const [saved, setSaved] = useState<number[]>([])
-  const [turns, setTurns] = useState<TutorTurn[]>([])
-  const [result, setResult] = useState<Result | null>(null)
+  const [turns, setTurns] = useState<TutorTurn[]>(() => restore ? [{ role: 'user', content: '我的翻譯：' + restore.answer }, { role: 'assistant', content: JSON.stringify(restore.result) }] : [])
+  const [result, setResult] = useState<Result | null>(() => restore?.result ?? null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [question, setQuestion] = useState('')
@@ -61,7 +63,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
       if (first) {
         const parsed = parse(reply)
         setResult(parsed)
-        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length)
+        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed)
         setTurns([...next, { role: 'assistant', content: reply }])
         if (!parsed) setError('老師回得格式怪怪的，下面是原文：\n' + reply)
       } else setTurns([...next, { role: 'assistant', content: reply }])
@@ -78,7 +80,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
     setTurns(first); void send(first, true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run])
-  if (!run) return null
+  if (!run && !restore && !result) return null
 
   const followUps = turns.slice(2)
   return <section className="tu-box" aria-live="polite">

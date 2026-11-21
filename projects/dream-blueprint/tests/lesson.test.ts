@@ -88,3 +88,26 @@ test('臨床情境：四步、記錄錯的原因，錯過的之後再出現', as
   assert.equal(readCase(notes, all[0].id)?.usedZh, true)
   assert.deepEqual(causeSummary(all, notes).count, { '看不懂英文': 1 })
 })
+
+test('上到一半的課：關掉再開、隔天回來都接得回原本的步驟', async () => {
+  const { updateLesson, activeLesson, resumeTarget, resumePhase, moveLesson, lessonKey, activeKey, sentenceFrame } = await import('../src/lib/lesson.ts')
+  let notes = updateLesson({}, '2026-11-21', 1, 2, { phase: 'write', hints: { 'u1-d2': { h: 3, r: true } } }, 'listen')
+  assert.equal(notes[activeKey], '2026-11-21')
+  assert.equal(resumePhase(activeLesson(notes)!.rec), 'write')
+  // Core not saved: continues only while the curriculum still points at it.
+  assert.ok(resumeTarget(notes, { unit: 1, day: 2 }, '2026-11-22'))
+  assert.equal(resumeTarget(notes, { unit: 1, day: 3 }, '2026-11-22'), null)
+  // Core saved: same day continues at 表達; later only when asked.
+  notes = updateLesson(notes, '2026-11-21', 1, 2, { phase: 'express' }, 'pattern')
+  assert.equal(resumePhase(activeLesson(notes)!.rec), 'express')
+  assert.ok(resumeTarget(notes, { unit: 1, day: 3 }, '2026-11-21'))
+  assert.equal(resumeTarget(notes, { unit: 1, day: 3 }, '2026-11-22'), null)
+  assert.ok(resumeTarget(notes, { unit: 1, day: 3 }, '2026-11-22', true))
+  const moved = moveLesson(notes, '2026-11-21', '2026-11-22')
+  assert.equal(moved.date, '2026-11-22')
+  assert.ok(moved.notes[lessonKey('2026-11-22')] && !moved.notes[lessonKey('2026-11-21')])
+  assert.equal(JSON.parse(moved.notes[lessonKey('2026-11-22')]).hints['u1-d2'].h, 3, '提示紀錄跟著走，不會變回沒看過')
+  const done = updateLesson(moved.notes, '2026-11-22', 1, 2, {}, 'done')
+  assert.equal(done[activeKey], undefined)
+  assert.equal(sentenceFrame('I am a nursing student.'), 'I a_ a n______ s______.')
+})

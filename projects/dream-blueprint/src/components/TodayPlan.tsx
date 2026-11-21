@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { dueCount, type Energy } from '../lib/progress'
 import { answeredOn, quizSectionKey } from '../lib/quiz'
-import { lessonFinished } from '../lib/lesson'
+import { activeLesson, lessonFinished } from '../lib/lesson'
 import './today-plan.css'
 
 type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
@@ -13,7 +13,6 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; mode?: 'regular' | 'nursing' }) {
   const due = dueCount(state.cards, today)
   const reviewedToday = state.reviewEvents.some(e => e.day === today)
-  const practisedToday = state.sessions.some(s => s.day === today)
   const key = (id: string) => 'plan.' + today + '.' + id
   const quizToday = answeredOn(state.notes, today)
   const tasks: Task[] = mode === 'nursing' ? [
@@ -28,7 +27,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
     { id: 'review', min: 8, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
       auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
     { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
-      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : practisedToday ? '繼續' : '開始' },
+      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' },
     { id: 'more', min: energy === 'high' ? 15 : 2, title: energy === 'high' ? '加練' : '收尾', detail: energy === 'high' ? '一段 7000 單短文，或跟 Emma 聊 5 分鐘' : '把今天批改出來的錯句加入複習，明天會再出現',
       auto: false, go: energy === 'high' ? () => { location.hash = 'library/passage' } : undefined, goLabel: '短文', go2: energy === 'high' ? () => { location.hash = 'speaking' } : undefined },
   ]

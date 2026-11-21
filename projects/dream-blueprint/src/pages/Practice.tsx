@@ -1,5 +1,5 @@
 import ScenePhoto from "../components/ScenePhoto";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
@@ -31,11 +31,19 @@ import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import {
   heardKey,
-  markLessonStep,
+  lessonFinished,
+  moveLesson,
   readHeard,
   readLessonRecord,
+  resumePhase,
+  resumeTarget,
+  sentenceFrame,
+  updateLesson,
   variationFor,
+  type ExpressRecord,
+  type HintUse,
   type Lesson,
+  type LessonRecord,
   type LessonStep,
 } from "../lib/lesson";
 import {
@@ -104,22 +112,37 @@ export function PracticeCover({ title, children }: { title: string; children?: R
   );
 }
 
+/** Hint levels: 1 self-check after writing, 2 a clearer hint, 3 a sentence frame, 4 the model answer.
+ *  With saved/onHint the level survives a reload, so a hint once seen is never forgotten. */
 function Translation({
   sentence,
   onMark,
   checkpoint,
   preparation,
+  saved,
+  onHint,
 }: {
   preparation?: ReactNode;
   sentence: Sentence;
   onMark: (mark: Mark, revealed: boolean) => void;
   checkpoint: boolean;
+  saved?: HintUse;
+  onHint?: (use: HintUse) => void;
 }) {
   const [answer, setAnswer] = useState(() => readDraft(sentence.id));
-  const [hint, setHint] = useState(0);
+  const [hint, setHintLevel] = useState(() => saved?.h ?? 0);
   const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState("");
-  const [seenHint, setSeenHint] = useState(false);
+  const [seenHint, setSeen] = useState(() => !!saved?.r || (saved?.h ?? 0) >= 2);
+  function record(h: number, r: boolean) {
+    setHintLevel(h);
+    setSeen(r);
+    onHint?.({ h, r });
+  }
+  const mountedAt = useRef(Date.now());
+  const ready = () => Date.now() - mountedAt.current > 450;
+  const setHint = (h: number) => { if (ready()) record(h, seenHint || h >= 2); };
+  const setSeenHint = (r: boolean) => record(hint, r);
   async function copyAnswer() {
     const value =
       sentence.zh +
@@ -165,10 +188,7 @@ function Translation({
           </button>
           <button
             className="pr-link"
-            onClick={() => {
-              setSeenHint(true);
-              setHint(2);
-            }}
+            onClick={() => setHint(2)}
           >
             我想看提示
           </button>
@@ -180,27 +200,27 @@ function Translation({
           <strong>自己檢查看看</strong>
           <p>{sentence.hints[0]}</p>
           {hint >= 2 && <p>{sentence.hints[1] || sentence.why}</p>}
-          {hint < 3 && (
+          {hint >= 3 && <p className="pr-frame" lang="en">{sentenceFrame(sentence.reference[0])}</p>}
+          {hint < 4 && (
             <div className="pr-actions">
               {hint === 1 && (
-                <button
-                  className="pr-link"
-                  onClick={() => {
-                    setSeenHint(true);
-                    setHint(2);
-                  }}
-                >
+                <button className="pr-link" onClick={() => setHint(2)}>
                   再清楚一點
                 </button>
               )}
-              <button className="pr-link" onClick={() => setHint(3)}>
+              {hint === 2 && (
+                <button className="pr-link" onClick={() => setHint(3)}>
+                  給我句架
+                </button>
+              )}
+              <button className="pr-link" onClick={() => setHint(4)}>
                 看參考句
               </button>
             </div>
           )}
         </section>
       )}
-      {hint === 3 && (
+      {hint === 4 && (
         <section className="pr-reference">
           <small>參考句</small>
           {sentence.reference.map((en) => (
@@ -238,7 +258,7 @@ function Translation({
           {marks.map(([mark, label]) => (
             <button
               key={mark}
-              onClick={() => { clearDraft(sentence.id); onMark(mark, seenHint || hint === 3); }}
+              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2); }}
             >
               {label}
             </button>
@@ -249,9 +269,10 @@ function Translation({
   );
 }
 
-function lesson(state: AppState, energy: Energy, date: string) {
+/** `at` continues a lesson that was already started (its core may be saved and the curriculum moved on). */
+function lesson(state: AppState, energy: Energy, date: string, at?: { unit: number; day: number }) {
   syncCustom(state.notes);
-  const cursor = state.curriculum;
+  const cursor = at ? { ...state.curriculum, unit: at.unit, day: at.day } : state.curriculum;
   const unit =
     units.find((u) => u.id === cursor.unit) ?? units[units.length - 1];
   const index = Math.min(6, Math.max(1, cursor.day));
@@ -263,7 +284,7 @@ function lesson(state: AppState, energy: Energy, date: string) {
   const period = activePeriod(date, state.settings.periods);
   const quiet = period === "exam" || period === "internship";
   const review =
-    quiet || energy==="low" || cursor.unit > units.length || advancedToday;
+    !at && (quiet || energy==="low" || cursor.unit > units.length || advancedToday);
   const checkpoint = index === 6 && !review;
   const completed = state.sessions
     .flatMap((s) => s.translations?.map((t) => t.sentenceId) ?? [s.sentenceId])
@@ -325,8 +346,9 @@ export function getLessonPreview(
   state: AppState,
   energy: Energy,
   date = dayKey(),
+  at?: { unit: number; day: number },
 ) {
-  return lesson(state, energy, date);
+  return lesson(state, energy, date, at);
 }
 
 type TranslationRecord = NonNullable<Session["translations"]>[number];
@@ -336,12 +358,24 @@ function PracticeSession({
   update,
   navigate,
   energy: requested,
-}: PageProps & { energy: Energy }) {
+  resume: explicitResume = false,
+}: PageProps & { energy: Energy; resume?: boolean }) {
   const [date] = useState(() => dayKey());
   const [period] = useState(() => activePeriod(date, state.settings.periods));
   const energy =
     period === "exam" || period === "internship" ? "low" : requested;
-  const [current] = useState(() => lesson(state, energy, date));
+  // An unfinished lesson continues where it stopped instead of being rebuilt from today's curriculum position.
+  const [resumeAt] = useState(() =>
+    energy === "low" ? null : resumeTarget(state.notes, state.curriculum, date, explicitResume));
+  const [lessonDate] = useState(() =>
+    resumeAt && resumeAt.date !== date && !lessonFinished(state.notes, date) ? date : resumeAt?.date ?? date);
+  useEffect(() => {
+    if (resumeAt && resumeAt.date !== lessonDate)
+      update((prev) => ({ ...prev, notes: moveLesson(prev.notes, resumeAt.date, lessonDate).notes }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const [current] = useState(() =>
+    lesson(state, energy, date, resumeAt ? { unit: resumeAt.rec.unit, day: resumeAt.rec.day } : undefined));
   const [pos, setPos] = useState(0);
   type Phase = "recall" | "listen" | "write" | "sound" | "vary" | "express" | "done";
   // Normal and high-energy lesson days (not review, not checkpoint) run the guided lesson.
@@ -356,8 +390,8 @@ function PracticeSession({
     return () => { alive = false; };
   }, [guided, current.unit]);
   const [firstListen] = useState(() => !readHeard(state.notes, current.unit));
-  const [corrections, setCorrections] = useState(0);
-  const [records, setRecords] = useState<TranslationRecord[]>([]);
+  const [corrections, setCorrections] = useState(() => resumeAt?.rec.express?.corrections ?? 0);
+  const [records, setRecords] = useState<TranslationRecord[]>(() => resumeAt?.rec.records ?? []);
   const [spoken, setSpoken] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<Session["feedback"]>();
   const [sessionId] = useState(
@@ -366,7 +400,7 @@ function PracticeSession({
       Date.now() + "-" + Math.random().toString(36).slice(2),
   );
   const [extra, setExtra] = useState(false);
-  const [recalls, setRecalls] = useState<TranslationRecord[]>([]);
+  const [recalls, setRecalls] = useState<TranslationRecord[]>(() => resumeAt?.rec.recalls ?? []);
   const [retention] = useState(() => {
     // Units finished with help come back first for an unaided recheck.
     const assisted = assistedUnits(state.notes).filter((u) => u < current.unit);
@@ -395,23 +429,44 @@ function PracticeSession({
   // Guided lessons start by recalling: day 5 → days 1–2 (and an older unit), days 2–4 → the day before.
   const guidedRecall = current.day === 5 ? recallItems
     : current.previousDay ? [{ sentence: current.previousDay, label: "回想上一天的句子" }] : [];
-  const [phase, setPhase] = useState<Phase>(() => guided ? (guidedRecall.length ? "recall" : "listen") : "write");
+  const [phase, setPhase] = useState<Phase>(() => !guided ? "write"
+    : (resumeAt && resumePhase(resumeAt.rec)) || (guidedRecall.length ? "recall" : "listen"));
   useEffect(() => {
     if (lessonData === null && phase !== "write" && phase !== "done") setPhase("write");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonData]);
   const live = guided && !!lessonData;
   const recallNow = guidedRecall[recalls.length];
-  const lessonRecord = readLessonRecord(state.notes, date);
+  const lessonRecord = readLessonRecord(state.notes, lessonDate) ?? (resumeAt?.date !== lessonDate ? resumeAt?.rec : null) ?? null;
   const stepsDone: LessonStep[] = [...(lessonRecord?.steps ?? []), ...(guidedRecall.length ? [] : ["recall" as const])];
   const stepNow: LessonStep = phase === "recall" ? "recall" : phase === "listen" ? "listen"
     : phase === "express" ? (corrections ? "fix" : "express") : phase === "done" ? "done" : "pattern";
-  function step(s: LessonStep, extra: { corrected?: boolean } = {}) {
-    update((prev) => ({ ...prev, notes: markLessonStep(prev.notes, date, current.unit, current.day, s, extra) }));
+  /** Saves the lesson's own state (step reached, answers, hints) so a reload or tomorrow continues the same lesson. */
+  function save(patch: Partial<LessonRecord>, s?: LessonStep) {
+    update((prev) => ({ ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, patch, s) }));
   }
+  function step(s: LessonStep, extra: Partial<LessonRecord> = {}) { save(extra, s); }
+  // A double tap must not also press the button that appears under the finger on the next screen.
+  const changedAt = useRef(0);
+  useEffect(() => { changedAt.current = Date.now(); }, [phase]);
+  const settled = () => Date.now() - changedAt.current > 450;
+  function go(p: Phase, patch: Partial<LessonRecord> = {}, s?: LessonStep) {
+    if (!settled()) return;
+    setPhase(p);
+    if (guided) save({ phase: p, ...patch }, s);
+  }
+  const hintFor = (id: string): HintUse | undefined => lessonRecord?.hints?.[id];
+  const saveHint = (id: string) => (use: HintUse) => {
+    if (guided) update((prev) => {
+      const rec = readLessonRecord(prev.notes, lessonDate);
+      return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { hints: { ...(rec?.hints ?? {}), [id]: use } }) };
+    });
+  };
   const item = current.items[pos];
   function mark(value: Mark, revealed: boolean) {
-    setRecords([
+    // Each sentence counts once, even if the button is pressed twice.
+    if (!settled() || records.some((r) => r.sentenceId === item.id)) return;
+    const list = [
       ...records,
       {
         sentenceId: item.id,
@@ -419,8 +474,9 @@ function PracticeSession({
         grammar: item.grammar,
         revealed,
       },
-    ]);
-    setPhase("sound");
+    ];
+    setRecords(list);
+    go("sound", { records: list });
   }
   function finish(skip = false, next: Phase = "done") {
     const results = skip ? [] : [...recalls, ...records];
@@ -566,19 +622,24 @@ function PracticeSession({
                 key={recallNow.sentence.id}
                 sentence={recallNow.sentence}
                 checkpoint={false}
-                onMark={(mark, revealed) =>
-                  setRecalls([
+                saved={hintFor(recallNow.sentence.id)}
+                onHint={saveHint(recallNow.sentence.id)}
+                onMark={(mark, revealed) => {
+                  if (recalls.some((r) => r.sentenceId === recallNow.sentence.id)) return;
+                  const list = [
                     ...recalls,
                     { sentenceId: recallNow.sentence.id, rating: ratingOf[mark], grammar: recallNow.sentence.grammar, revealed },
-                  ])
-                }
+                  ];
+                  setRecalls(list);
+                  save({ recalls: list, phase: "recall" });
+                }}
               />
             </div>
           ) : (
             <div className="pr-recall">
               <div className="pr-label">回想完成</div>
               <h2 className="pr-question">接著聽一段今天的對話。</h2>
-              <button className="pr-main" onClick={() => { step("recall"); setPhase("listen"); }}>下一步：聽懂</button>
+              <button className="pr-main" onClick={() => go("listen", {}, "recall")}>下一步：聽懂</button>
             </div>
           )
         )}
@@ -587,15 +648,10 @@ function PracticeSession({
             lesson={lessonData}
             firstTime={firstListen}
             rate={state.settings.speechRate}
-            onDone={(correct, total) => {
-              update((prev) => ({
-                ...prev,
-                notes: {
-                  ...markLessonStep(prev.notes, date, current.unit, current.day, "listen"),
-                  ...(total > 0 ? { [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total }) } : {}),
-                },
-              }));
-              setPhase("write");
+            onDone={(correct, total, plays) => {
+              if (total > 0)
+                update((prev) => ({ ...prev, notes: { ...prev.notes, [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total, plays }) } }));
+              go("write", {}, "listen");
             }}
           />
         )}
@@ -603,11 +659,12 @@ function PracticeSession({
           <LessonVariation
             item={variationFor(lessonData, current.day)}
             onDone={(m) => {
+              if (!settled()) return;
               const v = variationFor(lessonData, current.day);
               if (m !== "good")
                 update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
               finish(false, "express");
-              step("pattern");
+              step("pattern", { phase: "express" });
             }}
           />
         )}
@@ -616,13 +673,18 @@ function PracticeSession({
             lesson={lessonData}
             draftKey={"express." + current.unit + "." + current.day}
             pattern={current.title}
-            onCorrected={() => { const n = corrections + 1; setCorrections(n); step(n === 1 ? "express" : "fix", { corrected: true }); }}
+            saved={lessonRecord?.express}
+            onRecord={(rec: ExpressRecord, corrected: boolean) => {
+              setCorrections(rec.corrections);
+              save({ express: rec, ...(corrected ? { corrected: true } : {}) },
+                corrected ? (rec.corrections >= 2 ? "fix" : "express") : undefined);
+            }}
             onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
             onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
-            onFinish={() => { step("done"); setPhase("done"); }}
+            onFinish={() => go("done", {}, "done")}
           />
         )}
-        {phase === "write" && (
+        {phase === "write" && !(guided && lessonData === undefined) && (
           <>
             {energy === "low" && state.settings.why && (
               <p>{state.settings.why}</p>
@@ -672,6 +734,8 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
+                saved={guided ? hintFor(item.id) : undefined}
+                onHint={guided ? saveHint(item.id) : undefined}
                 preparation={!current.review && current.rule && (current.day !== 1 ? (live ? (
                   <details className="pr-tools pr-rule">
                     <summary>複習這課的規則：{current.title}</summary>
@@ -697,7 +761,7 @@ function PracticeSession({
             )}
           </>
         )}
-        {phase === "sound" && (
+        {phase === "sound" && !(guided && lessonData === undefined) && (
           <>
             <div className="pr-label">跟讀這一句</div>
             <h2 className="pr-question">聽一次，再用自己的聲音說一次</h2>
@@ -714,6 +778,7 @@ function PracticeSession({
                 <button
                   className="pr-main"
                   onClick={() => {
+                    if (!settled()) return;
                     setPos(pos + 1);
                     setPhase("write");
                   }}
@@ -721,11 +786,11 @@ function PracticeSession({
                   下一句
                 </button>
               ) : live ? (
-                <button className="pr-main" onClick={() => setPhase("vary")}>
+                <button className="pr-main" onClick={() => go("vary")}>
                   下一步：換個說法
                 </button>
               ) : (
-                <button className="pr-main" onClick={() => finish()}>
+                <button className="pr-main" onClick={() => settled() && finish()}>
                   今天到這裡
                 </button>
               )}

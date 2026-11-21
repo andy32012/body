@@ -369,3 +369,4 @@
 .cc-options button { text-align: left; }
 .cc-result { margin: 0; padding-left: 1.1rem; display: grid; gap: .2rem; }
 .cc-result li[data-ok=false] { color: var(--practice-miss); }
+.pr-frame { margin: 0; padding: .5rem .75rem; border-radius: 10px; background: var(--practice-inset); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .06em; font-size: 1.02rem; overflow-wrap: anywhere; }

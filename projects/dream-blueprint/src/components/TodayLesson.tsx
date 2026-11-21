@@ -4,7 +4,7 @@ import type { AppState, PageProps } from '../lib/store'
 import { activePeriod, type Energy, type Period } from '../lib/progress'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
-import { lessonFinished } from '../lib/lesson'
+import { activeLesson, coreSaved, lessonFinished, resumePhase, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../pages/Practice'
 import ScenePhoto from './ScenePhoto'
 import TodayPlan from './TodayPlan'
@@ -60,8 +60,15 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
 }) {
   const choice = useEnergyChoice(state, today)
   const { energy, quiet, period } = choice
-  const lesson = getLessonPreview(state, energy, today)
+  // An unfinished lesson: today (continue it), or an earlier day whose 表達 is still open (offered on the side).
+  const active = !quiet && energy !== 'low' ? activeLesson(state.notes) : null
+  const resume = !active ? null : coreSaved(active.rec)
+    ? (active.date === today ? 'same' : 'later')
+    : state.curriculum.unit === active.rec.unit && state.curriculum.day === active.rec.day ? 'core' : null
+  const at = resume === 'same' && active ? { unit: active.rec.unit, day: active.rec.day } : undefined
+  const lesson = getLessonPreview(state, energy, today, at)
   const finished = lessonFinished(state.notes, today)
+  const nextStep = active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const practised = state.sessions.some(s => s.day === today)
   const label = quiet ? (period === 'exam' ? '考週' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
     : lesson.review ? (energy === 'low' ? '今天 2 分鐘 · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
@@ -81,9 +88,10 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
         <div className="lesson-actions">
           {quiet && energy === 'normal'
             ? <button type="button" className="launch" onClick={() => document.getElementById('today-plan')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><ListChecks size={16} />看今天的清單<ArrowRight size={16} /></button>
-            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{finished ? '再上一次' : practised && lesson.review ? '再複習一句' : energy === 'low' ? '開始 2 分鐘' : '開始這一堂'}<ArrowRight size={16} /></button>}
+            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : practised && lesson.review ? '再複習一句' : energy === 'low' ? '開始 2 分鐘' : '開始這一堂'}<ArrowRight size={16} /></button>}
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
+        {resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
         <p className="lesson-stats">{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
       </div>
     </section>

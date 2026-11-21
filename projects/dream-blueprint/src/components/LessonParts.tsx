@@ -4,7 +4,7 @@ import CorrectBox from './CorrectBox'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import type { SayCard } from '../lib/sayCards'
-import { lessonSteps, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
+import { lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
 
 export function StepBar({ current, done }: { current: LessonStep; done: LessonStep[] }) {
@@ -59,8 +59,10 @@ function Transcript({ lines, playing, onPlayLine, showZh }: { lines: LessonLine[
 }
 
 /** Listen first without the text, answer two questions, then read along. Later days: listen and shadow. */
-export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Lesson; firstTime: boolean; rate: number; onDone: (correct: number, total: number) => void }) {
+export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Lesson; firstTime: boolean; rate: number; onDone: (correct: number, total: number, plays: number) => void }) {
   const voice = useDialogueVoice(rate)
+  const mountedAt = useRef(Date.now())
+  const ready = () => Date.now() - mountedAt.current > 450
   const [plays, setPlays] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
   const [checked, setChecked] = useState(!firstTime)
@@ -84,7 +86,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
       {lesson.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
         <div className="pr-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={answers[i] === j}
-          onClick={() => { const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
+          onClick={() => { if (!ready()) return; const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
       </li>)}
     </ol>}
     {firstTime && !checked && <button type="button" className="pr-main" disabled={answers.filter(a => a !== undefined).length < lesson.questions.length}
@@ -98,7 +100,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
       <Transcript lines={lesson.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(lesson.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(firstTime && !noVoice ? correct : -1, firstTime && !noVoice ? lesson.questions.length : 0) }}>下一步：句型</button>
+        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(firstTime && !noVoice ? correct : -1, firstTime && !noVoice ? lesson.questions.length : 0, plays) }}>下一步：句型</button>
       </div>
     </>}
   </section>
@@ -108,18 +110,22 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
 export function LessonVariation({ item, onDone }: { item: { zh: string; en: string }; onDone: (mark: 'good' | 'small' | 'again') => void }) {
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
+  const mountedAt = useRef(Date.now())
+  const shownAt = useRef(0)
+  const ready = () => Date.now() - mountedAt.current > 450
+  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m) }
   return <section className="ls-vary">
     <div className="pr-label">換個說法 · 同一個句型</div>
     <h2 className="pr-question">{item.zh}</h2>
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再看答案" />
     </label>
-    {!shown ? <div className="pr-actions"><button type="button" className="pr-main" onClick={() => setShown(true)}>看答案</button></div> : <>
+    {!shown ? <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (ready()) { shownAt.current = Date.now(); setShown(true) } }}>看答案</button></div> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p></section>
       <fieldset className="pr-marks"><legend>我寫得…</legend>
-        <button type="button" onClick={() => onDone('good')}>對了</button>
-        <button type="button" onClick={() => onDone('small')}>差一點（加入複習）</button>
-        <button type="button" onClick={() => onDone('again')}>不會（加入複習）</button>
+        <button type="button" onClick={() => done('good')}>對了</button>
+        <button type="button" onClick={() => done('small')}>差一點（加入複習）</button>
+        <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
       </fieldset>
     </>}
   </section>
@@ -146,22 +152,40 @@ export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']>
   </figure>
 }
 
-/** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again. */
-export function LessonExpress({ lesson, draftKey, pattern, onCorrected, onSave, onSpeak, onFinish }: {
-  lesson: Lesson; draftKey: string; pattern: string
-  onCorrected: (fixes: number) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: () => void
+/** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again.
+ *  Help comes in layers — purpose (中文說明) → cue (句型) → frame (句架) → model (參考寫法) — and every layer used is saved,
+ *  as are the first answer, its feedback and the corrected try, so a reload comes back to the same feedback. */
+export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
+  lesson: Lesson; draftKey: string; pattern: string; saved?: ExpressRecord
+  onRecord: (rec: ExpressRecord, corrected: boolean) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: () => void
 }) {
-  const [answer, setAnswer] = useState(() => readDraft(draftKey))
+  const [answer, setAnswer] = useState(() => readDraft(draftKey) || saved?.lastAnswer || '')
   const [run, setRun] = useState(0)
-  const [corrected, setCorrected] = useState(false)
-  const [sample, setSample] = useState(false)
-  const [zh, setZh] = useState(false)
+  const [rec, setRec] = useState<ExpressRecord>(() => saved ?? { corrections: 0, help: [] })
+  const [shown, setShown] = useState<string[]>(() => saved?.help ?? [])
+  const mountedAt = useRef(Date.now())
   const keyed = !!tutorKey()
   const p = lesson.prompt
+  const corrected = rec.corrections > 0
+  const firstSentence = p.sample.match(/^[^.?!]+[.?!]/)?.[0] ?? p.sample
+  function help(kind: 'zh' | 'cue' | 'frame' | 'sample') {
+    if (Date.now() - mountedAt.current < 450) return
+    setShown(list => list.includes(kind) ? list : [...list, kind])
+    if (rec.help.includes(kind)) return
+    const next = { ...rec, help: [...rec.help, kind] }
+    setRec(next); onRecord(next, false)
+  }
+  function result(r: CorrectionResult) {
+    const next: ExpressRecord = {
+      ...rec, corrections: rec.corrections + 1, lastAnswer: answer, last: r,
+      ...(rec.corrections === 0 ? { first: answer, firstResult: r } : {}),
+    }
+    setRec(next); onRecord(next, true)
+  }
+  const sees = (kind: string) => shown.includes(kind)
   return <section className="ls-express">
     <div className="pr-label">{corrected ? '訂正再試' : '表達 · 用自己的話'}</div>
     <h2 className="pr-question ls-prompt" lang="en">{p.en}</h2>
-    {zh ? <p className="ls-help">{p.zh}</p> : <button type="button" className="pr-link ls-zh-toggle" onClick={() => setZh(true)}>看中文說明</button>}
     {p.chart && <MiniChart chart={p.chart} />}
     {p.scaffold && <ol className="ls-scaffold" aria-label="回答的順序">{p.scaffold.map(s => <li key={s} lang="en">{s}</li>)}</ol>}
     {p.scaffold && !answer.trim() && <button type="button" className="pr-link ls-zh-toggle" onClick={() => { const t = p.scaffold!.map(x => x.replace(/…$/, ' ')).join('\n'); setAnswer(t); writeDraft(draftKey, t) }}>用這個順序開頭</button>}
@@ -169,16 +193,26 @@ export function LessonExpress({ lesson, draftKey, pattern, onCorrected, onSave, 
       <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼"
         onChange={e => { setAnswer(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
+    <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
+      <span>卡住了？一層一層打開：</span>
+      <button type="button" aria-pressed={sees('zh')} onClick={() => help('zh')}>① 要做什麼</button>
+      <button type="button" aria-pressed={sees('cue')} onClick={() => help('cue')}>② 用哪個句型</button>
+      <button type="button" aria-pressed={sees('frame')} onClick={() => help('frame')}>③ 句架</button>
+      <button type="button" aria-pressed={sees('sample')} onClick={() => help('sample')}>④ 參考寫法</button>
+    </div>
+    {sees('zh') && <p className="ls-help">{p.zh}</p>}
+    {sees('cue') && <p className="ls-help">這課的句型：<b>{pattern}</b>{lesson.cando ? '。目標：' + lesson.cando : ''}</p>}
+    {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
+    {sees('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{p.sample}</p></section>}
     <div className="pr-actions">
-      {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{run ? '改好了，再批一次' : '請 Claude 批改'}</button>}
-      <button type="button" className="pr-link" onClick={() => setSample(!sample)}>{sample ? '收起參考寫法' : '看參考寫法'}</button>
+      {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{corrected ? '改好了，再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
-    {sample && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{p.sample}</p></section>}
-    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？</p>}
+    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「答案待確認」。</p>}
     <CorrectBox run={run} mode="open" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
-      onSave={onSave} onResult={(_, fixes) => { setCorrected(true); onCorrected(fixes) }} />
+      restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
+      onSave={onSave} onResult={(_, __, r) => result(r)} />
     {corrected && <p className="ls-help ls-fixnote">看著上面的批改，把你的句子改好，再按「改好了，再批一次」。寫錯的句子按「加入複習」，之後會再出現。</p>}
-    <button type="button" className={corrected || !keyed || sample ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={onFinish}>完成今天這一堂</button>
+    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={onFinish}>完成今天這一堂</button>
   </section>
 }
