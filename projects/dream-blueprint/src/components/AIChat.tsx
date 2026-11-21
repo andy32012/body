@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUp, Sparkles, X } from 'lucide-react'
-import { askTutor, personaText, tutorKey, type TutorTurn } from '../lib/tutor'
+import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
+import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
 import './ai-chat.css'
+import './sketch.css'
 
 /** A small twinkling star used while Claude is thinking. */
 export function Spark({ size = 26, spinning = false }: { size?: number; spinning?: boolean }) {
@@ -18,7 +20,7 @@ const thinkingWords = ['思考中', '翻一下筆記', '想想怎麼說', '整�
 function Thinking() {
   const [i, setI] = useState(0)
   useEffect(() => { const t = setInterval(() => setI(n => (n + 1) % thinkingWords.length), 1600); return () => clearInterval(t) }, [])
-  return <div className="ai-thinking" aria-label="思考中"><Spark spinning /><em key={i}>{thinkingWords[i]}…</em></div>
+  return <div className="ai-thinking" aria-label="思考中"><SketchThinking /><em key={i}>{thinkingWords[i]}…</em></div>
 }
 
 /** Reveals the newest reply a few characters at a time. */
@@ -31,7 +33,7 @@ function Typed({ text, animate, onTick }: { text: string; animate: boolean; onTi
     return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, animate])
-  return <>{text.slice(0, n).split('\n').map((line, j) => line.trim() ? <p key={j}>{line.replace(/\*\*/g, '')}</p> : null)}{n < text.length && <span className="ai-caret" />}</>
+  return <>{text.slice(0, n).split('\n').map((line, j) => line.trim() ? <p key={j}>{line.replace(/\*\*/g, '')}</p> : null)}{n < text.length && <PencilCaret />}</>
 }
 
 /** A conversation with Claude. `opening` is sent automatically when the panel opens. */
@@ -44,8 +46,8 @@ const saveTurns = (key: string | undefined, turns: TutorTurn[]) => {
   try { localStorage.setItem(key, JSON.stringify(turns.slice(-40))) } catch { /* private mode */ }
 }
 
-export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist }:
-  { system: string; opening?: string; placeholder?: string; suggestions?: string[]; persist?: string }) {
+export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist, introCards = [] }:
+  { system: string; opening?: string; placeholder?: string; suggestions?: string[]; persist?: string; introCards?: string[] }) {
   const memory = useMemory()
   const [turns, setTurns] = useState<TutorTurn[]>(() => loadTurns(persist))
   const [busy, setBusy] = useState(false)
@@ -86,7 +88,8 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
   const shown = opening ? turns.slice(1) : turns
   return <div className="ai-chat">
     <div className="ai-log">
-      {shown.length === 0 && !busy && <div className="ai-hello"><Spark size={40} /><p>嗨～有什麼想問的？</p></div>}
+      {shown.length === 0 && !busy && <SketchIntro title={tutorPersona() === 'teacher' ? '嗨，你好～' : '嗨～哥哥'} subtitle="今天想學什麼呢？"
+        cards={[...introCards, memory.notes.length ? '記得 ' + memory.notes.length + ' 件事' : '']. filter(Boolean)} />}
       {shown.map((t, i) => {
         const index = opening ? i + 1 : i
         return <div key={index} className={'ai-msg ai-' + t.role}>
@@ -148,6 +151,11 @@ export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: 
   </>
 }
 
+function progressCards(progress: string) {
+  const m = progress.match(/現在：單元 (\d+)（[^）]*）第 (\d+) 天/)
+  return m ? ['單元 ' + m[1] + ' · 第 ' + m[2] + ' 天'] : []
+}
+
 /** The always-available "問問 Claude" button: knows the learner's progress from the handoff text. */
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
@@ -163,7 +171,7 @@ export function AIAssistant({ progress }: { progress: string }) {
   return <>
     <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Spark size={18} />問問 Claude</button>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
-      <AIChat system={system} persist="dream-blueprint.assistant-chat" placeholder="問單字、文法，或叫我出一句中翻英" />
+      <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} placeholder="問單字、文法，或叫我出一句中翻英" />
     </AISheet>}
   </>
 }

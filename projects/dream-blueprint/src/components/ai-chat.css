@@ -99,8 +99,8 @@
   background:
     linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
     linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
-    color-mix(in srgb, var(--panel) 96%, transparent);
-  border-radius: 22px;
+    var(--panel);
+  border-radius: 22px; min-height: min(440px, 80dvh);
   animation: ai-pop .38s cubic-bezier(.2, .9, .3, 1.2);
   transform-origin: 90% 100%;
 }
