@@ -1,10 +1,38 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { Send, Sparkles, X } from 'lucide-react'
+import { ArrowUp, Sparkles, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, type TutorTurn } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import './ai-chat.css'
+
+/** A small twinkling star used while Claude is thinking. */
+export function Spark({ size = 26, spinning = false }: { size?: number; spinning?: boolean }) {
+  return <svg className={'ai-spark' + (spinning ? ' spin' : '')} width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+    <path d="M16 2c1.2 6.6 3.4 9.9 14 14-10.6 4.1-12.8 7.4-14 14-1.2-6.6-3.4-9.9-14-14C12.6 11.9 14.8 8.6 16 2Z" fill="currentColor" />
+    <circle cx="26" cy="6" r="1.8" fill="currentColor" className="ai-spark-dot" />
+  </svg>
+}
+
+const thinkingWords = ['思考中', '翻一下筆記', '想想怎麼說', '整理一下']
+function Thinking() {
+  const [i, setI] = useState(0)
+  useEffect(() => { const t = setInterval(() => setI(n => (n + 1) % thinkingWords.length), 1600); return () => clearInterval(t) }, [])
+  return <div className="ai-thinking" aria-label="思考中"><Spark spinning /><em key={i}>{thinkingWords[i]}…</em></div>
+}
+
+/** Reveals the newest reply a few characters at a time. */
+function Typed({ text, animate, onTick }: { text: string; animate: boolean; onTick: () => void }) {
+  const [n, setN] = useState(animate ? 0 : text.length)
+  useEffect(() => {
+    if (!animate || matchMedia('(prefers-reduced-motion: reduce)').matches) { setN(text.length); return }
+    let k = 0
+    const t = setInterval(() => { k = Math.min(text.length, k + 2); setN(k); onTick(); if (k >= text.length) clearInterval(t) }, 22)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text, animate])
+  return <>{text.slice(0, n).split('\n').map((line, j) => line.trim() ? <p key={j}>{line.replace(/\*\*/g, '')}</p> : null)}{n < text.length && <span className="ai-caret" />}</>
+}
 
 /** A conversation with Claude. `opening` is sent automatically when the panel opens. */
 const loadTurns = (key?: string): TutorTurn[] => {
@@ -25,6 +53,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
   const [text, setText] = useState('')
   const end = useRef<HTMLDivElement>(null)
   const started = useRef(false)
+  const [fresh, setFresh] = useState(-1)
   const connected = !!tutorKey()
 
   async function send(content: string, history = turns) {
@@ -37,7 +66,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
       const { clean, remember, forget } = extractMemory(raw)
       if (remember.length || forget.length) memory.update(remember, forget)
       const done: TutorTurn[] = [...next, { role: 'assistant', content: clean || '嗯嗯～' }]
-      setTurns(done); saveTurns(persist, done)
+      setTurns(done); saveTurns(persist, done); setFresh(done.length - 1)
       driveLog('問問 Claude', [{ role: 'user', text: q }, { role: 'Claude', text: clean }])
     }
     catch (e) { setError(e instanceof Error ? e.message : String(e)); setTurns(history) }
@@ -57,10 +86,15 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
   const shown = opening ? turns.slice(1) : turns
   return <div className="ai-chat">
     <div className="ai-log">
-      {shown.map((t, i) => <div key={i} className={'ai-msg ai-' + t.role}>
-        {t.content.split('\n').map((line, j) => line.trim() ? <p key={j}>{line.replace(/\*\*/g, '')}</p> : null)}
-      </div>)}
-      {busy && <div className="ai-msg ai-assistant ai-typing" aria-label="思考中"><i /><i /><i /></div>}
+      {shown.length === 0 && !busy && <div className="ai-hello"><Spark size={40} /><p>嗨～有什麼想問的？</p></div>}
+      {shown.map((t, i) => {
+        const index = opening ? i + 1 : i
+        return <div key={index} className={'ai-msg ai-' + t.role}>
+          {t.role === 'assistant' ? <><Spark size={18} /><div className="ai-text"><Typed text={t.content} animate={index === fresh} onTick={() => end.current?.scrollIntoView({ block: 'nearest' })} /></div></>
+            : <p>{t.content}</p>}
+        </div>
+      })}
+      {busy && <Thinking />}
       {error && <p className="ai-error" role="alert">{error}</p>}
       {persist && turns.length > 0 && !busy && <button type="button" className="ai-clear" onClick={() => { setTurns([]); saveTurns(persist, []) }}>清空這段對話（記住的事不會刪）</button>}
       {!busy && turns.length <= (opening ? 2 : 0) && suggestions.length > 0 && <div className="ai-suggest">
@@ -70,7 +104,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
     </div>
     <form className="ai-input" onSubmit={e => { e.preventDefault(); void send(text) }}>
       <input value={text} onChange={e => setText(e.target.value)} placeholder={placeholder} aria-label="輸入問題" />
-      <button type="submit" disabled={busy || !text.trim()} aria-label="送出"><Send size={17} /></button>
+      <button type="submit" disabled={busy || !text.trim()} aria-label="送出"><ArrowUp size={19} strokeWidth={2.4} /></button>
     </form>
   </div>
 }
@@ -84,7 +118,7 @@ export function AISheet({ title, onClose, children }: { title: ReactNode; onClos
   }, [onClose])
   return createPortal(<div className="ai-veil" onClick={e => { e.stopPropagation(); onClose() }}>
     <section className="ai-sheet" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : '問問 Claude'} onClick={e => e.stopPropagation()}>
-      <header><Sparkles size={17} aria-hidden="true" /><strong>{title}</strong>
+      <header><Spark size={20} /><strong>{title}</strong>
         <button type="button" className="ai-close" aria-label="關閉" onClick={onClose}><X size={18} /></button></header>
       {children}
     </section>
@@ -127,7 +161,7 @@ export function AIAssistant({ progress }: { progress: string }) {
     progress,
   ].join('\n')
   return <>
-    <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Sparkles size={17} aria-hidden="true" />問問 Claude</button>
+    <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Spark size={18} />問問 Claude</button>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
       <AIChat system={system} persist="dream-blueprint.assistant-chat" placeholder="問單字、文法，或叫我出一句中翻英" />
     </AISheet>}

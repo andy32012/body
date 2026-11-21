@@ -90,3 +90,67 @@
 @keyframes ai-dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-3px) } }
 @media (prefers-reduced-motion: reduce) { .ai-veil, .ai-sheet, .ai-typing i { animation: none; } }
 .ai-clear { justify-self: center; border: 0; background: transparent; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: .2em; }
+
+/* —— animated chat (v2) —— */
+:root { --spark:#e07a5f; }
+.ai-veil { animation: ai-fade .25s ease-out; }
+.ai-sheet {
+  position: relative;
+  background:
+    linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
+    color-mix(in srgb, var(--panel) 96%, transparent);
+  border-radius: 22px;
+  animation: ai-pop .38s cubic-bezier(.2, .9, .3, 1.2);
+  transform-origin: 90% 100%;
+}
+.ai-sheet > header { border-bottom: 0; padding: 16px 18px 6px; color: var(--spark); }
+.ai-spark { color: var(--spark); flex: none; }
+.ai-spark.spin { animation: ai-spin 1.6s cubic-bezier(.5, 0, .5, 1) infinite; }
+.ai-spark .ai-spark-dot { animation: ai-twinkle 1.6s ease-in-out infinite; transform-origin: 26px 6px; }
+.ai-log { gap: 14px; padding: 12px 18px 18px; }
+.ai-msg { animation: ai-msg-in .35s cubic-bezier(.2, .8, .3, 1) both; }
+.ai-user {
+  background: color-mix(in srgb, var(--text) 9%, transparent); border-radius: 16px; border-bottom-right-radius: 16px;
+  padding: 10px 15px;
+}
+.ai-assistant { background: transparent; padding: 2px 0; max-width: 100%; display: flex; gap: 10px; align-items: flex-start; border-radius: 0; }
+.ai-assistant .ai-spark { margin-top: 4px; }
+.ai-text { min-width: 0; font-size: 15.5px; line-height: 1.7; }
+.ai-caret { display: inline-block; width: 7px; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: var(--spark); border-radius: 2px; animation: ai-blink .8s steps(2) infinite; }
+.ai-thinking { display: flex; align-items: center; gap: 12px; padding: 6px 0; animation: ai-msg-in .3s ease-out both; }
+.ai-thinking em {
+  font-family: Georgia, "Iowan Old Style", "Noto Serif TC", "PMingLiU", serif; font-style: italic; font-size: 18px; letter-spacing: .02em;
+  background: linear-gradient(90deg, var(--muted) 0%, var(--text) 45%, var(--muted) 90%) 0 0 / 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: ai-shimmer 1.4s linear infinite, ai-msg-in .3s ease-out both;
+}
+.ai-hello { margin: auto; display: grid; justify-items: center; gap: 12px; padding: 30px 0 10px; color: var(--muted); animation: ai-msg-in .45s ease-out both; }
+.ai-hello .ai-spark { animation: ai-float 3s ease-in-out infinite; }
+.ai-hello p { margin: 0; font-family: Georgia, "Noto Serif TC", serif; font-style: italic; font-size: 18px; }
+.ai-input {
+  margin: 0 14px calc(14px + env(safe-area-inset-bottom, 0px)); padding: 8px 8px 8px 14px;
+  border: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: 18px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  transition: border-color .2s, box-shadow .2s;
+}
+.ai-input:focus-within { border-color: color-mix(in srgb, var(--spark) 60%, var(--line)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--spark) 14%, transparent); }
+.ai-input input { border: 0; background: transparent; padding: 8px 4px; }
+.ai-input input:focus { outline: none; }
+.ai-input button { width: 40px; height: 40px; border-radius: 12px; background: var(--spark); color: #fff; transition: transform .15s, opacity .2s; }
+.ai-input button:not(:disabled):hover { transform: translateY(-2px); }
+.ai-input button:not(:disabled):active { transform: scale(.92); }
+.ai-fab .ai-spark { animation: ai-spin 6s linear infinite; }
+.ai-fab { border-color: color-mix(in srgb, var(--spark) 50%, transparent); color: var(--text); }
+.ai-fab:hover .ai-spark { animation-duration: 1.2s; }
+@keyframes ai-pop { from { opacity: 0; transform: scale(.86) translateY(20px); } }
+@keyframes ai-msg-in { from { opacity: 0; transform: translateY(10px); filter: blur(3px); } }
+@keyframes ai-spin { to { transform: rotate(360deg); } }
+@keyframes ai-twinkle { 50% { opacity: .2; transform: scale(.4); } }
+@keyframes ai-shimmer { to { background-position: -200% 0; } }
+@keyframes ai-blink { 50% { opacity: 0; } }
+@keyframes ai-float { 50% { transform: translateY(-6px) rotate(12deg); } }
+@media (max-width: 860px) { .ai-sheet { animation-name: ai-rise; } }
+@media (prefers-reduced-motion: reduce) {
+  .ai-sheet, .ai-msg, .ai-thinking, .ai-thinking em, .ai-spark.spin, .ai-fab .ai-spark, .ai-hello, .ai-hello .ai-spark, .ai-caret { animation: none; }
+}
