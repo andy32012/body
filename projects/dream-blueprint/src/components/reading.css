@@ -1,0 +1,19 @@
+.rd-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.rd-levels button { display: grid; gap: 2px; }
+.rd-levels small { font-size: .72rem; opacity: .8; font-weight: 500; }
+.rd-passage { display: grid; gap: .55rem; padding: .9rem 1rem; border-radius: 12px; background: var(--practice-inset, rgba(127,127,127,.08)); min-width: 0; }
+.rd-passage header { display: grid; gap: 2px; }
+.rd-passage h3 { margin: 0; }
+.rd-passage header small { opacity: .75; font-size: .8rem; }
+.rd-para { margin: 0; line-height: 1.75; overflow-wrap: anywhere; }
+.rd-para mark { background: color-mix(in srgb, #f3d27a 45%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+.rd-letter { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-right: .4em; border-radius: 6px; font-size: .8em; background: color-mix(in srgb, currentColor 14%, transparent); }
+.rd-zh { margin: 0; font-size: .92rem; opacity: .85; line-height: 1.7; }
+.rd-q { display: grid; gap: .5rem; }
+.rd-q h4 { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+.rd-qmeta { margin: 0; font-size: .8rem; opacity: .75; }
+.rd-options { display: grid; grid-template-columns: 1fr; }
+.rd-options button { text-align: left; }
+.rd-review { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: .2rem; font-size: .9rem; }
+.rd-review li[data-ok="false"] { color: var(--practice-miss, #b4483c); }
+.rd-words { margin: 0; font-size: .85rem; line-height: 2; }

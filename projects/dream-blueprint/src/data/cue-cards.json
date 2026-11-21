@@ -1,0 +1,122 @@
+[
+ {
+  "id": "person-helped",
+  "topic": "Describe a person who helped you a lot.",
+  "bullets": [
+   "who this person is",
+   "how you know them",
+   "what they did to help you"
+  ],
+  "explain": "and explain why this help was important to you.",
+  "part3": [
+   "Why do some people enjoy helping others?",
+   "Should schools teach children to help their community?",
+   "Do people help their neighbours less than in the past?"
+  ]
+ },
+ {
+  "id": "healthy-habit",
+  "topic": "Describe a healthy habit you have or want to have.",
+  "bullets": [
+   "what the habit is",
+   "when you started it (or want to start)",
+   "how you do it"
+  ],
+  "explain": "and explain how it helps your health.",
+  "part3": [
+   "Why do many young people not exercise enough?",
+   "Should the government do more to make people healthier?",
+   "Is it harder to stay healthy now than in the past?"
+  ]
+ },
+ {
+  "id": "place-study",
+  "topic": "Describe a place where you like to study.",
+  "bullets": [
+   "where it is",
+   "what it looks like",
+   "when you go there"
+  ],
+  "explain": "and explain why you like studying there.",
+  "part3": [
+   "Do you think libraries are still important today?",
+   "Is it better to study alone or in a group?",
+   "How has technology changed the way students study?"
+  ]
+ },
+ {
+  "id": "difficult-day",
+  "topic": "Describe a day when you were very busy.",
+  "bullets": [
+   "when it was",
+   "what you had to do",
+   "how you managed it"
+  ],
+  "explain": "and explain how you felt at the end of the day.",
+  "part3": [
+   "Why are people busier today than before?",
+   "Is stress always a bad thing?",
+   "What can employers do to reduce stress at work?"
+  ]
+ },
+ {
+  "id": "hospital-visit",
+  "topic": "Describe a time you visited a hospital or clinic.",
+  "bullets": [
+   "when and why you went",
+   "who you met there",
+   "what happened"
+  ],
+  "explain": "and explain how you felt about the visit.",
+  "part3": [
+   "What makes a good nurse or doctor?",
+   "Should medical care be free for everyone?",
+   "How will hospitals change in the future?"
+  ]
+ },
+ {
+  "id": "skill-learn",
+  "topic": "Describe a skill you would like to learn.",
+  "bullets": [
+   "what the skill is",
+   "why you want to learn it",
+   "how you would learn it"
+  ],
+  "explain": "and explain how this skill would change your life.",
+  "part3": [
+   "Is it easier for children or adults to learn new skills?",
+   "Should people learn practical skills at school?",
+   "How has the internet changed the way people learn?"
+  ]
+ },
+ {
+  "id": "trip",
+  "topic": "Describe a trip you remember well.",
+  "bullets": [
+   "where you went",
+   "who you went with",
+   "what you did there"
+  ],
+  "explain": "and explain why you remember it.",
+  "part3": [
+   "Why do people like to travel?",
+   "What are the good and bad effects of tourism?",
+   "Will people travel more or less in the future?"
+  ]
+ },
+ {
+  "id": "goal",
+  "topic": "Describe a goal you want to achieve in the future.",
+  "bullets": [
+   "what the goal is",
+   "when you decided on it",
+   "what you are doing to reach it"
+  ],
+  "explain": "and explain why this goal is important to you.",
+  "part3": [
+   "Is it important for young people to have clear goals?",
+   "Do parents influence their children's career choices too much?",
+   "What makes some people more successful than others?"
+  ]
+ }
+]

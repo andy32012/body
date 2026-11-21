@@ -8,6 +8,8 @@ import { driveLog } from '../lib/drive'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
 import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
+import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCard } from '../lib/ieltsSpeaking'
+import cueCards from '../data/cue-cards.json'
 import { markLessonStep, readLessonRecord } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import './speaking.css'
@@ -30,11 +32,18 @@ function instructions(memory: string[], lesson = '') {
 
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
 
-export default function Speaking({ state, update, lessonMode = false }: PageProps & { lessonMode?: boolean }) {
+export default function Speaking({ state, update, lessonMode = false, ieltsMode = false }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean }) {
   const memory = useMemory()
   const [today] = useState(dayKey)
   const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
   const [task, setTask] = useState<string>()
+  const [cardSkip, setCardSkip] = useState<string[]>([])
+  const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
+  const [prepEnd, setPrepEnd] = useState<number>()
+  const [prepNotes, setPrepNotes] = useState('')
+  const [liveAt, setLiveAt] = useState<number>()
+  const [tick, setTick] = useState(Date.now())
+  useEffect(() => { if (!prepEnd && !liveAt) return; const t = setInterval(() => setTick(Date.now()), 500); return () => clearInterval(t) }, [prepEnd, liveAt])
   useEffect(() => {
     if (!lesson) return
     let alive = true
@@ -73,11 +82,12 @@ export default function Speaking({ state, update, lessonMode = false }: PageProp
     setError(''); setLines([]); setNotes(''); setFixes([])
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes, lesson ? emmaLessonInstructions(lesson, task) : ''),
+        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : lesson ? emmaLessonInstructions(lesson, task) : ''),
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
           setStatus(s)
+          if (s === 'live') setLiveAt(Date.now())
           if (detail) setError(detail)
           if (s === 'closed') { session.current = null; void wrapUp() }
         },
@@ -96,13 +106,14 @@ export default function Speaking({ state, update, lessonMode = false }: PageProp
     setNoting(true)
     try {
       const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
-      const raw = await askTutor([
+      const raw = await askTutor(card ? part2FeedbackPrompt + '\n題目卡：' + card.topic + '\n' + memoryPrompt(memory.notes) : [
         `你是 ${NAME} 的口說小幫手。下面是玄燁剛剛跟美國朋友 ${NAME} 用英文聊天的逐字稿（語音辨識，可能有小錯字）。`,
         '用繁體中文、輕鬆的語氣給他很短的回饋，最多 3 行：一句鼓勵＋一個下次聊天可以用的句子。不要用 Markdown 標題。',
         '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因',
         memoryPrompt(memory.notes),
       ].join('\n'), [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
+      if (card) update(prev => ({ ...prev, notes: { ...prev.notes, [cueKey(card.id)]: today } }))
       if (lesson) update(prev => {
         const rec = readLessonRecord(prev.notes, today)
         return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
@@ -145,6 +156,23 @@ export default function Speaking({ state, update, lessonMode = false }: PageProp
         <span>Emma 會照今天的句型跟你聊，講錯一兩個地方會請你再說一次。</span>
         <a href="#speaking">改回一般聊天</a>
       </div>}
+
+      {card && <div className="sp-lesson sp-cue">
+        <small>雅思口說 Part 2 · 題目卡</small>
+        <strong lang="en">{card.topic}</strong>
+        <span lang="en">You should say:</span>
+        <ul lang="en">{card.bullets.map(b => <li key={b}>{b}</li>)}</ul>
+        <span lang="en">{card.explain}</span>
+        {!live && status !== 'closed' && <>
+          {!prepEnd ? <button type="button" onClick={() => setPrepEnd(Date.now() + 60000)}>開始 1 分鐘準備</button>
+            : <p className="sp-timer">{prepEnd > tick ? '準備時間剩 ' + Math.ceil((prepEnd - tick) / 1000) + ' 秒' : '準備時間到，按麥克風開始說'}</p>}
+          {prepEnd && <textarea lang="en" rows={3} value={prepNotes} onChange={e => setPrepNotes(e.target.value)} placeholder="只寫關鍵字，例如：grandma / nurse / hospital / kind" />}
+          <button type="button" className="sp-link" onClick={() => { setCardSkip(s => [...s, card.id]); setPrepEnd(undefined); setPrepNotes('') }}>換一張題目卡</button>
+        </>}
+        {status === 'live' && liveAt && <p className="sp-timer">已經說了 {Math.floor((tick - liveAt) / 60000)}:{String(Math.floor((tick - liveAt) / 1000) % 60).padStart(2, '0')}（Part 2 目標 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
+        <a href="#speaking">改回一般聊天</a>
+      </div>}
+      {!card && !lesson && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
 
       {settings && <div className="sp-settings">
         <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>

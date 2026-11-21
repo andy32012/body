@@ -163,3 +163,31 @@ test('Claude 跟著現在的題目；中文拆解的格式不對就不用', asyn
   assert.equal(parseDiagnosis('{"questionZh":"x","optionsZh":["a"]}', 3), null, '選項數量要對得上')
   assert.equal(parseDiagnosis('not json', 3), null)
 })
+
+test('閱讀和寫作：建議程度、過關條件、批改格式', async () => {
+  const { suggestedLevel, nextReading, saveRead, readSummary, passed } = await import('../src/lib/reading.ts')
+  const { default: reading } = await import('../src/data/reading.json', { with: { type: 'json' } })
+  const all = reading as Parameters<typeof suggestedLevel>[0]
+  for (const p of all) for (const q of p.qs) {
+    assert.ok(q.answer >= 0 && q.answer < q.options.length, p.id)
+    if (q.evidence) assert.ok(p.paras.join(' ').includes(q.evidence), p.id + ' 證據要在文章裡')
+  }
+  let notes: Record<string, string> = {}
+  assert.equal(suggestedLevel(all, notes), 'A1')
+  const a1 = all.filter(p => p.level === 'A1')
+  for (const p of a1.slice(0, 3)) notes = saveRead(notes, p.id, { day: '2026-11-21', picks: p.qs.map(q => q.answer), correct: p.qs.length, total: p.qs.length })
+  assert.equal(suggestedLevel(all, notes), 'A2', '三篇過關就往上')
+  assert.equal(nextReading(all, 'A1', notes)?.id, a1[3].id, '先讀沒讀過的')
+  notes = saveRead(notes, a1[3].id, { day: '2026-11-21', picks: [9, 9, 9, 9], correct: 0, total: 4, causes: { 0: '單字不認得' }, zh: true })
+  assert.equal(passed({ day: '', picks: [], correct: 4, total: 4, zh: true, tries: 1 }), false, '看過中文不算過關')
+  assert.equal(readSummary(all, notes).topCause, '單字不認得')
+  const { parseFeedback, wordCount, taskDone, suggestedStage } = await import('../src/lib/writing.ts')
+  assert.equal(wordCount("I'm a nurse. It's 3 o'clock."), 5)
+  const f = parseFeedback('{"criteria":[{"name":"TR","score":6,"comment":"ok"},{"score":"5.5"}],"band":6,"next":"加總覽","fixes":[{"wrong":"a","right":"b","why":"c"},{"x":1}]}', ['A', 'B'])
+  assert.equal(f?.criteria[1].name, 'B'); assert.equal(f?.criteria[1].score, 5.5); assert.equal(f?.fixes.length, 1)
+  assert.equal(parseFeedback('nope', ['A']), null)
+  assert.equal(taskDone({ day: '', words: 0, tries: 1, best: 5 }, true), false)
+  assert.equal(taskDone({ day: '', words: 0, tries: 1, best: 4 }, false), true)
+  const { default: writing } = await import('../src/data/writing.json', { with: { type: 'json' } })
+  assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'sentence')
+})

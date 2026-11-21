@@ -1,0 +1,233 @@
+{
+ "stages": [
+  {
+   "id": "sentence",
+   "name": "① 句子",
+   "goal": "把兩個想法連成一句",
+   "criteria": [
+    "文法正確（主詞動詞、時態）",
+    "用到題目指定的連接詞",
+    "意思清楚完整"
+   ],
+   "tasks": [
+    {
+     "id": "s1",
+     "prompt": "Write three sentences about your family. Use and, but, and because.",
+     "zh": "用三句寫你的家人，要用到 and、but、because。",
+     "min": 25,
+     "sample": "My father is a bus driver, and my mother is a nurse. My brother likes sports, but I like reading. I love my grandmother because she always cooks for us."
+    },
+    {
+     "id": "s2",
+     "prompt": "Write three sentences about your school day. Use so, but, and when.",
+     "zh": "用三句寫你在學校的一天，要用到 so、but、when。",
+     "min": 25,
+     "sample": "My first class starts at eight, so I get up at six. Anatomy is interesting, but it is difficult. When classes finish, I study in the library."
+    },
+    {
+     "id": "s3",
+     "prompt": "Write three sentences about a time you were sick. Use because, so, and after.",
+     "zh": "用三句寫你生病的一次經驗，要用到 because、so、after。",
+     "min": 25,
+     "sample": "I stayed home last week because I had a fever. I felt very tired, so I slept all day. After I took some medicine, I felt better."
+    },
+    {
+     "id": "s4",
+     "prompt": "Write three sentences to give health advice. Use should, if, and because.",
+     "zh": "用三句給健康建議，要用到 should、if、because。",
+     "min": 25,
+     "sample": "You should drink more water because your body needs it. If you feel dizzy, you should sit down. You should sleep early because sleep helps you learn."
+    }
+   ]
+  },
+  {
+   "id": "paragraph",
+   "name": "② 一段",
+   "goal": "主題句 → 三個支持 → 結論",
+   "criteria": [
+    "主題句：第一句說出整段要講什麼",
+    "支持句：至少三個理由或例子",
+    "結論句：最後一句收尾",
+    "連接詞讓句子接得順（First、Also、Because、So）",
+    "文法正確"
+   ],
+   "tasks": [
+    {
+     "id": "p1",
+     "prompt": "Write one paragraph: Why do you want to be a nurse?",
+     "zh": "寫一段：你為什麼想當護理師？",
+     "min": 60,
+     "sample": "I want to be a nurse for three reasons. First, I like helping people, especially older people like my grandmother. Also, nursing is a job that I can do in many countries, so it can help me reach my dream of working in the United States. Finally, I enjoy learning about the human body. For these reasons, I believe nursing is the right job for me."
+    },
+    {
+     "id": "p2",
+     "prompt": "Write one paragraph about a healthy habit you have or want to have.",
+     "zh": "寫一段：你有或想培養的一個健康習慣。",
+     "min": 60,
+     "sample": "One healthy habit I want to have is walking every day. First, walking is free and easy, so I do not need a gym. Also, it helps me sleep better at night. In addition, I can listen to English podcasts while I walk. That is why I plan to walk for thirty minutes every evening."
+    },
+    {
+     "id": "p3",
+     "prompt": "Write one paragraph describing your favorite place to study.",
+     "zh": "寫一段：描述你最喜歡讀書的地方。",
+     "min": 60,
+     "sample": "My favorite place to study is the school library. First, it is very quiet, so I can focus. Second, there are many books and computers that I can use for free. Also, the chairs are comfortable and the light is good. Because of this, I go to the library almost every day after class."
+    }
+   ]
+  },
+  {
+   "id": "multi",
+   "name": "③ 多段",
+   "goal": "開頭、內容、結尾分段寫",
+   "criteria": [
+    "每段有自己的工作（開頭、內容、結尾）",
+    "內容回答了題目的每一點",
+    "語氣和格式適合對象（例如 email 的稱呼和結尾）",
+    "段落之間有轉折詞",
+    "文法和用字正確"
+   ],
+   "tasks": [
+    {
+     "id": "m1",
+     "prompt": "Write an email to your teacher. You were sick and missed a class. Say sorry, explain what happened, and ask what you should study.",
+     "zh": "寫 email 給老師：你生病缺課。道歉、說明發生什麼事、問該補讀什麼。",
+     "min": 90,
+     "sample": "Dear Ms. Lin,\n\nI am sorry that I missed your class yesterday. I had a high fever on Monday night, and the doctor told me to stay home and rest.\n\nI am feeling much better now, and I will come to class tomorrow. Could you please tell me which pages I should read and if there was any homework?\n\nThank you for your understanding.\n\nBest regards,\nXuanye"
+    },
+    {
+     "id": "m2",
+     "prompt": "Some students study late at night before tests. Is this a good idea? Write three paragraphs: your opinion, your reasons, and a conclusion.",
+     "zh": "有些學生考前熬夜讀書，好不好？寫三段：你的看法、理由、結論。",
+     "min": 120,
+     "sample": "Many students stay up late before a test. In my opinion, this is not a good way to study.\n\nFirst, our brain needs sleep to remember what we learned. When we sleep less, we forget new words more easily. Second, tired students often feel stressed during the test, so they make careless mistakes. For example, last year I studied until 3 a.m. and then misread several questions.\n\nIn conclusion, it is better to study a little every day and sleep well before a test."
+    },
+    {
+     "id": "m3",
+     "prompt": "Write to a friend about your first day of clinical practice: what you did, how you felt, and what you learned.",
+     "zh": "寫信給朋友，說你第一天實習：做了什麼、感覺如何、學到什麼。",
+     "min": 120,
+     "sample": "Hi Amy,\n\nGuess what? Yesterday was my first day of clinical practice! I followed a senior nurse all day. I checked patients' blood pressure and helped one patient walk to the bathroom.\n\nI was very nervous at first, and my hands were shaking. But the nurse was kind and told me to take my time.\n\nI learned that it is OK to ask questions. I will be braver tomorrow!\n\nTalk soon,\nXuanye"
+    }
+   ]
+  },
+  {
+   "id": "task1",
+   "name": "④ 雅思 Task 1",
+   "goal": "描述圖表：總覽＋重點數據＋比較",
+   "criteria": [
+    "Task Achievement：有總覽（overview），挑出重要數據並比較",
+    "Coherence & Cohesion：段落清楚、用對連接詞",
+    "Lexical Resource：描述趨勢的用字多樣（rise、drop、remain stable）",
+    "Grammatical Range & Accuracy：句型有變化、錯誤少"
+   ],
+   "ielts": true,
+   "minutes": 20,
+   "tasks": [
+    {
+     "id": "t1a",
+     "prompt": "The chart shows a patient's systolic blood pressure from Monday to Friday. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+     "zh": "圖表是一位病人週一到週五的收縮壓。挑出重點描述並比較。",
+     "min": 150,
+     "chart": {
+      "title": "Systolic blood pressure (mmHg)",
+      "points": [
+       {
+        "label": "Mon",
+        "value": 150
+       },
+       {
+        "label": "Tue",
+        "value": 142
+       },
+       {
+        "label": "Wed",
+        "value": 130
+       },
+       {
+        "label": "Thu",
+        "value": 130
+       },
+       {
+        "label": "Fri",
+        "value": 124
+       }
+      ]
+     },
+     "sample": "The line graph shows changes in one patient's systolic blood pressure over five days, from Monday to Friday.\n\nOverall, the patient's blood pressure fell steadily during the week, apart from a short period when it remained stable.\n\nOn Monday, the reading was at its highest point of the week, 150 mmHg. It then dropped to 142 mmHg on Tuesday and fell further to 130 mmHg on Wednesday. On Thursday, the figure stayed the same at 130 mmHg.\n\nBy Friday, the blood pressure had decreased again to 124 mmHg, which was the lowest reading in the period. In total, it went down by 26 mmHg between Monday and Friday."
+    },
+    {
+     "id": "t1b",
+     "prompt": "The chart shows the number of patients visiting a small clinic each month from January to June. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+     "zh": "圖表是一家小診所一到六月每月看診人數。挑出重點描述並比較。",
+     "min": 150,
+     "chart": {
+      "title": "Clinic visits per month",
+      "points": [
+       {
+        "label": "Jan",
+        "value": 420
+       },
+       {
+        "label": "Feb",
+        "value": 460
+       },
+       {
+        "label": "Mar",
+        "value": 380
+       },
+       {
+        "label": "Apr",
+        "value": 300
+       },
+       {
+        "label": "May",
+        "value": 310
+       },
+       {
+        "label": "Jun",
+        "value": 350
+       }
+      ]
+     },
+     "sample": "The line graph illustrates how many patients visited a small clinic each month in the first half of the year.\n\nOverall, visits peaked in February and then fell to their lowest level in April, before recovering slightly by June.\n\nIn January, the clinic had 420 visits, and this number rose to a high of 460 in February. After that, there was a sharp decline to 380 in March and 300 in April, a drop of 160 visits in two months.\n\nFrom April onwards, the figures increased gradually. There were 310 visits in May and 350 in June, although this was still lower than at the start of the year."
+    }
+   ]
+  },
+  {
+   "id": "task2",
+   "name": "⑤ 雅思 Task 2",
+   "goal": "議論文：立場＋兩個論點＋結論",
+   "criteria": [
+    "Task Response：回答題目所有部分，立場清楚，論點有發展",
+    "Coherence & Cohesion：段落分明，每段一個重點",
+    "Lexical Resource：用字精準、有變化",
+    "Grammatical Range & Accuracy：複雜句用得對、錯誤少"
+   ],
+   "ielts": true,
+   "minutes": 40,
+   "tasks": [
+    {
+     "id": "t2a",
+     "prompt": "Some people think that hospitals should be free for everyone. Others think patients should pay for their own treatment. Discuss both views and give your own opinion.",
+     "zh": "有人認為醫院應該對所有人免費，有人認為病人應自付。討論兩種看法並提出你的意見。",
+     "min": 250,
+     "sample": ""
+    },
+    {
+     "id": "t2b",
+     "prompt": "Many young people today spend several hours a day on their phones. What problems does this cause, and what can be done to solve them?",
+     "zh": "現在很多年輕人每天花好幾小時滑手機。這造成什麼問題？可以怎麼解決？",
+     "min": 250,
+     "sample": ""
+    },
+    {
+     "id": "t2c",
+     "prompt": "Some people believe that the best way to improve public health is to increase the number of sports facilities. Others think other measures are more effective. To what extent do you agree or disagree?",
+     "zh": "有人認為改善大眾健康最好的方法是增加運動設施，也有人認為其他方法更有效。你同意到什麼程度？",
+     "min": 250,
+     "sample": ""
+    }
+   ]
+  }
+ ]
+}

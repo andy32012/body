@@ -39,8 +39,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
       auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
     { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
       auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' },
-    { id: 'more', min: energy === 'high' ? 15 : 2, title: energy === 'high' ? '加練' : '收尾', detail: energy === 'high' ? '一段 7000 單短文，或跟 Emma 聊 5 分鐘' : '把今天批改出來的錯句加入複習，明天會再出現',
-      auto: false, go: energy === 'high' ? () => { location.hash = 'library/passage' } : undefined, goLabel: '短文', go2: energy === 'high' ? () => { location.hash = 'speaking' } : undefined },
+    { id: 'more', min: energy === 'high' ? 15 : 2, title: energy === 'high' ? '加練' : '收尾', detail: energy === 'high' ? '一篇閱讀理解、一題寫作階梯，或跟 Emma 聊 5 分鐘' : '把今天批改出來的錯句加入複習，明天會再出現',
+      auto: false, go: energy === 'high' ? () => { location.hash = 'library/reading' } : undefined, goLabel: '閱讀', go2: energy === 'high' ? () => { location.hash = 'speaking' } : undefined },
   ]
   const isDone = (t: Task) => t.auto || state.notes[key(t.id)] === '1'
   const finished = tasks.filter(isDone).length

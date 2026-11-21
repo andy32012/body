@@ -1,0 +1,29 @@
+.wl-stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.wl-stages button { display: grid; gap: 2px; }
+.wl-stages small { font-size: .72rem; opacity: .8; font-weight: 500; }
+.wl-tasks { display: flex; flex-wrap: wrap; gap: 6px; }
+.wl-tasks button { padding: 4px 12px; border-radius: 999px; font-size: .85rem; }
+.wl-task { display: grid; gap: .45rem; min-width: 0; }
+.wl-task h3 { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+.wl-zh { margin: 0; opacity: .8; font-size: .92rem; }
+.wl-outline ol, .wl-criteria ul { margin: .35rem 0 0; padding-inline-start: 1.2rem; display: grid; gap: .2rem; font-size: .9rem; }
+.wl-outline summary, .wl-criteria summary { cursor: pointer; font-size: .9rem; }
+.wl-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: .88rem; }
+.wl-bar [data-ok="true"] { color: var(--practice-ok, #2f8a5b); font-weight: 600; }
+.wl-bar [data-ok="false"] { opacity: .8; }
+.wl-self { display: grid; gap: .4rem; font-size: .9rem; }
+.wl-self label { display: flex; gap: .5rem; align-items: flex-start; }
+.wl-fb { display: grid; gap: .55rem; padding: .8rem .9rem; border-radius: 12px; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); }
+.wl-fb p { margin: 0; }
+.wl-fb-head { display: flex; gap: .6rem; align-items: center; }
+.wl-band { font-size: .85rem; padding: 2px 10px; border-radius: 999px; background: color-mix(in srgb, #9e91e5 22%, transparent); }
+.wl-crit { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.wl-crit li { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); gap: .6rem; align-items: start; }
+.wl-crit li div { display: grid; gap: .1rem; }
+.wl-crit small { opacity: .85; line-height: 1.55; }
+.wl-score { text-align: center; font-weight: 700; padding: 3px 0; border-radius: 8px; font-size: .9rem; }
+.wl-score[data-level="hi"] { background: color-mix(in srgb, #2f8a5b 22%, transparent); }
+.wl-score[data-level="mid"] { background: color-mix(in srgb, #d6a640 25%, transparent); }
+.wl-score[data-level="lo"] { background: color-mix(in srgb, #b4483c 22%, transparent); }
+.wl-next { padding: .5rem .7rem; border-radius: 10px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.wl-note { opacity: .7; }

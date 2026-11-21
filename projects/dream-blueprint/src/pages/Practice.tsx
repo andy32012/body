@@ -44,6 +44,8 @@ import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import StuckButton from "../components/StuckButton";
 import UseWord from "../components/UseWord";
+import ReadingPath from "../components/ReadingPath";
+import WritingLadder from "../components/WritingLadder";
 import { useTaskContext } from "../lib/taskContext";
 import {
   heardKey,
@@ -1045,8 +1047,8 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing"];
   const fromHash = (): Mode => {
     const m = location.hash.split("/")[1] as Mode;
     return modes.includes(m) ? m : "words";
@@ -1197,6 +1199,8 @@ function Extras({
             ["words", "單字複習"],
             ["listen", "句子跟讀"],
             ["translate", "中翻英"],
+            ["reading", "閱讀理解"],
+            ["writing", "寫作階梯"],
             ["passage", "7000 單短文"],
             ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
             ["case", "臨床情境"],
@@ -1210,6 +1214,7 @@ function Extras({
               key === "words" ||
               key === "translate" ||
               key === "passage" ||
+              key === "reading" ||
               ((key === "quiz" || key === "case") && periodQuiet),
           )
           .map(([key, label]) => (
@@ -1340,6 +1345,8 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
+      {mode === "reading" && <ReadingPath state={state} onActivity={onActivity} date={date} />}
+      {mode === "writing" && <WritingLadder state={state} onActivity={onActivity} date={date} />}
       {mode === "quiz" && (!quiet || periodQuiet) && (
         <QuizPractice state={state} update={update} onActivity={onActivity} date={date}
           sections={periodQuiet ? ["nursing"] : undefined} />
