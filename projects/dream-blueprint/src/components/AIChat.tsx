@@ -88,8 +88,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
   const shown = opening ? turns.slice(1) : turns
   return <div className="ai-chat">
     <div className="ai-log">
-      {shown.length === 0 && !busy && <SketchIntro title={tutorPersona() === 'teacher' ? '嗨，你好～' : '嗨～哥哥'} subtitle="今天想學什麼呢？"
-        cards={[...introCards, memory.notes.length ? '記得 ' + memory.notes.length + ' 件事' : '']. filter(Boolean)} />}
+      {shown.length === 0 && !busy && <SketchIntro text={tutorPersona() === 'teacher' ? '你好' : '嗨～哥哥'} />}
       {shown.map((t, i) => {
         const index = opening ? i + 1 : i
         return <div key={index} className={'ai-msg ai-' + t.role}>

@@ -6,30 +6,19 @@
   animation: sk-draw 1.1s linear forwards;
 }
 .sk-frame-2 { stroke: var(--spark, #e07a5f); stroke-width: 1.2; opacity: 0; animation: sk-draw-show 1.2s .25s linear forwards; --show: .55; }
-.sk-write {
-  font-family: "Iowan Old Style", Georgia, "Noto Serif TC", "PMingLiU", serif; font-style: italic;
-  fill: var(--text); fill-opacity: 0; stroke: var(--text); stroke-width: .7;
-  stroke-dasharray: 90; stroke-dashoffset: 90;
-}
-.sk-w1 { font-size: 38px; font-weight: 600; animation: sk-dash 1.2s 1.45s ease-out forwards, sk-fill .6s 2.3s ease-out forwards; }
-.sk-w2 { font-size: 21px; fill: var(--muted); stroke: var(--muted); animation: sk-dash 1.1s 2.95s ease-out forwards, sk-fill .6s 3.7s ease-out forwards; }
-.sk-reveal { transform-box: fill-box; transform-origin: left center; transform: scaleX(0); }
-.sk-r1 { animation: sk-wipe 1.2s 1.45s linear forwards; }
-.sk-r2 { animation: sk-wipe 1.1s 2.95s linear forwards; }
-.sk-underline {
-  fill: none; stroke: var(--spark, #e07a5f); stroke-width: 3; stroke-linecap: round;
-  stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: sk-draw-show .5s 2.65s ease-out forwards;
-}
-.sk-pen-wrap { animation: sk-pen-out .5s 4.05s ease-in forwards; }
+.sk-board { position: relative; }
+.sk-board > svg:first-child { display: block; width: 100%; height: auto; overflow: visible; }
+.sk-words { position: absolute; inset: 0 0 8% 0; display: flex; align-items: center; justify-content: center; gap: 2px; }
+.sk-char { width: 70px; height: 70px; display: block; }
+.sk-char svg { overflow: visible; }
+.sk-tilde { width: 36px; height: 70px; display: grid; place-items: center; }
+.sk-tilde svg { width: 30px; overflow: visible; }
+.sk-tilde path { fill: none; stroke: var(--text); stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+.sk-tilde.show path { animation: sk-draw-show .42s ease-out forwards; }
+.sk-under { position: absolute; left: 50%; bottom: 22%; width: 62%; transform: translateX(-50%); overflow: visible; }
+.sk-under path { fill: none; stroke: var(--spark, #e07a5f); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sk-draw .5s ease-out forwards; }
+.sk-pen-wrap { animation: sk-pen-out .35s 1.1s ease-in forwards; }
 .sk-pencil { filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
-.sk-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.sk-card {
-  padding: 8px 14px; border-radius: 12px; font-size: 13.5px; font-weight: 600; letter-spacing: .03em;
-  background: color-mix(in srgb, var(--text) 8%, var(--panel)); border: 1px solid var(--line);
-  box-shadow: 0 6px 16px rgba(0,0,0,.25);
-  opacity: 0; transform: translateY(-26px) scale(.9);
-  animation: sk-drop .55s cubic-bezier(.3, 1.5, .5, 1) forwards;
-}
 .sk-think { width: 92px; height: 30px; overflow: visible; flex: none; }
 .sk-squiggle {
   fill: none; stroke: var(--spark, #e07a5f); stroke-width: 2.2; stroke-linecap: round;
@@ -49,9 +38,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sk-frame, .sk-underline, .sk-squiggle { animation: none; stroke-dashoffset: 0; opacity: 1; }
-  .sk-write { animation: none; stroke-dashoffset: 0; fill-opacity: 1; }
-  .sk-reveal { animation: none; transform: none; }
+  .sk-tilde path, .sk-under path { animation: none; stroke-dashoffset: 0; opacity: 1; }
   .sk-pen-wrap { display: none; }
-  .sk-card { animation: none; opacity: 1; transform: none; }
   .sk-caret { animation: none; }
 }

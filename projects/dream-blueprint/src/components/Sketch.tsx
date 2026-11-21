@@ -1,3 +1,10 @@
+import { useEffect, useRef, useState } from 'react'
+import HanziWriter from 'hanzi-writer'
+import hai from 'hanzi-writer-data/嗨.json'
+import ge from 'hanzi-writer-data/哥.json'
+import ni from 'hanzi-writer-data/你.json'
+import hao from 'hanzi-writer-data/好.json'
+
 /** Hand-drawn style animations for the 問問 Claude panel: a pencil draws a frame, writes, and doodles. */
 
 function PencilShape() {
@@ -15,36 +22,61 @@ function PencilShape() {
 }
 
 const FRAME = 'M28 14 H292 Q306 14 306 28 V150 Q306 164 292 164 H28 Q14 164 14 150 V28 Q14 14 28 14 Z'
+const CHARS: Record<string, CharData> = { 嗨: hai, 哥: ge, 你: ni, 好: hao }
+type CharData = { strokes: string[]; medians: number[][][] }
 
-export function SketchIntro({ title, subtitle, cards }: { title: string; subtitle: string; cards: string[] }) {
-  return <div className="sk-intro" aria-label={title + ' ' + subtitle}>
-    <svg className="sk-board" viewBox="0 0 320 178" role="img" aria-hidden="true">
-      <defs>
-        <clipPath id="sk-clip-1"><rect className="sk-reveal sk-r1" x="30" y="40" height="60" width="260" /></clipPath>
-        <clipPath id="sk-clip-2"><rect className="sk-reveal sk-r2" x="30" y="100" height="40" width="260" /></clipPath>
-      </defs>
-      <path className="sk-frame" d={FRAME} pathLength={1} />
-      <path className="sk-frame sk-frame-2" d={FRAME} pathLength={1} transform="translate(2 1.5)" />
-      <g clipPath="url(#sk-clip-1)">
-        <text className="sk-write sk-w1" x="38" y="84">{title}</text>
-      </g>
-      <g clipPath="url(#sk-clip-2)">
-        <text className="sk-write sk-w2" x="40" y="128">{subtitle}</text>
-      </g>
-      <path className="sk-underline" d="M40 95 C90 101, 150 90, 236 96" pathLength={1} />
-      <g className="sk-pen-wrap">
-        <PencilShape />
-        <animateMotion dur="1.1s" begin="0s" fill="freeze" path={FRAME} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
-        <animateMotion dur="0.35s" begin="1.1s" fill="freeze" path="M28 14 L40 84" />
-        <animateMotion dur="1.2s" begin="1.45s" fill="freeze" path="M40 84 C90 76, 160 90, 236 82" />
-        <animateMotion dur="0.3s" begin="2.65s" fill="freeze" path="M236 82 L42 126" />
-        <animateMotion dur="1.1s" begin="2.95s" fill="freeze" path="M42 126 C110 120, 190 130, 270 124" />
-        <animateMotion dur="0.6s" begin="4.05s" fill="freeze" path="M270 124 L330 30" />
-      </g>
-    </svg>
-    {cards.length > 0 && <div className="sk-cards">
-      {cards.map((c, i) => <span key={c} className="sk-card" style={{ animationDelay: 4.2 + i * 0.18 + 's', rotate: (i % 2 ? 2.5 : -2.5) + 'deg' }}>{c}</span>)}
-    </div>}
+/** A pencil draws a frame, then each character is written in real stroke order. */
+export function SketchIntro({ text }: { text: string }) {
+  const slots = useRef<(HTMLSpanElement | null)[]>([])
+  const [underline, setUnderline] = useState(false)
+  const parts = [...text]
+  useEffect(() => {
+    let alive = true
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+    const color = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#e9ecf4'
+    const writers = parts.map((ch, i) => {
+      const el = slots.current[i]
+      if (!el || !CHARS[ch]) return null
+      el.innerHTML = ''
+      return HanziWriter.create(el, ch, {
+        width: 70, height: 70, padding: 2, strokeColor: color, radicalColor: color,
+        showOutline: false, showCharacter: reduced, strokeAnimationSpeed: 4, delayBetweenStrokes: 30,
+        charDataLoader: (c, onLoad) => onLoad(CHARS[c] as never),
+      })
+    })
+    if (reduced) { setUnderline(true); return }
+    const run = async () => {
+      await new Promise(r => setTimeout(r, 1250))
+      for (let i = 0; i < parts.length && alive; i++) {
+        const w = writers[i]
+        if (w) await new Promise<void>(r => w.animateCharacter({ onComplete: () => r() }))
+        else { slots.current[i]?.classList.add('show'); await new Promise(r => setTimeout(r, 450)) }
+      }
+      if (alive) setUnderline(true)
+    }
+    void run()
+    return () => { alive = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text])
+  return <div className="sk-intro" aria-label={text}>
+    <div className="sk-board">
+      <svg viewBox="0 0 320 178" aria-hidden="true">
+        <path className="sk-frame" d={FRAME} pathLength={1} />
+        <path className="sk-frame sk-frame-2" d={FRAME} pathLength={1} transform="translate(2 1.5)" />
+        <g className="sk-pen-wrap">
+          <PencilShape />
+          <animateMotion dur="1.1s" begin="0s" fill="freeze" path={FRAME} />
+        </g>
+      </svg>
+      <div className="sk-words" aria-hidden="true">
+        {parts.map((ch, i) => CHARS[ch]
+          ? <span key={i} className="sk-char" ref={el => { slots.current[i] = el }} />
+          : <span key={i} className="sk-tilde" ref={el => { slots.current[i] = el }}>
+              <svg viewBox="0 0 40 20"><path d="M3 12 C9 2, 15 4, 20 10 S31 18, 37 6" pathLength={1} /></svg>
+            </span>)}
+      </div>
+      {underline && <svg className="sk-under" viewBox="0 0 240 14" aria-hidden="true"><path d="M4 9 C60 13, 140 3, 236 8" pathLength={1} /></svg>}
+    </div>
   </div>
 }
 
