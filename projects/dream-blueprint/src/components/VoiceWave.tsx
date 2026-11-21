@@ -35,6 +35,7 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
     const mouse = { x: 0.5, y: 0.5, active: false, strength: 0 }
     const ripples: { x: number; t0: number }[] = []
     const smooth = { her: 0, you: 0, wake: 0 }
+    let phase = 0 // accumulated, so a change in speed never makes the wave jump
     const parts: Particle[] = Array.from({ length: 90 }, () => ({
       x: Math.random(), off: (Math.random() * 2 - 1), v: 0.012 + Math.random() * 0.03,
       r: 0.6 + Math.random() * 2.2, seed: Math.random() * 10, push: 0,
@@ -62,8 +63,13 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
       const dt = Math.min(0.05, (now - last) / 1000); last = now
       const t = now / 1000
       const lv = levels.current
-      smooth.her += (lv.her - smooth.her) * 0.18
-      smooth.you += (lv.you - smooth.you) * 0.18
+      // ignore room noise, rise quickly when someone speaks, settle slowly
+      const gate = (v: number) => Math.max(0, (v - 0.05) / 0.95)
+      const herIn = gate(lv.her)
+      const youIn = gate(lv.you) * (1 - Math.min(1, herIn * 2) * 0.7) // her voice leaking into the mic
+      const follow = (cur: number, target: number) => cur + (target - cur) * (target > cur ? 0.22 : 0.05)
+      smooth.her = follow(smooth.her, herIn)
+      smooth.you = follow(smooth.you, youIn)
       smooth.wake += ((liveRef.current ? 1 : 0) - smooth.wake) * 0.04
       mouse.strength += ((mouse.active ? 1 : 0) - mouse.strength) * 0.08
       const idle = 0.16 + 0.05 * Math.sin(t * 0.9)
@@ -84,10 +90,11 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
         return a * (0.25 + 0.75 * Math.sin(Math.PI * Math.min(1, Math.max(0, x))) ** 0.7)
       }
       const speed = 1.1 + Math.sqrt(smooth.her) * 1.6 + Math.sqrt(smooth.you) * 1.6
+      phase += speed * dt
       const wave = (x: number, i: number) => {
         const f = 0.45 + 0.55 * Math.sin(i * 1.7) ** 2
         const ph = i * 0.33
-        const y = Math.sin(Math.PI * 2 * (1.6 * x) - t * speed + ph) + 0.35 * Math.sin(Math.PI * 2 * (3.4 * x) + t * speed * 0.7 - ph)
+        const y = Math.sin(Math.PI * 2 * (1.6 * x) - phase + ph) + 0.35 * Math.sin(Math.PI * 2 * (3.4 * x) + phase * 0.7 - ph)
         const bend = mouse.strength * gauss(x, mouse.x, 0.1) * (mouse.y - 0.5) * H * 0.35
         return mid + y * Math.min(1.2, env(x)) * H * 0.3 * f + bend
       }
