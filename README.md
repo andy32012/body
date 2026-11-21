@@ -2,7 +2,7 @@
 
 網站：https://xitian.page
 
-漫畫、內外科護理、語言學習、台股追蹤與認識美國的入口網站。
+漫畫、內外科護理、語言學習、台股追蹤、認識美國與赴美護理職涯的入口網站。
 
 ## 網站導覽
 
@@ -15,6 +15,7 @@
 | 護理英文與赴美計畫 | [夢想藍圖](https://xitian.page/dream/) |
 | 台股追蹤 | [微台快訊：微台走勢與世界新聞](https://globalio.me/#predict)（`andy32012/NEWS` 專案） |
 | 認識美國 | [城市、文化與日常生活](https://xitian.page/america/) |
+| 赴美護理職涯 | [台美薪資、RN／NP 制度與赴美準備](https://xitian.page/america/nursing/) |
 
 ### 維護夢想藍圖
 
@@ -23,6 +24,7 @@
 
 - `index.html`、`style.css`：Body 首頁（漫畫、語言學習、護理、夢想藍圖、台股追蹤、認識美國）
 - `america/`：認識美國，含四大地區互動地圖、六座城市、台美時間與單位換算
+- `america/nursing/`：赴美護理職涯，含台美薪資比較、生活預算試算、RN／NP 與 APRN 角色、分階段準備路線及官方來源
 - `comic/`：《西天》線上漫畫
 - `nursing/`：內科黑板課目錄（心臟、血液、免疫、腫瘤）
   - `nursing/heart-failure/`：心衰竭：左 vs 右
@@ -48,9 +50,24 @@
 - `app.js`：地區選擇、可鍵盤操作的州列表、城市篩選、即時／指定時間與換算輸入處理。資料均在瀏覽器中計算，不傳送輸入。
 - `tests/america.test.mjs`：夏令時間交界、跨日、不同執行時區、日期驗證與單位換算測試，包含在 `npm test`。
 
-修改後執行 `npm run version:america` 更新頁面、模組與圖片的快取雜湊。首頁樣式仍使用 `npm run version:learning` 更新。請實際檢查桌面與手機版面。
+修改後執行 `npm run version:america` 更新美國首頁與護理職涯頁的樣式、模組及原有首頁圖片快取雜湊；腳本會先更新兩個 App 的模組依賴，再將 App 雜湊寫入各自 HTML。Body 首頁樣式仍使用 `npm run version:learning` 更新。請實際檢查桌面與手機版面。
 
 主視覺為 [NPS 優勝美地](https://www.nps.gov/yose/index.htm) 照片（NPS / Cindy Jacoby），已轉成 WebP；授權依據見 [NPS 聲明](https://www.nps.gov/aboutus/disclaimer.htm)。州界由 [us-atlas](https://github.com/topojson/us-atlas) 的 `states-albers-10m.json` 轉為 SVG，依據 Census 2017 州界，保留 [ISC 授權](./america/assets/us-atlas-LICENSE.txt)。阿拉斯加、夏威夷為移位縮放插圖。城市意象為本站原創 SVG，非精確天際線。各內容的官方延伸資料亦列在頁面及頁尾。
+
+### 赴美護理職涯
+
+`/america/nursing/` 從美國首頁進入，提供台美護理薪資比較、RN 與 NP 制度切換、四種 APRN 角色、學生／台灣護理師／美國 RN 的準備建議，以及赴美考照與工作的路線。薪資可切換年薪或年薪除以 12 的月均值、原幣或依自訂匯率換算台幣，以及美國平均數／中位數。預算工具依使用者填入的年收入、每月扣款與生活費計算餘額，不推估稅額或實領薪資；匯率為示範輸入，沒有串接即時行情。靜態 HTML 保留薪資預設值、制度說明與來源，關閉 JavaScript 仍可閱讀。
+
+**資料與來源口徑：**台灣採[勞動部職類別薪資調查](https://statdb.mol.gov.tw/html/s3/svy14/1435all.pdf)的全時護理人員平均數，全年所得與經常性月薪分屬不同期間；美國採 BLS 的 [RN](https://www.bls.gov/ooh/healthcare/registered-nurses.htm) 與 [NP 等個別職業](https://www.bls.gov/ooh/healthcare/nurse-anesthetists-nurse-midwives-and-nurse-practitioners.htm)數據，NP 不使用多職業合併薪資。台灣專科護理師另列院所招募案例，不當作全國平均。各數字保留統計年度、薪資涵蓋範圍與來源；頁面查核日期不代表所有數據皆屬同一年。制度與申請流程依台灣法規、NCSBN、各州護理主管機關、TruMerit、USCIS 及相關認證機構整理，逐項連結見[官方來源清單](https://xitian.page/america/nursing/#sources)。
+
+| 檔案 | 用途 |
+| --- | --- |
+| `america/nursing/data.js` | 互動薪資數據、幣別、統計年度與三個階段的準備建議 |
+| `america/nursing/calculators.js` | 無 DOM／網路依賴的純計算函式：`salaryAmount`、`monthlyRemainder`、`parsePositiveRate`；處理薪資換算、預算餘額與輸入驗證 |
+| `america/nursing/app.js` | 薪資、制度與準備階段切換，預算欄位及錯誤訊息 |
+| `america/nursing/index.html`、`nursing.css` | 靜態內容、薪資預設值、統計口徑、官方來源與響應式版面；共用 `america/america.css` |
+
+更新流程：先核對官方來源與統計年度，再同步修改 `data.js`、HTML 中的預設薪資／說明／來源及資料查核日期。調整計算邏輯時更新相應測試，執行 `npm test`；待 HTML、CSS 與 JS 修改完成後，執行 `npm run version:america`。最後檢查桌面與手機版面、薪資切換、自訂匯率、空白／無效輸入、負數預算結果及無 JavaScript 的閱讀內容。變更只涉及 Body 首頁樣式時，沿用 `npm run version:learning`。
 
 ## 日韓學習室
 
