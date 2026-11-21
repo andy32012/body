@@ -111,3 +111,41 @@ test('上到一半的課：關掉再開、隔天回來都接得回原本的步�
   assert.equal(done[activeKey], undefined)
   assert.equal(sentenceFrame('I am a nursing student.'), 'I a_ a n______ s______.')
 })
+
+test('學對記對：多堂沒做完都找得到、提示不會忘、重送不等於改好', async () => {
+  const { updateLesson, pendingLessons, resumeTarget, moveLesson, readHints, writeHint, issuesFixed, lessonKey } = await import('../src/lib/lesson.ts')
+  // Two earlier lessons with 表達 left; a third lesson started today moves the active pointer.
+  let notes = updateLesson({}, '2026-11-18', 3, 1, {}, 'pattern')
+  notes = updateLesson(notes, '2026-11-19', 3, 2, {}, 'pattern')
+  notes = updateLesson(notes, '2026-11-21', 3, 3, {}, 'listen')
+  notes = { ...notes, 'lesson.heard.3': '{"day":"2026-11-21"}', 'lesson.active': '2026-11-21' }
+  assert.deepEqual(pendingLessons(notes).map(p => p.date), ['2026-11-19', '2026-11-18'])
+  assert.equal(resumeTarget(notes, { unit: 3, day: 3 }, '2026-11-21', true, '2026-11-18')?.rec.day, 1)
+  // Today already has its own lesson, so the old one is not copied over it.
+  const kept = moveLesson(notes, '2026-11-18', '2026-11-21')
+  assert.equal(kept.date, '2026-11-18')
+  assert.equal(JSON.parse(kept.notes[lessonKey('2026-11-21')]).day, 3)
+  // Hints outside the guided lesson.
+  let n2 = writeHint({}, '2026-11-21', 'u3-c1', { h: 2, r: true })
+  n2 = writeHint(n2, '2026-11-21', 'u3-c2', { h: 1, r: false })
+  assert.equal(readHints(n2, '2026-11-21')['u3-c1'].h, 2)
+  assert.deepEqual(readHints({ 'hints.2026-11-21': 'oops' }, '2026-11-21'), {})
+  // Retried vs fixed.
+  const prev = { verdict: 'small' as const, corrected: '', fixes: [{ wrong: 'go', right: 'went', why: '' }, { wrong: 'a', right: 'an', why: '' }] }
+  assert.equal(issuesFixed({ verdict: 'small', corrected: '', fixes: [{ wrong: 'x', right: 'y', why: '' }], resolved: [0], still: [1] }, prev), false)
+  assert.equal(issuesFixed({ verdict: 'small', corrected: '', fixes: [{ wrong: 'x', right: 'y', why: '' }], resolved: [0, 1], still: [] }, prev), true)
+  assert.equal(issuesFixed({ verdict: 'good', corrected: '', fixes: [] }, prev), true)
+  assert.equal(issuesFixed({ verdict: 'small', corrected: '', fixes: [{ wrong: 'x', right: 'y', why: '' }] }, prev), false, '沒有逐項判斷就不算改好')
+})
+
+test('護理英文清單只算護理題，或做完一個情境', async () => {
+  const { answeredOn } = await import('../src/lib/quiz.ts')
+  const { casesFinishedOn } = await import('../src/lib/scenarios.ts')
+  const rec = (day: string) => JSON.stringify({ day, picked: 0, correct: true, tries: 1, misses: 0 })
+  const notes = { 'quiz.ans.q-001': rec('2026-11-21'), 'quiz.ans.n-1': rec('2026-11-21'), 'quiz.ans.n-2': rec('2026-11-20'),
+    'case.c1': JSON.stringify({ day: '2026-11-21', results: [1, 2, 3, 4].map(() => ({ kind: 'cues', correct: true })), tries: 1 }),
+    'case.c2': JSON.stringify({ day: '2026-11-21', results: [{ kind: 'cues', correct: true }], tries: 1 }) }
+  assert.equal(answeredOn(notes, '2026-11-21'), 2)
+  assert.equal(answeredOn(notes, '2026-11-21', new Set(['n-1', 'n-2'])), 1)
+  assert.equal(casesFinishedOn(notes, '2026-11-21'), 1)
+})

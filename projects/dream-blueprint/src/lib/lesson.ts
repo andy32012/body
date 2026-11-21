@@ -39,9 +39,33 @@ export type LessonPhase = 'recall' | 'listen' | 'write' | 'sound' | 'vary' | 'ex
 export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'again'; grammar: string[]; revealed: boolean }
 /** h: how far the hints went (1 self-check, 2 clearer hint, 3 sentence frame, 4 the answer); r: an answer was shown. */
 export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' }
-export interface CorrectionResult { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string }
+
+/** Hints used outside the guided lesson (checkpoint, review, extra drills) live in "hints.<date>". */
+export const hintsKey = (day: string) => 'hints.' + day
+export function readHints(notes: Record<string, string>, day: string): Record<string, HintUse> {
+  try { const v = JSON.parse(notes[hintsKey(day)] ?? '{}'); return v && typeof v === 'object' ? v : {} } catch { return {} }
+}
+export function writeHint(notes: Record<string, string>, day: string, id: string, use: HintUse): Record<string, string> {
+  return { ...notes, [hintsKey(day)]: JSON.stringify({ ...readHints(notes, day), [id]: use }) }
+}
+export interface CorrectionResult { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string; resolved?: number[]; still?: number[] }
+/** A rewrite counts as fixed when every issue from the round before is resolved, or nothing is left to fix.
+ *  Sending the same answer again is a retry, not a fix. */
+export function issuesFixed(r: CorrectionResult, previous?: CorrectionResult): boolean {
+  if (r.verdict === 'good' || !r.fixes.length) return true
+  if (!previous?.fixes.length) return false
+  return (r.still?.length ?? 1) === 0 && (r.resolved?.length ?? 0) >= previous.fixes.length
+}
 /** The open task: first answer and its feedback are kept apart from the corrected try. */
-export interface ExpressRecord { first?: string; firstResult?: CorrectionResult; lastAnswer?: string; last?: CorrectionResult; corrections: number; help: string[] }
+export interface ExpressRecord {
+  first?: string; firstResult?: CorrectionResult; lastAnswer?: string; last?: CorrectionResult; corrections: number; help: string[]
+  /** Help layers already open when the first answer was submitted. */
+  firstHelp?: string[]
+  /** Saw the full correction before rewriting. */
+  revealed?: boolean
+  /** The last rewrite fixed every issue from the round before it (not just "sent again"). */
+  fixed?: boolean
+}
 export interface LessonRecord {
   unit: number; day: number; steps: LessonStep[]
   corrected?: boolean; saved?: number
@@ -82,7 +106,11 @@ export function activeLesson(notes: Record<string, string>): { date: string; rec
 export const coreSaved = (rec: LessonRecord) => rec.steps.includes('pattern')
 /** Should opening a lesson continue an unfinished one? A lesson whose core is saved continues the same day,
  *  or later when asked for explicitly; one whose core isn't saved continues while the curriculum still points at it. */
-export function resumeTarget(notes: Record<string, string>, cursor: { unit: number; day: number }, today: string, explicit = false) {
+export function resumeTarget(notes: Record<string, string>, cursor: { unit: number; day: number }, today: string, explicit = false, at?: string) {
+  if (at) {
+    const rec = readLessonRecord(notes, at)
+    return rec && !rec.steps.includes('done') ? { date: at, rec } : null
+  }
   const a = activeLesson(notes)
   if (!a) return null
   if (coreSaved(a.rec)) return a.date === today || explicit ? a : null
@@ -93,9 +121,21 @@ export function resumePhase(rec: LessonRecord): LessonPhase | null {
   if (rec.phase && rec.phase !== 'done' && rec.phase !== 'express') return rec.phase
   return rec.steps.includes('listen') ? 'write' : rec.steps.includes('recall') ? 'listen' : null
 }
-/** Continuing on a later day moves the lesson to today, unless today already has a finished lesson. */
+/** Every earlier lesson whose core is saved but whose 表達 is still open, newest first.
+ *  The single "lesson.active" pointer moves on when a new lesson starts, so these would otherwise be lost. */
+export function pendingLessons(notes: Record<string, string>): { date: string; rec: LessonRecord }[] {
+  const out: { date: string; rec: LessonRecord }[] = []
+  for (const k of Object.keys(notes)) {
+    const m = /^lesson\.(\d{4}-\d{2}-\d{2})$/.exec(k)
+    if (!m) continue
+    const rec = readLessonRecord(notes, m[1])
+    if (rec && coreSaved(rec) && !rec.steps.includes('done')) out.push({ date: m[1], rec })
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date))
+}
+/** Continuing on a later day moves the lesson to today, unless today already has a lesson of its own. */
 export function moveLesson(notes: Record<string, string>, from: string, to: string) {
-  if (from === to || lessonFinished(notes, to)) return { notes, date: from }
+  if (from === to || readLessonRecord(notes, to)) return { notes, date: from }
   const rec = readLessonRecord(notes, from)
   if (!rec) return { notes, date: from }
   const next = { ...notes, [lessonKey(to)]: JSON.stringify(rec), [activeKey]: to }

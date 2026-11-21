@@ -25,6 +25,7 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
   const [passed, setPassed] = useState(0)
+  const [heard, setHeard] = useState(false)
   const word = order[i]
   const options = useMemo(() => {
     if (!word) return []
@@ -38,20 +39,25 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   if (!words.length) return <p>先在每天的課或今日單字學幾個字，這裡就會有字可以練。</p>
   if (!word) return <div className="pr-stack">
     <p>這一輪 {order.length} 個字練完了，{passed} 個過關。</p>
-    <button type="button" onClick={() => { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false) }}>再一輪</button>
+    <button type="button" onClick={() => { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false) }}>再一輪</button>
   </div>
   const next = (ok: boolean) => {
     if (ok) { onPass(word); setPassed(n => n + 1) }
-    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false)
+    const upcoming = order[i + 1]
+    // The tap on 下一個 is a user gesture, so the next word can play right away.
+    const played = skill === 'listen' && !!upcoming && say(upcoming.en, rate)
+    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(played)
   }
   const right = picked !== undefined && options[picked]?.en === word.en
   return <div className="pr-stack ws">
     <p className="qz-meta"><span>{i + 1} / {order.length}</span><span>{skill === 'listen' ? '聽發音，選意思' : skill === 'say' ? '看中文，說出英文' : '看中文，拼出英文'}</span></p>
     {skill === 'listen' && <>
-      <button type="button" className="ws-play" onClick={() => say(word.en, rate)}><Volume2 size={18} />播放{picked !== undefined ? '（' + word.en + '）' : ''}</button>
-      <div className="pr-options">{options.map((o, j) => <button key={o.zh} type="button" disabled={picked !== undefined} aria-pressed={picked === j}
+      <button type="button" className="ws-play" onClick={() => { if (say(word.en, rate)) setHeard(true) }}><Volume2 size={18} />播放{picked !== undefined ? '（' + word.en + '）' : ''}</button>
+      <div className="pr-options">{options.map((o, j) => <button key={o.zh} type="button" disabled={picked !== undefined || !heard} aria-pressed={picked === j}
         className={picked === undefined ? undefined : o.en === word.en ? 'qz-right' : picked === j ? 'qz-wrong' : undefined}
         onClick={() => { setPicked(j); say(word.en, rate) }}>{o.zh}</button>)}</div>
+      {!heard && typeof speechSynthesis === 'undefined' && <p className="ls-help">這個瀏覽器不能播放語音，聽懂練習先換別的模式。</p>}
+      {!heard && <p className="ls-help">先按播放聽一次，再選意思（這樣才算「聽懂」）。</p>}
       {picked !== undefined && <button type="button" className="pr-main" onClick={() => next(right)}>下一個</button>}
     </>}
     {skill === 'say' && <>

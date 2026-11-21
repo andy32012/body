@@ -49,3 +49,9 @@
 .tu-save { justify-self: start; margin-top: 0.15rem; border: 1px solid currentColor; border-radius: 999px; padding: 0.15rem 0.7rem; background: transparent; color: inherit; font: inherit; font-size: 0.82rem; opacity: 0.85; cursor: pointer; }
 .tu-save:disabled { opacity: 0.5; cursor: default; }
 .tu-save-all { margin-top: 0.1rem; }
+.tu-progress { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.tu-progress li { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.35rem 0.55rem; border-radius: 8px; background: color-mix(in srgb, currentColor 6%, transparent); overflow-wrap: anywhere; }
+.tu-progress li[data-ok="true"] > span:first-child { color: var(--practice-ok, #2f8a5b); font-weight: 600; }
+.tu-progress li[data-ok="false"] > span:first-child { color: var(--practice-miss, #b4483c); font-weight: 600; }
+.tu-self { display: grid; gap: 0.5rem; }
+.tu-help { margin: 0; opacity: 0.85; font-size: 0.92rem; }

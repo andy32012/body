@@ -4,13 +4,14 @@ import { fixToCard, type SayCard } from '../lib/sayCards'
 import './tutor.css'
 
 type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string }
-type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string }
+type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
 const verdictNames = { good: '全對', small: '小錯', again: '要再練' }
 
-function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate') {
+function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate', previous?: Result) {
+  const tail = previous?.fixes.length ? ',"resolved":[上次問題中這次已改好的編號],"still":[上次問題中這次還沒改好的編號]' : ''
   const json = mode === 'open'
-    ? '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"}'
-    : '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"}'
+    ? '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
+    : '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
   return [
     mode === 'open'
       ? '你是英文老師，批改台灣護理系學生（英文國中程度）的英文短寫作。這是開放題，內容是他自己想的。'
@@ -28,6 +29,7 @@ function system(zh: string, reference?: string, words?: string[], mode: 'transla
     '- 第一次回覆只輸出 JSON，不要其他文字：' + json,
     '- 同一句有好幾個錯，合成一個 fix 就好；只是標點或大小寫的小問題不用列。',
     '- 全對時 fixes 是空陣列。',
+    previous?.fixes.length ? '- 這是他改過後的第二版。上次批改指出的問題（編號從 0 開始）：' + previous.fixes.map((f, i) => i + '. ' + (f.wrong || '漏寫') + ' → ' + f.right).join('；') + '。逐一判斷這次有沒有改好，放進 resolved 或 still；新的問題照樣放 fixes。' : '',
     '- 之後他追問時，用繁體中文正常回答，講清楚規則和例句，段落短一點，不要 JSON、不要 Markdown 標題。',
   ].filter(Boolean).join('\n')
 }
@@ -36,17 +38,23 @@ function parse(text: string): Result | null {
   try {
     const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1))
     if (typeof json.corrected !== 'string') return null
-    return { verdict: json.verdict in verdictNames ? json.verdict : 'small', corrected: json.corrected, fixes: Array.isArray(json.fixes) ? json.fixes : [], note: json.note }
+    const nums = (v: unknown) => Array.isArray(v) ? v.filter((n): n is number => typeof n === 'number') : undefined
+    return { verdict: json.verdict in verdictNames ? json.verdict : 'small', corrected: json.corrected, fixes: Array.isArray(json.fixes) ? json.fixes : [], note: json.note, resolved: nums(json.resolved), still: nums(json.still) }
   } catch { return null }
 }
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, mode = 'translate', restore }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, mode = 'translate', restore, previous, selfFix = false }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
   onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result) => void; mode?: 'translate' | 'open'
   /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
   restore?: { answer: string; result: Result }
+  /** The feedback on the earlier try, so Claude can say which of those issues are now fixed. */
+  previous?: Result
+  /** Show one issue at a time (where, and why) before the full correction. */
+  selfFix?: boolean
+  onReveal?: () => void
 }) {
   const [saved, setSaved] = useState<number[]>([])
   const [turns, setTurns] = useState<TutorTurn[]>(() => restore ? [{ role: 'user', content: '我的翻譯：' + restore.answer }, { role: 'assistant', content: JSON.stringify(restore.result) }] : [])
@@ -54,7 +62,9 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [question, setQuestion] = useState('')
-  const sys = system(zh, reference, words, mode)
+  const sys = system(zh, reference, words, mode, previous)
+  // In self-fix mode the corrected text stays hidden until asked for; a restored result is shown in full.
+  const [hints, setHints] = useState(() => restore || !selfFix ? -1 : 1)
 
   async function send(next: TutorTurn[], first: boolean) {
     setBusy(true); setError('')
@@ -73,7 +83,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
 
   useEffect(() => {
     if (!run) return
-    setResult(null); setQuestion(''); setTurns([]); setError(''); setSaved([])
+    setResult(null); setQuestion(''); setTurns([]); setError(''); setSaved([]); setHints(selfFix ? 1 : -1)
     if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); return }
     if (!answer.trim()) { setError('先寫一點英文再按批改。'); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
@@ -86,7 +96,25 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   return <section className="tu-box" aria-live="polite">
     {busy && !result && <p className="tu-wait">批改中……</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
-    {result && <>
+    {result && previous?.fixes.length && (result.resolved || result.still) ? <ul className="tu-progress" aria-label="上次的問題">
+      {previous.fixes.map((f, i) => {
+        const ok = result.resolved?.includes(i) ?? false
+        return <li key={i} data-ok={ok}><span>{ok ? '✓ 改好了' : '✗ 還沒改好'}</span> <span lang="en">{f.wrong || '（漏寫）'} → {f.right}</span></li>
+      })}
+    </ul> : null}
+    {result && hints >= 0 && result.verdict !== 'good' && result.fixes.length > 0 && <section className="tu-self">
+      <div className="tu-head"><strong>先自己改</strong><span className={'tu-badge tu-' + result.verdict}>{verdictNames[result.verdict]}</span></div>
+      <p className="tu-help">有 {result.fixes.length} 個地方要改。先看提示自己改，改好再批一次；真的想不出來再看完整批改。</p>
+      <ol className="tu-fixes">{result.fixes.slice(0, hints).map((f, i) => <li key={i}>
+        <span>問題在：<b lang="en">{f.wrong || '（這裡漏寫了一部分）'}</b></span>
+        <small>{f.why}</small>
+      </li>)}</ol>
+      <div className="pr-actions">
+        {hints < result.fixes.length && <button type="button" onClick={() => setHints(hints + 1)}>下一個提示</button>}
+        <button type="button" className="pr-link" onClick={() => { setHints(-1); onReveal?.() }}>看完整批改</button>
+      </div>
+    </section>}
+    {result && (hints < 0 || result.verdict === 'good' || !result.fixes.length) && <>
       <div className="tu-head"><strong>批改</strong><span className={'tu-badge tu-' + result.verdict}>{verdictNames[result.verdict]}</span></div>
       <p className="tu-corrected" lang="en">{result.corrected}</p>
       {result.fixes.length > 0 && <ul className="tu-fixes">

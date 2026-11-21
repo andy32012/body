@@ -4,7 +4,7 @@ import type { AppState, PageProps } from '../lib/store'
 import { activePeriod, type Energy, type Period } from '../lib/progress'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
-import { activeLesson, coreSaved, lessonFinished, resumePhase, stepLabel } from '../lib/lesson'
+import { activeLesson, coreSaved, lessonFinished, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../pages/Practice'
 import { nextFocus } from '../lib/nextFocus'
 import ScenePhoto from './ScenePhoto'
@@ -69,6 +69,8 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const at = resume === 'same' && active ? { unit: active.rec.unit, day: active.rec.day } : undefined
   const lesson = getLessonPreview(state, energy, today, at)
   const finished = lessonFinished(state.notes, today)
+  // Other earlier lessons still missing 表達 (the active pointer only remembers the latest one).
+  const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => p.date !== today && p.date !== (resume === 'later' ? active?.date : '')) : []
   const nextStep = active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const focus = quiet ? null : nextFocus(state, today, energy)
   const practised = state.sessions.some(s => s.day === today)
@@ -96,6 +98,12 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
         {resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
+        {others.length > 0 && <details className="lesson-pending">
+          <summary>還有 {others.length} 堂沒做完「表達」</summary>
+          <ul>{others.slice(0, 6).map(p => <li key={p.date}>
+            <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume-' + p.date }}>{p.date.slice(5).replace('-', '/')} · 單元 {p.rec.unit} 第 {p.rec.day} 天，補完表達</button>
+          </li>)}</ul>
+        </details>}
         <p className="lesson-stats">{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
       </div>
     </section>

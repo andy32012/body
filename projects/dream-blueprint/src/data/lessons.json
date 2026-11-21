@@ -932,7 +932,7 @@
   "prompt": {
    "en": "Write your schedule for tomorrow in three sentences. Use at, on, and in.",
    "zh": "用三句寫你明天的行程，要用到 at、on、in。",
-   "sample": "I have class at eight in the morning. My class is in Room 302. I will be at home in the evening."
+   "sample": "I have class at eight in the morning. My class is in Room 302 on the third floor. I will be at home in the evening."
   }
  },
  {

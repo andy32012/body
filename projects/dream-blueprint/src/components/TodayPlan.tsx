@@ -1,7 +1,11 @@
 import { Check } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { dueCount, type Energy } from '../lib/progress'
-import { answeredOn, quizSectionKey } from '../lib/quiz'
+import { answeredOn, quizSectionKey, sectionOf, type QuizItem } from '../lib/quiz'
+import { casesFinishedOn } from '../lib/scenarios'
+import quizData from '../data/quiz.json'
+
+const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
 import { activeLesson, lessonFinished } from '../lib/lesson'
 import type { Focus } from '../lib/nextFocus'
 import './today-plan.css'
@@ -17,12 +21,14 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   const due = dueCount(state.cards, today)
   const reviewedToday = state.reviewEvents.some(e => e.day === today)
   const key = (id: string) => 'plan.' + today + '.' + id
-  const quizToday = answeredOn(state.notes, today)
+  // Only nursing questions count toward the nursing plan; an English question is not nursing practice.
+  const quizToday = answeredOn(state.notes, today, nursingIds)
+  const casesToday = casesFinishedOn(state.notes, today)
   const tasks: Task[] = mode === 'nursing' ? [
     { id: 'n-review', min: 5, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，這步跳過',
       auto: due === 0, go: due ? () => { location.hash = 'library/words' } : undefined },
-    { id: 'n-quiz', min: 5, title: '護理英文題', detail: '做 3–5 題，或一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday ? '（今天做了 ' + quizToday + ' 題）' : ''),
-      auto: quizToday >= 3, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
+    { id: 'n-quiz', min: 5, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),
+      auto: quizToday >= 3 || casesToday >= 1, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
       goLabel: '題目', go2: () => { location.hash = 'library/case' }, go2Label: '情境' },
     { id: 'n-say', min: 4, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
       auto: false, go: () => { location.hash = 'speaking' }, goLabel: 'Emma' },

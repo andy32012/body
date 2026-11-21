@@ -4,7 +4,7 @@ import CorrectBox from './CorrectBox'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import type { SayCard } from '../lib/sayCards'
-import { lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
+import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
 
 export function StepBar({ current, done }: { current: LessonStep; done: LessonStep[] }) {
@@ -85,11 +85,12 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
     {firstTime && !checked && <ol className="ls-qs">
       {lesson.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
-        <div className="pr-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={answers[i] === j}
-          onClick={() => { if (!ready()) return; const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
+        <div className="pr-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={answers[i] === j} disabled={!plays}
+          onClick={() => { if (!ready() || !plays) return; const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
       </li>)}
     </ol>}
-    {firstTime && !checked && <button type="button" className="pr-main" disabled={answers.filter(a => a !== undefined).length < lesson.questions.length}
+    {firstTime && !checked && !plays && <p className="ls-help ls-need">先按「播放對話」聽一次，題目才能作答。</p>}
+    {firstTime && !checked && <button type="button" className="pr-main" disabled={!plays || answers.filter(a => a !== undefined).length < lesson.questions.length}
       onClick={() => { voice.stop(); setChecked(true) }}>對答案、看全文</button>}
     {firstTime && checked && !noVoice && <ul className="ls-results">
       {lesson.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}>
@@ -100,7 +101,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
       <Transcript lines={lesson.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(lesson.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(firstTime && !noVoice ? correct : -1, firstTime && !noVoice ? lesson.questions.length : 0, plays) }}>下一步：句型</button>
+        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(firstTime && !noVoice && plays ? correct : -1, firstTime && !noVoice && plays ? lesson.questions.length : 0, plays) }}>下一步：句型</button>
       </div>
     </>}
   </section>
@@ -175,12 +176,30 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
     const next = { ...rec, help: [...rec.help, kind] }
     setRec(next); onRecord(next, false)
   }
+  const [previous, setPrevious] = useState<CorrectionResult>()
+  /** The first answer is kept the moment it is sent, so a failed request still leaves a record. */
+  function submit() {
+    if (!answer.trim()) return
+    setPrevious(rec.last)
+    if (!rec.first) {
+      const next: ExpressRecord = { ...rec, first: answer, firstHelp: [...rec.help] }
+      setRec(next); onRecord(next, false)
+    }
+    setRun(n => n + 1)
+  }
   function result(r: CorrectionResult) {
+    const isFirst = !rec.firstResult && (rec.first ?? answer) === answer
+    const fixed = rec.corrections > 0 && issuesFixed(r, rec.last)
     const next: ExpressRecord = {
-      ...rec, corrections: rec.corrections + 1, lastAnswer: answer, last: r,
-      ...(rec.corrections === 0 ? { first: answer, firstResult: r } : {}),
+      ...rec, corrections: rec.corrections + 1, lastAnswer: answer, last: r, fixed,
+      ...(rec.first ? {} : { first: answer, firstHelp: [...rec.help] }),
+      ...(isFirst ? { firstResult: r } : {}),
     }
     setRec(next); onRecord(next, true)
+  }
+  function finish() {
+    const next = !rec.first && answer.trim() ? { ...rec, first: answer, firstHelp: [...rec.help] } : rec
+    onFinish(answer, next)
   }
   const sees = (kind: string) => shown.includes(kind)
   return <section className="ls-express">
@@ -205,14 +224,17 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
     {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     {sees('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{p.sample}</p></section>}
     <div className="pr-actions">
-      {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{corrected ? '改好了，再批一次' : '請 Claude 批改'}</button>}
+      {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={submit}>{corrected ? '改好了，再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
     {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「答案待確認」。</p>}
     <CorrectBox run={run} mode="open" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
+      previous={previous} selfFix={!corrected || !rec.revealed}
+      onReveal={() => { if (!rec.revealed) { const next = { ...rec, revealed: true }; setRec(next); onRecord(next, false) } }}
       onSave={onSave} onResult={(_, __, r) => result(r)} />
-    {corrected && <p className="ls-help ls-fixnote">看著上面的批改，把你的句子改好，再按「改好了，再批一次」。寫錯的句子按「加入複習」，之後會再出現。</p>}
-    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={() => onFinish(answer, rec)}>完成今天這一堂</button>
+    {corrected && !rec.fixed && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}
+    {rec.fixed && <p className="ls-help ls-fixnote">上次的問題都改好了。</p>}
+    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={finish}>完成今天這一堂</button>
   </section>
 }

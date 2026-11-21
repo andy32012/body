@@ -47,7 +47,9 @@ import {
   lessonFinished,
   moveLesson,
   readHeard,
+  readHints,
   readLessonRecord,
+  writeHint,
   resumePhase,
   resumeTarget,
   sentenceFrame,
@@ -374,16 +376,16 @@ function PracticeSession({
   navigate,
   energy: requested,
   resume: explicitResume = false,
-}: PageProps & { energy: Energy; resume?: boolean }) {
+}: PageProps & { energy: Energy; resume?: boolean | string }) {
   const [date] = useState(() => dayKey());
   const [period] = useState(() => activePeriod(date, state.settings.periods));
   const energy =
     period === "exam" || period === "internship" ? "low" : requested;
   // An unfinished lesson continues where it stopped instead of being rebuilt from today's curriculum position.
   const [resumeAt] = useState(() =>
-    energy === "low" ? null : resumeTarget(state.notes, state.curriculum, date, explicitResume));
+    energy === "low" ? null : resumeTarget(state.notes, state.curriculum, date, !!explicitResume, typeof explicitResume === "string" ? explicitResume : undefined));
   const [lessonDate] = useState(() =>
-    resumeAt && resumeAt.date !== date && !lessonFinished(state.notes, date) ? date : resumeAt?.date ?? date);
+    resumeAt && resumeAt.date !== date && !readLessonRecord(state.notes, date) ? date : resumeAt?.date ?? date);
   useEffect(() => {
     if (resumeAt && resumeAt.date !== lessonDate)
       update((prev) => ({ ...prev, notes: moveLesson(prev.notes, resumeAt.date, lessonDate).notes }));
@@ -477,12 +479,13 @@ function PracticeSession({
     update((prev) => ({ ...prev, notes: addEvidence(prev.notes, unit, { day: date, level, ...e, ...keep }) }));
   }
   const checkpointLevels = useRef<(Level | null)[]>([]);
-  const hintFor = (id: string): HintUse | undefined => lessonRecord?.hints?.[id];
+  const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id] : readHints(state.notes, date)[id];
   const saveHint = (id: string) => (use: HintUse) => {
     if (guided) update((prev) => {
       const rec = readLessonRecord(prev.notes, lessonDate);
       return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { hints: { ...(rec?.hints ?? {}), [id]: use } }) };
     });
+    else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
   };
   const item = current.items[pos];
   function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict }) {
@@ -713,14 +716,16 @@ function PracticeSession({
             saved={lessonRecord?.express}
             onRecord={(rec: ExpressRecord, corrected: boolean) => {
               setCorrections(rec.corrections);
+              // "訂正" counts only when the rewrite actually fixed the earlier issues, not just because it was sent again.
               save({ express: rec, ...(corrected ? { corrected: true } : {}) },
-                corrected ? (rec.corrections >= 2 ? "fix" : "express") : undefined);
+                corrected ? (rec.fixed ? "fix" : "express") : undefined);
             }}
             onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
             onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
             onFinish={(answer, rec) => {
               if (!settled()) return;
-              evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.help, answered: !!(rec.first || answer.trim()) }),
+              save({ express: rec });
+              evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.firstHelp ?? rec.help, answered: !!(rec.first || answer.trim()) }),
                 { source: "express", skill: "write", answer: rec.first || answer, prompt: lessonData.prompt.en, ref: lessonData.prompt.sample });
               go("done", {}, "done");
             }}
@@ -753,6 +758,8 @@ function PracticeSession({
                       key={recall.sentence.id}
                       sentence={recall.sentence}
                       checkpoint={false}
+                      saved={readHints(state.notes, date)[recall.sentence.id]}
+                      onHint={(use) => update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, recall.sentence.id, use) }))}
                       onMark={(mark, revealed, info) => {
                         if (retention && recall.sentence.id === retention.sentence.id) {
                           const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict });
@@ -781,8 +788,8 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
-                saved={guided ? hintFor(item.id) : undefined}
-                onHint={guided ? saveHint(item.id) : undefined}
+                saved={hintFor(item.id)}
+                onHint={saveHint(item.id)}
                 preparation={!current.review && current.rule && (current.day !== 1 ? (live ? (
                   <details className="pr-tools pr-rule">
                     <summary>複習這課的規則：{current.title}</summary>
@@ -856,7 +863,7 @@ function PracticeSession({
                 ["listen", heard?.day === date && heard.total ? "聽懂：對話題目答對 " + heard.correct + " / " + heard.total : "聽懂：聽對話、跟著唸"],
                 ["pattern", "句型：今天的句子和一個變化"],
                 ["express", did("express") ? "表達：用自己的話寫了一段" + (lessonRecord?.corrected ? "，請 Claude 批改過" : "") : "表達：今天跳過"],
-                ["fix", did("fix") ? "訂正：改好再批一次" : "訂正：下次試著改完再批一次"],
+                ["fix", did("fix") ? "訂正：上次指出的問題都改好了" : (lessonRecord?.express?.corrections ?? 0) >= 2 ? "訂正：再批過了，但還有問題沒改好，下次再試" : "訂正：下次試著改完再批一次"],
               ];
               return <>
                 {current.cando && <p className="ls-goal"><small>今天的目標</small>{current.cando}</p>}
@@ -1308,6 +1315,8 @@ function Extras({
                 key={repeat.id}
                 sentence={repeat}
                 checkpoint={false}
+                saved={readHints(state.notes, date)[repeat.id]}
+                onHint={(use) => onActivity((prev) => ({ ...prev, notes: writeHint(prev.notes, date, repeat.id, use) }))}
                 onMark={logRepeat}
               />
             )

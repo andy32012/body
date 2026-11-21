@@ -37,3 +37,13 @@ export function causeSummary(all: readonly Scenario[], notes: Record<string, str
   }
   return { done, total: all.length, count }
 }
+
+/** Cases finished (all four steps answered) on a day. */
+export function casesFinishedOn(notes: Record<string, string>, day: string) {
+  let n = 0
+  for (const [k, v] of Object.entries(notes)) {
+    if (!k.startsWith('case.')) continue
+    try { const r = JSON.parse(v) as CaseRecord; if (r.day === day && r.results?.length >= 4) n++ } catch { /* skip */ }
+  }
+  return n
+}

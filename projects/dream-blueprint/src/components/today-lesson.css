@@ -41,3 +41,6 @@
 .lesson-why { margin: 0; display: grid; gap: 4px; padding: 9px 12px; border-radius: 10px; background: rgba(8, 12, 20, .5); border-left: 3px solid #edb66b; color: #ece6dc; font-size: 13px; line-height: 1.55; }
 .lesson-why b { color: #f4ddbb; font-size: 12px; letter-spacing: .06em; font-weight: 600; }
 .lesson-why button { justify-self: start; margin-top: 3px; border: 1px solid rgba(255, 240, 215, .4); background: transparent; color: #fff2da; border-radius: 8px; padding: 5px 10px; font-size: 12.5px; }
+.lesson-pending { justify-self: start; color: #f6f2ea; font-size: 13px; }
+.lesson-pending summary { cursor: pointer; opacity: .85; }
+.lesson-pending ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; }

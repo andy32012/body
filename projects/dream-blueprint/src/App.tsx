@@ -46,7 +46,7 @@ function readRoute():Route {
   // The leaderboard now lives inside the plan page.
   if (key === 'rivals') return {view:'plan', tab:'rivals', energy:'low'}
   const view = [...links.map(l => l.id),'practice','settings','cosmos','rivals'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice' ? value : undefined, energy:value==='high'?'high':value==='normal'||value==='resume'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':value==='rivals'?'rivals':'calendar'}
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':value==='rivals'?'rivals':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
@@ -191,7 +191,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode==='resume'?':resume':'')} {...props} energy={route.energy} resume={route.mode==='resume'}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}
