@@ -345,3 +345,12 @@
 .passage-library .pr-tags > span:last-child { border-bottom: 0; }
 .passage-library .pr-tags .ctx-meaning { flex-basis: 100%; }
 .practice-page .passage-library button.ask-word { min-height: 28px; padding: .1rem .55rem; border-radius: 999px; font-size: .8rem; }
+.ws-head { margin-bottom: 0; }
+.practice-page button.ws-play { justify-self: start; display: inline-flex; align-items: center; gap: .5rem; border-color: var(--practice-accent); }
+.ws-answer { margin: 0; font-size: 1.25rem; font-weight: 650; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ws-answer.ok { color: var(--practice-accent); }
+.ws-answer.no { color: var(--practice-miss); }
+.practice-page button.ws-mini { min-height: 32px; width: 32px; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; }
+.ws-write { display: flex; gap: .6rem; flex-wrap: wrap; }
+.ws-write input { flex: 1 1 12rem; min-height: 44px; font-size: 1.1rem; padding: .5rem .8rem; border-radius: 12px; border: 1px solid var(--practice-line); background: var(--practice-inset); color: var(--practice-ink); }
+.ws h3 { margin: .3rem 0; font-size: clamp(1.4rem, 3vw, 1.9rem); }

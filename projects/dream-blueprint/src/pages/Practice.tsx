@@ -25,6 +25,8 @@ import { isKnownWord, wordKey, officialWords } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
 import { addSayCard, readSayCard, sayCardSentence } from "../lib/sayCards";
+import WordSkills from "../components/WordSkills";
+import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import {
   heardKey,
@@ -991,15 +993,24 @@ function Extras({
     setRepeatDone(true);
   }
   const listening = listeningPool[listen % Math.max(1, listeningPool.length)];
-  const [deck] = useState(() => {
-    const lookup = new Map<string, Word>();
+  const [lookup] = useState(() => {
+    const map = new Map<string, Word>();
     for (const w of [
       ...officialWords,
       ...words,
       ...allSentences.flatMap((s) => s.newWords),
       ...state.customWords,
     ])
-      lookup.set(wordKey(w.en), w);
+      map.set(wordKey(w.en), w);
+    return map;
+  });
+  const [wordSkill, setWordSkill] = useState<Skill>("read");
+  // Words being learned: what the lessons and daily words added, plus every word card.
+  const [learning] = useState(() => {
+    const keys = [...new Set([...state.learningWords, ...state.cards.filter((c) => c.id.startsWith("word:")).map((c) => c.id.slice(5))])];
+    return keys.flatMap((k) => { const w = lookup.get(k); return w ? [w] : []; });
+  });
+  const [deck] = useState(() => {
     const due = dueCards(
       state.cards.filter((c) => c.id.startsWith("word:")),
       date,
@@ -1023,6 +1034,7 @@ function Extras({
         ...prev,
         cards: prev.cards.map((c) => (c.id === id ? card : c)),
         reviewEvents: event ? [...prev.reviewEvents, event] : prev.reviewEvents,
+        notes: remembered && !see ? markSkill(prev.notes, wordKey(word.en), "read", date) : prev.notes,
       };
     });
     setOffset(offset + 1);
@@ -1061,7 +1073,35 @@ function Extras({
             </button>
           ))}
       </div>
-      {mode === "words" &&
+      {mode === "words" && (() => {
+        const count = skillSummary(state.notes, learning.map((w) => wordKey(w.en)));
+        return (
+          <div className="pr-stack ws-head">
+            <div className="pr-options qz-tabs" role="group" aria-label="單字能力">
+              {skills.map(([key, label]) => (
+                <button key={key} aria-pressed={wordSkill === key} onClick={() => setWordSkill(key)}>{label}</button>
+              ))}
+            </div>
+            <p className="qz-meta">
+              <span>在學的 {learning.length} 個字：</span>
+              {skills.map(([key, label]) => <span key={key}>{label} {count[key]}</span>)}
+            </p>
+          </div>
+        );
+      })()}
+      {mode === "words" && wordSkill !== "read" && (
+        <WordSkills
+          key={wordSkill}
+          skill={wordSkill}
+          words={learning}
+          distractors={officialWords.slice(0, 400)}
+          notes={state.notes}
+          keyOf={(w) => wordKey(w.en)}
+          rate={state.settings.speechRate}
+          onPass={(w) => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, wordKey(w.en), wordSkill, date) }))}
+        />
+      )}
+      {mode === "words" && wordSkill === "read" &&
         (word ? (
           <div className="pr-stack">
             <p>

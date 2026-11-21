@@ -60,3 +60,16 @@ test('單字意思現代化：常見字不再出現奇怪的舊義', () => {
   assert.equal(zh('exercise'), '運動、練習')
   assert.ok(!levels.some(w => /傢伙/.test(w.zh) && w.en === 'apple'))
 })
+
+test('單字四種能力：分開記錄，拼字接受 / 和 () 的寫法', async () => {
+  const { markSkill, readSkills, skillSummary, spellingMatches, orderForSkill } = await import('../src/lib/wordSkills.ts')
+  let notes = markSkill({}, 'nurse', 'read', '2026-11-21')
+  notes = markSkill(notes, 'nurse', 'listen', '2026-11-21')
+  notes = markSkill(notes, 'cough', 'read', '2026-11-21')
+  assert.deepEqual(readSkills(notes, 'nurse'), { read: '2026-11-21', listen: '2026-11-21' })
+  assert.deepEqual(skillSummary(notes, ['nurse', 'cough', 'fever']), { read: 2, listen: 1, say: 0, write: 0 })
+  assert.deepEqual(orderForSkill(['nurse', 'cough'], w => w, notes, 'listen'), ['cough', 'nurse'])
+  assert.ok(spellingMatches(' Actress ', 'actor/actress'))
+  assert.ok(spellingMatches('agreement', 'agree(ment)') && spellingMatches('agree', 'agree(ment)'))
+  assert.ok(!spellingMatches('agre', 'agree(ment)'))
+})
