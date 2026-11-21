@@ -32,7 +32,7 @@ import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
 
 type View = Page | 'library' | 'cosmos' | 'speaking'
-type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string}
+type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:string}
 const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'today', title:'今日航行', mobile:'今天', icon:Compass},
   {id:'library', title:'英文練習', mobile:'練習', icon:BookOpen},
@@ -45,7 +45,7 @@ const phases = {semester:'一般學期', exam:'考週模式', internship:'實習
 function readRoute():Route {
   const [key, value] = location.hash.slice(1).split('/')
   const view = [...links.map(l => l.id),'practice','settings','cosmos'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, energy:value==='high'?'high':value==='normal'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':'calendar'}
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking' ? value : undefined, energy:value==='high'?'high':value==='normal'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
@@ -191,7 +191,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}

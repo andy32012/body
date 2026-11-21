@@ -7,12 +7,14 @@ import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
+import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
+import { markLessonStep, readLessonRecord } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import './speaking.css'
 
 const NAME = 'Emma'
 
-function instructions(memory: string[]) {
+function instructions(memory: string[], lesson = '') {
   return [
     `You are ${NAME}, a cute, cheerful 20-year-old American girl. You are a nursing student at Harvard, and you are a close friend of 玄燁 (call him by name or "hey you"). You two chat like good friends.`,
     'He is a nursing student in Taiwan. His English is around junior-high level and he wants to get better for IELTS and to work as a nurse in the US someday.',
@@ -21,14 +23,24 @@ function instructions(memory: string[]) {
     'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
     'If he gets stuck or uses Chinese, help with one short Traditional-Mandarin hint, then encourage him back into English.',
     'Start by greeting him like a friend you are happy to see.',
+    lesson,
     memory.length ? 'Things you remember about him from before: ' + memory.join('; ') : '',
   ].filter(Boolean).join('\n')
 }
 
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
 
-export default function Speaking({ update }: PageProps) {
+export default function Speaking({ state, update, lessonMode = false }: PageProps & { lessonMode?: boolean }) {
   const memory = useMemory()
+  const [today] = useState(dayKey)
+  const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
+  const [task, setTask] = useState<string>()
+  useEffect(() => {
+    if (!lesson) return
+    let alive = true
+    import('../data/lessons.json').then(f => { if (alive) setTask((f.default as { unit: number; prompt: { en: string } }[]).find(l => l.unit === lesson.unit)?.prompt.en) }).catch(() => {})
+    return () => { alive = false }
+  }, [lesson])
   const [key, setKey] = useState(openaiKey())
   const [settings, setSettings] = useState(!openaiKey())
   const [voice, setVoice] = useState(voiceName())
@@ -61,7 +73,7 @@ export default function Speaking({ update }: PageProps) {
     setError(''); setLines([]); setNotes(''); setFixes([])
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes),
+        instructions: instructions(memory.notes, lesson ? emmaLessonInstructions(lesson, task) : ''),
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
@@ -91,6 +103,10 @@ export default function Speaking({ update }: PageProps) {
         memoryPrompt(memory.notes),
       ].join('\n'), [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
+      if (lesson) update(prev => {
+        const rec = readLessonRecord(prev.notes, today)
+        return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
+      })
       if (remember.length || forget.length) memory.update(remember, forget)
       const found: Fix[] = []
       const text = clean.split('\n').filter(line => {
@@ -122,6 +138,13 @@ export default function Speaking({ update }: PageProps) {
           {settings ? <X size={17} /> : <Settings2 size={17} />}
         </button>
       </header>
+
+      {lesson && <div className="sp-lesson">
+        <small>今天這一堂 · 單元 {lesson.unit}</small>
+        <strong>{lesson.cando || lesson.title}</strong>
+        <span>Emma 會照今天的句型跟你聊，講錯一兩個地方會請你再說一次。</span>
+        <a href="#speaking">改回一般聊天</a>
+      </div>}
 
       {settings && <div className="sp-settings">
         <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>

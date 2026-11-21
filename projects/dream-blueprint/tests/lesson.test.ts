@@ -34,3 +34,18 @@ test('一堂課的步驟會記下來；換天或換課就重新開始', () => {
   assert.equal(variationFor(lessons[0], 2), lessons[0].variations[1])
   assert.equal(variationFor(lessons[0], 3), lessons[0].variations[0])
 })
+
+test('Emma 的課堂模式：用今天上過的那一課，帶最近的錯句', async () => {
+  const { emmaLesson, emmaLessonInstructions } = await import('../src/lib/emmaLesson.ts')
+  const notes = {
+    'lesson.2026-11-21': JSON.stringify({ unit: 1, day: 1, steps: ['done'] }),
+    'say.say-a1': JSON.stringify({ zh: '舊的', en: 'Old one.' }),
+    'say.say-b2': JSON.stringify({ zh: '新的', en: 'I am at home.', wrong: 'I at home' }),
+  }
+  const l = emmaLesson({ notes, curriculum: { unit: 1, day: 2 } }, '2026-11-21')
+  assert.deepEqual([l?.unit, l?.day], [1, 1])
+  assert.equal(l?.mistakes[0], '"I at home" → "I am at home."')
+  assert.match(emmaLessonInstructions(l!, 'Introduce yourself.'), /fix at most one or two things/)
+  const noLesson = emmaLesson({ notes: {}, curriculum: { unit: 3, day: 4 } }, '2026-11-21')
+  assert.deepEqual([noLesson?.unit, noLesson?.day], [3, 4])
+})

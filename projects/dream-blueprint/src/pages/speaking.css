@@ -78,3 +78,8 @@
 .sp-fix span { color: var(--muted); font-size: 13px; }
 .sp-fix button { flex: none; border: 0; border-radius: 10px; padding: 7px 12px; background: var(--lav); color: #1c1530; font-weight: 650; font-size: 13px; }
 .sp-fix button:disabled { background: color-mix(in srgb, var(--mint) 25%, transparent); color: var(--mint); }
+.sp-lesson { position: relative; z-index: 2; display: grid; gap: 3px; margin: 4px 16px 0; padding: 11px 14px; border-radius: 14px; border: 1px solid rgba(124, 200, 255, .28); background: rgba(70, 140, 220, .08); }
+.sp-lesson small { color: #8fc6ff; font-size: 12px; letter-spacing: .05em; }
+.sp-lesson strong { font-size: 14.5px; line-height: 1.45; }
+.sp-lesson span { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.sp-lesson a { justify-self: start; color: #8fc6ff; font-size: 12.5px; margin-top: 2px; }
