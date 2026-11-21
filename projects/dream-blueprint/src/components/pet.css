@@ -73,3 +73,5 @@
 @media (prefers-reduced-motion: reduce) {
   .pet g { animation: none !important; }
 }
+.pet-hover { display: inline-block; position: relative; z-index: 2; cursor: pointer; transform-origin: 0% 50%; transition: transform .3s cubic-bezier(.3, 1.5, .5, 1), margin .3s ease; }
+.pet-hover.big { transform: scale(1.7); margin-right: 18px; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .4)); }

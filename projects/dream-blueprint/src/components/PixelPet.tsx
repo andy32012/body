@@ -103,24 +103,41 @@ export function usePet(typing: boolean) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typing])
 
-  function show() {
+  const hovering = useRef(false)
+  const showTimer = useRef<number | undefined>(undefined)
+  /** One move, grown big. With the mouse it stays big while hovered and shrinks the moment the mouse leaves. */
+  function show(hover = false) {
+    hovering.current = hover
     if (busy.current) return
     busy.current = true
     lastSeen.current = Date.now()
     setBig(true)
-    if (reduced()) {
+    const move: PetAction = reduced() ? 'idle' : showcase[Math.floor(Math.random() * showcase.length)]
+    set(move)
+    window.clearTimeout(showTimer.current)
+    showTimer.current = window.setTimeout(() => {
+      busy.current = false
       set('idle')
-      window.setTimeout(() => { setBig(false); busy.current = false }, 1600)
-      return
-    }
-    let i = 0
-    const next = () => {
-      if (i >= showcase.length) { busy.current = false; setBig(false); set('idle'); return }
-      const move = showcase[i++]
-      set(move)
-      window.setTimeout(next, (durations[move] ?? 1000) + 120)
-    }
-    window.setTimeout(next, 250)
+      if (!hovering.current) setBig(false)
+    }, (durations[move] ?? 1000) + 150)
   }
-  return { action, big, show, label: big ? showNames[action] ?? '' : '' }
+  function hide() {
+    hovering.current = false
+    window.clearTimeout(showTimer.current)
+    busy.current = false
+    setBig(false)
+    set('idle')
+  }
+  return { action, big, show, hide, label: big && action !== 'idle' ? showNames[action] ?? '' : '' }
+}
+
+/** The pet as a small icon (e.g. in the chat header): hover or tap makes it grow and do one move. */
+export function HoverPet({ size = 24 }: { size?: number }) {
+  const pet = usePet(false)
+  return <span className={'pet-hover' + (pet.big ? ' big' : '')} aria-hidden="true"
+    onPointerEnter={e => { if (e.pointerType === 'mouse') pet.show(true) }}
+    onPointerLeave={e => { if (e.pointerType === 'mouse') pet.hide() }}
+    onClick={e => { if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') pet.show(false) }}>
+    <PixelPet action={pet.action} size={size} />
+  </span>
 }

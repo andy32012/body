@@ -5,7 +5,7 @@ import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '.
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
-import { PixelPet, usePet } from './PixelPet'
+import { HoverPet, PixelPet, usePet } from './PixelPet'
 import './ai-chat.css'
 import './sketch.css'
 
@@ -121,7 +121,7 @@ export function AISheet({ title, onClose, children }: { title: ReactNode; onClos
   }, [onClose])
   return createPortal(<div className="ai-veil" onClick={e => { e.stopPropagation(); onClose() }}>
     <section className="ai-sheet" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : '問問 Claude'} onClick={e => e.stopPropagation()}>
-      <header><Spark size={20} /><strong>{title}</strong>
+      <header><HoverPet size={26} /><strong>{title}</strong>
         <button type="button" className="ai-close" aria-label="關閉" onClick={onClose}><X size={18} /></button></header>
       {children}
     </section>
@@ -190,8 +190,9 @@ export function AIAssistant({ progress }: { progress: string }) {
   return <>
     <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
       <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
-        onPointerEnter={e => { if (e.pointerType === 'mouse' && !typing) pet.show() }}
-        onClick={() => (typing ? setOpen(true) : pet.show())}>
+        onPointerEnter={e => { if (e.pointerType === 'mouse' && !typing) pet.show(true) }}
+        onPointerLeave={e => { if (e.pointerType === 'mouse') pet.hide() }}
+        onClick={e => { if (typing) setOpen(true); else if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') pet.show(false) }}>
         <span className="ai-pet-stage"><PixelPet action={pet.action} size={30} /></span>
         {pet.label && <span className="ai-pet-bubble" aria-live="polite">{pet.label}</span>}
       </button>
