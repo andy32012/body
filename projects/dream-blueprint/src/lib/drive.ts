@@ -60,6 +60,36 @@ export function driveLog(source: string, rows: { role: string; text: string }[])
   post({ type: 'log', source, rows: clean.map(r => ({ role: r.role === 'user' ? '玄燁' : r.role, text: r.text })) }).catch(() => { /* best effort */ })
 }
 
+const STATUS = 'dream-blueprint.cloud-status'
+export type CloudStatus = { at: number; ok: boolean; message: string }
+export function cloudStatus(): CloudStatus | null {
+  try { return JSON.parse(localStorage.getItem(STATUS) || 'null') } catch { return null }
+}
+function setStatus(ok: boolean, message: string) {
+  try { localStorage.setItem(STATUS, JSON.stringify({ at: Date.now(), ok, message })) } catch { /* optional */ }
+}
+
+/** Whole progress, stored in chunks on the 「進度」 sheet. */
+export async function loadDriveState(): Promise<{ state: string | null; savedAt: number } | null> {
+  const d = read()
+  if (!d) return null
+  const res = await fetch(d.url + '?type=state&token=' + encodeURIComponent(d.token))
+  const json = await res.json()
+  if (!json.ok) throw new Error(json.error === 'token' ? '同步碼不對' : '雲端硬碟回傳錯誤')
+  return { state: typeof json.state === 'string' && json.state ? json.state : null, savedAt: Number(json.savedAt) || 0 }
+}
+export async function saveDriveState(state: string, savedAt: number) {
+  if (!read()) return
+  try {
+    const json = await post({ type: 'state', state, savedAt })
+    if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
+    setStatus(true, '學習進度已存到雲端硬碟')
+  } catch (e) {
+    setStatus(false, '同步失敗：' + (e instanceof Error ? e.message : String(e)) + '，下次有變動會再試')
+  }
+}
+export function noteSynced(message: string) { setStatus(true, message) }
+
 /** One string to copy to another device. */
 export function syncCode() {
   const d = read()
@@ -90,8 +120,14 @@ function allowed(t){
   return saved===t;
 }
 function out(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
 function doGet(e){
   if(!allowed(e.parameter.token))return out({ok:false,error:'token'});
+  if(e.parameter.type==='state'){
+    var p=tab('進度'),rows=p.getLastRow()-1;
+    var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0])}):[];
+    return out({ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0});
+  }
   var ss=book(),sh=ss.getSheetByName('記憶'),n=sh.getLastRow()-1;
   var notes=n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[];
   return out({ok:true,notes:notes,url:ss.getUrl()});
@@ -109,6 +145,13 @@ function doPost(e){
     if(m.getLastRow()>1)m.getRange(2,1,m.getLastRow()-1,1).clearContent();
     var rows=(d.notes||[]).map(function(x){return [String(x)]});
     if(rows.length)m.getRange(2,1,rows.length,1).setValues(rows);
+  }
+  if(d.type==='state'&&typeof d.state==='string'){
+    var p=tab('進度');p.clear();
+    p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
+    var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push([d.state.slice(i,i+45000)]);
+    if(chunks.length)p.getRange(2,1,chunks.length,1).setValues(chunks);
+    return out({ok:true,state:true,url:ss.getUrl()});
   }
   return out({ok:true,url:ss.getUrl()});
 }

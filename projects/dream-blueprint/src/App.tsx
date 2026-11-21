@@ -24,7 +24,8 @@ import { AIAssistant } from './components/AIChat'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import { MemoryContext, applyMemory, readMemory, writeMemory, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory } from './lib/drive'
+import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced } from './lib/drive'
+import { localModified, restoreBackup, setLocalModified } from './lib/store'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
@@ -150,6 +151,26 @@ function App() {
     update:(remember,forget)=>update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
     remove:i=>update(s=>({...s,notes:writeMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
     clear:()=>update(s=>({...s,notes:writeMemory(s.notes,[])}))}
+  const stateJson=JSON.stringify(state)
+  const cloudReady=useRef(false)
+  useEffect(()=>{
+    if(!driveConnected())return
+    loadDriveState().then(remote=>{
+      if(remote?.state&&remote.savedAt>localModified()){
+        restoreBackup(remote.state,remote.savedAt)
+        noteSynced('已從雲端硬碟載入最新的學習進度')
+      } else {
+        const at=localModified()||Date.now(); setLocalModified(at)
+        void saveDriveState(JSON.stringify(state),at)
+      }
+    }).catch(()=>{}).finally(()=>{cloudReady.current=true})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+  useEffect(()=>{
+    if(!cloudReady.current||!driveConnected())return
+    const t=setTimeout(()=>void saveDriveState(stateJson,localModified()||Date.now()),5000)
+    return ()=>clearTimeout(t)
+  },[stateJson])
   const memoryJson=JSON.stringify(memoryNotes)
   const driveReady=useRef(!driveConnected())
   useEffect(()=>{

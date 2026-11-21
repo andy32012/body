@@ -216,6 +216,8 @@ function commit(updater:(prev:AppState)=>AppState,replace=false) {
     try {
       const raw=JSON.stringify(state)
       localStorage.setItem(STORAGE_KEY,raw)
+      try { localStorage.setItem(MODIFIED_KEY,String(stampOverride ?? Date.now())) } catch { /* optional */ }
+      stampOverride=null
       rawLoaded=raw
       dirty=false
       unreadable=false
@@ -232,9 +234,19 @@ function apply(updater:(prev:AppState)=>AppState,replace=false) {
     void navigator.locks.request(STORAGE_KEY,()=>commit(updater,replace))
   } else commit(updater,replace)
 }
-export function restoreBackup(raw:string) {
+export function restoreBackup(raw:string, stamp?:number) {
   const state=importBackup(raw)
+  if (stamp) stampOverride=stamp
   apply(()=>state,true)
+}
+/** When this device last changed its progress (ms). 0 means never since cloud sync existed. */
+export const MODIFIED_KEY='dream-blueprint.modified'
+let stampOverride:number|null=null
+export function localModified() {
+  try { return Number(localStorage.getItem(MODIFIED_KEY)) || 0 } catch { return 0 }
+}
+export function setLocalModified(ms:number) {
+  try { localStorage.setItem(MODIFIED_KEY,String(ms)) } catch { /* optional */ }
 }
 export function updateStore(updater:(prev:AppState)=>AppState) { apply(updater) }
 export function useAppStore() {

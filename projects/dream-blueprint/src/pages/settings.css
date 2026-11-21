@@ -137,3 +137,4 @@
   .set-dates { grid-template-columns:minmax(0,1fr); }
 }
 .set-subhead { margin: 1.2rem 0 .2rem; font-size: 15px; font-weight: 650; }
+.set-ok { color: var(--mint); } .set-warn { color: #ef8b7d; }
