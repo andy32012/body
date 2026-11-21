@@ -71,19 +71,32 @@
 .ai-fab {
   position: fixed; z-index: 30;
   right: max(24px, env(safe-area-inset-right, 0px)); bottom: 24px;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 18px; border-radius: 999px;
+  display: inline-flex; align-items: center;
+  border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--lav) 50%, transparent);
   background: color-mix(in srgb, var(--panel) 80%, transparent); backdrop-filter: blur(14px);
-  color: var(--lav); font-weight: 650; font-size: 14px; letter-spacing: .04em;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  transition: background .2s, opacity .2s;
 }
 .ai-fab:hover { background: color-mix(in srgb, var(--lav) 18%, var(--panel)); }
+.ai-pet-btn { position: relative; display: grid; place-items: center; border: 0; background: transparent; padding: 7px 3px 7px 13px; cursor: pointer; border-radius: 999px 0 0 999px; }
+.ai-pet-stage { display: block; transform-origin: 35% 90%; transition: transform .38s cubic-bezier(.3, 1.55, .5, 1); }
+.ai-fab.showing .ai-pet-stage { transform: translate(-4px, -30px) scale(2.7); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .45)); }
+.ai-pet-bubble {
+  position: absolute; left: 18px; bottom: calc(100% + 66px); white-space: nowrap;
+  padding: 5px 11px; border-radius: 12px 12px 12px 3px;
+  background: var(--panel); color: var(--text); border: 1px solid color-mix(in srgb, var(--lav) 45%, transparent);
+  font-size: 13px; font-weight: 600; letter-spacing: .03em; box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+  animation: ai-fade .18s;
+}
+.ai-fab-label { border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 650; font-size: 14px; letter-spacing: .04em; padding: 12px 18px 12px 5px; cursor: pointer; border-radius: 0 999px 999px 0; }
 
 @media (max-width: 860px) {
   .ai-veil { place-items: end stretch; padding: 0; }
   .ai-sheet { width: 100%; max-height: 88dvh; border-radius: 18px 18px 0 0; border-bottom: 0; }
-  .ai-fab { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); padding: 8px 12px; font-size: 13px; }
+  .ai-fab { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); }
+  .ai-pet-btn { padding: 5px 2px 5px 10px; }
+  .ai-fab-label { padding: 8px 13px 8px 4px; font-size: 13px; }
 }
 @keyframes ai-fade { from { opacity: 0 } }
 @keyframes ai-rise { from { transform: translateY(14px); opacity: 0 } }
@@ -140,9 +153,7 @@
 .ai-input button { width: 40px; height: 40px; border-radius: 12px; background: var(--spark); color: #fff; transition: transform .15s, opacity .2s; }
 .ai-input button:not(:disabled):hover { transform: translateY(-2px); }
 .ai-input button:not(:disabled):active { transform: scale(.92); }
-.ai-fab .ai-spark { animation: ai-spin 6s linear infinite; }
 .ai-fab { border-color: color-mix(in srgb, var(--spark) 50%, transparent); color: var(--text); }
-.ai-fab:hover .ai-spark { animation-duration: 1.2s; }
 @keyframes ai-pop { from { opacity: 0; transform: scale(.86) translateY(20px); } }
 @keyframes ai-msg-in { from { opacity: 0; transform: translateY(10px); filter: blur(3px); } }
 @keyframes ai-spin { to { transform: rotate(360deg); } }
@@ -152,9 +163,10 @@
 @keyframes ai-float { 50% { transform: translateY(-6px) rotate(12deg); } }
 @media (max-width: 860px) { .ai-sheet { animation-name: ai-rise; } }
 @media (prefers-reduced-motion: reduce) {
-  .ai-sheet, .ai-msg, .ai-thinking, .ai-thinking em, .ai-spark.spin, .ai-fab .ai-spark, .ai-hello, .ai-hello .ai-spark, .ai-caret { animation: none; }
+  .ai-sheet, .ai-msg, .ai-thinking, .ai-thinking em, .ai-spark.spin, .ai-hello, .ai-hello .ai-spark, .ai-caret { animation: none; }
 }
-/* While answering, the button shrinks to its icon so it does not cover the answer box. */
-.ai-fab.compact { padding: 10px; gap: 0; opacity: .82; }
-.ai-fab.compact span { display: none; }
-.ai-fab.compact:hover, .ai-fab.compact:focus-visible { opacity: 1; }
+/* While answering, the button shrinks to just the monster so it does not cover the answer box. */
+.ai-fab.compact { opacity: .85; }
+.ai-fab.compact .ai-fab-label { display: none; }
+.ai-fab.compact .ai-pet-btn { padding: 6px 10px; border-radius: 999px; }
+.ai-fab.compact:hover, .ai-fab.compact:focus-within { opacity: 1; }

@@ -5,6 +5,7 @@ import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '.
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
+import { PixelPet, usePet } from './PixelPet'
 import './ai-chat.css'
 import './sketch.css'
 
@@ -176,6 +177,7 @@ function useTyping() {
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
   const typing = useTyping()
+  const pet = usePet(typing)
   const system = [
     personaText(),
     '你住在玄燁的「夢想藍圖」網站裡，幫他學習。他是台灣護理系學生，目標考雅思、去美國當註冊護理師。',
@@ -186,7 +188,15 @@ export function AIAssistant({ progress }: { progress: string }) {
     progress,
   ].join('\n')
   return <>
-    <button type="button" className={'ai-fab' + (typing ? ' compact' : '')} aria-label="問問 Claude" title="問問 Claude" onClick={() => setOpen(true)}><Spark size={18} /><span>問問 Claude</span></button>
+    <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
+      <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
+        onPointerEnter={e => { if (e.pointerType === 'mouse' && !typing) pet.show() }}
+        onClick={() => (typing ? setOpen(true) : pet.show())}>
+        <span className="ai-pet-stage"><PixelPet action={pet.action} size={30} /></span>
+        {pet.label && <span className="ai-pet-bubble" aria-live="polite">{pet.label}</span>}
+      </button>
+      <button type="button" className="ai-fab-label" onClick={() => setOpen(true)}>問問 Claude</button>
+    </div>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
       <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} placeholder="問單字、文法，或叫我出一句中翻英" />
     </AISheet>}
