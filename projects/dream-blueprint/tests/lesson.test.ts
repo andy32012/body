@@ -73,3 +73,18 @@ test('單字四種能力：分開記錄，拼字接受 / 和 () 的寫法', asyn
   assert.ok(spellingMatches('agreement', 'agree(ment)') && spellingMatches('agree', 'agree(ment)'))
   assert.ok(!spellingMatches('agre', 'agree(ment)'))
 })
+
+test('臨床情境：四步、記錄錯的原因，錯過的之後再出現', async () => {
+  const { nextScenario, saveCase, causeSummary, readCase } = await import('../src/lib/scenarios.ts')
+  const all = JSON.parse(readFileSync(new URL('../src/data/scenarios.json', import.meta.url), 'utf8'))
+  assert.ok(all.length >= 8)
+  for (const c of all) assert.deepEqual(c.steps.map((s: { kind: string }) => s.kind), ['cues', 'problem', 'action', 'evaluate'])
+  let notes: Record<string, string> = {}
+  assert.equal(nextScenario(all, notes).id, all[0].id)
+  notes = saveCase(notes, all[0].id, '2026-11-20', [{ kind: 'cues', correct: false, cause: '看不懂英文' }, { kind: 'problem', correct: true }], true)
+  assert.equal(nextScenario(all, notes).id, all[1].id)
+  for (const c of all.slice(1)) notes = saveCase(notes, c.id, '2026-11-21', [{ kind: 'cues', correct: true }], false)
+  assert.equal(nextScenario(all, notes).id, all[0].id, '全做過以後，先回到答錯的')
+  assert.equal(readCase(notes, all[0].id)?.usedZh, true)
+  assert.deepEqual(causeSummary(all, notes).count, { '看不懂英文': 1 })
+})

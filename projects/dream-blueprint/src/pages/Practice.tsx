@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
+import ClinicalCase from "../components/ClinicalCase";
 import TutorChat from "../components/TutorChat";
 import { clearDraft, readDraft, writeDraft } from "../lib/drafts";
 import { AskWord } from "../components/AIChat";
@@ -902,8 +903,8 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "screen" | "translate" | "passage";
-  const modes: Mode[] = ["words", "listen", "quiz", "screen", "translate", "passage"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage"];
   const fromHash = (): Mode => {
     const m = location.hash.split("/")[1] as Mode;
     return modes.includes(m) ? m : "words";
@@ -1051,6 +1052,7 @@ function Extras({
             ["translate", "中翻英"],
             ["passage", "7000 單短文"],
             ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
+            ["case", "臨床情境"],
             ["screen", "單字快篩"],
           ] as const
         )
@@ -1061,7 +1063,7 @@ function Extras({
               key === "words" ||
               key === "translate" ||
               key === "passage" ||
-              (key === "quiz" && periodQuiet),
+              ((key === "quiz" || key === "case") && periodQuiet),
           )
           .map(([key, label]) => (
             <button
@@ -1191,6 +1193,9 @@ function Extras({
       {mode === "quiz" && (!quiet || periodQuiet) && (
         <QuizPractice state={state} update={update} onActivity={onActivity} date={date}
           sections={periodQuiet ? ["nursing"] : undefined} />
+      )}
+      {mode === "case" && (!quiet || periodQuiet) && (
+        <ClinicalCase state={state} onActivity={onActivity} date={date} />
       )}
       {mode === "screen" && !quiet && (
         <VocabScreen state={state} update={update} navigate={navigate} />

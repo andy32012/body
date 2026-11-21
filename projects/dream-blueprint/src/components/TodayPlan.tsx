@@ -5,7 +5,7 @@ import { answeredOn, quizSectionKey } from '../lib/quiz'
 import { lessonFinished } from '../lib/lesson'
 import './today-plan.css'
 
-type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void }
+type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
 
 /** The 30-minute regular day, or during exams and internship a 10–15 minute nursing-English plan.
  *  Built from features that already exist; the curriculum does not move in the nursing plan. */
@@ -19,8 +19,9 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   const tasks: Task[] = mode === 'nursing' ? [
     { id: 'n-review', min: 5, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，這步跳過',
       auto: due === 0, go: due ? () => { location.hash = 'library/words' } : undefined },
-    { id: 'n-quiz', min: 5, title: '護理英文題', detail: '做 3–5 題，先不看中文；答錯就選「卡在哪」' + (quizToday ? '（今天做了 ' + quizToday + ' 題）' : ''),
-      auto: quizToday >= 3, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' } },
+    { id: 'n-quiz', min: 5, title: '護理英文題', detail: '做 3–5 題，或一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday ? '（今天做了 ' + quizToday + ' 題）' : ''),
+      auto: quizToday >= 3, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
+      goLabel: '題目', go2: () => { location.hash = 'library/case' }, go2Label: '情境' },
     { id: 'n-say', min: 4, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
       auto: false, go: () => { location.hash = 'speaking' }, goLabel: 'Emma' },
   ] : [
@@ -49,7 +50,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
         <div className="tp-text"><b>{t.title}<small>{t.min} 分鐘</small></b><span>{t.detail}</span></div>
         <div className="tp-go">
           {t.go && <button type="button" onClick={t.go}>{t.goLabel ?? '去做'}</button>}
-          {t.go2 && <button type="button" onClick={t.go2}>Emma</button>}
+          {t.go2 && <button type="button" onClick={t.go2}>{t.go2Label ?? 'Emma'}</button>}
         </div>
       </li>)}
     </ol>

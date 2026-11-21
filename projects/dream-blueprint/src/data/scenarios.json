@@ -1,0 +1,418 @@
+[
+ {
+  "id": "hypoglycemia",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which information is the most important clue?",
+    "options": [
+     "He uses insulin and did not eat breakfast.",
+     "It is 10 a.m.",
+     "He is 68 years old."
+    ],
+    "answer": 0,
+    "why": "用胰島素又沒進食，是懷疑低血糖最重要的線索。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the most likely problem?",
+    "options": [
+     "High blood pressure",
+     "A fever",
+     "Low blood sugar"
+    ],
+    "answer": 2,
+    "why": "發抖、冒冷汗，加上用胰島素沒吃東西，是典型的低血糖表現。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do first?",
+    "options": [
+     "Let him sleep.",
+     "Check his blood sugar.",
+     "Give his insulin."
+    ],
+    "answer": 1,
+    "why": "先測血糖確認，再依醫囑或常規給快速吸收的糖；這時候絕對不能再給胰島素。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "His blood sugar was 55 mg/dL, and he drank some juice. Which finding shows he is getting better?",
+    "options": [
+     "He is still cool and sweaty.",
+     "He asks for more insulin.",
+     "15 minutes later, his blood sugar is 105 mg/dL and he stops shaking."
+    ],
+    "answer": 2,
+    "why": "給糖後約 15 分鐘複測，血糖回升、症狀緩解，才代表處置有效。"
+   }
+  ],
+  "topic": "低血糖",
+  "case": "Mr. Chen is 68 and has diabetes. He uses insulin. At 10 a.m. he says, \"I feel shaky.\" His skin is cool and sweaty. He did not eat breakfast.",
+  "caseZh": "陳先生 68 歲，有糖尿病，使用胰島素。早上 10 點他說「我覺得發抖」，皮膚濕冷、冒汗。他沒吃早餐。"
+ },
+ {
+  "id": "fall-risk",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which clues show she may fall?",
+    "options": [
+     "She is 80, had surgery, and took a sleeping pill.",
+     "She is a woman.",
+     "She went to bed early."
+    ],
+    "answer": 0,
+    "why": "高齡、剛手術、使用安眠藥，都是跌倒的危險因子。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the main risk right now?",
+    "options": [
+     "Infection",
+     "Falling",
+     "Low blood sugar"
+    ],
+    "answer": 1,
+    "why": "半夜、藥物作用加上手術後虛弱，最需要防範的是跌倒。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do first?",
+    "options": [
+     "Help her walk to the bathroom.",
+     "Tell her to wait until morning.",
+     "Give her another sleeping pill."
+    ],
+    "answer": 0,
+    "why": "陪同協助如廁最安全；叫她憋到早上不合理，再給安眠藥會更容易跌倒。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "Which finding shows the plan worked?",
+    "options": [
+     "She walks alone the next time.",
+     "She stays awake all night.",
+     "She goes to the bathroom and back to bed safely with help."
+    ],
+    "answer": 2,
+    "why": "目標是安全完成如廁、沒有跌倒。"
+   }
+  ],
+  "topic": "跌倒風險",
+  "case": "Mrs. Lin is 80. She had surgery yesterday, and she took a sleeping pill at night. At 2 a.m. she wants to walk to the bathroom alone.",
+  "caseZh": "林太太 80 歲，昨天剛開完刀，晚上吃了安眠藥。凌晨兩點她想自己走去廁所。"
+ },
+ {
+  "id": "wound-infection",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which clues are important?",
+    "options": [
+     "A fever and a red, warm wound with yellow fluid",
+     "He had lunch at noon.",
+     "He talked with his son."
+    ],
+    "answer": 0,
+    "why": "發燒加上傷口紅、熱、有膿樣分泌物，是感染的重要線索。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the most likely problem?",
+    "options": [
+     "A broken bone",
+     "Wound infection",
+     "Low blood sugar"
+    ],
+    "answer": 1,
+    "why": "術後幾天出現發燒和局部紅熱化膿，最可能是傷口感染。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do first?",
+    "options": [
+     "Report the fever and the wound to the doctor.",
+     "Give him a cold shower.",
+     "Remove the dressing and leave the wound open."
+    ],
+    "answer": 0,
+    "why": "完成評估後要通報醫師，依醫囑處理（例如傷口培養、抗生素）；不可自行把傷口敞開。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "After two days of antibiotics, which finding shows improvement?",
+    "options": [
+     "His temperature is 37.0°C and the wound is less red.",
+     "His temperature is 39°C.",
+     "There is more yellow fluid."
+    ],
+    "answer": 0,
+    "why": "退燒、傷口紅腫減輕，表示治療有效。"
+   }
+  ],
+  "topic": "傷口感染",
+  "case": "Mr. Wang had surgery two days ago. Today his temperature is 38.6°C. His wound is red and warm, and there is yellow fluid on the dressing.",
+  "caseZh": "王先生兩天前開刀。今天體溫 38.6°C，傷口紅、熱，紗布上有黃色分泌物。"
+ },
+ {
+  "id": "allergy",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "What is the key clue?",
+    "options": [
+     "She is wearing a wristband.",
+     "The medicine is given by IV.",
+     "She is allergic to the medicine that was ordered."
+    ],
+    "answer": 2,
+    "why": "醫囑的藥正是她過敏的藥，這是最關鍵的線索。"
+   },
+   {
+    "kind": "problem",
+    "q": "What could happen if the nurse gives the medicine?",
+    "options": [
+     "Nothing, because it is given by IV",
+     "She will sleep better",
+     "A serious allergic reaction"
+    ],
+    "answer": 2,
+    "why": "給過敏的藥可能引起嚴重過敏反應，甚至過敏性休克；打點滴不會比較安全。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do?",
+    "options": [
+     "Give half of the dose.",
+     "Hold the medicine and call the doctor.",
+     "Give it more slowly."
+    ],
+    "answer": 1,
+    "why": "先暫停給藥並聯絡醫師更改醫囑；減量或放慢速度都不安全。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "Which result shows good care?",
+    "options": [
+     "The penicillin is given later.",
+     "The doctor changes the order to a different antibiotic.",
+     "The patient gets a rash."
+    ],
+    "answer": 1,
+    "why": "改成她不過敏的藥、沒有發生過敏反應，才是安全的結果。"
+   }
+  ],
+  "topic": "藥物過敏",
+  "case": "Ms. Lee will get an antibiotic by IV. Before giving it, the nurse sees a red band on her wrist: \"Penicillin allergy.\" The ordered medicine is penicillin.",
+  "caseZh": "李小姐要打靜脈抗生素。給藥前，護理師看到她手上的紅色手圈寫著「盤尼西林過敏」，而醫囑的藥就是盤尼西林。"
+ },
+ {
+  "id": "dehydration",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which clues are the most important?",
+    "options": [
+     "He likes cartoons.",
+     "He is four years old.",
+     "No urine for 8 hours, dry lips, and very sleepy"
+    ],
+    "answer": 2,
+    "why": "沒有尿、口唇乾、精神變差，都是脫水的重要表現。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the most likely problem?",
+    "options": [
+     "Asthma",
+     "Dehydration",
+     "A broken arm"
+    ],
+    "answer": 1,
+    "why": "上吐下瀉後尿量減少、口乾、嗜睡，最可能是脫水。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do first?",
+    "options": [
+     "Give him a big meal.",
+     "Let him sleep and check later.",
+     "Check his vital signs and tell the doctor."
+    ],
+    "answer": 2,
+    "why": "嗜睡可能代表脫水變嚴重，要先評估生命徵象並馬上通報，依醫囑補充水分；不能讓他睡著再說。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "Which finding shows he is getting better?",
+    "options": [
+     "He still has not passed urine.",
+     "His lips are drier.",
+     "He passes urine and is more awake."
+    ],
+    "answer": 2,
+    "why": "開始有尿、精神變好，表示補水有效。"
+   }
+  ],
+  "topic": "脫水",
+  "case": "A 4-year-old boy has had vomiting and diarrhea since yesterday. His lips are dry. He has not passed urine for 8 hours, and he is very sleepy.",
+  "caseZh": "一位 4 歲男童從昨天開始嘔吐和腹瀉，嘴唇乾燥，已經 8 小時沒有尿尿，而且非常想睡。"
+ },
+ {
+  "id": "chest-pain",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which clues are serious?",
+    "options": [
+     "Chest pain that goes to the left arm, and sweating",
+     "He pressed the call button.",
+     "He is wearing pajamas."
+    ],
+    "answer": 0,
+    "why": "胸痛延伸到左手臂、冒冷汗，可能是心臟問題的警訊。"
+   },
+   {
+    "kind": "problem",
+    "q": "What could this be?",
+    "options": [
+     "A cold",
+     "A heart problem",
+     "Hunger"
+    ],
+    "answer": 1,
+    "why": "這些症狀要先當作心臟問題（例如心肌缺氧）處理。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do first?",
+    "options": [
+     "Tell him to walk around.",
+     "Give him a cup of coffee.",
+     "Stay with him and get help right away."
+    ],
+    "answer": 2,
+    "why": "不要離開病人，立刻求援並評估生命徵象，依醫院流程處理；不能讓他走動。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "Which finding is a good sign?",
+    "options": [
+     "His chest pain goes away and his vital signs are stable.",
+     "He is more short of breath.",
+     "The pain spreads to his jaw."
+    ],
+    "answer": 0,
+    "why": "胸痛緩解、生命徵象穩定才是好轉；疼痛擴散或更喘都是惡化。"
+   }
+  ],
+  "topic": "胸痛",
+  "case": "Mr. Ho is 60. He presses the call button and says, \"My chest hurts. The pain goes to my left arm.\" He is sweating.",
+  "caseZh": "何先生 60 歲，按了呼叫鈴說：「我胸口痛，痛到左手臂。」他正在冒汗。"
+ },
+ {
+  "id": "hand-hygiene",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "What is the key point?",
+    "options": [
+     "It is the same patient.",
+     "The patient needs eye drops.",
+     "She is moving from a dirty task to a clean task."
+    ],
+    "answer": 2,
+    "why": "從汙染的工作換到乾淨的工作，就是要做手部衛生的時機，即使是同一位病人。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the risk?",
+    "options": [
+     "Spreading germs to the patient's eyes",
+     "The eye drops are too cold.",
+     "The patient will fall asleep."
+    ],
+    "answer": 0,
+    "why": "沒清潔雙手就碰眼睛，可能把傷口的細菌帶到眼睛。"
+   },
+   {
+    "kind": "action",
+    "q": "What should she do first?",
+    "options": [
+     "Wipe her gloves on her uniform.",
+     "Keep the same gloves on.",
+     "Take off her gloves and clean her hands."
+    ],
+    "answer": 2,
+    "why": "脫手套後立刻手部衛生，再拿眼藥；手套不能從髒處直接用到乾淨處。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "Which shows correct practice?",
+    "options": [
+     "She cleans her hands only at the end of her shift.",
+     "She cleans her hands before she touches the eye drops.",
+     "She uses the same gloves for both tasks."
+    ],
+    "answer": 1,
+    "why": "在乾淨操作之前做好手部衛生，才是正確做法。"
+   }
+  ],
+  "topic": "手部衛生",
+  "case": "A nurse has just changed a patient's dirty dressing. Next, she wants to give the same patient eye drops.",
+  "caseZh": "護理師剛幫病人換完髒的敷料，接下來要幫同一位病人點眼藥。"
+ },
+ {
+  "id": "pain",
+  "steps": [
+   {
+    "kind": "cues",
+    "q": "Which clue tells how bad the pain is?",
+    "options": [
+     "She had surgery this morning.",
+     "She is in bed.",
+     "She says it is 8 out of 10."
+    ],
+    "answer": 2,
+    "why": "疼痛分數是病人自己說的，是評估疼痛程度最重要的依據。"
+   },
+   {
+    "kind": "problem",
+    "q": "What is the main problem now?",
+    "options": [
+     "Low blood sugar",
+     "Severe pain after surgery",
+     "An allergy"
+    ],
+    "answer": 1,
+    "why": "術後 8 分的疼痛屬於嚴重疼痛，需要處理。"
+   },
+   {
+    "kind": "action",
+    "q": "What should the nurse do?",
+    "options": [
+     "Make her walk right away.",
+     "Tell her the pain is normal and leave.",
+     "Give the ordered pain medicine and help her into a comfortable position."
+    ],
+    "answer": 2,
+    "why": "依醫囑給止痛藥，並協助舒適擺位；不能忽視疼痛。"
+   },
+   {
+    "kind": "evaluate",
+    "q": "How should the nurse check if it worked?",
+    "options": [
+     "Ask her pain score again after the medicine starts to work.",
+     "Wait until tomorrow.",
+     "Only check her temperature."
+    ],
+    "answer": 0,
+    "why": "給藥後要在藥效時間內再評估疼痛分數，確認有沒有降低。"
+   }
+  ],
+  "topic": "術後疼痛",
+  "case": "Mrs. Wu had knee surgery this morning. She says her pain is 8 out of 10. She is holding her knee and does not want to move.",
+  "caseZh": "吳太太今天早上開完膝蓋，她說疼痛 8 分（滿分 10 分），抱著膝蓋不想動。"
+ }
+]
