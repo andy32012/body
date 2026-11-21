@@ -38,18 +38,22 @@ export default function PracticeDock({ state, update, navigate, onStart, nextSte
   const defaultEnergy: Energy = quiet ? 'low' : holiday && weekday !== 0 ? 'high' : !holiday && regular ? 'normal' : 'low'
   const [choice, setChoice] = useState<{key:string; energy:Energy} | null>(null)
   const scheduleKey = today + period + ':' + defaultEnergy
-  const energy = quiet ? 'low' : choice?.key === scheduleKey ? choice.energy : defaultEnergy
+  // Exams and internship: no new lessons, but 普通 opens a 10–15 minute nursing-English plan.
+  const picked = choice?.key === scheduleKey ? choice.energy : defaultEnergy
+  const energy: Energy = quiet && picked === 'high' ? 'normal' : picked
   const lesson = getLessonPreview(state, energy, today)
   const previewTopic = lesson.freshReview ? '自選熟悉的一句' : lesson.review ? lesson.items[0]?.grammar.join('、') || lesson.title : lesson.title
   const school = schoolToday(state.school, today)
   const schoolSummary = [school.classes, ...school.events, '原訂讀書時段 · ' + school.study].join(' ／ ')
   const rivalry = !onlyPractice && state.settings.rivalsEnabled ? rivalSummary(state) : ''
   const highMinutes = holidayMinutes(today)
-  const longHaul = today >= '2028-02-01' && today <= '2029-07-31'
-  const englishTask = quiet ? (longHaul ? '護理英文 10–15 分鐘：英文病例或實習遇到的名詞；太累就複習 2 分鐘。' : '複習 2 分鐘，或休息。') :
+  const englishTask = quiet ? (period === 'exam'
+    ? '考試優先。想動一下英文就選「普通」：10 分鐘護理英文；不然複習 2 分鐘或休息。'
+    : '護理英文 10–15 分鐘：複習、幾題護理英文、用英文說一件實習的事；太累就複習 2 分鐘。') :
     holiday ? (weekday === 0 ? '今天休息。' : '放假練習 ' + highMinutes + ' 分鐘。') :
     regular ? '一般日 30 分鐘：複習、理解、表達、訂正。' : restDay ? '今天休息。' : '複習 2 分鐘。'
-  const durations = { low: '2 分鐘', normal: '30 分鐘', high: holiday ? highMinutes + ' 分鐘' : '45 分鐘' }
+  const durations = quiet ? { low: '2 分鐘', normal: '10–15 分鐘', high: '先不用' }
+    : { low: '2 分鐘', normal: '30 分鐘', high: holiday ? highMinutes + ' 分鐘' : '45 分鐘' }
 
   return <div className="practice-dock" data-only-practice={onlyPractice}>
     <section className="dock-panel" aria-labelledby="dock-energy-title" id="practice-dock" tabIndex={-1}>
@@ -57,21 +61,21 @@ export default function PracticeDock({ state, update, navigate, onStart, nextSte
       <div className="dock-choices" role="group" aria-labelledby="dock-energy-title">
         {options.map(({ energy: value, name, cells }) => <button
           className="dock-choice" type="button" key={value} data-energy={value}
-          aria-pressed={energy === value} disabled={quiet && value !== 'low'}
+          aria-pressed={energy === value} disabled={quiet && value === 'high'}
           onClick={() => setChoice({key:scheduleKey, energy:value})}>
           <span className="dock-battery" aria-hidden="true">{[1,2,3].map(n => <i key={n} data-filled={n <= cells} />)}</span>
           <strong>{name}</strong><small>{durations[value]}</small>
         </button>)}
       </div>
-      {quiet && <p className="dock-pause">{period === 'exam' ? '考週' : '實習'}只複習舊內容，課表會留在原位。</p>}
+      {quiet && <p className="dock-pause">{period === 'exam' ? '考週' : '實習'}不學新課，課表會留在原位。選「普通」是 10–15 分鐘護理英文。</p>}
       {energy === 'low' && state.settings.why && <blockquote className="dock-why">{state.settings.why}</blockquote>}
       <div className="dock-preview" aria-live="polite">
         <p className="dock-unit">{lesson.review ? '複習日 · 課表停在' : '今日課表 · '} 單元 {lesson.unit} 第 {lesson.day} 天 · {previewTopic}</p>
         <p className="dock-sentence">{lesson.zh}</p>
         <p className="dock-words">{lesson.review ? '今天不加新字' : lesson.newWords.length ? '今天的字：' + lesson.newWords.map(w => w.en + '（' + w.zh + '）').join('、') : '今天不加新字'}</p>
       </div>
-      <button className="dock-launch" type="button" onClick={() => onStart(energy)}><Play size={16} fill="currentColor" aria-hidden="true" />開始練習</button>
-      {!quiet && energy !== 'low' && <TodayPlan state={state} update={update} today={today} energy={energy} onStart={onStart} />}
+      {!(quiet && energy === 'normal') && <button className="dock-launch" type="button" onClick={() => onStart(energy)}><Play size={16} fill="currentColor" aria-hidden="true" />開始練習</button>}
+      {energy !== 'low' && <TodayPlan state={state} update={update} today={today} energy={energy} onStart={onStart} mode={quiet ? 'nursing' : 'regular'} />}
     </section>
     {!onlyPractice && <section className="dock-panel" aria-labelledby="dock-tasks-title">
       <h2 className="dock-title" id="dock-tasks-title"><ListChecks size={21} aria-hidden="true" />今天的三件事</h2>

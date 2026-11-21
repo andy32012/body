@@ -92,3 +92,13 @@ export function quizSummary(items: readonly QuizItem[], section: QuizSection, no
     topCause: top ? { cause: top[0], count: top[1] } : null,
   }
 }
+
+/** How many quiz questions were answered on a day. */
+export function answeredOn(notes: Record<string, string>, day: string) {
+  let n = 0
+  for (const [k, v] of Object.entries(notes)) {
+    if (!k.startsWith('quiz.ans.')) continue
+    try { if ((JSON.parse(v) as QuizRecord).day === day) n++ } catch { /* skip */ }
+  }
+  return n
+}

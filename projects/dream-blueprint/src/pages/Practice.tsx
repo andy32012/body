@@ -794,9 +794,9 @@ function Extras({
   const [offset, setOffset] = useState(0);
   const [see, setSee] = useState(false);
   const [listen, setListen] = useState(0);
-  const quiet =
-    energy === "low" ||
-    ["exam", "internship"].includes(activePeriod(date, state.settings.periods));
+  // Exams and internship: no new content, but the nursing-English questions stay open (10–15 minutes).
+  const periodQuiet = ["exam", "internship"].includes(activePeriod(date, state.settings.periods));
+  const quiet = energy === "low" || periodQuiet;
   const familiar = state.sessions.flatMap(
     (s) => s.translations?.map((t) => t.sentenceId) ?? [s.sentenceId],
   );
@@ -902,7 +902,7 @@ function Extras({
             ["listen", "句子跟讀"],
             ["translate", "中翻英"],
             ["passage", "7000 單短文"],
-            ["quiz", "選擇題"],
+            ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
             ["screen", "單字快篩"],
           ] as const
         )
@@ -912,7 +912,8 @@ function Extras({
               key === "listen" ||
               key === "words" ||
               key === "translate" ||
-              key === "passage",
+              key === "passage" ||
+              (key === "quiz" && periodQuiet),
           )
           .map(([key, label]) => (
             <button
@@ -1011,8 +1012,9 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
-      {mode === "quiz" && !quiet && (
-        <QuizPractice state={state} update={update} onActivity={onActivity} date={date} />
+      {mode === "quiz" && (!quiet || periodQuiet) && (
+        <QuizPractice state={state} update={update} onActivity={onActivity} date={date}
+          sections={periodQuiet ? ["nursing"] : undefined} />
       )}
       {mode === "screen" && !quiet && (
         <VocabScreen state={state} update={update} navigate={navigate} />
