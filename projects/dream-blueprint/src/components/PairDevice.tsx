@@ -19,7 +19,9 @@ export function PairSend() {
   async function make() {
     const c = randomCode()
     const payload = await seal({ claude: tutorKey(), openai: openaiKey() || undefined, model: tutorModel() }, c)
-    const url = location.origin + location.pathname + pairPrefix + payload
+    // ?pair=1 makes Safari load the page fresh even when the site is already open in a tab (a link that only
+    // differs after # would just jump inside the old page). The keys stay after #, which is never sent to the server.
+    const url = location.origin + location.pathname + '?pair=1' + pairPrefix + payload
     setLink(url); setCode(c); setUntil(Date.now() + 10 * 60 * 1000); setCopied('')
     setQr(await QRCode.toDataURL(url, { margin: 1, width: 240, errorCorrectionLevel: 'L' }))
   }

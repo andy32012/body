@@ -44,7 +44,7 @@ let taken: string | null = null
 export function takePairing(): string | null {
   if (location.hash.startsWith(pairPrefix)) {
     taken = location.hash.slice(pairPrefix.length) || null
-    history.replaceState(null, '', location.pathname + location.search + '#today')
+    history.replaceState(null, '', location.pathname + '#today')
   }
   // The same link read twice on one load (React may run the first render twice) gives the same answer.
   return taken
