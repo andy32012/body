@@ -28,7 +28,7 @@ const schoolSchema = z.object({
 const sessions = z.array(z.object({
   id,day,energy,period,sentenceId:str,feedback:z.enum(['right','much','more']).optional(),
   words:stringList,rating:rating.optional(),advanced:z.boolean().optional(),
-  translations:z.array(z.object({sentenceId:id,rating,grammar:stringList,revealed:z.boolean()})).optional(),
+  translations:z.array(z.object({sentenceId:id,rating,grammar:stringList,revealed:z.boolean(),verified:z.boolean().optional()})).optional(),
   spokenIds:stringList.optional(),
 }))
 const settingsSchema = z.object({

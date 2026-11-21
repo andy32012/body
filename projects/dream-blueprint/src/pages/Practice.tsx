@@ -504,6 +504,8 @@ function PracticeSession({
   function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict }) {
     // Each sentence counts once, even if the button is pressed twice.
     if (!settled() || records.some((r) => r.sentenceId === item.id)) return;
+    // Nothing written: marking it "correct" cannot count as done alone, so it is kept as done with help.
+    if (!info?.answer?.trim()) revealed = true;
     const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict });
     if (current.checkpoint) checkpointLevels.current.push(level);
     else if (guided)
@@ -516,6 +518,7 @@ function PracticeSession({
         rating: ratingOf[value],
         grammar: item.grammar,
         revealed,
+        verified: level === "independent",
       },
     ];
     setRecords(list);

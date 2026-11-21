@@ -66,11 +66,13 @@ export function clearAssisted(notes: Notes, unit: number): Notes {
   delete next[assistedKey(unit)];
   return next;
 }
-/** Checkpoint outcome: finished (move on) and independent (counts as stable). */
-export function checkpointOutcome(records: readonly { rating: string; revealed: boolean }[]) {
+/** Checkpoint outcome: finished (move on) and independent (counts as stable).
+ *  "Independent" needs an answer that was actually checked (exact match or Claude's first verdict):
+ *  a self-marked "correct" nobody verified, or a blank answer, finishes the unit but never makes it stable. */
+export function checkpointOutcome(records: readonly { rating: string; revealed: boolean; verified?: boolean }[]) {
   const correct = records.filter((t) => t.rating === "correct");
   return {
     finished: correct.length >= 2,
-    independent: correct.filter((t) => !t.revealed).length >= 2,
+    independent: correct.filter((t) => !t.revealed && t.verified === true).length >= 2,
   };
 }

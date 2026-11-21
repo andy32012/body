@@ -22,6 +22,77 @@
     ]
   },
   {
+    "id": "s-041",
+    "topic": "日常生活",
+    "zh": "這間房間很安靜。",
+    "grammar": [
+      "be 動詞"
+    ],
+    "hints": [
+      "主詞後面要有連接狀態的動詞。",
+      "單數的 this room 搭配 is。"
+    ],
+    "reference": [
+      "This room is quiet."
+    ],
+    "why": "quiet 是形容詞，前面用 is 連接主詞。",
+    "newWords": [
+      {
+        "en": "quiet",
+        "zh": "安靜的"
+      }
+    ]
+  },
+  {
+    "id": "s-042",
+    "topic": "日常生活",
+    "zh": "最近的公車站在哪裡？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "問地點的字放句首。",
+      "Where is 加上要問的地方；最近的用 nearest。"
+    ],
+    "reference": [
+      "Where is the nearest bus stop?"
+    ],
+    "why": "where 問地點；nearest 是 near 的最高級，前面加 the。",
+    "newWords": [
+      {
+        "en": "nearest",
+        "zh": "最近的"
+      },
+      {
+        "en": "bus stop",
+        "zh": "公車站"
+      }
+    ]
+  },
+  {
+    "id": "s-077",
+    "topic": "學校與社會",
+    "zh": "很多學生在網路上學英文。",
+    "grammar": [
+      "現在簡單式"
+    ],
+    "hints": [
+      "主詞是複數 students，動詞要加 s 嗎？",
+      "Many students learn English online。"
+    ],
+    "reference": [
+      "Many students learn English online.",
+      "A lot of students learn English online."
+    ],
+    "why": "複數主詞的現在式動詞不加 s；online 是在網路上。",
+    "newWords": [
+      {
+        "en": "online",
+        "zh": "在網路上"
+      }
+    ]
+  },
+  {
     "id": "s-002",
     "topic": "疼痛",
     "zh": "你哪裡痛？",
@@ -40,6 +111,28 @@
       {
         "en": "pain",
         "zh": "疼痛"
+      }
+    ]
+  },
+  {
+    "id": "s-043",
+    "topic": "日常生活",
+    "zh": "你喜歡辣的食物嗎？",
+    "grammar": [
+      "現在簡單式疑問句"
+    ],
+    "hints": [
+      "一般動詞的問句要請助動詞幫忙。",
+      "Do you 加原形動詞 like。"
+    ],
+    "reference": [
+      "Do you like spicy food?"
+    ],
+    "why": "主詞 you 的現在式問句用 Do 開頭，動詞維持原形。",
+    "newWords": [
+      {
+        "en": "spicy",
+        "zh": "辣的"
       }
     ]
   },
@@ -66,6 +159,68 @@
     ]
   },
   {
+    "id": "s-044",
+    "topic": "日常生活",
+    "zh": "我需要一把雨傘。",
+    "grammar": [
+      "冠詞"
+    ],
+    "hints": [
+      "單數可數名詞前面少了一個小字。",
+      "umbrella 是母音開頭，用 an。"
+    ],
+    "reference": [
+      "I need an umbrella."
+    ],
+    "why": "母音發音開頭的單數名詞用 an。",
+    "newWords": [
+      {
+        "en": "umbrella",
+        "zh": "雨傘"
+      }
+    ]
+  },
+  {
+    "id": "s-045",
+    "topic": "日常生活",
+    "zh": "我弟弟每天晚上打電動。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "主詞是「他」的時候動詞要變。",
+      "play 要加 s。"
+    ],
+    "reference": [
+      "My brother plays video games every night."
+    ],
+    "why": "第三人稱單數現在式，動詞加 s。",
+    "newWords": [
+      {
+        "en": "video game",
+        "zh": "電動遊戲"
+      }
+    ]
+  },
+  {
+    "id": "s-078",
+    "topic": "學校與社會",
+    "zh": "這座城市有很多公園。",
+    "grammar": [
+      "單複數"
+    ],
+    "hints": [
+      "用 There are 開頭，或用 This city has。",
+      "many parks。"
+    ],
+    "reference": [
+      "There are many parks in this city.",
+      "This city has many parks."
+    ],
+    "why": "many 後面接複數名詞；city 是單數，動詞用 has。",
+    "newWords": []
+  },
+  {
     "id": "s-004",
     "topic": "疼痛",
     "zh": "這是一陣刺痛。",
@@ -84,6 +239,29 @@
       {
         "en": "sharp",
         "zh": "尖銳的"
+      }
+    ]
+  },
+  {
+    "id": "s-046",
+    "topic": "日常生活",
+    "zh": "我可以借你的筆嗎？",
+    "grammar": [
+      "請求許可"
+    ],
+    "hints": [
+      "請求許可用哪個助動詞開頭？",
+      "Can I 或 May I 加原形動詞 borrow。"
+    ],
+    "reference": [
+      "Can I borrow your pen?",
+      "May I borrow your pen?"
+    ],
+    "why": "Can I / May I 加原形動詞表示請求許可；borrow 是借入。",
+    "newWords": [
+      {
+        "en": "borrow",
+        "zh": "借（入）"
       }
     ]
   },
@@ -110,6 +288,68 @@
     ]
   },
   {
+    "id": "s-047",
+    "topic": "日常生活",
+    "zh": "這雙鞋太小了。",
+    "grammar": [
+      "程度副詞"
+    ],
+    "hints": [
+      "「太」要用哪個字？鞋子是複數。",
+      "These shoes are too small."
+    ],
+    "reference": [
+      "These shoes are too small."
+    ],
+    "why": "too 放形容詞前面表示「太、過於」；shoes 是複數，用 these 和 are。",
+    "newWords": [
+      {
+        "en": "too",
+        "zh": "太"
+      }
+    ]
+  },
+  {
+    "id": "s-048",
+    "topic": "日常生活",
+    "zh": "我昨天看了一部電影。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "昨天發生的事，動詞要換時態。",
+      "watch 的過去式是 watched。"
+    ],
+    "reference": [
+      "I watched a movie yesterday.",
+      "I saw a movie yesterday."
+    ],
+    "why": "yesterday 是過去時間，動詞用過去式。",
+    "newWords": [
+      {
+        "en": "movie",
+        "zh": "電影"
+      }
+    ]
+  },
+  {
+    "id": "s-079",
+    "topic": "學校與社會",
+    "zh": "搭火車比開車快。",
+    "grammar": [
+      "比較級"
+    ],
+    "hints": [
+      "動作當主詞時，動詞要加 ing。",
+      "Taking the train is faster than driving。"
+    ],
+    "reference": [
+      "Taking the train is faster than driving."
+    ],
+    "why": "動名詞當主詞視為單數；fast 的比較級是 faster。",
+    "newWords": []
+  },
+  {
     "id": "s-006",
     "topic": "疼痛",
     "zh": "你可以指出哪裡痛嗎？",
@@ -132,6 +372,23 @@
     ]
   },
   {
+    "id": "s-049",
+    "topic": "日常生活",
+    "zh": "桌上有三本書。",
+    "grammar": [
+      "單複數"
+    ],
+    "hints": [
+      "「有」某物在某處，用 There 開頭；三本是複數。",
+      "There are three books。"
+    ],
+    "reference": [
+      "There are three books on the table."
+    ],
+    "why": "複數名詞用 There are，book 加 s。",
+    "newWords": []
+  },
+  {
     "id": "s-007",
     "topic": "疼痛",
     "zh": "我的左膝蓋會痛。",
@@ -150,6 +407,77 @@
       {
         "en": "knee",
         "zh": "膝蓋"
+      }
+    ]
+  },
+  {
+    "id": "s-050",
+    "topic": "日常生活",
+    "zh": "你週末通常做什麼？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "問「什麼」的字放句首，後面要有助動詞。",
+      "What do you usually do，週末前面用 on。"
+    ],
+    "reference": [
+      "What do you usually do on weekends?",
+      "What do you usually do on the weekend?"
+    ],
+    "why": "what 問事情；頻率副詞 usually 放在主詞和動詞之間。",
+    "newWords": [
+      {
+        "en": "usually",
+        "zh": "通常"
+      },
+      {
+        "en": "weekend",
+        "zh": "週末"
+      }
+    ]
+  },
+  {
+    "id": "s-051",
+    "topic": "日常生活",
+    "zh": "火車幾點開？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "問時間用 What time；火車是第三人稱單數。",
+      "What time does the train leave?"
+    ],
+    "reference": [
+      "What time does the train leave?"
+    ],
+    "why": "第三人稱單數的問句用 does，後面動詞用原形 leave。",
+    "newWords": [
+      {
+        "en": "leave",
+        "zh": "離開、出發"
+      }
+    ]
+  },
+  {
+    "id": "s-080",
+    "topic": "學校與社會",
+    "zh": "我們應該節約用水。",
+    "grammar": [
+      "情態動詞"
+    ],
+    "hints": [
+      "「應該」用哪個助動詞？",
+      "should save water。"
+    ],
+    "reference": [
+      "We should save water."
+    ],
+    "why": "should 加原形動詞表示應該；water 不可數。",
+    "newWords": [
+      {
+        "en": "save",
+        "zh": "節省"
       }
     ]
   },
@@ -176,6 +504,29 @@
     ]
   },
   {
+    "id": "s-052",
+    "topic": "日常生活",
+    "zh": "今天比昨天冷。",
+    "grammar": [
+      "比較級"
+    ],
+    "hints": [
+      "兩天在比較，形容詞要變化。",
+      "cold 加 er，再用 than。"
+    ],
+    "reference": [
+      "Today is colder than yesterday.",
+      "It is colder today than yesterday."
+    ],
+    "why": "短形容詞比較級加 er，用 than 接比較的對象。",
+    "newWords": [
+      {
+        "en": "than",
+        "zh": "比"
+      }
+    ]
+  },
+  {
     "id": "s-009",
     "topic": "心臟血管",
     "zh": "我可以量你的脈搏嗎？",
@@ -194,6 +545,75 @@
       {
         "en": "pulse",
         "zh": "脈搏"
+      }
+    ]
+  },
+  {
+    "id": "s-053",
+    "topic": "日常生活",
+    "zh": "你可以幫我拍張照嗎？",
+    "grammar": [
+      "禮貌請求"
+    ],
+    "hints": [
+      "禮貌地請人幫忙，用 Could you 或 Can you。",
+      "take a picture，後面說「幫我們/我」。"
+    ],
+    "reference": [
+      "Could you take a picture for me?",
+      "Can you take a picture for me?"
+    ],
+    "why": "Could you 加原形動詞是禮貌的請求；take a picture 是拍照。",
+    "newWords": [
+      {
+        "en": "take a picture",
+        "zh": "拍照"
+      }
+    ]
+  },
+  {
+    "id": "s-054",
+    "topic": "日常生活",
+    "zh": "我想要一杯咖啡。",
+    "grammar": [
+      "禮貌問句"
+    ],
+    "hints": [
+      "點餐時比 I want 更禮貌的說法是什麼？",
+      "I would like（I'd like）a cup of coffee."
+    ],
+    "reference": [
+      "I would like a cup of coffee.",
+      "I'd like a cup of coffee."
+    ],
+    "why": "would like 比 want 禮貌；一杯咖啡是 a cup of coffee。",
+    "newWords": [
+      {
+        "en": "would like",
+        "zh": "想要"
+      }
+    ]
+  },
+  {
+    "id": "s-081",
+    "topic": "學校與社會",
+    "zh": "手機讓生活更方便。",
+    "grammar": [
+      "比較級"
+    ],
+    "hints": [
+      "make 加受詞加形容詞。長形容詞的比較級前面加什麼？",
+      "make life more convenient。"
+    ],
+    "reference": [
+      "Cellphones make life more convenient.",
+      "Smartphones make life more convenient."
+    ],
+    "why": "make + 受詞 + 形容詞表示「使……變得」；長形容詞用 more。",
+    "newWords": [
+      {
+        "en": "convenient",
+        "zh": "方便的"
       }
     ]
   },
@@ -220,6 +640,24 @@
     ]
   },
   {
+    "id": "s-055",
+    "topic": "日常生活",
+    "zh": "我搭公車上學。",
+    "grammar": [
+      "介系詞"
+    ],
+    "hints": [
+      "搭交通工具用哪個介系詞？",
+      "by bus，中間不加 the。"
+    ],
+    "reference": [
+      "I go to school by bus.",
+      "I take the bus to school."
+    ],
+    "why": "by 加交通工具表示搭乘，不加冠詞。",
+    "newWords": []
+  },
+  {
     "id": "s-011",
     "topic": "心臟血管",
     "zh": "我記下了你的血壓。",
@@ -238,6 +676,75 @@
       {
         "en": "blood pressure",
         "zh": "血壓"
+      }
+    ]
+  },
+  {
+    "id": "s-056",
+    "topic": "日常生活",
+    "zh": "我明天要去找我奶奶。",
+    "grammar": [
+      "未來式"
+    ],
+    "hints": [
+      "明天的計畫，動詞前面要加什麼？",
+      "will visit 或 am going to visit。"
+    ],
+    "reference": [
+      "I will visit my grandmother tomorrow.",
+      "I am going to visit my grandmother tomorrow."
+    ],
+    "why": "will 或 be going to 加原形動詞表示未來。",
+    "newWords": [
+      {
+        "en": "visit",
+        "zh": "拜訪"
+      }
+    ]
+  },
+  {
+    "id": "s-057",
+    "topic": "日常生活",
+    "zh": "我沒有零錢。",
+    "grammar": [
+      "不可數名詞"
+    ],
+    "hints": [
+      "零錢 change 可以數嗎？否定句用哪個字？",
+      "I don't have any change."
+    ],
+    "reference": [
+      "I don't have any change.",
+      "I do not have any change."
+    ],
+    "why": "change 當零錢是不可數名詞，否定句用 any，不加 s。",
+    "newWords": [
+      {
+        "en": "change",
+        "zh": "零錢"
+      }
+    ]
+  },
+  {
+    "id": "s-082",
+    "topic": "學校與社會",
+    "zh": "越來越多人在家工作。",
+    "grammar": [
+      "現在進行式"
+    ],
+    "hints": [
+      "「越來越多」是 more and more，動詞用進行式。",
+      "More and more people are working from home。"
+    ],
+    "reference": [
+      "More and more people are working from home.",
+      "More and more people work from home."
+    ],
+    "why": "more and more 表示越來越多；work from home 是在家工作。",
+    "newWords": [
+      {
+        "en": "work from home",
+        "zh": "在家工作"
       }
     ]
   },
@@ -264,6 +771,23 @@
     ]
   },
   {
+    "id": "s-058",
+    "topic": "日常生活",
+    "zh": "這是我姊姊的包包。",
+    "grammar": [
+      "所有格"
+    ],
+    "hints": [
+      "「姊姊的」要怎麼表示？",
+      "sister 後面加 's。"
+    ],
+    "reference": [
+      "This is my sister's bag."
+    ],
+    "why": "人名或人的名詞加 's 表示「……的」。",
+    "newWords": []
+  },
+  {
     "id": "s-013",
     "topic": "身體評估",
     "zh": "你現在覺得頭暈嗎？",
@@ -282,6 +806,70 @@
       {
         "en": "dizzy",
         "zh": "頭暈的"
+      }
+    ]
+  },
+  {
+    "id": "s-059",
+    "topic": "日常生活",
+    "zh": "我七點起床。",
+    "grammar": [
+      "時間介系詞"
+    ],
+    "hints": [
+      "幾點鐘前面用哪個介系詞？",
+      "at seven，起床是 get up。"
+    ],
+    "reference": [
+      "I get up at seven.",
+      "I get up at seven o'clock."
+    ],
+    "why": "時刻前面用 at；get up 是起床（wake up 是醒來）。",
+    "newWords": [
+      {
+        "en": "get up",
+        "zh": "起床"
+      }
+    ]
+  },
+  {
+    "id": "s-060",
+    "topic": "日常生活",
+    "zh": "我的手機在包包裡。",
+    "grammar": [
+      "位置介系詞"
+    ],
+    "hints": [
+      "在……裡面用哪個介系詞？",
+      "in my bag。"
+    ],
+    "reference": [
+      "My phone is in my bag.",
+      "My cellphone is in my bag."
+    ],
+    "why": "in 表示在某個空間裡面。",
+    "newWords": []
+  },
+  {
+    "id": "s-083",
+    "topic": "學校與社會",
+    "zh": "這間圖書館每天早上九點開門。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "library 是單數，動詞要加 s；時刻用 at。",
+      "opens at nine every morning。"
+    ],
+    "reference": [
+      "This library opens at nine every morning.",
+      "The library opens at nine every morning."
+    ],
+    "why": "第三人稱單數現在式動詞加 s；時刻前面用 at。",
+    "newWords": [
+      {
+        "en": "library",
+        "zh": "圖書館"
       }
     ]
   },
@@ -308,6 +896,29 @@
     ]
   },
   {
+    "id": "s-061",
+    "topic": "日常生活",
+    "zh": "這件襯衫多少錢？",
+    "grammar": [
+      "疑問詞"
+    ],
+    "hints": [
+      "問價錢用哪兩個字？",
+      "How much is this shirt?"
+    ],
+    "reference": [
+      "How much is this shirt?",
+      "How much does this shirt cost?"
+    ],
+    "why": "how much 問價錢；單數的 shirt 用 is。",
+    "newWords": [
+      {
+        "en": "shirt",
+        "zh": "襯衫"
+      }
+    ]
+  },
+  {
     "id": "s-015",
     "topic": "用藥溝通",
     "zh": "你在家有服用藥物嗎？",
@@ -326,6 +937,79 @@
       {
         "en": "medicine",
         "zh": "藥"
+      }
+    ]
+  },
+  {
+    "id": "s-062",
+    "topic": "日常生活",
+    "zh": "我在找一間便宜的公寓。",
+    "grammar": [
+      "現在進行式"
+    ],
+    "hints": [
+      "正在進行的事，用 be 動詞加 V-ing。",
+      "I'm looking for；apartment 前面用 a 還是 an？"
+    ],
+    "reference": [
+      "I am looking for a cheap apartment.",
+      "I'm looking for a cheap apartment."
+    ],
+    "why": "look for 是尋找；現在進行式是 am/is/are 加 V-ing。",
+    "newWords": [
+      {
+        "en": "look for",
+        "zh": "尋找"
+      },
+      {
+        "en": "apartment",
+        "zh": "公寓"
+      }
+    ]
+  },
+  {
+    "id": "s-063",
+    "topic": "日常生活",
+    "zh": "我忘了帶鑰匙。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "忘記 forget 的過去式是不規則變化。",
+      "forgot my keys。"
+    ],
+    "reference": [
+      "I forgot my keys.",
+      "I forgot to bring my keys."
+    ],
+    "why": "forget 的過去式是 forgot；鑰匙通常用複數 keys。",
+    "newWords": [
+      {
+        "en": "forget",
+        "zh": "忘記"
+      }
+    ]
+  },
+  {
+    "id": "s-084",
+    "topic": "學校與社會",
+    "zh": "運動對健康有好處。",
+    "grammar": [
+      "不可數名詞"
+    ],
+    "hints": [
+      "「對……有好處」是 be good for。",
+      "Exercise is good for your health。"
+    ],
+    "reference": [
+      "Exercise is good for your health.",
+      "Exercise is good for health."
+    ],
+    "why": "exercise 當「運動」這件事是不可數名詞，搭配 is。",
+    "newWords": [
+      {
+        "en": "health",
+        "zh": "健康"
       }
     ]
   },
@@ -352,6 +1036,29 @@
     ]
   },
   {
+    "id": "s-064",
+    "topic": "日常生活",
+    "zh": "你有兄弟姊妹嗎？",
+    "grammar": [
+      "名詞複數"
+    ],
+    "hints": [
+      "問有沒有，用 Do you have any 加複數名詞。",
+      "brothers or sisters。"
+    ],
+    "reference": [
+      "Do you have any brothers or sisters?",
+      "Do you have any siblings?"
+    ],
+    "why": "問句裡 any 後面的可數名詞用複數。",
+    "newWords": [
+      {
+        "en": "sibling",
+        "zh": "兄弟姊妹"
+      }
+    ]
+  },
+  {
     "id": "s-017",
     "topic": "用藥溝通",
     "zh": "盒子裡有兩顆膠囊。",
@@ -370,6 +1077,70 @@
       {
         "en": "capsule",
         "zh": "膠囊"
+      }
+    ]
+  },
+  {
+    "id": "s-065",
+    "topic": "日常生活",
+    "zh": "我不太會煮飯。",
+    "grammar": [
+      "情態動詞"
+    ],
+    "hints": [
+      "「不會」做某事用 can 的否定。",
+      "can't cook very well。"
+    ],
+    "reference": [
+      "I can't cook very well.",
+      "I cannot cook very well."
+    ],
+    "why": "can't 加原形動詞表示不會；very well 放在後面修飾程度。",
+    "newWords": [
+      {
+        "en": "cook",
+        "zh": "煮飯"
+      }
+    ]
+  },
+  {
+    "id": "s-066",
+    "topic": "日常生活",
+    "zh": "雨停了。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "不指明是誰的天氣主詞用什麼？stop 的過去式要重複字尾。",
+      "It stopped raining。"
+    ],
+    "reference": [
+      "It stopped raining.",
+      "The rain stopped."
+    ],
+    "why": "stop 的過去式是 stopped；stop 後面接 V-ing 表示停止做那件事。",
+    "newWords": []
+  },
+  {
+    "id": "s-085",
+    "topic": "學校與社會",
+    "zh": "很多人擔心空氣汙染。",
+    "grammar": [
+      "現在簡單式"
+    ],
+    "hints": [
+      "「擔心」是 worry about 或 be worried about。",
+      "Many people worry about air pollution。"
+    ],
+    "reference": [
+      "Many people worry about air pollution.",
+      "Many people are worried about air pollution."
+    ],
+    "why": "people 是複數；worry about 加擔心的事。",
+    "newWords": [
+      {
+        "en": "pollution",
+        "zh": "汙染"
       }
     ]
   },
@@ -396,6 +1167,29 @@
     ]
   },
   {
+    "id": "s-067",
+    "topic": "日常生活",
+    "zh": "這家餐廳的菜很好吃。",
+    "grammar": [
+      "be 動詞"
+    ],
+    "hints": [
+      "主詞是 food，不可數，be 動詞用單數。",
+      "The food at this restaurant is delicious。"
+    ],
+    "reference": [
+      "The food at this restaurant is delicious.",
+      "The food in this restaurant is delicious."
+    ],
+    "why": "food 是不可數名詞，搭配 is；delicious 是好吃的。",
+    "newWords": [
+      {
+        "en": "delicious",
+        "zh": "好吃的"
+      }
+    ]
+  },
+  {
     "id": "s-019",
     "topic": "用藥溝通",
     "zh": "你有任何藥物過敏嗎？",
@@ -414,6 +1208,79 @@
       {
         "en": "allergy",
         "zh": "過敏"
+      }
+    ]
+  },
+  {
+    "id": "s-068",
+    "topic": "日常生活",
+    "zh": "我每天走路三十分鐘。",
+    "grammar": [
+      "現在簡單式"
+    ],
+    "hints": [
+      "每天的習慣用哪個時態？「走三十分鐘」用 for。",
+      "I walk for thirty minutes every day。"
+    ],
+    "reference": [
+      "I walk for thirty minutes every day.",
+      "I walk thirty minutes every day."
+    ],
+    "why": "習慣用現在簡單式；for 加一段時間。",
+    "newWords": [
+      {
+        "en": "minute",
+        "zh": "分鐘"
+      }
+    ]
+  },
+  {
+    "id": "s-069",
+    "topic": "日常生活",
+    "zh": "她喜歡聽音樂。",
+    "grammar": [
+      "動名詞"
+    ],
+    "hints": [
+      "like 後面的動詞要變什麼形？主詞是 she。",
+      "likes listening to music。"
+    ],
+    "reference": [
+      "She likes listening to music.",
+      "She likes to listen to music."
+    ],
+    "why": "like 後面可以接 V-ing 或 to V；listen 後面要加 to。",
+    "newWords": [
+      {
+        "en": "listen to",
+        "zh": "聽"
+      }
+    ]
+  },
+  {
+    "id": "s-086",
+    "topic": "學校與社會",
+    "zh": "去年學生人數增加了。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "「……的人數」是 the number of，動詞看 number（單數）。",
+      "The number of students increased last year。"
+    ],
+    "reference": [
+      "The number of students increased last year.",
+      "The number of students went up last year."
+    ],
+    "why": "the number of 加複數名詞，動詞用單數；去年用過去式。",
+    "newWords": [
+      {
+        "en": "increase",
+        "zh": "增加"
+      },
+      {
+        "en": "the number of",
+        "zh": "……的數量"
       }
     ]
   },
@@ -440,6 +1307,24 @@
     ]
   },
   {
+    "id": "s-070",
+    "topic": "日常生活",
+    "zh": "我想學游泳。",
+    "grammar": [
+      "不定詞"
+    ],
+    "hints": [
+      "want 後面接動詞要加什麼？",
+      "want to learn to swim。"
+    ],
+    "reference": [
+      "I want to learn to swim.",
+      "I want to learn how to swim."
+    ],
+    "why": "want 和 learn 後面都用 to 加原形動詞。",
+    "newWords": []
+  },
+  {
     "id": "s-021",
     "topic": "癌症照護",
     "zh": "我昨天覺得很累。",
@@ -458,6 +1343,78 @@
       {
         "en": "tired",
         "zh": "累的"
+      }
+    ]
+  },
+  {
+    "id": "s-071",
+    "topic": "日常生活",
+    "zh": "請在這裡等一下。",
+    "grammar": [
+      "祈使句"
+    ],
+    "hints": [
+      "請別人做事，句子直接用什麼開頭？",
+      "Please wait here for a moment。"
+    ],
+    "reference": [
+      "Please wait here for a moment.",
+      "Please wait here."
+    ],
+    "why": "祈使句用原形動詞開頭，加 please 比較禮貌。",
+    "newWords": [
+      {
+        "en": "moment",
+        "zh": "片刻"
+      }
+    ]
+  },
+  {
+    "id": "s-072",
+    "topic": "日常生活",
+    "zh": "我的房間比你的大。",
+    "grammar": [
+      "比較級"
+    ],
+    "hints": [
+      "big 的比較級要重複字尾。「你的（房間）」用哪個字？",
+      "bigger than yours。"
+    ],
+    "reference": [
+      "My room is bigger than yours."
+    ],
+    "why": "big 的比較級是 bigger；yours 代替 your room。",
+    "newWords": [
+      {
+        "en": "yours",
+        "zh": "你的（東西）"
+      }
+    ]
+  },
+  {
+    "id": "s-087",
+    "topic": "學校與社會",
+    "zh": "這份工作需要很好的英文能力。",
+    "grammar": [
+      "第三人稱單數"
+    ],
+    "hints": [
+      "job 是單數，動詞要變。能力可以用 skills。",
+      "This job requires good English skills。"
+    ],
+    "reference": [
+      "This job requires good English skills.",
+      "This job needs good English skills."
+    ],
+    "why": "第三人稱單數現在式動詞加 s；skills 用複數表示各種能力。",
+    "newWords": [
+      {
+        "en": "require",
+        "zh": "需要"
+      },
+      {
+        "en": "skill",
+        "zh": "技能"
       }
     ]
   },
@@ -484,6 +1441,29 @@
     ]
   },
   {
+    "id": "s-073",
+    "topic": "日常生活",
+    "zh": "我們昨晚吃了披薩。",
+    "grammar": [
+      "過去簡單式"
+    ],
+    "hints": [
+      "eat 的過去式是不規則變化。",
+      "ate pizza last night。"
+    ],
+    "reference": [
+      "We ate pizza last night.",
+      "We had pizza last night."
+    ],
+    "why": "eat 的過去式是 ate；last night 是昨晚。",
+    "newWords": [
+      {
+        "en": "last night",
+        "zh": "昨晚"
+      }
+    ]
+  },
+  {
     "id": "s-023",
     "topic": "癌症照護",
     "zh": "噁心感是什麼時候開始的？",
@@ -506,6 +1486,71 @@
     ]
   },
   {
+    "id": "s-074",
+    "topic": "日常生活",
+    "zh": "我住在這裡三年了。",
+    "grammar": [
+      "現在完成式"
+    ],
+    "hints": [
+      "從過去持續到現在，用 have 加過去分詞。",
+      "have lived here for three years。"
+    ],
+    "reference": [
+      "I have lived here for three years.",
+      "I've lived here for three years."
+    ],
+    "why": "現在完成式 have + 過去分詞，for 加一段時間，表示持續到現在。",
+    "newWords": []
+  },
+  {
+    "id": "s-075",
+    "topic": "日常生活",
+    "zh": "如果明天下雨，我會待在家。",
+    "grammar": [
+      "條件句"
+    ],
+    "hints": [
+      "if 那半句用現在式，另一半用 will。",
+      "If it rains tomorrow, I will stay home。"
+    ],
+    "reference": [
+      "If it rains tomorrow, I will stay home.",
+      "If it rains tomorrow, I will stay at home."
+    ],
+    "why": "可能發生的條件：if 子句用現在式，主要子句用 will。",
+    "newWords": [
+      {
+        "en": "stay",
+        "zh": "待、停留"
+      }
+    ]
+  },
+  {
+    "id": "s-088",
+    "topic": "學校與社會",
+    "zh": "孩子們從遊戲中學習。",
+    "grammar": [
+      "現在簡單式"
+    ],
+    "hints": [
+      "child 的複數是不規則變化。",
+      "Children learn from play。"
+    ],
+    "reference": [
+      "Children learn from play.",
+      "Children learn from playing.",
+      "Children learn through play."
+    ],
+    "why": "child 的複數是 children；learn from 是從……學習。",
+    "newWords": [
+      {
+        "en": "children",
+        "zh": "孩子們"
+      }
+    ]
+  },
+  {
     "id": "s-024",
     "topic": "癌症照護",
     "zh": "我需要休息一下。",
@@ -524,6 +1569,29 @@
       {
         "en": "rest",
         "zh": "休息"
+      }
+    ]
+  },
+  {
+    "id": "s-076",
+    "topic": "日常生活",
+    "zh": "我覺得這部電影很無聊。",
+    "grammar": [
+      "名詞子句"
+    ],
+    "hints": [
+      "「我覺得」後面直接接一個完整句子。無聊的東西用 boring 還是 bored？",
+      "I think this movie is boring。"
+    ],
+    "reference": [
+      "I think this movie is boring.",
+      "I think the movie is boring."
+    ],
+    "why": "I think 後面接完整句子；事物讓人無聊用 boring，人覺得無聊用 bored。",
+    "newWords": [
+      {
+        "en": "boring",
+        "zh": "無聊的"
       }
     ]
   },

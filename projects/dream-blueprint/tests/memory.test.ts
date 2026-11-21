@@ -15,7 +15,10 @@ import { checkpointOutcome } from '../src/lib/grammarRetention'
 test('checkpoint: answers seen with hints finish the unit but do not make it stable', () => {
   const seen = [{ rating: 'correct', revealed: true }, { rating: 'correct', revealed: false }, { rating: 'again', revealed: true }]
   assert.deepEqual(checkpointOutcome(seen), { finished: true, independent: false })
-  const own = [{ rating: 'correct', revealed: false }, { rating: 'correct', revealed: false }, { rating: 'minor', revealed: false }]
+  const own = [{ rating: 'correct', revealed: false, verified: true }, { rating: 'correct', revealed: false, verified: true }, { rating: 'minor', revealed: false }]
   assert.deepEqual(checkpointOutcome(own), { finished: true, independent: true })
   assert.deepEqual(checkpointOutcome([{ rating: 'minor', revealed: false }]), { finished: false, independent: false })
+  // Self-marked correct with nothing checked (e.g. a blank answer) finishes but is not stable.
+  const blank = [{ rating: 'correct', revealed: false }, { rating: 'correct', revealed: false, verified: false }]
+  assert.deepEqual(checkpointOutcome(blank), { finished: true, independent: false })
 })
