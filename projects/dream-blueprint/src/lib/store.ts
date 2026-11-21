@@ -44,7 +44,7 @@ const safeKey = z.string().min(1).max(512).refine(s => !['__proto__','constructo
 const schema = z.object({
   version:z.literal(2),startedDay:day,settings:settingsSchema,school:schoolSchema,sessions,
   workload:z.object({extraWords:natural,lastAssessment:z.union([day,z.literal('')]),lastReduction:z.union([day,z.literal('')])}).default({extraWords:0,lastAssessment:'',lastReduction:''}),
-  cards:z.array(z.object({id,box:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5)]),lastDay:day,due:day,mastered:z.boolean()})),
+  cards:z.array(z.object({id,box:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5),z.literal(6),z.literal(7),z.literal(8)]),lastDay:day,due:day,mastered:z.boolean()})),
   reviewEvents:z.array(z.object({id,day,gap:natural,remembered:z.boolean(),shownAnswer:z.boolean()})),
   curriculum:z.object({unit:z.number().int().min(1).max(43),day:z.number().int().min(1).max(6),retry:natural,stableUnits:z.array(z.number().int().min(1).max(42))}),
   knownWords:stringList,learningWords:stringList,customWords:z.array(customWord),
@@ -91,7 +91,7 @@ export function createInitialState(startedDay=dayKey()):AppState {
     },
     school:JSON.parse(JSON.stringify(defaultSchool)),sessions:[],cards:[],reviewEvents:[],
     curriculum:{unit:1,day:1,retry:0,stableUnits:[]},knownWords:[],learningWords:[],customWords:[],
-    checks:{},notes:{},flagged:[],
+    checks:{},notes:{'migrate.study30':'1'},flagged:[],
   }
 }
 export function exportBackup(state:AppState):string {
@@ -126,6 +126,11 @@ export function importBackup(raw:string):AppState {
     state.settings.examPromptSeen=true
     state.settings.internshipSeason=state.settings.internshipSeason || '暑假'
     state.settings.profileRevision=1
+  }
+  // Regular study days grew from 8 to 30 minutes (2026-11 plan revision).
+  if (!state.notes['migrate.study30']) {
+    state.school.study=state.school.study.map(s=>s.minutes===8?{...s,minutes:30}:s)
+    state.notes={...state.notes,'migrate.study30':'1'}
   }
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'

@@ -23,6 +23,7 @@ import { UniverseBackground, useObservatory } from './components/Observatory'
 import { AIAssistant } from './components/AIChat'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
+import Baseline from './components/Baseline'
 import { MemoryContext, applyMemory, readMemory, writeMemory, type MemoryApi } from './lib/memory'
 import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced } from './lib/drive'
 import { localModified, restoreBackup, setLocalModified } from './lib/store'
@@ -95,8 +96,8 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
   const year=planData.years.find(y=>y.year===Number(today.slice(0,4)))
   const hadBreak=state.sessions.length>0&&!state.sessions.some(s=>s.day===today||s.day===addDays(today,-1))
   const regular=defaultEnergy(state,today)
-  const heroCue=maintenance?'這段維持期已排進計畫，每天只需複習 2 分鐘。':hadBreak?'回來就好，從你熟悉的一句話接著練。':
-    regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天從一句中翻英開始，接著用同一句聽和說。'
+  const heroCue=maintenance?'實習／國考期：每天 10–15 分鐘護理英文，真的太累就複習 2 分鐘。':hadBreak?'回來就好，從你熟悉的一句話接著練。':
+    regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天是 30 分鐘完整課：複習、理解、表達、訂正。'
   return <div className="home-stack">
     <section className="flight-deck" aria-label="今日練習">
       <ScenePhoto className="flight-photo" />
@@ -210,7 +211,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}

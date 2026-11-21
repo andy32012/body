@@ -1,0 +1,19 @@
+.tp-card { display: grid; gap: 10px; margin-top: 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 70%, transparent); }
+.tp-card header { display: flex; align-items: baseline; justify-content: space-between; }
+.tp-card header strong { font-size: 15px; letter-spacing: .04em; }
+.tp-card header span { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tp-bar { height: 4px; border-radius: 4px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.tp-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--lav), var(--mint)); border-radius: 4px; transition: width .4s; }
+.tp-card ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tp-card li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.tp-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--line); background: transparent; display: grid; place-items: center; color: var(--bg); padding: 0; }
+.tp-card li.done .tp-check { background: var(--mint); border-color: var(--mint); }
+.tp-check:disabled { cursor: default; }
+.tp-text { display: grid; min-width: 0; flex: 1; }
+.tp-text b { font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
+.tp-text small { color: var(--muted); font-weight: 400; font-size: 12px; }
+.tp-text span { color: var(--muted); font-size: 12.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.tp-card li.done .tp-text b { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--text) 40%, transparent); }
+.tp-go { display: flex; gap: 6px; flex: none; }
+.tp-go button { border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 9px; padding: 5px 10px; font-size: 12.5px; white-space: nowrap; }
+.tp-go button:hover { border-color: var(--lav); color: var(--lav); }

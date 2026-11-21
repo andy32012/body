@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, RotateCcw, Volume2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { activePeriod, newCard } from '../lib/progress'
+import { activePeriod, addDays, dueCount, newCard } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
 import { paintSky, seedOf } from '../lib/starfield'
 import { wordKey } from '../lib/vocab'
-import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey } from '../lib/dailyWords'
+import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -14,7 +14,8 @@ type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () 
 export default function DailyWord({ state, update, today, onClose }: Props) {
   const period = activePeriod(today, state.settings.periods)
   const quiet = period === 'exam' || period === 'internship'
-  const target = dailyTarget(state.notes, quiet, today)
+  const due = dueCount(state.cards, today)
+  const target = dailyTarget(state.notes, quiet, today, due)
   const done = Number(state.notes[doneKey(today)] || 0)
   const queue = useMemo(() => dailyQueue(state.knownWords, state.learningWords),
     [state.knownWords, state.learningWords])
@@ -55,7 +56,10 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
         ...prev,
         knownWords: known ? [...prev.knownWords, key] : prev.knownWords,
         learningWords: known ? prev.learningWords : [...prev.learningWords, key],
-        cards: known || prev.cards.some(c => c.id === id) ? prev.cards : [...prev.cards, newCard(id, today)],
+        cards: prev.cards.some(c => c.id === id) ? prev.cards
+          : !known ? [...prev.cards, newCard(id, today)]
+          : spotCheck(key) ? [...prev.cards, { id, box: 4 as const, lastDay: today, due: addDays(today, 14), mastered: false }]
+          : prev.cards,
         notes: { ...prev.notes, [doneKey(today)]: String(Number(prev.notes[doneKey(today)] || 0) + 1) },
       }
     })
@@ -94,7 +98,8 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           </div>
         </div>
       </> : <div className="daily-word-body daily-word-finished">
-        <strong className="daily-word-term">{queue.length ? '今天的 ' + done + ' 個看完了' : '六級單字都看過一輪了'}</strong>
+        <strong className="daily-word-term">{!queue.length ? '六級單字都看過一輪了' : target === 0 ? '今天先複習' : '今天的 ' + done + ' 個看完了'}</strong>
+        {due > 30 && queue.length > 0 && <p className="daily-word-meaning">今天有 {due} 張卡要複習，新字先{target === 0 ? '暫停' : '減少到 ' + target + ' 個'}，複習完明天再加回來。</p>}
         <p className="daily-word-meaning">{queue.length ? '還不熟的字明天會出現在複習裡。' : '之後從待學單字和複習繼續。'}</p>
         {quiet && queue.length > 0 && state.notes[moreKey(today)] !== '1' &&
           <button type="button" className="daily-word-reveal" onClick={() => setNote(moreKey(today), '1')}>考週只排 1 個。還想再看幾個</button>}

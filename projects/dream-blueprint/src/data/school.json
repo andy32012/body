@@ -30,7 +30,7 @@
     },
     {
       "weekday": 2,
-      "minutes": 8,
+      "minutes": 30,
       "time": ""
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "weekday": 4,
-      "minutes": 8,
+      "minutes": 30,
       "time": ""
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "weekday": 6,
-      "minutes": 8,
+      "minutes": 30,
       "time": ""
     }
   ],

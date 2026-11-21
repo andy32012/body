@@ -88,7 +88,7 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
       const maintenance = schedule.periods.find(p =>
         p.start >= '2028-02-01' && !p.tentative && p.type === period && p.start <= day && day <= p.end)
       item.label = maintenance
-        ? maintenance.label + ' · 舊句複習或休息'
+        ? maintenance.label + ' · 忙的日子 2 分鐘'
         : period === 'exam' ? '考週 · 2 分鐘舊句複習或休息' : '實習 · 2 分鐘舊句聽說或休息'
     } else if (holidayBreak(day)) {
       item.label = '過年休息'

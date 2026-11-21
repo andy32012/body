@@ -5,6 +5,7 @@ import { activePeriod, dayKey, type Energy } from '../lib/progress'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
 import { getLessonPreview } from '../pages/Practice'
+import TodayPlan from './TodayPlan'
 import './dock.css'
 
 interface DockProps extends PageProps {
@@ -26,7 +27,7 @@ function holidayMinutes(day: string) {
   return 20
 }
 
-export default function PracticeDock({ state, navigate, onStart, nextStep, onlyPractice = false }: DockProps) {
+export default function PracticeDock({ state, update, navigate, onStart, nextStep, onlyPractice = false }: DockProps) {
   const today = dayKey()
   const weekday = new Date(today + 'T12:00:00').getDay()
   const period = activePeriod(today, state.settings.periods)
@@ -44,10 +45,11 @@ export default function PracticeDock({ state, navigate, onStart, nextStep, onlyP
   const schoolSummary = [school.classes, ...school.events, '原訂讀書時段 · ' + school.study].join(' ／ ')
   const rivalry = !onlyPractice && state.settings.rivalsEnabled ? rivalSummary(state) : ''
   const highMinutes = holidayMinutes(today)
-  const englishTask = quiet ? '複習 2 分鐘，或休息。' :
+  const longHaul = today >= '2028-02-01' && today <= '2029-07-31'
+  const englishTask = quiet ? (longHaul ? '護理英文 10–15 分鐘：英文病例或實習遇到的名詞；太累就複習 2 分鐘。' : '複習 2 分鐘，或休息。') :
     holiday ? (weekday === 0 ? '今天休息。' : '放假練習 ' + highMinutes + ' 分鐘。') :
-    regular ? '普通練習 8–10 分鐘。' : restDay ? '今天休息。' : '複習 2 分鐘。'
-  const durations = { low: '2 分鐘', normal: '8–10 分鐘', high: holiday ? highMinutes + ' 分鐘' : '延伸練習' }
+    regular ? '一般日 30 分鐘：複習、理解、表達、訂正。' : restDay ? '今天休息。' : '複習 2 分鐘。'
+  const durations = { low: '2 分鐘', normal: '30 分鐘', high: holiday ? highMinutes + ' 分鐘' : '45 分鐘' }
 
   return <div className="practice-dock" data-only-practice={onlyPractice}>
     <section className="dock-panel" aria-labelledby="dock-energy-title" id="practice-dock" tabIndex={-1}>
@@ -69,6 +71,7 @@ export default function PracticeDock({ state, navigate, onStart, nextStep, onlyP
         <p className="dock-words">{lesson.review ? '今天不加新字' : lesson.newWords.length ? '今天的字：' + lesson.newWords.map(w => w.en + '（' + w.zh + '）').join('、') : '今天不加新字'}</p>
       </div>
       <button className="dock-launch" type="button" onClick={() => onStart(energy)}><Play size={16} fill="currentColor" aria-hidden="true" />開始練習</button>
+      {!quiet && energy !== 'low' && <TodayPlan state={state} update={update} today={today} energy={energy} onStart={onStart} />}
     </section>
     {!onlyPractice && <section className="dock-panel" aria-labelledby="dock-tasks-title">
       <h2 className="dock-title" id="dock-tasks-title"><ListChecks size={21} aria-hidden="true" />今天的三件事</h2>

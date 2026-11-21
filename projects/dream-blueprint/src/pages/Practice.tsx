@@ -1,5 +1,5 @@
 import ScenePhoto from "../components/ScenePhoto";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import TutorChat from "../components/TutorChat";
@@ -17,6 +17,8 @@ import {
   dayKey,
   dueCards,
   newCard,
+  reviewBudget,
+  dueCount,
   reviewCard,
 } from "../lib/progress";
 import { isKnownWord, wordKey, officialWords } from "../lib/vocab";
@@ -283,7 +285,8 @@ function lesson(state: AppState, energy: Energy, date: string) {
       ? [...entry.newWords, ...(entry.bonusWords ?? [])]
       : entry.newWords;
   const base = proposed.filter((w) => !isKnownWord(w.en, state.knownWords));
-  const added = review || checkpoint ? [] : workloadWords(state, base);
+  const busyReview = dueCount(state.cards, date) > 30;
+  const added = review || checkpoint || busyReview ? [] : workloadWords(state, base);
   const vocabulary = review || checkpoint ? [] : [...base, ...added];
   return {
     unit: unit.id,
@@ -749,16 +752,32 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  const [mode, setMode] = useState<
-    "words" | "listen" | "quiz" | "screen" | "translate" | "passage"
-  >("words");
+  type Mode = "words" | "listen" | "quiz" | "screen" | "translate" | "passage";
+  const modes: Mode[] = ["words", "listen", "quiz", "screen", "translate", "passage"];
+  const fromHash = (): Mode => {
+    const m = location.hash.split("/")[1] as Mode;
+    return modes.includes(m) ? m : "words";
+  };
+  const [mode, setMode] = useState<Mode>(fromHash);
+  useEffect(() => {
+    const onHash = () => {
+      if (location.hash.startsWith("#library/")) {
+        setMode(fromHash());
+        document.querySelector(".pr-extras")?.scrollIntoView({ block: "start" });
+      }
+    };
+    onHash();
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [limit] = useState(() => {
     const reviewed = new Set(
       state.reviewEvents
         .filter((e) => e.day === date && e.id.startsWith("word:"))
         .map((e) => e.id),
     );
-    return Math.max(0, { low: 1, normal: 5, high: 10 }[energy] - reviewed.size);
+    return Math.max(0, reviewBudget(energy) - reviewed.size);
   });
   const [offset, setOffset] = useState(0);
   const [see, setSee] = useState(false);

@@ -42,7 +42,7 @@ export function activePeriod(
 
 export interface ReviewCard {
   id: string
-  box: 1 | 2 | 3 | 4 | 5
+  box: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
   lastDay: string
   due: string
   mastered: boolean
@@ -57,7 +57,9 @@ export interface ReviewEvent {
 export function newCard(id: string, day: string): ReviewCard {
   return { id, box: 1, lastDay: day, due: addDays(day, 1), mastered: false }
 }
-const intervals = [1, 2, 4, 8, 16]
+/** Days until the next check for each box. Cards only climb after an unaided recall. */
+export const intervals = [1, 2, 4, 8, 16, 30, 60, 120]
+export const TOP_BOX = intervals.length
 export function reviewCard(
   card: ReviewCard,
   day: string,
@@ -66,14 +68,15 @@ export function reviewCard(
 ): { card: ReviewCard; event: ReviewEvent | null } {
   if (day <= card.lastDay || day < card.due) return { card, event: null }
   const recalled = remembered && !shownAnswer
-  const box = (recalled ? Math.min(card.box + 1, 5) : 1) as ReviewCard['box']
+  // Forgetting a well-known card steps it back a little instead of starting over.
+  const box = (recalled ? Math.min(card.box + 1, TOP_BOX) : card.box > 3 ? card.box - 2 : 1) as ReviewCard['box']
   return {
     card: {
       ...card,
       box,
       lastDay: day,
       due: addDays(day, intervals[box - 1]),
-      mastered: card.mastered || (card.box === 5 && recalled),
+      mastered: card.mastered || (card.box >= 5 && recalled),
     },
     event: {
       id: card.id,
@@ -84,12 +87,18 @@ export function reviewCard(
     },
   }
 }
+/** Review is limited by time, not a fixed handful: roughly five cards a minute. */
+export const reviewMinutes = { low: 1, normal: 8, high: 15 } as const
+export const reviewBudget = (energy: Energy) => reviewMinutes[energy] * 5
+/** How many cards are waiting today, used to slow down new words when review piles up. */
+export const dueCount = (cards: readonly ReviewCard[], day: string) =>
+  cards.filter((c) => c.due <= day && c.lastDay < day).length
 export function dueCards<T extends ReviewCard>(
   cards: readonly T[],
   day: string,
   energy: Energy,
 ): T[] {
-  const limit = { low: 1, normal: 5, high: 10 }[energy]
+  const limit = reviewBudget(energy)
   return cards
     .filter((c) => c.due <= day && c.lastDay < day)
     .sort((a, b) => a.due.localeCompare(b.due) || a.id.localeCompare(b.id))
