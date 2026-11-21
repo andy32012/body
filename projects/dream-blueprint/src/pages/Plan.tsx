@@ -7,6 +7,7 @@ import { originalPlan, projectCalendar } from "../lib/projection";
 import plan from "../data/plan.json";
 import curriculum from "../data/curriculum.json";
 import Roadmap from "../components/Roadmap";
+import Rivals from "./Rivals";
 import "./plan.css";
 
 const tracks = ["school", "english", "dream"] as const;
@@ -35,7 +36,7 @@ const baseGoals: Goal[] = plan.months.flatMap((m) =>
   })),
 );
 
-export type PlanTab = "calendar" | "timeline" | "map";
+export type PlanTab = "calendar" | "timeline" | "map" | "rivals";
 const firstMonth = plan.months[0].month;
 const lastMonth = "2034-12";
 export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
@@ -44,7 +45,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   const thisMonth = today.slice(0, 7);
   const [month, setMonth] = useState(thisMonth);
   const [selected, setSelected] = useState(today);
-  const [tab, setTab] = useState<PlanTab>(props.initialTab ?? "calendar");
+  const [tab, setTab] = useState<PlanTab>(props.initialTab === "rivals" && !props.state.settings.rivalsEnabled ? "calendar" : props.initialTab ?? "calendar");
   const [expanded, setExpanded] = useState<number | null>(
     Number(today.slice(0, 4)),
   );
@@ -154,7 +155,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   }
   const practicedDays = new Set(state.sessions.map((session) => session.day));
   const plannedLessons = calendar.filter(entry => entry.kind === "lesson").length;
-  const heroDetail = tab === "calendar"
+  const heroDetail = tab === "rivals" ? "跟虛擬對手比每週練習" : tab === "calendar"
     ? `${Number(month.slice(5))} 月預排 ${plannedLessons} 天課程`
     : tab === "timeline"
       ? `${plan.years[0].year} — ${plan.years[plan.years.length - 1].year}`
@@ -174,8 +175,9 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
             ["calendar", "每月行程"],
             ["timeline", "年度目標"],
             ["map", "赴美路線"],
+            ["rivals", "排行榜"],
           ] as const
-        ).map(([key, label]) => (
+        ).filter(([key]) => key !== "rivals" || state.settings.rivalsEnabled).map(([key, label]) => (
           <button
             key={key}
             aria-pressed={tab === key}
@@ -185,6 +187,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
           </button>
         ))}
       </div>
+      {tab === "rivals" && <Rivals {...props} />}
       {tab === "map" && (
         <>
           <Roadmap {...props} />

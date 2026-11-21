@@ -156,8 +156,26 @@ function progressCards(progress: string) {
 }
 
 /** The always-available "問問 Claude" button: knows the learner's progress from the handoff text. */
+/** True while the learner is typing an answer somewhere on the page (not in the assistant itself). */
+function useTyping() {
+  const [typing, setTyping] = useState(false)
+  useEffect(() => {
+    const check = () => {
+      const el = document.activeElement as HTMLElement | null
+      const field = !!el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'submit', 'range'].includes((el as HTMLInputElement).type)))
+      setTyping(field && !el!.closest('.ai-sheet'))
+    }
+    const later = () => setTimeout(check, 0)
+    document.addEventListener('focusin', check)
+    document.addEventListener('focusout', later)
+    return () => { document.removeEventListener('focusin', check); document.removeEventListener('focusout', later) }
+  }, [])
+  return typing
+}
+
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
+  const typing = useTyping()
   const system = [
     personaText(),
     '你住在玄燁的「夢想藍圖」網站裡，幫他學習。他是台灣護理系學生，目標考雅思、去美國當註冊護理師。',
@@ -168,7 +186,7 @@ export function AIAssistant({ progress }: { progress: string }) {
     progress,
   ].join('\n')
   return <>
-    <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Spark size={18} />問問 Claude</button>
+    <button type="button" className={'ai-fab' + (typing ? ' compact' : '')} aria-label="問問 Claude" title="問問 Claude" onClick={() => setOpen(true)}><Spark size={18} /><span>問問 Claude</span></button>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
       <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} placeholder="問單字、文法，或叫我出一句中翻英" />
     </AISheet>}

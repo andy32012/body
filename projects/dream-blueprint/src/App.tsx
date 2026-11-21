@@ -4,7 +4,7 @@ import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Settings2, Star, Sun,
-  Telescope, Trophy, Mic, House,
+  Telescope, Mic, House,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
@@ -15,7 +15,6 @@ import Plan, { type PlanTab } from './pages/Plan'
 import Practice, { PracticeCover, PracticeLibrary } from './pages/Practice'
 import { LessonBanner, TodayLesson, TodayThings } from './components/TodayLesson'
 import WorkloadRecommendation from './components/WorkloadRecommendation'
-import Rivals from './pages/Rivals'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
@@ -36,16 +35,18 @@ type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:s
 const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'today', title:'今日航行', mobile:'今天', icon:Compass},
   {id:'library', title:'英文練習', mobile:'練習', icon:BookOpen},
-  {id:'plan', title:'夢想星圖', mobile:'計畫', icon:MapIcon},
-  {id:'history', title:'航行紀錄', mobile:'紀錄', icon:ChartNoAxesColumnIncreasing},
-  {id:'rivals', title:'星際排行榜', mobile:'對手', icon:Trophy},
   {id:'speaking', title:'英文口說', mobile:'口說', icon:Mic},
+  {id:'history', title:'航行紀錄', mobile:'紀錄', icon:ChartNoAxesColumnIncreasing},
+  {id:'plan', title:'夢想星圖', mobile:'計畫', icon:MapIcon},
 ]
+const extraTitles: Partial<Record<View, string>> = {rivals:'星際排行榜', settings:'設定', cosmos:'宇宙圖鑑', practice:'英文練習'}
 const phases = {semester:'一般學期', exam:'考週模式', internship:'實習模式', vacation:'寒暑假模式'}
 function readRoute():Route {
   const [key, value] = location.hash.slice(1).split('/')
-  const view = [...links.map(l => l.id),'practice','settings','cosmos'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking' ? value : undefined, energy:value==='high'?'high':value==='normal'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':'calendar'}
+  // The leaderboard now lives inside the plan page.
+  if (key === 'rivals') return {view:'plan', tab:'rivals', energy:'low'}
+  const view = [...links.map(l => l.id),'practice','settings','cosmos','rivals'].includes(key) ? key as View : 'today'
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking' ? value : undefined, energy:value==='high'?'high':value==='normal'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':value==='rivals'?'rivals':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
@@ -111,7 +112,7 @@ function App() {
   const closeWord=()=>{setWordOpen(false);update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})}
   const navigate=(p:Page)=>setView(p==='practice'?'library':p)
   const start=(e:Energy)=>setView('practice',e)
-  const page=route.view==='rivals'&&!state.settings.rivalsEnabled?'today':route.view
+  const page=route.view
   const active=page==='practice'?'library':page
   const sky=useObservatory(page,state.notes['cosmos.pin.'+active])
   useEffect(()=>{
@@ -123,8 +124,7 @@ function App() {
     return ()=>{window.removeEventListener('hashchange',handle);window.removeEventListener('focus',clock);clearInterval(timer)}
   },[])
   useEffect(()=>{document.documentElement.dataset.theme=state.settings.theme},[state.settings.theme])
-  useEffect(()=>{if(route.view==='rivals'&&!state.settings.rivalsEnabled)location.replace('#today')},[route.view,state.settings.rivalsEnabled])
-  const pageName=links.find(l=>l.id===active)?.title||'設定'
+  const pageName=links.find(l=>l.id===active)?.title||extraTitles[active]||'設定'
   useEffect(()=>{document.title=pageName+' · 夢想藍圖'},[pageName])
   const props:PageProps={state,update,navigate}
   const memoryNotes=readMemory(state.notes)
@@ -166,7 +166,7 @@ function App() {
     const t=setTimeout(()=>saveDriveMemory(JSON.parse(memoryJson)),1500)
     return ()=>clearTimeout(t)
   },[memoryJson])
-  const available=links.filter(l=>l.id!=='rivals'||state.settings.rivalsEnabled)
+  const available=links
   const date=new Date(today+'T12:00:00')
   const dateText=new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(date)
   const phase=activePeriod(today,state.settings.periods)
@@ -191,7 +191,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}

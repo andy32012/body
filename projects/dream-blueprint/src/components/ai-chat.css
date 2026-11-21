@@ -154,3 +154,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ai-sheet, .ai-msg, .ai-thinking, .ai-thinking em, .ai-spark.spin, .ai-fab .ai-spark, .ai-hello, .ai-hello .ai-spark, .ai-caret { animation: none; }
 }
+/* While answering, the button shrinks to its icon so it does not cover the answer box. */
+.ai-fab.compact { padding: 10px; gap: 0; opacity: .82; }
+.ai-fab.compact span { display: none; }
+.ai-fab.compact:hover, .ai-fab.compact:focus-visible { opacity: 1; }
