@@ -1,0 +1,52 @@
+import { useRef, useState } from 'react'
+import { askTutor, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
+import './tutor.css'
+
+const verdictNames = { good: '對了', small: '小錯', again: '再試一次' }
+
+export default function TutorChat({ sentence, answer }: { sentence: TutorSentence; answer: string }) {
+  const [turns, setTurns] = useState<TutorTurn[]>([])
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [question, setQuestion] = useState('')
+  const abort = useRef<AbortController | null>(null)
+  if (!tutorKey()) return null
+
+  async function send(content: string) {
+    if (!content.trim() || busy) return
+    const next: TutorTurn[] = [...turns, { role: 'user', content }]
+    setTurns(next); setBusy(true); setError('')
+    abort.current = new AbortController()
+    try {
+      const reply = await askTutor(tutorSystem(sentence, []), next, abort.current.signal)
+      setTurns([...next, { role: 'assistant', content: reply }])
+    } catch (e) {
+      setTurns(turns)
+      setError(e instanceof Error ? e.message : String(e))
+    } finally { setBusy(false) }
+  }
+
+  const attempts = turns.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
+  const last = [...turns].reverse().find(t => t.role === 'assistant')
+  const verdict = last ? verdictOf(last.content) : null
+
+  return <section className="tu-box" aria-live="polite">
+    <strong>Claude 老師</strong>
+    {turns.map((t, i) => <div key={i} className={'tu-turn tu-' + t.role}>
+      {t.content.split('\n').map((line, j) => line.trim() && !/^判定：/.test(line.trim()) ? <p key={j}>{line}</p> : null)}
+    </div>)}
+    {busy && <p className="tu-wait">老師在看你寫的……</p>}
+    {error && <p className="tu-error" role="alert">{error}</p>}
+    {verdict && <p className="tu-verdict">判定：<b>{verdictNames[verdict]}</b></p>}
+    <div className="pr-actions">
+      {attempts === 0
+        ? <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim())}>請老師批改</button>
+        : <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我改成：' + answer.trim())}>改好了，再批一次</button>}
+      {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => send('我還是不會，請直接給答案並完整講原因。')}>直接告訴我</button>}
+    </div>
+    {attempts > 0 && <form className="tu-ask" onSubmit={e => { e.preventDefault(); send(question.trim()); setQuestion('') }}>
+      <input value={question} onChange={e => setQuestion(e.target.value)} placeholder="問老師，例如：為什麼不用 being？" />
+      <button type="submit" disabled={busy || !question.trim()}>問</button>
+    </form>}
+  </section>
+}

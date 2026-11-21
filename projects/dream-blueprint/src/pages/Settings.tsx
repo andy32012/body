@@ -1,9 +1,10 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { BookA, BookOpen, Bot, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
+import { BookA, BookOpen, Bot, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, KeyRound, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
 import ScenePhoto from '../components/ScenePhoto'
 import SchoolSettings from '../components/SchoolSettings'
 import VocabScreen from '../components/VocabScreen'
 import AIHandoff from '../components/AIHandoff'
+import ClaudeConnect from '../components/ClaudeConnect'
 import quizBank from '../data/quiz.json'
 import './settings.css'
 
@@ -197,6 +198,7 @@ export default function Settings(props: PageProps) {
       <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={reply} onChange={e=>setReply(e.target.value)} placeholder="有確切梯次或報到日期時，可以記在這裡。" /></label>
       <button type="button" onClick={()=>{update(prev=>({...prev,settings:{...prev.settings,officeReply:reply.trim(),officeAsked:prev.settings.officeAsked||!!reply.trim()}})); announce('office','已儲存系辦回覆。')}}>儲存系辦回覆</button>{status('office')}
     </Panel>
+    <Panel icon={KeyRound} title="連接 Claude" hint="用自己的 API 金鑰，讓 Claude 批改中翻英"><ClaudeConnect /></Panel>
     <Panel icon={Bot} title="交給其他 AI" hint="複製進度和教法，讓別的 AI 接著教">
       <AIHandoff state={state} update={update} />
     </Panel>

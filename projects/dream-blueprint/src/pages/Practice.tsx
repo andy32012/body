@@ -2,6 +2,7 @@ import ScenePhoto from "../components/ScenePhoto";
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
+import TutorChat from "../components/TutorChat";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
@@ -140,6 +141,7 @@ function Translation({
           </button>
         </div>
       )}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} />}
       {hint >= 1 && (
         <section className="pr-hint">
           <strong>自己檢查看看</strong>

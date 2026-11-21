@@ -1,0 +1,36 @@
+.tu-box {
+  margin: 1.2rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  background: var(--practice-inset);
+  border: 1px solid var(--practice-line);
+  border-inline-start: 3px solid var(--practice-accent);
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.tu-turn { min-width: 0; overflow-wrap: anywhere; }
+.tu-turn p { margin: 0.25rem 0; line-height: 1.65; }
+.tu-user { opacity: 0.72; font-size: 0.92em; }
+.tu-wait { opacity: 0.7; font-style: italic; margin: 0; }
+.tu-error { color: #c0392b; margin: 0; }
+.tu-verdict { margin: 0; }
+.tu-ask { display: flex; gap: 0.5rem; min-width: 0; }
+.tu-ask input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--practice-line);
+  background: transparent;
+  color: inherit;
+}
+.tu-ask button {
+  font: inherit;
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--practice-line);
+  background: transparent;
+  color: inherit;
+}
