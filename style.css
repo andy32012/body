@@ -62,15 +62,13 @@ section[id], a[id] { scroll-margin-top: 10px; }
   letter-spacing: -.075em;
 }
 .reply { font-size: clamp(20px, 2.3cqw, 30px); font-weight: 550; }
-.course-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--gap); }
-.course { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 1; padding: clamp(12px, 1.6vw, 23px); }
+.course-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--gap); }
+.course { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 3 / 2; padding: clamp(12px, 1.6vw, 23px); }
 .glyph { position: absolute; inset: 6% 0 23%; display: grid; place-items: center; font-weight: 700; font-size: clamp(50px, 6.7cqw, 83px); line-height: 1; }
 .course-label { font-size: clamp(15px, 1.5vw, 21px); font-weight: 700; }
 .course small { display: inline-block; font-size: .58em; font-weight: 600; }
 .ja { background: #ffddd8; color: #6e182b; }
 .ja .glyph { color: #b6384e; transform: rotate(-8deg); }
-.en { background: #c7e7ff; color: #163d60; }
-.en .glyph { color: #216cb3; font-family: Georgia, serif; font-style: italic; letter-spacing: -.08em; transform: rotate(-5deg); }
 .ko { background: #ffe4aa; color: #62370c; }
 .ko .glyph { color: #9b5313; transform: rotate(6deg); }
 .arrow { position: absolute; right: 10%; bottom: 9%; font: 18px/1.2 Arial, sans-serif; }
