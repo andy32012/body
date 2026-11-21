@@ -2,6 +2,7 @@ import { useState } from 'react'
 import data from '../data/scenarios.json'
 import type { PageProps } from '../lib/store'
 import DiagnoseBox from './DiagnoseBox'
+import './tutor.css'
 import { useTaskContext } from '../lib/taskContext'
 import { caseCauses, causeSummary, nextScenario, saveCase, stepNames, type Scenario, type StepResult } from '../lib/scenarios'
 
@@ -80,6 +81,8 @@ export default function ClinicalCase({ state, onActivity, date }: Pick<PageProps
       {picked !== undefined && <div className="pr-hint">
         <strong>{wrong ? '這一步的答案是：' : '答對了'}{wrong && <span lang="en"> {s.options[s.answer]}</span>}</strong>
         <p>{s.why}</p>
+        {s.whyOptions && <ol className="dg-why cc-why" aria-label="每個選項為什麼對或錯">{s.options.map((o, i) => <li key={o} data-ok={i === s.answer}>
+          <span lang="en">{o}</span><small>{s.whyOptions![i]}</small></li>)}</ol>}
         {wrong && <div className="qz-cause"><small>卡在哪？英文看不懂和護理觀念不熟會分開記。</small>
           <div className="pr-options">{caseCauses.map(c => <button key={c} type="button" aria-pressed={lastCause === c} disabled={!!lastCause && lastCause !== c} onClick={() => cause(c)}>{c}</button>)}</div>
           <DiagnoseBox key={current.id + step} id={'case.' + current.id + '.' + step} context={current.case} question={s.q} options={s.options} answer={s.answer} picked={picked!}
@@ -88,6 +91,11 @@ export default function ClinicalCase({ state, onActivity, date }: Pick<PageProps
         <button type="button" className="pr-main qz-next" onClick={next}>{step + 1 >= current.steps.length ? '看結果' : '下一步：' + stepNames[current.steps[step + 1].kind]}</button>
       </div>}
     </>}
+    <footer className="cc-meta">
+      {current.subjects && <span>國考科目：{current.subjects.join('、')}</span>}
+      {current.sources && <span>依據：{current.sources.map((x, i) => <a key={x.url} href={x.url} target="_blank" rel="noreferrer">{i ? '、' : ''}{x.title}</a>)}</span>}
+      <span>{current.updated ? '更新 ' + current.updated + ' · ' : ''}{current.review === 'reviewed' ? '已經臨床護理師審校' : '自編教材，照上面的公開資料整理，還沒經過臨床護理師審校；實際照護以醫囑和醫院流程為準'}</span>
+    </footer>
     {finished && <div className="pr-hint">
       <strong>這個情境答對 {results.filter(r => r.correct).length} / {results.length} 步</strong>
       <ul className="cc-result">{results.map(r => <li key={r.kind} data-ok={r.correct}>{stepNames[r.kind]}：{r.correct ? '對' : '錯' + (r.cause ? '（' + r.cause + '）' : '')}</li>)}</ul>

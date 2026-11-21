@@ -271,7 +271,10 @@
     ],
     "answerIndex": 1,
     "explanation": "數一分鐘內呼吸的次數，就能記錄呼吸速率。",
-    "source": "https://medlineplus.gov/ency/article/002341.htm"
+    "source": "https://medlineplus.gov/ency/article/002341.htm",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-022",
@@ -285,7 +288,10 @@
     ],
     "answerIndex": 1,
     "explanation": "血壓以毫米汞柱表示，記錄時分為收縮壓與舒張壓。",
-    "source": "https://medlineplus.gov/ency/article/002341.htm"
+    "source": "https://medlineplus.gov/ency/article/002341.htm",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-023",
@@ -299,7 +305,10 @@
     ],
     "answerIndex": 2,
     "explanation": "體溫計用來量體溫，台灣常用攝氏度記錄。",
-    "source": "https://medlineplus.gov/ency/article/002341.htm"
+    "source": "https://medlineplus.gov/ency/article/002341.htm",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-024",
@@ -313,7 +322,10 @@
     ],
     "answerIndex": 0,
     "explanation": "SpO₂ 是利用光學訊號估計的動脈血氧飽和度，以百分比表示。",
-    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-025",
@@ -327,7 +339,10 @@
     ],
     "answerIndex": 2,
     "explanation": "深色指甲油會阻擋儀器發出的光，影響讀值。",
-    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-026",
@@ -341,7 +356,10 @@
     ],
     "answerIndex": 1,
     "explanation": "儀器量測穿過指尖的光，再以訊號估計血氧飽和度。",
-    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/"
+    "source": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-027",
@@ -355,7 +373,10 @@
     ],
     "answerIndex": 0,
     "explanation": "雙手在脫手套的過程中有接觸汙染物的風險，脫下後要立刻執行手部衛生。",
-    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-028",
@@ -369,7 +390,10 @@
     ],
     "answerIndex": 1,
     "explanation": "雙手有明顯髒汙時，用肥皂和水洗手以去除髒汙。",
-    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-029",
@@ -383,7 +407,10 @@
     ],
     "answerIndex": 1,
     "explanation": "無菌操作前先執行手部衛生，降低將微生物帶入處置部位的風險。",
-    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
   },
   {
     "id": "q-030",
@@ -397,6 +424,163 @@
     ],
     "answerIndex": 2,
     "explanation": "照護部位從汙染轉為清潔時，要先執行手部衛生。戴著手套時要先脫掉。",
-    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+    "source": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html",
+    "subjects": [
+      "基本護理學與護理行政"
+    ]
+  },
+  {
+    "id": "q-031",
+    "kind": "nursing",
+    "en": "Antibiotics work against which kind of germ?",
+    "zh": "抗生素對哪一種病菌有效？",
+    "options": [
+      "兩種都有效",
+      "細菌",
+      "病毒"
+    ],
+    "answerIndex": 1,
+    "explanation": "抗生素治療細菌感染，對感冒、流感這類病毒感染沒有效。",
+    "source": "https://medlineplus.gov/antibiotics.html",
+    "subjects": [
+      "基礎醫學"
+    ]
+  },
+  {
+    "id": "q-032",
+    "kind": "nursing",
+    "en": "A patient gets hives and trouble breathing after a new medicine. What could this be?",
+    "zh": "病人用了新藥後起蕁麻疹、呼吸困難，可能是什麼？",
+    "options": [
+      "正常的藥效",
+      "肚子餓",
+      "嚴重的藥物過敏反應"
+    ],
+    "answerIndex": 2,
+    "explanation": "用藥後起疹子加上呼吸困難，要懷疑嚴重藥物過敏（過敏性休克），立刻停藥求援。",
+    "source": "https://medlineplus.gov/ency/article/000819.htm",
+    "subjects": [
+      "基礎醫學"
+    ]
+  },
+  {
+    "id": "q-033",
+    "kind": "nursing",
+    "en": "Which blood sugar level is considered low?",
+    "zh": "血糖多少以下算低血糖？",
+    "options": [
+      "低於 70 mg/dL",
+      "低於 120 mg/dL",
+      "低於 150 mg/dL"
+    ],
+    "answerIndex": 0,
+    "explanation": "美國 CDC：血糖低於 70 mg/dL 算低，低於 55 mg/dL 算嚴重偏低。",
+    "source": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html",
+    "subjects": [
+      "內外科護理學"
+    ]
+  },
+  {
+    "id": "q-034",
+    "kind": "nursing",
+    "en": "In the 15-15 rule, when should blood sugar be checked again?",
+    "zh": "15-15 法則中，什麼時候要再測一次血糖？",
+    "options": [
+      "隔天早上",
+      "吃或喝 15 公克醣類後 15 分鐘",
+      "1 小時後"
+    ],
+    "answerIndex": 1,
+    "explanation": "先吃喝 15 公克醣類，等 15 分鐘再測；還低於 70 mg/dL 就再來一次。",
+    "source": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html",
+    "subjects": [
+      "內外科護理學"
+    ]
+  },
+  {
+    "id": "q-035",
+    "kind": "nursing",
+    "en": "Which sign can mean a surgical wound is infected?",
+    "zh": "哪一個表現可能代表手術傷口感染？",
+    "options": [
+      "傷口乾燥、癒合中",
+      "傷口不紅不痛",
+      "傷口流出膿"
+    ],
+    "answerIndex": 2,
+    "explanation": "傷口流膿、紅、熱、痛，或發燒，都是要通報的感染警訊。",
+    "source": "https://medlineplus.gov/ency/article/007645.htm",
+    "subjects": [
+      "內外科護理學"
+    ]
+  },
+  {
+    "id": "q-036",
+    "kind": "nursing",
+    "en": "Which is a warning sign of a heart attack?",
+    "zh": "哪一個是心臟病發作的警訊？",
+    "options": [
+      "胸口不適延伸到手臂",
+      "剛吃飽有點睏",
+      "打一個噴嚏"
+    ],
+    "answerIndex": 0,
+    "explanation": "胸口壓迫或疼痛，延伸到手臂、背、頸或下巴，常伴隨冒冷汗、喘，都是心臟病發作的警訊。",
+    "source": "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack",
+    "subjects": [
+      "內外科護理學"
+    ]
+  },
+  {
+    "id": "q-037",
+    "kind": "nursing",
+    "en": "Which finding is a sign of severe dehydration?",
+    "zh": "哪一個表現是嚴重脫水的徵象？",
+    "options": [
+      "剛喝完一杯水",
+      "沒有排尿或尿液很深",
+      "有點口渴"
+    ],
+    "answerIndex": 1,
+    "explanation": "沒有尿或尿色很深、精神變差、心跳快，都是嚴重脫水的表現。小孩上吐下瀉時要特別注意。",
+    "source": "https://medlineplus.gov/ency/article/000982.htm",
+    "subjects": [
+      "產兒科護理學"
+    ]
+  },
+  {
+    "id": "q-038",
+    "kind": "nursing",
+    "en": "A child has a cold caused by a virus. Will antibiotics help?",
+    "zh": "小孩因為病毒感冒，抗生素有幫助嗎？",
+    "options": [
+      "會，馬上就好",
+      "會，而且可以預防所有感染",
+      "不會，抗生素對病毒沒效"
+    ],
+    "answerIndex": 2,
+    "explanation": "感冒多半是病毒造成，抗生素沒效；亂用還可能產生抗藥性。衛教家長時常會問到。",
+    "source": "https://medlineplus.gov/antibiotics.html",
+    "subjects": [
+      "產兒科護理學",
+      "精神科與社區衛生護理學"
+    ]
+  },
+  {
+    "id": "q-039",
+    "kind": "nursing",
+    "en": "When teaching handwashing in the community, how long should people scrub with soap?",
+    "zh": "在社區衛教洗手時，用肥皂搓洗要多久？",
+    "options": [
+      "至少 20 秒",
+      "3 秒",
+      "不用搓，沖水就好"
+    ],
+    "answerIndex": 0,
+    "explanation": "美國 CDC 建議用肥皂搓洗雙手至少 20 秒，再用清水沖乾淨。",
+    "source": "https://www.cdc.gov/clean-hands/about/index.html",
+    "subjects": [
+      "精神科與社區衛生護理學"
+    ]
   }
 ]

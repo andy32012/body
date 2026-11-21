@@ -46,7 +46,7 @@ function readRoute():Route {
   // The leaderboard now lives inside the plan page.
   if (key === 'rivals') return {view:'plan', tab:'rivals', energy:'low'}
   const view = [...links.map(l => l.id),'practice','settings','cosmos','rivals'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':value==='rivals'?'rivals':'calendar'}
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='exam'?'exam':value==='timeline'?'timeline':value==='rivals'?'rivals':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')

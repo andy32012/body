@@ -7,6 +7,7 @@ import { originalPlan, projectCalendar } from "../lib/projection";
 import plan from "../data/plan.json";
 import curriculum from "../data/curriculum.json";
 import Roadmap from "../components/Roadmap";
+import ExamMap from "../components/ExamMap";
 import Rivals from "./Rivals";
 import "./plan.css";
 
@@ -36,7 +37,7 @@ const baseGoals: Goal[] = plan.months.flatMap((m) =>
   })),
 );
 
-export type PlanTab = "calendar" | "timeline" | "map" | "rivals";
+export type PlanTab = "calendar" | "timeline" | "map" | "exam" | "rivals";
 const firstMonth = plan.months[0].month;
 const lastMonth = "2034-12";
 export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
@@ -155,7 +156,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   }
   const practicedDays = new Set(state.sessions.map((session) => session.day));
   const plannedLessons = calendar.filter(entry => entry.kind === "lesson").length;
-  const heroDetail = tab === "rivals" ? "跟虛擬對手比每週練習" : tab === "calendar"
+  const heroDetail = tab === "rivals" ? "跟虛擬對手比每週練習" : tab === "exam" ? "台灣護理師國考 5 科，對應的英文練習" : tab === "calendar"
     ? `${Number(month.slice(5))} 月預排 ${plannedLessons} 天課程`
     : tab === "timeline"
       ? `${plan.years[0].year} — ${plan.years[plan.years.length - 1].year}`
@@ -175,6 +176,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
             ["calendar", "每月行程"],
             ["timeline", "年度目標"],
             ["map", "赴美路線"],
+            ["exam", "國考對照"],
             ["rivals", "排行榜"],
           ] as const
         ).filter(([key]) => key !== "rivals" || state.settings.rivalsEnabled).map(([key, label]) => (
@@ -188,6 +190,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
         ))}
       </div>
       {tab === "rivals" && <Rivals {...props} />}
+      {tab === "exam" && <ExamMap state={state} update={props.update} />}
       {tab === "map" && (
         <>
           <Roadmap {...props} />

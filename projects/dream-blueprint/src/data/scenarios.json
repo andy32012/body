@@ -11,7 +11,12 @@
      "He is 68 years old."
     ],
     "answer": 0,
-    "why": "用胰島素又沒進食，是懷疑低血糖最重要的線索。"
+    "why": "用胰島素又沒進食，是懷疑低血糖最重要的線索。",
+    "whyOptions": [
+     "對：用胰島素又沒吃東西，血糖最容易掉下來。",
+     "錯：幾點鐘本身不是症狀的原因。",
+     "錯：年紀大是背景，但不是這次發抖冒汗的關鍵。"
+    ]
    },
    {
     "kind": "problem",
@@ -22,7 +27,12 @@
      "Low blood sugar"
     ],
     "answer": 2,
-    "why": "發抖、冒冷汗，加上用胰島素沒吃東西，是典型的低血糖表現。"
+    "why": "發抖、冒冷汗，加上用胰島素沒吃東西，是典型的低血糖表現。",
+    "whyOptions": [
+     "錯：高血壓通常不會讓人發抖、冒冷汗。",
+     "錯：發燒皮膚通常是熱的，他是冷汗。",
+     "對：發抖、冷汗，加上用胰島素沒進食，是典型低血糖。"
+    ]
    },
    {
     "kind": "action",
@@ -33,7 +43,12 @@
      "Give his insulin."
     ],
     "answer": 1,
-    "why": "先測血糖確認，再依醫囑或常規給快速吸收的糖；這時候絕對不能再給胰島素。"
+    "why": "先測血糖確認，再依醫囑或常規給快速吸收的糖；這時候絕對不能再給胰島素。",
+    "whyOptions": [
+     "錯：低血糖讓他睡著可能變成昏迷，很危險。",
+     "對：先測血糖確認，再依醫囑或常規給快速吸收的糖。",
+     "錯：再給胰島素會讓血糖更低，最危險的選項。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -44,12 +59,28 @@
      "15 minutes later, his blood sugar is 105 mg/dL and he stops shaking."
     ],
     "answer": 2,
-    "why": "給糖後約 15 分鐘複測，血糖回升、症狀緩解，才代表處置有效。"
+    "why": "給糖後約 15 分鐘複測，血糖回升、症狀緩解，才代表處置有效。",
+    "whyOptions": [
+     "錯：還在冒冷汗代表症狀沒好。",
+     "錯：要胰島素跟改善無關，而且現在不能給。",
+     "對：約 15 分鐘複測血糖回升、不再發抖，才算有效。"
+    ]
    }
   ],
   "topic": "低血糖",
   "case": "Mr. Chen is 68 and has diabetes. He uses insulin. At 10 a.m. he says, \"I feel shaky.\" His skin is cool and sweaty. He did not eat breakfast.",
-  "caseZh": "陳先生 68 歲，有糖尿病，使用胰島素。早上 10 點他說「我覺得發抖」，皮膚濕冷、冒汗。他沒吃早餐。"
+  "caseZh": "陳先生 68 歲，有糖尿病，使用胰島素。早上 10 點他說「我覺得發抖」，皮膚濕冷、冒汗。他沒吃早餐。",
+  "sources": [
+   {
+    "title": "CDC：Treatment of Low Blood Sugar (Hypoglycemia)",
+    "url": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html"
+   }
+  ],
+  "subjects": [
+   "內外科護理學"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "fall-risk",
@@ -63,7 +94,12 @@
      "She went to bed early."
     ],
     "answer": 0,
-    "why": "高齡、剛手術、使用安眠藥，都是跌倒的危險因子。"
+    "why": "高齡、剛手術、使用安眠藥，都是跌倒的危險因子。",
+    "whyOptions": [
+     "對：高齡、剛手術、吃了安眠藥，都是跌倒危險因子。",
+     "錯：性別不是這裡的主要危險因子。",
+     "錯：早睡跟跌倒沒有直接關係。"
+    ]
    },
    {
     "kind": "problem",
@@ -74,7 +110,12 @@
      "Low blood sugar"
     ],
     "answer": 1,
-    "why": "半夜、藥物作用加上手術後虛弱，最需要防範的是跌倒。"
+    "why": "半夜、藥物作用加上手術後虛弱，最需要防範的是跌倒。",
+    "whyOptions": [
+     "錯：現在沒有發燒或傷口紅腫的線索。",
+     "對：半夜、藥效加上術後虛弱，最怕跌倒。",
+     "錯：沒有低血糖的線索。"
+    ]
    },
    {
     "kind": "action",
@@ -85,7 +126,12 @@
      "Give her another sleeping pill."
     ],
     "answer": 0,
-    "why": "陪同協助如廁最安全；叫她憋到早上不合理，再給安眠藥會更容易跌倒。"
+    "why": "陪同協助如廁最安全；叫她憋到早上不合理，再給安眠藥會更容易跌倒。",
+    "whyOptions": [
+     "對：陪同協助如廁最安全，也尊重她的需要。",
+     "錯：叫她憋到早上不合理，她可能自己偷偷下床。",
+     "錯：再給安眠藥會更暈、更容易跌倒。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -96,12 +142,28 @@
      "She goes to the bathroom and back to bed safely with help."
     ],
     "answer": 2,
-    "why": "目標是安全完成如廁、沒有跌倒。"
+    "why": "目標是安全完成如廁、沒有跌倒。",
+    "whyOptions": [
+     "錯：獨自走路代表風險還在，不是目標。",
+     "錯：整晚沒睡不是照護目標。",
+     "對：在協助下安全如廁、回到床上、沒有跌倒，才是目標。"
+    ]
    }
   ],
   "topic": "跌倒風險",
   "case": "Mrs. Lin is 80. She had surgery yesterday, and she took a sleeping pill at night. At 2 a.m. she wants to walk to the bathroom alone.",
-  "caseZh": "林太太 80 歲，昨天剛開完刀，晚上吃了安眠藥。凌晨兩點她想自己走去廁所。"
+  "caseZh": "林太太 80 歲，昨天剛開完刀，晚上吃了安眠藥。凌晨兩點她想自己走去廁所。",
+  "sources": [
+   {
+    "title": "AHRQ：Fall TIPS – A Patient-Centered Fall Prevention Toolkit",
+    "url": "https://www.ahrq.gov/patient-safety/settings/hospital/fall-tips/index.html"
+   }
+  ],
+  "subjects": [
+   "基本護理學與護理行政"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "wound-infection",
@@ -115,7 +177,12 @@
      "He talked with his son."
     ],
     "answer": 0,
-    "why": "發燒加上傷口紅、熱、有膿樣分泌物，是感染的重要線索。"
+    "why": "發燒加上傷口紅、熱、有膿樣分泌物，是感染的重要線索。",
+    "whyOptions": [
+     "對：發燒加上傷口紅、熱、有黃色分泌物，是感染的線索。",
+     "錯：吃午餐跟感染無關。",
+     "錯：跟兒子聊天跟感染無關。"
+    ]
    },
    {
     "kind": "problem",
@@ -126,7 +193,12 @@
      "Low blood sugar"
     ],
     "answer": 1,
-    "why": "術後幾天出現發燒和局部紅熱化膿，最可能是傷口感染。"
+    "why": "術後幾天出現發燒和局部紅熱化膿，最可能是傷口感染。",
+    "whyOptions": [
+     "錯：沒有受傷或骨頭變形的線索。",
+     "對：術後發燒、傷口紅熱有膿，最可能是傷口感染。",
+     "錯：沒有低血糖的線索。"
+    ]
    },
    {
     "kind": "action",
@@ -137,7 +209,12 @@
      "Remove the dressing and leave the wound open."
     ],
     "answer": 0,
-    "why": "完成評估後要通報醫師，依醫囑處理（例如傷口培養、抗生素）；不可自行把傷口敞開。"
+    "why": "完成評估後要通報醫師，依醫囑處理（例如傷口培養、抗生素）；不可自行把傷口敞開。",
+    "whyOptions": [
+     "對：評估後通報醫師，依醫囑做傷口培養、給抗生素。",
+     "錯：冷水澡不是處理感染的方法，還可能讓他發抖不舒服。",
+     "錯：自己把敷料拿掉讓傷口敞開，會增加汙染。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -148,12 +225,29 @@
      "There is more yellow fluid."
     ],
     "answer": 0,
-    "why": "退燒、傷口紅腫減輕，表示治療有效。"
+    "why": "退燒、傷口紅腫減輕，表示治療有效。",
+    "whyOptions": [
+     "對：退燒、傷口紅腫減輕，表示治療有效。",
+     "錯：39°C 代表燒得更高，是惡化。",
+     "錯：分泌物變多是惡化。"
+    ]
    }
   ],
   "topic": "傷口感染",
   "case": "Mr. Wang had surgery two days ago. Today his temperature is 38.6°C. His wound is red and warm, and there is yellow fluid on the dressing.",
-  "caseZh": "王先生兩天前開刀。今天體溫 38.6°C，傷口紅、熱，紗布上有黃色分泌物。"
+  "caseZh": "王先生兩天前開刀。今天體溫 38.6°C，傷口紅、熱，紗布上有黃色分泌物。",
+  "sources": [
+   {
+    "title": "MedlinePlus：Surgical wound infection - treatment",
+    "url": "https://medlineplus.gov/ency/article/007645.htm"
+   }
+  ],
+  "subjects": [
+   "內外科護理學",
+   "基礎醫學"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "allergy",
@@ -167,7 +261,12 @@
      "She is allergic to the medicine that was ordered."
     ],
     "answer": 2,
-    "why": "醫囑的藥正是她過敏的藥，這是最關鍵的線索。"
+    "why": "醫囑的藥正是她過敏的藥，這是最關鍵的線索。",
+    "whyOptions": [
+     "錯：戴手圈本身不是重點，重點是手圈寫了什麼。",
+     "錯：打點滴不會讓過敏的藥變安全。",
+     "對：醫囑的藥正好是她過敏的藥，最關鍵。"
+    ]
    },
    {
     "kind": "problem",
@@ -178,7 +277,12 @@
      "A serious allergic reaction"
     ],
     "answer": 2,
-    "why": "給過敏的藥可能引起嚴重過敏反應，甚至過敏性休克；打點滴不會比較安全。"
+    "why": "給過敏的藥可能引起嚴重過敏反應，甚至過敏性休克；打點滴不會比較安全。",
+    "whyOptions": [
+     "錯：從靜脈給反而作用更快，不會比較安全。",
+     "錯：給過敏的藥不會讓人睡得比較好。",
+     "對：可能發生嚴重過敏反應，甚至過敏性休克。"
+    ]
    },
    {
     "kind": "action",
@@ -189,7 +293,12 @@
      "Give it more slowly."
     ],
     "answer": 1,
-    "why": "先暫停給藥並聯絡醫師更改醫囑；減量或放慢速度都不安全。"
+    "why": "先暫停給藥並聯絡醫師更改醫囑；減量或放慢速度都不安全。",
+    "whyOptions": [
+     "錯：減量還是會過敏，不安全。",
+     "對：先暫停給藥，聯絡醫師更改醫囑。",
+     "錯：放慢速度一樣會過敏。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -200,12 +309,29 @@
      "The patient gets a rash."
     ],
     "answer": 1,
-    "why": "改成她不過敏的藥、沒有發生過敏反應，才是安全的結果。"
+    "why": "改成她不過敏的藥、沒有發生過敏反應，才是安全的結果。",
+    "whyOptions": [
+     "錯：之後再給還是同一種過敏的藥。",
+     "對：改成她不過敏的抗生素、沒有過敏反應，才是安全結果。",
+     "錯：起紅疹代表發生了過敏反應，是不好的結果。"
+    ]
    }
   ],
   "topic": "藥物過敏",
   "case": "Ms. Lee will get an antibiotic by IV. Before giving it, the nurse sees a red band on her wrist: \"Penicillin allergy.\" The ordered medicine is penicillin.",
-  "caseZh": "李小姐要打靜脈抗生素。給藥前，護理師看到她手上的紅色手圈寫著「盤尼西林過敏」，而醫囑的藥就是盤尼西林。"
+  "caseZh": "李小姐要打靜脈抗生素。給藥前，護理師看到她手上的紅色手圈寫著「盤尼西林過敏」，而醫囑的藥就是盤尼西林。",
+  "sources": [
+   {
+    "title": "MedlinePlus：Drug allergies",
+    "url": "https://medlineplus.gov/ency/article/000819.htm"
+   }
+  ],
+  "subjects": [
+   "基礎醫學",
+   "基本護理學與護理行政"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "dehydration",
@@ -219,7 +345,12 @@
      "No urine for 8 hours, dry lips, and very sleepy"
     ],
     "answer": 2,
-    "why": "沒有尿、口唇乾、精神變差，都是脫水的重要表現。"
+    "why": "沒有尿、口唇乾、精神變差，都是脫水的重要表現。",
+    "whyOptions": [
+     "錯：喜歡卡通跟病情無關。",
+     "錯：年齡是背景，但不是脫水的表現。",
+     "對：8 小時沒尿、口唇乾、很嗜睡，都是脫水的重要表現。"
+    ]
    },
    {
     "kind": "problem",
@@ -230,7 +361,12 @@
      "A broken arm"
     ],
     "answer": 1,
-    "why": "上吐下瀉後尿量減少、口乾、嗜睡，最可能是脫水。"
+    "why": "上吐下瀉後尿量減少、口乾、嗜睡，最可能是脫水。",
+    "whyOptions": [
+     "錯：沒有喘或喘鳴的線索。",
+     "對：上吐下瀉後尿少、口乾、嗜睡，最可能是脫水。",
+     "錯：沒有受傷的線索。"
+    ]
    },
    {
     "kind": "action",
@@ -241,7 +377,12 @@
      "Check his vital signs and tell the doctor."
     ],
     "answer": 2,
-    "why": "嗜睡可能代表脫水變嚴重，要先評估生命徵象並馬上通報，依醫囑補充水分；不能讓他睡著再說。"
+    "why": "嗜睡可能代表脫水變嚴重，要先評估生命徵象並馬上通報，依醫囑補充水分；不能讓他睡著再說。",
+    "whyOptions": [
+     "錯：一直吐的時候吃大餐只會吐更多。",
+     "錯：嗜睡可能是脫水變嚴重，不能讓他睡著再說。",
+     "對：先量生命徵象並通報醫師，依醫囑補充水分。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -252,12 +393,28 @@
      "He passes urine and is more awake."
     ],
     "answer": 2,
-    "why": "開始有尿、精神變好，表示補水有效。"
+    "why": "開始有尿、精神變好，表示補水有效。",
+    "whyOptions": [
+     "錯：還是沒尿代表脫水沒改善。",
+     "錯：嘴唇更乾是惡化。",
+     "對：開始有尿、精神變好，表示補水有效。"
+    ]
    }
   ],
   "topic": "脫水",
   "case": "A 4-year-old boy has had vomiting and diarrhea since yesterday. His lips are dry. He has not passed urine for 8 hours, and he is very sleepy.",
-  "caseZh": "一位 4 歲男童從昨天開始嘔吐和腹瀉，嘴唇乾燥，已經 8 小時沒有尿尿，而且非常想睡。"
+  "caseZh": "一位 4 歲男童從昨天開始嘔吐和腹瀉，嘴唇乾燥，已經 8 小時沒有尿尿，而且非常想睡。",
+  "sources": [
+   {
+    "title": "MedlinePlus：Dehydration",
+    "url": "https://medlineplus.gov/ency/article/000982.htm"
+   }
+  ],
+  "subjects": [
+   "產兒科護理學"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "chest-pain",
@@ -271,7 +428,12 @@
      "He is wearing pajamas."
     ],
     "answer": 0,
-    "why": "胸痛延伸到左手臂、冒冷汗，可能是心臟問題的警訊。"
+    "why": "胸痛延伸到左手臂、冒冷汗，可能是心臟問題的警訊。",
+    "whyOptions": [
+     "對：胸痛延伸到左手臂、冒冷汗，可能是心臟問題的警訊。",
+     "錯：按呼叫鈴只是他求助的方式。",
+     "錯：穿睡衣跟病情無關。"
+    ]
    },
    {
     "kind": "problem",
@@ -282,7 +444,12 @@
      "Hunger"
     ],
     "answer": 1,
-    "why": "這些症狀要先當作心臟問題（例如心肌缺氧）處理。"
+    "why": "這些症狀要先當作心臟問題（例如心肌缺氧）處理。",
+    "whyOptions": [
+     "錯：感冒不會有延伸到手臂的胸痛和冷汗。",
+     "對：要先當作心臟問題（例如心肌缺氧）處理。",
+     "錯：肚子餓不會造成這些症狀。"
+    ]
    },
    {
     "kind": "action",
@@ -293,7 +460,12 @@
      "Stay with him and get help right away."
     ],
     "answer": 2,
-    "why": "不要離開病人，立刻求援並評估生命徵象，依醫院流程處理；不能讓他走動。"
+    "why": "不要離開病人，立刻求援並評估生命徵象，依醫院流程處理；不能讓他走動。",
+    "whyOptions": [
+     "錯：走動會增加心臟負擔，很危險。",
+     "錯：咖啡不是處理方式，還可能增加心跳。",
+     "對：留在病人身邊、立刻求援並評估生命徵象，依醫院流程處理。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -304,12 +476,28 @@
      "The pain spreads to his jaw."
     ],
     "answer": 0,
-    "why": "胸痛緩解、生命徵象穩定才是好轉；疼痛擴散或更喘都是惡化。"
+    "why": "胸痛緩解、生命徵象穩定才是好轉；疼痛擴散或更喘都是惡化。",
+    "whyOptions": [
+     "對：胸痛消失、生命徵象穩定，是好轉。",
+     "錯：更喘是惡化。",
+     "錯：疼痛擴散到下巴是惡化的警訊。"
+    ]
    }
   ],
   "topic": "胸痛",
   "case": "Mr. Ho is 60. He presses the call button and says, \"My chest hurts. The pain goes to my left arm.\" He is sweating.",
-  "caseZh": "何先生 60 歲，按了呼叫鈴說：「我胸口痛，痛到左手臂。」他正在冒汗。"
+  "caseZh": "何先生 60 歲，按了呼叫鈴說：「我胸口痛，痛到左手臂。」他正在冒汗。",
+  "sources": [
+   {
+    "title": "American Heart Association：Warning Signs of a Heart Attack",
+    "url": "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack"
+   }
+  ],
+  "subjects": [
+   "內外科護理學"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "hand-hygiene",
@@ -323,7 +511,12 @@
      "She is moving from a dirty task to a clean task."
     ],
     "answer": 2,
-    "why": "從汙染的工作換到乾淨的工作，就是要做手部衛生的時機，即使是同一位病人。"
+    "why": "從汙染的工作換到乾淨的工作，就是要做手部衛生的時機，即使是同一位病人。",
+    "whyOptions": [
+     "錯：同一位病人也要洗手，這不是重點。",
+     "錯：要點眼藥是事實，但關鍵是前一個工作是髒的。",
+     "對：從汙染的工作換到乾淨的工作，就是手部衛生的時機。"
+    ]
    },
    {
     "kind": "problem",
@@ -334,7 +527,12 @@
      "The patient will fall asleep."
     ],
     "answer": 0,
-    "why": "沒清潔雙手就碰眼睛，可能把傷口的細菌帶到眼睛。"
+    "why": "沒清潔雙手就碰眼睛，可能把傷口的細菌帶到眼睛。",
+    "whyOptions": [
+     "對：可能把傷口的細菌帶到眼睛。",
+     "錯：溫度不是這裡的風險。",
+     "錯：睡著跟手部衛生無關。"
+    ]
    },
    {
     "kind": "action",
@@ -345,7 +543,12 @@
      "Take off her gloves and clean her hands."
     ],
     "answer": 2,
-    "why": "脫手套後立刻手部衛生，再拿眼藥；手套不能從髒處直接用到乾淨處。"
+    "why": "脫手套後立刻手部衛生，再拿眼藥；手套不能從髒處直接用到乾淨處。",
+    "whyOptions": [
+     "錯：把手套擦在制服上，細菌還在，制服也髒了。",
+     "錯：手套不能從髒處直接用到乾淨處。",
+     "對：脫手套、立刻做手部衛生，再拿眼藥。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -356,12 +559,28 @@
      "She uses the same gloves for both tasks."
     ],
     "answer": 1,
-    "why": "在乾淨操作之前做好手部衛生，才是正確做法。"
+    "why": "在乾淨操作之前做好手部衛生，才是正確做法。",
+    "whyOptions": [
+     "錯：只在下班時洗手，中間的時機都漏掉了。",
+     "對：碰眼藥之前先做手部衛生，才是正確做法。",
+     "錯：兩個工作用同一副手套會把細菌帶過去。"
+    ]
    }
   ],
   "topic": "手部衛生",
   "case": "A nurse has just changed a patient's dirty dressing. Next, she wants to give the same patient eye drops.",
-  "caseZh": "護理師剛幫病人換完髒的敷料，接下來要幫同一位病人點眼藥。"
+  "caseZh": "護理師剛幫病人換完髒的敷料，接下來要幫同一位病人點眼藥。",
+  "sources": [
+   {
+    "title": "CDC：Clinical Safety – Hand Hygiene for Healthcare Workers",
+    "url": "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+   }
+  ],
+  "subjects": [
+   "基本護理學與護理行政"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  },
  {
   "id": "pain",
@@ -375,7 +594,12 @@
      "She says it is 8 out of 10."
     ],
     "answer": 2,
-    "why": "疼痛分數是病人自己說的，是評估疼痛程度最重要的依據。"
+    "why": "疼痛分數是病人自己說的，是評估疼痛程度最重要的依據。",
+    "whyOptions": [
+     "錯：開刀是背景，但不能告訴你有多痛。",
+     "錯：躺在床上不能代表痛的程度。",
+     "對：病人自己說的疼痛分數，是判斷多痛最重要的依據。"
+    ]
    },
    {
     "kind": "problem",
@@ -386,7 +610,12 @@
      "An allergy"
     ],
     "answer": 1,
-    "why": "術後 8 分的疼痛屬於嚴重疼痛，需要處理。"
+    "why": "術後 8 分的疼痛屬於嚴重疼痛，需要處理。",
+    "whyOptions": [
+     "錯：沒有低血糖的線索。",
+     "對：術後 8 分的疼痛屬於嚴重疼痛，需要處理。",
+     "錯：沒有過敏的線索。"
+    ]
    },
    {
     "kind": "action",
@@ -397,7 +626,12 @@
      "Give the ordered pain medicine and help her into a comfortable position."
     ],
     "answer": 2,
-    "why": "依醫囑給止痛藥，並協助舒適擺位；不能忽視疼痛。"
+    "why": "依醫囑給止痛藥，並協助舒適擺位；不能忽視疼痛。",
+    "whyOptions": [
+     "錯：痛到 8 分時馬上逼她走，她會更痛也更怕動。",
+     "錯：忽視疼痛不是好的照護。",
+     "對：依醫囑給止痛藥，並協助舒適的擺位。"
+    ]
    },
    {
     "kind": "evaluate",
@@ -408,11 +642,28 @@
      "Only check her temperature."
     ],
     "answer": 0,
-    "why": "給藥後要在藥效時間內再評估疼痛分數，確認有沒有降低。"
+    "why": "給藥後要在藥效時間內再評估疼痛分數，確認有沒有降低。",
+    "whyOptions": [
+     "對：在藥效開始後再問一次疼痛分數，確認有沒有下降。",
+     "錯：等到明天太久了。",
+     "錯：體溫不能告訴你痛有沒有改善。"
+    ]
    }
   ],
   "topic": "術後疼痛",
   "case": "Mrs. Wu had knee surgery this morning. She says her pain is 8 out of 10. She is holding her knee and does not want to move.",
-  "caseZh": "吳太太今天早上開完膝蓋，她說疼痛 8 分（滿分 10 分），抱著膝蓋不想動。"
+  "caseZh": "吳太太今天早上開完膝蓋，她說疼痛 8 分（滿分 10 分），抱著膝蓋不想動。",
+  "sources": [
+   {
+    "title": "MedlinePlus：Postsurgical pain treatment in adults",
+    "url": "https://medlineplus.gov/ency/patientinstructions/000406.htm"
+   }
+  ],
+  "subjects": [
+   "內外科護理學",
+   "基本護理學與護理行政"
+  ],
+  "updated": "2026-11-21",
+  "review": "self"
  }
 ]

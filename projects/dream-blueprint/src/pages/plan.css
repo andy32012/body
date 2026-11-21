@@ -381,3 +381,7 @@
   .pl-day { padding: 16px; }
   .pl-calendar-layout { gap: 10px; }
 }
+/* Five tabs do not fit a phone; let them wrap instead of widening the page. */
+.pl-switch { flex-wrap: wrap; }
+.pl-switch button { min-width: 0; }
+@media (max-width: 520px) { .pl-switch { width: 100%; } .pl-switch button { flex: 1 1 30%; padding-inline: 8px; } }

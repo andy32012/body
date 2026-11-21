@@ -1,0 +1,282 @@
+{
+ "updated": "2026-11-21",
+ "source": {
+  "title": "考選部公告：專門職業及技術人員高等考試護理師考試命題大綱（113年12月27日修正，補習班網站轉載）",
+  "url": "https://www.3people.com.tw/%E9%87%8D%E8%A6%81%E8%80%83%E8%A8%8A/%E7%B0%A1%E7%AB%A0/114/license/%E8%AD%B7%E7%90%86%E5%B8%AB%E5%91%BD%E9%A1%8C%E5%A4%A7%E7%B6%B1.pdf"
+ },
+ "official": {
+  "title": "考選部網站（報名前以官方公告為準）",
+  "url": "https://www.moex.gov.tw/"
+ },
+ "subjects": [
+  {
+   "id": "basic-med",
+   "name": "基礎醫學",
+   "includes": "解剖學、生理學、病理學、藥理學、微生物學與免疫學",
+   "outline": [
+    "解剖學",
+    "生理學",
+    "病理學",
+    "藥理學",
+    "微生物學與免疫學"
+   ],
+   "words": [
+    {
+     "en": "anatomy",
+     "zh": "解剖學"
+    },
+    {
+     "en": "physiology",
+     "zh": "生理學"
+    },
+    {
+     "en": "pathology",
+     "zh": "病理學"
+    },
+    {
+     "en": "pharmacology",
+     "zh": "藥理學"
+    },
+    {
+     "en": "microbiology",
+     "zh": "微生物學"
+    },
+    {
+     "en": "immunity",
+     "zh": "免疫"
+    },
+    {
+     "en": "inflammation",
+     "zh": "發炎"
+    },
+    {
+     "en": "side effect",
+     "zh": "副作用"
+    },
+    {
+     "en": "dose",
+     "zh": "劑量"
+    },
+    {
+     "en": "bacteria",
+     "zh": "細菌"
+    }
+   ]
+  },
+  {
+   "id": "fundamentals",
+   "name": "基本護理學與護理行政",
+   "includes": "護理原理、護理技術、護理行政",
+   "outline": [
+    "基本護理學",
+    "護理行政"
+   ],
+   "words": [
+    {
+     "en": "vital signs",
+     "zh": "生命徵象"
+    },
+    {
+     "en": "hand hygiene",
+     "zh": "手部衛生"
+    },
+    {
+     "en": "aseptic technique",
+     "zh": "無菌技術"
+    },
+    {
+     "en": "fall prevention",
+     "zh": "預防跌倒"
+    },
+    {
+     "en": "pressure injury",
+     "zh": "壓力性損傷"
+    },
+    {
+     "en": "intake and output",
+     "zh": "輸入輸出量"
+    },
+    {
+     "en": "nursing process",
+     "zh": "護理過程"
+    },
+    {
+     "en": "handover",
+     "zh": "交班"
+    },
+    {
+     "en": "patient safety",
+     "zh": "病人安全"
+    },
+    {
+     "en": "informed consent",
+     "zh": "知情同意"
+    }
+   ]
+  },
+  {
+   "id": "med-surg",
+   "name": "內外科護理學",
+   "includes": "各系統疾病、急症與傳染病護理",
+   "outline": [
+    "腦神經系統",
+    "消化系統",
+    "肌肉骨骼系統",
+    "眼耳鼻喉",
+    "心臟血管系統",
+    "血液腫瘤",
+    "皮膚",
+    "免疫系統",
+    "呼吸系統",
+    "腎臟與泌尿系統",
+    "內分泌系統",
+    "急症護理",
+    "傳染病護理"
+   ],
+   "words": [
+    {
+     "en": "blood sugar",
+     "zh": "血糖"
+    },
+    {
+     "en": "hypertension",
+     "zh": "高血壓"
+    },
+    {
+     "en": "chest pain",
+     "zh": "胸痛"
+    },
+    {
+     "en": "shortness of breath",
+     "zh": "呼吸短促"
+    },
+    {
+     "en": "wound",
+     "zh": "傷口"
+    },
+    {
+     "en": "infection",
+     "zh": "感染"
+    },
+    {
+     "en": "stroke",
+     "zh": "中風"
+    },
+    {
+     "en": "fracture",
+     "zh": "骨折"
+    },
+    {
+     "en": "dialysis",
+     "zh": "透析"
+    },
+    {
+     "en": "chemotherapy",
+     "zh": "化學治療"
+    }
+   ]
+  },
+  {
+   "id": "ob-peds",
+   "name": "產兒科護理學",
+   "includes": "產科護理學、兒科護理學",
+   "outline": [
+    "產科護理學",
+    "兒科護理學"
+   ],
+   "words": [
+    {
+     "en": "pregnancy",
+     "zh": "懷孕"
+    },
+    {
+     "en": "contraction",
+     "zh": "子宮收縮"
+    },
+    {
+     "en": "labor",
+     "zh": "產程、分娩"
+    },
+    {
+     "en": "newborn",
+     "zh": "新生兒"
+    },
+    {
+     "en": "breastfeeding",
+     "zh": "哺餵母乳"
+    },
+    {
+     "en": "vaccine",
+     "zh": "疫苗"
+    },
+    {
+     "en": "dehydration",
+     "zh": "脫水"
+    },
+    {
+     "en": "growth and development",
+     "zh": "生長發展"
+    },
+    {
+     "en": "fever",
+     "zh": "發燒"
+    },
+    {
+     "en": "jaundice",
+     "zh": "黃疸"
+    }
+   ]
+  },
+  {
+   "id": "psych-community",
+   "name": "精神科與社區衛生護理學",
+   "includes": "精神科護理學、社區衛生護理學",
+   "outline": [
+    "精神科護理學",
+    "社區衛生護理學"
+   ],
+   "words": [
+    {
+     "en": "anxiety",
+     "zh": "焦慮"
+    },
+    {
+     "en": "depression",
+     "zh": "憂鬱"
+    },
+    {
+     "en": "hallucination",
+     "zh": "幻覺"
+    },
+    {
+     "en": "therapeutic communication",
+     "zh": "治療性溝通"
+    },
+    {
+     "en": "coping",
+     "zh": "因應"
+    },
+    {
+     "en": "home visit",
+     "zh": "家訪"
+    },
+    {
+     "en": "health education",
+     "zh": "衛生教育"
+    },
+    {
+     "en": "screening",
+     "zh": "篩檢"
+    },
+    {
+     "en": "infectious disease",
+     "zh": "傳染病"
+    },
+    {
+     "en": "community",
+     "zh": "社區"
+    }
+   ]
+  }
+ ]
+}

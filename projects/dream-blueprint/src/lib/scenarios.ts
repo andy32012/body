@@ -1,8 +1,11 @@
 /** Small clinical-judgment cases in four steps (like the NCLEX model): cues → problem → first action → evaluate.
  *  A wrong step asks why, so "I didn't understand the English" is kept apart from "I didn't know the nursing". */
 export type StepKind = 'cues' | 'problem' | 'action' | 'evaluate'
-export interface CaseStep { kind: StepKind; q: string; options: string[]; answer: number; why: string }
-export interface Scenario { id: string; topic: string; case: string; caseZh: string; steps: CaseStep[] }
+/** whyOptions: one line per option saying why it is right or wrong. */
+export interface CaseStep { kind: StepKind; q: string; options: string[]; answer: number; why: string; whyOptions?: string[] }
+/** sources: public references the case follows; review: 'self' = written for this site, not yet checked by a clinical nurse. */
+export interface Scenario { id: string; topic: string; case: string; caseZh: string; steps: CaseStep[]
+  sources?: { title: string; url: string }[]; subjects?: string[]; updated?: string; review?: 'self' | 'reviewed' }
 export const stepNames: Record<StepKind, string> = { cues: '看線索', problem: '判斷問題', action: '先做什麼', evaluate: '評估結果' }
 export const caseCauses = ['看不懂英文', '護理觀念不熟', '不知道先處理哪個', '看漏條件']
 export interface StepResult { kind: StepKind; correct: boolean; cause?: string }
