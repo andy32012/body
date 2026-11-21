@@ -13,7 +13,7 @@ export function originalPlan(day: string): string {
   if (planned) return label(planned.unit, planned.lessonDay)
   if (holidayBreak(day)) return '過年休息，想練時複習 2 分鐘'
   if (day >= initialBounds.from && day <= initialBounds.to) {
-    if ((day <= '2026-11-23') || (day >= '2027-01-03' && day <= '2027-01-16')) {
+    if ((day <= '2026-11-19') || (day >= '2027-01-03' && day <= '2027-01-16')) {
       return '考週，複習 2 分鐘或休息'
     }
     return '休息或複習 2 分鐘'

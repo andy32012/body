@@ -9,7 +9,7 @@ test('已知考週自動排程，暑假確認與系辦回覆分開保存',()=>{
   assert.equal(initial.settings.officeReply,'')
   assert.equal(initial.settings.examPromptSeen,true)
   assert.equal(activePeriod('2026-11-13',initial.settings.periods),'exam')
-  assert.equal(activePeriod('2026-11-23',initial.settings.periods),'exam')
+  assert.equal(activePeriod('2026-11-19',initial.settings.periods),'exam')
   assert.equal(activePeriod('2026-11-24',initial.settings.periods),'semester')
   const custom={type:'semester',start:'2026-11-15',end:'2026-11-17'}
   const legacy={...initial.settings,profileRevision:undefined,internshipSeason:undefined,officeReply:'系辦說暑假第二梯',officeAsked:true,examPromptSeen:false,periods:[custom]}

@@ -57,7 +57,7 @@ export type PageProps = {state:AppState, update:(updater:(prev:AppState)=>AppSta
 export type {Energy, Period} from './progress'
 export const STORAGE_KEY = 'dream-blueprint.v2'
 const oldKey = 'dream-blueprint.v1'
-const novemberExam:PeriodRange = {type:'exam',start:'2026-11-13',end:'2026-11-23'}
+const novemberExam:PeriodRange = {type:'exam',start:'2026-11-13',end:'2026-11-19'}
 
 const plannedMaintenance:PeriodRange[] = [
   {type:'internship',start:'2028-02-01',end:'2029-01-31'},
@@ -127,6 +127,8 @@ export function importBackup(raw:string):AppState {
     state.settings.internshipSeason=state.settings.internshipSeason || '暑假'
     state.settings.profileRevision=1
   }
+  // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
+  for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
   return state
 }
 
