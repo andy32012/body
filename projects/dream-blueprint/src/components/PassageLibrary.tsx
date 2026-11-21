@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import CorrectBox from './CorrectBox'
+import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
 import { doneKey, levelKey, levelProgress, nextPassage, redoKey, type Passage } from '../lib/passages'
 
@@ -34,6 +35,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
     [all, level, state.checks])
   const letters = useMemo(() => all ? [...new Set(all.filter(p => p.level === level).map(p => p.letter))] : [], [all, level])
 
+  useEffect(() => { if (passage) setAnswer(readDraft('passage.' + passage.id)) }, [passage?.id])
   function reset() { setRun(0); setAnswer(''); setShow('none'); setCopied(''); setManualCopy('') }
   function choose(next: number) {
     onActivity(prev => ({ ...prev, notes: { ...prev.notes, [levelKey]: String(next) } }))
@@ -49,6 +51,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       return { ...prev, notes, checks: result === 'again' ? prev.checks : { ...prev.checks, [doneKey(id)]: true } }
     })
     if (result === 'again') setSkipped(list => [...list, id])
+    clearDraft('passage.' + id)
     reset()
   }
   async function copy() {
@@ -77,7 +80,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       <p className="passage-text">{passage.zh}</p>
       <label className="pr-field" htmlFor="passage-answer">我的英文翻譯</label>
       <textarea id="passage-answer" rows={5} lang="en" value={answer} placeholder="一句一句翻，寫不出來的先空著"
-        onChange={event => setAnswer(event.target.value)} />
+        onChange={event => { setAnswer(event.target.value); writeDraft('passage.' + passage.id, event.target.value) }} />
       <div className="pr-actions">
         {passage.words && passage.words.length > 0 &&
           <button className="pr-link" onClick={() => setShow(show === 'words' ? 'none' : 'words')}>這段會用到的單字</button>}

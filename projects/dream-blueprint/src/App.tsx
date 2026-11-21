@@ -179,7 +179,7 @@ function App() {
       <nav aria-label="主要導覽">{available.map(l=>titleNav(l))}</nav>
       <div className="side-bottom"><button className="destination" onClick={()=>setView('plan','map')}><span className="destination-symbol"><Orbit size={27}/></span><small>我的目的地</small><strong>美國註冊護理師 <ArrowUpRight size={13}/></strong><span>期望抵達 2033–2034</span></button>
       <button className={'nav-link settings-link'+(page==='settings'?' current':'')} onClick={()=>setView('settings')}><Settings2 size={18}/>設定</button>
-      <div className="profile"><span>玄</span><div><b>玄燁</b><small>弘光科技大學 · 護理系</small></div></div></div>
+      <div className="profile"><span>玄</span><div><b>玄燁</b><small>{state.school.schoolName} · {state.school.program}</small></div></div></div>
     </aside>
     <div className="viewport"><div className="mobile-brand"><Brand/><a className="home-link" href="/" title="回到 Body 首頁"><House size={16}/>回首頁</a><button className="icon-control" aria-label="設定" onClick={()=>setView('settings')}><Settings2 size={20}/></button></div>
     <div className="desktop-content" id="content" tabIndex={-1}>

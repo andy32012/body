@@ -1,0 +1,322 @@
+[
+ {
+  "id": "start-01",
+  "zh": "我很累。",
+  "grammar": [
+   "be 動詞"
+  ],
+  "hints": [
+   "主詞 I 配 am。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I am tired."
+  ],
+  "why": "累＝tired，前面放 am。",
+  "newWords": []
+ },
+ {
+  "id": "start-02",
+  "zh": "今天很冷。",
+  "grammar": [
+   "天氣用 it"
+  ],
+  "hints": [
+   "天氣的主詞用 It。",
+   "參考寫法開頭：It …"
+  ],
+  "reference": [
+   "It is cold today."
+  ],
+  "why": "It is + 天氣形容詞 + today。",
+  "newWords": []
+ },
+ {
+  "id": "start-03",
+  "zh": "我餓了。",
+  "grammar": [
+   "be 動詞"
+  ],
+  "hints": [
+   "主詞 I 配 am。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I am hungry."
+  ],
+  "why": "hungry 是形容詞，前面要 am。",
+  "newWords": []
+ },
+ {
+  "id": "start-04",
+  "zh": "你可以再說一次嗎？",
+  "grammar": [
+   "請求句"
+  ],
+  "hints": [
+   "禮貌請別人做事用 Could you…?",
+   "參考寫法開頭：Could …"
+  ],
+  "reference": [
+   "Could you say that again?"
+  ],
+  "why": "Could you + 原形動詞…？是很常用的禮貌問法。",
+  "newWords": []
+ },
+ {
+  "id": "start-05",
+  "zh": "我是學生。",
+  "grammar": [
+   "a / an"
+  ],
+  "hints": [
+   "單數可數名詞前面要加 a。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I am a student."
+  ],
+  "why": "student 是一個人，要說 a student。",
+  "newWords": []
+ },
+ {
+  "id": "start-06",
+  "zh": "謝謝你的幫忙。",
+  "grammar": [
+   "固定說法"
+  ],
+  "hints": [
+   "謝謝某事用 Thank you for…",
+   "參考寫法開頭：Thank …"
+  ],
+  "reference": [
+   "Thank you for your help."
+  ],
+  "why": "Thank you for + 名詞。",
+  "newWords": []
+ },
+ {
+  "id": "start-07",
+  "zh": "我今天很忙。",
+  "grammar": [
+   "be 動詞"
+  ],
+  "hints": [
+   "busy 前面要 be 動詞。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I am busy today."
+  ],
+  "why": "時間 today 放句尾。",
+  "newWords": []
+ },
+ {
+  "id": "start-08",
+  "zh": "這個很好吃。",
+  "grammar": [
+   "be 動詞"
+  ],
+  "hints": [
+   "This 配 is。",
+   "參考寫法開頭：This …"
+  ],
+  "reference": [
+   "This is delicious."
+  ],
+  "why": "delicious＝很好吃。",
+  "newWords": []
+ },
+ {
+  "id": "start-09",
+  "zh": "我不懂。",
+  "grammar": [
+   "否定句"
+  ],
+  "hints": [
+   "一般動詞的否定用 don't。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I don't understand."
+  ],
+  "why": "don't + 原形動詞。",
+  "newWords": []
+ },
+ {
+  "id": "start-10",
+  "zh": "請慢慢說。",
+  "grammar": [
+   "祈使句"
+  ],
+  "hints": [
+   "祈使句直接用原形動詞開頭。",
+   "參考寫法開頭：Please …"
+  ],
+  "reference": [
+   "Please speak slowly."
+  ],
+  "why": "Please + 原形動詞，slowly 修飾動詞。",
+  "newWords": []
+ },
+ {
+  "id": "start-11",
+  "zh": "我住在台灣。",
+  "grammar": [
+   "介系詞 in"
+  ],
+  "hints": [
+   "國家前面用 in。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I live in Taiwan."
+  ],
+  "why": "live in + 地方。",
+  "newWords": []
+ },
+ {
+  "id": "start-12",
+  "zh": "現在幾點？",
+  "grammar": [
+   "問句"
+  ],
+  "hints": [
+   "問時間用 What time…？",
+   "參考寫法開頭：What …"
+  ],
+  "reference": [
+   "What time is it now?"
+  ],
+  "why": "What time is it? 主詞用 it。",
+  "newWords": []
+ },
+ {
+  "id": "start-13",
+  "zh": "我想喝水。",
+  "grammar": [
+   "want"
+  ],
+  "hints": [
+   "想要某東西用 want。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I want some water."
+  ],
+  "why": "water 不可數，可以加 some。",
+  "newWords": []
+ },
+ {
+  "id": "start-14",
+  "zh": "你還好嗎？",
+  "grammar": [
+   "be 動詞問句"
+  ],
+  "hints": [
+   "問句把 be 動詞放前面。",
+   "參考寫法開頭：Are …"
+  ],
+  "reference": [
+   "Are you okay?"
+  ],
+  "why": "you 配 are，問句 Are you…?",
+  "newWords": []
+ },
+ {
+  "id": "start-15",
+  "zh": "我很開心。",
+  "grammar": [
+   "be 動詞"
+  ],
+  "hints": [
+   "主詞 I 配 am。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I am happy."
+  ],
+  "why": "happy 是形容詞。",
+  "newWords": []
+ },
+ {
+  "id": "start-16",
+  "zh": "外面在下雨。",
+  "grammar": [
+   "現在進行式"
+  ],
+  "hints": [
+   "正在發生用 be + V-ing。",
+   "參考寫法開頭：It …"
+  ],
+  "reference": [
+   "It is raining outside."
+  ],
+  "why": "下雨的主詞也是 It。",
+  "newWords": []
+ },
+ {
+  "id": "start-17",
+  "zh": "我明天有考試。",
+  "grammar": [
+   "have"
+  ],
+  "hints": [
+   "有某東西用 have。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I have a test tomorrow."
+  ],
+  "why": "a test 單數加 a，tomorrow 放句尾。",
+  "newWords": []
+ },
+ {
+  "id": "start-18",
+  "zh": "我等一下打給你。",
+  "grammar": [
+   "will"
+  ],
+  "hints": [
+   "之後要做的事用 will。",
+   "參考寫法開頭：I …"
+  ],
+  "reference": [
+   "I will call you later."
+  ],
+  "why": "will + 原形動詞，later＝等一下。",
+  "newWords": []
+ },
+ {
+  "id": "start-19",
+  "zh": "這是我的書。",
+  "grammar": [
+   "所有格"
+  ],
+  "hints": [
+   "我的＝my。",
+   "參考寫法開頭：This …"
+  ],
+  "reference": [
+   "This is my book."
+  ],
+  "why": "my 後面直接放名詞。",
+  "newWords": []
+ },
+ {
+  "id": "start-20",
+  "zh": "晚安，明天見。",
+  "grammar": [
+   "固定說法"
+  ],
+  "hints": [
+   "兩句分開說。",
+   "參考寫法開頭：Good …"
+  ],
+  "reference": [
+   "Good night. See you tomorrow."
+  ],
+  "why": "See you tomorrow＝明天見。",
+  "newWords": []
+ }
+]

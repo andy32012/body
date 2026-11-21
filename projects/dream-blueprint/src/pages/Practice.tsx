@@ -3,11 +3,13 @@ import { useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import TutorChat from "../components/TutorChat";
+import { clearDraft, readDraft, writeDraft } from "../lib/drafts";
 import { AskWord } from "../components/AIChat";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
 import quiz from "../data/quiz.json";
+import starters from "../data/starters.json";
 import SpeechPractice from "../components/SpeechPractice";
 import type { AppState, PageProps, Session } from "../lib/store";
 import {
@@ -53,8 +55,26 @@ type Mark = "good" | "small" | "again";
 const units: Unit[] = curriculum.units;
 const allSentences: Sentence[] = units
   .flatMap((unit) => [...unit.days, ...unit.checkpoint, ...unit.backup])
-  .concat(sentences);
+  .concat(sentences)
+  .concat(starters);
 const sentenceById = new Map(allSentences.map((s) => [s.id, s]));
+/** Sentences saved from Emma's speaking practice live in state.notes as "say.<id>". */
+function syncCustom(notes: Record<string, string>) {
+  for (const [k, v] of Object.entries(notes)) {
+    if (!k.startsWith("say.")) continue;
+    try {
+      const d = JSON.parse(v) as { zh: string; en: string; wrong?: string; why?: string };
+      const id = k.slice(4);
+      sentenceById.set(id, {
+        id, zh: d.zh, grammar: ["口說錯句"],
+        hints: [d.why || "想想 Emma 當時怎麼幫你改的", "開頭：" + d.en.split(" ")[0] + " …"],
+        reference: [d.en],
+        why: (d.wrong ? "你在口說時說成：" + d.wrong + "。" : "") + (d.why || ""),
+        newWords: [],
+      });
+    } catch { /* skip broken note */ }
+  }
+}
 const marks: [Mark, string][] = [
   ["good", "對了"],
   ["small", "小錯"],
@@ -83,7 +103,7 @@ function Translation({
   onMark: (mark: Mark, revealed: boolean) => void;
   checkpoint: boolean;
 }) {
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState(() => readDraft(sentence.id));
   const [hint, setHint] = useState(0);
   const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState("");
@@ -122,7 +142,7 @@ function Translation({
           spellCheck={false}
           rows={3}
           value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
+          onChange={(e) => { setAnswer(e.target.value); writeDraft(sentence.id, e.target.value); }}
           placeholder="把想到的英文寫在這裡"
         />
       </label>
@@ -206,7 +226,7 @@ function Translation({
           {marks.map(([mark, label]) => (
             <button
               key={mark}
-              onClick={() => onMark(mark, seenHint || hint === 3)}
+              onClick={() => { clearDraft(sentence.id); onMark(mark, seenHint || hint === 3); }}
             >
               {label}
             </button>
@@ -218,6 +238,7 @@ function Translation({
 }
 
 function lesson(state: AppState, energy: Energy, date: string) {
+  syncCustom(state.notes);
   const cursor = state.curriculum;
   const unit =
     units.find((u) => u.id === cursor.unit) ?? units[units.length - 1];
@@ -240,7 +261,9 @@ function lesson(state: AppState, energy: Energy, date: string) {
     date,
     energy,
   )[0];
-  const previous = sentenceById.get(due?.id ?? completed.at(-1) ?? "");
+  // With nothing to review yet, hand over a ready everyday sentence instead of asking for one.
+  const starter = starters[Number(date.replace(/-/g, "")) % starters.length] as Sentence;
+  const previous = sentenceById.get(due?.id ?? completed.at(-1) ?? "") ?? (review ? starter : undefined);
   const items = review
     ? [previous ?? anchor]
     : checkpoint
@@ -265,7 +288,7 @@ function lesson(state: AppState, energy: Energy, date: string) {
   return {
     unit: unit.id,
     day: index,
-    title: review ? "熟悉的一句" : unit.title,
+    title: review ? "今天只練這一句" : unit.title,
     zh: review && !previous ? "用自己記得的一句英文複習。" : items[0].zh,
     newWords: vocabulary,
     review,
@@ -754,6 +777,7 @@ function Extras({
   const [repeatIndex, setRepeatIndex] = useState(0);
   const [repeatDone, setRepeatDone] = useState(false);
   const [translationPool] = useState(() => {
+    syncCustom(state.notes);
     const due = dueCards(
       state.cards.filter((c) => sentenceById.has(c.id)),
       date,

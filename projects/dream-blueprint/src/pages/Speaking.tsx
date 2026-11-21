@@ -5,6 +5,7 @@ import { openaiKey, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, t
 import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
+import { dayKey, newCard } from '../lib/progress'
 import './speaking.css'
 
 const NAME = 'Emma'
@@ -22,7 +23,9 @@ function instructions(memory: string[]) {
   ].filter(Boolean).join('\n')
 }
 
-export default function Speaking(_: PageProps) {
+type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
+
+export default function Speaking({ update }: PageProps) {
   const memory = useMemory()
   const [key, setKey] = useState(openaiKey())
   const [settings, setSettings] = useState(!openaiKey())
@@ -33,6 +36,7 @@ export default function Speaking(_: PageProps) {
   const [level, setLevel] = useState(0)
   const [notes, setNotes] = useState('')
   const [noting, setNoting] = useState(false)
+  const [fixes, setFixes] = useState<Fix[]>([])
   const session = useRef<VoiceSession | null>(null)
   const log = useRef<HTMLDivElement>(null)
   const linesRef = useRef<Line[]>([])
@@ -43,7 +47,7 @@ export default function Speaking(_: PageProps) {
 
   async function start() {
     if (!openaiKey()) { setSettings(true); return }
-    setError(''); setLines([]); setNotes('')
+    setError(''); setLines([]); setNotes(''); setFixes([])
     try {
       session.current = await startVoice({
         instructions: instructions(memory.notes),
@@ -71,14 +75,34 @@ export default function Speaking(_: PageProps) {
       const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
       const raw = await askTutor([
         `你是 ${NAME} 的口說小幫手。下面是玄燁剛剛跟美國朋友 ${NAME} 用英文聊天的逐字稿（語音辨識，可能有小錯字）。`,
-        '用繁體中文、輕鬆的語氣給他很短的回饋，最多 5 行：一句鼓勵；最多 2 個可以說得更自然的地方，寫成「他說的 → 更自然的說法」；一個下次聊天可以用的句子。不要用 Markdown 標題。',
+        '用繁體中文、輕鬆的語氣給他很短的回饋，最多 3 行：一句鼓勵＋一個下次聊天可以用的句子。不要用 Markdown 標題。',
+        '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因',
         memoryPrompt(memory.notes),
       ].join('\n'), [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
       if (remember.length || forget.length) memory.update(remember, forget)
-      setNotes(clean)
+      const found: Fix[] = []
+      const text = clean.split('\n').filter(line => {
+        const m = line.trim().match(/^\[卡\]\s*(.+?)\s*\|\|\|\s*(.+?)\s*\|\|\|\s*(.+?)\s*\|\|\|\s*(.+)$/)
+        if (m) found.push({ wrong: m[1], en: m[2], zh: m[3], why: m[4] })
+        return !m
+      }).join('\n').trim()
+      setFixes(found)
+      setNotes(text)
     } catch { /* notes are optional */ }
     finally { setNoting(false) }
+  }
+
+  function addCard(i: number) {
+    const f = fixes[i]
+    const id = 'say-' + Date.now().toString(36) + i
+    const today = dayKey()
+    update(prev => ({
+      ...prev,
+      notes: { ...prev.notes, ['say.' + id]: JSON.stringify({ zh: f.zh, en: f.en, wrong: f.wrong, why: f.why }) },
+      cards: [...prev.cards, newCard(id, today)],
+    }))
+    setFixes(list => list.map((x, j) => j === i ? { ...x, added: true } : x))
   }
 
   const live = status === 'live' || status === 'connecting'
@@ -125,6 +149,13 @@ export default function Speaking(_: PageProps) {
     {(noting || notes) && <section className="sp-notes">
       <strong>這次聊天的小筆記</strong>
       {noting ? <p>整理中……</p> : notes.split('\n').map((line, i) => line.trim() ? <p key={i}>{line}</p> : null)}
+      {fixes.length > 0 && <div className="sp-fixes">
+        <small>要把這些句子加入明天的複習嗎？</small>
+        {fixes.map((f, i) => <div key={i} className="sp-fix">
+          <div><s lang="en">{f.wrong}</s><b lang="en">{f.en}</b><span>{f.zh}・{f.why}</span></div>
+          <button type="button" disabled={f.added} onClick={() => addCard(i)}>{f.added ? '已加入' : '加入複習'}</button>
+        </div>)}
+      </div>}
     </section>}
   </div>
 }

@@ -54,7 +54,7 @@ test('完整還原課表、設定、複習及跨天進度', () => {
   const state = createInitialState('2026-11-13')
   state.settings.officeAsked = true
   state.settings.officeReply = '下學期洽系辦確認梯次'
-  state.school.requirements[0].done = true
+  state.school.requirements.push({id:'r1',group:'待修',label:'範例課程',done:true})
   state.sessions.push({id:'s1',day:'2026-11-13',energy:'normal',period:'semester',words:['nurse'],sentenceId:'u1d1',rating:'correct',spokenIds:['u1d1'],translations:[{sentenceId:'u1d1',grammar:['be 動詞'],rating:'correct',revealed:false}]})
   state.cards.push({id:'nurse',box:2,lastDay:'2026-11-13',due:'2026-11-15',mastered:false})
   state.reviewEvents.push({id:'nurse',gap:4,day:'2026-11-13',remembered:true,shownAnswer:false})
@@ -64,7 +64,7 @@ test('完整還原課表、設定、複習及跨天進度', () => {
   state.checks['plan.2026.english']=true
   const restored=importBackup('\uFEFF'+exportBackup(state))
   assert.deepEqual(restored,state)
-  assert.equal(createInitialState().school.requirements[0].done,false)
+  assert.equal(createInitialState().school.requirements.length,0)
 })
 test('舊版進度補上新增欄位並保留練習位置', () => {
   const old={version:1,startedDay:'2026-11-13',sessions:[],curriculum:{unit:2,day:4},settings:{theme:'light'}}

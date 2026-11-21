@@ -49,3 +49,12 @@
 @keyframes sp-in { from { opacity: 0; transform: translateY(6px); } }
 @media (max-width: 760px) { .sp-shell { height: calc(100dvh - 250px - env(safe-area-inset-bottom, 0px)); border-radius: 20px; } }
 @media (prefers-reduced-motion: reduce) { .sp-orb.on, .sp-bubble { animation: none; } }
+.sp-fixes { display: grid; gap: 8px; margin-top: 6px; }
+.sp-fixes small { color: var(--muted); }
+.sp-fix { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.sp-fix > div { display: grid; gap: 2px; min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.sp-fix s { opacity: .55; font-size: 13px; }
+.sp-fix b { font-size: 15px; }
+.sp-fix span { color: var(--muted); font-size: 13px; }
+.sp-fix button { flex: none; border: 0; border-radius: 10px; padding: 7px 12px; background: var(--lav); color: #1c1530; font-weight: 650; font-size: 13px; }
+.sp-fix button:disabled { background: color-mix(in srgb, var(--mint) 25%, transparent); color: var(--mint); }

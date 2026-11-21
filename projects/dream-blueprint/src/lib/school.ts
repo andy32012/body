@@ -1,10 +1,14 @@
 import initial from '../data/school.json'
 
 export interface SchoolClass { id: string; weekday: number; start: string; end: string; label: string }
-export interface SchoolData extends Omit<typeof initial, 'classes'> {
+export interface SchoolEvent { id: string; day: string; label: string; kind: string }
+export interface SchoolRequirement { id: string; group: string; label: string; done: boolean }
+export interface SchoolData extends Omit<typeof initial, 'classes' | 'events' | 'requirements'> {
   classes: SchoolClass[]
+  events: SchoolEvent[]
+  requirements: SchoolRequirement[]
 }
-export const defaultSchool: SchoolData = initial
+export const defaultSchool: SchoolData = initial as SchoolData
 export const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 export const makeSchoolId = () => 'school-' + (globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + Math.random().toString(36).slice(2))
 
