@@ -25,7 +25,7 @@ const FRAME = 'M28 14 H292 Q306 14 306 28 V150 Q306 164 292 164 H28 Q14 164 14 1
 const CHARS: Record<string, CharData> = { 嗨: hai, 哥: ge, 你: ni, 好: hao }
 type CharData = { strokes: string[]; medians: number[][][] }
 
-/** A pencil draws a frame, then each character is written in real stroke order. */
+/** Each character is written in real stroke order, then underlined. */
 export function SketchIntro({ text }: { text: string }) {
   const slots = useRef<(HTMLSpanElement | null)[]>([])
   const [underline, setUnderline] = useState(false)
@@ -46,7 +46,7 @@ export function SketchIntro({ text }: { text: string }) {
     })
     if (reduced) { setUnderline(true); return }
     const run = async () => {
-      await new Promise(r => setTimeout(r, 1250))
+      await new Promise(r => setTimeout(r, 250))
       for (let i = 0; i < parts.length && alive; i++) {
         const w = writers[i]
         if (w) await new Promise<void>(r => w.animateCharacter({ onComplete: () => r() }))
@@ -60,14 +60,7 @@ export function SketchIntro({ text }: { text: string }) {
   }, [text])
   return <div className="sk-intro" aria-label={text}>
     <div className="sk-board">
-      <svg viewBox="0 0 320 178" aria-hidden="true">
-        <path className="sk-frame" d={FRAME} pathLength={1} />
-        <path className="sk-frame sk-frame-2" d={FRAME} pathLength={1} transform="translate(2 1.5)" />
-        <g className="sk-pen-wrap">
-          <PencilShape />
-          <animateMotion dur="1.1s" begin="0s" fill="freeze" path={FRAME} />
-        </g>
-      </svg>
+      <svg viewBox="0 0 320 112" aria-hidden="true" />
       <div className="sk-words" aria-hidden="true">
         {parts.map((ch, i) => CHARS[ch]
           ? <span key={i} className="sk-char" ref={el => { slots.current[i] = el }} />
