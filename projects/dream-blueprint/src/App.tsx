@@ -151,7 +151,7 @@ function App() {
     remove:i=>update(s=>({...s,notes:writeMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
     clear:()=>update(s=>({...s,notes:writeMemory(s.notes,[])}))}
   const memoryJson=JSON.stringify(memoryNotes)
-  const driveReady=useRef(false)
+  const driveReady=useRef(!driveConnected())
   useEffect(()=>{
     if(!driveConnected())return
     loadDriveMemory().then(list=>{
@@ -160,7 +160,7 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   useEffect(()=>{
-    if(!driveReady.current)return
+    if(!driveReady.current||!driveConnected())return
     const t=setTimeout(()=>saveDriveMemory(JSON.parse(memoryJson)),1500)
     return ()=>clearTimeout(t)
   },[memoryJson])
