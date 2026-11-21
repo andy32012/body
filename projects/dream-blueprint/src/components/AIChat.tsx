@@ -129,8 +129,7 @@ export function AIAssistant({ progress }: { progress: string }) {
   return <>
     <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Sparkles size={17} aria-hidden="true" />問問 Claude</button>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
-      <AIChat system={system} persist="dream-blueprint.assistant-chat" placeholder="問單字、文法，或叫我出一句中翻英"
-        suggestions={['出一句今天的中翻英給我', '幫我複習最近錯的文法', '我今天要做什麼？', 'be 動詞什麼時候用 is？']} />
+      <AIChat system={system} persist="dream-blueprint.assistant-chat" placeholder="問單字、文法，或叫我出一句中翻英" />
     </AISheet>}
   </>
 }
