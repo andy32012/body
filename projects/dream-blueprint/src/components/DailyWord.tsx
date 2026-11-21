@@ -81,7 +81,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           {reveal
             ? <p className="daily-word-meaning">{word.zh}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
-          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問 AI 這個字" /></div>
+          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問問 Claude" /></div>
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}
         </div>
         <div className="daily-word-foot">

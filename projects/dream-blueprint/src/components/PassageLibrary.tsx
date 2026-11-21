@@ -87,13 +87,13 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       </div>
       <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer} />
       {show === 'words' && passage.words && <div className="pr-tags">
-        {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} label="問" /></span>)}
+        {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
       </div>}
       {show === 'reference' && passage.en && <section className="pr-reference">
         <small>參考翻譯（寫法不只一種，意思和文法對就算對）</small>
         <p lang="en">{passage.en}</p>
         {passage.words && passage.words.length > 0 && <div className="pr-tags">
-          {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} label="問" /></span>)}
+          {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
         </div>}
       </section>}
       {!passage.en && <p className="passage-note">這一級的參考翻譯還沒加入。寫完按下面的按鈕複製，貼到聊天裡請人批改。</p>}

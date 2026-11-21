@@ -181,7 +181,7 @@ function Translation({
             <div className="pr-tags">
               {sentence.newWords.map((word) => (
                 <span key={word.en}>
-                  {word.en} · {word.zh} <AskWord en={word.en} zh={word.zh} label="問" />
+                  {word.en} · {word.zh} <AskWord en={word.en} zh={word.zh} />
                 </span>
               ))}
             </div>
@@ -593,7 +593,7 @@ function PracticeSession({
                     <strong>
                       {w.en} · {w.zh}
                     </strong>{" "}
-                    <AskWord en={w.en} zh={w.zh} label="問" />
+                    <AskWord en={w.en} zh={w.zh} />
                     <br />
                     {w.example}
                     <br />
@@ -880,7 +880,7 @@ function Extras({
             </p>
             <h3 lang="en">{word.en}</h3>
             {see && <p>{word.zh}</p>}
-            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問 AI 這個字" /></div>
+            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" /></div>
             <div className="pr-actions">
               <button onClick={() => scoreWord(true)}>記得</button>
               <button onClick={() => setSee(true)}>看中文意思</button>

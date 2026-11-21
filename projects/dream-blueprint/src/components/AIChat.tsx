@@ -63,7 +63,7 @@ export function AISheet({ title, onClose, children }: { title: ReactNode; onClos
     return () => window.removeEventListener('keydown', key, true)
   }, [onClose])
   return createPortal(<div className="ai-veil" onClick={e => { e.stopPropagation(); onClose() }}>
-    <section className="ai-sheet" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : 'AI 老師'} onClick={e => e.stopPropagation()}>
+    <section className="ai-sheet" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : '問問 Claude'} onClick={e => e.stopPropagation()}>
       <header><Sparkles size={17} aria-hidden="true" /><strong>{title}</strong>
         <button type="button" className="ai-close" aria-label="關閉" onClick={onClose}><X size={18} /></button></header>
       {children}
@@ -82,10 +82,10 @@ const wordSystem = [
 ].join('\n')
 
 /** Small "問 AI" button for any word; opens a short teacher-style explanation. */
-export function AskWord({ en, zh, label = '問 AI' }: { en: string; zh?: string; label?: string }) {
+export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: string; label?: string }) {
   const [open, setOpen] = useState(false)
   return <>
-    <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問 AI：' + en}>
+    <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en}>
       <Sparkles size={13} aria-hidden="true" />{label}
     </button>
     {open && <AISheet title={<><span lang="en">{en}</span>{zh ? <small> · {zh}</small> : null}</>} onClose={() => setOpen(false)}>
@@ -95,7 +95,7 @@ export function AskWord({ en, zh, label = '問 AI' }: { en: string; zh?: string;
   </>
 }
 
-/** The always-available "AI 老師" button: knows the learner's progress from the handoff text. */
+/** The always-available "問問 Claude" button: knows the learner's progress from the handoff text. */
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
   const system = [
@@ -107,8 +107,8 @@ export function AIAssistant({ progress }: { progress: string }) {
     progress,
   ].join('\n')
   return <>
-    <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Sparkles size={17} aria-hidden="true" />AI 老師</button>
-    {open && <AISheet title="AI 老師" onClose={() => setOpen(false)}>
+    <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Sparkles size={17} aria-hidden="true" />問問 Claude</button>
+    {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
       <AIChat system={system} placeholder="問單字、文法，或叫我出一句中翻英"
         suggestions={['出一句今天的中翻英給我', '幫我複習最近錯的文法', '我今天要做什麼？', 'be 動詞什麼時候用 is？']} />
     </AISheet>}
