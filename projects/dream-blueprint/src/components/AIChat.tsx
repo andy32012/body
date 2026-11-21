@@ -2,12 +2,23 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Send, Sparkles, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, type TutorTurn } from '../lib/tutor'
+import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import './ai-chat.css'
 
 /** A conversation with Claude. `opening` is sent automatically when the panel opens. */
-export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [] }:
-  { system: string; opening?: string; placeholder?: string; suggestions?: string[] }) {
-  const [turns, setTurns] = useState<TutorTurn[]>([])
+const loadTurns = (key?: string): TutorTurn[] => {
+  if (!key) return []
+  try { const v = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(v) ? v : [] } catch { return [] }
+}
+const saveTurns = (key: string | undefined, turns: TutorTurn[]) => {
+  if (!key) return
+  try { localStorage.setItem(key, JSON.stringify(turns.slice(-40))) } catch { /* private mode */ }
+}
+
+export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist }:
+  { system: string; opening?: string; placeholder?: string; suggestions?: string[]; persist?: string }) {
+  const memory = useMemory()
+  const [turns, setTurns] = useState<TutorTurn[]>(() => loadTurns(persist))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [text, setText] = useState('')
@@ -20,7 +31,13 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
     if (!q || busy) return
     const next: TutorTurn[] = [...history, { role: 'user', content: q }]
     setTurns(next); setBusy(true); setError(''); setText('')
-    try { setTurns([...next, { role: 'assistant', content: await askTutor(system, next) }]) }
+    try {
+      const raw = await askTutor(system + '\n' + memoryPrompt(memory.notes), next)
+      const { clean, remember, forget } = extractMemory(raw)
+      if (remember.length || forget.length) memory.update(remember, forget)
+      const done: TutorTurn[] = [...next, { role: 'assistant', content: clean || '嗯嗯～' }]
+      setTurns(done); saveTurns(persist, done)
+    }
     catch (e) { setError(e instanceof Error ? e.message : String(e)); setTurns(history) }
     finally { setBusy(false) }
   }
@@ -43,6 +60,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
       </div>)}
       {busy && <div className="ai-msg ai-assistant ai-typing" aria-label="思考中"><i /><i /><i /></div>}
       {error && <p className="ai-error" role="alert">{error}</p>}
+      {persist && turns.length > 0 && !busy && <button type="button" className="ai-clear" onClick={() => { setTurns([]); saveTurns(persist, []) }}>清空這段對話（記住的事不會刪）</button>}
       {!busy && turns.length <= (opening ? 2 : 0) && suggestions.length > 0 && <div className="ai-suggest">
         {suggestions.map(s => <button type="button" key={s} onClick={() => send(s)}>{s}</button>)}
       </div>}
@@ -110,7 +128,7 @@ export function AIAssistant({ progress }: { progress: string }) {
   return <>
     <button type="button" className="ai-fab" onClick={() => setOpen(true)}><Sparkles size={17} aria-hidden="true" />問問 Claude</button>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
-      <AIChat system={system} placeholder="問單字、文法，或叫我出一句中翻英"
+      <AIChat system={system} persist="dream-blueprint.assistant-chat" placeholder="問單字、文法，或叫我出一句中翻英"
         suggestions={['出一句今天的中翻英給我', '幫我複習最近錯的文法', '我今天要做什麼？', 'be 動詞什麼時候用 is？']} />
     </AISheet>}
   </>

@@ -4,7 +4,7 @@ import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Play, Settings2, Star, Sun,
-  Telescope, Trophy, Images,
+  Telescope, Trophy, Mic,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
@@ -22,10 +22,12 @@ import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
 import { AIAssistant } from './components/AIChat'
 import { handoffText } from './lib/handoff'
+import Speaking from './pages/Speaking'
+import { MemoryContext, applyMemory, readMemory, writeMemory, type MemoryApi } from './lib/memory'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
 
-type View = Page | 'library' | 'cosmos'
+type View = Page | 'library' | 'cosmos' | 'speaking'
 type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string}
 const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'today', title:'今日航行', mobile:'今天', icon:Compass},
@@ -33,12 +35,12 @@ const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'plan', title:'夢想星圖', mobile:'計畫', icon:MapIcon},
   {id:'history', title:'航行紀錄', mobile:'紀錄', icon:ChartNoAxesColumnIncreasing},
   {id:'rivals', title:'星際排行榜', mobile:'對手', icon:Trophy},
-  {id:'cosmos', title:'宇宙圖鑑', mobile:'圖鑑', icon:Images},
+  {id:'speaking', title:'英文口說', mobile:'口說', icon:Mic},
 ]
 const phases = {semester:'一般學期', exam:'考週模式', internship:'實習模式', vacation:'寒暑假模式'}
 function readRoute():Route {
   const [key, value] = location.hash.slice(1).split('/')
-  const view = [...links.map(l => l.id),'practice','settings'].includes(key) ? key as View : 'today'
+  const view = [...links.map(l => l.id),'practice','settings','cosmos'].includes(key) ? key as View : 'today'
   return {view, photoId:view==='cosmos' ? value : undefined, energy:value==='high'?'high':value==='normal'?'normal':'low', tab:value==='map'?'map':value==='timeline'?'timeline':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
@@ -141,6 +143,11 @@ function App() {
   const pageName=links.find(l=>l.id===active)?.title||'設定'
   useEffect(()=>{document.title=pageName+' · 夢想藍圖'},[pageName])
   const props:PageProps={state,update,navigate}
+  const memoryNotes=readMemory(state.notes)
+  const memory:MemoryApi={notes:memoryNotes,
+    update:(remember,forget)=>update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
+    remove:i=>update(s=>({...s,notes:writeMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
+    clear:()=>update(s=>({...s,notes:writeMemory(s.notes,[])}))}
   const available=links.filter(l=>l.id!=='rivals'||state.settings.rivalsEnabled)
   const date=new Date(today+'T12:00:00')
   const dateText=new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(date)
@@ -149,7 +156,7 @@ function App() {
   const until=sorted[0]?.end
   const status=phase==='exam'&&today>='2029-02-01'&&today<='2029-07-31'?'國考衝刺':phases[phase]
   const titleNav=(l:typeof links[number],mobile=false)=><button type="button" key={l.id} className={(active===l.id?'nav-link current':'nav-link')} aria-current={active===l.id?'page':undefined} onClick={()=>setView(l.id)}><l.icon size={mobile?20:19}/><span>{mobile?l.mobile:l.title}</span>{!mobile&&active===l.id&&<i/>}</button>
-  return <SceneFeatureContext.Provider value={sky?.feature}><div className="application" data-theme={state.settings.theme} data-view={page}>
+  return <MemoryContext.Provider value={memory}><SceneFeatureContext.Provider value={sky?.feature}><div className="application" data-theme={state.settings.theme} data-view={page}>
     <UniverseBackground photo={sky?.background}/>
     <a className="skip-link" href="#content" onClick={e=>{e.preventDefault();document.getElementById('content')?.focus()}}>跳到主要內容</a>
     <aside className="sidebar"><Brand/><div className="sidebar-rule"/>
@@ -165,12 +172,12 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     <AIAssistant progress={handoffText(state,today)}/>
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
-  </div></SceneFeatureContext.Provider>
+  </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }
 export default App
 

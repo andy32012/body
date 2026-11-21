@@ -1,0 +1,46 @@
+.sp-page { display: grid; gap: 16px; min-width: 0; }
+.sp-head h1 { margin: 0 0 6px; font-size: clamp(26px, 3vw, 34px); font-weight: 600; letter-spacing: .06em; }
+.sp-head p { margin: 0; color: var(--muted); line-height: 1.7; max-width: 42em; }
+.sp-page .orbit-card { display: grid; gap: 12px; }
+.sp-page h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 17px; font-weight: 620; }
+.sp-page h2 svg { color: var(--lav); }
+.sp-key p, .sp-review p { margin: 0; line-height: 1.7; }
+.sp-key input, .sp-meta select {
+  font: inherit; color: var(--text); background: color-mix(in srgb, var(--bg) 60%, transparent);
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; min-width: 0;
+}
+.sp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.sp-meta label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.sp-main { border: 0; border-radius: 10px; padding: 9px 18px; background: var(--lav); color: #1c1530; font-weight: 650; }
+.sp-link { border: 0; background: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: .22em; font-size: 14px; }
+.sp-topics { display: flex; flex-wrap: wrap; gap: 8px; }
+.sp-topics button {
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 15px; background: transparent; color: var(--text); font-size: 14px;
+}
+.sp-topics button[aria-pressed=true] { border-color: var(--lav); background: color-mix(in srgb, var(--lav) 16%, transparent); color: var(--lav); }
+.sp-topics button:disabled { opacity: .55; }
+.sp-mic {
+  justify-self: center; margin: 10px 0 2px;
+  width: 132px; height: 132px; border-radius: 50%;
+  display: grid; place-items: center; align-content: center; gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--lav) 50%, transparent);
+  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--lav) 30%, transparent), color-mix(in srgb, var(--lav) 8%, transparent));
+  color: var(--lav); font-weight: 650; font-size: 14px; letter-spacing: .05em;
+  transition: transform .15s;
+}
+.sp-mic:hover { transform: scale(1.03); }
+.sp-mic.on { color: #ffd9d2; border-color: #e88c7d; background: radial-gradient(circle, rgba(232,140,125,.3), rgba(232,140,125,.08)); animation: sp-pulse 1.8s infinite; }
+.sp-hint { justify-self: center; margin: 0; color: var(--mint); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.sp-hint i { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); animation: sp-blink 1s infinite; }
+.sp-error { margin: 0; color: #ef8b7d; text-align: center; }
+.sp-log { max-height: 420px; overflow-y: auto; }
+.sp-line { display: grid; gap: 2px; max-width: 88%; }
+.sp-line small { color: var(--muted); font-size: 12px; }
+.sp-line p { margin: 0; padding: 9px 13px; border-radius: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.sp-user { justify-self: end; text-align: right; }
+.sp-user p { background: color-mix(in srgb, var(--lav) 20%, transparent); }
+.sp-assistant p { background: color-mix(in srgb, var(--text) 6%, transparent); font-size: 1.05em; }
+.sp-cost { margin: 0; color: var(--muted); font-size: 12px; }
+@keyframes sp-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,140,125,.35) } 50% { box-shadow: 0 0 0 14px rgba(232,140,125,0) } }
+@keyframes sp-blink { 50% { opacity: .3 } }
+@media (prefers-reduced-motion: reduce) { .sp-mic.on, .sp-hint i { animation: none; } }
