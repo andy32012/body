@@ -84,7 +84,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       }
     } catch { /* keep whatever we have */ }
     const result: BaselineResult = {
-      form: formId, date: dayKey(), listening: score(form.listenQs, listen), reading: score(form.readQs, read),
+      form: formId, date: dayKey(), listening: score(form.listenQs, listen), plays, reading: score(form.readQs, read),
       writing: { text: writing, feedback: writeFeedback },
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
@@ -103,13 +103,13 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       <div className="bl-table-wrap"><table className="bl-table">
         <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.date + r.form}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}</small></th>)}</tr></thead>
         <tbody>
-          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.date}>{r.listening} / 3</td>)}</tr>
+          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.date}>{r.listening} / 3{r.plays !== undefined && <small>聽了 {r.plays} 次</small>}</td>)}</tr>
           <tr><th scope="row">閱讀</th>{shown.map(r => <td key={r.date}>{r.reading} / 3</td>)}</tr>
           <tr><th scope="row">寫作</th>{shown.map(r => <td key={r.date}>{wordCount(r.writing.text)} 字{cefrOf(r.writing.feedback) && <small>{cefrOf(r.writing.feedback)}</small>}</td>)}</tr>
           <tr><th scope="row">口說</th>{shown.map(r => <td key={r.date}>{r.speaking.seconds} 秒{r.speaking.transcript && <small>{wordCount(r.speaking.transcript)} 字{cefrOf(r.speaking.feedback) && ' · ' + cefrOf(r.speaking.feedback)}</small>}</td>)}</tr>
         </tbody>
       </table></div>
-      {results.length > 1 && <p className="bl-delta">跟起點比：聽力 {sign(last.listening - first.listening)}、閱讀 {sign(last.reading - first.reading)}、寫作 {sign(wordCount(last.writing.text) - wordCount(first.writing.text))} 字、口說 {sign(last.speaking.seconds - first.speaking.seconds)} 秒</p>}
+      {results.length > 1 && <p className="bl-delta">跟起點比（題目不同，只當參考）：聽力 {sign(last.listening - first.listening)}、閱讀 {sign(last.reading - first.reading)}、寫作 {sign(wordCount(last.writing.text) - wordCount(first.writing.text))} 字、口說 {sign(last.speaking.seconds - first.speaking.seconds)} 秒</p>}
       <details><summary>看每次的作品和回饋</summary>
         {[...results].reverse().map(r => <div key={r.date + r.form} className="bl-past">
           <p className="bl-label">{name(r)} · {r.date} · 題本 {r.form ?? 'A'}</p>
@@ -122,7 +122,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       {retest.due
         ? <button type="button" className="bl-main" onClick={() => setOpen(true)}>開始第 {results.length} 次回測（新題本 {formId}，約 15 分鐘）</button>
         : <button type="button" className="bl-early" onClick={() => setOpen(true)}>想提早回測（新題本 {formId}）</button>}
-      <small>每次換一份難度相近的新題本。單次小樣本，只拿來和自己比，不代表正式程度或雅思分數。</small>
+      <small>每次換一份新題本，題型、長度和作答條件都一樣（聽力最多聽 2 次、不看字；寫作和口說不查字典、不用翻譯）。題目不同，差一兩題可能只是題目難易，比較「寫得多不多、說得長不長、需要的幫忙有沒有變少」更準。只拿來和自己比，不代表正式程度或雅思分數。</small>
     </section>
   }
 

@@ -8,6 +8,8 @@ export interface BaselineResult {
   form?: FormId
   date: string
   listening: number
+  /** How many times the listening clip was played (max 2), so results are compared under the same conditions. */
+  plays?: number
   reading: number
   writing: { text: string; feedback: string }
   speaking: { transcript: string; feedback: string; seconds: number }
