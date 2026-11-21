@@ -4,7 +4,7 @@ import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Play, Settings2, Star, Sun,
-  Telescope, Trophy, Mic,
+  Telescope, Trophy, Mic, House,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
@@ -181,10 +181,11 @@ function App() {
       <button className={'nav-link settings-link'+(page==='settings'?' current':'')} onClick={()=>setView('settings')}><Settings2 size={18}/>設定</button>
       <div className="profile"><span>玄</span><div><b>玄燁</b><small>弘光科技大學 · 護理系</small></div></div></div>
     </aside>
-    <div className="viewport"><div className="mobile-brand"><Brand/><button className="icon-control" aria-label="設定" onClick={()=>setView('settings')}><Settings2 size={20}/></button></div>
+    <div className="viewport"><div className="mobile-brand"><Brand/><a className="home-link" href="/" title="回到 Body 首頁"><House size={16}/>回首頁</a><button className="icon-control" aria-label="設定" onClick={()=>setView('settings')}><Settings2 size={20}/></button></div>
     <div className="desktop-content" id="content" tabIndex={-1}>
       <header className="global-head"><div>{page==='today'?<><h1>今日航行</h1><p><CalendarDays size={14}/>{dateText}</p></>:<button className="back-home" onClick={()=>setView('today')}><Compass size={16}/> 今日航行 <span className="back-context"><ChevronRight size={14}/> {pageName}</span></button>}</div>
       <div className="header-controls"><button className="phase-pill" title="編輯目前時期" onClick={()=>setView('settings')}><i/>{status}{until&&daysBetween(today,until)<32?' · 還有 '+(daysBetween(today,until)+1)+' 天':''}</button>
+      <a className="home-link" href="/" title="回到 Body 首頁"><House size={16}/>回首頁</a>
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}

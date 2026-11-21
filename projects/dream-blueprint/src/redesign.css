@@ -100,3 +100,14 @@
   .application { --glass:var(--panel); --glass-strong:var(--panel); }
   .universe-photo { display:none; }
 }
+.application .home-link {
+  display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 13px; border-radius:999px;
+  border:1px solid var(--glass-line); background:var(--glass); backdrop-filter:blur(10px);
+  color:var(--text); font-size:13px; font-weight:600; letter-spacing:.04em; text-decoration:none; white-space:nowrap;
+  transition:background .15s,border-color .15s;
+}
+.application .home-link:hover { background:color-mix(in srgb,var(--lav) 16%,transparent); border-color:color-mix(in srgb,var(--lav) 45%,transparent); }
+.application .home-link svg { color:var(--lav); }
+.application .mobile-brand .home-link { margin-left:auto; margin-right:8px; }
+@media (max-width:760px) { .application .header-controls .home-link { display:none; } }
+@media (min-width:761px) { .application .mobile-brand .home-link { display:none; } }
