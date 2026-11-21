@@ -34,3 +34,15 @@
   background: transparent;
   color: inherit;
 }
+.tu-head { display: flex; align-items: center; gap: 0.6rem; }
+.tu-badge { font-size: 0.8rem; padding: 0.15rem 0.6rem; border-radius: 999px; border: 1px solid currentColor; }
+.tu-badge.tu-good { color: #3fbf8a; }
+.tu-badge.tu-small { color: #e0a83a; }
+.tu-badge.tu-again { color: #e06a5a; }
+.tu-corrected { font-size: 1.15rem; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.tu-fixes { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: 0.5rem; }
+.tu-fixes li { display: grid; gap: 0.15rem; overflow-wrap: anywhere; }
+.tu-fixes s { opacity: 0.6; }
+.tu-fixes small { opacity: 0.85; font-size: 0.9rem; line-height: 1.5; }
+.tu-note { margin: 0; opacity: 0.85; }
+.tu-turn.tu-user { border-top: 1px dashed var(--practice-line); padding-top: 0.5rem; }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
+import CorrectBox from './CorrectBox'
 import { doneKey, levelKey, levelProgress, nextPassage, redoKey, type Passage } from '../lib/passages'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update'] }
@@ -15,6 +16,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
   const [show, setShow] = useState<'none' | 'words' | 'reference'>('none')
   const [copied, setCopied] = useState('')
   const [manualCopy, setManualCopy] = useState('')
+  const [run, setRun] = useState(0)
   const level = Math.min(6, Math.max(1, Number(state.notes[levelKey]) || 1))
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
     [all, level, state.checks])
   const letters = useMemo(() => all ? [...new Set(all.filter(p => p.level === level).map(p => p.letter))] : [], [all, level])
 
-  function reset() { setAnswer(''); setShow('none'); setCopied(''); setManualCopy('') }
+  function reset() { setRun(0); setAnswer(''); setShow('none'); setCopied(''); setManualCopy('') }
   function choose(next: number) {
     onActivity(prev => ({ ...prev, notes: { ...prev.notes, [levelKey]: String(next) } }))
     setSkipped([]); setLetter(''); reset()
@@ -78,9 +80,11 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       <div className="pr-actions">
         {passage.words && passage.words.length > 0 &&
           <button className="pr-link" onClick={() => setShow(show === 'words' ? 'none' : 'words')}>這段會用到的單字</button>}
-        {passage.en && <button className="pr-main" onClick={() => setShow('reference')}>我寫好了，看參考翻譯</button>}
+        <button className="pr-main" onClick={() => setRun(n => n + 1)}>{run ? '改好了，再批一次' : '批改'}</button>
+        {passage.en && <button className="pr-link" onClick={() => setShow(show === 'reference' ? 'none' : 'reference')}>參考翻譯</button>}
         <button className="pr-link" onClick={() => { setSkipped(list => [...list, passage.id]); reset() }}>換一段</button>
       </div>
+      <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer} />
       {show === 'words' && passage.words && <div className="pr-tags">
         {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh}</span>)}
       </div>}
@@ -92,7 +96,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
         </div>}
       </section>}
       {!passage.en && <p className="passage-note">這一級的參考翻譯還沒加入。寫完按下面的按鈕複製，貼到聊天裡請人批改。</p>}
-      <button className="pr-link" onClick={copy}>複製題目和我的答案</button>
+      <button className="pr-link passage-copy" onClick={copy}>複製題目和我的答案</button>
       <small role="status">{copied}</small>
       {manualCopy && <textarea aria-label="可複製的內容" readOnly value={manualCopy} onFocus={event => event.target.select()} />}
       <fieldset className="pr-marks">
