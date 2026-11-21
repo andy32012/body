@@ -20,6 +20,8 @@ import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
 import { AIAssistant } from './components/AIChat'
+import { PairReceive } from './components/PairDevice'
+import { takePairing } from './lib/pairing'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import Baseline from './components/Baseline'
@@ -106,6 +108,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
 }
 function App() {
   const {state,update,storageError}=useAppStore()
+  const [pairing,setPairing]=useState(takePairing)
   const [route, changeRoute]=useState(readRoute)
   const [today,changeDay]=useState(dayKey)
   const [wordOpen,setWordOpen]=useState(false)
@@ -194,7 +197,8 @@ function App() {
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
-    {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}
+    {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
+    {pairing&&<PairReceive payload={pairing} onDone={()=>setPairing(null)}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }

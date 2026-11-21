@@ -191,3 +191,18 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   const { default: writing } = await import('../src/data/writing.json', { with: { type: 'json' } })
   assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'sentence')
 })
+
+test('配對 QR：要對的配對碼、10 分鐘內才打得開', async () => {
+  const { seal, open, randomCode } = await import('../src/lib/pairing.ts')
+  const code = randomCode()
+  assert.match(code, /^\d{6}$/)
+  const t = 1_800_000_000_000
+  const p = await seal({ claude: 'sk-ant-test', model: 'claude-sonnet-5-5' }, code, t)
+  assert.ok(!p.includes('sk-ant'), '連結裡看不到金鑰')
+  const ok = await open(p, code, t + 60_000)
+  assert.ok(ok.ok && ok.keys.claude === 'sk-ant-test' && ok.keys.model === 'claude-sonnet-5-5')
+  const wrong = await open(p, code === '000000' ? '111111' : '000000', t)
+  assert.deepEqual(wrong, { ok: false, reason: 'code' })
+  assert.deepEqual(await open(p, code, t + 11 * 60_000), { ok: false, reason: 'expired' })
+  assert.deepEqual(await open('garbage!!', code, t), { ok: false, reason: 'broken' })
+})
