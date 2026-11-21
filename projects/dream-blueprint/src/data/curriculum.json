@@ -1985,7 +1985,7 @@
             "名詞單複數、a／an"
           ],
           "hints": [
-            "檢查看到一顆藥時名詞前面要放什麼。",
+            "檢查 apple 前面要放 a 還是 an。",
             "apple 的開頭是母音，前面放 an。"
           ],
           "reference": [
@@ -2075,7 +2075,7 @@
             "名詞單複數、a／an"
           ],
           "hints": [
-            "檢查看到一顆藥時名詞前面要放什麼。",
+            "檢查 apple 前面要放 a 還是 an。",
             "apple 的開頭是母音，前面放 an。"
           ],
           "reference": [
@@ -3087,7 +3087,7 @@
             "the"
           ],
           "hints": [
-            "這裡說的是哪一位醫師、哪一間病房？",
+            "這裡說的是哪一位老師、哪一間教室？",
             "雙方都知道是哪位老師、哪間教室，兩個都用 the。"
           ],
           "reference": [
@@ -10395,14 +10395,18 @@
       "unit": 12,
       "stage": "A",
       "title": "助動詞",
-      "rule": "can（能、可以）、should（應該）、must 和 have to（必須）、may（可以、可能）後面都接原形動詞。否定在助動詞後面加 not。問句把助動詞放最前面。",
+      "rule": "can（能、可以）、should（應該）、must（必須）、may（可以、可能）是助動詞：後面接原形動詞，否定直接在後面加 not（cannot、should not、must not），問句把它放最前面（Can you…?）。have to（必須）比較特別，它像一般動詞：否定用 don't／doesn't have to，問句用 Do／Does…have to…?。注意意思不同：must not 是「不准」，don't have to 是「不必」。",
       "examples": [
         "You should drink more water.",
-        "Can you stand up?"
+        "Can you stand up?",
+        "Does she have to work today?",
+        "You must not smoke here, but you don't have to leave."
       ],
       "examplesZh": [
         "你應該多喝水。",
-        "你可以站起來嗎？"
+        "你可以站起來嗎？",
+        "她今天必須上班嗎？",
+        "你不准在這裡抽菸，但你不必離開。"
       ],
       "days": [
         {
@@ -11944,14 +11948,16 @@
       "unit": 14,
       "stage": "A",
       "title": "可數與不可數名詞",
-      "rule": "數得出來的名詞用 many、a few，數不出來的（water、blood、medicine、pain、time）用 much、a little。some 用在肯定句，any 用在否定句和問句。a lot of 兩種都能用。",
+      "rule": "數得出來的名詞用 many、a few，數不出來的（water、blood、medicine、pain、time）用 much、a little。some 通常用在肯定句，any 通常用在否定句和問句；但請別人吃喝東西或提出邀請時，問句也常用 some（Would you like some water?）。a lot of 兩種名詞都能用。",
       "examples": [
         "How much water did you drink?",
-        "I have a few questions."
+        "I have a few questions.",
+        "Would you like some tea?"
       ],
       "examplesZh": [
         "你喝了多少水？",
-        "我有幾個問題。"
+        "我有幾個問題。",
+        "你要不要喝點茶？"
       ],
       "days": [
         {
@@ -13496,14 +13502,18 @@
       "unit": 16,
       "stage": "A",
       "title": "疑問詞問句",
-      "rule": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
+      "rule": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序（加 do、does、did 或把 be 動詞提前）。例外：問「是誰做的」時，Who／What 本身就是主詞，直接接動詞，不加 did：Who called you?（誰打給你？）；問「做的對象」才要加 did：Who did you call?（你打給誰？）",
       "examples": [
         "Where is the pain?",
-        "How often do you take this medicine?"
+        "How often do you take this medicine?",
+        "Who called you?",
+        "Who did you call?"
       ],
       "examplesZh": [
         "哪裡痛？",
-        "你多久吃一次這個藥？"
+        "你多久吃一次這個藥？",
+        "誰打電話給你？",
+        "你打電話給誰？"
       ],
       "days": [
         {
@@ -14721,8 +14731,8 @@
             "連接詞 and／but／so／because"
           ],
           "hints": [
-            "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "「想去」和「很忙」意思相反，用哪個連接詞？",
+            "意思相反用 but：I want to go, but I am busy."
           ],
           "reference": [
             "I want to go, but I am busy."
@@ -14811,8 +14821,8 @@
             "連接詞 and／but／so／because"
           ],
           "hints": [
-            "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "「想去」和「很忙」意思相反，用哪個連接詞？",
+            "意思相反用 but：I want to go, but I am busy."
           ],
           "reference": [
             "I want to go, but I am busy."
@@ -18133,14 +18143,18 @@
       "unit": 22,
       "stage": "B",
       "title": "不定詞和動名詞",
-      "rule": "有些動詞後面接 to 加原形（want、need、decide、hope、plan、try）；有些接動詞 ing（enjoy、finish、stop、avoid、keep）。介系詞後面的動詞用 ing。",
+      "rule": "有些動詞後面接 to 加原形（want、need、decide、hope、plan）；有些接動詞 ing（enjoy、finish、avoid、keep、mind）。介系詞後面的動詞用 ing。有些動詞兩種都能接，但意思不一樣：stop smoking 是「戒菸／不再抽菸」，stop to smoke 是「停下手邊的事去抽菸」；try to open 是「努力想打開」，try opening 是「試試看打開這個方法」。",
       "examples": [
         "He wants to go home.",
-        "She finished eating."
+        "She finished eating.",
+        "He stopped smoking last year.",
+        "He stopped to buy some water."
       ],
       "examplesZh": [
         "他想回家。",
-        "她吃完了。"
+        "她吃完了。",
+        "他去年戒菸了。",
+        "他停下來去買水。"
       ],
       "days": [
         {
@@ -18688,19 +18702,19 @@
         {
           "id": "u22-c2",
           "day": 6,
-          "zh": "我做完功課了。",
+          "zh": "他寫完報告了。",
           "grammar": [
             "不定詞和動名詞"
           ],
           "hints": [
-            "看前面那個動詞是接 to 加原形，還是接 ing。",
-            "want、need、decide 接 to 加原形；enjoy、finish、stop、avoid 接動詞 ing。"
+            "finish 後面的動詞要用什麼形式？",
+            "finish 後面接動詞 ing：finished writing。"
           ],
           "reference": [
-            "I finished doing my homework.",
-            "I have finished doing my homework."
+            "He finished writing the report.",
+            "He has finished writing the report."
           ],
-          "why": "有些動詞後面接 to 加原形（want、need、decide、hope、plan、try）；有些接動詞 ing（enjoy、finish、stop、avoid、keep）。介系詞後面的動詞用 ing。",
+          "why": "finish 後面接動詞 ing，所以是 finished writing the report。",
           "newWords": []
         },
         {
@@ -26440,19 +26454,19 @@
         {
           "id": "u32-c2",
           "day": 6,
-          "zh": "她從來沒有見過他。",
+          "zh": "在那之前，她從來沒有見過他。",
           "grammar": [
             "過去完成式"
           ],
           "hints": [
-            "找出兩件過去的事裡哪一件先發生。",
-            "先發生的用 had 加過去分詞，後發生的用過去式。"
+            "「在那之前」是指過去某個時間點之前，用哪個時態？",
+            "比過去更早的經驗用 had 加過去分詞：had never met。"
           ],
           "reference": [
-            "She had never met him before.",
-            "She had never seen him before."
+            "She had never met him before that.",
+            "Before that, she had never met him."
           ],
-          "why": "had 加過去分詞，表示在過去某個時間點或某件事「之前」就已經發生的事。兩件過去的事裡，先發生的用過去完成式，後發生的用過去式。",
+          "why": "有一個過去的時間點（那時），比它更早的經驗用過去完成式 had never met。",
           "newWords": []
         },
         {
@@ -29564,19 +29578,19 @@
         {
           "id": "u36-c3",
           "day": 6,
-          "zh": "在哭的那個小孩需要他的媽媽。",
+          "zh": "在門口哭的那個小孩需要他的媽媽。",
           "grammar": [
             "分詞片語"
           ],
           "hints": [
-            "先判斷名詞是在做動作，還是被做。",
-            "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+            "小孩是自己在哭，還是被弄哭？",
+            "自己在做的動作用 ing：the child crying at the door，主要動詞是 needs。"
           ],
           "reference": [
-            "The child crying needs his mother.",
-            "The crying child needs his mother."
+            "The child crying at the door needs his mother.",
+            "The child who is crying at the door needs his mother."
           ],
-          "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
+          "why": "小孩自己在哭，用 crying at the door 放在 child 後面說明；主要動詞是 needs。",
           "newWords": []
         }
       ],
@@ -29782,14 +29796,14 @@
             "對比和讓步"
           ],
           "hints": [
-            "看兩個句子是「雖然…還是…」還是「一個這樣、另一個那樣」。",
-            "Although 接句子，後面不要再用 but。"
+            "although 和 but 可以同時用嗎？",
+            "Although 接一個句子，後面直接接 we still went out，不要再加 but。"
           ],
           "reference": [
-            "Although it was raining, we went.",
-            "Although it rained, we still went."
+            "Although it was raining, we still went out.",
+            "Although it was raining, we went anyway."
           ],
-          "why": "although、even though（雖然）後面接句子；despite、in spite of（儘管）後面接名詞或動詞 ing。while、whereas 用來對比兩件事。however（然而）放在第二句開頭，後面加逗號。although 和 but 不能同時用。",
+          "why": "Although 已經表示「雖然」，後面不要再加 but；「還是」可以用 still 或 anyway。",
           "newWords": [
             {
               "en": "although",
@@ -32679,8 +32693,8 @@
             "先說 In my opinion 或 I think，再用 because 給理由，再用 For example 舉例。"
           ],
           "reference": [
-            "For example, I study ten minutes every day.",
-            "For example, I study for ten minutes every day."
+            "For example, I study for ten minutes every day.",
+            "For example, I study ten minutes a day."
           ],
           "why": "口說檢定要把回答講長：先講意見（I think、In my opinion、I believe），再講理由（because、The main reason is that），再舉例（For example、For instance），最後收尾（That is why…）。同意和不同意可以說 I agree that…、I do not agree that…。",
           "newWords": []
@@ -34114,8 +34128,8 @@
             "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
           ],
           "reference": [
-            "I need to take your history.",
-            "I need to take your medical history."
+            "I need to take your medical history.",
+            "I need to take your history."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": [],
@@ -34206,8 +34220,8 @@
             "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
           ],
           "reference": [
-            "I need to take your history.",
-            "I need to take your medical history."
+            "I need to take your medical history.",
+            "I need to take your history."
           ],
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
