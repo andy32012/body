@@ -125,7 +125,7 @@ function doGet(e){
   if(!allowed(e.parameter.token))return out({ok:false,error:'token'});
   if(e.parameter.type==='state'){
     var p=tab('進度'),rows=p.getLastRow()-1;
-    var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0])}):[];
+    var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0]).slice(1)}):[];
     return out({ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0});
   }
   var ss=book(),sh=ss.getSheetByName('記憶'),n=sh.getLastRow()-1;
@@ -149,8 +149,8 @@ function doPost(e){
   if(d.type==='state'&&typeof d.state==='string'){
     var p=tab('進度');p.clear();
     p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
-    var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push([d.state.slice(i,i+45000)]);
-    if(chunks.length)p.getRange(2,1,chunks.length,1).setValues(chunks);
+    var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push(['~'+d.state.slice(i,i+45000)]);
+    if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
     return out({ok:true,state:true,url:ss.getUrl()});
   }
   return out({ok:true,url:ss.getUrl()});
