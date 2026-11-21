@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "version:learning": "node learning/version-assets.mjs",
-    "serve": "python3 -m http.server 8080"
+    "serve": "python3 -m http.server 8080",
+    "version:america": "node america/version-assets.mjs"
   },
   "engines": {
     "node": ">=20"

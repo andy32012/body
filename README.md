@@ -2,7 +2,7 @@
 
 網站：https://xitian.page
 
-漫畫、內外科護理和語言學習的入口網站。
+漫畫、內外科護理、語言學習、台股追蹤與認識美國的入口網站。
 
 ## 網站導覽
 
@@ -13,13 +13,16 @@
 | 語言 | [日文學堂](https://xitian.page/japanese/) · [韓文學堂](https://xitian.page/korean/) · [英文課規劃](https://xitian.page/english/) |
 | 日韓學習工具 | [今日單字與複習](https://xitian.page/vocabulary/) · [學習進度](https://xitian.page/progress/) |
 | 護理英文與赴美計畫 | [夢想藍圖](https://xitian.page/dream/) |
+| 台股追蹤 | [微台快訊：微台走勢與世界新聞](https://globalio.me/#predict)（`andy32012/NEWS` 專案） |
+| 認識美國 | [城市、文化與日常生活](https://xitian.page/america/) |
 
 ### 維護夢想藍圖
 
 完整原始碼、教材與測試放在 [projects/dream-blueprint](./projects/dream-blueprint/)，操作方式見[專案說明](./projects/dream-blueprint/README.md)。更新 App 時請在該資料夾安裝依賴、測試並建置，將產出的靜態檔案發佈到根目錄的 [dream](./dream/) 資料夾。Body 首頁和日韓學習室沿用下方原有的維護方式。
 
 
-- `index.html`、`style.css`：Body 首頁（漫畫、語言學習、護理、夢想藍圖）
+- `index.html`、`style.css`：Body 首頁（漫畫、語言學習、護理、夢想藍圖、台股追蹤、認識美國）
+- `america/`：認識美國，含四大地區互動地圖、六座城市、台美時間與單位換算
 - `comic/`：《西天》線上漫畫
 - `nursing/`：內科黑板課目錄（心臟、血液、免疫、腫瘤）
   - `nursing/heart-failure/`：心衰竭：左 vs 右
@@ -35,6 +38,19 @@
 黑板課的字會照筆順一筆一畫寫出來，圖邊講邊畫，同時播放語音講解。語音事先生成好放在各課的 `audio/` 資料夾，網頁播放時不連任何 API，也沒有存放任何金鑰。
 
 筆順資料來自 [Make Me a Hanzi](https://github.com/skishore/makemeahanzi)（Arphic Public License，見 `licenses/`），英文字使用 Hershey 字型。
+
+## 認識美國
+
+`america/` 是原生 HTML、CSS 與 ES modules 頁面，可直接由 GitHub Pages 提供。首頁的台股卡片連到 NEWS 既有正式網站 `https://globalio.me/#predict`；美國卡片連到本專案的 `/america/`。
+
+- `data.js`：美國人口普查局四大地區、50 州與華盛頓特區的中英文名稱；`index.html` 內嵌互動 SVG 地圖與六座城市介紹。
+- `tools.js`：使用 `Intl.DateTimeFormat` 與 IANA 城市時區計算台美時間及夏令時間。日期規劃限 2000–2100 年，輸入明確以台灣 UTC+8 解析。包含溫度、距離、重量與長度的雙向換算。
+- `app.js`：地區選擇、可鍵盤操作的州列表、城市篩選、即時／指定時間與換算輸入處理。資料均在瀏覽器中計算，不傳送輸入。
+- `tests/america.test.mjs`：夏令時間交界、跨日、不同執行時區、日期驗證與單位換算測試，包含在 `npm test`。
+
+修改後執行 `npm run version:america` 更新頁面、模組與圖片的快取雜湊。首頁樣式仍使用 `npm run version:learning` 更新。請實際檢查桌面與手機版面。
+
+主視覺為 [NPS 優勝美地](https://www.nps.gov/yose/index.htm) 照片（NPS / Cindy Jacoby），已轉成 WebP；授權依據見 [NPS 聲明](https://www.nps.gov/aboutus/disclaimer.htm)。州界由 [us-atlas](https://github.com/topojson/us-atlas) 的 `states-albers-10m.json` 轉為 SVG，依據 Census 2017 州界，保留 [ISC 授權](./america/assets/us-atlas-LICENSE.txt)。阿拉斯加、夏威夷為移位縮放插圖。城市意象為本站原創 SVG，非精確天際線。各內容的官方延伸資料亦列在頁面及頁尾。
 
 ## 日韓學習室
 

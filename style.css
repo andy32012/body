@@ -29,6 +29,7 @@ nav a:hover { color: white; text-decoration: underline; text-underline-offset: 5
   container-type: inline-size; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-areas:
     "dream dream dream dream dream dream"
+    "discover discover discover discover discover discover"
     "lang lang lang comic comic vocab"
     "lang lang lang comic comic progress"
     "nursing nursing nursing nursing nursing practice";
@@ -38,6 +39,28 @@ nav a:hover { color: white; text-decoration: underline; text-underline-offset: 5
 .tile, .practice { min-width: 0; }
 .tile img { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 section[id], a[id] { scroll-margin-top: 10px; }
+.discovery-row { grid-area: discover; display: grid; grid-template-columns: clamp(180px, 20vw, 224px) minmax(0, 1fr); gap: var(--gap); min-width: 0; }
+.stock-link { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding: clamp(18px, 2vw, 25px); color: #173f33; background: linear-gradient(145deg, #addcc9, #d6ecdb); }
+.discovery-kicker { display: block; font-size: 12px; font-weight: 700; line-height: 1.3; letter-spacing: .1em; }
+.stock-art { display: block; flex: 1 1 0; min-height: 0; width: 100%; max-height: 65px; overflow: visible; color: #226d51; }
+.stock-grid { stroke: #27654a; stroke-width: 1; opacity: .15; }
+.stock-area { fill: #2b805d; opacity: .1; }
+.stock-line { stroke: currentColor; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.discovery-copy h2 { font-size: clamp(21px, 2.1vw, 28px); line-height: 1.25; letter-spacing: -.035em; }
+.discovery-copy p { margin-top: 6px; font-size: 14px; line-height: 1.5; }
+.america-link { display: flex; align-items: center; padding: clamp(22px, 3vw, 38px); color: #f5eee1; background: radial-gradient(ellipse at 87% 48%, #354a62, transparent 65%), #1c2c3e; border: 1px solid #3b4b5d; }
+.america-card-copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 19px; }
+.america-link .discovery-kicker { color: #dfc695; }
+.america-link .discovery-copy h2 { font-size: clamp(28px, 3.1vw, 40px); }
+.america-link .discovery-copy p { color: #d9e1e8; font-size: 15px; }
+.america-card-note { color: #bbc6d2; font-size: 14px; line-height: 1.5; }
+.america-art { position: absolute; z-index: 0; right: 2%; top: 50%; transform: translateY(-50%); height: 110%; width: min(53%, 390px); overflow: visible; }
+.america-globe { stroke: #e0c797; stroke-width: 1.1; opacity: .46; }
+.america-orbit { stroke: #bacbdc; stroke-width: 1; opacity: .3; }
+.america-land { fill: #d8c59e; opacity: .23; }
+.america-pin-halo { fill: #f4d29b; opacity: .16; }
+.america-pin { fill: #f4d29b; }
+.america-star { stroke: #e4cd9f; stroke-width: 1.4; opacity: .65; }
 .languages { grid-area: lang; display: grid; grid-template-rows: 1fr auto; gap: var(--gap); }
 .hello-panel {
   display: flex;
@@ -157,8 +180,12 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .frame { max-width: 730px; }
   .board {
     grid-template-columns: repeat(3,minmax(0,1fr));
-    grid-template-areas: "dream dream dream" "lang lang lang" "comic comic vocab" "comic comic progress" "nursing nursing practice";
+    grid-template-areas: "dream dream dream" "discover discover discover" "lang lang lang" "comic comic vocab" "comic comic progress" "nursing nursing practice";
   }
+  .discovery-row { grid-template-columns: 180px minmax(0, 1fr); }
+  .america-card-copy { gap: 13px; }
+  .america-card-note { max-width: 160px; }
+  .america-art { right: -5%; width: 52%; opacity: .68; }
   .hello-panel { min-height: clamp(160px, 31cqw, 210px); }
   .greeting [lang] { font-size: clamp(70px, 19cqw, 120px); }
   .reply { font-size: clamp(19px, 5.7cqw, 35px); }
@@ -188,6 +215,17 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .dream .feature-copy h2 { font-size: 30px; }
   .dream .feature-copy p { font-size: 13px; }
   .hero-action { font-size: 13px; margin-top: 12px; }
+  .discovery-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stock-link, .america-link { aspect-ratio: 1; padding: 14px; border-radius: 18px; }
+  .stock-link { gap: 8px; }
+  .discovery-kicker { font-size: 12px; letter-spacing: .06em; }
+  .stock-art { max-height: 44px; }
+  .discovery-copy h2, .america-link .discovery-copy h2 { font-size: 21px; }
+  .discovery-copy p, .america-link .discovery-copy p { margin-top: 4px; font-size: 14px; }
+  .america-link { align-items: stretch; }
+  .america-card-copy { width: 100%; justify-content: space-between; gap: 8px; }
+  .america-card-note { display: none; }
+  .america-art { width: 100%; height: 74%; right: -10%; top: 40%; opacity: .62; }
   .course { padding: 10px; border-radius: 15px; }
   .course small { font-size: 9px; }
   .arrow { font-size: 12px; right: 8%; bottom: 10%; }
