@@ -6,6 +6,7 @@ import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
 import { activeLesson, coreSaved, lessonFinished, resumePhase, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../pages/Practice'
+import { nextFocus } from '../lib/nextFocus'
 import ScenePhoto from './ScenePhoto'
 import TodayPlan from './TodayPlan'
 import './dock.css'
@@ -69,6 +70,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const lesson = getLessonPreview(state, energy, today, at)
   const finished = lessonFinished(state.notes, today)
   const nextStep = active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
+  const focus = quiet ? null : nextFocus(state, today, energy)
   const practised = state.sessions.some(s => s.day === today)
   const label = quiet ? (period === 'exam' ? '考週' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
     : lesson.review ? (energy === 'low' ? '今天 2 分鐘 · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
@@ -84,6 +86,8 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
         <div className="hero-label"><span aria-hidden="true" className="hero-dash" />{label}</div>
         <h2 className="lesson-goal" id="lesson-goal">{goal}</h2>
         {!quiet && <p className="lesson-sentence">今天的句子：<span>{lesson.zh}</span></p>}
+        {focus?.reason && <p className="lesson-why"><b>為什麼這樣排</b>{focus.reason}
+          {focus.action && <button type="button" onClick={() => { location.hash = focus.action!.hash }}>{focus.action.label}</button>}</p>}
         <EnergyChoices choice={choice} label="今天的時間" />
         <div className="lesson-actions">
           {quiet && energy === 'normal'
@@ -95,7 +99,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
         <p className="lesson-stats">{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
       </div>
     </section>
-    {showPlan && <div id="today-plan" className="lesson-plan"><TodayPlan state={state} update={update} today={today} energy={energy} onStart={start} mode={quiet ? 'nursing' : 'regular'} /></div>}
+    {showPlan && <div id="today-plan" className="lesson-plan"><TodayPlan state={state} update={update} today={today} energy={energy} onStart={start} mode={quiet ? 'nursing' : 'regular'} focus={focus ?? undefined} /></div>}
   </>
 }
 

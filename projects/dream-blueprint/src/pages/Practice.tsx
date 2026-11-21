@@ -1038,6 +1038,7 @@ function Extras({
     const onHash = () => {
       if (location.hash.startsWith("#library/")) {
         setMode(fromHash());
+        if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
         document.querySelector(".pr-extras")?.scrollIntoView({ block: "start" });
       }
     };
@@ -1129,7 +1130,11 @@ function Extras({
       map.set(wordKey(w.en), w);
     return map;
   });
-  const [wordSkill, setWordSkill] = useState<Skill>("read");
+  const skillFromHash = (): Skill => {
+    const k = location.hash.split("/")[2] as Skill;
+    return skills.some(([key]) => key === k) ? k : "read";
+  };
+  const [wordSkill, setWordSkill] = useState<Skill>(skillFromHash);
   // Words being learned: what the lessons and daily words added, plus every word card.
   const [learning] = useState(() => {
     const keys = [...new Set([...state.learningWords, ...state.cards.filter((c) => c.id.startsWith("word:")).map((c) => c.id.slice(5))])];

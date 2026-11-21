@@ -3,14 +3,17 @@ import type { PageProps } from '../lib/store'
 import { dueCount, type Energy } from '../lib/progress'
 import { answeredOn, quizSectionKey } from '../lib/quiz'
 import { activeLesson, lessonFinished } from '../lib/lesson'
+import type { Focus } from '../lib/nextFocus'
 import './today-plan.css'
 
 type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
 
 /** The 30-minute regular day, or during exams and internship a 10–15 minute nursing-English plan.
  *  Built from features that already exist; the curriculum does not move in the nursing plan. */
-export default function TodayPlan({ state, update, today, energy, onStart, mode = 'regular' }:
-  Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; mode?: 'regular' | 'nursing' }) {
+export default function TodayPlan({ state, update, today, energy, onStart, mode = 'regular', focus }:
+  Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; mode?: 'regular' | 'nursing'; focus?: Focus }) {
+  // A focus for today takes its minutes out of review, so the total stays what was chosen.
+  const focusMin = mode === 'regular' && focus?.action ? focus.minutes : 0
   const due = dueCount(state.cards, today)
   const reviewedToday = state.reviewEvents.some(e => e.day === today)
   const key = (id: string) => 'plan.' + today + '.' + id
@@ -24,7 +27,9 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
     { id: 'n-say', min: 4, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
       auto: false, go: () => { location.hash = 'speaking' }, goLabel: 'Emma' },
   ] : [
-    { id: 'review', min: 8, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
+    ...(focusMin ? [{ id: 'focus', min: focusMin, title: '先補強', detail: focus!.reason, auto: false,
+      go: () => { location.hash = focus!.action!.hash }, goLabel: '去做' }] : []),
+    { id: 'review', min: 8 - Math.min(5, focusMin), title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
       auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
     { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
       auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' },
