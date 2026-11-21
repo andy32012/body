@@ -107,13 +107,13 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
 }
 
 /** One more sentence with the same pattern, written from Chinese, answer revealed after trying. */
-export function LessonVariation({ item, onDone }: { item: { zh: string; en: string }; onDone: (mark: 'good' | 'small' | 'again') => void }) {
+export function LessonVariation({ item, onDone }: { item: { zh: string; en: string }; onDone: (mark: 'good' | 'small' | 'again', answer: string) => void }) {
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
   const mountedAt = useRef(Date.now())
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
-  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m) }
+  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer) }
   return <section className="ls-vary">
     <div className="pr-label">換個說法 · 同一個句型</div>
     <h2 className="pr-question">{item.zh}</h2>
@@ -157,7 +157,7 @@ export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']>
  *  as are the first answer, its feedback and the corrected try, so a reload comes back to the same feedback. */
 export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
   lesson: Lesson; draftKey: string; pattern: string; saved?: ExpressRecord
-  onRecord: (rec: ExpressRecord, corrected: boolean) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: () => void
+  onRecord: (rec: ExpressRecord, corrected: boolean) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
 }) {
   const [answer, setAnswer] = useState(() => readDraft(draftKey) || saved?.lastAnswer || '')
   const [run, setRun] = useState(0)
@@ -213,6 +213,6 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
       onSave={onSave} onResult={(_, __, r) => result(r)} />
     {corrected && <p className="ls-help ls-fixnote">看著上面的批改，把你的句子改好，再按「改好了，再批一次」。寫錯的句子按「加入複習」，之後會再出現。</p>}
-    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={onFinish}>完成今天這一堂</button>
+    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={() => onFinish(answer, rec)}>完成今天這一堂</button>
   </section>
 }

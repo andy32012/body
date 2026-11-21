@@ -52,3 +52,10 @@
 .ls-helps span { color: var(--practice-secondary); font-size: .88rem; }
 .practice-page .ls-helps button { min-height: 34px; padding: .25rem .75rem; border-radius: 999px; font-size: .86rem; }
 .practice-page .ls-helps button[aria-pressed=true] { border-color: var(--practice-accent); color: var(--practice-ink); }
+.ls-evidence { display: grid; gap: .45rem; padding: .8rem .9rem; border-radius: 12px; border: 1px solid var(--practice-line); }
+.ls-evidence ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+.ls-evidence li { display: flex; justify-content: space-between; gap: .8rem; flex-wrap: wrap; font-size: .93rem; }
+.ls-evidence li span { color: var(--practice-secondary); }
+.ls-evidence li[data-level=independent] b, .ls-evidence li[data-level=delayed] b { color: var(--practice-accent); }
+.ls-evidence li[data-level=pending] b { color: var(--practice-secondary); font-weight: 500; }
+.ls-evidence small { color: var(--practice-secondary); line-height: 1.55; }

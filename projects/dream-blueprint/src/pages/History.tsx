@@ -4,6 +4,7 @@ import { addDays, attendance, dayKey, weekKey } from "../lib/progress";
 import { seasonHistory } from "../lib/rivals";
 import type { PageProps } from "../lib/store";
 import { getRetentionStatus } from "../lib/grammarRetention";
+import EvidencePanel from "../components/EvidencePanel";
 import "./history.css";
 
 const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
@@ -129,7 +130,7 @@ function GrammarHistory({ sessions }: { sessions: Sessions }) {
   </section>;
 }
 
-export default function History({ state }: PageProps) {
+export default function History({ state, update }: PageProps) {
   const today = dayKey();
   const { sessions, cards, reviewEvents, settings } = state;
   const days = new Set(sessions.map(s => s.day)).size;
@@ -157,13 +158,14 @@ export default function History({ state }: PageProps) {
     <div className="history-grid">
     <PracticeCalendar sessions={sessions} today={today} />
     <WeeklyChart sessions={sessions} today={today} />
+    <EvidencePanel state={state} update={update} />
     <GrammarHistory sessions={sessions} />
     {state.curriculum.stableUnits.length>0 && <section className="history-section"><h2>單元回想</h2><p className="history-note">隔三個單元回想舊句。連續兩次想不起來的單元會優先複習。</p>{state.curriculum.stableUnits.map(id=><span key={id} className="history-chip">單元 {id} · {getRetentionStatus(state.notes,id)}</span>)}</section>}
     <section className="history-section history-recall">
       <h2>隔幾天，還記得嗎？</h2>
       <p>{delayed.length ? "相隔至少四天再複習且未看答案，共 " + delayed.length + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
         {delayed.length > 0 && <strong> {Math.round(recalled / delayed.length * 100)}%</strong>}</p>
-      <h3>單字複習盒</h3><div className="history-boxes">{[1, 2, 4, 8, 16].map((interval, index) =>
+      <h3>單字複習盒</h3><div className="history-boxes">{[1, 2, 4, 8, 16, 30, 60, 120].map((interval, index) =>
         <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval} 天格</small></div>)}</div>
       <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 快篩已認得 {state.knownWords.length} 個字</p>
     </section>

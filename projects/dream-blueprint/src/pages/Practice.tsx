@@ -27,6 +27,19 @@ import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
 import { addSayCard, readSayCard, sayCardSentence } from "../lib/sayCards";
 import WordSkills from "../components/WordSkills";
+import {
+  addEvidence,
+  judgeCheckpoint,
+  judgeExpress,
+  judgeVariation,
+  judgeWritten,
+  levelNames,
+  readEvidence,
+  sourceNames,
+  type Evidence,
+  type Level,
+  type Verdict,
+} from "../lib/evidence";
 import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import {
@@ -124,7 +137,7 @@ function Translation({
 }: {
   preparation?: ReactNode;
   sentence: Sentence;
-  onMark: (mark: Mark, revealed: boolean) => void;
+  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict }) => void;
   checkpoint: boolean;
   saved?: HintUse;
   onHint?: (use: HintUse) => void;
@@ -134,10 +147,11 @@ function Translation({
   const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState("");
   const [seenHint, setSeen] = useState(() => !!saved?.r || (saved?.h ?? 0) >= 2);
-  function record(h: number, r: boolean) {
+  const [firstVerdict, setFirstVerdict] = useState<Verdict | undefined>(() => saved?.v);
+  function record(h: number, r: boolean, v = firstVerdict) {
     setHintLevel(h);
     setSeen(r);
-    onHint?.({ h, r });
+    onHint?.({ h, r, ...(v ? { v } : {}) });
   }
   const mountedAt = useRef(Date.now());
   const ready = () => Date.now() - mountedAt.current > 450;
@@ -194,7 +208,8 @@ function Translation({
           </button>
         </div>
       )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)} />}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
+        onVerdict={(v, attempt) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); record(hint, seenHint, v); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
           <strong>自己檢查看看</strong>
@@ -258,7 +273,7 @@ function Translation({
           {marks.map(([mark, label]) => (
             <button
               key={mark}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2); }}
+              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2, { answer, firstVerdict }); }}
             >
               {label}
             </button>
@@ -455,6 +470,13 @@ function PracticeSession({
     setPhase(p);
     if (guided) save({ phase: p, ...patch }, s);
   }
+  /** Evidence about a unit's goal; 待確認 entries keep the answer so it can be checked later. */
+  function evidence(unit: number, level: Level | null, e: Omit<Evidence, "day" | "level">) {
+    if (!level) return;
+    const keep = level === "pending" ? {} : { answer: undefined, prompt: undefined, ref: undefined };
+    update((prev) => ({ ...prev, notes: addEvidence(prev.notes, unit, { day: date, level, ...e, ...keep }) }));
+  }
+  const checkpointLevels = useRef<(Level | null)[]>([]);
   const hintFor = (id: string): HintUse | undefined => lessonRecord?.hints?.[id];
   const saveHint = (id: string) => (use: HintUse) => {
     if (guided) update((prev) => {
@@ -463,9 +485,14 @@ function PracticeSession({
     });
   };
   const item = current.items[pos];
-  function mark(value: Mark, revealed: boolean) {
+  function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict }) {
     // Each sentence counts once, even if the button is pressed twice.
     if (!settled() || records.some((r) => r.sentenceId === item.id)) return;
+    const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict });
+    if (current.checkpoint) checkpointLevels.current.push(level);
+    else if (guided)
+      evidence(current.unit, level, { source: "pattern", skill: "write", item: item.id, hints: hintFor(item.id)?.h,
+        answer: info?.answer, prompt: item.zh, ref: item.reference[0] });
     const list = [
       ...records,
       {
@@ -479,6 +506,8 @@ function PracticeSession({
     go("sound", { records: list });
   }
   function finish(skip = false, next: Phase = "done") {
+    if (current.checkpoint && !skip)
+      evidence(current.unit, judgeCheckpoint(checkpointLevels.current), { source: "checkpoint", skill: "write" });
     const results = skip ? [] : [...recalls, ...records];
     const drawn =
       retention && recalls.find((t) => t.sentenceId === retention.sentence.id);
@@ -624,8 +653,13 @@ function PracticeSession({
                 checkpoint={false}
                 saved={hintFor(recallNow.sentence.id)}
                 onHint={saveHint(recallNow.sentence.id)}
-                onMark={(mark, revealed) => {
+                onMark={(mark, revealed, info) => {
                   if (recalls.some((r) => r.sentenceId === recallNow.sentence.id)) return;
+                  if (retention && recallNow.sentence.id === retention.sentence.id) {
+                    const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recallNow.sentence.reference, firstVerdict: info.firstVerdict });
+                    evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recallNow.sentence.id,
+                      answer: info.answer, prompt: recallNow.sentence.zh, ref: recallNow.sentence.reference[0] });
+                  }
                   const list = [
                     ...recalls,
                     { sentenceId: recallNow.sentence.id, rating: ratingOf[mark], grammar: recallNow.sentence.grammar, revealed },
@@ -649,8 +683,10 @@ function PracticeSession({
             firstTime={firstListen}
             rate={state.settings.speechRate}
             onDone={(correct, total, plays) => {
-              if (total > 0)
+              if (total > 0) {
                 update((prev) => ({ ...prev, notes: { ...prev.notes, [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total, plays }) } }));
+                evidence(current.unit, correct === total ? "independent" : "assisted", { source: "listen", skill: "listen" });
+              }
               go("write", {}, "listen");
             }}
           />
@@ -658,9 +694,10 @@ function PracticeSession({
         {live && lessonData && phase === "vary" && (
           <LessonVariation
             item={variationFor(lessonData, current.day)}
-            onDone={(m) => {
+            onDone={(m, answer) => {
               if (!settled()) return;
               const v = variationFor(lessonData, current.day);
+              evidence(current.unit, judgeVariation(m, answer, v.en), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
               if (m !== "good")
                 update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
               finish(false, "express");
@@ -681,7 +718,12 @@ function PracticeSession({
             }}
             onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
             onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
-            onFinish={() => go("done", {}, "done")}
+            onFinish={(answer, rec) => {
+              if (!settled()) return;
+              evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.help, answered: !!(rec.first || answer.trim()) }),
+                { source: "express", skill: "write", answer: rec.first || answer, prompt: lessonData.prompt.en, ref: lessonData.prompt.sample });
+              go("done", {}, "done");
+            }}
           />
         )}
         {phase === "write" && !(guided && lessonData === undefined) && (
@@ -711,7 +753,12 @@ function PracticeSession({
                       key={recall.sentence.id}
                       sentence={recall.sentence}
                       checkpoint={false}
-                      onMark={(mark, revealed) =>
+                      onMark={(mark, revealed, info) => {
+                        if (retention && recall.sentence.id === retention.sentence.id) {
+                          const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict });
+                          evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recall.sentence.id,
+                            answer: info.answer, prompt: recall.sentence.zh, ref: recall.sentence.reference[0] });
+                        }
                         setRecalls([
                           ...recalls,
                           {
@@ -720,8 +767,8 @@ function PracticeSession({
                             grammar: recall.sentence.grammar,
                             revealed,
                           },
-                        ])
-                      }
+                        ]);
+                      }}
                     />
                   </div>
                 ) : (
@@ -815,6 +862,18 @@ function PracticeSession({
                 {current.cando && <p className="ls-goal"><small>今天的目標</small>{current.cando}</p>}
                 <ul className="ls-summary">{lines.map(([id, text]) => <li key={id} data-skip={!did(id)}>{text}</li>)}</ul>
               </>;
+            })()}
+            {(live || current.checkpoint) && (() => {
+              const today = readEvidence(state.notes, current.unit).filter((e) => e.day === date);
+              return today.length > 0 && (
+                <div className="ls-evidence">
+                  <strong>今天留下的能力紀錄</strong>
+                  <ul>{today.map((e) => (
+                    <li key={e.source + (e.item ?? "")} data-level={e.level}><span>{sourceNames[e.source]}</span><b>{e.skill === "listen" ? (e.level === "assisted" ? "要看字才懂" : "只聽也懂") : levelNames[e.level]}</b></li>
+                  ))}</ul>
+                  <small>「完成」和「學會」分開記。要算「延後換題仍能完成」，要等之後的小關卡或隔幾個單元的回想；「答案待確認」可以到「紀錄」請 Claude 看。</small>
+                </div>
+              );
             })()}
             {current.checkpoint && (
               <p>

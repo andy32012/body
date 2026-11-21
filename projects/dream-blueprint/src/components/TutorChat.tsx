@@ -7,7 +7,11 @@ const verdictNames = { good: '對了', small: '小錯', again: '再試一次' }
 const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
 
 /** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
-export default function TutorChat({ sentence, answer, onReveal }: { sentence: TutorSentence; answer: string; onReveal?: () => void }) {
+export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
+  sentence: TutorSentence; answer: string; onReveal?: () => void
+  /** Claude's verdict on each submitted try (1 = the first try, before any feedback). */
+  onVerdict?: (verdict: 'good' | 'small' | 'again', attempt: number) => void
+}) {
   const [turns, setTurns] = useState<TutorTurn[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -23,6 +27,9 @@ export default function TutorChat({ sentence, answer, onReveal }: { sentence: Tu
     try {
       const reply = await askTutor(tutorSystem(sentence, []), next, abort.current.signal)
       setTurns([...next, { role: 'assistant', content: reply }])
+      const tries = next.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
+      const v = verdictOf(reply)
+      if (v && (content.startsWith('我的翻譯') || content.startsWith('我改成'))) onVerdict?.(v, tries)
       if (verdictOf(reply) !== 'good' && sentence.reference.some(r => squash(r).length > 6 && squash(reply).includes(squash(r)))) onReveal?.()
     } catch (e) {
       setTurns(turns)

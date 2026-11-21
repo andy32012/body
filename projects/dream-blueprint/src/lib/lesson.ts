@@ -38,7 +38,7 @@ export const activeKey = 'lesson.active'
 export type LessonPhase = 'recall' | 'listen' | 'write' | 'sound' | 'vary' | 'express' | 'done'
 export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'again'; grammar: string[]; revealed: boolean }
 /** h: how far the hints went (1 self-check, 2 clearer hint, 3 sentence frame, 4 the answer); r: an answer was shown. */
-export interface HintUse { h: number; r: boolean }
+export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' }
 export interface CorrectionResult { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string }
 /** The open task: first answer and its feedback are kept apart from the corrected try. */
 export interface ExpressRecord { first?: string; firstResult?: CorrectionResult; lastAnswer?: string; last?: CorrectionResult; corrections: number; help: string[] }
