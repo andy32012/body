@@ -49,3 +49,14 @@ test('Emma 的課堂模式：用今天上過的那一課，帶最近的錯句', 
   const noLesson = emmaLesson({ notes: {}, curriculum: { unit: 3, day: 4 } }, '2026-11-21')
   assert.deepEqual([noLesson?.unit, noLesson?.day], [3, 4])
 })
+
+test('單字意思現代化：常見字不再出現奇怪的舊義', () => {
+  const levels = JSON.parse(readFileSync(new URL('../src/data/levels.json', import.meta.url), 'utf8')) as { en: string; zh: string }[]
+  const zh = (en: string) => levels.find(w => w.en === en)?.zh
+  assert.equal(zh('apple'), '蘋果')
+  assert.equal(zh('commute'), '通勤')
+  assert.match(zh('monitor') ?? '', /監測/)
+  assert.match(zh('appoint(ment)') ?? '', /預約/)
+  assert.equal(zh('exercise'), '運動、練習')
+  assert.ok(!levels.some(w => /傢伙/.test(w.zh) && w.en === 'apple'))
+})

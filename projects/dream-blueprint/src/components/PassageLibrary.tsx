@@ -3,6 +3,7 @@ import type { PageProps } from '../lib/store'
 import CorrectBox from './CorrectBox'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
+import ContextMeaning from './ContextMeaning'
 import { doneKey, levelKey, levelProgress, nextPassage, redoDue, redoKey, type Passage } from '../lib/passages'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
@@ -94,7 +95,10 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
         onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {show === 'words' && passage.words && <div className="pr-tags">
-        {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
+        {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh}{' '}
+          <ContextMeaning word={word.en} context={(passage.en ?? '') + '\n' + passage.zh} cacheKey={'ctx.' + passage.id + '.' + word.en}
+            notes={state.notes} onSave={(k, v) => onActivity(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} />{' '}
+          <AskWord en={word.en} zh={word.zh} /></span>)}
       </div>}
       {show === 'reference' && passage.en && <section className="pr-reference">
         <small>參考翻譯（寫法不只一種，意思和文法對就算對）</small>

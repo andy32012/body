@@ -337,3 +337,11 @@
 .qz-next { justify-self: start; margin-top: .3rem; }
 .qz-cause { display: grid; gap: .45rem; margin-top: .4rem; padding-top: .6rem; border-top: 1px dashed var(--practice-line); }
 .qz-cause small { color: var(--practice-secondary); }
+.ctx-meaning { color: var(--practice-accent); font-size: .9em; }
+.practice-page button.ctx-ask { min-height: 28px; padding: .1rem .55rem; border-radius: 999px; font-size: .82rem; background: transparent; color: var(--practice-secondary); }
+/* Passage word list: one tidy row per word instead of big pills. */
+.passage-library .pr-tags { display: grid; gap: 2px; }
+.passage-library .pr-tags > span { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; border: 0; border-bottom: 1px solid var(--practice-line); border-radius: 0; padding: .45rem .1rem; font-size: .92rem; }
+.passage-library .pr-tags > span:last-child { border-bottom: 0; }
+.passage-library .pr-tags .ctx-meaning { flex-basis: 100%; }
+.practice-page .passage-library button.ask-word { min-height: 28px; padding: .1rem .55rem; border-radius: 999px; font-size: .8rem; }
