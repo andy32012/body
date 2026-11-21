@@ -3,6 +3,7 @@ import { Check, RotateCcw, Volume2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, newCard } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
+import { AskWord } from './AIChat'
 import { paintSky, seedOf } from '../lib/starfield'
 import { wordKey } from '../lib/vocab'
 import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey } from '../lib/dailyWords'
@@ -80,7 +81,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           {reveal
             ? <p className="daily-word-meaning">{word.zh}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
-          <button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button>
+          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問 AI 這個字" /></div>
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}
         </div>
         <div className="daily-word-foot">

@@ -34,3 +34,4 @@
 @keyframes daily-word-rise {from {opacity:0;transform:translateY(14px) scale(.97)}}
 @media (prefers-reduced-motion:reduce) {.daily-word-veil,.daily-word-card {animation:none}}
 @media (max-width:760px) {.word-chip {margin:8px 0 0;font-size:12px;padding:8px 11px}}
+.daily-word-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }

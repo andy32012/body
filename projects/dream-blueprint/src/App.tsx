@@ -20,6 +20,8 @@ import History from './pages/History'
 import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
+import { AIAssistant } from './components/AIChat'
+import { handoffText } from './lib/handoff'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
 
@@ -166,6 +168,7 @@ function App() {
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
+    <AIAssistant progress={handoffText(state,today)}/>
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider>
 }

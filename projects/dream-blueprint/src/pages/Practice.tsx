@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import TutorChat from "../components/TutorChat";
+import { AskWord } from "../components/AIChat";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
@@ -180,7 +181,7 @@ function Translation({
             <div className="pr-tags">
               {sentence.newWords.map((word) => (
                 <span key={word.en}>
-                  {word.en} · {word.zh}
+                  {word.en} · {word.zh} <AskWord en={word.en} zh={word.zh} label="問" />
                 </span>
               ))}
             </div>
@@ -591,7 +592,8 @@ function PracticeSession({
                   <p key={w.en}>
                     <strong>
                       {w.en} · {w.zh}
-                    </strong>
+                    </strong>{" "}
+                    <AskWord en={w.en} zh={w.zh} label="問" />
                     <br />
                     {w.example}
                     <br />
@@ -878,6 +880,7 @@ function Extras({
             </p>
             <h3 lang="en">{word.en}</h3>
             {see && <p>{word.zh}</p>}
+            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問 AI 這個字" /></div>
             <div className="pr-actions">
               <button onClick={() => scoreWord(true)}>記得</button>
               <button onClick={() => setSee(true)}>看中文意思</button>
