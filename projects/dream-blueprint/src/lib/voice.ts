@@ -18,6 +18,7 @@ export async function startVoice(opts: {
   instructions: string
   onLine: (lines: (prev: Line[]) => Line[]) => void
   onState: (state: 'connecting' | 'live' | 'closed', detail?: string) => void
+  onLevel?: (level: number) => void
 }): Promise<VoiceSession> {
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
@@ -26,7 +27,25 @@ export async function startVoice(opts: {
   const pc = new RTCPeerConnection()
   const audio = new Audio()
   audio.autoplay = true
-  pc.ontrack = e => { audio.srcObject = e.streams[0] }
+  let ctx: AudioContext | null = null
+  let frame = 0
+  pc.ontrack = e => {
+    audio.srcObject = e.streams[0]
+    if (!opts.onLevel) return
+    try {
+      ctx = new AudioContext()
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 256
+      ctx.createMediaStreamSource(e.streams[0]).connect(analyser)
+      const buf = new Uint8Array(analyser.frequencyBinCount)
+      const tick = () => {
+        analyser.getByteFrequencyData(buf)
+        opts.onLevel!(buf.reduce((a, b) => a + b, 0) / buf.length / 255)
+        frame = requestAnimationFrame(tick)
+      }
+      tick()
+    } catch { /* level meter is optional */ }
+  }
   pc.addTrack(mic.getAudioTracks()[0], mic)
   const events = pc.createDataChannel('oai-events')
   let closed = false
@@ -37,6 +56,9 @@ export async function startVoice(opts: {
     setTimeout(() => pc.close(), 300)
     mic.getTracks().forEach(t => t.stop())
     audio.srcObject = null
+    cancelAnimationFrame(frame)
+    ctx?.close().catch(() => {})
+    opts.onLevel?.(0)
     opts.onState('closed')
   }
   const append = (role: Line['role'], delta: string) => opts.onLine(prev => {

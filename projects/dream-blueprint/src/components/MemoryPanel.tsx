@@ -1,13 +1,51 @@
-import { useMemory } from '../lib/memory'
+import { useState } from 'react'
+import { applyMemory, useMemory } from '../lib/memory'
+import { connectDrive, disconnectDrive, driveConfig, importSyncCode, syncCode } from '../lib/drive'
 
 export default function MemoryPanel() {
-  const { notes, remove, clear } = useMemory()
+  const { notes, update, remove, clear } = useMemory()
+  const [drive, setDrive] = useState(driveConfig())
+  const [url, setUrl] = useState('')
+  const [code, setCode] = useState('')
+  const [status, setStatus] = useState('')
+
+  async function connect(fn: () => Promise<string[] | null>) {
+    setStatus('連接中……')
+    try {
+      const list = await fn()
+      if (list) update(applyMemory([], list, []).filter(n => !notes.includes(n)), [])
+      setDrive(driveConfig())
+      setStatus('連上了！之後的對話和記憶都會存進雲端硬碟。')
+    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
+  }
+  async function copyCode() {
+    try { await navigator.clipboard.writeText(syncCode()); setStatus('同步碼已複製，貼到手機的這一格就能連上同一份記憶。') }
+    catch { setStatus('複製失敗，請手動選取下面的同步碼。') }
+  }
+
   return <>
-    <p>你在「問問 Claude」或英文口說裡講到重要的事，她會自己記在這裡，之後每次聊天都會先看過。不想讓她記得的，按「刪掉」就好。</p>
-    <p>記憶存在網站的進度裡，所以「備份與還原」的備份檔也會帶著它，換手機還原就會回來。</p>
+    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，按「刪掉」就好。</p>
     {notes.length ? <div className="set-list">
       {notes.map((n, i) => <div key={i + n}><span>{n}</span><button type="button" onClick={() => remove(i)}>刪掉</button></div>)}
     </div> : <p>目前還沒有記住任何事。</p>}
     {notes.length > 0 && <div className="set-actions"><button type="button" onClick={() => clear()}>全部清空</button></div>}
+
+    <h3 className="set-subhead">雲端硬碟</h3>
+    {drive ? <>
+      <p>已連上。你說過的話會存在雲端硬碟的「夢想藍圖・記憶」試算表：「對話紀錄」分頁是每一句對話，「記憶」分頁是她們記住的事。</p>
+      {drive.sheet && <p><a href={drive.sheet} target="_blank" rel="noreferrer">打開雲端硬碟裡的試算表</a></p>}
+      <div className="set-actions">
+        <button type="button" onClick={copyCode}>複製同步碼（給手機用）</button>
+        <button type="button" onClick={() => { disconnectDrive(); setDrive(null); setStatus('這台裝置已中斷雲端硬碟。') }}>這台裝置中斷連線</button>
+      </div>
+      <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
+    </> : <>
+      <p>連上之後，你說的話和記住的事會自動存進你自己的 Google 雲端硬碟，電腦和手機會共用同一份記憶。</p>
+      <label className="set-field">網頁應用程式網址<input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/…/exec" /></label>
+      <div className="set-actions"><button type="button" disabled={!url.trim()} onClick={() => connect(() => connectDrive(url))}>連接雲端硬碟</button></div>
+      <label className="set-field">已經在別台裝置連過？貼上同步碼<input value={code} onChange={e => setCode(e.target.value)} placeholder="同步碼" /></label>
+      <div className="set-actions"><button type="button" disabled={!code.trim()} onClick={() => connect(() => importSyncCode(code))}>用同步碼連接</button></div>
+    </>}
+    <small role="status">{status}</small>
   </>
 }

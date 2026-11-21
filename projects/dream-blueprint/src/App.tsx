@@ -24,6 +24,8 @@ import { AIAssistant } from './components/AIChat'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import { MemoryContext, applyMemory, readMemory, writeMemory, type MemoryApi } from './lib/memory'
+import { driveConnected, loadDriveMemory, saveDriveMemory } from './lib/drive'
+import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
 
@@ -148,6 +150,20 @@ function App() {
     update:(remember,forget)=>update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
     remove:i=>update(s=>({...s,notes:writeMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
     clear:()=>update(s=>({...s,notes:writeMemory(s.notes,[])}))}
+  const memoryJson=JSON.stringify(memoryNotes)
+  const driveReady=useRef(false)
+  useEffect(()=>{
+    if(!driveConnected())return
+    loadDriveMemory().then(list=>{
+      if(list)update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),list,[]))}))
+    }).catch(()=>{}).finally(()=>{driveReady.current=true})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+  useEffect(()=>{
+    if(!driveReady.current)return
+    const t=setTimeout(()=>saveDriveMemory(JSON.parse(memoryJson)),1500)
+    return ()=>clearTimeout(t)
+  },[memoryJson])
   const available=links.filter(l=>l.id!=='rivals'||state.settings.rivalsEnabled)
   const date=new Date(today+'T12:00:00')
   const dateText=new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(date)
@@ -175,7 +191,7 @@ function App() {
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
-    <AIAssistant progress={handoffText(state,today)}/>
+    {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }

@@ -1,67 +1,58 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Square, KeyRound, Sparkles } from 'lucide-react'
+import { Mic, Square, Settings2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { openaiKey, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
-import { askTutor, tutorKey, tutorPersona } from '../lib/tutor'
+import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
-import { handoffText } from '../lib/handoff'
-import { dayKey } from '../lib/progress'
+import { driveLog } from '../lib/drive'
 import './speaking.css'
 
-const topics = [
-  { id: 'free', label: '自由聊天', brief: 'Chat freely about his day, school, and life. Ask easy follow-up questions.' },
-  { id: 'intro', label: '自我介紹', brief: 'Help him practise introducing himself: name, school (nursing student in Taiwan), hobbies, his dream of becoming a US RN.' },
-  { id: 'hospital', label: '醫院情境', brief: 'Role-play simple hospital English: he is the nurse, you are the patient. Greeting, asking about pain, taking vital signs, explaining simple care.' },
-  { id: 'ielts1', label: '雅思 Part 1', brief: 'Act as a friendly IELTS speaking examiner for Part 1: ask one short everyday question at a time (home, study, food, weekends) and wait for his answer.' },
-  { id: 'daily', label: '生活對話', brief: 'Practise everyday situations: ordering food, shopping, asking for directions, small talk with a classmate.' },
-]
+const NAME = 'Emma'
 
-function persona() {
-  if (tutorPersona() === 'teacher') return 'You are a warm, patient English speaking teacher.'
-  return 'You are his younger sister, a brilliant Harvard Medical School student. Call him "哥哥" (gēge). You are sweet and a little playful-cute, sometimes teasing in a lovable way, but always a helpful tutor first. Keep it a cute sibling vibe, never romantic.'
+function instructions(memory: string[]) {
+  return [
+    `You are ${NAME}, a cute, cheerful 20-year-old American girl. You are a nursing student at Harvard, and you are a close friend of 玄燁 (call him by name or "hey you"). You two chat like good friends.`,
+    'He is a nursing student in Taiwan. His English is around junior-high level and he wants to get better for IELTS and to work as a nurse in the US someday.',
+    'This is casual everyday chat: your day, his day, classes, food, movies, weekend plans, nursing school life, little jokes. Be warm, playful and curious, use natural American expressions, laugh a little, react with feeling.',
+    'Speak simple, clear English (A2–B1) a bit slowly. Keep your turns short, usually one or two sentences, and end with an easy question so he talks more.',
+    'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
+    'If he gets stuck or uses Chinese, help with one short Traditional-Mandarin hint, then encourage him back into English.',
+    'Start by greeting him like a friend you are happy to see.',
+    memory.length ? 'Things you remember about him from before: ' + memory.join('; ') : '',
+  ].filter(Boolean).join('\n')
 }
 
-export default function Speaking({ state }: PageProps) {
+export default function Speaking(_: PageProps) {
   const memory = useMemory()
   const [key, setKey] = useState(openaiKey())
-  const [editing, setEditing] = useState(!openaiKey())
+  const [settings, setSettings] = useState(!openaiKey())
   const [voice, setVoice] = useState(voiceName())
-  const [topic, setTopic] = useState(topics[0].id)
   const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>('idle')
   const [error, setError] = useState('')
   const [lines, setLines] = useState<Line[]>([])
-  const [review, setReview] = useState('')
-  const [reviewing, setReviewing] = useState(false)
+  const [level, setLevel] = useState(0)
+  const [notes, setNotes] = useState('')
+  const [noting, setNoting] = useState(false)
   const session = useRef<VoiceSession | null>(null)
   const log = useRef<HTMLDivElement>(null)
   const linesRef = useRef<Line[]>([])
   linesRef.current = lines
 
   useEffect(() => () => session.current?.stop(), [])
-  useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight }) }, [lines])
+  useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }) }, [lines])
 
   async function start() {
-    setError(''); setLines([]); setReview('')
-    const t = topics.find(x => x.id === topic)!
-    const instructions = [
-      persona(),
-      'You are his English speaking partner. He is a Taiwanese nursing student whose English is about junior-high level; he wants to pass IELTS and work as a registered nurse in the US.',
-      'Speak mostly in simple, clear English, slowly, short sentences (A2–B1). Keep each turn short so he talks more than you.',
-      'When he makes a mistake, first repeat his sentence the correct way naturally, then continue the conversation. Do not lecture.',
-      'If he is stuck or speaks Chinese, help with a short Traditional-Mandarin hint, then encourage him to try again in English.',
-      'Start by greeting him and opening the topic.',
-      'Topic: ' + t.brief,
-      memory.notes.length ? 'Things you remember about him: ' + memory.notes.join('; ') : '',
-      'His learning progress (Chinese):\n' + handoffText(state, dayKey()).slice(0, 2500),
-    ].filter(Boolean).join('\n')
+    if (!openaiKey()) { setSettings(true); return }
+    setError(''); setLines([]); setNotes('')
     try {
       session.current = await startVoice({
-        instructions,
+        instructions: instructions(memory.notes),
         onLine: setLines,
+        onLevel: setLevel,
         onState: (s, detail) => {
           setStatus(s)
           if (detail) setError(detail)
-          if (s === 'closed') { session.current = null; void summarise() }
+          if (s === 'closed') { session.current = null; void wrapUp() }
         },
       })
     } catch (e) {
@@ -71,69 +62,69 @@ export default function Speaking({ state }: PageProps) {
     }
   }
 
-  async function summarise() {
+  async function wrapUp() {
     const said = linesRef.current
+    driveLog('英文口說', said.map(l => ({ role: l.role === 'user' ? 'user' : NAME, text: l.text })))
     if (said.filter(l => l.role === 'user').length < 2 || !tutorKey()) return
-    setReviewing(true)
+    setNoting(true)
     try {
-      const transcript = said.map(l => (l.role === 'user' ? '哥哥：' : '對方：') + l.text).join('\n')
+      const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
       const raw = await askTutor([
-        tutorPersona() === 'teacher' ? '你是英文口說老師。' : '你是玄燁的妹妹，哈佛醫學系，叫他哥哥，語氣可愛、偶爾撒嬌。',
-        '下面是他剛剛的英文口說練習逐字稿（語音辨識，可能有小錯字）。用繁體中文給他簡短回饋：',
-        '1. 一句鼓勵。2. 最多 3 個他說錯或可以說得更自然的地方，寫成「他說的 → 比較好的說法：一句原因」。3. 一個下次可以練的句子。',
-        '不要用 Markdown 標題。',
+        `你是 ${NAME} 的口說小幫手。下面是玄燁剛剛跟美國朋友 ${NAME} 用英文聊天的逐字稿（語音辨識，可能有小錯字）。`,
+        '用繁體中文、輕鬆的語氣給他很短的回饋，最多 5 行：一句鼓勵；最多 2 個可以說得更自然的地方，寫成「他說的 → 更自然的說法」；一個下次聊天可以用的句子。不要用 Markdown 標題。',
         memoryPrompt(memory.notes),
       ].join('\n'), [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
       if (remember.length || forget.length) memory.update(remember, forget)
-      setReview(clean)
-    } catch (e) { setReview('回饋產生失敗：' + (e instanceof Error ? e.message : String(e))) }
-    finally { setReviewing(false) }
+      setNotes(clean)
+    } catch { /* notes are optional */ }
+    finally { setNoting(false) }
   }
 
   const live = status === 'live' || status === 'connecting'
+  const speaking = level > 0.04
   return <div className="sp-page">
-    <header className="sp-head">
-      <h1>英文口說</h1>
-      <p>按下開始，直接用講的。對方會用簡單英文跟你聊，你講錯時會順口幫你改。講完按結束，會整理這次的回饋。</p>
-    </header>
-
-    {editing ? <section className="orbit-card sp-key">
-      <h2><KeyRound size={18} aria-hidden="true" />連接 OpenAI 語音</h2>
-      <p>語音用的是 OpenAI 的 GPT-Live-1.1。貼上 OpenAI 的 API 金鑰（platform.openai.com → API keys）。金鑰只存在這台裝置的瀏覽器裡。</p>
-      <input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." aria-label="OpenAI API 金鑰" />
-      <div className="sp-row">
-        <button type="button" className="sp-main" onClick={() => { setOpenaiKey(key); setEditing(!key.trim()) }}>儲存</button>
-        {openaiKey() && <button type="button" className="sp-link" onClick={() => { setKey(openaiKey()); setEditing(false) }}>取消</button>}
-      </div>
-    </section> : <>
-      <section className="orbit-card sp-setup">
-        <div className="sp-topics" role="group" aria-label="練習主題">
-          {topics.map(t => <button type="button" key={t.id} aria-pressed={topic === t.id} disabled={live} onClick={() => setTopic(t.id)}>{t.label}</button>)}
-        </div>
-        <div className="sp-row sp-meta">
-          <label>聲音 <select value={voice} disabled={live} onChange={e => { setVoice(e.target.value); setVoiceName(e.target.value) }}>
-            {voices.map(v => <option key={v} value={v}>{v}</option>)}
-          </select></label>
-          <button type="button" className="sp-link" disabled={live} onClick={() => setEditing(true)}>更換 OpenAI 金鑰</button>
-        </div>
-        <button type="button" className={'sp-mic' + (live ? ' on' : '')} onClick={() => live ? session.current?.stop() : void start()}>
-          {live ? <Square size={22} fill="currentColor" aria-hidden="true" /> : <Mic size={26} aria-hidden="true" />}
-          <span>{status === 'connecting' ? '連線中…' : status === 'live' ? '結束' : '開始說話'}</span>
+    <section className="sp-shell">
+      <header className="sp-top">
+        <span className={'sp-avatar' + (live ? ' on' : '')} aria-hidden="true" />
+        <div className="sp-who"><strong>{NAME}</strong><small>{status === 'connecting' ? '連線中…' : status === 'live' ? (speaking ? 'speaking…' : 'listening…') : '20 · Harvard Nursing · 你的美國朋友'}</small></div>
+        <button type="button" className="sp-gear" aria-label={settings ? '關閉設定' : '語音設定'} onClick={() => setSettings(!settings)} disabled={live}>
+          {settings ? <X size={18} /> : <Settings2 size={18} />}
         </button>
-        {status === 'live' && <p className="sp-hint"><i aria-hidden="true" />正在聽，直接開口就好</p>}
-        {error && <p className="sp-error" role="alert">{error}</p>}
-      </section>
+      </header>
 
-      {lines.length > 0 && <section className="orbit-card sp-log" ref={log} aria-live="polite">
-        {lines.map((l, i) => <div key={i} className={'sp-line sp-' + l.role}><small>{l.role === 'user' ? '你' : '對方'}</small><p lang={l.role === 'user' ? undefined : 'en'}>{l.text}</p></div>)}
-      </section>}
+      {settings && <div className="sp-settings">
+        <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>
+        <label>聲音<select value={voice} onChange={e => { setVoice(e.target.value); setVoiceName(e.target.value) }}>
+          {voices.map(v => <option key={v} value={v}>{v}</option>)}
+        </select></label>
+        <button type="button" onClick={() => { setOpenaiKey(key); if (key.trim()) setSettings(false) }}>儲存</button>
+        <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
+      </div>}
 
-      {(reviewing || review) && <section className="orbit-card sp-review">
-        <h2><Sparkles size={17} aria-hidden="true" />這次的回饋</h2>
-        {reviewing ? <p>整理中……</p> : review.split('\n').map((line, i) => line.trim() ? <p key={i}>{line}</p> : null)}
-      </section>}
-    </>}
-    <p className="sp-cost">費用：說話中每分鐘約 US$0.05，從你的 OpenAI 額度扣。回饋用的是 Claude 金鑰。</p>
+      <div className="sp-stage" ref={log} aria-live="polite">
+        {lines.length === 0
+          ? <div className="sp-empty">
+              <span className={'sp-orb' + (live ? ' on' : '')} style={{ transform: `scale(${1 + Math.min(level * 2.2, 0.35)})` }} aria-hidden="true" />
+              <p>{status === 'connecting' ? `正在打給 ${NAME}…` : live ? 'Say hi!' : `按下麥克風，跟 ${NAME} 聊聊天`}</p>
+            </div>
+          : lines.map((l, i) => <div key={i} className={'sp-bubble ' + (l.role === 'user' ? 'me' : 'her')}>
+              <p lang={l.role === 'user' ? undefined : 'en'}>{l.text}</p>
+            </div>)}
+      </div>
+
+      {error && <p className="sp-error" role="alert">{error}</p>}
+      <footer className="sp-bar">
+        <button type="button" className={'sp-mic' + (live ? ' on' : '')} style={live ? { boxShadow: `0 0 0 ${4 + level * 40}px rgba(232,140,125,.18)` } : undefined}
+          onClick={() => live ? session.current?.stop() : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
+          {live ? <Square size={20} fill="currentColor" /> : <Mic size={24} />}
+        </button>
+      </footer>
+    </section>
+
+    {(noting || notes) && <section className="sp-notes">
+      <strong>這次聊天的小筆記</strong>
+      {noting ? <p>整理中……</p> : notes.split('\n').map((line, i) => line.trim() ? <p key={i}>{line}</p> : null)}
+    </section>}
   </div>
 }

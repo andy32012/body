@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Send, Sparkles, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, type TutorTurn } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
+import { driveLog } from '../lib/drive'
 import './ai-chat.css'
 
 /** A conversation with Claude. `opening` is sent automatically when the panel opens. */
@@ -37,6 +38,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
       if (remember.length || forget.length) memory.update(remember, forget)
       const done: TutorTurn[] = [...next, { role: 'assistant', content: clean || '嗯嗯～' }]
       setTurns(done); saveTurns(persist, done)
+      driveLog('問問 Claude', [{ role: 'user', text: q }, { role: 'Claude', text: clean }])
     }
     catch (e) { setError(e instanceof Error ? e.message : String(e)); setTurns(history) }
     finally { setBusy(false) }

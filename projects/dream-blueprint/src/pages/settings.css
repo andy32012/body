@@ -136,3 +136,4 @@
   .set-body :is(textarea,select,input:not([type=checkbox],[type=file])) { font-size:16px; }
   .set-dates { grid-template-columns:minmax(0,1fr); }
 }
+.set-subhead { margin: 1.2rem 0 .2rem; font-size: 15px; font-weight: 650; }
