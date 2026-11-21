@@ -12,6 +12,7 @@ import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCa
 import cueCards from '../data/cue-cards.json'
 import { markLessonStep, readLessonRecord } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
+import { PairPaste } from '../components/PairDevice'
 import './speaking.css'
 
 const NAME = 'Emma'
@@ -67,6 +68,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   linesRef.current = lines
 
   useEffect(() => () => session.current?.stop(), [])
+  // Keys that arrive from the computer (QR pairing) fill in here without a reload.
+  useEffect(() => {
+    const on = () => { setKey(openaiKey()); if (openaiKey()) setSettings(false) }
+    window.addEventListener('dream-blueprint:keys', on)
+    return () => window.removeEventListener('dream-blueprint:keys', on)
+  }, [])
   useEffect(() => {
     if (status !== 'live') { setWho(''); return }
     const t = setInterval(() => {
@@ -181,6 +188,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         </select></label>
         <button type="button" onClick={() => { setOpenaiKey(key); if (key.trim()) setSettings(false) }}>儲存</button>
         <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
+        <PairPaste need="voice" />
       </div>}
 
       <div className={'sp-wavebox' + (lines.length ? ' compact' : '')}>

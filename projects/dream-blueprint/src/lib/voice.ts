@@ -23,12 +23,18 @@ export async function startVoice(opts: {
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
   opts.onState('connecting')
-  const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
-  const pc = new RTCPeerConnection()
+  // iPad / iPhone Safari only lets sound start inside the tap, so the player and the level meter are set up
+  // before the first await (asking for the microphone ends the tap).
   const audio = new Audio()
   audio.autoplay = true
-  // Levels for the wave: "her" is Emma's voice, "you" is the microphone (both 0–1).
+  audio.setAttribute('playsinline', '')
   let ctx: AudioContext | null = null
+  if (opts.onLevel) { try { ctx = new AudioContext(); void ctx.resume() } catch { ctx = null } }
+  let mic: MediaStream
+  try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
+  catch (e) { ctx?.close().catch(() => {}); throw e }
+  const pc = new RTCPeerConnection()
+  // Levels for the wave: "her" is Emma's voice, "you" is the microphone (both 0–1).
   let frame = 0
   let herAnalyser: AnalyserNode | null = null
   let youAnalyser: AnalyserNode | null = null
@@ -39,9 +45,9 @@ export async function startVoice(opts: {
     for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v }
     return Math.min(1, Math.sqrt(sum / buf.length) * 3.2)
   }
-  if (opts.onLevel) {
+  if (opts.onLevel && ctx) {
     try {
-      ctx = new AudioContext()
+      if (ctx.state === 'suspended') void ctx.resume()
       youAnalyser = ctx.createAnalyser()
       youAnalyser.fftSize = 512
       ctx.createMediaStreamSource(mic).connect(youAnalyser)
@@ -55,6 +61,7 @@ export async function startVoice(opts: {
   }
   pc.ontrack = e => {
     audio.srcObject = e.streams[0]
+    audio.play().catch(() => { /* Safari allows sound while the microphone is on; ignore other refusals */ })
     if (!ctx) return
     try {
       herAnalyser = ctx.createAnalyser()

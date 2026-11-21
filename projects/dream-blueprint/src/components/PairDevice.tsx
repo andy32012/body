@@ -49,6 +49,7 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
   const [ok, setOk] = useState(false)
+  const [voice, setVoice] = useState(false)
   async function submit() {
     setBusy(true); setMsg('')
     const r = await open(payload, code.replace(/\D/g, ''))
@@ -56,13 +57,14 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
     if (!r.ok) { setMsg(r.reason === 'code' ? '配對碼不對，再看一次電腦上的 6 位數。' : r.reason === 'expired' ? '這個 QR code 過期了（超過 10 分鐘），在電腦上重新產生一個。' : '連結壞掉了，在電腦上重新產生一個。'); return }
     setTutorKey(r.keys.claude)
     if (r.keys.model) setTutorModel(r.keys.model)
-    if (r.keys.openai) setOpenaiKey(r.keys.openai)
+    if (r.keys.openai) { setOpenaiKey(r.keys.openai); setVoice(true) }
+    window.dispatchEvent(new Event('dream-blueprint:keys'))
     setOk(true)
   }
   return <div className="pair-veil" role="dialog" aria-modal="true" aria-labelledby="pair-title">
     <form className="pair-box" onSubmit={e => { e.preventDefault(); if (!ok) void submit() }}>
       <h2 id="pair-title">{ok ? '這台也連上 Claude 了 ✓' : '連接這台裝置'}</h2>
-      {ok ? <p>問問 Claude、批改和口說在這台都能用了。金鑰只存在這台的瀏覽器裡。</p> : <>
+      {ok ? <p>{voice ? '問問 Claude、批改和英文口說在這台都能用了。' : '問問 Claude 和批改在這台能用了。電腦上還沒存 OpenAI 金鑰，所以口說要另外在口說頁貼。'}金鑰只存在這台的瀏覽器裡。</p> : <>
         <p>輸入電腦畫面上的 6 位數配對碼。</p>
         <input inputMode="numeric" autoComplete="one-time-code" maxLength={7} value={code} onChange={e => setCode(e.target.value)} placeholder="000 000" aria-label="配對碼" autoFocus />
         {msg && <p className="pair-err" role="alert">{msg}</p>}
@@ -78,13 +80,14 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
 }
 
 /** On a device without a key: paste the link sent from the computer (works in the home-screen app too). */
-export function PairPaste() {
+export function PairPaste({ need = 'claude' }: { need?: 'claude' | 'voice' }) {
   const [text, setText] = useState('')
   const [msg, setMsg] = useState('')
-  if (tutorKey()) return null
+  if (need === 'claude' ? tutorKey() : openaiKey()) return null
   return <div className="pair">
     <strong><Smartphone size={15} aria-hidden="true" /> 從電腦連過來</strong>
-    <p>掃 QR code 沒反應，或你是用加到主畫面的 App 開的？在電腦按「複製連結」，用 LINE 傳給自己，再把連結貼在這裡。</p>
+    <p>{need === 'voice' ? '不用再貼一次 OpenAI 金鑰：在電腦打開 設定 → 連接 Claude，按「產生配對 QR code」，用這台的相機掃，Claude 和口說的金鑰會一起過來。掃了沒反應的話，在電腦按「複製連結」，用 LINE 傳給自己，貼在這裡。'
+      : '掃 QR code 沒反應，或你是用加到主畫面的 App 開的？在電腦按「複製連結」，用 LINE 傳給自己，再把連結貼在這裡。'}</p>
     <label className="set-field">配對連結<input value={text} autoComplete="off" spellCheck={false} onChange={e => { setText(e.target.value); setMsg('') }} placeholder="https://xitian.page/dream/#pair=…" /></label>
     <div className="set-actions"><button type="button" disabled={!text.trim()} onClick={() => {
       const p = payloadFrom(text)
