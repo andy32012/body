@@ -18,7 +18,7 @@ export async function startVoice(opts: {
   instructions: string
   onLine: (lines: (prev: Line[]) => Line[]) => void
   onState: (state: 'connecting' | 'live' | 'closed', detail?: string) => void
-  onLevel?: (level: number) => void
+  onLevel?: (her: number, you: number) => void
 }): Promise<VoiceSession> {
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
@@ -27,24 +27,40 @@ export async function startVoice(opts: {
   const pc = new RTCPeerConnection()
   const audio = new Audio()
   audio.autoplay = true
+  // Levels for the wave: "her" is Emma's voice, "you" is the microphone (both 0–1).
   let ctx: AudioContext | null = null
   let frame = 0
-  pc.ontrack = e => {
-    audio.srcObject = e.streams[0]
-    if (!opts.onLevel) return
+  let herAnalyser: AnalyserNode | null = null
+  let youAnalyser: AnalyserNode | null = null
+  const measure = (a: AnalyserNode | null, buf: Uint8Array<ArrayBuffer>) => {
+    if (!a) return 0
+    a.getByteTimeDomainData(buf)
+    let sum = 0
+    for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v }
+    return Math.min(1, Math.sqrt(sum / buf.length) * 3.2)
+  }
+  if (opts.onLevel) {
     try {
       ctx = new AudioContext()
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = 256
-      ctx.createMediaStreamSource(e.streams[0]).connect(analyser)
-      const buf = new Uint8Array(analyser.frequencyBinCount)
+      youAnalyser = ctx.createAnalyser()
+      youAnalyser.fftSize = 512
+      ctx.createMediaStreamSource(mic).connect(youAnalyser)
+      const a = new Uint8Array(512), b = new Uint8Array(512)
       const tick = () => {
-        analyser.getByteFrequencyData(buf)
-        opts.onLevel!(buf.reduce((a, b) => a + b, 0) / buf.length / 255)
+        opts.onLevel!(measure(herAnalyser, a), measure(youAnalyser, b))
         frame = requestAnimationFrame(tick)
       }
       tick()
     } catch { /* level meter is optional */ }
+  }
+  pc.ontrack = e => {
+    audio.srcObject = e.streams[0]
+    if (!ctx) return
+    try {
+      herAnalyser = ctx.createAnalyser()
+      herAnalyser.fftSize = 512
+      ctx.createMediaStreamSource(e.streams[0]).connect(herAnalyser)
+    } catch { /* optional */ }
   }
   pc.addTrack(mic.getAudioTracks()[0], mic)
   const events = pc.createDataChannel('oai-events')
@@ -58,7 +74,7 @@ export async function startVoice(opts: {
     audio.srcObject = null
     cancelAnimationFrame(frame)
     ctx?.close().catch(() => {})
-    opts.onLevel?.(0)
+    opts.onLevel?.(0, 0)
     opts.onState('closed')
   }
   const append = (role: Line['role'], delta: string) => opts.onLine(prev => {

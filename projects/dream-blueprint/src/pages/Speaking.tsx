@@ -6,6 +6,7 @@ import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { dayKey, newCard } from '../lib/progress'
+import VoiceWave, { type Levels } from '../components/VoiceWave'
 import './speaking.css'
 
 const NAME = 'Emma'
@@ -33,7 +34,8 @@ export default function Speaking({ update }: PageProps) {
   const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>('idle')
   const [error, setError] = useState('')
   const [lines, setLines] = useState<Line[]>([])
-  const [level, setLevel] = useState(0)
+  const levels = useRef<Levels>({ her: 0, you: 0 })
+  const [who, setWho] = useState<'' | 'her' | 'you'>('')
   const [notes, setNotes] = useState('')
   const [noting, setNoting] = useState(false)
   const [fixes, setFixes] = useState<Fix[]>([])
@@ -43,6 +45,14 @@ export default function Speaking({ update }: PageProps) {
   linesRef.current = lines
 
   useEffect(() => () => session.current?.stop(), [])
+  useEffect(() => {
+    if (status !== 'live') { setWho(''); return }
+    const t = setInterval(() => {
+      const { her, you } = levels.current
+      setWho(her > 0.06 ? 'her' : you > 0.08 ? 'you' : '')
+    }, 220)
+    return () => clearInterval(t)
+  }, [status])
   useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }) }, [lines])
 
   async function start() {
@@ -52,7 +62,7 @@ export default function Speaking({ update }: PageProps) {
       session.current = await startVoice({
         instructions: instructions(memory.notes),
         onLine: setLines,
-        onLevel: setLevel,
+        onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
           setStatus(s)
           if (detail) setError(detail)
@@ -106,14 +116,15 @@ export default function Speaking({ update }: PageProps) {
   }
 
   const live = status === 'live' || status === 'connecting'
-  const speaking = level > 0.04
+  const statusText = status === 'connecting' ? '連線中…' : status === 'live'
+    ? (who === 'her' ? NAME + ' 正在說' : who === 'you' ? '正在聽你說' : '輪到你說了')
+    : '20 · Harvard Nursing'
   return <div className="sp-page">
-    <section className="sp-shell">
+    <section className={'sp-shell' + (live ? ' is-live' : '')}>
       <header className="sp-top">
-        <span className={'sp-avatar' + (live ? ' on' : '')} aria-hidden="true" />
-        <div className="sp-who"><strong>{NAME}</strong><small>{status === 'connecting' ? '連線中…' : status === 'live' ? (speaking ? 'speaking…' : 'listening…') : '20 · Harvard Nursing · 你的美國朋友'}</small></div>
+        <div className="sp-who"><strong>{NAME}</strong><small><i className={'sp-dot ' + (status === 'live' ? 'on' : '')} />{statusText}</small></div>
         <button type="button" className="sp-gear" aria-label={settings ? '關閉設定' : '語音設定'} onClick={() => setSettings(!settings)} disabled={live}>
-          {settings ? <X size={18} /> : <Settings2 size={18} />}
+          {settings ? <X size={17} /> : <Settings2 size={17} />}
         </button>
       </header>
 
@@ -126,22 +137,24 @@ export default function Speaking({ update }: PageProps) {
         <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
       </div>}
 
-      <div className="sp-stage" ref={log} aria-live="polite">
-        {lines.length === 0
-          ? <div className="sp-empty">
-              <span className={'sp-orb' + (live ? ' on' : '')} style={{ transform: `scale(${1 + Math.min(level * 2.2, 0.35)})` }} aria-hidden="true" />
-              <p>{status === 'connecting' ? `正在打給 ${NAME}…` : live ? 'Say hi!' : `按下麥克風，跟 ${NAME} 聊聊天`}</p>
-            </div>
-          : lines.map((l, i) => <div key={i} className={'sp-bubble ' + (l.role === 'user' ? 'me' : 'her')}>
-              <p lang={l.role === 'user' ? undefined : 'en'}>{l.text}</p>
-            </div>)}
+      <div className={'sp-wavebox' + (lines.length ? ' compact' : '')}>
+        <VoiceWave levels={levels} live={status === 'live'} className="sp-wave" />
+        <span className={'sp-tag you' + (who === 'you' ? ' on' : '')}>你</span>
+        <span className={'sp-tag her' + (who === 'her' ? ' on' : '')}>{NAME}</span>
+        {lines.length === 0 && <p className="sp-hint">{status === 'connecting' ? `正在打給 ${NAME}…` : live ? 'Say hi!' : '按下麥克風開始聊天'}</p>}
       </div>
+
+      {lines.length > 0 && <div className="sp-stage" ref={log} aria-live="polite">
+        {lines.map((l, i) => <div key={i} className={'sp-bubble ' + (l.role === 'user' ? 'me' : 'her')}>
+          <p lang={l.role === 'user' ? undefined : 'en'}>{l.text}</p>
+        </div>)}
+      </div>}
 
       {error && <p className="sp-error" role="alert">{error}</p>}
       <footer className="sp-bar">
-        <button type="button" className={'sp-mic' + (live ? ' on' : '')} style={live ? { boxShadow: `0 0 0 ${4 + level * 40}px rgba(232,140,125,.18)` } : undefined}
+        <button type="button" className={'sp-mic' + (live ? ' on' : '')}
           onClick={() => live ? session.current?.stop() : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
-          {live ? <Square size={20} fill="currentColor" /> : <Mic size={24} />}
+          {live ? <Square size={18} fill="currentColor" /> : <Mic size={22} />}
         </button>
       </footer>
     </section>
