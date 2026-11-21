@@ -4,7 +4,10 @@ import './tutor.css'
 
 const verdictNames = { good: '對了', small: '小錯', again: '再試一次' }
 
-export default function TutorChat({ sentence, answer }: { sentence: TutorSentence; answer: string }) {
+const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
+
+/** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
+export default function TutorChat({ sentence, answer, onReveal }: { sentence: TutorSentence; answer: string; onReveal?: () => void }) {
   const [turns, setTurns] = useState<TutorTurn[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -20,6 +23,7 @@ export default function TutorChat({ sentence, answer }: { sentence: TutorSentenc
     try {
       const reply = await askTutor(tutorSystem(sentence, []), next, abort.current.signal)
       setTurns([...next, { role: 'assistant', content: reply }])
+      if (verdictOf(reply) !== 'good' && sentence.reference.some(r => squash(r).length > 6 && squash(reply).includes(squash(r)))) onReveal?.()
     } catch (e) {
       setTurns(turns)
       setError(e instanceof Error ? e.message : String(e))
@@ -42,7 +46,7 @@ export default function TutorChat({ sentence, answer }: { sentence: TutorSentenc
       {attempts === 0
         ? <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim())}>請老師批改</button>
         : <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我改成：' + answer.trim())}>改好了，再批一次</button>}
-      {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => send('我還是不會，請直接給答案並完整講原因。')}>直接告訴我</button>}
+      {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => { onReveal?.(); void send('我還是不會，請直接給答案並完整講原因。') }}>直接告訴我</button>}
     </div>
     {attempts > 0 && <form className="tu-ask" onSubmit={e => { e.preventDefault(); send(question.trim()); setQuestion('') }}>
       <input value={question} onChange={e => setQuestion(e.target.value)} placeholder="問老師，例如：為什麼不用 being？" />

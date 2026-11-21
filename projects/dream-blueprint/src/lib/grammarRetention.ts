@@ -50,3 +50,27 @@ export function recordRetention(
     ),
   };
 }
+
+/** Units finished with help (hint or answer seen) wait here until an unaided recheck. */
+const assistedKey = (unit: number) => "unit-assisted." + unit;
+export const assistedUnits = (notes: Notes) =>
+  Object.keys(notes)
+    .filter((k) => k.startsWith("unit-assisted."))
+    .map((k) => Number(k.slice("unit-assisted.".length)))
+    .filter((n) => n > 0);
+export function markAssisted(notes: Notes, unit: number, day: string): Notes {
+  return { ...notes, [assistedKey(unit)]: day };
+}
+export function clearAssisted(notes: Notes, unit: number): Notes {
+  const next = { ...notes };
+  delete next[assistedKey(unit)];
+  return next;
+}
+/** Checkpoint outcome: finished (move on) and independent (counts as stable). */
+export function checkpointOutcome(records: readonly { rating: string; revealed: boolean }[]) {
+  const correct = records.filter((t) => t.rating === "correct");
+  return {
+    finished: correct.length >= 2,
+    independent: correct.filter((t) => !t.revealed).length >= 2,
+  };
+}

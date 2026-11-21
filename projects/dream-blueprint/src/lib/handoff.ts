@@ -1,6 +1,7 @@
 import type { AppState } from './store'
 import curriculum from '../data/curriculum.json'
 import { activePeriod } from './progress'
+import { assistedUnits } from './grammarRetention'
 
 type Sentence = { id: string; zh: string; reference: string[]; grammar: string[] }
 const units = curriculum.units
@@ -50,7 +51,8 @@ export function handoffText(state: AppState, today: string) {
     lesson ? '- 今天這句：「' + lesson.zh + '」（不要先給答案）' : null,
     lesson && lesson.newWords.length ? '- 今天的新字：' + lesson.newWords.map(w => w.en + ' ' + w.zh).join('、') : null,
     checkpoint.length ? '- 今天是小關卡，三句：' + checkpoint.map(s => '「' + s.zh + '」').join('、') + '。對兩句以上就過關，進下一個單元。' : null,
-    stable.length ? '- 已過關的單元：' + stable.join('、') : null,
+    stable.length ? '- 已過關的單元（沒看提示自己寫對）：' + stable.join('、') : null,
+    assistedUnits(state.notes).length ? '- 做完但有看提示、之後要再確認：' + assistedUnits(state.notes).map(id => units.find(u => u.id === id)?.title).filter(Boolean).join('、') : null,
     '- 單字：已認得 ' + state.knownWords.length + ' 個，待學 ' + state.learningWords.length + ' 個。',
     '',
     '## 最近做過的句子',

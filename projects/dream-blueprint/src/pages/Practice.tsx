@@ -26,6 +26,10 @@ import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
 import {
   pickRetentionUnit,
+  assistedUnits,
+  markAssisted,
+  clearAssisted,
+  checkpointOutcome,
   recordRetention,
   retentionDrawCount,
 } from "../lib/grammarRetention";
@@ -164,7 +168,7 @@ function Translation({
           </button>
         </div>
       )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} />}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)} />}
       {hint >= 1 && (
         <section className="pr-hint">
           <strong>自己檢查看看</strong>
@@ -343,7 +347,9 @@ function PracticeSession({
   const [extra, setExtra] = useState(false);
   const [recalls, setRecalls] = useState<TranslationRecord[]>([]);
   const [retention] = useState(() => {
-    const id = pickRetentionUnit(
+    // Units finished with help come back first for an unaided recheck.
+    const assisted = assistedUnits(state.notes).filter((u) => u < current.unit);
+    const id = assisted[0] ?? pickRetentionUnit(
       state.curriculum.stableUnits,
       current.unit,
       state.notes,
@@ -382,7 +388,7 @@ function PracticeSession({
     const results = skip ? [] : [...recalls, ...records];
     const drawn =
       retention && recalls.find((t) => t.sentenceId === retention.sentence.id);
-    const success = records.filter((t) => t.rating === "correct").length >= 2;
+    const { finished: success, independent } = checkpointOutcome(records);
     update((prev) => {
       if (prev.sessions.some((s) => s.id === sessionId)) return prev;
       const cards = [...prev.cards];
@@ -415,9 +421,11 @@ function PracticeSession({
       ) {
         if (current.checkpoint) {
           if (success) {
-            next.stableUnits = [
-              ...new Set([...next.stableUnits, current.unit]),
-            ];
+            // Only answers written without hints or the answer make a unit "stable".
+            if (independent)
+              next.stableUnits = [
+                ...new Set([...next.stableUnits, current.unit]),
+              ];
             next.unit += 1;
             next.day = 1;
             next.retry = 0;
@@ -451,16 +459,26 @@ function PracticeSession({
         cards,
         reviewEvents: events,
         curriculum: next,
-        notes:
-          drawn && retention
-            ? recordRetention(
-                prev.notes,
-                retention.unit,
-                current.unit,
-                drawn.rating,
-                drawn.revealed,
-              )
-            : prev.notes,
+        notes: (() => {
+          let notes =
+            drawn && retention
+              ? recordRetention(
+                  prev.notes,
+                  retention.unit,
+                  current.unit,
+                  drawn.rating,
+                  drawn.revealed,
+                )
+              : prev.notes;
+          if (current.checkpoint && success && !independent && !alreadyAdvanced)
+            notes = markAssisted(notes, current.unit, date);
+          if (current.checkpoint && independent) notes = clearAssisted(notes, current.unit);
+          if (drawn && retention && drawn.rating === "correct" && !drawn.revealed && notes["unit-assisted." + retention.unit]) {
+            notes = clearAssisted(notes, retention.unit);
+            next.stableUnits = [...new Set([...next.stableUnits, retention.unit])];
+          }
+          return notes;
+        })(),
         learningWords: [...new Set([...prev.learningWords, ...learned])],
       };
     });
@@ -604,9 +622,11 @@ function PracticeSession({
             <h2 className="pr-question">今天有練，就往前了一點。</h2>
             {current.checkpoint && (
               <p>
-                {records.filter((t) => t.rating === "correct").length >= 2
-                  ? "這個單元穩了。下次從下一站接著練。"
-                  : "下次換幾句新的，從第 4 天再熟悉一次。"}
+                {checkpointOutcome(records).independent
+                  ? "這個單元穩了：你沒看提示就寫對了。下次從下一站接著練。"
+                  : checkpointOutcome(records).finished
+                    ? "這個單元完成了，不過有看提示或答案。可以往下一站走，過幾天會再出一句讓你自己寫，確認真的會了。"
+                    : "下次換幾句新的，從第 4 天再熟悉一次。"}
               </p>
             )}
             {current.newWords.length > 0 && (
