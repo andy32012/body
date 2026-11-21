@@ -36,9 +36,9 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
     const ripples: { x: number; t0: number }[] = []
     const smooth = { her: 0, you: 0, wake: 0 }
     let phase = 0 // accumulated, so a change in speed never makes the wave jump
-    const parts: Particle[] = Array.from({ length: 90 }, () => ({
+    const parts: Particle[] = Array.from({ length: 56 }, () => ({
       x: Math.random(), off: (Math.random() * 2 - 1), v: 0.012 + Math.random() * 0.03,
-      r: 0.6 + Math.random() * 2.2, seed: Math.random() * 10, push: 0,
+      r: 0.5 + Math.random() * 1.6, seed: Math.random() * 10, push: 0,
     }))
 
     const resize = () => {
@@ -91,47 +91,66 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
       }
       const speed = 1.1 + Math.sqrt(smooth.her) * 1.6 + Math.sqrt(smooth.you) * 1.6
       phase += speed * dt
-      const wave = (x: number, i: number) => {
-        const f = 0.45 + 0.55 * Math.sin(i * 1.7) ** 2
-        const ph = i * 0.33
-        const y = Math.sin(Math.PI * 2 * (1.6 * x) - phase + ph) + 0.35 * Math.sin(Math.PI * 2 * (3.4 * x) + phase * 0.7 - ph)
-        const bend = mouse.strength * gauss(x, mouse.x, 0.1) * (mouse.y - 0.5) * H * 0.35
-        return mid + y * Math.min(1.2, env(x)) * H * 0.3 * f + bend
+      // One coherent ribbon: every strand shares the same centre line and only fans out
+      // around it, so the lines flow together instead of crossing at random.
+      const center = (x: number) => {
+        const s1 = Math.sin(Math.PI * 2 * 1.3 * x - phase)
+        const s2 = Math.sin(Math.PI * 2 * 0.55 * x - phase * 0.45 + 1.3)
+        const bend = mouse.strength * gauss(x, mouse.x, 0.1) * (mouse.y - 0.5) * H * 0.3
+        return mid + (0.8 * s1 + 0.2 * s2) * Math.min(1.1, env(x)) * H * 0.3 + bend
       }
+      const thick = (x: number) => H * (0.014 + 0.085 * Math.min(1, env(x)))
+      const twist = (x: number) => Math.cos(Math.PI * 2 * 0.8 * x - phase * 0.6)
+      const step = Math.max(3, W / 220)
+      const xs: number[] = [], cy: number[] = [], th: number[] = [], tw: number[] = []
+      for (let px = 0; px <= W + step; px += step) {
+        const x = Math.min(1, px / W)
+        xs.push(px); cy.push(center(x)); th.push(thick(x)); tw.push(twist(x))
+      }
+      const wave = (x: number) => center(x)
 
       ctx.clearRect(0, 0, W, H)
       ctx.globalCompositeOperation = 'lighter'
 
-      // watercolor clouds that follow the wave
-      const blobs = 16
+      // soft watercolor clouds along the ribbon
+      const blobs = 11
       for (let k = 0; k < blobs; k++) {
-        const x = (k + 0.5) / blobs + 0.015 * Math.sin(t * 0.5 + k)
+        const x = (k + 0.5) / blobs
         const e = Math.min(1, env(x))
-        const y = wave(x, 3) + Math.sin(t * 0.7 + k * 2.1) * H * 0.04
-        const r = H * (0.15 + e * 0.26)
+        const y = center(x) + Math.sin(t * 0.5 + k * 2.1) * H * 0.03
+        const r = H * (0.13 + e * 0.2)
         const c = colorAt(x)
         const g = ctx.createRadialGradient(x * W, y, 0, x * W, y, r)
-        g.addColorStop(0, rgba(c, 0.11 + e * 0.07))
-        g.addColorStop(0.55, rgba(c, 0.04 + e * 0.03))
+        g.addColorStop(0, rgba(c, 0.1 + e * 0.08))
         g.addColorStop(1, rgba(c, 0))
         ctx.fillStyle = g
-        ctx.beginPath(); ctx.ellipse(x * W, y, r * 1.5, r, 0, 0, Math.PI * 2); ctx.fill()
+        ctx.beginPath(); ctx.ellipse(x * W, y, r * 1.7, r, 0, 0, Math.PI * 2); ctx.fill()
       }
 
-      // fine strands
       const grad = ctx.createLinearGradient(0, 0, W, 0)
       for (const [s, c] of STOPS) grad.addColorStop(s, rgba(c, 1))
-      const step = Math.max(4, W / 180)
-      const strands = 20
-      for (let i = 0; i < strands; i++) {
+
+      // translucent body of the ribbon
+      ctx.beginPath()
+      for (let i = 0; i < xs.length; i++) { const y = cy[i] - th[i] * 1.25; i ? ctx.lineTo(xs[i], y) : ctx.moveTo(xs[i], y) }
+      for (let i = xs.length - 1; i >= 0; i--) ctx.lineTo(xs[i], cy[i] + th[i] * 1.25)
+      ctx.closePath()
+      ctx.fillStyle = grad
+      ctx.globalAlpha = 0.07
+      ctx.fill()
+
+      // fine strands fanning around the centre and twisting slowly
+      const strands = 14
+      ctx.strokeStyle = grad
+      ctx.lineWidth = 1
+      for (let s = 0; s < strands; s++) {
+        const u = (s / (strands - 1)) * 2 - 1
         ctx.beginPath()
-        for (let px = 0; px <= W; px += step) {
-          const y = wave(px / W, i)
-          px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y)
+        for (let i = 0; i < xs.length; i++) {
+          const y = cy[i] + u * th[i] * (0.35 + 0.65 * tw[i])
+          i ? ctx.lineTo(xs[i], y) : ctx.moveTo(xs[i], y)
         }
-        ctx.strokeStyle = grad
-        ctx.globalAlpha = 0.12 + 0.1 * Math.sin(i * 2.3) ** 2
-        ctx.lineWidth = 1
+        ctx.globalAlpha = 0.1 + 0.18 * (1 - Math.abs(u))
         ctx.stroke()
       }
       // the bright core line
@@ -140,10 +159,7 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
       ctx.shadowBlur = 14
       ctx.lineWidth = 2.2
       ctx.beginPath()
-      for (let px = 0; px <= W; px += step) {
-        const y = wave(px / W, 0)
-        px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y)
-      }
+      for (let i = 0; i < xs.length; i++) i ? ctx.lineTo(xs[i], cy[i]) : ctx.moveTo(xs[i], cy[i])
       ctx.stroke()
       ctx.shadowBlur = 0
 
@@ -152,7 +168,7 @@ export default function VoiceWave({ levels, live, className }: { levels: Mutable
         p.x += p.v * dt * (0.6 + speed * 0.35)
         if (p.x > 1.02) { p.x = -0.02; p.off = Math.random() * 2 - 1 }
         const e = Math.min(1, env(p.x))
-        let y = wave(p.x, 2) + p.off * H * (0.08 + e * 0.35)
+        let y = wave(p.x) + p.off * thick(p.x) * 2.6
         const dx = (p.x - mouse.x) * W, dy = y - mouse.y * H
         const d = Math.hypot(dx, dy)
         if (mouse.active && d < 80) p.push = Math.min(1, p.push + 0.12)
