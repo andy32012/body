@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { askTutor, setTutorKey, setTutorModel, tutorKey, tutorModel, tutorModels } from '../lib/tutor'
+import { askTutor, personas, setTutorKey, setTutorModel, setTutorPersona, tutorKey, tutorModel, tutorModels, tutorPersona } from '../lib/tutor'
 
 export default function ClaudeConnect() {
   const [key, setKey] = useState(tutorKey())
   const [model, setModel] = useState(tutorModel())
+  const [persona, setPersona] = useState(tutorPersona())
   const [status, setStatus] = useState(tutorKey() ? '已連接。' : '')
   async function save() {
-    setTutorKey(key); setTutorModel(model)
+    setTutorKey(key); setTutorModel(model); setTutorPersona(persona)
     if (!key.trim()) { setStatus('已清除金鑰。'); return }
     setStatus('測試中……')
     try {
@@ -20,6 +21,9 @@ export default function ClaudeConnect() {
     <label className="set-field">API 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-ant-..." /></label>
     <label className="set-field">模型<select value={model} onChange={e => setModel(e.target.value)}>
       {tutorModels.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+    </select></label>
+    <label className="set-field">「問問 Claude」的身分<select value={persona} onChange={e => { setPersona(e.target.value); setTutorPersona(e.target.value) }}>
+      {personas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
     </select></label>
     <div className="set-actions"><button type="button" onClick={save}>儲存並測試</button></div>
     <small role="status">{status}</small>

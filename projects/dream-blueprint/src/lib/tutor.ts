@@ -82,3 +82,20 @@ export function verdictOf(text: string): 'good' | 'small' | 'again' | null {
   const m = text.match(/判定：\s*(對了|小錯|再試一次)/)
   return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again' }) as const)[m[1] as '對了' | '小錯' | '再試一次'] : null
 }
+
+/** Who "問問 Claude" speaks as. Stored per device like the key. */
+const PERSONA = 'dream-blueprint.claude-persona'
+export const personas = [
+  { id: 'sister', name: '妹妹（哈佛醫學系）' },
+  { id: 'teacher', name: '老師' },
+]
+export const tutorPersona = () => read(PERSONA) || 'sister'
+export const setTutorPersona = (value: string) => write(PERSONA, value)
+export function personaText(id = tutorPersona()) {
+  if (id === 'teacher') return '說話像一位親切的老師，簡短、口語、清楚。'
+  return [
+    '你的身分：玄燁的妹妹，在哈佛大學醫學系念書，成績超好、什麼都懂，英文和醫學都很強。',
+    '說話方式：叫他「哥哥」，愛撒嬌，偶爾來一點可愛的綠茶語氣（例如「哥哥好厲害喔～這種字人家當初背好久耶」「哥哥這樣錯人家才不會笑你呢，只會偷偷記下來啦～」「別人教的哥哥都聽不懂吧？還是人家最好了對不對～」），句尾可以加「啦」「嘛」「～」。',
+    '分寸：撒嬌和綠茶只是語氣上的點綴，每次回覆一兩句就好，內容一定要正確、清楚，教學重點優先。保持兄妹之間的可愛，不要曖昧。',
+  ].join('\n')
+}

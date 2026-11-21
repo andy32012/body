@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Send, Sparkles, X } from 'lucide-react'
-import { askTutor, tutorKey, type TutorTurn } from '../lib/tutor'
+import { askTutor, personaText, tutorKey, type TutorTurn } from '../lib/tutor'
 import './ai-chat.css'
 
 /** A conversation with Claude. `opening` is sent automatically when the panel opens. */
@@ -72,12 +72,12 @@ export function AISheet({ title, onClose, children }: { title: ReactNode; onClos
 }
 
 const wordSystem = [
-  '你是玄燁的英文老師。他是台灣護理系學生，英文國中程度，正在背大考中心 7000 單字，之後要考雅思。',
-  '他問一個單字時，用繁體中文像老師上課一樣簡短回答，總共不超過 6 行：',
+  '你在教玄燁英文。他是台灣護理系學生，英文國中程度，正在背大考中心 7000 單字，之後要考雅思。',
+  '他問一個單字時，用繁體中文簡短回答，總共不超過 6 行：',
   '1. 最常用的中文意思和詞性（一行）。',
   '2. 一個簡單、生活化的英文例句，下一行附中文。',
   '3. 如果有常見搭配、易混淆的字或護理會用到的意思，挑最重要的一個講一行；沒有就省略。',
-  '4. 最後一行問他「有問題嗎？」或類似的簡短問句，可以變化說法。',
+  '4. 最後一行問他有沒有問題，用你的語氣、每次換個說法。',
   '不要用 Markdown 標題或粗體。他追問時一樣簡短清楚，像朋友一樣口語。',
 ].join('\n')
 
@@ -89,7 +89,7 @@ export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: 
       <Sparkles size={13} aria-hidden="true" />{label}
     </button>
     {open && <AISheet title={<><span lang="en">{en}</span>{zh ? <small> · {zh}</small> : null}</>} onClose={() => setOpen(false)}>
-      <AIChat system={wordSystem} opening={'請教我這個單字：' + en + (zh ? '（' + zh + '）' : '')}
+      <AIChat system={personaText() + '\n\n' + wordSystem} opening={'請教我這個單字：' + en + (zh ? '（' + zh + '）' : '')}
         placeholder="例如：可以再給我一個例句嗎？" suggestions={['再給我一個例句', '怎麼記比較好？', '跟它很像的字是什麼？']} />
     </AISheet>}
   </>
@@ -99,8 +99,9 @@ export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: 
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
   const system = [
-    '你是玄燁的學習老師兼助理，住在他的「夢想藍圖」網站裡。他是台灣護理系學生，目標考雅思、去美國當註冊護理師。',
-    '他可能問英文單字、文法、中翻英、雅思，也可能問護理課業或學習計畫。用繁體中文回答，簡短、口語，像老師一樣：先直接回答，再給一個例子，最後簡短問他有沒有問題。不要用 Markdown 標題或粗體。',
+    personaText(),
+    '你住在玄燁的「夢想藍圖」網站裡，幫他學習。他是台灣護理系學生，目標考雅思、去美國當註冊護理師。',
+    '他可能問英文單字、文法、中翻英、雅思，也可能問護理課業或學習計畫。用繁體中文回答，簡短、口語：先直接回答，再給一個例子，最後簡短問他有沒有問題。不要用 Markdown 標題或粗體。',
     '他要練中翻英時，照下面的教法：一次一句、先讓他自己翻、錯了分層提示。',
     '',
     '以下是網站自動產生的他的進度：',
