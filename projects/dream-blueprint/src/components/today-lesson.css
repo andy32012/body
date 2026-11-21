@@ -1,0 +1,38 @@
+/* Tokens the old dock wrapper used to provide. */
+.dock-choices, .today-things { --mint: #92d6c9; --peach: #edb58e; --lilac: #bda7f1; --dl: var(--line, rgba(153,168,217,.25)); --dt: var(--text, #edf0ff); --dm: var(--muted, #afb8d0); --ds: var(--panel, #141a2b); }
+.flight-deck.lesson-deck { align-items: stretch; }
+.flight-deck .hero-body.lesson-body { max-width: min(620px, 66%); display: grid; align-content: center; gap: 11px; }
+.lesson-goal { margin: 0; font-size: clamp(20px, 2.15vw, 28px); line-height: 1.42; font-weight: 650; color: #fff; text-wrap: balance; letter-spacing: .01em; }
+.lesson-sentence { margin: 0; color: #e4ded3; font-size: 14px; line-height: 1.6; }
+.lesson-sentence span { color: #fff; }
+.lesson-deck .dock-choices { max-width: 430px; }
+.application .lesson-deck .dock-choice { color: #f6f2ea; border-color: rgba(255, 240, 215, .26); }
+.application .lesson-deck .dock-choices button:not([aria-pressed=true]) { background: rgba(8, 12, 20, .5); }
+.lesson-deck .dock-choice small { color: #d9d2c6; }
+.application .lesson-deck .dock-choice[aria-pressed=true] { border-color: var(--ec); background: color-mix(in srgb, var(--ec) 24%, rgba(8, 12, 20, .55)); box-shadow: inset 0 0 0 1px var(--ec); }
+.lesson-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 2px; }
+.lesson-actions .word-chip { margin-left: 0; }
+.lesson-stats { margin: 0; color: #d6cfc3; font-size: 12.5px; letter-spacing: .03em; font-variant-numeric: tabular-nums; }
+.lesson-plan .tp-card { margin-top: 0; background: var(--panel); border-radius: 18px; padding: 16px 18px; }
+
+.today-things { padding-block: 14px; }
+.today-things summary { display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none; font-weight: 650; font-size: 15px; letter-spacing: .04em; min-height: 28px; }
+.today-things summary::-webkit-details-marker { display: none; }
+.today-things summary svg { color: var(--lav); flex: none; }
+.today-things summary small { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12.5px; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
+.today-things summary::after { content: "▾"; color: var(--muted); font-size: 12px; margin-left: 6px; transition: transform .2s; }
+.today-things[open] summary::after { transform: rotate(180deg); }
+.today-things[open] summary { margin-bottom: 12px; }
+
+.lesson-banner { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.lesson-banner div { display: grid; gap: 2px; min-width: 0; }
+.lesson-banner small { color: var(--muted); font-size: 12px; letter-spacing: .05em; }
+.lesson-banner strong { font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
+.lesson-banner button { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 14px; border-radius: 10px; border: 0; background: var(--lav); color: #1c1530; font-weight: 650; }
+
+@media (max-width: 760px) {
+  .flight-deck .hero-body.lesson-body { max-width: 100%; padding: 18px; gap: 10px; }
+  .lesson-goal { font-size: 19px; }
+  .lesson-sentence { font-size: 13px; }
+  .lesson-deck .dock-choices { max-width: none; }
+}

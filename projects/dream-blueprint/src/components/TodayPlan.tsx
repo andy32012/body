@@ -2,6 +2,7 @@ import { Check } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { dueCount, type Energy } from '../lib/progress'
 import { answeredOn, quizSectionKey } from '../lib/quiz'
+import { lessonFinished } from '../lib/lesson'
 import './today-plan.css'
 
 type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void }
@@ -25,12 +26,10 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   ] : [
     { id: 'review', min: 8, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
       auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
-    { id: 'understand', min: 10, title: '理解', detail: '讀一段 7000 單短文，翻成英文後按「批改」',
-      auto: false, go: () => { location.hash = 'library/passage' } },
-    { id: 'express', min: 8, title: '表達', detail: '今天的中翻英一句，再跟 Emma 聊 3 分鐘',
-      auto: practisedToday, go: () => onStart(energy), goLabel: '中翻英', go2: () => { location.hash = 'speaking' } },
-    { id: 'fix', min: 4, title: '訂正', detail: '看批改和 Emma 的小筆記，把講錯的句子加入複習',
-      auto: false },
+    { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
+      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : practisedToday ? '繼續' : '開始' },
+    { id: 'more', min: energy === 'high' ? 15 : 2, title: energy === 'high' ? '加練' : '收尾', detail: energy === 'high' ? '一段 7000 單短文，或跟 Emma 聊 5 分鐘' : '把今天批改出來的錯句加入複習，明天會再出現',
+      auto: false, go: energy === 'high' ? () => { location.hash = 'library/passage' } : undefined, goLabel: '短文', go2: energy === 'high' ? () => { location.hash = 'speaking' } : undefined },
   ]
   const isDone = (t: Task) => t.auto || state.notes[key(t.id)] === '1'
   const finished = tasks.filter(isDone).length
@@ -39,7 +38,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
     if (notes[key(id)] === '1') delete notes[key(id)]; else notes[key(id)] = '1'
     return { ...prev, notes }
   })
-  const title = mode === 'nursing' ? '今天的護理英文 10–15 分鐘' : '今天的 30 分鐘'
+  const title = mode === 'nursing' ? '今天的護理英文 10–15 分鐘' : energy === 'high' ? '今天的 45 分鐘' : '今天的 30 分鐘'
   return <section className="tp-card" aria-label={title}>
     <header><strong>{title}</strong><span>{finished} / {tasks.length}</span></header>
     <div className="tp-bar" aria-hidden="true"><i style={{ width: finished / tasks.length * 100 + '%' }} /></div>

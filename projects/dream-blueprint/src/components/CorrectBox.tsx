@@ -7,18 +7,25 @@ type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string
 type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string }
 const verdictNames = { good: '全對', small: '小錯', again: '要再練' }
 
-function system(zh: string, reference?: string, words?: string[]) {
+function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate') {
+  const json = mode === 'open'
+    ? '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"}'
+    : '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"}'
   return [
-    '你是英文老師，批改台灣護理系學生（英文國中程度）的中翻英。',
+    mode === 'open'
+      ? '你是英文老師，批改台灣護理系學生（英文國中程度）的英文短寫作。這是開放題，內容是他自己想的。'
+      : '你是英文老師，批改台灣護理系學生（英文國中程度）的中翻英。',
     '題目：' + zh,
-    reference ? '參考翻譯（寫法不只一種）：' + reference : '',
-    words?.length ? '這段要練的單字：' + words.join(', ') : '',
+    reference ? (mode === 'open' ? '參考寫法（只是一種例子，不要照這個改他的內容）：' : '參考翻譯（寫法不只一種）：') + reference : '',
+    words?.length ? (mode === 'open' ? '這課要練的句型：' : '這段要練的單字：') + words.join(', ') : '',
     '',
     '規則：',
-    '- 保留他的寫法，只改錯的地方。意思和文法對就不要改成更難或更漂亮的說法。',
-    '- 漏翻的句子要補上。',
+    mode === 'open'
+      ? '- 保留他的意思和內容，只改文法、用字和不自然的地方。意思和文法對就不要改成更難的說法。沒用到這課的句型，就在 note 提醒一句。'
+      : '- 保留他的寫法，只改錯的地方。意思和文法對就不要改成更難或更漂亮的說法。',
+    mode === 'open' ? '' : '- 漏翻的句子要補上。',
     '- why 用繁體中文，一句話講清楚規則，像朋友一樣口語。',
-    '- 第一次回覆只輸出 JSON，不要其他文字：{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"}',
+    '- 第一次回覆只輸出 JSON，不要其他文字：' + json,
     '- 同一句有好幾個錯，合成一個 fix 就好；只是標點或大小寫的小問題不用列。',
     '- 全對時 fixes 是空陣列。',
     '- 之後他追問時，用繁體中文正常回答，講清楚規則和例句，段落短一點，不要 JSON、不要 Markdown 標題。',
@@ -35,14 +42,17 @@ function parse(text: string): Result | null {
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave }: { zh: string; reference?: string; words?: string[]; answer: string; run: number; onSave?: (card: SayCard) => void }) {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, mode = 'translate' }: {
+  zh: string; reference?: string; words?: string[]; answer: string; run: number
+  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number) => void; mode?: 'translate' | 'open'
+}) {
   const [saved, setSaved] = useState<number[]>([])
   const [turns, setTurns] = useState<TutorTurn[]>([])
   const [result, setResult] = useState<Result | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [question, setQuestion] = useState('')
-  const sys = system(zh, reference, words)
+  const sys = system(zh, reference, words, mode)
 
   async function send(next: TutorTurn[], first: boolean) {
     setBusy(true); setError('')
@@ -51,6 +61,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave }
       if (first) {
         const parsed = parse(reply)
         setResult(parsed)
+        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length)
         setTurns([...next, { role: 'assistant', content: reply }])
         if (!parsed) setError('老師回得格式怪怪的，下面是原文：\n' + reply)
       } else setTurns([...next, { role: 'assistant', content: reply }])

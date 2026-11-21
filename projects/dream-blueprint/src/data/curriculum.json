@@ -1317,7 +1317,8 @@
           "why": "I 用 am。You、we、they 和複數用 are；he、she、it 和其他單數用 is。否定在 be 動詞後加 not；問句把 be 動詞移到主詞前。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 am／is／are 介紹自己和別人，說出身分和狀態"
     },
     {
       "id": 2,
@@ -2298,7 +2299,8 @@
           "why": "一個可數的人或物，用 a 或 an，依下一個字的開頭音決定。複數多加 -s 或 -es，也有不規則形，例如 child → children、foot → feet。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 a／an 和複數說出身邊的東西，例如病房裡的用品"
     },
     {
       "id": 3,
@@ -3296,7 +3298,8 @@
           "why": "第一次提到一個可數的人或物，用 a 或 an；第二次再提到，或雙方知道是哪一個，用 the。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "第一次提到用 a／an，再提到或雙方都知道是哪個時用 the"
     },
     {
       "id": 4,
@@ -4290,7 +4293,8 @@
           "why": "談習慣，用現在簡單式。I、you、we、they 配原形，he、she、it 和單數主詞的動詞要加 -s 或 -es；have 變 has。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用現在簡單式說自己和別人每天的習慣（he／she 的動詞加 -s）"
     },
     {
       "id": 5,
@@ -5281,7 +5285,8 @@
           "why": "一般動詞用 do 或 does 提問。加 not 表達否定。助動詞後面的主要動詞用原形。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 Do／Does 問別人的習慣，用 don't／doesn't 說沒有"
     },
     {
       "id": 6,
@@ -6273,7 +6278,8 @@
           "why": "現在正在做的動作，用 am、is 或 are 加動詞的 -ing 形式。問句把 be 動詞放在主詞前，否定時在 be 動詞後加 not。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 am／is／are ＋ -ing 說現在正在做的事"
     },
     {
       "id": 7,
@@ -7264,7 +7270,8 @@
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 was／were 說昨天或剛才的狀態"
     },
     {
       "id": 8,
@@ -8047,7 +8054,8 @@
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用規則動詞 -ed 說昨天做了什麼"
     },
     {
       "id": 9,
@@ -8826,7 +8834,8 @@
           "why": "有些常用動詞的過去式不加 -ed，要直接記：go→went、eat→ate、take→took、have→had、come→came、see→saw、give→gave、sleep→slept、drink→drank、feel→felt、fall→fell、tell→told。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用常見的不規則過去式說發生過的事"
     },
     {
       "id": 10,
@@ -9607,7 +9616,8 @@
           "why": "過去式的否定用 did not（didn't），問句把 Did 放最前面。用了 did 之後，後面的動詞要打回原形。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 Did…? 問過去的事，用 didn't 說沒做（後面動詞回原形）"
     },
     {
       "id": 11,
@@ -10388,7 +10398,8 @@
           "why": "未來的事用 will 加原形動詞，或用 be going to 加原形動詞。否定是 will not（won't）。問句把 Will 放最前面。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 will／be going to 說之後的安排和計畫"
     },
     {
       "id": 12,
@@ -11165,7 +11176,8 @@
           "why": "can（能、可以）、should（應該）、must 和 have to（必須）、may（可以、可能）後面都接原形動詞。否定在助動詞後面加 not。問句把助動詞放最前面。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 can／should／must 說能不能、該不該、一定要（衛教用語）"
     },
     {
       "id": 13,
@@ -11941,7 +11953,8 @@
           "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 at／on／in 說清楚時間和地點（約診、上課）"
     },
     {
       "id": 14,
@@ -12722,7 +12735,8 @@
           "why": "數得出來的名詞用 many、a few，數不出來的（water、blood、medicine、pain、time）用 much、a little。some 用在肯定句，any 用在否定句和問句。a lot of 兩種都能用。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 many／much／a few／a little／some／any 說數量"
     },
     {
       "id": 15,
@@ -13495,7 +13509,8 @@
           "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用比較級和最高級比較兩樣東西、說出「最…」"
     },
     {
       "id": 16,
@@ -14270,7 +14285,8 @@
           "why": "What（什麼）、Where（哪裡）、When（什麼時候）、Who（誰）、Why（為什麼）、How（如何）、How long（多久）、How often（多常）。疑問詞放最前面，後面照一般問句的順序。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 What／Where／When／Who／How 問病人的基本資料和症狀"
     },
     {
       "id": 17,
@@ -15042,7 +15058,8 @@
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 and／but／so／because 把兩件事接成一句"
     },
     {
       "id": 18,
@@ -15819,7 +15836,8 @@
           "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 when／before／after／if 說明步驟和條件（衛教）"
     },
     {
       "id": 19,
@@ -16594,7 +16612,8 @@
           "why": "have 或 has 加過去分詞，表示從以前到現在的經驗、持續或剛完成。for 加一段時間，since 加起點。he、she、it 用 has。否定是 have not、has not；問句把 Have、Has 放前面。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 have／has ＋ 過去分詞說經驗和持續多久（for／since）"
     },
     {
       "id": 20,
@@ -17370,7 +17389,8 @@
           "why": "句子裡有明確的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "有明確過去時間用過去式，從以前延續到現在用現在完成式"
     },
     {
       "id": 21,
@@ -18136,7 +18156,8 @@
           "why": "主詞是「被做」的那一方時用被動：be 動詞加過去分詞。現在用 am、is、are，過去用 was、were。要講是誰做的就加 by。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 be ＋ 過去分詞說「被做」的事（處置、紀錄）"
     },
     {
       "id": 22,
@@ -18912,7 +18933,8 @@
           "why": "有些動詞後面接 to 加原形（want、need、decide、hope、plan、try）；有些接動詞 ing（enjoy、finish、stop、avoid、keep）。介系詞後面的動詞用 ing。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "分得出 want／need／plan to ＋ 原形，和 enjoy／finish／stop ＋ -ing"
     },
     {
       "id": 23,
@@ -19682,7 +19704,8 @@
           "why": "「某個地方有…」用 There is 加單數或不可數、There are 加複數。過去用 There was、There were。講天氣、時間、距離，或後面才說真正的事情時，用 It 當主詞。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 There is／There are 說某處有什麼，用 It is … to … 說看法"
     },
     {
       "id": 24,
@@ -20447,7 +20470,8 @@
           "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 always／usually／sometimes／never 和 once／twice a day 說頻率"
     },
     {
       "id": 25,
@@ -21226,7 +21250,8 @@
           "why": "叫對方做事用原形動詞開頭，否定用 Do not。加 Please 比較有禮貌。更客氣可以用 Could you、Can you 加原形，或 I need you to 加原形。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用祈使句和 Could you…? 有禮貌地請病人配合"
     },
     {
       "id": 26,
@@ -22007,7 +22032,8 @@
           "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 who／which／that 補充說明是哪一個人或東西"
     },
     {
       "id": 27,
@@ -22780,7 +22806,8 @@
           "why": "把問句放進另一句裡（Can you tell me…、Do you know…、I do not know…）時，後面要變回一般句子的順序：疑問詞加主詞加動詞，不用 do、does、did。沒有疑問詞的用 if 或 whether。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 Can you tell me…／Do you know… 有禮貌地問（後面用直述句語序）"
     },
     {
       "id": 28,
@@ -23557,7 +23584,8 @@
           "why": "was 或 were 加動詞 ing，表示過去某個時間點正在進行的動作。常和 when 加過去式一起用：一個動作正在進行時，另一件事發生了。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 was／were ＋ -ing 說事情發生時正在做什麼"
     },
     {
       "id": 29,
@@ -24332,7 +24360,8 @@
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。if 那一句不能用 will。unless 的意思是「除非」。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 If ＋ 現在式, will／祈使句 說可能發生的情況和怎麼處理"
     },
     {
       "id": 30,
@@ -25113,7 +25142,8 @@
           "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 say／tell 轉述病人或醫生說的話"
     },
     {
       "id": 31,
@@ -25892,7 +25922,8 @@
           "why": "have 或 has 加 been 加動詞 ing，強調一個動作從以前一直持續到現在，而且可能還在繼續。常和 for、since、how long 一起用。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 have／has been ＋ -ing 說一個動作持續了多久（症狀持續時間）"
     },
     {
       "id": 32,
@@ -26669,7 +26700,8 @@
           "why": "had 加過去分詞，表示在過去某個時間點或某件事「之前」就已經發生的事。兩件過去的事裡，先發生的用過去完成式，後發生的用過去式。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 had ＋ 過去分詞說過去某件事之前就已經發生的事"
     },
     {
       "id": 33,
@@ -27444,7 +27476,8 @@
           "why": "講跟現在事實相反或不太可能的事：If 加過去式，主要句用 would 加原形。be 動詞不管主詞是誰都常用 were。給建議常說 If I were you, I would…。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 If ＋ 過去式, would ＋ 原形說跟事實相反的假設、給建議"
     },
     {
       "id": 34,
@@ -28223,7 +28256,8 @@
           "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 must／should／can ＋ be ＋ 過去分詞說處置規定（給藥、傷口照護）"
     },
     {
       "id": 35,
@@ -28998,7 +29032,8 @@
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 I think／I hope／I'm sure (that)… 說看法和希望"
     },
     {
       "id": 36,
@@ -29771,7 +29806,8 @@
           "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 -ing／過去分詞片語接在名詞後面，說清楚是哪一位"
     },
     {
       "id": 37,
@@ -30554,7 +30590,8 @@
           "why": "although、even though（雖然）後面接句子；despite、in spite of（儘管）後面接名詞或動詞 ing。while、whereas 用來對比兩件事。however（然而）放在第二句開頭，後面加逗號。although 和 but 不能同時用。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 although／despite／however 說出兩件相反的事"
     },
     {
       "id": 38,
@@ -31337,7 +31374,8 @@
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 because of／due to／therefore／as a result 寫因果（報告用語）"
     },
     {
       "id": 39,
@@ -32120,7 +32158,8 @@
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用 rise／drop／remain stable ＋ from…to… 描述圖表和數字的變化"
     },
     {
       "id": 40,
@@ -32901,7 +32940,8 @@
           "why": "口說檢定要把回答講長：先講意見（I think、In my opinion、I believe），再講理由（because、The main reason is that），再舉例（For example、For instance），最後收尾（That is why…）。同意和不同意可以說 I agree that…、I do not agree that…。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用「意見 → 理由 → 例子 → 結論」把口說回答講長"
     },
     {
       "id": 41,
@@ -33669,7 +33709,8 @@
           "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school、in hospital 這類固定說法不加。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "泛指不加冠詞，特指才用 the；說得出疾病名稱的冠詞"
     },
     {
       "id": 42,
@@ -34446,7 +34487,8 @@
           "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
           "newWords": []
         }
-      ]
+      ],
+      "cando": "用整組搭配和片語動詞（make an appointment、take off、look after）說得更自然"
     }
   ],
   "schedule": {

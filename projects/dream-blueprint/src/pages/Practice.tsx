@@ -24,7 +24,17 @@ import {
 import { isKnownWord, wordKey, officialWords } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
-import { readSayCard, sayCardSentence } from "../lib/sayCards";
+import { addSayCard, readSayCard, sayCardSentence } from "../lib/sayCards";
+import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
+import {
+  heardKey,
+  markLessonStep,
+  readHeard,
+  readLessonRecord,
+  variationFor,
+  type Lesson,
+  type LessonStep,
+} from "../lib/lesson";
 import {
   pickRetentionUnit,
   assistedUnits,
@@ -53,6 +63,7 @@ type Unit = {
   rule?: string;
   examples?: string[];
   examplesZh?: string[];
+  cando?: string;
   days: LessonDay[];
   checkpoint: Sentence[];
   backup: Sentence[];
@@ -299,6 +310,8 @@ function lesson(state: AppState, energy: Energy, date: string) {
     examplesZh: unit.examplesZh ?? [],
     listening: entry.listening ?? [],
     earlier: unit.days.slice(0, 2),
+    previousDay: index > 1 ? unit.days[index - 2] : undefined,
+    cando: unit.cando ?? "",
     previousPair,
     vacation,
     freshReview: review && !previous,
@@ -327,7 +340,20 @@ function PracticeSession({
     period === "exam" || period === "internship" ? "low" : requested;
   const [current] = useState(() => lesson(state, energy, date));
   const [pos, setPos] = useState(0);
-  const [phase, setPhase] = useState<"write" | "sound" | "done">("write");
+  type Phase = "recall" | "listen" | "write" | "sound" | "vary" | "express" | "done";
+  // Normal and high-energy lesson days (not review, not checkpoint) run the guided lesson.
+  const guided = !current.review && !current.checkpoint && energy !== "low";
+  const [lessonData, setLessonData] = useState<Lesson | null | undefined>(guided ? undefined : null);
+  useEffect(() => {
+    if (!guided) return;
+    let alive = true;
+    import("../data/lessons.json")
+      .then((file) => { if (alive) setLessonData((file.default as Lesson[]).find((l) => l.unit === current.unit) ?? null); })
+      .catch(() => { if (alive) setLessonData(null); });
+    return () => { alive = false; };
+  }, [guided, current.unit]);
+  const [firstListen] = useState(() => !readHeard(state.notes, current.unit));
+  const [corrections, setCorrections] = useState(0);
   const [records, setRecords] = useState<TranslationRecord[]>([]);
   const [spoken, setSpoken] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<Session["feedback"]>();
@@ -363,6 +389,23 @@ function PracticeSession({
       label: "回想已學過的單元 " + retention.unit,
     });
   const recall = recallItems[recalls.length];
+  // Guided lessons start by recalling: day 5 → days 1–2 (and an older unit), days 2–4 → the day before.
+  const guidedRecall = current.day === 5 ? recallItems
+    : current.previousDay ? [{ sentence: current.previousDay, label: "回想上一天的句子" }] : [];
+  const [phase, setPhase] = useState<Phase>(() => guided ? (guidedRecall.length ? "recall" : "listen") : "write");
+  useEffect(() => {
+    if (lessonData === null && phase !== "write" && phase !== "done") setPhase("write");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonData]);
+  const live = guided && !!lessonData;
+  const recallNow = guidedRecall[recalls.length];
+  const lessonRecord = readLessonRecord(state.notes, date);
+  const stepsDone: LessonStep[] = [...(lessonRecord?.steps ?? []), ...(guidedRecall.length ? [] : ["recall" as const])];
+  const stepNow: LessonStep = phase === "recall" ? "recall" : phase === "listen" ? "listen"
+    : phase === "express" ? (corrections ? "fix" : "express") : phase === "done" ? "done" : "pattern";
+  function step(s: LessonStep, extra: { corrected?: boolean } = {}) {
+    update((prev) => ({ ...prev, notes: markLessonStep(prev.notes, date, current.unit, current.day, s, extra) }));
+  }
   const item = current.items[pos];
   function mark(value: Mark, revealed: boolean) {
     setRecords([
@@ -376,7 +419,7 @@ function PracticeSession({
     ]);
     setPhase("sound");
   }
-  function finish(skip = false) {
+  function finish(skip = false, next: Phase = "done") {
     const results = skip ? [] : [...recalls, ...records];
     const drawn =
       retention && recalls.find((t) => t.sentenceId === retention.sentence.id);
@@ -474,7 +517,7 @@ function PracticeSession({
         learningWords: [...new Set([...prev.learningWords, ...learned])],
       };
     });
-    setPhase("done");
+    setPhase(next);
   }
   function logSpoken(id: string) {
     update((prev) => ({
@@ -497,7 +540,7 @@ function PracticeSession({
   }
   return (
     <section className="practice-page">
-      <PracticeCover title={levels[energy] + "練習"}>
+      <PracticeCover title={live ? "今天這一堂" : levels[energy] + "練習"}>
         <button type="button" className="pr-back" onClick={() => navigate("today")}>
           <ChevronLeft size={16} aria-hidden="true"/>回今天
         </button>
@@ -505,11 +548,77 @@ function PracticeSession({
       <div className="pr-pane pr-session" data-phase={phase}>
         <div className="pr-session-meta">
           <span className="pr-stage-icon" aria-hidden="true">
-            {phase === "write" ? <PenLine size={17}/> : phase === "sound" ? <Headphones size={17}/> : <Check size={17}/>}
+            {phase === "done" ? <Check size={17}/> : phase === "sound" || phase === "listen" ? <Headphones size={17}/> : <PenLine size={17}/>}
           </span>
           <span>{current.review ? "舊句複習" : "單元 " + current.unit + " · 第 " + current.day + " 天"}</span>
           {phase !== "done" && current.checkpoint && <span className="pr-item-index">{pos + 1} / {current.items.length}</span>}
         </div>
+        {live && <StepBar current={stepNow} done={stepsDone} />}
+        {guided && lessonData === undefined && <p className="ls-help">準備今天這一堂…</p>}
+        {live && phase === "recall" && (
+          recallNow ? (
+            <div className="pr-hint">
+              <strong>{recallNow.label} · {recalls.length + 1} / {guidedRecall.length}</strong>
+              <Translation
+                key={recallNow.sentence.id}
+                sentence={recallNow.sentence}
+                checkpoint={false}
+                onMark={(mark, revealed) =>
+                  setRecalls([
+                    ...recalls,
+                    { sentenceId: recallNow.sentence.id, rating: ratingOf[mark], grammar: recallNow.sentence.grammar, revealed },
+                  ])
+                }
+              />
+            </div>
+          ) : (
+            <div className="pr-recall">
+              <div className="pr-label">回想完成</div>
+              <h2 className="pr-question">接著聽一段今天的對話。</h2>
+              <button className="pr-main" onClick={() => { step("recall"); setPhase("listen"); }}>下一步：聽懂</button>
+            </div>
+          )
+        )}
+        {live && lessonData && phase === "listen" && (
+          <LessonListen
+            lesson={lessonData}
+            firstTime={firstListen}
+            rate={state.settings.speechRate}
+            onDone={(correct, total) => {
+              update((prev) => ({
+                ...prev,
+                notes: {
+                  ...markLessonStep(prev.notes, date, current.unit, current.day, "listen"),
+                  ...(total > 0 ? { [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total }) } : {}),
+                },
+              }));
+              setPhase("write");
+            }}
+          />
+        )}
+        {live && lessonData && phase === "vary" && (
+          <LessonVariation
+            item={variationFor(lessonData, current.day)}
+            onDone={(m) => {
+              const v = variationFor(lessonData, current.day);
+              if (m !== "good")
+                update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
+              finish(false, "express");
+              step("pattern");
+            }}
+          />
+        )}
+        {live && lessonData && phase === "express" && (
+          <LessonExpress
+            lesson={lessonData}
+            draftKey={"express." + current.unit + "." + current.day}
+            pattern={current.title}
+            onCorrected={() => { const n = corrections + 1; setCorrections(n); step(n === 1 ? "express" : "fix", { corrected: true }); }}
+            onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
+            onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
+            onFinish={() => { step("done"); setPhase("done"); }}
+          />
+        )}
         {phase === "write" && (
           <>
             {energy === "low" && state.settings.why && (
@@ -522,7 +631,7 @@ function PracticeSession({
                 <button className="pr-main" onClick={() => finish(true)}>我複習了自己熟悉的一句</button>
               </div>
             )}
-            {!current.review && current.day === 5 && (
+            {!live && !current.review && current.day === 5 && (
               <details className="pr-tools">
                 <summary>
                   回想第 1、2 天的句子{retention ? "與以前的單元" : ""}
@@ -560,7 +669,15 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
-                preparation={!current.review && current.day === 1 && current.rule && (
+                preparation={!current.review && current.rule && (current.day !== 1 ? (live ? (
+                  <details className="pr-tools pr-rule">
+                    <summary>複習這課的規則：{current.title}</summary>
+                    <p>{current.rule}</p>
+                    {current.examples.map((en, i) => (
+                      <p key={en}><span lang="en">{en}</span><br/>{current.examplesZh[i]}</p>
+                    ))}
+                  </details>
+                ) : null) : (
                   <section className="pr-rule">
                     <strong>{current.title}</strong>
                     <p>{current.rule}</p>
@@ -571,7 +688,7 @@ function PracticeSession({
                       ))}
                     </details>}
                   </section>
-                )}
+                ))}
                 onMark={mark}
               />
             )}
@@ -600,6 +717,10 @@ function PracticeSession({
                 >
                   下一句
                 </button>
+              ) : live ? (
+                <button className="pr-main" onClick={() => setPhase("vary")}>
+                  下一步：換個說法
+                </button>
               ) : (
                 <button className="pr-main" onClick={() => finish()}>
                   今天到這裡
@@ -612,6 +733,21 @@ function PracticeSession({
           <>
             <div className="pr-label">練習已儲存</div>
             <h2 className="pr-question">今天有練，就往前了一點。</h2>
+            {live && (() => {
+              const heard = readHeard(state.notes, current.unit);
+              const did = (id: LessonStep) => stepsDone.includes(id) && (id !== "recall" || guidedRecall.length > 0);
+              const lines: [LessonStep, string][] = [
+                ["recall", guidedRecall.length ? "回想：" + recalls.length + " 句舊句" : "回想：今天沒有要回想的句子"],
+                ["listen", heard?.day === date && heard.total ? "聽懂：對話題目答對 " + heard.correct + " / " + heard.total : "聽懂：聽對話、跟著唸"],
+                ["pattern", "句型：今天的句子和一個變化"],
+                ["express", did("express") ? "表達：用自己的話寫了一段" + (lessonRecord?.corrected ? "，請 Claude 批改過" : "") : "表達：今天跳過"],
+                ["fix", did("fix") ? "訂正：改好再批一次" : "訂正：下次試著改完再批一次"],
+              ];
+              return <>
+                {current.cando && <p className="ls-goal"><small>今天的目標</small>{current.cando}</p>}
+                <ul className="ls-summary">{lines.map(([id, text]) => <li key={id} data-skip={!did(id)}>{text}</li>)}</ul>
+              </>;
+            })()}
             {current.checkpoint && (
               <p>
                 {checkpointOutcome(records).independent

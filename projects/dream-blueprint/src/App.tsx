@@ -1,9 +1,9 @@
-import ScenePhoto, { SceneFeatureContext } from './components/ScenePhoto'
+import { SceneFeatureContext } from './components/ScenePhoto'
 import { useEffect, useState } from 'react'
 import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
-  Map as MapIcon, Moon, Orbit, Play, Settings2, Star, Sun,
+  Map as MapIcon, Moon, Orbit, Settings2, Star, Sun,
   Telescope, Trophy, Mic, House,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -13,7 +13,7 @@ import planData from './data/plan.json'
 import roadmap from './data/roadmap.json'
 import Plan, { type PlanTab } from './pages/Plan'
 import Practice, { PracticeCover, PracticeLibrary } from './pages/Practice'
-import PracticeDock from './components/PracticeDock'
+import { LessonBanner, TodayLesson, TodayThings } from './components/TodayLesson'
 import WorkloadRecommendation from './components/WorkloadRecommendation'
 import Rivals from './pages/Rivals'
 import History from './pages/History'
@@ -60,13 +60,6 @@ function nextAction(state:AppState) {
   }
   return {kind:'map',title:'回顧你的赴美路線',detail:'所有站點的待辦都已完成。',action:'查看夢想星圖'}
 }
-function defaultEnergy(state:AppState,today:string):Energy {
-  const period=activePeriod(today,state.settings.periods)
-  const weekday=new Date(today+'T12:00:00').getDay()
-  if(period==='exam'||period==='internship')return 'low'
-  if(period==='vacation')return weekday===0?'low':'high'
-  return state.settings.regularDays.includes(weekday)?'normal':'low'
-}
 function Brand() {
   return <button type="button" className="brand" onClick={()=>setView('today')} aria-label="夢想藍圖首頁">
     <span className="brand-orbit" aria-hidden="true"><i/><b/></span><span>夢想藍圖</span>
@@ -88,27 +81,15 @@ function Week({state,today}:{state:AppState,today:string}) {
   </section>
 }
 function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:()=>void}) {
-  const {state,update,today,start,openWord}=props
-  const phase=activePeriod(today,state.settings.periods)
-  const maintenance= today>='2028-02-01'&&today<='2029-07-31' && (phase==='exam'||phase==='internship')
+  const {state,update,navigate,today,start,openWord}=props
   const goal=nextAction(state), days=new Set(state.sessions.map(s=>s.day)).size
   const month=planData.months.find(m=>m.month===today.slice(0,7))
   const year=planData.years.find(y=>y.year===Number(today.slice(0,4)))
-  const hadBreak=state.sessions.length>0&&!state.sessions.some(s=>s.day===today||s.day===addDays(today,-1))
-  const regular=defaultEnergy(state,today)
-  const heroCue=maintenance?'實習／國考期：每天 10–15 分鐘護理英文，真的太累就複習 2 分鐘。':hadBreak?'回來就好，從你熟悉的一句話接著練。':
-    regular==='low'?'今天可以只複習一句，照自己的電量前進。':regular==='high'?'假期的英文時間到了，從今天的一句話開始。':'今天是 30 分鐘完整課：複習、理解、表達、訂正。'
+  const weekStart=weekKey(today), practised=new Set(state.sessions.map(s=>s.day))
+  const weekCount=Array.from({length:7},(_,i)=>addDays(weekStart,i)).filter(d=>practised.has(d)).length
   return <div className="home-stack">
-    <section className="flight-deck" aria-label="今日練習">
-      <ScenePhoto className="flight-photo" />
-      <div className="hero-body">
-        <div className="hero-label"><span aria-hidden="true" className="hero-dash"/>累計練習</div>
-        <div className="hero-number"><strong>{days}</strong><span>天</span></div>
-        <p>{heroCue}</p>
-        <button type="button" className="launch" onClick={()=>{const dock=document.getElementById('practice-dock');dock?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});dock?.focus({preventScroll:true})}}><Play size={16} fill="currentColor"/>準備今日練習<ArrowRight size={16}/></button>
-        <button type="button" className="word-chip" onClick={openWord}><Star size={14}/>今日單字</button>
-      </div>
-    </section>
+    <TodayLesson state={state} update={update} today={today} start={start} openWord={openWord} days={days} weekCount={weekCount}/>
+    <TodayThings state={state} navigate={navigate} today={today} nextStep={goal.title}/>
     <div className="overview-row">
       <section className="orbit-card next-card">
         <div className="section-head"><h2>夢想星圖 · 下一步</h2></div>
@@ -118,7 +99,6 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
       </section>
       <Week state={state} today={today}/>
     </div>
-    <section className="home-practice"><PracticeDock {...props} onStart={start} nextStep={goal.title}/></section>
     <WorkloadRecommendation state={state} update={update}/>
     <button className="plan-strip" type="button" onClick={()=>setView('plan','timeline')}><span className="card-symbol lavender"><Telescope size={20}/></span><span><strong>今年 · {year?.school || '重排年度目標'}</strong><small>這個月 · {month?.english || '到計畫頁查看本月目標'}</small></span><ArrowUpRight size={18}/></button>
   </div>
@@ -211,7 +191,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><PracticeDock {...props} onStart={start} onlyPractice/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy} {...props} energy={route.energy}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='rivals'?<Rivals {...props}/>:page==='speaking'?<Speaking {...props}/>:<Settings {...props}/>}
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant progress={handoffText(state,today)}/>}
