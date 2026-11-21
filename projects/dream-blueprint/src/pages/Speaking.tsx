@@ -5,7 +5,8 @@ import { openaiKey, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, t
 import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
-import { dayKey, newCard } from '../lib/progress'
+import { dayKey } from '../lib/progress'
+import { addSayCard } from '../lib/sayCards'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import './speaking.css'
 
@@ -105,13 +106,7 @@ export default function Speaking({ update }: PageProps) {
 
   function addCard(i: number) {
     const f = fixes[i]
-    const id = 'say-' + Date.now().toString(36) + i
-    const today = dayKey()
-    update(prev => ({
-      ...prev,
-      notes: { ...prev.notes, ['say.' + id]: JSON.stringify({ zh: f.zh, en: f.en, wrong: f.wrong, why: f.why }) },
-      cards: [...prev.cards, newCard(id, today)],
-    }))
+    update(prev => addSayCard(prev, { zh: f.zh, en: f.en, wrong: f.wrong, why: f.why, from: 'emma' }, dayKey(), String(i)))
     setFixes(list => list.map((x, j) => j === i ? { ...x, added: true } : x))
   }
 

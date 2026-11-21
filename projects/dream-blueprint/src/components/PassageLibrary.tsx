@@ -3,10 +3,12 @@ import type { PageProps } from '../lib/store'
 import CorrectBox from './CorrectBox'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
-import { doneKey, levelKey, levelProgress, nextPassage, redoKey, type Passage } from '../lib/passages'
+import { doneKey, levelKey, levelProgress, nextPassage, redoDue, redoKey, type Passage } from '../lib/passages'
+import { dayKey } from '../lib/progress'
+import { addSayCard } from '../lib/sayCards'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update'] }
-const marks = [['good', '對了'], ['small', '小錯'], ['again', '不會，之後再來']] as const
+const marks = [['good', '對了'], ['small', '小錯'], ['again', '不會，明天再來']] as const
 
 // Short passages written around the 7000-word list. One passage at a time, in book order.
 export default function PassageLibrary({ state, onActivity }: Props) {
@@ -46,7 +48,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
     const id = passage.id
     onActivity(prev => {
       const notes = { ...prev.notes }
-      if (result === 'again') notes[redoKey(id)] = '1'
+      if (result === 'again') notes[redoKey(id)] = dayKey()
       else delete notes[redoKey(id)]
       return { ...prev, notes, checks: result === 'again' ? prev.checks : { ...prev.checks, [doneKey(id)]: true } }
     })
@@ -77,6 +79,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
     </div>
     {!passage ? <p>{letter ? '這個字母的短文都做完了，換一個字母或回到照順序。' : '第 ' + level + ' 級的短文都做完了。可以換下一級。'}</p> : <>
       <div className="pr-label">7000 單短文 · 第 {passage.level} 級 · {passage.letter} {String(passage.n).padStart(2, '0')}</div>
+      {redoDue(state.notes, passage.id) && <p className="passage-again">這段之前按了「不會」，隔一天再試一次。寫不出來的地方先空著，批改後把錯的加入複習。</p>}
       <p className="passage-text">{passage.zh}</p>
       <label className="pr-field" htmlFor="passage-answer">我的英文翻譯</label>
       <textarea id="passage-answer" rows={5} lang="en" value={answer} placeholder="一句一句翻，寫不出來的先空著"
@@ -88,7 +91,8 @@ export default function PassageLibrary({ state, onActivity }: Props) {
         {passage.en && <button className="pr-link" onClick={() => setShow(show === 'reference' ? 'none' : 'reference')}>參考翻譯</button>}
         <button className="pr-link" onClick={() => { setSkipped(list => [...list, passage.id]); reset() }}>換一段</button>
       </div>
-      <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer} />
+      <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
+        onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {show === 'words' && passage.words && <div className="pr-tags">
         {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
       </div>}

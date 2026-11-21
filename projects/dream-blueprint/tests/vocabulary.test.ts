@@ -55,7 +55,7 @@ test('今日單字每 56 個字看完整組實拍照，回頭看同一個字會�
   assert.equal(dailyWordPhoto(officialWords[38].en).id, sequence[38])
 })
 
-test('7000 單短文：六級共 1,476 段，六級每段都有參考翻譯；做完的不再出現，標記不會的排到最後', () => {
+test('7000 單短文：六級共 1,476 段，六級每段都有參考翻譯；做完的不再出現，標記不會的隔天才回來', () => {
   assert.equal(passages.length,1476)
   assert.equal(new Set(passages.map(p=>p.id)).size,1476)
   const first = passages.filter(p=>p.level===1)
@@ -64,7 +64,8 @@ test('7000 單短文：六級共 1,476 段，六級每段都有參考翻譯；�
   assert.ok(passages.every(p=>p.en && p.en.length>40 && p.words), '六級每段都要有參考翻譯')
   assert.equal(nextPassage(passages,1,{},{})?.id,'L1-A01')
   assert.equal(nextPassage(passages,1,{[doneKey('L1-A01')]:true},{})?.id,'L1-A02')
-  assert.equal(nextPassage(passages,1,{},{[redoKey('L1-A01')]:'1'})?.id,'L1-A02')
+  assert.equal(nextPassage(passages,1,{},{[redoKey('L1-A01')]:'2026-11-21'},[],'','2026-11-21')?.id,'L1-A02')
+  assert.equal(nextPassage(passages,1,{},{[redoKey('L1-A01')]:'2026-11-21'},[],'','2026-11-22')?.id,'L1-A01')
   assert.equal(nextPassage(passages,1,{},{},[],'Z')?.id,'L1-Z01')
   assert.deepEqual(levelProgress(passages,1,{[doneKey('L1-A01')]:true}),{done:1,total:235})
 })

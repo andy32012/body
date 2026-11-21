@@ -2,13 +2,13 @@ import ScenePhoto from "../components/ScenePhoto";
 import { useEffect, useState, type ReactNode } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
+import QuizPractice from "../components/QuizPractice";
 import TutorChat from "../components/TutorChat";
 import { clearDraft, readDraft, writeDraft } from "../lib/drafts";
 import { AskWord } from "../components/AIChat";
 import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
-import quiz from "../data/quiz.json";
 import starters from "../data/starters.json";
 import SpeechPractice from "../components/SpeechPractice";
 import type { AppState, PageProps, Session } from "../lib/store";
@@ -24,6 +24,7 @@ import {
 import { isKnownWord, wordKey, officialWords } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
+import { readSayCard, sayCardSentence } from "../lib/sayCards";
 import {
   pickRetentionUnit,
   assistedUnits,
@@ -64,21 +65,12 @@ const allSentences: Sentence[] = units
   .concat(sentences)
   .concat(starters);
 const sentenceById = new Map(allSentences.map((s) => [s.id, s]));
-/** Sentences saved from Emma's speaking practice live in state.notes as "say.<id>". */
+/** Sentences saved from Emma, passages or lessons live in state.notes as "say.<id>". */
 function syncCustom(notes: Record<string, string>) {
   for (const [k, v] of Object.entries(notes)) {
     if (!k.startsWith("say.")) continue;
-    try {
-      const d = JSON.parse(v) as { zh: string; en: string; wrong?: string; why?: string };
-      const id = k.slice(4);
-      sentenceById.set(id, {
-        id, zh: d.zh, grammar: ["口說錯句"],
-        hints: [d.why || "想想 Emma 當時怎麼幫你改的", "開頭：" + d.en.split(" ")[0] + " …"],
-        reference: [d.en],
-        why: (d.wrong ? "你在口說時說成：" + d.wrong + "。" : "") + (d.why || ""),
-        newWords: [],
-      });
-    } catch { /* skip broken note */ }
+    const d = readSayCard(v);
+    if (d) sentenceById.set(k.slice(4), sayCardSentence(k.slice(4), d));
   }
 }
 const marks: [Mark, string][] = [
@@ -801,7 +793,6 @@ function Extras({
   });
   const [offset, setOffset] = useState(0);
   const [see, setSee] = useState(false);
-  const [picked, setPicked] = useState<number>();
   const [listen, setListen] = useState(0);
   const quiet =
     energy === "low" ||
@@ -884,8 +875,6 @@ function Extras({
     });
     return cards.slice(0, limit);
   });
-  const [quizIndex, setQuizIndex] = useState(0);
-  const question = quiz[quizIndex % quiz.length];
   const word = deck[offset];
   function scoreWord(remembered: boolean) {
     if (!word) return;
@@ -1023,69 +1012,7 @@ function Extras({
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
       {mode === "quiz" && !quiet && (
-        <div className="pr-stack">
-          <small>
-            第 {(quizIndex % quiz.length) + 1} / {quiz.length} 題
-          </small>
-          <h3 lang="en">{question.en}</h3>
-          <p>{question.zh}</p>
-          <div className="pr-options">
-            {question.options.map((label, i) => (
-              <button
-                key={label}
-                disabled={picked !== undefined}
-                aria-pressed={i === picked}
-                onClick={() => {
-                  setPicked(i);
-                  onActivity((prev) => prev);
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          {picked !== undefined && (
-            <div className="pr-hint">
-              <strong>
-                {picked === question.answerIndex
-                  ? "答對了"
-                  : "這題的答案是「" +
-                    question.options[question.answerIndex] +
-                    "」"}
-              </strong>
-              <p>{question.explanation}</p>
-              {question.source && (
-                <a href={question.source} target="_blank" rel="noreferrer">
-                  查看資料來源
-                </a>
-              )}
-              <div>
-                <button
-                  onClick={() => {
-                    setQuizIndex(quizIndex + 1);
-                    setPicked(undefined);
-                  }}
-                >
-                  下一題
-                </button>
-              </div>
-            </div>
-          )}
-          <button
-            className="pr-link"
-            disabled={state.flagged.includes(question.id)}
-            onClick={() =>
-              update((prev) => ({
-                ...prev,
-                flagged: [...new Set([...prev.flagged, question.id])],
-              }))
-            }
-          >
-            {state.flagged.includes(question.id)
-              ? "已記到設定頁"
-              : "這題怪怪的"}
-          </button>
-        </div>
+        <QuizPractice state={state} update={update} onActivity={onActivity} date={date} />
       )}
       {mode === "screen" && !quiet && (
         <VocabScreen state={state} update={update} navigate={navigate} />

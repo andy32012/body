@@ -46,3 +46,6 @@
 .tu-fixes small { opacity: 0.85; font-size: 0.9rem; line-height: 1.5; }
 .tu-note { margin: 0; opacity: 0.85; }
 .tu-turn.tu-user { border-top: 1px dashed var(--practice-line); padding-top: 0.5rem; }
+.tu-save { justify-self: start; margin-top: 0.15rem; border: 1px solid currentColor; border-radius: 999px; padding: 0.15rem 0.7rem; background: transparent; color: inherit; font: inherit; font-size: 0.82rem; opacity: 0.85; cursor: pointer; }
+.tu-save:disabled { opacity: 0.5; cursor: default; }
+.tu-save-all { margin-top: 0.1rem; }
