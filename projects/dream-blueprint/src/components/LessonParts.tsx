@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, Pause, Play, Volume2 } from 'lucide-react'
 import CorrectBox from './CorrectBox'
+import StuckButton from './StuckButton'
+import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import type { SayCard } from '../lib/sayCards'
@@ -169,7 +171,13 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
   const p = lesson.prompt
   const corrected = rec.corrections > 0
   const firstSentence = p.sample.match(/^[^.?!]+[.?!]/)?.[0] ?? p.sample
-  function help(kind: 'zh' | 'cue' | 'frame' | 'sample') {
+  useTaskContext({
+    label: '表達：' + p.en,
+    detail: ['開放寫作題：' + p.en + '（' + p.zh + '）', '這課的句型：' + pattern + (lesson.cando ? '。目標：' + lesson.cando : ''),
+      '參考寫法（只是例子，不要直接給他）：' + p.sample, '他要寫自己的內容；幫他想內容或句型就好，不要替他寫整段。'].join('\n'),
+    draft: answer,
+  })
+  function help(kind: 'zh' | 'cue' | 'frame' | 'sample' | 'claude') {
     if (Date.now() - mountedAt.current < 450) return
     setShown(list => list.includes(kind) ? list : [...list, kind])
     if (rec.help.includes(kind)) return
@@ -218,6 +226,7 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
       <button type="button" aria-pressed={sees('cue')} onClick={() => help('cue')}>② 用哪個句型</button>
       <button type="button" aria-pressed={sees('frame')} onClick={() => help('frame')}>③ 句架</button>
       <button type="button" aria-pressed={sees('sample')} onClick={() => help('sample')}>④ 參考寫法</button>
+      <StuckButton onUse={() => help('claude')} />
     </div>
     {sees('zh') && <p className="ls-help">{p.zh}</p>}
     {sees('cue') && <p className="ls-help">這課的句型：<b>{pattern}</b>{lesson.cando ? '。目標：' + lesson.cando : ''}</p>}

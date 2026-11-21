@@ -42,6 +42,9 @@ import {
 } from "../lib/evidence";
 import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
+import StuckButton from "../components/StuckButton";
+import UseWord from "../components/UseWord";
+import { useTaskContext } from "../lib/taskContext";
 import {
   heardKey,
   lessonFinished,
@@ -150,11 +153,18 @@ function Translation({
   const [manualCopy, setManualCopy] = useState("");
   const [seenHint, setSeen] = useState(() => !!saved?.r || (saved?.h ?? 0) >= 2);
   const [firstVerdict, setFirstVerdict] = useState<Verdict | undefined>(() => saved?.v);
-  function record(h: number, r: boolean, v = firstVerdict) {
+  const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
+  function record(h: number, r: boolean, v = firstVerdict, c = askedHelp) {
     setHintLevel(h);
     setSeen(r);
-    onHint?.({ h, r, ...(v ? { v } : {}) });
+    onHint?.({ h, r, ...(v ? { v } : {}), ...(c ? { c } : {}) });
   }
+  useTaskContext({
+    label: (checkpoint ? "小關卡" : "中翻英") + "：" + sentence.zh,
+    detail: ["題目（中翻英）：" + sentence.zh, "這題練的文法：" + sentence.grammar.join("、"), "課本提示：" + sentence.hints.join(" ／ "),
+      "參考答案（只供你判斷，他沒說要看答案前不要說出來）：" + sentence.reference.join(" / ")].join("\n"),
+    draft: answer,
+  });
   const mountedAt = useRef(Date.now());
   const ready = () => Date.now() - mountedAt.current > 450;
   const setHint = (h: number) => { if (ready()) record(h, seenHint || h >= 2); };
@@ -208,6 +218,7 @@ function Translation({
           >
             我想看提示
           </button>
+          <StuckButton onUse={() => { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }} />
         </div>
       )}
       {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
@@ -275,7 +286,7 @@ function Translation({
           {marks.map(([mark, label]) => (
             <button
               key={mark}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2, { answer, firstVerdict }); }}
+              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict }); }}
             >
               {label}
             </button>
@@ -1247,7 +1258,8 @@ function Extras({
             </p>
             <h3 lang="en">{word.en}</h3>
             {see && <p>{word.zh}</p>}
-            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" /></div>
+            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" />{see && <> <UseWord key={word.en} en={word.en} zh={word.zh}
+              onGood={() => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), "write", date) }))} /></>}</div>
             <div className="pr-actions">
               <button onClick={() => scoreWord(true)}>記得</button>
               <button onClick={() => setSee(true)}>看中文意思</button>

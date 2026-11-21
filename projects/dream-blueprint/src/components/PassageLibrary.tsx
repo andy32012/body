@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import CorrectBox from './CorrectBox'
+import CorrectBox, { type Result as Feedback } from './CorrectBox'
+import StuckButton from './StuckButton'
+import { useTaskContext } from '../lib/taskContext'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
 import ContextMeaning from './ContextMeaning'
@@ -22,6 +24,8 @@ export default function PassageLibrary({ state, onActivity }: Props) {
   const [copied, setCopied] = useState('')
   const [manualCopy, setManualCopy] = useState('')
   const [run, setRun] = useState(0)
+  const [last, setLast] = useState<Feedback>()
+  const [previous, setPrevious] = useState<Feedback>()
   const level = Math.min(6, Math.max(1, Number(state.notes[levelKey]) || 1))
 
   useEffect(() => {
@@ -39,7 +43,13 @@ export default function PassageLibrary({ state, onActivity }: Props) {
   const letters = useMemo(() => all ? [...new Set(all.filter(p => p.level === level).map(p => p.letter))] : [], [all, level])
 
   useEffect(() => { if (passage) setAnswer(readDraft('passage.' + passage.id)) }, [passage?.id])
-  function reset() { setRun(0); setAnswer(''); setShow('none'); setCopied(''); setManualCopy('') }
+  useTaskContext(passage ? {
+    label: '短文中翻英：' + passage.zh.slice(0, 40) + (passage.zh.length > 40 ? '…' : ''),
+    detail: ['短文中翻英，題目：' + passage.zh, passage.words?.length ? '會用到的單字：' + passage.words.map(w => w.en + '（' + w.zh + '）').join('、') : '',
+      passage.en ? '參考翻譯（只供你判斷，他沒說要看前不要整段給）：' + passage.en : ''].filter(Boolean).join('\n'),
+    draft: answer,
+  } : null)
+  function reset() { setRun(0); setAnswer(''); setShow('none'); setCopied(''); setManualCopy(''); setLast(undefined); setPrevious(undefined) }
   function choose(next: number) {
     onActivity(prev => ({ ...prev, notes: { ...prev.notes, [levelKey]: String(next) } }))
     setSkipped([]); setLetter(''); reset()
@@ -88,11 +98,13 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       <div className="pr-actions">
         {passage.words && passage.words.length > 0 &&
           <button className="pr-link" onClick={() => setShow(show === 'words' ? 'none' : 'words')}>這段會用到的單字</button>}
-        <button className="pr-main" onClick={() => setRun(n => n + 1)}>{run ? '改好了，再批一次' : '批改'}</button>
+        <button className="pr-main" onClick={() => { setPrevious(last); setRun(n => n + 1) }}>{run ? '改好了，再批一次' : '批改'}</button>
+        <StuckButton />
         {passage.en && <button className="pr-link" onClick={() => setShow(show === 'reference' ? 'none' : 'reference')}>參考翻譯</button>}
         <button className="pr-link" onClick={() => { setSkipped(list => [...list, passage.id]); reset() }}>換一段</button>
       </div>
       <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
+        selfFix previous={previous} onResult={(_, __, r) => setLast(r)}
         onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {show === 'words' && passage.words && <div className="pr-tags">
         {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh}{' '}

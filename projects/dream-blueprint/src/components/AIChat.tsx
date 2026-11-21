@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUp, Sparkles, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
+import { askEvent, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
@@ -47,8 +48,10 @@ const saveTurns = (key: string | undefined, turns: TutorTurn[]) => {
   try { localStorage.setItem(key, JSON.stringify(turns.slice(-40))) } catch { /* private mode */ }
 }
 
-export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist, introCards = [] }:
-  { system: string; opening?: string; placeholder?: string; suggestions?: string[]; persist?: string; introCards?: string[] }) {
+export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist, introCards = [], ask, alwaysSuggest = false }:
+  { system: string | (() => string); opening?: string; placeholder?: string; suggestions?: string[]; persist?: string; introCards?: string[]
+    /** A message to send right away (e.g. from 「我卡住了」); a new n sends again. */
+    ask?: { text: string; n: number }; alwaysSuggest?: boolean }) {
   const memory = useMemory()
   const [turns, setTurns] = useState<TutorTurn[]>(() => loadTurns(persist))
   const [busy, setBusy] = useState(false)
@@ -65,7 +68,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
     const next: TutorTurn[] = [...history, { role: 'user', content: q }]
     setTurns(next); setBusy(true); setError(''); setText('')
     try {
-      const raw = await askTutor(system + '\n' + memoryPrompt(memory.notes), next)
+      const raw = await askTutor((typeof system === 'function' ? system() : system) + '\n' + memoryPrompt(memory.notes), next)
       const { clean, remember, forget } = extractMemory(raw)
       if (remember.length || forget.length) memory.update(remember, forget)
       const done: TutorTurn[] = [...next, { role: 'assistant', content: clean || '嗯嗯～' }]
@@ -79,6 +82,11 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
     if (opening && connected && !started.current) { started.current = true; void send(opening, []) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const asked = useRef(0)
+  useEffect(() => {
+    if (ask && connected && ask.n !== asked.current) { asked.current = ask.n; void send(ask.text) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ask?.n])
   useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }) }, [turns, busy])
 
   if (!connected) return <div className="ai-empty">
@@ -100,7 +108,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
       {busy && <Thinking />}
       {error && <p className="ai-error" role="alert">{error}</p>}
       {persist && turns.length > 0 && !busy && <button type="button" className="ai-clear" onClick={() => { setTurns([]); saveTurns(persist, []) }}>清空這段對話（記住的事不會刪）</button>}
-      {!busy && turns.length <= (opening ? 2 : 0) && suggestions.length > 0 && <div className="ai-suggest">
+      {!busy && (alwaysSuggest || turns.length <= (opening ? 2 : 0)) && suggestions.length > 0 && <div className="ai-suggest">
         {suggestions.map(s => <button type="button" key={s} onClick={() => send(s)}>{s}</button>)}
       </div>}
       <div ref={end} />
@@ -176,9 +184,16 @@ function useTyping() {
 
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
+  const [ask, setAsk] = useState<{ text: string; n: number }>()
   const typing = useTyping()
   const pet = usePet(typing)
-  const system = [
+  const task = useCurrentTask()
+  useEffect(() => {
+    const on = (e: Event) => { setOpen(true); setAsk(a => ({ text: String((e as CustomEvent).detail), n: (a?.n ?? 0) + 1 })) }
+    window.addEventListener(askEvent, on)
+    return () => window.removeEventListener(askEvent, on)
+  }, [])
+  const base = [
     personaText(),
     '你住在玄燁的「夢想藍圖」網站裡，幫他學習。他是台灣護理系學生，目標考雅思、去美國當註冊護理師。',
     '他可能問英文單字、文法、中翻英、雅思，也可能問護理課業或學習計畫。用繁體中文回答，非常簡短：直接回答重點就好，需要時才給一個短例子。出中翻英時一次只出一句，不先給答案。不要用 Markdown 標題、粗體或長清單。',
@@ -187,6 +202,8 @@ export function AIAssistant({ progress }: { progress: string }) {
     '以下是網站自動產生的他的進度：',
     progress,
   ].join('\n')
+  // Read at send time, so the latest draft goes along with the question.
+  const system = () => base + '\n' + taskPrompt(currentTask())
   return <>
     <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
       <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
@@ -199,7 +216,10 @@ export function AIAssistant({ progress }: { progress: string }) {
       <button type="button" className="ai-fab-label" onClick={() => setOpen(true)}>問問 Claude</button>
     </div>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
-      <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} placeholder="問單字、文法，或叫我出一句中翻英" />
+      {task && <p className="ai-task"><b>正在協助</b><span>{task.label}</span></p>}
+      <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} ask={ask} alwaysSuggest={!!task}
+        suggestions={task ? ['我卡住了，給我一點提示就好', '幫我看我寫的哪裡怪', '這題要用哪個文法？'] : []}
+        placeholder={task ? '問這一題，或問別的' : '問單字、文法，或叫我出一句中翻英'} />
     </AISheet>}
   </>
 }

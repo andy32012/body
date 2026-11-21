@@ -38,7 +38,8 @@ export const activeKey = 'lesson.active'
 export type LessonPhase = 'recall' | 'listen' | 'write' | 'sound' | 'vary' | 'express' | 'done'
 export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'again'; grammar: string[]; revealed: boolean }
 /** h: how far the hints went (1 self-check, 2 clearer hint, 3 sentence frame, 4 the answer); r: an answer was shown. */
-export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' }
+/** c: asked Claude for help with 「我卡住了」 before marking. */
+export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again'; c?: boolean }
 
 /** Hints used outside the guided lesson (checkpoint, review, extra drills) live in "hints.<date>". */
 export const hintsKey = (day: string) => 'hints.' + day

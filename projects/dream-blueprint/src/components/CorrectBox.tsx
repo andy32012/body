@@ -4,7 +4,7 @@ import { fixToCard, type SayCard } from '../lib/sayCards'
 import './tutor.css'
 
 type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string }
-type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
+export type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
 const verdictNames = { good: '全對', small: '小錯', again: '要再練' }
 
 function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate', previous?: Result) {

@@ -69,10 +69,10 @@ export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string,
   if (mark === 'small') return 'assisted'
   return matchesReference(answer, [en]) ? 'independent' : 'pending'
 }
-/** The open task: a frame or the model answer counts as help; the first feedback decides "alone". */
+/** The open task: a frame, the model answer or asking Claude (「我卡住了」) counts as help; the first feedback decides "alone". */
 export function judgeExpress(r: { firstVerdict?: Verdict; help: readonly string[]; answered: boolean }): Level | null {
   if (!r.answered) return null
-  if (r.help.includes('frame') || r.help.includes('sample')) return 'assisted'
+  if (r.help.includes('frame') || r.help.includes('sample') || r.help.includes('claude')) return 'assisted'
   if (!r.firstVerdict) return 'pending'
   return r.firstVerdict === 'good' ? 'independent' : 'assisted'
 }

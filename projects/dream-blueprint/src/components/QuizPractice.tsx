@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import quizData from '../data/quiz.json'
 import type { PageProps } from '../lib/store'
+import DiagnoseBox from './DiagnoseBox'
+import { useTaskContext } from '../lib/taskContext'
 import {
   advanceQuiz, causeOptions, nextQuizItem, quizSectionKey, quizSummary, recordQuizAnswer, recordQuizCause,
   sectionNames, sectionOf, type QuizItem, type QuizSection,
@@ -50,6 +52,12 @@ export default function QuizPractice({ state, update, onActivity = update, date,
     reset()
   }
 
+  useTaskContext(current ? {
+    label: (sectionOf(current.item) === 'nursing' ? '護理英文題：' : '英文題：') + current.item.en.slice(0, 60),
+    detail: ['選擇題：' + current.item.en, '選項：' + current.item.options.map((o, i) => (i + 1) + '. ' + o).join(' / '),
+      picked === undefined ? '他還沒作答；正確答案是第 ' + (current.item.answerIndex + 1) + ' 個，他作答前不要說出來，只幫他看懂題目。'
+        : '他選了第 ' + (picked + 1) + ' 個，正確答案是第 ' + (current.item.answerIndex + 1) + ' 個。說明：' + current.item.explanation].join('\n'),
+  } : null)
   if (!current) return <p>這一區還沒有題目。</p>
   const { item: question, retry } = current
   const nursing = sectionOf(question) === 'nursing'
@@ -85,6 +93,8 @@ export default function QuizPractice({ state, update, onActivity = update, date,
         <div className="pr-options">
           {causeOptions[sectionOf(question)].map(c => <button key={c} aria-pressed={cause === c} disabled={!!cause && cause !== c} onClick={() => saveCause(c)}>{c}</button>)}
         </div>
+        {nursing && <DiagnoseBox key={question.id} id={'quiz.' + question.id} question={question.en} options={question.options} answer={question.answerIndex} picked={picked!}
+          notes={state.notes} onSave={(k, v) => update(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} onCause={saveCause} cause={cause} />}
       </div>}
       <button className="pr-main qz-next" onClick={next}>下一題</button>
     </div>}

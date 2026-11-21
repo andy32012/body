@@ -1,4 +1,6 @@
 import { AskWord } from './AIChat'
+import UseWord from './UseWord'
+import { markSkill } from '../lib/wordSkills'
 import { useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, dayKey, newCard, weekKey } from '../lib/progress'
@@ -81,7 +83,8 @@ export default function VocabScreen({state, update}: PageProps) {
       {tab === 'learn' && <div className="vocab-panel">
         {practiceWord ? <><small>待學 {waiting.length} 個</small><strong className="vocab-term" lang="en">{practiceWord.en}</strong>
           <p>{practiceWord.zh || '匯入時未提供中文詞義。'}</p>
-          <div><AskWord en={practiceWord.en} zh={practiceWord.zh} label="問問 Claude" /></div>
+          <div><AskWord en={practiceWord.en} zh={practiceWord.zh} label="問問 Claude" /> <UseWord key={practiceWord.en} en={practiceWord.en} zh={practiceWord.zh}
+            onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(practiceWord.en), 'write', today) }))} /></div>
           <button type="button" onClick={() => {
             const id = 'word:' + wordKey(practiceWord.en)
             update(prev => prev.cards.some(card => card.id === id) ? prev : {...prev, cards:[...prev.cards,newCard(id,today)]})

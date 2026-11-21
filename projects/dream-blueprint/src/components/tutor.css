@@ -55,3 +55,12 @@
 .tu-progress li[data-ok="false"] > span:first-child { color: var(--practice-miss, #b4483c); font-weight: 600; }
 .tu-self { display: grid; gap: 0.5rem; }
 .tu-help { margin: 0; opacity: 0.85; font-size: 0.92rem; }
+.dg { display: grid; gap: 0.55rem; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px dashed color-mix(in srgb, currentColor 30%, transparent); }
+.dg p { margin: 0; }
+.dg-verdict { font-weight: 600; }
+.dg-verdict[data-kind="english"] { color: var(--practice-ok, #2f8a5b); }
+.dg-verdict[data-kind="concept"] { color: var(--practice-miss, #b4483c); }
+.dg-words, .dg-why { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: 0.35rem; }
+.dg-why li { display: grid; gap: 0.1rem; overflow-wrap: anywhere; }
+.dg-why li[data-ok="true"] span { font-weight: 700; }
+.dg-why small { opacity: 0.85; }

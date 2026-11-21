@@ -149,3 +149,17 @@ test('護理英文清單只算護理題，或做完一個情境', async () => {
   assert.equal(answeredOn(notes, '2026-11-21', new Set(['n-1', 'n-2'])), 1)
   assert.equal(casesFinishedOn(notes, '2026-11-21'), 1)
 })
+
+test('Claude 跟著現在的題目；中文拆解的格式不對就不用', async () => {
+  const { taskPrompt } = await import('../src/lib/taskContext.ts')
+  const { parseDiagnosis } = await import('../src/lib/diagnosis.ts')
+  assert.equal(taskPrompt(null), '')
+  const p = taskPrompt({ label: '中翻英：我很累。', detail: '參考答案：I am tired.', draft: 'I tired' })
+  assert.ok(p.includes('中翻英：我很累。') && p.includes('「I tired」') && p.includes('不要直接給整句答案'))
+  assert.ok(taskPrompt({ label: 'x', detail: 'y', draft: '  ' }).includes('還沒開始寫'))
+  const ok = parseDiagnosis('好的 {"questionZh":"護理師應該先做什麼？","optionsZh":["讓他睡","測血糖","給胰島素"],"words":[{"en":"first","zh":"首先"},{"en":3}],"why":["a","b","c"]}', 3)
+  assert.equal(ok?.optionsZh[1], '測血糖')
+  assert.equal(ok?.words.length, 1)
+  assert.equal(parseDiagnosis('{"questionZh":"x","optionsZh":["a"]}', 3), null, '選項數量要對得上')
+  assert.equal(parseDiagnosis('not json', 3), null)
+})

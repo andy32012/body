@@ -4,6 +4,8 @@ import type { PageProps } from '../lib/store'
 import { activePeriod, addDays, dueCount, newCard } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
+import UseWord from './UseWord'
+import { markSkill } from '../lib/wordSkills'
 import { paintSky, seedOf } from '../lib/starfield'
 import { wordKey } from '../lib/vocab'
 import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, spotCheck } from '../lib/dailyWords'
@@ -85,7 +87,8 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           {reveal
             ? <p className="daily-word-meaning">{word.zh}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
-          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問問 Claude" /></div>
+          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問問 Claude" />{reveal && <UseWord key={word.en} en={word.en} zh={word.zh}
+            onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), 'write', today) }))} />}</div>
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}
         </div>
         <div className="daily-word-foot">

@@ -170,3 +170,8 @@
 .ai-fab.compact .ai-fab-label { display: none; }
 .ai-fab.compact .ai-pet-btn { padding: 6px 10px; border-radius: 999px; }
 .ai-fab.compact:hover, .ai-fab.compact:focus-within { opacity: 1; }
+.ai-task { margin: 4px 18px 0; flex: none; display: flex; gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 10px;
+  background: color-mix(in srgb, var(--lav) 12%, transparent); border: 1px solid color-mix(in srgb, var(--lav) 30%, transparent); font-size: 13px; line-height: 1.45; }
+.ai-task b { flex: none; color: var(--lav); font-weight: 700; letter-spacing: .04em; }
+.ai-task span { min-width: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.stuck-btn { display: inline-flex; align-items: center; gap: 5px; }

@@ -1,0 +1,6 @@
+.use-word-open { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  border: 1px solid currentColor; background: transparent; color: inherit; opacity: .85; cursor: pointer; }
+.use-word-open:hover { opacity: 1; }
+.use-word { display: grid; gap: 8px; width: 100%; text-align: left; }
+.use-word textarea { width: 100%; box-sizing: border-box; }
+.use-word-warn { color: var(--practice-miss, #c0574a); }
