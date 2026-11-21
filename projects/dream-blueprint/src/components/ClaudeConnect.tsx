@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PairSend } from './PairDevice'
+import { PairPaste, PairSend } from './PairDevice'
 import { askTutor, personas, setTutorKey, setTutorModel, setTutorPersona, tutorKey, tutorModel, tutorModels, tutorPersona } from '../lib/tutor'
 
 export default function ClaudeConnect() {
@@ -29,5 +29,6 @@ export default function ClaudeConnect() {
     <div className="set-actions"><button type="button" onClick={save}>儲存並測試</button></div>
     <small role="status">{status}</small>
     <PairSend />
+    <PairPaste />
   </>
 }

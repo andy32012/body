@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import { Smartphone } from 'lucide-react'
 import { setTutorKey, setTutorModel, tutorKey, tutorModel } from '../lib/tutor'
 import { openaiKey, setOpenaiKey } from '../lib/voice'
-import { open, pairPrefix, randomCode, seal } from '../lib/pairing'
+import { open, pairEvent, pairPrefix, payloadFrom, randomCode, seal } from '../lib/pairing'
 import './pair.css'
 
 /** On the computer: a QR code + 6-digit code that carries the keys to an iPad or phone. */
@@ -72,5 +72,23 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
         </>}
       </div>
     </form>
+  </div>
+}
+
+/** On a device without a key: paste the link sent from the computer (works in the home-screen app too). */
+export function PairPaste() {
+  const [text, setText] = useState('')
+  const [msg, setMsg] = useState('')
+  if (tutorKey()) return null
+  return <div className="pair">
+    <strong><Smartphone size={15} aria-hidden="true" /> 從電腦連過來</strong>
+    <p>掃 QR code 沒反應，或你是用加到主畫面的 App 開的？在電腦按「複製連結」，用 LINE 傳給自己，再把連結貼在這裡。</p>
+    <label className="set-field">配對連結<input value={text} autoComplete="off" spellCheck={false} onChange={e => { setText(e.target.value); setMsg('') }} placeholder="https://xitian.page/dream/#pair=…" /></label>
+    <div className="set-actions"><button type="button" disabled={!text.trim()} onClick={() => {
+      const p = payloadFrom(text)
+      if (!p) { setMsg('這不是配對連結，請整段貼上。'); return }
+      window.dispatchEvent(new CustomEvent(pairEvent, { detail: p })); setText('')
+    }}>下一步：輸入配對碼</button></div>
+    {msg && <small role="alert">{msg}</small>}
   </div>
 }

@@ -21,7 +21,7 @@ import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
 import { AIAssistant } from './components/AIChat'
 import { PairReceive } from './components/PairDevice'
-import { takePairing } from './lib/pairing'
+import { clearPairing, pairEvent, pairPrefix, takePairing } from './lib/pairing'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import Baseline from './components/Baseline'
@@ -119,7 +119,15 @@ function App() {
   const active=page==='practice'?'library':page
   const sky=useObservatory(page,state.notes['cosmos.pin.'+active])
   useEffect(()=>{
-    const handle=()=>{changeRoute(readRoute());window.scrollTo(0,0)}
+    // A QR link opened while the app is already open in this tab arrives as a hash change, not a new load.
+    const pair=()=>{if(location.hash.startsWith(pairPrefix)){const p=takePairing();if(p)setPairing(p)}}
+    const fromSettings=(e:Event)=>setPairing(String((e as CustomEvent).detail))
+    window.addEventListener('hashchange',pair)
+    window.addEventListener(pairEvent,fromSettings)
+    return ()=>{window.removeEventListener('hashchange',pair);window.removeEventListener(pairEvent,fromSettings)}
+  },[])
+  useEffect(()=>{
+    const handle=()=>{if(location.hash.startsWith(pairPrefix))return;changeRoute(readRoute());window.scrollTo(0,0)}
     const clock=()=>changeDay(dayKey())
     window.addEventListener('hashchange',handle)
     window.addEventListener('focus',clock)
@@ -198,7 +206,7 @@ function App() {
     </div></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
-    {pairing&&<PairReceive payload={pairing} onDone={()=>setPairing(null)}/>}
+    {pairing&&<PairReceive payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }

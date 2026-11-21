@@ -40,11 +40,22 @@ export async function open(payload: string, code: string, now = Date.now()): Pro
 }
 export const pairPrefix = '#pair='
 /** Read a pairing link from the address bar and remove it right away, so it doesn't stay in history. */
-let taken: string | null | undefined
+let taken: string | null = null
 export function takePairing(): string | null {
-  if (taken !== undefined) return taken
-  if (!location.hash.startsWith(pairPrefix)) return (taken = null)
-  taken = location.hash.slice(pairPrefix.length) || null
-  history.replaceState(null, '', location.pathname + location.search + '#today')
+  if (location.hash.startsWith(pairPrefix)) {
+    taken = location.hash.slice(pairPrefix.length) || null
+    history.replaceState(null, '', location.pathname + location.search + '#today')
+  }
+  // The same link read twice on one load (React may run the first render twice) gives the same answer.
   return taken
 }
+export const clearPairing = () => { taken = null }
+/** Accept a whole pasted link, or just the part after #pair=. */
+export function payloadFrom(text: string): string | null {
+  const t = text.trim()
+  const i = t.indexOf(pairPrefix)
+  const p = i >= 0 ? t.slice(i + pairPrefix.length) : t
+  return /^[A-Za-z0-9_-]{40,}$/.test(p) ? p : null
+}
+/** Tell the open app that a pairing link should be shown (from Settings or a link opened in a running tab). */
+export const pairEvent = 'dream-blueprint:pair'
