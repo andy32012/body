@@ -457,12 +457,12 @@
    {
     "who": "Nurse A",
     "en": "Was he hungry this morning?",
-    "zh": "他今天早上會餓嗎？"
+    "zh": "他今天早上有餓嗎？"
    },
    {
     "who": "Nurse B",
     "en": "Yes, he was. He is better now.",
-    "zh": "會。他現在好多了。"
+    "zh": "有。他現在好多了。"
    }
   ],
   "questions": [

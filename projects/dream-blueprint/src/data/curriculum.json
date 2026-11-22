@@ -4370,7 +4370,8 @@
           ],
           "reference": [
             "Do you need water?",
-            "Do you need some water?"
+            "Do you need some water?",
+            "Do you need any water?"
           ],
           "why": "一般動詞用 do 或 does 提問。加 not 表達否定。助動詞後面的主要動詞用原形。",
           "newWords": [
@@ -4439,7 +4440,8 @@
               ],
               "reference": [
                 "Do you need water?",
-                "Do you need some water?"
+                "Do you need some water?",
+                "Do you need any water?"
               ],
               "why": "一般動詞用 do 或 does 提問。加 not 表達否定。助動詞後面的主要動詞用原形。",
               "newWords": []
@@ -6355,7 +6357,8 @@
           ],
           "reference": [
             "I was at home yesterday.",
-            "Yesterday I was home."
+            "Yesterday I was home.",
+            "I was home yesterday."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": [
@@ -6424,7 +6427,8 @@
               ],
               "reference": [
                 "I was at home yesterday.",
-                "Yesterday I was home."
+                "Yesterday I was home.",
+                "I was home yesterday."
               ],
               "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
               "newWords": []
@@ -6741,7 +6745,8 @@
           ],
           "reference": [
             "The patient was in pain last night.",
-            "This patient was in pain last night."
+            "This patient was in pain last night.",
+            "The patient was in a lot of pain last night."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": [
@@ -6810,7 +6815,8 @@
               ],
               "reference": [
                 "The patient was in pain last night.",
-                "This patient was in pain last night."
+                "This patient was in pain last night.",
+                "The patient was in a lot of pain last night."
               ],
               "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
               "newWords": []
@@ -7149,7 +7155,8 @@
           ],
           "reference": [
             "She was at home yesterday.",
-            "Yesterday she was home."
+            "Yesterday she was home.",
+            "She was home yesterday."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": []
@@ -7240,7 +7247,8 @@
           ],
           "reference": [
             "She was at home yesterday.",
-            "Yesterday she was home."
+            "Yesterday she was home.",
+            "She was home yesterday."
           ],
           "why": "描述過去的狀態，I、he、she、it 與其他單數主詞用 was；you、we、they 和複數用 were。問句把 was 或 were 移到主詞前，否定時在後面加 not。",
           "newWords": []
@@ -7608,7 +7616,9 @@
           "reference": [
             "The nurse washed the patient's hands.",
             "The nurse washed the patient's hands for him.",
-            "The nurse washed the patient's hands for her."
+            "The nurse washed the patient's hands for her.",
+            "The nurse helped the patient wash his hands.",
+            "The nurse helped the patient wash her hands."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
@@ -7662,7 +7672,9 @@
               "reference": [
                 "The nurse washed the patient's hands.",
                 "The nurse washed the patient's hands for him.",
-                "The nurse washed the patient's hands for her."
+                "The nurse washed the patient's hands for her.",
+                "The nurse helped the patient wash his hands.",
+                "The nurse helped the patient wash her hands."
               ],
               "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
@@ -7789,7 +7801,8 @@
           ],
           "reference": [
             "I cleaned the room yesterday.",
-            "Yesterday I cleaned the room."
+            "Yesterday I cleaned the room.",
+            "I cleaned my room yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [],
@@ -7808,7 +7821,8 @@
               ],
               "reference": [
                 "I cleaned the room yesterday.",
-                "Yesterday I cleaned the room."
+                "Yesterday I cleaned the room.",
+                "I cleaned my room yesterday."
               ],
               "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
@@ -7816,7 +7830,7 @@
             {
               "id": "u8-c2",
               "day": 6,
-              "zh": "病人走到浴室。",
+              "zh": "病人剛才走到浴室。",
               "grammar": [
                 "過去式（規則動詞）"
               ],
@@ -7825,7 +7839,9 @@
                 "過去的事，規則動詞字尾加 -ed。"
               ],
               "reference": [
-                "The patient walked to the bathroom."
+                "The patient walked to the bathroom.",
+                "The patient walked to the bathroom just now.",
+                "The patient just walked to the bathroom."
               ],
               "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
@@ -7857,7 +7873,7 @@
             },
             {
               "en": "The patient walked to the bathroom.",
-              "zh": "病人走到浴室。"
+              "zh": "病人剛才走到浴室。"
             },
             {
               "en": "She studied English last night.",
@@ -7880,7 +7896,8 @@
           ],
           "reference": [
             "I cleaned the room yesterday.",
-            "Yesterday I cleaned the room."
+            "Yesterday I cleaned the room.",
+            "I cleaned my room yesterday."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
@@ -7888,7 +7905,7 @@
         {
           "id": "u8-c2",
           "day": 6,
-          "zh": "病人走到浴室。",
+          "zh": "病人剛才走到浴室。",
           "grammar": [
             "過去式（規則動詞）"
           ],
@@ -7897,7 +7914,9 @@
             "過去的事，規則動詞字尾加 -ed。"
           ],
           "reference": [
-            "The patient walked to the bathroom."
+            "The patient walked to the bathroom.",
+            "The patient walked to the bathroom just now.",
+            "The patient just walked to the bathroom."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []

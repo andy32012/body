@@ -65,6 +65,14 @@ test('文法規則：講太死的地方改掉了', () => {
   assert.match(s062.hints[1], /cheap/)
   const start13 = (starters as { id: string; reference: string[] }[]).find(s => s.id === 'start-13')!
   assert.ok(matchesReference('I want to drink water.', start13.reference))
+  // Units 5–8: a past sentence needs a past clue in the Chinese; common correct answers are accepted.
+  const u8 = curriculum.units.find(u => u.id === 8)!
+  assert.match(u8.checkpoint[1].zh, /剛才/)
+  assert.ok(matchesReference('The nurse helped the patient wash his hands.', u8.days[3].reference))
+  const u7 = curriculum.units.find(u => u.id === 7)!
+  assert.ok(matchesReference('I was home yesterday.', u7.days[0].reference))
+  const l7 = (lessons as { unit: number; dialogue: { en: string; zh: string }[] }[]).find(l => l.unit === 7)!
+  assert.equal(l7.dialogue.find(d => d.en === 'Was he hungry this morning?')!.zh, '他今天早上有餓嗎？')
 })
 
 test('護理內容：消防演習不叫讀者自己關氧氣；實習與國考期的時間跟每日計畫一致', () => {
