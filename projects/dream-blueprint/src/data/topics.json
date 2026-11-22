@@ -1700,5 +1700,2182 @@
     "sample": "Hi, we'd like a bowl of beef noodles, a bowl of chicken rice, and two cups of hot tea, please. My father doesn't eat beef, so the chicken rice is for him. It's for here. How long will it take?"
    }
   }
+ },
+ {
+  "id": "t5",
+  "n": 5,
+  "after": 8,
+  "title": "這是誰的？",
+  "titleEn": "Whose is it?",
+  "goal": "能用 me、my、mine、myself 這些代名詞說東西是誰的、誰幫了誰，也聽得懂別人在說誰。",
+  "scene": "宿舍交誼廳的失物招領箱裡有一堆東西，大家在找自己的。",
+  "grammar": {
+   "title": "人稱代名詞：I／me／my／mine／myself",
+   "points": [
+    "當主詞用 I、you、he、she、it、we、they；放在動詞或介系詞後面（受詞）要換成 me、you、him、her、it、us、them：She helped me. This is for him.（不能說 help I、for he）",
+    "後面接名詞用 my、your、his、her、its、our、their（我的……）：my phone、her bag；後面不接名詞、自己就代表「我的那個」用 mine、yours、his、hers、ours、theirs：This phone is mine. Is this yours?",
+    "對自己做的事用 myself、yourself、himself、herself、ourselves、themselves：I cut myself.（我割到自己）；by myself 是「自己一個人、靠自己」：I did it by myself.",
+    "容易錯：its 是「它的」，it's 是 it is；問「誰的」用 Whose：Whose bag is this? — It's mine."
+   ],
+   "examples": [
+    {
+     "en": "Is this your umbrella? — No, it isn't mine. It's hers.",
+     "zh": "這是你的傘嗎？——不是我的，是她的。"
+    },
+    {
+     "en": "My mom called me, and I told her the news.",
+     "zh": "我媽打給我，我跟她說了這個消息。"
+    },
+    {
+     "en": "He made dinner by himself.",
+     "zh": "他自己一個人做了晚餐。"
+    }
+   ]
+  },
+  "words": [
+   {
+    "en": "whose",
+    "zh": "誰的",
+    "use": "Whose bag is this?",
+    "example": "Whose phone is ringing?",
+    "exampleZh": "誰的手機在響？"
+   },
+   {
+    "en": "mine",
+    "zh": "我的（東西）",
+    "use": "This one is mine.",
+    "example": "That cup is mine.",
+    "exampleZh": "那個杯子是我的。"
+   },
+   {
+    "en": "yours",
+    "zh": "你的（東西）",
+    "use": "Is this yours?",
+    "example": "Is this pen yours?",
+    "exampleZh": "這支筆是你的嗎？"
+   },
+   {
+    "en": "myself",
+    "zh": "我自己",
+    "use": "by myself",
+    "example": "I live by myself.",
+    "exampleZh": "我自己一個人住。"
+   },
+   {
+    "en": "lost and found",
+    "zh": "失物招領",
+    "use": "the lost and found box",
+    "example": "I found my key in the lost and found.",
+    "exampleZh": "我在失物招領找到我的鑰匙。"
+   },
+   {
+    "en": "belong to",
+    "zh": "屬於（是……的）",
+    "use": "belong to me",
+    "example": "This bag belongs to my sister.",
+    "exampleZh": "這個包包是我姊姊的。"
+   },
+   {
+    "en": "borrow",
+    "zh": "借（入）",
+    "use": "borrow a pen from her",
+    "example": "Can I borrow your charger?",
+    "exampleZh": "我可以借你的充電器嗎？"
+   },
+   {
+    "en": "lend",
+    "zh": "借（出）",
+    "use": "lend him some money",
+    "example": "I lent him my notes.",
+    "exampleZh": "我把筆記借給他。"
+   }
+  ],
+  "chunks": [
+   {
+    "en": "Whose … is this?",
+    "zh": "這是誰的……？"
+   },
+   {
+    "en": "It's mine. / It's not mine.",
+    "zh": "是我的／不是我的。"
+   },
+   {
+    "en": "by myself",
+    "zh": "自己一個人；靠自己"
+   },
+   {
+    "en": "Help yourself.",
+    "zh": "請自便（自己拿）。"
+   }
+  ],
+  "wordCheck": [
+   {
+    "q": "說話的人要做什麼？",
+    "options": [
+     "把筆借給對方",
+     "跟對方借筆",
+     "送對方一支筆"
+    ],
+    "answer": 1,
+    "sentence": "Can I borrow your pen? I'll give it back after class."
+   },
+   {
+    "q": "充電器是誰的？",
+    "options": [
+     "說話的人",
+     "Kevin",
+     "沒有說"
+    ],
+    "answer": 1,
+    "sentence": "This charger isn't mine. It belongs to Kevin."
+   }
+  ],
+  "practice": [
+   {
+    "id": "t5-p1",
+    "zh": "這把傘不是我的，是她的。",
+    "grammar": [
+     "mine／hers"
+    ],
+    "hints": [
+     "「我的」後面沒有名詞，用 mine；「她的」用 hers。",
+     "This umbrella isn't mine. It's hers."
+    ],
+    "reference": [
+     "This umbrella isn't mine. It's hers.",
+     "This umbrella is not mine. It is hers.",
+     "This umbrella isn't mine; it's hers.",
+     "This isn't my umbrella. It's hers."
+    ],
+    "why": "後面沒有接名詞的「我的、她的」要用 mine、hers；後面有名詞才用 my umbrella。",
+    "newWords": []
+   },
+   {
+    "id": "t5-p2",
+    "zh": "他昨天自己一個人做完了作業。",
+    "grammar": [
+     "by himself",
+     "過去式"
+    ],
+    "hints": [
+     "「自己一個人」用 by + 反身代名詞，主詞是 he。",
+     "He finished his homework by himself yesterday."
+    ],
+    "reference": [
+     "He finished his homework by himself yesterday.",
+     "Yesterday he finished his homework by himself.",
+     "He did his homework by himself yesterday."
+    ],
+    "why": "主詞 he，所以用 by himself；「做完」是昨天的事，用過去式 finished。",
+    "newWords": []
+   }
+  ],
+  "listen": {
+   "scene": "Mia 和 Jay 在宿舍的失物招領箱前面找東西。",
+   "dialogue": [
+    {
+     "who": "Mia",
+     "en": "Jay, is this your jacket?",
+     "zh": "Jay，這是你的外套嗎？"
+    },
+    {
+     "who": "Jay",
+     "en": "No, it isn't mine. Mine is black. I think it's Tom's.",
+     "zh": "不是，不是我的。我的是黑色的。我想是 Tom 的。"
+    },
+    {
+     "who": "Mia",
+     "en": "And this phone charger? Is it yours?",
+     "zh": "那這個充電器呢？是你的嗎？"
+    },
+    {
+     "who": "Jay",
+     "en": "Yes! I lost it last week. Thank you! Where did you find it?",
+     "zh": "對！我上週弄丟的。謝謝！你在哪裡找到的？"
+    },
+    {
+     "who": "Mia",
+     "en": "It was in the box. Oh, these are my glasses! I looked for them all day yesterday.",
+     "zh": "就在箱子裡。喔，這是我的眼鏡！我昨天找了一整天。"
+    },
+    {
+     "who": "Jay",
+     "en": "Did you ask the front desk?",
+     "zh": "你有去問櫃台嗎？"
+    },
+    {
+     "who": "Mia",
+     "en": "No, I looked for them by myself. I didn't want to trouble them.",
+     "zh": "沒有，我自己找，不想麻煩他們。"
+    },
+    {
+     "who": "Jay",
+     "en": "Next time, ask them. They can help you. Let's give this jacket to Tom.",
+     "zh": "下次去問他們，他們可以幫你。我們把這件外套拿給 Tom 吧。"
+    }
+   ],
+   "gist": {
+    "q": "What are they mainly doing?",
+    "options": [
+     "Looking for their things in a lost and found box",
+     "Buying a new jacket",
+     "Cleaning their room"
+    ],
+    "answer": 0
+   },
+   "details": [
+    {
+     "q": "Whose jacket is it?",
+     "options": [
+      "Jay's",
+      "Mia's",
+      "Tom's"
+     ],
+     "answer": 2
+    },
+    {
+     "q": "What did Jay lose last week?",
+     "options": [
+      "His glasses",
+      "His phone charger",
+      "His jacket"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "Why didn't Mia ask the front desk?",
+     "options": [
+      "She didn't want to trouble them",
+      "The desk was closed",
+      "She forgot"
+     ],
+     "answer": 0
+    }
+   ],
+   "shadow": [
+    1,
+    6
+   ],
+   "retell": "不看稿，用兩三句英文說每樣東西是誰的：The jacket is…／The charger is…／The glasses are…（用 Tom's、his、hers）",
+   "retellSample": "The jacket isn't Jay's. It's Tom's. The charger is his, and the glasses are hers."
+  },
+  "read": {
+   "kind": "宿舍公告",
+   "title": "LOST AND FOUND",
+   "lines": [
+    {
+     "en": "We found these things in the study room last week: a black umbrella, a blue water bottle, and a pair of glasses.",
+     "zh": "上週我們在讀書室找到這些東西：一把黑傘、一個藍色水壺和一副眼鏡。"
+    },
+    {
+     "en": "If one of them is yours, please come to the front desk.",
+     "zh": "如果其中有你的，請到櫃台來。"
+    },
+    {
+     "en": "Tell us what it looks like, and we will give it back to you.",
+     "zh": "告訴我們它長什麼樣子，我們就會還給你。"
+    },
+    {
+     "en": "Please keep your things with you. Do not leave them in the study room.",
+     "zh": "請把自己的東西帶在身上，不要留在讀書室。"
+    },
+    {
+     "en": "Things that nobody takes will go to charity after two weeks.",
+     "zh": "兩週後沒人領的東西會捐給慈善機構。"
+    }
+   ],
+   "questions": [
+    {
+     "q": "What is this notice about?",
+     "options": [
+      "Things people lost in the study room",
+      "A new study room",
+      "How to buy a water bottle"
+     ],
+     "answer": 0,
+     "skill": "主旨"
+    },
+    {
+     "q": "Where should you go if the umbrella is yours?",
+     "options": [
+      "The study room",
+      "The front desk",
+      "The charity shop"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "In \"we will give it back to you\", what does \"it\" mean?",
+     "options": [
+      "The front desk",
+      "The study room",
+      "The thing that is yours"
+     ],
+     "answer": 2,
+     "skill": "指涉"
+    },
+    {
+     "q": "What happens to things after two weeks?",
+     "options": [
+      "They go to charity",
+      "They stay at the front desk",
+      "They go back to the study room"
+     ],
+     "answer": 0,
+     "skill": "細節"
+    },
+    {
+     "q": "Does the notice say what time the front desk is open?",
+     "options": [
+      "Yes, from 9 a.m.",
+      "No, it does not say"
+     ],
+     "answer": 1,
+     "skill": "有沒有提供"
+    }
+   ]
+  },
+  "speak": {
+   "situation": "你在宿舍櫃台找你掉的東西，櫃台人員問你東西的樣子。",
+   "conditions": [
+    "說你掉了什麼、什麼顏色",
+    "用 mine 或 my 說明哪一個是你的",
+    "最後問一個問題（例如 Whose … is this?）"
+   ],
+   "followUps": [
+    "When did you lose it?",
+    "Is this one yours?"
+   ],
+   "sample": "Hi, I lost my umbrella last week. It's black, and it has my name on it. That one is mine! Whose bottle is this? It looks like my friend's."
+  },
+  "write": {
+   "task": "在班級群組傳訊息，說你撿到一個東西，請失主來拿。",
+   "conditions": [
+    "說你撿到什麼、在哪裡",
+    "用 yours、mine 這類代名詞",
+    "說對方可以怎麼拿回去"
+   ],
+   "minSentences": 3,
+   "sample": "I found a blue water bottle in Room 302 this morning. Is it yours? It isn't mine, so please message me. You can get it from me after class."
+  },
+  "review": {
+   "situation": "換個情境：在家裡，跟家人說東西是誰的、誰幫誰做事。",
+   "practice": [
+    {
+     "id": "t5-r1",
+     "zh": "我媽媽常常幫我。",
+     "grammar": [
+      "受詞 me",
+      "頻率副詞"
+     ],
+     "hints": [
+      "「幫我」的「我」放在動詞後面，要用受格。",
+      "My mom often helps me."
+     ],
+     "reference": [
+      "My mom often helps me.",
+      "My mother often helps me.",
+      "My mom helps me often."
+     ],
+     "why": "主詞 my mom 是第三人稱單數，helps 要加 s；動詞後面的「我」用 me，不用 I。",
+     "newWords": []
+    },
+    {
+     "id": "t5-r2",
+     "zh": "這些書不是你的，是我們的。",
+     "grammar": [
+      "yours／ours"
+     ],
+     "hints": [
+      "後面沒有名詞的「你的、我們的」用 yours、ours。",
+      "These books aren't yours. They're ours."
+     ],
+     "reference": [
+      "These books aren't yours. They're ours.",
+      "These books are not yours. They are ours.",
+      "These aren't your books. They're ours.",
+      "These books aren't yours; they're ours."
+     ],
+     "why": "「不是你的」後面沒有名詞用 yours；「是我們的」用 ours。主詞 these books 是複數，用 are。",
+     "newWords": []
+    },
+    {
+     "id": "t5-r3",
+     "zh": "她昨天割到自己了。",
+     "grammar": [
+      "herself",
+      "過去式"
+     ],
+     "hints": [
+      "「割到自己」用 cut + 反身代名詞，主詞是 she。",
+      "She cut herself yesterday."
+     ],
+     "reference": [
+      "She cut herself yesterday.",
+      "Yesterday she cut herself."
+     ],
+     "why": "對自己做的事用 herself；cut 的過去式還是 cut。",
+     "newWords": []
+    }
+   ],
+   "speak": {
+    "situation": "朋友來你家，問你房間裡的東西是誰的。",
+    "conditions": [
+     "說出至少兩樣東西是誰的（mine、my sister's、his……）",
+     "說一件你自己完成的事（by myself）"
+    ],
+    "followUps": [
+     "Is this guitar yours?",
+     "Who cleans your room?"
+    ],
+    "sample": "This guitar isn't mine. It's my brother's. These books are mine. I clean my room by myself every Sunday."
+   }
+  }
+ },
+ {
+  "id": "t6",
+  "n": 6,
+  "after": 15,
+  "title": "照著說明做",
+  "titleEn": "Doing it the right way",
+  "goal": "能用 slowly、carefully 這類副詞說「怎麼做」，分清楚形容詞和副詞，也聽得懂別人的步驟說明。",
+  "scene": "阿公膝蓋開刀後要做復健，你陪他去，物理治療師用英文教動作。",
+  "grammar": {
+   "title": "形容詞和副詞：slow 和 slowly",
+   "points": [
+    "形容詞形容名詞，或放在 be 動詞後面：a slow walk、He is careful.；說「動作怎麼做」要用副詞：He walks slowly. Drive carefully.",
+    "大部分副詞是形容詞加 ly：slow → slowly、careful → carefully、quiet → quietly、deep → deeply；y 結尾改成 ily：easy → easily、happy → happily。",
+    "特別的：good 的副詞是 well（He swims well.）；fast、hard、late 本身就是副詞：She works hard.（hardly 是「幾乎不」，意思完全不一樣）",
+    "feel、look、sound、smell、taste 後面接形容詞，不接副詞：I feel good. You look tired. It smells bad.（因為說的是狀態，不是動作怎麼做）"
+   ],
+   "examples": [
+    {
+     "en": "Please walk slowly. The floor is wet.",
+     "zh": "請慢慢走，地板是濕的。"
+    },
+    {
+     "en": "She is a careful nurse. She checks everything carefully.",
+     "zh": "她是很細心的護理師，每件事都仔細檢查。"
+    },
+    {
+     "en": "You speak English well, and you look happy today.",
+     "zh": "你英文說得很好，你今天看起來很開心。"
+    }
+   ]
+  },
+  "words": [
+   {
+    "en": "slowly",
+    "zh": "慢慢地",
+    "use": "walk slowly",
+    "example": "Breathe in slowly.",
+    "exampleZh": "慢慢吸氣。"
+   },
+   {
+    "en": "carefully",
+    "zh": "小心地；仔細地",
+    "use": "listen carefully",
+    "example": "Read the label carefully.",
+    "exampleZh": "仔細看標籤。"
+   },
+   {
+    "en": "gently",
+    "zh": "輕輕地",
+    "use": "press it gently",
+    "example": "Touch the wound gently.",
+    "exampleZh": "輕輕碰傷口。"
+   },
+   {
+    "en": "deeply",
+    "zh": "深深地",
+    "use": "breathe deeply",
+    "example": "Breathe deeply and relax.",
+    "exampleZh": "深呼吸、放輕鬆。"
+   },
+   {
+    "en": "exercise",
+    "zh": "運動；（復健）動作",
+    "use": "do the exercises",
+    "example": "Do these exercises every day.",
+    "exampleZh": "每天做這些動作。"
+   },
+   {
+    "en": "bend",
+    "zh": "彎曲",
+    "use": "bend your knee",
+    "example": "Bend your knee slowly.",
+    "exampleZh": "慢慢彎曲膝蓋。"
+   },
+   {
+    "en": "straight",
+    "zh": "直的；挺直",
+    "use": "keep your back straight",
+    "example": "Keep your back straight.",
+    "exampleZh": "背保持挺直。"
+   },
+   {
+    "en": "hard",
+    "zh": "努力地；用力地",
+    "use": "work hard",
+    "example": "He worked hard today.",
+    "exampleZh": "他今天很努力。"
+   }
+  ],
+  "chunks": [
+   {
+    "en": "Take your time.",
+    "zh": "慢慢來，不急。"
+   },
+   {
+    "en": "Like this?",
+    "zh": "像這樣嗎？"
+   },
+   {
+    "en": "That's it! / Well done!",
+    "zh": "就是這樣！／做得好！"
+   },
+   {
+    "en": "Be careful.",
+    "zh": "小心。"
+   }
+  ],
+  "wordCheck": [
+   {
+    "q": "slowly 在說什麼？",
+    "options": [
+     "他走路的樣子",
+     "他的膝蓋",
+     "他的心情"
+    ],
+    "answer": 0,
+    "sentence": "He walks slowly because his knee hurts."
+   },
+   {
+    "q": "這句話的意思是？",
+    "options": [
+     "她很努力，也睡很多",
+     "她很努力，但幾乎沒睡",
+     "她不努力，常常睡覺"
+    ],
+    "answer": 1,
+    "sentence": "She works hard, but she hardly sleeps."
+   }
+  ],
+  "practice": [
+   {
+    "id": "t6-p1",
+    "zh": "請慢慢地深呼吸。",
+    "grammar": [
+     "副詞 slowly／deeply"
+    ],
+    "hints": [
+     "「慢慢地」「深深地」形容呼吸這個動作，用 ly 副詞。",
+     "Please breathe slowly and deeply."
+    ],
+    "reference": [
+     "Please breathe slowly and deeply.",
+     "Please breathe deeply and slowly.",
+     "Breathe slowly and deeply, please.",
+     "Please take a slow, deep breath."
+    ],
+    "why": "說「怎麼呼吸」要用副詞 slowly、deeply；名詞 breath 前面才用形容詞 slow、deep。",
+    "newWords": []
+   },
+   {
+    "id": "t6-p2",
+    "zh": "你今天看起來很累。",
+    "grammar": [
+     "look + 形容詞"
+    ],
+    "hints": [
+     "look 是「看起來」，後面接形容詞。",
+     "You look tired today."
+    ],
+    "reference": [
+     "You look tired today.",
+     "You look very tired today.",
+     "Today you look tired.",
+     "You look really tired today."
+    ],
+    "why": "look、feel 說的是狀態，後面接形容詞 tired，不能用副詞。",
+    "newWords": []
+   }
+  ],
+  "listen": {
+   "scene": "物理治療師 Lisa 教王先生膝蓋手術後的動作。",
+   "dialogue": [
+    {
+     "who": "Lisa",
+     "en": "Good morning, Mr. Wang. Today we'll do three easy exercises for your knee.",
+     "zh": "王先生早安。今天我們做三個膝蓋的簡單動作。"
+    },
+    {
+     "who": "Mr. Wang",
+     "en": "OK. But it still hurts a little.",
+     "zh": "好，可是還有一點痛。"
+    },
+    {
+     "who": "Lisa",
+     "en": "That's normal. First, sit on the chair and keep your back straight. Now bend your knee slowly.",
+     "zh": "這很正常。首先坐在椅子上，背挺直。現在慢慢彎膝蓋。"
+    },
+    {
+     "who": "Mr. Wang",
+     "en": "Like this?",
+     "zh": "像這樣嗎？"
+    },
+    {
+     "who": "Lisa",
+     "en": "That's it! Don't move too fast. Do it ten times, and breathe deeply.",
+     "zh": "就是這樣！不要動太快。做十次，深呼吸。"
+    },
+    {
+     "who": "Mr. Wang",
+     "en": "I feel better when I go slowly.",
+     "zh": "慢慢做的時候我覺得比較好。"
+    },
+    {
+     "who": "Lisa",
+     "en": "Good. Next, stand up carefully and hold the table. You're doing really well.",
+     "zh": "很好。接下來小心站起來，扶著桌子。你做得真好。"
+    },
+    {
+     "who": "Mr. Wang",
+     "en": "Thank you. I'll practice hard at home.",
+     "zh": "謝謝，我回家會努力練習。"
+    }
+   ],
+   "gist": {
+    "q": "What is Lisa doing?",
+    "options": [
+     "Teaching knee exercises",
+     "Giving him medicine",
+     "Cooking dinner"
+    ],
+    "answer": 0
+   },
+   "details": [
+    {
+     "q": "How should Mr. Wang bend his knee?",
+     "options": [
+      "Quickly",
+      "Slowly",
+      "Hard"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "How many times should he do it?",
+     "options": [
+      "Five times",
+      "Twenty times",
+      "Ten times"
+     ],
+     "answer": 2
+    },
+    {
+     "q": "What should he hold when he stands up?",
+     "options": [
+      "The table",
+      "Lisa's arm",
+      "The door"
+     ],
+     "answer": 0
+    }
+   ],
+   "shadow": [
+    2,
+    6
+   ],
+   "retell": "不看稿，用兩三句英文說治療師要王先生怎麼做：He should bend his knee…／He should stand up…（用 slowly、carefully）",
+   "retellSample": "He should sit with his back straight and bend his knee slowly ten times. Then he should stand up carefully and hold the table."
+  },
+  "read": {
+   "kind": "復健單張",
+   "title": "KNEE EXERCISES AT HOME",
+   "lines": [
+    {
+     "en": "Do these exercises twice a day, in the morning and in the evening.",
+     "zh": "這些動作一天做兩次，早上和晚上。"
+    },
+    {
+     "en": "Move slowly and stop if the pain gets worse.",
+     "zh": "動作要慢，痛變嚴重就停下來。"
+    },
+    {
+     "en": "Put ice on your knee for 15 minutes after the exercises.",
+     "zh": "做完動作後冰敷膝蓋 15 分鐘。"
+    },
+    {
+     "en": "Wear good shoes and walk carefully on wet floors.",
+     "zh": "穿好走的鞋，在濕的地板上要小心走。"
+    },
+    {
+     "en": "Call us if your knee is red, hot, or very swollen.",
+     "zh": "膝蓋紅、熱或腫得很厲害，就打電話給我們。"
+    }
+   ],
+   "questions": [
+    {
+     "q": "What is this paper mainly about?",
+     "options": [
+      "How to do knee exercises safely at home",
+      "How to buy good shoes",
+      "How to cook healthy food"
+     ],
+     "answer": 0,
+     "skill": "主旨"
+    },
+    {
+     "q": "How often should you do the exercises?",
+     "options": [
+      "Once a day",
+      "Twice a day",
+      "Every hour"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "In \"Call us if your knee is red\", who are \"us\"?",
+     "options": [
+      "The clinic that gave you this paper",
+      "Your family",
+      "Your classmates"
+     ],
+     "answer": 0,
+     "skill": "指涉"
+    },
+    {
+     "q": "What should you do if the pain gets worse?",
+     "options": [
+      "Move faster",
+      "Stop",
+      "Put on new shoes"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "Does the paper say how long each exercise takes?",
+     "options": [
+      "No, it does not say",
+      "Yes, ten minutes"
+     ],
+     "answer": 0,
+     "skill": "有沒有提供"
+    }
+   ]
+  },
+  "speak": {
+   "situation": "朋友第一次要去健身房，你告訴他怎麼安全地運動。",
+   "conditions": [
+    "至少用兩個 ly 副詞（slowly、carefully、gently……）",
+    "用一句 feel 或 look + 形容詞"
+   ],
+   "followUps": [
+    "How fast should I run?",
+    "What if I feel tired?"
+   ],
+   "sample": "First, warm up slowly for five minutes. Lift the weights carefully and keep your back straight. If you feel tired or dizzy, stop and drink some water."
+  },
+  "write": {
+   "task": "傳訊息給剛扭傷腳的室友，提醒他這幾天要注意什麼。",
+   "conditions": [
+    "至少用兩個副詞說怎麼做（slowly、carefully……）",
+    "用一句 look 或 feel + 形容詞",
+    "最後說你可以怎麼幫忙"
+   ],
+   "minSentences": 3,
+   "sample": "How is your ankle? You looked tired this morning. Please walk slowly and go down the stairs carefully. I can carry your bag to class tomorrow."
+  },
+  "review": {
+   "situation": "換個情境：體育課上，跟同學說動作要怎麼做。",
+   "practice": [
+    {
+     "id": "t6-r1",
+     "zh": "他游泳游得很好。",
+     "grammar": [
+      "good → well"
+     ],
+     "hints": [
+      "「游得好」形容游泳這個動作，good 的副詞是 well。",
+      "He swims very well."
+     ],
+     "reference": [
+      "He swims very well.",
+      "He swims well.",
+      "He is a very good swimmer.",
+      "He's a very good swimmer."
+     ],
+     "why": "說動作做得好用 well；good 是形容詞，要放在名詞前面：a good swimmer。",
+     "newWords": []
+    },
+    {
+     "id": "t6-r2",
+     "zh": "請輕輕地把手放在我的肩膀上。",
+     "grammar": [
+      "副詞 gently",
+      "祈使句"
+     ],
+     "hints": [
+      "「輕輕地」用 gently，可以放在動詞前面或句尾。",
+      "Please put your hand on my shoulder gently."
+     ],
+     "reference": [
+      "Please put your hand on my shoulder gently.",
+      "Please gently put your hand on my shoulder.",
+      "Put your hand gently on my shoulder, please.",
+      "Please put your hand gently on my shoulder."
+     ],
+     "why": "gently 說的是「怎麼放」，所以用副詞；祈使句直接用原形動詞 put。",
+     "newWords": []
+    },
+    {
+     "id": "t6-r3",
+     "zh": "這湯聞起來很香。",
+     "grammar": [
+      "smell + 形容詞"
+     ],
+     "hints": [
+      "smell 後面接形容詞，不接副詞。",
+      "This soup smells good."
+     ],
+     "reference": [
+      "This soup smells good.",
+      "This soup smells great.",
+      "The soup smells good.",
+      "This soup smells delicious.",
+      "This soup smells really good."
+     ],
+     "why": "smell、taste、look 說的是狀態，後面用形容詞 good，不能用 well。",
+     "newWords": []
+    }
+   ],
+   "speak": {
+    "situation": "你是體育課小老師，教同學做一個伸展動作。",
+    "conditions": [
+     "說兩三個步驟，每一步至少用一個副詞",
+     "最後用 That's it! 或 Well done! 鼓勵對方"
+    ],
+    "followUps": [
+     "Should I do it fast?",
+     "How long should I hold it?"
+    ],
+    "sample": "Stand up straight and raise your arms slowly. Bend to the left gently and hold it for ten seconds. Then come back up carefully. That's it! Well done!"
+   }
+  }
+ },
+ {
+  "id": "t7",
+  "n": 7,
+  "after": 17,
+  "title": "這也太好吃了吧！",
+  "titleEn": "It was so good!",
+  "goal": "能用 so 和 such 加強語氣，說出「這麼……以至於……」，也分得清楚 so（所以）和 so（這麼）。",
+  "scene": "放假回來，同學問你去台南玩得怎麼樣。",
+  "grammar": {
+   "title": "so 和 such：這麼……",
+   "points": [
+    "so 後面接形容詞或副詞（沒有名詞）：It was so hot. She talks so fast.",
+    "such 後面接名詞：such a／an + 形容詞 + 單數名詞（such a nice day、such an old house）；複數或不可數名詞前面不用 a：such nice people、such good food。",
+    "so … that …、such … that … 是「這麼……以至於……」，that 後面接結果：It was so hot that we stayed inside. It was such a long line that we left.",
+    "單元 17 學過的 so 是「所以」，放在兩個句子中間：I was tired, so I went home. 這裡的 so 是「這麼」，放在形容詞前面：I was so tired. 看後面接什麼就分得出來。"
+   ],
+   "examples": [
+    {
+     "en": "The beef soup was so good!",
+     "zh": "牛肉湯好好喝！"
+    },
+    {
+     "en": "Tainan is such a beautiful city.",
+     "zh": "台南是個好美的城市。"
+    },
+    {
+     "en": "It was so crowded that we waited for an hour.",
+     "zh": "人多到我們等了一個小時。"
+    }
+   ]
+  },
+  "words": [
+   {
+    "en": "delicious",
+    "zh": "美味的",
+    "use": "delicious food",
+    "example": "The noodles were delicious.",
+    "exampleZh": "麵很好吃。"
+   },
+   {
+    "en": "crowded",
+    "zh": "擁擠的",
+    "use": "a crowded street",
+    "example": "The night market was crowded.",
+    "exampleZh": "夜市很擠。"
+   },
+   {
+    "en": "line",
+    "zh": "排隊的隊伍",
+    "use": "wait in line",
+    "example": "We waited in a long line.",
+    "exampleZh": "我們排了好長的隊。"
+   },
+   {
+    "en": "amazing",
+    "zh": "很棒的；令人驚嘆的",
+    "use": "an amazing trip",
+    "example": "The view was amazing.",
+    "exampleZh": "風景很棒。"
+   },
+   {
+    "en": "temple",
+    "zh": "廟",
+    "use": "visit a temple",
+    "example": "We visited an old temple.",
+    "exampleZh": "我們參觀了一座老廟。"
+   },
+   {
+    "en": "worth it",
+    "zh": "值得",
+    "use": "It was worth it.",
+    "example": "The long wait was worth it.",
+    "exampleZh": "排那麼久是值得的。"
+   },
+   {
+    "en": "exhausted",
+    "zh": "筋疲力盡的",
+    "use": "feel exhausted",
+    "example": "I was exhausted after the trip.",
+    "exampleZh": "旅行完我累壞了。"
+   },
+   {
+    "en": "recommend",
+    "zh": "推薦",
+    "use": "recommend a place",
+    "example": "I recommend this shop.",
+    "exampleZh": "我推薦這家店。"
+   }
+  ],
+  "chunks": [
+   {
+    "en": "It was so good!",
+    "zh": "超好吃／超棒的！"
+   },
+   {
+    "en": "such a long line",
+    "zh": "好長的隊伍"
+   },
+   {
+    "en": "so … that …",
+    "zh": "這麼……以至於……"
+   },
+   {
+    "en": "It was worth it.",
+    "zh": "很值得。"
+   }
+  ],
+  "wordCheck": [
+   {
+    "q": "他們為什麼回旅館？",
+    "options": [
+     "因為太熱了",
+     "因為下雨",
+     "因為太晚了"
+    ],
+    "answer": 0,
+    "sentence": "It was so hot that we went back to the hotel."
+   },
+   {
+    "q": "這裡的 so 是什麼意思？",
+    "options": [
+     "這麼",
+     "所以",
+     "也"
+    ],
+    "answer": 1,
+    "sentence": "I was tired, so I went to bed early."
+   }
+  ],
+  "practice": [
+   {
+    "id": "t7-p1",
+    "zh": "那家餐廳的菜好好吃！",
+    "grammar": [
+     "so + 形容詞"
+    ],
+    "hints": [
+     "so 後面直接接形容詞，沒有名詞。",
+     "The food at that restaurant was so good!"
+    ],
+    "reference": [
+     "The food at that restaurant was so good!",
+     "The food at that restaurant is so good!",
+     "The food at that restaurant was so delicious!",
+     "The food in that restaurant was so good!",
+     "That restaurant's food was so good!"
+    ],
+    "why": "so 後面接形容詞 good 或 delicious；說去過的那一次用 was，說平常的話用 is 也可以。",
+    "newWords": []
+   },
+   {
+    "id": "t7-p2",
+    "zh": "那是好長的一條隊伍。",
+    "grammar": [
+     "such a + 形容詞 + 名詞"
+    ],
+    "hints": [
+     "後面有名詞 line，要用 such a。",
+     "It was such a long line."
+    ],
+    "reference": [
+     "It was such a long line.",
+     "That was such a long line.",
+     "It was such a long line!",
+     "That was such a long queue."
+    ],
+    "why": "有名詞（line）就用 such；單數名詞前面要有 a：such a long line。",
+    "newWords": []
+   }
+  ],
+  "listen": {
+   "scene": "Ken 問 Emily 週末去台南玩得怎麼樣。",
+   "dialogue": [
+    {
+     "who": "Ken",
+     "en": "How was your trip to Tainan?",
+     "zh": "你去台南玩得怎麼樣？"
+    },
+    {
+     "who": "Emily",
+     "en": "It was amazing! The weather was so nice, and the old streets were beautiful.",
+     "zh": "超棒的！天氣好好，老街也很漂亮。"
+    },
+    {
+     "who": "Ken",
+     "en": "Did you try the beef soup?",
+     "zh": "你有喝牛肉湯嗎？"
+    },
+    {
+     "who": "Emily",
+     "en": "Yes! It was so delicious that I had two bowls. But there was such a long line. We waited for forty minutes.",
+     "zh": "有！好喝到我喝了兩碗。可是隊伍好長，我們等了四十分鐘。"
+    },
+    {
+     "who": "Ken",
+     "en": "Forty minutes? Was it worth it?",
+     "zh": "四十分鐘？值得嗎？"
+    },
+    {
+     "who": "Emily",
+     "en": "Totally worth it. We also visited an old temple. It was so quiet and peaceful.",
+     "zh": "完全值得。我們也去了一座老廟，好安靜、好平靜。"
+    },
+    {
+     "who": "Ken",
+     "en": "Sounds great. Were you tired?",
+     "zh": "聽起來很棒。你累嗎？"
+    },
+    {
+     "who": "Emily",
+     "en": "I was exhausted, so I slept on the train home. I recommend Tainan to everyone!",
+     "zh": "累壞了，所以回程在火車上睡著了。我推薦大家去台南！"
+    }
+   ],
+   "gist": {
+    "q": "What are they talking about?",
+    "options": [
+     "Emily's trip to Tainan",
+     "A new restaurant in Taipei",
+     "A test at school"
+    ],
+    "answer": 0
+   },
+   "details": [
+    {
+     "q": "Why did Emily have two bowls of beef soup?",
+     "options": [
+      "She was very hungry",
+      "It was so delicious",
+      "It was free"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "How long did they wait in line?",
+     "options": [
+      "Four minutes",
+      "Fourteen minutes",
+      "Forty minutes"
+     ],
+     "answer": 2
+    },
+    {
+     "q": "What did Emily do on the train home?",
+     "options": [
+      "She slept",
+      "She ate",
+      "She read a book"
+     ],
+     "answer": 0
+    }
+   ],
+   "shadow": [
+    1,
+    3
+   ],
+   "retell": "不看稿，用兩三句英文說 Emily 的旅行：The soup was so…／There was such a…（至少用一個 so、一個 such）",
+   "retellSample": "Emily's trip to Tainan was amazing. The beef soup was so delicious that she had two bowls, but there was such a long line. She was so tired that she slept on the train."
+  },
+  "read": {
+   "kind": "網路評論",
+   "title": "REVIEW: A-Ming's Beef Soup ★★★★☆",
+   "lines": [
+    {
+     "en": "This place is so popular that you should come before 7 a.m.",
+     "zh": "這家店超紅，最好早上七點前來。"
+    },
+    {
+     "en": "We came at 8, and there was such a long line.",
+     "zh": "我們八點到，結果隊伍好長。"
+    },
+    {
+     "en": "The soup was hot, and the beef was so fresh.",
+     "zh": "湯很熱，牛肉好新鮮。"
+    },
+    {
+     "en": "The shop is small and it gets crowded, so it's not great for big groups.",
+     "zh": "店很小，會很擠，所以不太適合很多人一起來。"
+    },
+    {
+     "en": "It isn't cheap, but it's worth it.",
+     "zh": "不便宜，但很值得。"
+    }
+   ],
+   "questions": [
+    {
+     "q": "What is this review about?",
+     "options": [
+      "A beef soup shop",
+      "A hotel in Tainan",
+      "A train trip"
+     ],
+     "answer": 0,
+     "skill": "主旨"
+    },
+    {
+     "q": "When should you come?",
+     "options": [
+      "After 8 a.m.",
+      "Before 7 a.m.",
+      "At lunch time"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "In \"It isn't cheap, but it's worth it\", what does \"it\" mean?",
+     "options": [
+      "The train",
+      "The line",
+      "The soup at this shop"
+     ],
+     "answer": 2,
+     "skill": "指涉"
+    },
+    {
+     "q": "Who might NOT enjoy this shop?",
+     "options": [
+      "A group of fifteen friends",
+      "One person eating alone",
+      "Two friends"
+     ],
+     "answer": 0,
+     "skill": "推論"
+    },
+    {
+     "q": "Does the review say the shop's address?",
+     "options": [
+      "Yes, it's near the station",
+      "No, it does not say"
+     ],
+     "answer": 1,
+     "skill": "有沒有提供"
+    }
+   ]
+  },
+  "speak": {
+   "situation": "同學問你最近吃過最好吃的一家店，你推薦給他。",
+   "conditions": [
+    "至少用一次 so + 形容詞、一次 such (a) + 名詞",
+    "說一個缺點（例如要排隊）",
+    "最後說值不值得"
+   ],
+   "followUps": [
+    "How long did you wait?",
+    "Is it expensive?"
+   ],
+   "sample": "There's a noodle shop near my school. The noodles are so good, and the owner is such a friendly man. There is always a line, but it's worth it."
+  },
+  "write": {
+   "task": "在地圖 app 幫你喜歡的一家店寫三到五句評論。",
+   "conditions": [
+    "用 so … that … 或 such … that … 寫一句",
+    "說一個優點、一個缺點",
+    "說推薦給哪種人"
+   ],
+   "minSentences": 3,
+   "sample": "The coffee here is so good that I come every week. It's such a quiet place, so I often study here. The chairs are a little hard. I recommend it to students."
+  },
+  "review": {
+   "situation": "換個情境：說說你看過的一部電影或一本書。",
+   "practice": [
+    {
+     "id": "t7-r1",
+     "zh": "那部電影好好笑。",
+     "grammar": [
+      "so + 形容詞"
+     ],
+     "hints": [
+      "so 後面接形容詞 funny。",
+      "That movie was so funny."
+     ],
+     "reference": [
+      "That movie was so funny.",
+      "The movie was so funny.",
+      "That movie was so funny!",
+      "That film was so funny."
+     ],
+     "why": "後面沒有名詞，用 so + funny；說看過的電影用過去式 was。",
+     "newWords": []
+    },
+    {
+     "id": "t7-r2",
+     "zh": "她是個好善良的人。",
+     "grammar": [
+      "such a + 形容詞 + 名詞"
+     ],
+     "hints": [
+      "後面有名詞 person，用 such a。",
+      "She is such a kind person."
+     ],
+     "reference": [
+      "She is such a kind person.",
+      "She's such a kind person.",
+      "She is such a nice person.",
+      "She's such a nice person."
+     ],
+     "why": "有名詞 person 就用 such a；如果不說 person，就用 so：She is so kind.",
+     "newWords": []
+    },
+    {
+     "id": "t7-r3",
+     "zh": "那本書太有趣了，所以我看到半夜兩點。",
+     "grammar": [
+      "so … that …"
+     ],
+     "hints": [
+      "用 so + 形容詞 + that + 結果。",
+      "The book was so interesting that I read until 2 a.m."
+     ],
+     "reference": [
+      "The book was so interesting that I read until two in the morning.",
+      "The book was so interesting that I read until 2 a.m.",
+      "The book was so interesting that I read it until two in the morning.",
+      "That book was so interesting that I read until 2 a.m."
+     ],
+     "why": "「太……所以……」可以用 so + 形容詞 + that，that 後面接結果：I read until 2 a.m.",
+     "newWords": []
+    }
+   ],
+   "speak": {
+    "situation": "朋友問你推不推薦你最近看的電影或影集。",
+    "conditions": [
+     "so 和 such 各用一次",
+     "說一個你不喜歡的地方"
+    ],
+    "followUps": [
+     "Who is in it?",
+     "Is it good for a date?"
+    ],
+    "sample": "I just watched a Korean drama. It was so funny, and the main actor is such a good actor. The ending was a little sad, but I really recommend it."
+   }
+  }
+ },
+ {
+  "id": "t8",
+  "n": 8,
+  "after": 20,
+  "title": "確認一下，對吧？",
+  "titleEn": "Checking details",
+  "goal": "能用附加問句（…, isn't it? / …, don't you?）確認資訊，也聽得懂語調往上揚是真的在問、往下降是在確認。",
+  "scene": "跟同學約好週末一起做報告，出門前再確認一次時間、地點和要帶的東西。",
+  "grammar": {
+   "title": "附加問句：…, isn't it?",
+   "points": [
+    "前面是肯定句，後面就用否定：It's Saturday, isn't it?；前面是否定句，後面就用肯定：You don't eat beef, do you?",
+    "後面的助動詞跟著前面走：be 動詞用 is／are／was（You're tired, aren't you?）；一般動詞現在式用 do／does（She lives here, doesn't she?）；過去式用 did（You called him, didn't you?）；完成式用 have／has（You've finished, haven't you?）；will、can 照用（You can come, can't you?）。",
+    "後面的主詞一律換成代名詞：Amy is coming, isn't she? This bus goes to the station, doesn't it? 特別的：I'm late, aren't I?",
+    "語調：句尾往下降，是你已經很確定、只要對方同意；句尾往上揚，是你真的不確定、想要對方回答。回答照事實：You don't eat beef, do you? — No, I don't.（我不吃）／ Yes, I do.（我吃）"
+   ],
+   "examples": [
+    {
+     "en": "The meeting is at two, isn't it?",
+     "zh": "會議是兩點，對吧？"
+    },
+    {
+     "en": "You haven't finished the slides, have you?",
+     "zh": "你還沒做完投影片，對吧？"
+    },
+    {
+     "en": "Tom lives near the station, doesn't he?",
+     "zh": "Tom 住在車站附近，對不對？"
+    }
+   ]
+  },
+  "words": [
+   {
+    "en": "check",
+    "zh": "確認；檢查",
+    "use": "check the time",
+    "example": "Let me check the time again.",
+    "exampleZh": "我再確認一次時間。"
+   },
+   {
+    "en": "presentation",
+    "zh": "（口頭）報告",
+    "use": "give a presentation",
+    "example": "Our presentation is on Monday.",
+    "exampleZh": "我們的報告在星期一。"
+   },
+   {
+    "en": "slides",
+    "zh": "投影片",
+    "use": "make the slides",
+    "example": "I've made the slides.",
+    "exampleZh": "我做好投影片了。"
+   },
+   {
+    "en": "library",
+    "zh": "圖書館",
+    "use": "meet at the library",
+    "example": "Let's meet at the library.",
+    "exampleZh": "我們約在圖書館。"
+   },
+   {
+    "en": "on time",
+    "zh": "準時",
+    "use": "be on time",
+    "example": "Please be on time.",
+    "exampleZh": "請準時。"
+   },
+   {
+    "en": "forget",
+    "zh": "忘記",
+    "use": "forget the laptop",
+    "example": "Don't forget your laptop.",
+    "exampleZh": "別忘了你的筆電。"
+   },
+   {
+    "en": "sure",
+    "zh": "確定的",
+    "use": "Are you sure?",
+    "example": "I'm not sure about the time.",
+    "exampleZh": "我不確定時間。"
+   },
+   {
+    "en": "remind",
+    "zh": "提醒",
+    "use": "remind me",
+    "example": "Can you remind me tomorrow?",
+    "exampleZh": "你明天可以提醒我嗎？"
+   }
+  ],
+  "chunks": [
+   {
+    "en": "…, isn't it? / …, aren't you?",
+    "zh": "……，對吧？"
+   },
+   {
+    "en": "Just to check, …",
+    "zh": "只是確認一下，……"
+   },
+   {
+    "en": "See you then.",
+    "zh": "到時見。"
+   },
+   {
+    "en": "Don't forget …",
+    "zh": "別忘了……"
+   }
+  ],
+  "wordCheck": [
+   {
+    "q": "回答的人喝咖啡嗎？",
+    "options": [
+     "喝",
+     "不喝",
+     "沒有說"
+    ],
+    "answer": 1,
+    "sentence": "You don't drink coffee, do you? — No, I don't."
+   },
+   {
+    "q": "說話的人覺得對方怎麼了？",
+    "options": [
+     "已經做完投影片了",
+     "還沒開始做投影片",
+     "不知道投影片是什麼"
+    ],
+    "answer": 0,
+    "sentence": "You've finished the slides, haven't you?"
+   }
+  ],
+  "practice": [
+   {
+    "id": "t8-p1",
+    "zh": "我們星期六見面，對吧？",
+    "grammar": [
+     "附加問句",
+     "未來式"
+    ],
+    "hints": [
+     "前面肯定，後面用否定；助動詞要跟前面一樣。",
+     "We'll meet on Saturday, won't we?"
+    ],
+    "reference": [
+     "We'll meet on Saturday, won't we?",
+     "We will meet on Saturday, won't we?",
+     "We're meeting on Saturday, aren't we?",
+     "We are meeting on Saturday, aren't we?",
+     "We meet on Saturday, don't we?"
+    ],
+    "why": "前面是 will meet（肯定），後面就用 won't we；如果前面用 are meeting，就接 aren't we。",
+    "newWords": []
+   },
+   {
+    "id": "t8-p2",
+    "zh": "你還沒跟老師說，對吧？",
+    "grammar": [
+     "附加問句",
+     "現在完成式"
+    ],
+    "hints": [
+     "前面否定（haven't），後面用肯定。",
+     "You haven't told the teacher, have you?"
+    ],
+    "reference": [
+     "You haven't told the teacher, have you?",
+     "You have not told the teacher, have you?",
+     "You haven't told the teacher yet, have you?"
+    ],
+    "why": "前面是 haven't told（完成式的否定），後面就用肯定的 have you。",
+    "newWords": []
+   }
+  ],
+  "listen": {
+   "scene": "Grace 打電話跟組員 Ben 確認明天做報告的事。",
+   "dialogue": [
+    {
+     "who": "Grace",
+     "en": "Hi Ben. Just to check, we're meeting at the library tomorrow, aren't we?",
+     "zh": "嗨 Ben，只是確認一下，我們明天約在圖書館，對吧？"
+    },
+    {
+     "who": "Ben",
+     "en": "Yes, on the second floor. The meeting is at ten, isn't it?",
+     "zh": "對，在二樓。是十點，對吧？"
+    },
+    {
+     "who": "Grace",
+     "en": "No, it's at nine thirty. Kelly has a class at eleven, doesn't she?",
+     "zh": "不是，是九點半。Kelly 十一點有課，對不對？"
+    },
+    {
+     "who": "Ben",
+     "en": "Oh, right. Nine thirty. You've finished the slides, haven't you?",
+     "zh": "喔，對，九點半。你投影片做完了吧？"
+    },
+    {
+     "who": "Grace",
+     "en": "Almost. I'll finish them tonight. You can bring your laptop, can't you?",
+     "zh": "快好了，我今晚會做完。你可以帶筆電來吧？"
+    },
+    {
+     "who": "Ben",
+     "en": "Sure. You don't need the printer, do you?",
+     "zh": "當然。你不需要印表機吧？"
+    },
+    {
+     "who": "Grace",
+     "en": "No, we don't. The teacher wants the file by email.",
+     "zh": "不用，老師要我們用 email 交檔案。"
+    },
+    {
+     "who": "Ben",
+     "en": "Great. See you at nine thirty. Don't forget the slides!",
+     "zh": "太好了。九點半見。別忘了投影片！"
+    }
+   ],
+   "gist": {
+    "q": "Why does Grace call Ben?",
+    "options": [
+     "To check the plan for tomorrow",
+     "To ask him to a movie",
+     "To borrow some money"
+    ],
+    "answer": 0
+   },
+   "details": [
+    {
+     "q": "What time is the meeting?",
+     "options": [
+      "At ten",
+      "At nine thirty",
+      "At eleven"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "What will Ben bring?",
+     "options": [
+      "The printer",
+      "The slides",
+      "His laptop"
+     ],
+     "answer": 2
+    },
+    {
+     "q": "How does the teacher want the file?",
+     "options": [
+      "By email",
+      "On paper",
+      "On a USB drive"
+     ],
+     "answer": 0
+    }
+   ],
+   "shadow": [
+    0,
+    5
+   ],
+   "retell": "不看稿，用兩三句英文說他們的計畫：They're meeting at…／Ben will bring…（說時間、地點、要帶的東西）",
+   "retellSample": "Grace and Ben are meeting at the library at nine thirty tomorrow. Ben will bring his laptop, and Grace will finish the slides tonight."
+  },
+  "read": {
+   "kind": "群組訊息",
+   "title": "Group chat: Nursing English project",
+   "lines": [
+    {
+     "en": "Grace: Our presentation is next Monday, isn't it?",
+     "zh": "Grace：我們的報告是下週一，對吧？"
+    },
+    {
+     "en": "Kelly: Yes, at 1 p.m. in Room 205.",
+     "zh": "Kelly：對，下午一點在 205 教室。"
+    },
+    {
+     "en": "Ben: We need ten slides, don't we?",
+     "zh": "Ben：我們需要十張投影片，對吧？"
+    },
+    {
+     "en": "Kelly: No, the teacher said eight. Each person talks for two minutes.",
+     "zh": "Kelly：不是，老師說八張。每個人講兩分鐘。"
+    },
+    {
+     "en": "Grace: OK! I'll send everyone the file on Sunday night.",
+     "zh": "Grace：好！我星期天晚上把檔案傳給大家。"
+    }
+   ],
+   "questions": [
+    {
+     "q": "What are they talking about?",
+     "options": [
+      "Their class presentation",
+      "A party on Monday",
+      "A new classroom"
+     ],
+     "answer": 0,
+     "skill": "主旨"
+    },
+    {
+     "q": "How many slides do they need?",
+     "options": [
+      "Ten",
+      "Eight",
+      "Two"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "In \"I'll send everyone the file\", who is \"I\"?",
+     "options": [
+      "Kelly",
+      "Ben",
+      "Grace"
+     ],
+     "answer": 2,
+     "skill": "指涉"
+    },
+    {
+     "q": "How long does each person talk?",
+     "options": [
+      "Two minutes",
+      "Eight minutes",
+      "Ten minutes"
+     ],
+     "answer": 0,
+     "skill": "細節"
+    },
+    {
+     "q": "Does the chat say who will talk first?",
+     "options": [
+      "No, it does not say",
+      "Yes, Kelly will talk first"
+     ],
+     "answer": 0,
+     "skill": "有沒有提供"
+    }
+   ]
+  },
+  "speak": {
+   "situation": "你和朋友約好週末去看電影，出門前打電話用附加問句確認細節。",
+   "conditions": [
+    "至少用三個附加問句確認時間、地點、要帶的東西",
+    "其中一個是否定句加肯定的附加問句（…, do you?）"
+   ],
+   "followUps": [
+    "Did you buy the tickets?",
+    "How are you getting there?"
+   ],
+   "sample": "Hi! The movie starts at seven, doesn't it? We're meeting at the MRT station, aren't we? You don't need me to buy snacks, do you? OK, see you then!"
+  },
+  "write": {
+   "task": "傳訊息給組員，確認明天上課要帶的東西和時間。",
+   "conditions": [
+    "至少用兩個附加問句",
+    "說你自己會負責的一件事",
+    "提醒對方一件事（Don't forget…）"
+   ],
+   "minSentences": 3,
+   "sample": "Class starts at eight tomorrow, doesn't it? You have the poster, don't you? I'll bring the markers. Don't forget your student ID!"
+  },
+  "review": {
+   "situation": "換個情境：實習時，量完血壓跟病人確認資訊。",
+   "practice": [
+    {
+     "id": "t8-r1",
+     "zh": "你對盤尼西林過敏，對吧？",
+     "grammar": [
+      "附加問句",
+      "be 動詞"
+     ],
+     "hints": [
+      "前面是 are 的肯定句，後面用 aren't you。",
+      "You're allergic to penicillin, aren't you?"
+     ],
+     "reference": [
+      "You're allergic to penicillin, aren't you?",
+      "You are allergic to penicillin, aren't you?"
+     ],
+     "why": "前面是 are（肯定），後面就用否定的 aren't you。",
+     "newWords": [
+      {
+       "en": "allergic",
+       "zh": "過敏的"
+      },
+      {
+       "en": "penicillin",
+       "zh": "盤尼西林"
+      }
+     ]
+    },
+    {
+     "id": "t8-r2",
+     "zh": "你昨天晚上沒睡好，對吧？",
+     "grammar": [
+      "附加問句",
+      "過去式"
+     ],
+     "hints": [
+      "前面否定（didn't），後面用肯定 did you。",
+      "You didn't sleep well last night, did you?"
+     ],
+     "reference": [
+      "You didn't sleep well last night, did you?",
+      "You did not sleep well last night, did you?"
+     ],
+     "why": "過去式的否定是 didn't，附加問句就用肯定的 did you。",
+     "newWords": []
+    },
+    {
+     "id": "t8-r3",
+     "zh": "你兒子明天會來，對吧？",
+     "grammar": [
+      "附加問句",
+      "未來式"
+     ],
+     "hints": [
+      "主詞 your son 要換成 he；will 的否定是 won't。",
+      "Your son will come tomorrow, won't he?"
+     ],
+     "reference": [
+      "Your son will come tomorrow, won't he?",
+      "Your son is coming tomorrow, isn't he?",
+      "Your son will be here tomorrow, won't he?"
+     ],
+     "why": "前面是 will（肯定），後面用 won't；附加問句的主詞要換成代名詞 he。",
+     "newWords": []
+    }
+   ],
+   "speak": {
+    "situation": "你是實習護生，量完血壓後，跟病人確認他平常吃的藥和昨晚的睡眠。",
+    "conditions": [
+     "至少用兩個附加問句確認資訊",
+     "對方回答後，再問一個 How 或 What 開頭的問題"
+    ],
+    "followUps": [
+     "Do I need to stay in bed?",
+     "When can I go home?"
+    ],
+    "sample": "You take a blood pressure pill every morning, don't you? And you didn't sleep well last night, did you? What woke you up?"
+   }
+  }
+ },
+ {
+  "id": "t9",
+  "n": 9,
+  "after": 21,
+  "title": "請人幫你處理",
+  "titleEn": "Getting things done",
+  "goal": "能用 have／get + 東西 + 過去分詞，說請別人幫你做的事，分清楚自己做和請人做。",
+  "scene": "週末你要辦一堆事：剪頭髮、修手機、去眼鏡行驗光。",
+  "grammar": {
+   "title": "使役句：have something done",
+   "points": [
+    "請別人幫你做（不是自己做）：have + 東西 + 過去分詞：I had my hair cut.（我去剪了頭髮，是理髮師剪的）；I cut my hair.（我自己剪的）",
+    "口語常用 get 代替 have：I need to get my phone fixed. I'm getting my eyes tested tomorrow.",
+    "時態放在 have 或 get 上，後面的過去分詞不變：I have my car washed every month. I had my teeth cleaned last week. I'm going to have my blood pressure checked.",
+    "過去分詞就是單元 21 被動語態用的那個形：cut → cut、fix → fixed、check → checked、test → tested、clean → cleaned、take → taken（have my photo taken）。"
+   ],
+   "examples": [
+    {
+     "en": "I had my hair cut yesterday.",
+     "zh": "我昨天去剪頭髮了。"
+    },
+    {
+     "en": "You should get your eyes tested.",
+     "zh": "你應該去驗一下視力。"
+    },
+    {
+     "en": "She has her blood pressure checked every month.",
+     "zh": "她每個月都去量血壓。"
+    }
+   ]
+  },
+  "words": [
+   {
+    "en": "haircut",
+    "zh": "理髮；髮型",
+    "use": "get a haircut",
+    "example": "I need a haircut.",
+    "exampleZh": "我該剪頭髮了。"
+   },
+   {
+    "en": "repair shop",
+    "zh": "修理店",
+    "use": "take it to a repair shop",
+    "example": "I took my phone to a repair shop.",
+    "exampleZh": "我把手機拿去修理店。"
+   },
+   {
+    "en": "screen",
+    "zh": "螢幕",
+    "use": "a broken screen",
+    "example": "My phone screen is broken.",
+    "exampleZh": "我的手機螢幕破了。"
+   },
+   {
+    "en": "fix",
+    "zh": "修理",
+    "use": "get it fixed",
+    "example": "They fixed my phone in an hour.",
+    "exampleZh": "他們一小時就把我的手機修好了。"
+   },
+   {
+    "en": "test",
+    "zh": "檢查；檢測",
+    "use": "get your eyes tested",
+    "example": "I had my eyes tested.",
+    "exampleZh": "我去驗了視力。"
+   },
+   {
+    "en": "glasses",
+    "zh": "眼鏡",
+    "use": "a new pair of glasses",
+    "example": "I need new glasses.",
+    "exampleZh": "我需要新眼鏡。"
+   },
+   {
+    "en": "appointment",
+    "zh": "預約",
+    "use": "make an appointment",
+    "example": "I have an appointment at three.",
+    "exampleZh": "我三點有預約。"
+   },
+   {
+    "en": "deliver",
+    "zh": "送達；外送",
+    "use": "have it delivered",
+    "example": "We had the pizza delivered.",
+    "exampleZh": "我們叫了披薩外送。"
+   }
+  ],
+  "chunks": [
+   {
+    "en": "have my hair cut",
+    "zh": "去剪頭髮（請人剪）"
+   },
+   {
+    "en": "get my phone fixed",
+    "zh": "把手機拿去修"
+   },
+   {
+    "en": "make an appointment",
+    "zh": "預約"
+   },
+   {
+    "en": "How much does it cost?",
+    "zh": "要多少錢？"
+   }
+  ],
+  "wordCheck": [
+   {
+    "q": "誰剪了頭髮？",
+    "options": [
+     "說話的人自己剪",
+     "理髮師幫他剪",
+     "沒有人剪"
+    ],
+    "answer": 1,
+    "sentence": "I had my hair cut last Saturday."
+   },
+   {
+    "q": "他要做什麼？",
+    "options": [
+     "自己修手機",
+     "買一支新手機",
+     "把手機拿去給人修"
+    ],
+    "answer": 2,
+    "sentence": "I need to get my phone fixed."
+   }
+  ],
+  "practice": [
+   {
+    "id": "t9-p1",
+    "zh": "我昨天去剪頭髮了。",
+    "grammar": [
+     "have something done",
+     "過去式"
+    ],
+    "hints": [
+     "請別人幫你剪：have + my hair + cut。",
+     "I had my hair cut yesterday."
+    ],
+    "reference": [
+     "I had my hair cut yesterday.",
+     "I got my hair cut yesterday.",
+     "Yesterday I had my hair cut.",
+     "I got a haircut yesterday."
+    ],
+    "why": "是理髮師剪的，用 had my hair cut；cut 的過去分詞還是 cut。也可以說 got a haircut。",
+    "newWords": []
+   },
+   {
+    "id": "t9-p2",
+    "zh": "我得把我的手機拿去修。",
+    "grammar": [
+     "get something done"
+    ],
+    "hints": [
+     "「拿去給人修」= get + my phone + fixed。",
+     "I need to get my phone fixed."
+    ],
+    "reference": [
+     "I need to get my phone fixed.",
+     "I have to get my phone fixed.",
+     "I need to have my phone fixed.",
+     "I have to have my phone fixed."
+    ],
+    "why": "請別人修用 get 或 have + my phone + fixed；「得」用 need to 或 have to。",
+    "newWords": []
+   }
+  ],
+  "listen": {
+   "scene": "Ryan 和室友 Joy 聊週末辦了哪些事。",
+   "dialogue": [
+    {
+     "who": "Joy",
+     "en": "You look different. Did you cut your hair?",
+     "zh": "你看起來不一樣，你剪頭髮了？"
+    },
+    {
+     "who": "Ryan",
+     "en": "I didn't cut it myself! I had it cut at the shop near the station.",
+     "zh": "不是我自己剪的！我在車站附近那家店剪的。"
+    },
+    {
+     "who": "Joy",
+     "en": "It looks great. What else did you do this weekend?",
+     "zh": "很好看。你這週末還做了什麼？"
+    },
+    {
+     "who": "Ryan",
+     "en": "My phone screen broke, so I got it fixed. It cost two thousand dollars.",
+     "zh": "我手機螢幕破了，所以拿去修，花了兩千塊。"
+    },
+    {
+     "who": "Joy",
+     "en": "That's expensive! I need to get my eyes tested. I can't see the board in class.",
+     "zh": "好貴！我需要去驗視力，上課看不清楚黑板。"
+    },
+    {
+     "who": "Ryan",
+     "en": "You should make an appointment. The eye shop is busy on weekends.",
+     "zh": "你應該先預約，眼鏡行週末很忙。"
+    },
+    {
+     "who": "Joy",
+     "en": "Good idea. I'll call them tomorrow.",
+     "zh": "好主意，我明天打給他們。"
+    },
+    {
+     "who": "Ryan",
+     "en": "And let's have dinner delivered tonight. I'm too tired to cook.",
+     "zh": "還有，今晚叫外送吧，我累到不想煮飯。"
+    }
+   ],
+   "gist": {
+    "q": "What are they talking about?",
+    "options": [
+     "Things they had done or need to get done",
+     "A trip to Japan",
+     "Their exam results"
+    ],
+    "answer": 0
+   },
+   "details": [
+    {
+     "q": "Who cut Ryan's hair?",
+     "options": [
+      "Ryan himself",
+      "Someone at a shop",
+      "Joy"
+     ],
+     "answer": 1
+    },
+    {
+     "q": "How much did the phone repair cost?",
+     "options": [
+      "Two hundred dollars",
+      "Twelve hundred dollars",
+      "Two thousand dollars"
+     ],
+     "answer": 2
+    },
+    {
+     "q": "Why does Joy need an eye test?",
+     "options": [
+      "She can't see the board in class",
+      "Her glasses broke",
+      "Her eyes hurt"
+     ],
+     "answer": 0
+    }
+   ],
+   "shadow": [
+    1,
+    4
+   ],
+   "retell": "不看稿，用兩三句英文說他們做了或要做的事：Ryan had his…／Joy needs to get her…",
+   "retellSample": "Ryan had his hair cut at a shop and got his phone fixed. Joy needs to get her eyes tested, so she will make an appointment."
+  },
+  "read": {
+   "kind": "店家公告",
+   "title": "QUICK FIX PHONE REPAIR",
+   "lines": [
+    {
+     "en": "Get your phone fixed while you wait!",
+     "zh": "手機現場修，等一下就好！"
+    },
+    {
+     "en": "Most screen repairs take about one hour.",
+     "zh": "大部分螢幕維修約一小時。"
+    },
+    {
+     "en": "Please save your photos before you leave your phone with us.",
+     "zh": "把手機交給我們之前，請先備份照片。"
+    },
+    {
+     "en": "We are open from 10 a.m. to 9 p.m., but we are closed on Mondays.",
+     "zh": "營業時間早上十點到晚上九點，星期一公休。"
+    },
+    {
+     "en": "Make an appointment online and get 10% off.",
+     "zh": "線上預約打九折。"
+    }
+   ],
+   "questions": [
+    {
+     "q": "What does this shop do?",
+     "options": [
+      "It repairs phones",
+      "It sells glasses",
+      "It cuts hair"
+     ],
+     "answer": 0,
+     "skill": "主旨"
+    },
+    {
+     "q": "How long does a screen repair usually take?",
+     "options": [
+      "About ten minutes",
+      "About one hour",
+      "About one day"
+     ],
+     "answer": 1,
+     "skill": "細節"
+    },
+    {
+     "q": "In \"before you leave your phone with us\", who are \"us\"?",
+     "options": [
+      "Your friends",
+      "Your family",
+      "The repair shop"
+     ],
+     "answer": 2,
+     "skill": "指涉"
+    },
+    {
+     "q": "How can you get 10% off?",
+     "options": [
+      "Make an appointment online",
+      "Come on a Monday",
+      "Bring a friend"
+     ],
+     "answer": 0,
+     "skill": "細節"
+    },
+    {
+     "q": "Does the notice say how much a screen repair costs?",
+     "options": [
+      "No, it does not say",
+      "Yes, two thousand dollars"
+     ],
+     "answer": 0,
+     "skill": "有沒有提供"
+    }
+   ]
+  },
+  "speak": {
+   "situation": "朋友問你週末做了什麼，你說兩件請別人幫忙做的事。",
+   "conditions": [
+    "至少用兩次 had／got + 東西 + 過去分詞",
+    "說一件你自己做的事來比較（I … myself）"
+   ],
+   "followUps": [
+    "Where did you get it done?",
+    "Was it expensive?"
+   ],
+   "sample": "On Saturday, I had my hair cut near my school, and I got my bike fixed. Then I cleaned my room myself. It took all afternoon!"
+  },
+  "write": {
+   "task": "傳訊息給家人，說你這週要去處理的兩件事，並問一個問題。",
+   "conditions": [
+    "至少用兩次 have／get + 東西 + 過去分詞",
+    "說什麼時候要去",
+    "問一個問題（例如價錢或地點）"
+   ],
+   "minSentences": 3,
+   "sample": "I'm going to get my eyes tested on Friday. I also need to have my laptop fixed. Do you know a good repair shop near our home?"
+  },
+  "review": {
+   "situation": "換個情境：在醫院或診所，說醫護人員幫你做的檢查。",
+   "practice": [
+    {
+     "id": "t9-r1",
+     "zh": "我上週去量了血壓。",
+     "grammar": [
+      "have something done",
+      "過去式"
+     ],
+     "hints": [
+      "是護理師幫你量的：had + my blood pressure + checked。",
+      "I had my blood pressure checked last week."
+     ],
+     "reference": [
+      "I had my blood pressure checked last week.",
+      "I got my blood pressure checked last week.",
+      "Last week I had my blood pressure checked.",
+      "I had my blood pressure taken last week."
+     ],
+     "why": "請別人量用 had + my blood pressure + checked；時態放在 had 上。",
+     "newWords": []
+    },
+    {
+     "id": "t9-r2",
+     "zh": "你應該去驗一下視力。",
+     "grammar": [
+      "get something done",
+      "should"
+     ],
+     "hints": [
+      "should 後面接原形 get 或 have。",
+      "You should get your eyes tested."
+     ],
+     "reference": [
+      "You should get your eyes tested.",
+      "You should have your eyes tested.",
+      "You should get your eyes checked.",
+      "You should have your eyes checked."
+     ],
+     "why": "should 後面用原形動詞 get／have；眼睛是給人檢查的，用 tested 或 checked。",
+     "newWords": []
+    },
+    {
+     "id": "t9-r3",
+     "zh": "她每半年去洗一次牙。",
+     "grammar": [
+      "have something done",
+      "現在式"
+     ],
+     "hints": [
+      "主詞 she，習慣用現在式 has；「每半年」= every six months。",
+      "She has her teeth cleaned every six months."
+     ],
+     "reference": [
+      "She has her teeth cleaned every six months.",
+      "She gets her teeth cleaned every six months.",
+      "Every six months, she has her teeth cleaned.",
+      "She has her teeth cleaned twice a year."
+     ],
+     "why": "習慣用現在式，主詞 she 用 has 或 gets；牙齒是牙醫幫你洗的，用 cleaned。",
+     "newWords": []
+    }
+   ],
+   "speak": {
+    "situation": "健康檢查完，朋友問你今天在醫院做了哪些檢查。",
+    "conditions": [
+     "用 had + 東西 + 過去分詞說至少兩項檢查",
+     "說一個醫護人員給你的建議（She told me to …）"
+    ],
+    "followUps": [
+     "Did it hurt?",
+     "When will you get the results?"
+    ],
+    "sample": "Today I had my blood taken and my eyes tested. I also had an X-ray taken. The nurse told me to drink more water."
+   }
+  }
  }
 ]
