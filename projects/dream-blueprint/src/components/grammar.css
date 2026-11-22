@@ -1,0 +1,56 @@
+/* Grammar teaching and its small drills: inside a lesson's rule box and in the practice library. */
+.gm { display: grid; gap: .7rem; }
+.gm > strong { font-size: 1.05rem; }
+.gm-lead { color: var(--practice-secondary); font-size: .85rem; }
+.gm-rule { margin: 0; line-height: 1.7; }
+.gm-explain { display: grid; gap: .9rem; margin-top: .3rem; }
+.gm-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; }
+.gm-steps > li { display: grid; gap: .35rem; }
+.gm-steps h4, .gm-mistakes h4 { margin: 0; font-size: 1rem; line-height: 1.5; display: flex; gap: .5rem; align-items: baseline; }
+.gm-steps h4 i { flex: none; display: inline-grid; place-items: center; width: 1.45em; height: 1.45em; border-radius: 50%; font-style: normal; font-size: .8rem; font-weight: 700;
+  color: var(--practice-accent); border: 1px solid var(--practice-accent); }
+.gm-steps p { margin: 0; line-height: 1.7; }
+.gm-ex { list-style: none; margin: .1rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.gm-ex li { display: flex; gap: .5rem; align-items: flex-start; padding: .45rem .6rem; border-radius: 10px; background: color-mix(in srgb, var(--practice-accent-wash) 55%, transparent); }
+.gm-ex span { display: grid; gap: 1px; min-width: 0; }
+.gm-ex b { font-weight: 600; font-size: 1.02rem; line-height: 1.5; overflow-wrap: anywhere; }
+.gm-ex small, .gm-mistakes small { color: var(--practice-secondary); font-size: .86rem; line-height: 1.5; }
+.practice-page button.gm-say { flex: none; min-height: 30px; width: 30px; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; margin-top: 1px; }
+.gm-table { margin: 0; display: grid; gap: .35rem; }
+.gm-table figcaption { font-weight: 650; font-size: .95rem; }
+.gm-table-scroll { overflow-x: auto; border: 1px solid var(--practice-line); border-radius: 10px; }
+.gm-table table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.gm-table th, .gm-table td { padding: .45rem .6rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--practice-line); line-height: 1.5; }
+.gm-table thead th { font-size: .8rem; color: var(--practice-secondary); font-weight: 600; white-space: nowrap; }
+.gm-table tbody th { font-weight: 650; min-width: 3.6em; }
+.gm-table tbody tr:last-child th, .gm-table tbody tr:last-child td { border-bottom: 0; }
+.gm-mistakes { display: grid; gap: .5rem; }
+.gm-mistakes p { margin: 0; display: grid; gap: 2px; padding: .5rem .65rem; border-radius: 10px; border: 1px dashed var(--practice-line); }
+.gm-bad { color: var(--practice-miss); text-decoration: line-through; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+.gm-good { color: var(--practice-accent); font-weight: 600; overflow-wrap: anywhere; }
+
+.gm-drills { display: grid; gap: .6rem; margin-top: .3rem; padding-top: .8rem; border-top: 1px dashed var(--practice-line); }
+.gm-drills-head { display: flex; flex-wrap: wrap; gap: .2rem .8rem; align-items: baseline; justify-content: space-between; }
+.gm-drills-head small { color: var(--practice-secondary); font-size: .82rem; font-variant-numeric: tabular-nums; }
+.gm-drills-done p { margin: .2rem 0 0; color: var(--practice-secondary); }
+.gm-drill { display: grid; gap: .55rem; }
+.gm-ask { margin: 0; font-size: .88rem; color: var(--practice-secondary); }
+.gm-q { margin: 0; font-size: 1.12rem; line-height: 1.6; font-weight: 600; overflow-wrap: anywhere; }
+.gm-q.gm-wrong { text-decoration: underline wavy var(--practice-miss); text-underline-offset: .3em; text-decoration-thickness: 1px; }
+.pr-pane .pr-options.gm-options { grid-template-columns: 1fr; gap: .45rem; }
+.pr-pane .pr-options.gm-options button { text-align: left; }
+.pr-pane .pr-options.gm-options button.gm-right { border-color: var(--practice-accent); box-shadow: inset 0 0 0 2px var(--practice-accent); background: var(--practice-accent-wash); color: var(--practice-ink); opacity: 1; }
+.pr-pane .pr-options.gm-options button.gm-right::before { content: "✓ "; color: var(--practice-accent); }
+.pr-pane .pr-options.gm-options button.gm-miss { border-color: var(--practice-miss); box-shadow: inset 0 0 0 1px var(--practice-miss); color: var(--practice-miss); opacity: 1; }
+.pr-pane .pr-options.gm-options button.gm-miss::before { content: "✗ "; }
+.gm-type { display: grid; gap: .5rem; }
+.gm-type .pr-field { margin: 0; }
+.gm-type input { width: 100%; }
+.gm-type .pr-main, .gm-next { justify-self: start; }
+.gm-feedback { display: grid; gap: .25rem; padding: .65rem .8rem; border-radius: 12px; background: var(--practice-inset); border: 1px solid var(--practice-line); border-inline-start: 3px solid var(--practice-miss); }
+.gm-feedback[data-ok="true"] { border-inline-start-color: var(--practice-accent); }
+.gm-feedback p { margin: 0; font-size: 1.05rem; font-weight: 600; line-height: 1.55; overflow-wrap: anywhere; }
+.gm-feedback small { color: var(--practice-secondary); font-size: .88rem; line-height: 1.55; }
+.gm-book h3 { margin: .2rem 0 0; }
+.gm-pick { display: grid; gap: .3rem; font-size: .88rem; color: var(--practice-secondary); }
+.gm-pick select { width: 100%; max-width: 100%; }

@@ -11,6 +11,7 @@ import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
 import { dailyTarget, doneKey } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
+import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
 import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
 import './today-plan.css'
 
@@ -44,7 +45,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const topicDone = topicDoneToday(state.notes, today)
   const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog)
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
-  const readToday = savedToday(state.notes, 'read.', today)
+  // A reading record saved today, or graded passages read today (logged as a reading day).
+  const readToday = practisedOn(state.notes, state.sessions, 'read', today)
   const wroteToday = savedToday(state.notes, 'write.', today)
   const listenedToday = practisedOn(state.notes, state.sessions, 'listen', today)
   const spokeToday = practisedOn(state.notes, state.sessions, 'speak', today)
@@ -59,6 +61,11 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const held = pack ? readHeld(state.notes, pack) : {}
   const testDay = !!pack && heldOpen(state.curriculum, pack) && !(held.reading && held.listening)
   const where = (tab: string, other: string) => pack ? 'library/unit/' + tab : other
+  // Reading: the passages with comprehension questions first; once the A1–B1 ones are done, the graded passages.
+  const questionsLeft = plainReadCount(state.notes) < QUESTION_PASSAGES
+  const readHash = questionsLeft ? 'library/reading' : 'library/story/read'
+  const readDetail = questionsLeft ? '一篇閱讀理解（有題目）；還有時間再讀一段短文' : '短文閱讀一兩段，不會的字點一下看意思'
+  const listenHash = 'library/story/listen'
   // The certificate to prepare for: the step after the level already shown on a certificate.
   const level = officialLevel(state.notes)
   const nextStep = steps.find(s => s.from === level)
@@ -90,22 +97,22 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         go: to('library/unit/test'), goLabel: '回測' }
       : { id: 'input', title: '聽或讀', auto: readToday || listenedToday,
         detail: '這週聽 ' + week.listen + ' 天、讀 ' + week.read + ' 天 → 今天先' + (listenFirst
-          ? '聽：' + (pack ? '單元 ' + pack + ' 的聽力，先不看字' : '句子跟讀，聽一句、跟著念，再自己說一次')
-          : '讀：' + (pack ? '單元 ' + pack + ' 的閱讀' : '一篇閱讀理解')),
-        go: to(listenFirst ? where('listen', 'library/listen') : where('read', 'library/reading')), goLabel: listenFirst ? '聽' : '讀',
-        go2: to(listenFirst ? where('read', 'library/reading') : where('listen', 'library/listen')), go2Label: listenFirst ? '讀' : '聽' },
+          ? '聽：' + (pack ? '單元 ' + pack + ' 的聽力，先不看字' : '短文聽力，先不看字聽一段，再看著字跟著念')
+          : '讀：' + (pack ? '單元 ' + pack + ' 的閱讀' : readDetail)),
+        go: to(listenFirst ? where('listen', listenHash) : where('read', readHash)), goLabel: listenFirst ? '聽' : '讀',
+        go2: to(listenFirst ? where('read', readHash) : where('listen', listenHash)), go2Label: listenFirst ? '讀' : '聽' },
     output: { id: 'output', title: '說或寫', auto: wroteToday || spokeToday,
       detail: '這週說 ' + week.speak + ' 天、寫 ' + week.write + ' 天 → 今天先' + (speakFirst
         ? '說：' + (pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務' : '跟 Emma 聊 10 分鐘')
         : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : '寫作階梯一題')),
       go: to(speakFirst ? where('speak', 'speaking') : where('write', 'library/writing')), goLabel: speakFirst ? '說' : '寫',
       go2: to(speakFirst ? where('write', 'library/writing') : where('speak', 'speaking')), go2Label: speakFirst ? '寫' : '說' },
-    // The 7000-word passages are a translation exercise with no audio, so listening points at sentence shadowing.
-    listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '句子跟讀：聽一句、跟著念，再自己說一次', auto: listenedToday,
-      go: to(where('listen', 'library/listen')), goLabel: pack ? '聽力' : '跟讀', ...(pack ? { go2: to('library/listen'), go2Label: '跟讀' } : {}) },
+    // Listening is the graded passages (whole passage first, then line by line, then dictation); sentence shadowing stays one tap away.
+    listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '短文聽力：先不看字聽一段，再看著字跟著念；還有時間就做一段聽寫', auto: listenedToday,
+      go: to(where('listen', listenHash)), goLabel: pack ? '聽力' : '短文', go2: to('library/listen'), go2Label: '跟讀' },
     read: testDay ? { id: 'read', title: '單元回測', detail: '單元 ' + pack + ' 最後一天：沒看過的閱讀和聽力，各只有一次機會', auto: !!(held.reading && held.listening), go: to('library/unit/test'), goLabel: '回測' }
-      : { id: 'read', title: '閱讀理解', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '一到兩篇；錯的題目選「卡在哪」', auto: readToday,
-        go: to(where('read', 'library/reading')), goLabel: '閱讀', ...(pack ? { go2: to('library/reading'), go2Label: '其他文章' } : {}) },
+      : { id: 'read', title: '閱讀', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '閱讀理解一到兩篇（錯的題目選「卡在哪」），再讀幾段短文', auto: readToday,
+        go: to(where('read', 'library/reading')), goLabel: pack ? '閱讀' : '閱讀理解', go2: to(pack ? 'library/reading' : 'library/story/read'), go2Label: pack ? '其他文章' : '短文' },
     write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : '寫作階梯一題，批改完改一版', auto: wroteToday,
       go: to(where('write', 'library/writing')), goLabel: '寫作' },
     speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,
@@ -114,7 +121,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       detail: !exam ? '照下一張證照的題型練一回' : cert?.state === 'waiting' && cert.next ? exam.name + ' ' + cert.next.date.slice(5).replace('-', '/') + ' 考，考前聽讀、說寫的題型各練一回'
         : '下一張：' + exam.name + '。照它的題型練一回' + (exam.link ? '（官網有練習題）' : ''),
       ...(exam?.link ? { go2: () => { window.open(exam.link, '_blank', 'noopener') }, go2Label: '官網' } : {}) },
-    extra: { id: 'extra', title: '加練', detail: '再一篇閱讀、多寫一題，或再跟 Emma 聊', auto: false, go: to('library/reading'), goLabel: '閱讀', go2: to('speaking'), go2Label: 'Emma' },
+    extra: { id: 'extra', title: '加練', detail: '再讀幾段短文、多寫一題，或再跟 Emma 聊', auto: false, go: to('library/story/read'), goLabel: '短文', go2: to('speaking'), go2Label: 'Emma' },
   }
   let tasks: Task[]
   if (mode === 'nursing') {

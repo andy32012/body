@@ -23,6 +23,11 @@ export const readCauses = ['單字不認得', '句子看不懂', '找不到答�
 export interface ReadAttempt { day: string; correct: number; total: number; zh?: boolean }
 export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean }
 export const readKey = (id: string) => 'read.' + id
+/** The general passages below B2 that come with comprehension questions (A1, A2, B1 in reading.json; a test keeps this number true).
+ *  Today's list sends reading there until they have all been read, then to the graded passages. */
+export const QUESTION_PASSAGES = 14
+/** How many of those have been read: their ids start with the level (read.a1-…, read.a2-…, read.b1-…). */
+export const plainReadCount = (notes: Record<string, string>) => Object.keys(notes).filter(k => /^read\.(a1|a2|b1)-/.test(k)).length
 
 export function readRecord(notes: Record<string, string>, id: string): ReadRecord | null {
   try { const v = notes[readKey(id)]; return v ? JSON.parse(v) as ReadRecord : null } catch { return null }

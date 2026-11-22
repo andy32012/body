@@ -58,6 +58,9 @@ function setView(view:View, detail?:Energy|PlanTab) {
 function nextAction(state:AppState) {
   const unresolved=state.school.requirements.find(r=>!r.done)
   if(unresolved) return {kind:'map',title:unresolved.label,detail:'到星圖第一站核對這項畢業條件，完成後就能勾選。',action:'查看學校清單'}
+  // Still studying: the first station is the next step, not the diploma tasks of station 2.
+  const school=state.school
+  if(school.acceptedCredits<school.requiredCredits) return {kind:'map',title:roadmap.stations[0].title,detail:'赴美路線第 1 站 · 已採計 '+school.acceptedCredits+'／'+school.requiredCredits+' 學分。英文檢定（第 5 站）可以同時準備。',action:'開啟路線地圖'}
   for (const station of roadmap.stations.slice(1)) {
     const item=station.tasks.find((_,i)=>!state.checks['roadmap.'+station.id+'.'+(i+1)])
     if(item) return {kind:'map',title:item,detail:'赴美路線第 '+station.id+' 站 · '+station.title,action:'開啟路線地圖'}

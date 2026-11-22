@@ -12,12 +12,12 @@ const label = (unit: number, day: number) => `單元 ${unit} 第 ${day} 天`
 export function originalPlan(day: string): string {
   const planned = initial.get(day)
   if (planned) return label(planned.unit, planned.lessonDay)
-  if (holidayBreak(day)) return '過年休息，想練時複習 2 分鐘'
+  if (holidayBreak(day)) return '過年休息，想練的話複習 15 分鐘（選做）'
   if (day >= initialBounds.from && day <= initialBounds.to) {
     if ((day <= '2026-11-19') || (day >= '2027-01-03' && day <= '2027-01-16')) {
-      return '考週，複習 2 分鐘或休息'
+      return '考週，複習 15 分鐘或休息（選做）'
     }
-    return '休息或複習 2 分鐘'
+    return '休息，想練的話複習 15 分鐘（選做）'
   }
   const month = day.slice(0,7)
   const segment = [...schedule.monthly, ...schedule.longRange].find(s => s.from <= month && month <= s.to)

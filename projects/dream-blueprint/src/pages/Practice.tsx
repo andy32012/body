@@ -58,6 +58,10 @@ import UseWord from "../components/UseWord";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
+import GrammarTeach, { GrammarBook } from "../components/GrammarTeach";
+import StoryLibrary from "../components/StoryLibrary";
+import { grammarFor } from "../lib/grammar";
+import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
 import { useTaskContext } from "../lib/taskContext";
 import {
@@ -859,7 +863,19 @@ function PracticeSession({
                 checkpoint={current.checkpoint}
                 saved={hintFor(item.id)}
                 onHint={saveHint(item.id)}
-                preparation={!current.review && current.rule && (current.day !== 1 ? (live ? (
+                preparation={!current.review && current.rule && grammarFor(current.unit) && (current.day === 1 || live) ? (
+                  <GrammarTeach
+                    key={current.unit + "." + current.day}
+                    unit={current.unit}
+                    day={current.day}
+                    title={current.title}
+                    rule={current.rule}
+                    notes={state.notes}
+                    date={date}
+                    rate={state.settings.speechRate}
+                    onSave={(apply) => update((prev) => ({ ...prev, notes: apply(prev.notes) }))}
+                  />
+                ) : !current.review && current.rule && (current.day !== 1 ? (live ? (
                   <details className="pr-tools pr-rule">
                     <summary>複習這課的規則：{current.title}</summary>
                     <p>{current.rule}</p>
@@ -1129,8 +1145,14 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords" | "grammar" | "story";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords", "grammar", "story"];
+  // #library/story/listen opens the graded passages on that tab.
+  const storyFromHash = (): StoryTab => {
+    const t = location.hash.startsWith("#library/story/") ? location.hash.split("/")[2] : "";
+    return t === "listen" || t === "dictate" ? t : "read";
+  };
+  const [storyTab, setStoryTab] = useState<StoryTab>(storyFromHash);
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
@@ -1145,6 +1167,7 @@ function Extras({
         setMode(fromHash());
         if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
         if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
+        if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
         document.querySelector(".pr-extras")?.scrollIntoView({ block: "start" });
       }
     };
@@ -1300,8 +1323,10 @@ function Extras({
         {(
           [
             ["words", "單字複習"],
+            ["grammar", "文法講解"],
             ["listen", "句子跟讀"],
             ["translate", "中翻英"],
+            ["story", "短文讀聽"],
             ["reading", "閱讀理解"],
             ["writing", "寫作階梯"],
             ["unit", "單元讀聽說寫"],
@@ -1322,6 +1347,8 @@ function Extras({
               key === "words" ||
               key === "translate" ||
               key === "passage" ||
+              key === "grammar" ||
+              key === "story" ||
               key === "reading" ||
               key === "nlisten" ||
               key === "nread" ||
@@ -1470,6 +1497,8 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
+      {mode === "grammar" && <GrammarBook state={state} onActivity={onActivity} date={date} />}
+      {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
