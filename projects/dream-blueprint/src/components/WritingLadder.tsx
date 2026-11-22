@@ -15,6 +15,7 @@ const outlines: Record<string, string[]> = {
   multi: ['第一段：開頭（打招呼／說出主題或立場）', '第二段：內容（理由、例子、經過）', '第三段：結尾（總結／請求／祝福）'],
   task1: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
   task2: ['Introduction：改寫題目＋你的立場', 'Body 1：第一個論點＋解釋＋例子', 'Body 2：第二個論點（或另一方看法）＋解釋＋例子', 'Conclusion：重申立場，不加新論點'],
+  bridge: ['第一句：說出這一段要講什麼', '中間三到五句：照題目用這一課的句型寫，用時間、因果、轉折的字接起來（First / Then / because / so / However）', '最後一句：收尾（結果、感想或建議）'],
 }
 function system(stage: WriteStage, task: WriteTask, prompt: string) {
   const ielts = !!stage.ielts
@@ -23,6 +24,7 @@ function system(stage: WriteStage, task: WriteTask, prompt: string) {
     '你是英文寫作老師，批改台灣護理系學生（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
     ...(kind ? ['這題是「' + essays[kind].name + '」題，照這種題目該有的結構評：' + essays[kind].outline.join('；')] : []),
+    ...(task.focus ? ['這一課的文法重點：' + task.focus + '。第一項看他有沒有照題目用到這些句型、用得對不對；沒用到就照實給低分並說明要怎麼加。'] : []),
     '這一階的評分項目（name 一定要照這些名稱、照這個順序）：' + criteriaFor(stage, task).join('；'),
     ielts ? '每個項目給雅思分數（1–9 的數字，可用 .5；初學者寫得很短、錯很多就如實給 1–3.5，不要為了鼓勵而墊高到 4），再給整體 band（四項平均，四捨五入到 .5）。分數要誠實，寧可保守；這只是練習估計，不是正式分數。字數不足要在 Task 項目扣分並說明。'
       : '這一階不是考試作文，不給雅思分數。每個項目給 1–5 的整數（5 = 完全做到），comment 要具體說出哪個字、哪個文法或哪句表達要改，以及怎麼改。',
@@ -32,12 +34,14 @@ function system(stage: WriteStage, task: WriteTask, prompt: string) {
 }
 
 /** 寫作階梯 with criteria feedback; IELTS tasks get a timer and a word target. */
-export default function WritingLadder({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
+export default function WritingLadder({ state, onActivity, date, initialTask }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }) {
   const suggested = suggestedStage(stages, state.notes)
-  const [stageId, setStageId] = useState(suggested)
+  // A task opened from a unit's pack (library/writing/<id>) starts on that task.
+  const opened = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask)) : undefined
+  const [stageId, setStageId] = useState(() => opened?.id ?? suggested)
   const stage = stages.find(s => s.id === stageId)!
   const firstOpen = stage.tasks.find(t => !taskDone(readWrite(state.notes, t.id), !!stage.ielts)) ?? stage.tasks[0]
-  const [taskId, setTaskId] = useState(firstOpen.id)
+  const [taskId, setTaskId] = useState(() => opened && initialTask ? initialTask : firstOpen.id)
   const task = stage.tasks.find(t => t.id === taskId) ?? firstOpen
   const draftKey = 'write.' + task.id
   const [text, setText] = useState(() => readDraft(draftKey))
@@ -97,7 +101,7 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
     </div>
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
     {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => <button key={t.id} type="button" aria-pressed={t.id === task.id} onClick={() => setTaskId(t.id)}>
-      題 {i + 1}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>)}</div>}
+      {stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>)}</div>}
     <section className="wl-task">
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>

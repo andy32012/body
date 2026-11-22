@@ -20,10 +20,28 @@ export function StepBar({ current, done }: { current: LessonStep; done: LessonSt
   </ol>
 }
 
+/** The device's English voices for an accent (en-GB, en-AU…), best first; empty when the device has none. */
+export function accentVoices(accent: string) {
+  if (!('speechSynthesis' in window)) return []
+  const want = accent.toLowerCase()
+  return speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase() === want)
+}
+/** Re-renders when the device's voice list arrives (it loads late on some browsers). */
+export function useVoiceList() {
+  const [, setN] = useState(0)
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return
+    const on = () => setN(n => n + 1)
+    speechSynthesis.addEventListener?.('voiceschanged', on)
+    return () => speechSynthesis.removeEventListener?.('voiceschanged', on)
+  }, [])
+}
+
 /** Reads lines aloud one after another; the second speaker gets a different voice (or pitch).
+ *  `accent` picks the device's voices for that accent when it has them (computer voices, not recordings), else any English voice.
  *  `completed` counts plays that reached the last line without being stopped or failing — pressing play is not listening.
  *  `status`: error = the voice could not play (treated as no audio, so nothing counts as "understood by ear"). */
-export function useDialogueVoice(rate: number) {
+export function useDialogueVoice(rate: number, accent = 'en-US') {
   const [playing, setPlaying] = useState<number | null>(null)
   const [completed, setCompleted] = useState(0)
   const [status, setStatus] = useState<'idle' | 'playing' | 'done' | 'stopped' | 'error'>('idle')
@@ -39,7 +57,9 @@ export function useDialogueVoice(rate: number) {
     const id = run.current
     const full = start === 0 && !only
     const speakers = [...new Set(lines.map(l => l.who))]
-    const voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'))
+    const english = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'))
+    const matching = accentVoices(accent)
+    const voices = matching.length ? matching : english
     const say = (i: number) => {
       if (id !== run.current) return
       if (i >= lines.length || (only && i > start)) {
@@ -49,9 +69,9 @@ export function useDialogueVoice(rate: number) {
       }
       const u = new SpeechSynthesisUtterance(lines[i].en)
       const who = speakers.indexOf(lines[i].who)
-      u.lang = 'en-US'
+      u.lang = matching.length ? accent : 'en-US'
       u.rate = Math.max(0.5, Math.min(1.4, rate))
-      if (voices.length > 1) u.voice = voices[who % 2 === 0 ? 0 : Math.min(voices.length - 1, 1)]
+      if (voices.length > 1 || matching.length) u.voice = voices[who % 2 === 0 ? 0 : Math.min(voices.length - 1, 1)]
       u.pitch = who % 2 === 0 ? 1 : 1.25
       u.onend = () => say(i + 1)
       u.onerror = e => {

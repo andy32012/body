@@ -142,11 +142,12 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
             item.kind = 'lesson'
             item.topic = { n: topic.t.n, part: topic.part }
             item.label = '生活主題 ' + topic.t.n + '：' + topic.t.title + ' · 第 ' + ('ABC'.indexOf(topic.part) + 1) + ' 次（' + partLabel[topic.part] + '）'
-          } else if (cursor < limit && input.lockedUnit && cursor % schedule.daysPerUnit === 0 && Math.floor(cursor / schedule.daysPerUnit) + 1 === input.lockedUnit) {
+          } else if (cursor < limit && input.lockedUnit && Math.floor(cursor / schedule.daysPerUnit) + 1 >= input.lockedUnit) {
+            // Also mid-unit: a result that fails after the unit has begun turns the lessons into review (DBP-010).
             // The next level's lessons open once the certificate before it is booked.
             const before = steps[steps.indexOf(stepOfUnit(input.lockedUnit)) - 1]
             item.kind = 'review'
-            item.label = '升級關卡：報名' + exams[before.exams[0]].name + '，填上考試日期就接著上單元 ' + input.lockedUnit
+            item.label = '升級關卡：報名' + exams[before.exams[0]].name + '，填上考試日期就接著上單元 ' + (Math.floor(cursor / schedule.daysPerUnit) + 1)
           } else if (cursor < limit) {
             topicTurn = true
             item.kind = 'lesson'

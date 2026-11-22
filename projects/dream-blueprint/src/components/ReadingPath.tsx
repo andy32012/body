@@ -18,20 +18,22 @@ function Highlight({ text, marks }: { text: string; marks: string[] }) {
   return <>{text.slice(0, i)}<mark>{m}</mark><Highlight text={text.slice(i + m.length)} marks={hits.slice(1)} /></>
 }
 
-/** 閱讀理解：A1 → B2 (IELTS question types). Answer one question at a time; a wrong answer asks why. */
-export default function ReadingPath({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
+/** 閱讀理解：A1 → B2 (IELTS question types). Answer one question at a time; a wrong answer asks why.
+ *  `only`: just these passages (a unit's pack), without the level picker. Held-out test passages are never listed here. */
+export default function ReadingPath({ state, onActivity, date, only }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; only?: readonly string[] }) {
   const [all, setAll] = useState<ReadPassage[] | null>(null)
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     let alive = true
-    import('../data/reading.json').then(f => { if (alive) setAll(f.default as ReadPassage[]) }).catch(() => { if (alive) setFailed(true) })
+    import('../data/reading.json').then(f => { if (alive) setAll((f.default as ReadPassage[]).filter(p => only ? only.includes(p.id) : !p.held)) }).catch(() => { if (alive) setFailed(true) })
     return () => { alive = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const suggested = all ? suggestedLevel(all, state.notes) : 'A1'
   // The level and the passage only change when he moves on (or picks a level): a new score changing the suggestion
   // must not swap the passage while its feedback is still on screen.
   const [level, setLevel] = useState<ReadLevel | null>(null)
-  const [manual, setManual] = useState(false)
+  const [manual, setManual] = useState(!!only)
   const lvl = level ?? suggested
   const [skip, setSkip] = useState<string[]>([])
   const [currentId, setCurrentId] = useState<string | null | undefined>(undefined)
@@ -74,7 +76,7 @@ export default function ReadingPath({ state, onActivity, date }: Pick<PageProps,
 
   if (failed) return <p>閱讀教材載入失敗，重新整理再試一次。</p>
   if (!all) return <p>載入中……</p>
-  const levelButtons = <div className="pr-options rd-levels" role="group" aria-label="閱讀程度">
+  const levelButtons = only ? null : <div className="pr-options rd-levels" role="group" aria-label="閱讀程度">
     {readLevels.map(l => {
       const here = all.filter(p => p.level === l.id)
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length
@@ -87,10 +89,10 @@ export default function ReadingPath({ state, onActivity, date }: Pick<PageProps,
     return <div className="pr-stack rd">
       {levelButtons}
       <div className="pr-hint">
-        <strong>{currentId === undefined ? '準備文章中……' : readLevels.find(l => l.id === lvl)!.name + '這一輪的文章都看過或略過了'}</strong>
+        <strong>{currentId === undefined ? '準備文章中……' : only ? '這個單元的文章都看過或略過了' : readLevels.find(l => l.id === lvl)!.name + '這一輪的文章都看過或略過了'}</strong>
         {currentId !== undefined && <div className="pr-actions">
-          <button type="button" className="pr-main" onClick={() => chooseLevel(lvl)}>這一級從頭再來</button>
-          {nextLevel && <button type="button" className="pr-link" onClick={() => chooseLevel(nextLevel.id)}>換到 {nextLevel.name}</button>}
+          <button type="button" className="pr-main" onClick={() => chooseLevel(lvl)}>{only ? '從第一篇再來' : '這一級從頭再來'}</button>
+          {nextLevel && !only && <button type="button" className="pr-link" onClick={() => chooseLevel(nextLevel.id)}>換到 {nextLevel.name}</button>}
         </div>}
       </div>
     </div>
@@ -127,8 +129,8 @@ export default function ReadingPath({ state, onActivity, date }: Pick<PageProps,
     {levelButtons}
     {moved && <p className="rd-moved" role="status">前面這一級已經有三篇過關，升到 {readLevels.find(l => l.id === moved)!.name}。想留在原本那一級，按上面的程度就好。</p>}
     <p className="qz-meta">
-      <span>{readLevels.find(l => l.id === lvl)!.note}</span>
-      <span>讀過 {summary.done} / {summary.total} 篇</span>
+      {!only && <span>{readLevels.find(l => l.id === lvl)!.note}</span>}
+      <span>{only ? '這個單元' : ''}讀過 {summary.done} / {summary.total} 篇</span>
       {summary.weakest && <span>最弱題型：{typeNames[summary.weakest]}</span>}
       {summary.topCause && <span>最常卡在：{summary.topCause}</span>}
     </p>

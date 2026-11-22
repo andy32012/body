@@ -13,17 +13,19 @@ import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCa
 import cueCards from '../data/cue-cards.json'
 import { markLessonStep, readLessonRecord } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
+import { emmaLevel } from '../lib/cefr'
+import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
 import { PairPaste } from '../components/PairDevice'
 import './speaking.css'
 
 const NAME = 'Emma'
 
-function instructions(memory: string[], lesson = '') {
+function instructions(memory: string[], lesson = '', level = emmaLevel(1)) {
   return [
     `You are ${NAME}, a cute, cheerful 20-year-old American girl. You are a nursing student at Harvard, and you are a close friend of 玄燁 (call him by name or "hey you"). You two chat like good friends.`,
-    'He is a nursing student in Taiwan. His English is around junior-high level and he wants to get better for IELTS and to work as a nurse in the US someday.',
+    'He is a nursing student in Taiwan. ' + level.about + ' He wants to get better for IELTS and to work as a nurse in the US someday.',
     'This is casual everyday chat: your day, his day, classes, food, movies, weekend plans, nursing school life, little jokes. Be warm, playful and curious, use natural American expressions, laugh a little, react with feeling.',
-    'Speak simple, clear English (A2–B1) a bit slowly. Keep your turns short, usually one or two sentences, and end with an easy question so he talks more.',
+    level.speak,
     'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
     'If he gets stuck or uses Chinese, help with one short Traditional-Mandarin hint, then encourage him back into English.',
     'Start by greeting him like a friend you are happy to see.',
@@ -33,8 +35,9 @@ function instructions(memory: string[], lesson = '') {
 }
 
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
+const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
 
-export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string }) {
+export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string }) {
   const memory = useMemory()
   const [today] = useState(dayKey)
   const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
@@ -44,12 +47,25 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     const t = id ? topicById(id) : undefined
     return t && ['A', 'B', 'C'].includes(part) ? { topic: t, part: part as TopicPart } : null
   })
+  // "43-0": the first speaking task of bridge unit 43's pack.
+  const [packRef] = useState(() => { const m = (packMode ?? '').match(/^(\d+)-(\d+)$/); return m ? { unit: Number(m[1]), i: Number(m[2]) } : null })
+  const [pack, setPack] = useState<Pack | null>(null)
+  useEffect(() => {
+    if (!packRef) return
+    let alive = true
+    import('../data/bridge.json').then(f => { const p = (f.default as Pack[]).find(x => x.unit === packRef.unit); if (alive && p?.speak[packRef.i]) setPack(p) }).catch(() => {})
+    return () => { alive = false }
+  }, [packRef])
+  const packTask = pack && packRef ? pack.speak[packRef.i] : null
   const [task, setTask] = useState<string>()
   const [cardSkip, setCardSkip] = useState<string[]>([])
   const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
   const [prepEnd, setPrepEnd] = useState<number>()
   const [prepNotes, setPrepNotes] = useState('')
   const [liveAt, setLiveAt] = useState<number>()
+  // Part 2 timing counts from his first words, not from the connection; youMs adds up the time his voice is heard.
+  const [youFrom, setYouFrom] = useState<number>()
+  const [youMs, setYouMs] = useState(0)
   const [tick, setTick] = useState(Date.now())
   useEffect(() => { if (!prepEnd && !liveAt) return; const t = setInterval(() => setTick(Date.now()), 500); return () => clearInterval(t) }, [prepEnd, liveAt])
   useEffect(() => {
@@ -85,7 +101,9 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (status !== 'live') { setWho(''); return }
     const t = setInterval(() => {
       const { her, you } = levels.current
-      setWho(her > 0.06 ? 'her' : you > 0.08 ? 'you' : '')
+      const now = her > 0.06 ? 'her' : you > 0.08 ? 'you' : ''
+      setWho(now)
+      if (now === 'you') { setYouMs(ms => ms + 220); setYouFrom(at => at ?? Date.now()) }
     }, 220)
     return () => clearInterval(t)
   }, [status])
@@ -93,10 +111,11 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
 
   async function start() {
     if (!openaiKey()) { setSettings(true); return }
-    setError(''); setLines([]); setNotes(''); setFixes([])
+    if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
+    setError(''); setLines([]); setNotes(''); setFixes([]); setYouMs(0); setYouFrom(undefined)
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : ''),
+        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : '', emmaLevel(state.curriculum.unit)),
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
@@ -121,6 +140,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     const userWords = userLines.map(l => l.text).join(' ').split(/\s+/).filter(Boolean).length
     const spoke = userLines.length >= 2 || userWords >= 15
     if (!spoke) return
+    // Speaking counts toward the week's balance of skills, whatever the mode.
+    update(prev => ({ ...prev, notes: logSkill(packRef && packTask ? { ...prev.notes, [speakKey(packRef.unit, packRef.i)]: today } : prev.notes, 'speak', today) }))
     // The attempt is kept whether or not Claude is connected to give feedback.
     if (card) update(prev => ({ ...prev, notes: { ...prev.notes, [cueKey(card.id)]: today } }))
     if (lesson) update(prev => {
@@ -177,6 +198,13 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         <a href="#speaking">改回一般聊天</a>
       </div>}
 
+      {packRef && <div className="sp-lesson">
+        <small>單元 {packRef.unit} · 口說任務 {packRef.i + 1}{pack ? ' · ' + unitTitle(packRef.unit).split(/[：（]/)[0] : ''}</small>
+        <strong>{packTask ? packTask.title : '載入中……'}</strong>
+        {packTask && <span>{packTask.zh}</span>}
+        <a href={'#library/unit/speak/' + packRef.unit}>回到單元讀聽說寫</a>
+      </div>}
+
       {topic && <div className="sp-lesson">
         <small>生活主題 {topic.topic.n} · {topic.topic.title}</small>
         <strong>{(topic.part === 'C' ? topic.topic.review.speak : topic.topic.speak).situation}</strong>
@@ -200,10 +228,10 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
           </label>}
           <button type="button" className="sp-link" onClick={() => { setCardSkip(s => [...s, card.id]); setPrepEnd(undefined); setPrepNotes('') }}>換一張題目卡</button>
         </>}
-        {status === 'live' && liveAt && <p className="sp-timer">已經說了 {Math.floor((tick - liveAt) / 60000)}:{String(Math.floor((tick - liveAt) / 1000) % 60).padStart(2, '0')}（Part 2 目標 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
+        {status === 'live' && liveAt && <p className="sp-timer">{youFrom ? '從你開口算起 ' + clock(tick - youFrom) + ' · 實際出聲 ' + clock(youMs) : '等你開口才開始計時'} · 通話 {clock(tick - liveAt)}（Part 2 目標從開口算 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
-      {!card && !lesson && !topic && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
+      {!card && !lesson && !topic && !packRef && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
 
       {settings && <div className="sp-settings">
         <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>

@@ -12,8 +12,9 @@
 .rd-q { display: grid; gap: .5rem; }
 .rd-q h4 { margin: 0; font-size: 1.05rem; line-height: 1.5; }
 .rd-qmeta { margin: 0; font-size: .8rem; opacity: .75; }
-.rd-options { display: grid; grid-template-columns: 1fr; }
-.rd-options button { text-align: left; }
+/* Answer choices are sentences: one per row. (Specific enough to beat .pr-pane .pr-options, which loads later.) */
+.pr-pane .pr-options.rd-options { display: grid; grid-template-columns: 1fr; }
+.pr-pane .pr-options.rd-options button { text-align: left; }
 .rd-review { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: .2rem; font-size: .9rem; }
 .rd-review li[data-ok="false"] { color: var(--practice-miss, #b4483c); }
 .rd-words { margin: 0; font-size: .85rem; line-height: 2; }

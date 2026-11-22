@@ -10,6 +10,7 @@ import type { Focus } from '../lib/nextFocus'
 import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
 import { dailyTarget, doneKey } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
+import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
 import './today-plan.css'
 
 const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
@@ -38,6 +39,19 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
   const readToday = savedToday(state.notes, 'read.', today)
   const wroteToday = savedToday(state.notes, 'write.', today)
+  const listenedToday = practisedOn(state.notes, state.sessions, 'listen', today)
+  const spokeToday = practisedOn(state.notes, state.sessions, 'speak', today)
+  // Four skills over the week: the "listen or read" and "speak or write" slots point at whichever was done on fewer days;
+  // on a tie, listening and speaking go first (they are the harder ones to fit in, and VisaScreen asks for speaking 7).
+  const week = weekCounts(state.notes, state.sessions, today)
+  const listenFirst = week.listen <= week.read
+  const speakFirst = week.speak <= week.write
+  // A bridge unit's skills pack, when the current unit has one; on its last day, the held-out test comes first.
+  const unit = state.curriculum.unit
+  const pack = hasPack(unit) ? unit : null
+  const held = pack ? readHeld(state.notes, pack) : {}
+  const testDay = !!pack && heldOpen(state.curriculum, pack) && !(held.reading && held.listening)
+  const where = (tab: string, other: string) => pack ? 'library/unit/' + tab : other
   // The certificate to prepare for: the step after the level already shown on a certificate.
   const level = officialLevel(state.notes)
   const nextStep = steps.find(s => s.from === level)
@@ -56,16 +70,29 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: false, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
     words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 15–20）' : '') : '複習卡比較多，今天先不加新字',
       auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
-    input: { id: 'input', title: '聽或讀', detail: '一篇閱讀理解；或 7000 單短文挑一段，聽一次再跟著念', auto: readToday,
-      go: to('library/reading'), goLabel: '閱讀', go2: to('library/passage'), go2Label: '短文' },
-    output: { id: 'output', title: '說或寫', detail: '跟 Emma 聊 10 分鐘，或寫一題寫作階梯', auto: wroteToday,
-      go: to('speaking'), goLabel: 'Emma', go2: to('library/writing'), go2Label: '寫作' },
-    listen: { id: 'listen', title: '聽力跟讀', detail: '句子跟讀，或 7000 單短文聽一段再跟著念', auto: false,
-      go: to('library/listen'), goLabel: '跟讀', go2: to('library/passage'), go2Label: '短文' },
-    read: { id: 'read', title: '閱讀理解', detail: '一到兩篇；錯的題目選「卡在哪」', auto: readToday, go: to('library/reading'), goLabel: '閱讀' },
-    write: { id: 'write', title: '寫作', detail: '寫作階梯一題，批改完改一版', auto: wroteToday, go: to('library/writing'), goLabel: '寫作' },
-    speak: { id: 'speak', title: '口說', detail: '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: false,
-      go: to('speaking'), goLabel: 'Emma', go2: to('speaking/ielts'), go2Label: 'Part 2' },
+    input: testDay ? { id: 'input', title: '聽或讀：單元回測', detail: '單元 ' + pack + ' 最後一天：一篇沒看過的閱讀＋一段沒聽過的聽力，各只有一次機會', auto: !!(held.reading && held.listening),
+        go: to('library/unit/test'), goLabel: '回測' }
+      : { id: 'input', title: '聽或讀', auto: readToday || listenedToday,
+        detail: '這週聽 ' + week.listen + ' 天、讀 ' + week.read + ' 天 → 今天先' + (listenFirst
+          ? '聽：' + (pack ? '單元 ' + pack + ' 的聽力，先不看字' : '句子跟讀，或 7000 單短文聽一段再跟著念')
+          : '讀：' + (pack ? '單元 ' + pack + ' 的閱讀' : '一篇閱讀理解')),
+        go: to(listenFirst ? where('listen', 'library/listen') : where('read', 'library/reading')), goLabel: listenFirst ? '聽' : '讀',
+        go2: to(listenFirst ? where('read', 'library/reading') : where('listen', 'library/listen')), go2Label: listenFirst ? '讀' : '聽' },
+    output: { id: 'output', title: '說或寫', auto: wroteToday || spokeToday,
+      detail: '這週說 ' + week.speak + ' 天、寫 ' + week.write + ' 天 → 今天先' + (speakFirst
+        ? '說：' + (pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務' : '跟 Emma 聊 10 分鐘')
+        : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : '寫作階梯一題')),
+      go: to(speakFirst ? where('speak', 'speaking') : where('write', 'library/writing')), goLabel: speakFirst ? '說' : '寫',
+      go2: to(speakFirst ? where('write', 'library/writing') : where('speak', 'speaking')), go2Label: speakFirst ? '寫' : '說' },
+    listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '句子跟讀，或 7000 單短文聽一段再跟著念', auto: listenedToday,
+      go: to(where('listen', 'library/listen')), goLabel: pack ? '聽力' : '跟讀', go2: to('library/passage'), go2Label: '短文' },
+    read: testDay ? { id: 'read', title: '單元回測', detail: '單元 ' + pack + ' 最後一天：沒看過的閱讀和聽力，各只有一次機會', auto: !!(held.reading && held.listening), go: to('library/unit/test'), goLabel: '回測' }
+      : { id: 'read', title: '閱讀理解', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '一到兩篇；錯的題目選「卡在哪」', auto: readToday,
+        go: to(where('read', 'library/reading')), goLabel: '閱讀', ...(pack ? { go2: to('library/reading'), go2Label: '其他文章' } : {}) },
+    write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : '寫作階梯一題，批改完改一版', auto: wroteToday,
+      go: to(where('write', 'library/writing')), goLabel: '寫作' },
+    speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,
+      go: to(where('speak', 'speaking')), goLabel: 'Emma', go2: to('speaking/ielts'), go2Label: 'Part 2' },
     cert: { id: 'cert', title: '證照準備', auto: false, go: to('plan/levels'), goLabel: '關卡',
       detail: !exam ? '照下一張證照的題型練一回' : cert?.state === 'waiting' && cert.next ? exam.name + ' ' + cert.next.date.slice(5).replace('-', '/') + ' 考，考前聽讀、說寫的題型各練一回'
         : '下一張：' + exam.name + '。照它的題型練一回' + (exam.link ? '（官網有練習題）' : ''),

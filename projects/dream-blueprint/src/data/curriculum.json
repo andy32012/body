@@ -326,6 +326,48 @@
       "title": "常見搭配和片語動詞",
       "example": "take a history, pass out, come down with",
       "available": true
+    },
+    {
+      "unit": 43,
+      "stage": "BR",
+      "title": "敘事時態：過去式、過去進行式、過去完成式、used to",
+      "example": "When I got there, she had already left. / I used to live in Tainan.",
+      "available": true
+    },
+    {
+      "unit": 44,
+      "stage": "BR",
+      "title": "未來安排、未來進行式和未來完成式",
+      "example": "I'm meeting Dr. Lin tomorrow. / By June, I'll have finished.",
+      "available": true
+    },
+    {
+      "unit": 45,
+      "stage": "BR",
+      "title": "推測：must、might、can't（have done）",
+      "example": "He must be tired. / She can't have seen us.",
+      "available": true
+    },
+    {
+      "unit": 46,
+      "stage": "BR",
+      "title": "第三類假設：跟過去事實相反",
+      "example": "If I had left earlier, I wouldn't have been late.",
+      "available": true
+    },
+    {
+      "unit": 47,
+      "stage": "BR",
+      "title": "願望和遺憾：wish、if only、should have",
+      "example": "I wish I had more time. / I shouldn't have eaten so much.",
+      "available": true
+    },
+    {
+      "unit": 48,
+      "stage": "BR",
+      "title": "非限定關係子句（加逗號的補充說明）",
+      "example": "My sister, who is a nurse, lives in Taipei.",
+      "available": true
     }
   ],
   "units": [
@@ -34556,11 +34598,4704 @@
         }
       ],
       "cando": "用整組搭配和片語動詞（make an appointment、take off、look after）說得更自然"
+    },
+    {
+      "id": 43,
+      "unit": 43,
+      "stage": "BR",
+      "title": "敘事時態：過去式、過去進行式、過去完成式、used to",
+      "rule": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+      "examples": [
+        "When I got to the ward, the nurse had already taken his blood pressure.",
+        "I used to live in Tainan."
+      ],
+      "examplesZh": [
+        "我到病房的時候，護理師已經量過他的血壓了。",
+        "我以前住在台南。"
+      ],
+      "days": [
+        {
+          "id": "u43-d1",
+          "day": 1,
+          "zh": "我以前住在台南。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前住、現在不住了：想想表示「以前的習慣或狀態」的句型。",
+            "used to + 原形動詞：I used to live…"
+          ],
+          "reference": [
+            "I used to live in Tainan."
+          ],
+          "why": "used to + 原形：以前是這樣，現在已經不是了。不能寫成 used to lived。",
+          "newWords": [
+            {
+              "en": "hometown",
+              "zh": "故鄉、家鄉",
+              "example": "Tainan is my hometown.",
+              "exampleZh": "台南是我的家鄉。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "childhood",
+              "zh": "孩童時期",
+              "example": "I had a happy childhood.",
+              "exampleZh": "我有一個快樂的童年。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "hometown",
+              "zh": "故鄉、家鄉",
+              "example": "Tainan is my hometown.",
+              "exampleZh": "台南是我的家鄉。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "childhood",
+              "zh": "孩童時期",
+              "example": "I had a happy childhood.",
+              "exampleZh": "我有一個快樂的童年。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u43-d1",
+              "day": 1,
+              "zh": "我以前住在台南。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "以前住、現在不住了：想想表示「以前的習慣或狀態」的句型。",
+                "used to + 原形動詞：I used to live…"
+              ],
+              "reference": [
+                "I used to live in Tainan."
+              ],
+              "why": "used to + 原形：以前是這樣，現在已經不是了。不能寫成 used to lived。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I used to live in Tainan.",
+              "zh": "我以前住在台南。"
+            },
+            {
+              "en": "When I got to the ward, the nurse had already taken his blood pressure.",
+              "zh": "我到病房的時候，護理師已經量過他的血壓了。"
+            }
+          ]
+        },
+        {
+          "id": "u43-d2",
+          "day": 2,
+          "zh": "醫生到的時候，病人正在睡覺。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "兩件事：一件是正在進行的背景，一件是中途發生的事。",
+            "背景用 was／were + -ing，中途發生的用過去式：was sleeping … arrived。"
+          ],
+          "reference": [
+            "The patient was sleeping when the doctor arrived.",
+            "When the doctor arrived, the patient was sleeping.",
+            "The patient was asleep when the doctor arrived.",
+            "When the doctor arrived, the patient was asleep."
+          ],
+          "why": "正在進行的背景（was sleeping）配上中途發生的事（arrived）。when 後面接過去式。",
+          "newWords": [
+            {
+              "en": "asleep",
+              "zh": "睡著的",
+              "example": "The baby is asleep.",
+              "exampleZh": "寶寶睡著了。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "incident",
+              "zh": "事件",
+              "example": "The nurse reported the incident.",
+              "exampleZh": "護理師通報了這件事。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "words": [
+            {
+              "en": "asleep",
+              "zh": "睡著的",
+              "example": "The baby is asleep.",
+              "exampleZh": "寶寶睡著了。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "incident",
+              "zh": "事件",
+              "example": "The nurse reported the incident.",
+              "exampleZh": "護理師通報了這件事。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u43-d2",
+              "day": 2,
+              "zh": "醫生到的時候，病人正在睡覺。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "兩件事：一件是正在進行的背景，一件是中途發生的事。",
+                "背景用 was／were + -ing，中途發生的用過去式：was sleeping … arrived。"
+              ],
+              "reference": [
+                "The patient was sleeping when the doctor arrived.",
+                "When the doctor arrived, the patient was sleeping.",
+                "The patient was asleep when the doctor arrived.",
+                "When the doctor arrived, the patient was asleep."
+              ],
+              "why": "正在進行的背景（was sleeping）配上中途發生的事（arrived）。when 後面接過去式。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "The patient was sleeping when the doctor arrived.",
+              "zh": "醫生到的時候，病人正在睡覺。"
+            },
+            {
+              "en": "I used to live in Tainan.",
+              "zh": "我以前住在台南。"
+            }
+          ]
+        },
+        {
+          "id": "u43-d3",
+          "day": 3,
+          "zh": "我到病房的時候，護理師已經量過他的血壓了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "量血壓這件事比「我到」更早發生。",
+            "更早的那件事用 had + 過去分詞：had already taken his blood pressure。"
+          ],
+          "reference": [
+            "When I got to the ward, the nurse had already taken his blood pressure.",
+            "When I arrived at the ward, the nurse had already taken his blood pressure.",
+            "When I got to the ward, the nurse had already checked his blood pressure.",
+            "When I arrived at the ward, the nurse had already checked his blood pressure.",
+            "The nurse had already taken his blood pressure when I got to the ward."
+          ],
+          "why": "兩件過去的事，先發生的用過去完成式 had taken，後發生的用過去式 got。量血壓常說 take／check someone's blood pressure。",
+          "newWords": [
+            {
+              "en": "ward",
+              "zh": "病房",
+              "example": "He is in Ward 5.",
+              "exampleZh": "他在五號病房。",
+              "source": "level6",
+              "level": 6
+            },
+            {
+              "en": "pressure",
+              "zh": "壓力；（血）壓",
+              "example": "Her blood pressure is high.",
+              "exampleZh": "她的血壓很高。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "ward",
+              "zh": "病房",
+              "example": "He is in Ward 5.",
+              "exampleZh": "他在五號病房。",
+              "source": "level6",
+              "level": 6
+            },
+            {
+              "en": "pressure",
+              "zh": "壓力；（血）壓",
+              "example": "Her blood pressure is high.",
+              "exampleZh": "她的血壓很高。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u43-d3",
+              "day": 3,
+              "zh": "我到病房的時候，護理師已經量過他的血壓了。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "量血壓這件事比「我到」更早發生。",
+                "更早的那件事用 had + 過去分詞：had already taken his blood pressure。"
+              ],
+              "reference": [
+                "When I got to the ward, the nurse had already taken his blood pressure.",
+                "When I arrived at the ward, the nurse had already taken his blood pressure.",
+                "When I got to the ward, the nurse had already checked his blood pressure.",
+                "When I arrived at the ward, the nurse had already checked his blood pressure.",
+                "The nurse had already taken his blood pressure when I got to the ward."
+              ],
+              "why": "兩件過去的事，先發生的用過去完成式 had taken，後發生的用過去式 got。量血壓常說 take／check someone's blood pressure。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "When I got to the ward, the nurse had already taken his blood pressure.",
+              "zh": "我到病房的時候，護理師已經量過他的血壓了。"
+            },
+            {
+              "en": "When I got to the ward, the nurse had already taken his blood pressure.",
+              "zh": "我到病房的時候，護理師已經量過他的血壓了。"
+            }
+          ]
+        },
+        {
+          "id": "u43-d4",
+          "day": 4,
+          "zh": "我以前不喜歡吃青菜，可是現在喜歡了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "否定的 used to：did 已經表示過去了。",
+            "didn't use to（不是 didn't used to）+ 原形，後面接 but now I do。"
+          ],
+          "reference": [
+            "I didn't use to like vegetables, but now I do.",
+            "I didn't use to like vegetables, but I do now.",
+            "I used not to like vegetables, but now I do."
+          ],
+          "why": "否定句是 didn't use to + 原形：did 已經是過去式，所以 use 不加 d。but now I do 的 do 代替 like vegetables。",
+          "newWords": [
+            {
+              "en": "diet",
+              "zh": "飲食；節食",
+              "example": "She has a healthy diet.",
+              "exampleZh": "她的飲食很健康。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "former",
+              "zh": "以前的；前者",
+              "example": "He is a former nurse.",
+              "exampleZh": "他以前是護理師。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "diet",
+              "zh": "飲食；節食",
+              "example": "She has a healthy diet.",
+              "exampleZh": "她的飲食很健康。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "former",
+              "zh": "以前的；前者",
+              "example": "He is a former nurse.",
+              "exampleZh": "他以前是護理師。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u43-d4",
+              "day": 4,
+              "zh": "我以前不喜歡吃青菜，可是現在喜歡了。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "否定的 used to：did 已經表示過去了。",
+                "didn't use to（不是 didn't used to）+ 原形，後面接 but now I do。"
+              ],
+              "reference": [
+                "I didn't use to like vegetables, but now I do.",
+                "I didn't use to like vegetables, but I do now.",
+                "I used not to like vegetables, but now I do."
+              ],
+              "why": "否定句是 didn't use to + 原形：did 已經是過去式，所以 use 不加 d。but now I do 的 do 代替 like vegetables。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I didn't use to like vegetables, but now I do.",
+              "zh": "我以前不喜歡吃青菜，可是現在喜歡了。"
+            },
+            {
+              "en": "I used to live in Tainan.",
+              "zh": "我以前住在台南。"
+            }
+          ]
+        },
+        {
+          "id": "u43-d5",
+          "day": 5,
+          "zh": "我在讀書的時候，手機一直響。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "讀書是那段時間一直在做的事。",
+            "while + 過去進行式 was studying；「一直響」用 kept ringing。"
+          ],
+          "reference": [
+            "While I was studying, my phone kept ringing.",
+            "My phone kept ringing while I was studying.",
+            "When I was studying, my phone kept ringing."
+          ],
+          "why": "while 帶出正在進行的背景（was studying）；keep + -ing 表示一直、一再發生。",
+          "newWords": [
+            {
+              "en": "sequence",
+              "zh": "順序、連續",
+              "example": "Put the events in the right sequence.",
+              "exampleZh": "把事情照正確的順序排好。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "event",
+              "zh": "事件、活動",
+              "example": "It was a big event.",
+              "exampleZh": "那是一件大事。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "sequence",
+              "zh": "順序、連續",
+              "example": "Put the events in the right sequence.",
+              "exampleZh": "把事情照正確的順序排好。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "event",
+              "zh": "事件、活動",
+              "example": "It was a big event.",
+              "exampleZh": "那是一件大事。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u43-d5",
+              "day": 5,
+              "zh": "我在讀書的時候，手機一直響。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "讀書是那段時間一直在做的事。",
+                "while + 過去進行式 was studying；「一直響」用 kept ringing。"
+              ],
+              "reference": [
+                "While I was studying, my phone kept ringing.",
+                "My phone kept ringing while I was studying.",
+                "When I was studying, my phone kept ringing."
+              ],
+              "why": "while 帶出正在進行的背景（was studying）；keep + -ing 表示一直、一再發生。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "While I was studying, my phone kept ringing.",
+              "zh": "我在讀書的時候，手機一直響。"
+            },
+            {
+              "en": "When I got to the ward, the nurse had already taken his blood pressure.",
+              "zh": "我到病房的時候，護理師已經量過他的血壓了。"
+            }
+          ],
+          "recall": [
+            "u43-d1",
+            "u43-d2"
+          ]
+        },
+        {
+          "id": "u43-c1",
+          "day": 6,
+          "zh": "我昨天到家的時候，我媽已經煮好晚餐了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "哪件事先發生？",
+            "先發生的用 had + 過去分詞，到家用過去式 got home。"
+          ],
+          "reference": [
+            "When I got home yesterday, my mom had already cooked dinner.",
+            "When I got home yesterday, my mom had already made dinner.",
+            "When I got home yesterday, my mother had already cooked dinner.",
+            "When I got home yesterday, my mother had already made dinner.",
+            "My mom had already cooked dinner when I got home yesterday."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u43-c1",
+              "day": 6,
+              "zh": "我昨天到家的時候，我媽已經煮好晚餐了。",
+              "grammar": [
+                "敘事時態"
+              ],
+              "hints": [
+                "哪件事先發生？",
+                "先發生的用 had + 過去分詞，到家用過去式 got home。"
+              ],
+              "reference": [
+                "When I got home yesterday, my mom had already cooked dinner.",
+                "When I got home yesterday, my mom had already made dinner.",
+                "When I got home yesterday, my mother had already cooked dinner.",
+                "When I got home yesterday, my mother had already made dinner.",
+                "My mom had already cooked dinner when I got home yesterday."
+              ],
+              "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "When I got home yesterday, my mom had already cooked dinner.",
+              "zh": "我昨天到家的時候，我媽已經煮好晚餐了。"
+            },
+            {
+              "en": "She was walking to work when she fell.",
+              "zh": "她跌倒的時候正在走路去上班。"
+            },
+            {
+              "en": "We used to go hiking every weekend.",
+              "zh": "我們以前每個週末都去爬山。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u43-c1",
+          "day": 6,
+          "zh": "我昨天到家的時候，我媽已經煮好晚餐了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "哪件事先發生？",
+            "先發生的用 had + 過去分詞，到家用過去式 got home。"
+          ],
+          "reference": [
+            "When I got home yesterday, my mom had already cooked dinner.",
+            "When I got home yesterday, my mom had already made dinner.",
+            "When I got home yesterday, my mother had already cooked dinner.",
+            "When I got home yesterday, my mother had already made dinner.",
+            "My mom had already cooked dinner when I got home yesterday."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-c2",
+          "day": 6,
+          "zh": "她跌倒的時候正在走路去上班。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "走路去上班是背景，跌倒是中途發生的事。",
+            "was walking … when she fell。"
+          ],
+          "reference": [
+            "She was walking to work when she fell.",
+            "She fell while she was walking to work.",
+            "She was walking to work when she fell down.",
+            "She fell down while she was walking to work."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-c3",
+          "day": 6,
+          "zh": "我們以前每個週末都去爬山。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前的習慣，現在不一定還這樣。",
+            "used to + 原形：used to go hiking。"
+          ],
+          "reference": [
+            "We used to go hiking every weekend.",
+            "We used to go mountain climbing every weekend.",
+            "We used to hike every weekend."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u43-r1",
+          "day": 4,
+          "zh": "他以前是護理師。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前的身分，現在不是了。",
+            "used to be a nurse。"
+          ],
+          "reference": [
+            "He used to be a nurse."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r2",
+          "day": 5,
+          "zh": "雨開始下的時候，我們正在等公車。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "等公車是背景。",
+            "were waiting … when it started to rain。"
+          ],
+          "reference": [
+            "We were waiting for the bus when it started to rain.",
+            "We were waiting for the bus when it started raining.",
+            "When it started to rain, we were waiting for the bus.",
+            "When it started raining, we were waiting for the bus."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r3",
+          "day": 6,
+          "zh": "我到的時候，電影已經開始了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "電影比我先開始。",
+            "had already started。"
+          ],
+          "reference": [
+            "When I arrived, the movie had already started.",
+            "When I got there, the movie had already started.",
+            "The movie had already started when I arrived.",
+            "When I arrived, the movie had already begun."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r4",
+          "day": 6,
+          "zh": "我們以前常常一起讀書。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前的習慣。",
+            "used to study together。"
+          ],
+          "reference": [
+            "We used to study together a lot.",
+            "We often used to study together.",
+            "We used to study together often.",
+            "We used to often study together."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r5",
+          "day": 6,
+          "zh": "醫生來的時候，她已經醒了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "醒來比醫生來更早。",
+            "had already woken up，或用狀態 was already awake。"
+          ],
+          "reference": [
+            "When the doctor came, she had already woken up.",
+            "When the doctor came, she was already awake.",
+            "She had already woken up when the doctor came.",
+            "She was already awake when the doctor came."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u43-r1",
+          "day": 4,
+          "zh": "他以前是護理師。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前的身分，現在不是了。",
+            "used to be a nurse。"
+          ],
+          "reference": [
+            "He used to be a nurse."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r2",
+          "day": 5,
+          "zh": "雨開始下的時候，我們正在等公車。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "等公車是背景。",
+            "were waiting … when it started to rain。"
+          ],
+          "reference": [
+            "We were waiting for the bus when it started to rain.",
+            "We were waiting for the bus when it started raining.",
+            "When it started to rain, we were waiting for the bus.",
+            "When it started raining, we were waiting for the bus."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r3",
+          "day": 6,
+          "zh": "我到的時候，電影已經開始了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "電影比我先開始。",
+            "had already started。"
+          ],
+          "reference": [
+            "When I arrived, the movie had already started.",
+            "When I got there, the movie had already started.",
+            "The movie had already started when I arrived.",
+            "When I arrived, the movie had already begun."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r4",
+          "day": 6,
+          "zh": "我們以前常常一起讀書。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "以前的習慣。",
+            "used to study together。"
+          ],
+          "reference": [
+            "We used to study together a lot.",
+            "We often used to study together.",
+            "We used to study together often.",
+            "We used to often study together."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        },
+        {
+          "id": "u43-r5",
+          "day": 6,
+          "zh": "醫生來的時候，她已經醒了。",
+          "grammar": [
+            "敘事時態"
+          ],
+          "hints": [
+            "醒來比醫生來更早。",
+            "had already woken up，或用狀態 was already awake。"
+          ],
+          "reference": [
+            "When the doctor came, she had already woken up.",
+            "When the doctor came, she was already awake.",
+            "She had already woken up when the doctor came.",
+            "She was already awake when the doctor came."
+          ],
+          "why": "講一件過去的事：主要發生的事用過去式；那時候正在進行的背景用過去進行式（was／were + -ing）；比那件事更早就發生的用過去完成式（had + 過去分詞）；以前的習慣、現在已經不這樣了，用 used to + 原形。",
+          "newWords": []
+        }
+      ],
+      "cando": "用過去式、過去進行式、過去完成式和 used to 把一件事的先後講清楚"
+    },
+    {
+      "id": 44,
+      "unit": 44,
+      "stage": "BR",
+      "title": "未來安排、未來進行式和未來完成式",
+      "rule": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+      "examples": [
+        "This time tomorrow, I'll be working the night shift.",
+        "By June, I'll have finished this book."
+      ],
+      "examplesZh": [
+        "明天這個時候，我會在上夜班。",
+        "到了六月，我就會讀完這本書了。"
+      ],
+      "days": [
+        {
+          "id": "u44-d1",
+          "day": 1,
+          "zh": "我明天下午要跟林醫師見面。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "已經約好的安排。",
+            "用現在進行式 I'm meeting…（也可以用 be going to）。"
+          ],
+          "reference": [
+            "I'm meeting Dr. Lin tomorrow afternoon.",
+            "I am meeting Dr. Lin tomorrow afternoon.",
+            "I'm going to meet Dr. Lin tomorrow afternoon.",
+            "I am going to meet Dr. Lin tomorrow afternoon."
+          ],
+          "why": "已經約好、時間都定了的安排，英文常用現在進行式表示未來。",
+          "newWords": [
+            {
+              "en": "appointment",
+              "zh": "預約、約診",
+              "example": "I have an appointment at two.",
+              "exampleZh": "我兩點有約診。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "arrange",
+              "zh": "安排、排列",
+              "example": "I arranged a meeting with her.",
+              "exampleZh": "我安排了跟她見面。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "appointment",
+              "zh": "預約、約診",
+              "example": "I have an appointment at two.",
+              "exampleZh": "我兩點有約診。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "arrange",
+              "zh": "安排、排列",
+              "example": "I arranged a meeting with her.",
+              "exampleZh": "我安排了跟她見面。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u44-d1",
+              "day": 1,
+              "zh": "我明天下午要跟林醫師見面。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "已經約好的安排。",
+                "用現在進行式 I'm meeting…（也可以用 be going to）。"
+              ],
+              "reference": [
+                "I'm meeting Dr. Lin tomorrow afternoon.",
+                "I am meeting Dr. Lin tomorrow afternoon.",
+                "I'm going to meet Dr. Lin tomorrow afternoon.",
+                "I am going to meet Dr. Lin tomorrow afternoon."
+              ],
+              "why": "已經約好、時間都定了的安排，英文常用現在進行式表示未來。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I'm meeting Dr. Lin tomorrow afternoon.",
+              "zh": "我明天下午要跟林醫師見面。"
+            },
+            {
+              "en": "This time tomorrow, I'll be working the night shift.",
+              "zh": "明天這個時候，我會在上夜班。"
+            }
+          ]
+        },
+        {
+          "id": "u44-d2",
+          "day": 2,
+          "zh": "明天這個時候，我會在上夜班。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "未來某個時間點「正在做」的事。",
+            "will be + -ing：I'll be working the night shift。"
+          ],
+          "reference": [
+            "This time tomorrow, I'll be working the night shift.",
+            "This time tomorrow, I will be working the night shift.",
+            "I'll be working the night shift this time tomorrow.",
+            "At this time tomorrow, I'll be working the night shift.",
+            "This time tomorrow, I'll be working a night shift."
+          ],
+          "why": "說未來某個時間正在做的事，用 will be + -ing。",
+          "newWords": [
+            {
+              "en": "shift",
+              "zh": "輪班；改變",
+              "example": "I work the night shift.",
+              "exampleZh": "我上夜班。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "schedule",
+              "zh": "時間表、行程",
+              "example": "What's your schedule tomorrow?",
+              "exampleZh": "你明天的行程是什麼？",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "shift",
+              "zh": "輪班；改變",
+              "example": "I work the night shift.",
+              "exampleZh": "我上夜班。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "schedule",
+              "zh": "時間表、行程",
+              "example": "What's your schedule tomorrow?",
+              "exampleZh": "你明天的行程是什麼？",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u44-d2",
+              "day": 2,
+              "zh": "明天這個時候，我會在上夜班。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "未來某個時間點「正在做」的事。",
+                "will be + -ing：I'll be working the night shift。"
+              ],
+              "reference": [
+                "This time tomorrow, I'll be working the night shift.",
+                "This time tomorrow, I will be working the night shift.",
+                "I'll be working the night shift this time tomorrow.",
+                "At this time tomorrow, I'll be working the night shift.",
+                "This time tomorrow, I'll be working a night shift."
+              ],
+              "why": "說未來某個時間正在做的事，用 will be + -ing。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "This time tomorrow, I'll be working the night shift.",
+              "zh": "明天這個時候，我會在上夜班。"
+            },
+            {
+              "en": "By June, I'll have finished this book.",
+              "zh": "到了六月，我就會讀完這本書了。"
+            }
+          ]
+        },
+        {
+          "id": "u44-d3",
+          "day": 3,
+          "zh": "到了六月，我就會讀完這本書了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "在六月之前會完成。",
+            "by June + will have + 過去分詞：I'll have finished…"
+          ],
+          "reference": [
+            "By June, I'll have finished this book.",
+            "By June, I will have finished this book.",
+            "I'll have finished this book by June.",
+            "I will have finished this book by June.",
+            "By June, I'll have finished reading this book."
+          ],
+          "why": "到未來某個時間點之前會完成的事：by + 時間，will have + 過去分詞。",
+          "newWords": [
+            {
+              "en": "deadline",
+              "zh": "截止期限",
+              "example": "The deadline is Friday.",
+              "exampleZh": "截止日是星期五。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "graduate",
+              "zh": "畢業；畢業生",
+              "example": "I will graduate in 2029.",
+              "exampleZh": "我會在 2029 年畢業。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "words": [
+            {
+              "en": "deadline",
+              "zh": "截止期限",
+              "example": "The deadline is Friday.",
+              "exampleZh": "截止日是星期五。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "graduate",
+              "zh": "畢業；畢業生",
+              "example": "I will graduate in 2029.",
+              "exampleZh": "我會在 2029 年畢業。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u44-d3",
+              "day": 3,
+              "zh": "到了六月，我就會讀完這本書了。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "在六月之前會完成。",
+                "by June + will have + 過去分詞：I'll have finished…"
+              ],
+              "reference": [
+                "By June, I'll have finished this book.",
+                "By June, I will have finished this book.",
+                "I'll have finished this book by June.",
+                "I will have finished this book by June.",
+                "By June, I'll have finished reading this book."
+              ],
+              "why": "到未來某個時間點之前會完成的事：by + 時間，will have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "By June, I'll have finished this book.",
+              "zh": "到了六月，我就會讀完這本書了。"
+            },
+            {
+              "en": "This time tomorrow, I'll be working the night shift.",
+              "zh": "明天這個時候，我會在上夜班。"
+            }
+          ]
+        },
+        {
+          "id": "u44-d4",
+          "day": 4,
+          "zh": "等你到的時候，我們已經吃完晚餐了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "「等你到的時候」用 by the time，後面不能用 will。",
+            "By the time you arrive, we'll have finished dinner。"
+          ],
+          "reference": [
+            "By the time you arrive, we'll have finished dinner.",
+            "By the time you arrive, we will have finished dinner.",
+            "By the time you get here, we'll have finished dinner.",
+            "By the time you get here, we will have finished dinner.",
+            "By the time you arrive, we'll have eaten dinner.",
+            "We'll have finished dinner by the time you arrive."
+          ],
+          "why": "by the time 後面用現在式（arrive），主要句子用 will have + 過去分詞。",
+          "newWords": [
+            {
+              "en": "certificate",
+              "zh": "證書、證明",
+              "example": "She got her nursing certificate.",
+              "exampleZh": "她拿到了護理證書。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "relax",
+              "zh": "放鬆",
+              "example": "I want to relax this weekend.",
+              "exampleZh": "我這個週末想放鬆。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "words": [
+            {
+              "en": "certificate",
+              "zh": "證書、證明",
+              "example": "She got her nursing certificate.",
+              "exampleZh": "她拿到了護理證書。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "relax",
+              "zh": "放鬆",
+              "example": "I want to relax this weekend.",
+              "exampleZh": "我這個週末想放鬆。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u44-d4",
+              "day": 4,
+              "zh": "等你到的時候，我們已經吃完晚餐了。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "「等你到的時候」用 by the time，後面不能用 will。",
+                "By the time you arrive, we'll have finished dinner。"
+              ],
+              "reference": [
+                "By the time you arrive, we'll have finished dinner.",
+                "By the time you arrive, we will have finished dinner.",
+                "By the time you get here, we'll have finished dinner.",
+                "By the time you get here, we will have finished dinner.",
+                "By the time you arrive, we'll have eaten dinner.",
+                "We'll have finished dinner by the time you arrive."
+              ],
+              "why": "by the time 後面用現在式（arrive），主要句子用 will have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "By the time you arrive, we'll have finished dinner.",
+              "zh": "等你到的時候，我們已經吃完晚餐了。"
+            },
+            {
+              "en": "By June, I'll have finished this book.",
+              "zh": "到了六月，我就會讀完這本書了。"
+            }
+          ]
+        },
+        {
+          "id": "u44-d5",
+          "day": 5,
+          "zh": "我下週五要考全民英檢。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "已經報名、日期確定的安排。",
+            "考試用 take：I'm taking the GEPT next Friday。"
+          ],
+          "reference": [
+            "I'm taking the GEPT next Friday.",
+            "I am taking the GEPT next Friday.",
+            "I'm going to take the GEPT next Friday.",
+            "I am going to take the GEPT next Friday."
+          ],
+          "why": "已經確定的安排用現在進行式；考試的動詞用 take：take an exam、take the GEPT。",
+          "newWords": [
+            {
+              "en": "exam",
+              "zh": "考試；檢查",
+              "example": "I have an exam next week.",
+              "exampleZh": "我下週有考試。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "review",
+              "zh": "複習；評論",
+              "example": "I need to review Unit 3.",
+              "exampleZh": "我需要複習第三單元。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "exam",
+              "zh": "考試；檢查",
+              "example": "I have an exam next week.",
+              "exampleZh": "我下週有考試。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "review",
+              "zh": "複習；評論",
+              "example": "I need to review Unit 3.",
+              "exampleZh": "我需要複習第三單元。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u44-d5",
+              "day": 5,
+              "zh": "我下週五要考全民英檢。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "已經報名、日期確定的安排。",
+                "考試用 take：I'm taking the GEPT next Friday。"
+              ],
+              "reference": [
+                "I'm taking the GEPT next Friday.",
+                "I am taking the GEPT next Friday.",
+                "I'm going to take the GEPT next Friday.",
+                "I am going to take the GEPT next Friday."
+              ],
+              "why": "已經確定的安排用現在進行式；考試的動詞用 take：take an exam、take the GEPT。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I'm taking the GEPT next Friday.",
+              "zh": "我下週五要考全民英檢。"
+            },
+            {
+              "en": "This time tomorrow, I'll be working the night shift.",
+              "zh": "明天這個時候，我會在上夜班。"
+            }
+          ],
+          "recall": [
+            "u44-d1",
+            "u44-d2"
+          ]
+        },
+        {
+          "id": "u44-c1",
+          "day": 6,
+          "zh": "明天早上八點，我會在開車去醫院的路上。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "那個時間點正在做的事。",
+            "will be driving。"
+          ],
+          "reference": [
+            "At eight tomorrow morning, I'll be driving to the hospital.",
+            "At 8 tomorrow morning, I'll be driving to the hospital.",
+            "I'll be driving to the hospital at eight tomorrow morning.",
+            "At eight o'clock tomorrow morning, I will be driving to the hospital.",
+            "At 8 a.m. tomorrow, I'll be driving to the hospital."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u44-c1",
+              "day": 6,
+              "zh": "明天早上八點，我會在開車去醫院的路上。",
+              "grammar": [
+                "未來進行式和未來完成式"
+              ],
+              "hints": [
+                "那個時間點正在做的事。",
+                "will be driving。"
+              ],
+              "reference": [
+                "At eight tomorrow morning, I'll be driving to the hospital.",
+                "At 8 tomorrow morning, I'll be driving to the hospital.",
+                "I'll be driving to the hospital at eight tomorrow morning.",
+                "At eight o'clock tomorrow morning, I will be driving to the hospital.",
+                "At 8 a.m. tomorrow, I'll be driving to the hospital."
+              ],
+              "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "At eight tomorrow morning, I'll be driving to the hospital.",
+              "zh": "明天早上八點，我會在開車去醫院的路上。"
+            },
+            {
+              "en": "By the end of the year, I'll have learned 2,000 words.",
+              "zh": "到了年底，我就會學完兩千個單字了。"
+            },
+            {
+              "en": "By the time he wakes up, I'll have gone home.",
+              "zh": "等他醒來的時候，我已經下班回家了。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u44-c1",
+          "day": 6,
+          "zh": "明天早上八點，我會在開車去醫院的路上。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "那個時間點正在做的事。",
+            "will be driving。"
+          ],
+          "reference": [
+            "At eight tomorrow morning, I'll be driving to the hospital.",
+            "At 8 tomorrow morning, I'll be driving to the hospital.",
+            "I'll be driving to the hospital at eight tomorrow morning.",
+            "At eight o'clock tomorrow morning, I will be driving to the hospital.",
+            "At 8 a.m. tomorrow, I'll be driving to the hospital."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-c2",
+          "day": 6,
+          "zh": "到了年底，我就會學完兩千個單字了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "年底之前會完成。",
+            "by the end of the year + will have learned。"
+          ],
+          "reference": [
+            "By the end of the year, I'll have learned 2,000 words.",
+            "By the end of the year, I will have learned 2,000 words.",
+            "By the end of the year, I'll have learned 2000 words.",
+            "By the end of the year, I'll have learned two thousand words.",
+            "I'll have learned 2,000 words by the end of the year.",
+            "By the end of the year, I'll have learnt 2,000 words."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-c3",
+          "day": 6,
+          "zh": "等他醒來的時候，我已經下班回家了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "by the time 後面用現在式。",
+            "By the time he wakes up, I'll have gone home。"
+          ],
+          "reference": [
+            "By the time he wakes up, I'll have gone home.",
+            "By the time he wakes up, I will have gone home.",
+            "By the time he wakes up, I'll have already gone home.",
+            "I'll have gone home by the time he wakes up."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u44-r1",
+          "day": 4,
+          "zh": "等你下班的時候，我已經煮好晚餐了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "by the time + 現在式。",
+            "I'll have cooked dinner。"
+          ],
+          "reference": [
+            "By the time you get off work, I'll have cooked dinner.",
+            "By the time you get off work, I'll have made dinner.",
+            "By the time you finish work, I'll have made dinner.",
+            "By the time you finish work, I'll have cooked dinner.",
+            "By the time you get off work, I will have cooked dinner."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r2",
+          "day": 5,
+          "zh": "我們這個週末要去台北。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "已經安排好的行程。",
+            "We're going to Taipei this weekend。"
+          ],
+          "reference": [
+            "We're going to Taipei this weekend.",
+            "We are going to Taipei this weekend.",
+            "We're going to go to Taipei this weekend."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r3",
+          "day": 6,
+          "zh": "下週這個時候，我會在海邊放鬆。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "那時候正在做的事。",
+            "will be relaxing。"
+          ],
+          "reference": [
+            "This time next week, I'll be relaxing at the beach.",
+            "This time next week, I'll be relaxing on the beach.",
+            "This time next week, I will be relaxing at the beach.",
+            "I'll be relaxing at the beach this time next week."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r4",
+          "day": 6,
+          "zh": "到了明年，她就會當護理師三年了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "到明年為止會持續三年。",
+            "will have been a nurse for three years。"
+          ],
+          "reference": [
+            "By next year, she'll have been a nurse for three years.",
+            "By next year, she will have been a nurse for three years.",
+            "By next year, she'll have worked as a nurse for three years.",
+            "By next year, she will have worked as a nurse for three years."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r5",
+          "day": 6,
+          "zh": "我明天早上九點要看牙醫。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "約好的時間。",
+            "I'm seeing the dentist at nine tomorrow morning。"
+          ],
+          "reference": [
+            "I'm seeing the dentist at nine tomorrow morning.",
+            "I'm seeing the dentist at 9 tomorrow morning.",
+            "I'm going to see the dentist at nine tomorrow morning.",
+            "I have a dentist appointment at nine tomorrow morning.",
+            "I am seeing the dentist at nine tomorrow morning."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u44-r1",
+          "day": 4,
+          "zh": "等你下班的時候，我已經煮好晚餐了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "by the time + 現在式。",
+            "I'll have cooked dinner。"
+          ],
+          "reference": [
+            "By the time you get off work, I'll have cooked dinner.",
+            "By the time you get off work, I'll have made dinner.",
+            "By the time you finish work, I'll have made dinner.",
+            "By the time you finish work, I'll have cooked dinner.",
+            "By the time you get off work, I will have cooked dinner."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r2",
+          "day": 5,
+          "zh": "我們這個週末要去台北。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "已經安排好的行程。",
+            "We're going to Taipei this weekend。"
+          ],
+          "reference": [
+            "We're going to Taipei this weekend.",
+            "We are going to Taipei this weekend.",
+            "We're going to go to Taipei this weekend."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r3",
+          "day": 6,
+          "zh": "下週這個時候，我會在海邊放鬆。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "那時候正在做的事。",
+            "will be relaxing。"
+          ],
+          "reference": [
+            "This time next week, I'll be relaxing at the beach.",
+            "This time next week, I'll be relaxing on the beach.",
+            "This time next week, I will be relaxing at the beach.",
+            "I'll be relaxing at the beach this time next week."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r4",
+          "day": 6,
+          "zh": "到了明年，她就會當護理師三年了。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "到明年為止會持續三年。",
+            "will have been a nurse for three years。"
+          ],
+          "reference": [
+            "By next year, she'll have been a nurse for three years.",
+            "By next year, she will have been a nurse for three years.",
+            "By next year, she'll have worked as a nurse for three years.",
+            "By next year, she will have worked as a nurse for three years."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        },
+        {
+          "id": "u44-r5",
+          "day": 6,
+          "zh": "我明天早上九點要看牙醫。",
+          "grammar": [
+            "未來進行式和未來完成式"
+          ],
+          "hints": [
+            "約好的時間。",
+            "I'm seeing the dentist at nine tomorrow morning。"
+          ],
+          "reference": [
+            "I'm seeing the dentist at nine tomorrow morning.",
+            "I'm seeing the dentist at 9 tomorrow morning.",
+            "I'm going to see the dentist at nine tomorrow morning.",
+            "I have a dentist appointment at nine tomorrow morning.",
+            "I am seeing the dentist at nine tomorrow morning."
+          ],
+          "why": "已經約好的安排用現在進行式（I'm meeting Dr. Lin tomorrow.）；未來某個時間點正在做的事用 will be + -ing；到未來某個時間點之前會完成的事用 will have + 過去分詞，常跟 by（在…之前）、by the time（等到…的時候）一起用。by the time 後面用現在式，不用 will。",
+          "newWords": []
+        }
+      ],
+      "cando": "說清楚未來的安排、某個時間正在做的事，以及在那之前會完成什麼"
+    },
+    {
+      "id": 45,
+      "unit": 45,
+      "stage": "BR",
+      "title": "推測：must、might、can't（have done）",
+      "rule": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+      "examples": [
+        "He must be tired. He worked a twelve-hour shift.",
+        "She can't have seen us. She was sleeping."
+      ],
+      "examplesZh": [
+        "他一定很累，他上了十二個小時的班。",
+        "她不可能看到我們，她當時在睡覺。"
+      ],
+      "days": [
+        {
+          "id": "u45-d1",
+          "day": 1,
+          "zh": "他一定很累，他上了十二個小時的班。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "根據線索很確定的推測。",
+            "must be tired；十二小時的班 a twelve-hour shift（hour 不加 s）。"
+          ],
+          "reference": [
+            "He must be tired. He worked a twelve-hour shift.",
+            "He must be tired. He worked a 12-hour shift.",
+            "He must be tired because he worked a twelve-hour shift.",
+            "He must be tired; he worked a twelve-hour shift.",
+            "He must be tired. He worked for twelve hours."
+          ],
+          "why": "很確定的推測用 must be。twelve-hour 當形容詞時 hour 不加 s。",
+          "newWords": [
+            {
+              "en": "clue",
+              "zh": "線索、暗示",
+              "example": "The police found a clue.",
+              "exampleZh": "警察找到一條線索。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "evidence",
+              "zh": "證據",
+              "example": "There is no evidence.",
+              "exampleZh": "沒有證據。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "words": [
+            {
+              "en": "clue",
+              "zh": "線索、暗示",
+              "example": "The police found a clue.",
+              "exampleZh": "警察找到一條線索。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "evidence",
+              "zh": "證據",
+              "example": "There is no evidence.",
+              "exampleZh": "沒有證據。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u45-d1",
+              "day": 1,
+              "zh": "他一定很累，他上了十二個小時的班。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "根據線索很確定的推測。",
+                "must be tired；十二小時的班 a twelve-hour shift（hour 不加 s）。"
+              ],
+              "reference": [
+                "He must be tired. He worked a twelve-hour shift.",
+                "He must be tired. He worked a 12-hour shift.",
+                "He must be tired because he worked a twelve-hour shift.",
+                "He must be tired; he worked a twelve-hour shift.",
+                "He must be tired. He worked for twelve hours."
+              ],
+              "why": "很確定的推測用 must be。twelve-hour 當形容詞時 hour 不加 s。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "He must be tired. He worked a twelve-hour shift.",
+              "zh": "他一定很累，他上了十二個小時的班。"
+            },
+            {
+              "en": "He must be tired. He worked a twelve-hour shift.",
+              "zh": "他一定很累，他上了十二個小時的班。"
+            }
+          ]
+        },
+        {
+          "id": "u45-d2",
+          "day": 2,
+          "zh": "她可能在開會。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "不確定，有可能。",
+            "might／may／could be in a meeting。"
+          ],
+          "reference": [
+            "She might be in a meeting.",
+            "She may be in a meeting.",
+            "She could be in a meeting.",
+            "She might be having a meeting."
+          ],
+          "why": "有可能但不確定用 might／may／could。",
+          "newWords": [
+            {
+              "en": "conclude",
+              "zh": "下結論；結束",
+              "example": "What can we conclude?",
+              "exampleZh": "我們可以得出什麼結論？",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "guess",
+              "zh": "猜",
+              "example": "Can you guess?",
+              "exampleZh": "你猜得到嗎？",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "words": [
+            {
+              "en": "conclude",
+              "zh": "下結論；結束",
+              "example": "What can we conclude?",
+              "exampleZh": "我們可以得出什麼結論？",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "guess",
+              "zh": "猜",
+              "example": "Can you guess?",
+              "exampleZh": "你猜得到嗎？",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u45-d2",
+              "day": 2,
+              "zh": "她可能在開會。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "不確定，有可能。",
+                "might／may／could be in a meeting。"
+              ],
+              "reference": [
+                "She might be in a meeting.",
+                "She may be in a meeting.",
+                "She could be in a meeting.",
+                "She might be having a meeting."
+              ],
+              "why": "有可能但不確定用 might／may／could。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "She might be in a meeting.",
+              "zh": "她可能在開會。"
+            },
+            {
+              "en": "She can't have seen us. She was sleeping.",
+              "zh": "她不可能看到我們，她當時在睡覺。"
+            }
+          ]
+        },
+        {
+          "id": "u45-d3",
+          "day": 3,
+          "zh": "那不可能是真的。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "確定不是。",
+            "can't be true（不用 mustn't）。"
+          ],
+          "reference": [
+            "That can't be true.",
+            "That cannot be true.",
+            "That can't be right."
+          ],
+          "why": "確定「不可能」用 can't be。mustn't 是「不准」，不是推測。",
+          "newWords": [
+            {
+              "en": "imagine",
+              "zh": "想像、設想",
+              "example": "I can't imagine that.",
+              "exampleZh": "我無法想像。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "suggest",
+              "zh": "提議、建議",
+              "example": "The evidence suggests he was tired.",
+              "exampleZh": "證據顯示他很累。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "imagine",
+              "zh": "想像、設想",
+              "example": "I can't imagine that.",
+              "exampleZh": "我無法想像。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "suggest",
+              "zh": "提議、建議",
+              "example": "The evidence suggests he was tired.",
+              "exampleZh": "證據顯示他很累。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u45-d3",
+              "day": 3,
+              "zh": "那不可能是真的。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "確定不是。",
+                "can't be true（不用 mustn't）。"
+              ],
+              "reference": [
+                "That can't be true.",
+                "That cannot be true.",
+                "That can't be right."
+              ],
+              "why": "確定「不可能」用 can't be。mustn't 是「不准」，不是推測。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "That can't be true.",
+              "zh": "那不可能是真的。"
+            },
+            {
+              "en": "He must be tired. He worked a twelve-hour shift.",
+              "zh": "他一定很累，他上了十二個小時的班。"
+            }
+          ]
+        },
+        {
+          "id": "u45-d4",
+          "day": 4,
+          "zh": "他一定是忘記吃藥了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "推測過去發生的事。",
+            "推測過去：must have + 過去分詞，吃藥用 take。"
+          ],
+          "reference": [
+            "He must have forgotten to take his medicine.",
+            "He must have forgotten to take his medication.",
+            "He must have forgotten to take his pills."
+          ],
+          "why": "推測過去：must have + 過去分詞。forget 的過去分詞是 forgotten；吃藥用 take medicine。",
+          "newWords": [
+            {
+              "en": "medication",
+              "zh": "藥物、藥品",
+              "example": "Take this medication after meals.",
+              "exampleZh": "飯後吃這個藥。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "notice",
+              "zh": "注意到；通知",
+              "example": "Did you notice anything?",
+              "exampleZh": "你有注意到什麼嗎？",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "words": [
+            {
+              "en": "medication",
+              "zh": "藥物、藥品",
+              "example": "Take this medication after meals.",
+              "exampleZh": "飯後吃這個藥。",
+              "source": "level5",
+              "level": 5
+            },
+            {
+              "en": "notice",
+              "zh": "注意到；通知",
+              "example": "Did you notice anything?",
+              "exampleZh": "你有注意到什麼嗎？",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u45-d4",
+              "day": 4,
+              "zh": "他一定是忘記吃藥了。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "推測過去發生的事。",
+                "推測過去：must have + 過去分詞，吃藥用 take。"
+              ],
+              "reference": [
+                "He must have forgotten to take his medicine.",
+                "He must have forgotten to take his medication.",
+                "He must have forgotten to take his pills."
+              ],
+              "why": "推測過去：must have + 過去分詞。forget 的過去分詞是 forgotten；吃藥用 take medicine。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "He must have forgotten to take his medicine.",
+              "zh": "他一定是忘記吃藥了。"
+            },
+            {
+              "en": "She can't have seen us. She was sleeping.",
+              "zh": "她不可能看到我們，她當時在睡覺。"
+            }
+          ]
+        },
+        {
+          "id": "u45-d5",
+          "day": 5,
+          "zh": "她不可能看到我們，她當時在睡覺。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "確定過去不可能發生。",
+            "can't have seen us，後面說當時在睡覺 was sleeping。"
+          ],
+          "reference": [
+            "She can't have seen us. She was sleeping.",
+            "She can't have seen us. She was asleep.",
+            "She couldn't have seen us. She was sleeping.",
+            "She couldn't have seen us. She was asleep.",
+            "She can't have seen us because she was sleeping."
+          ],
+          "why": "推測過去「不可能」用 can't／couldn't have + 過去分詞。",
+          "newWords": [
+            {
+              "en": "identify",
+              "zh": "辨認、識別",
+              "example": "Can you identify the man?",
+              "exampleZh": "你認得出那個人嗎？",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "condition",
+              "zh": "情況、條件",
+              "example": "His condition is stable.",
+              "exampleZh": "他的狀況穩定。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "identify",
+              "zh": "辨認、識別",
+              "example": "Can you identify the man?",
+              "exampleZh": "你認得出那個人嗎？",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "condition",
+              "zh": "情況、條件",
+              "example": "His condition is stable.",
+              "exampleZh": "他的狀況穩定。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u45-d5",
+              "day": 5,
+              "zh": "她不可能看到我們，她當時在睡覺。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "確定過去不可能發生。",
+                "can't have seen us，後面說當時在睡覺 was sleeping。"
+              ],
+              "reference": [
+                "She can't have seen us. She was sleeping.",
+                "She can't have seen us. She was asleep.",
+                "She couldn't have seen us. She was sleeping.",
+                "She couldn't have seen us. She was asleep.",
+                "She can't have seen us because she was sleeping."
+              ],
+              "why": "推測過去「不可能」用 can't／couldn't have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "She can't have seen us. She was sleeping.",
+              "zh": "她不可能看到我們，她當時在睡覺。"
+            },
+            {
+              "en": "He must be tired. He worked a twelve-hour shift.",
+              "zh": "他一定很累，他上了十二個小時的班。"
+            }
+          ],
+          "recall": [
+            "u45-d1",
+            "u45-d2"
+          ]
+        },
+        {
+          "id": "u45-c1",
+          "day": 6,
+          "zh": "病人可能吃錯藥了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "不確定的過去推測。",
+            "might have taken the wrong medicine。"
+          ],
+          "reference": [
+            "The patient might have taken the wrong medicine.",
+            "The patient may have taken the wrong medicine.",
+            "The patient could have taken the wrong medicine.",
+            "The patient might have taken the wrong medication.",
+            "The patient may have taken the wrong medication."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u45-c1",
+              "day": 6,
+              "zh": "病人可能吃錯藥了。",
+              "grammar": [
+                "推測"
+              ],
+              "hints": [
+                "不確定的過去推測。",
+                "might have taken the wrong medicine。"
+              ],
+              "reference": [
+                "The patient might have taken the wrong medicine.",
+                "The patient may have taken the wrong medicine.",
+                "The patient could have taken the wrong medicine.",
+                "The patient might have taken the wrong medication.",
+                "The patient may have taken the wrong medication."
+              ],
+              "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "The patient might have taken the wrong medicine.",
+              "zh": "病人可能吃錯藥了。"
+            },
+            {
+              "en": "It must be raining outside. Everyone is carrying an umbrella.",
+              "zh": "外面一定在下雨，大家都拿著傘。"
+            },
+            {
+              "en": "He can't have gotten home already. He only left ten minutes ago.",
+              "zh": "他不可能已經到家了，他十分鐘前才走。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u45-c1",
+          "day": 6,
+          "zh": "病人可能吃錯藥了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "不確定的過去推測。",
+            "might have taken the wrong medicine。"
+          ],
+          "reference": [
+            "The patient might have taken the wrong medicine.",
+            "The patient may have taken the wrong medicine.",
+            "The patient could have taken the wrong medicine.",
+            "The patient might have taken the wrong medication.",
+            "The patient may have taken the wrong medication."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-c2",
+          "day": 6,
+          "zh": "外面一定在下雨，大家都拿著傘。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "根據線索推測現在正在發生的事。",
+            "must be raining。"
+          ],
+          "reference": [
+            "It must be raining outside. Everyone is carrying an umbrella.",
+            "It must be raining outside. Everyone has an umbrella.",
+            "It must be raining outside, because everyone is carrying an umbrella.",
+            "It must be raining outside; everyone is carrying an umbrella."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-c3",
+          "day": 6,
+          "zh": "他不可能已經到家了，他十分鐘前才走。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "確定不可能。",
+            "can't have gotten home，或 can't be home yet。"
+          ],
+          "reference": [
+            "He can't have gotten home already. He only left ten minutes ago.",
+            "He can't have got home already. He only left ten minutes ago.",
+            "He can't be home yet. He only left ten minutes ago.",
+            "He can't have arrived home yet. He only left ten minutes ago.",
+            "He can't be home already. He left only ten minutes ago."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u45-r1",
+          "day": 4,
+          "zh": "她一定是錯過公車了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "推測過去。",
+            "must have missed the bus。"
+          ],
+          "reference": [
+            "She must have missed the bus."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r2",
+          "day": 5,
+          "zh": "他不可能做這件事，他整天都在醫院。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "過去不可能。",
+            "can't have done it。"
+          ],
+          "reference": [
+            "He can't have done it. He was at the hospital all day.",
+            "He couldn't have done it. He was at the hospital all day.",
+            "He can't have done this. He was at the hospital all day.",
+            "He can't have done it because he was at the hospital all day."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r3",
+          "day": 6,
+          "zh": "這個傷口可能感染了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "現在的狀態，不確定。",
+            "might be infected。"
+          ],
+          "reference": [
+            "This wound might be infected.",
+            "This wound may be infected.",
+            "This wound could be infected.",
+            "The wound might be infected.",
+            "The wound may be infected."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r4",
+          "day": 6,
+          "zh": "他們一定已經回家了，燈都關了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "根據線索推測過去。",
+            "must have gone home。"
+          ],
+          "reference": [
+            "They must have gone home. The lights are off.",
+            "They must have gone home. All the lights are off.",
+            "They must have gone home because the lights are off.",
+            "They must have gone home; the lights are all off."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r5",
+          "day": 6,
+          "zh": "你一定很想念你的家人。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "確定的推測（現在）。",
+            "must + 原形 miss。"
+          ],
+          "reference": [
+            "You must miss your family.",
+            "You must miss your family a lot.",
+            "You must really miss your family."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u45-r1",
+          "day": 4,
+          "zh": "她一定是錯過公車了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "推測過去。",
+            "must have missed the bus。"
+          ],
+          "reference": [
+            "She must have missed the bus."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r2",
+          "day": 5,
+          "zh": "他不可能做這件事，他整天都在醫院。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "過去不可能。",
+            "can't have done it。"
+          ],
+          "reference": [
+            "He can't have done it. He was at the hospital all day.",
+            "He couldn't have done it. He was at the hospital all day.",
+            "He can't have done this. He was at the hospital all day.",
+            "He can't have done it because he was at the hospital all day."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r3",
+          "day": 6,
+          "zh": "這個傷口可能感染了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "現在的狀態，不確定。",
+            "might be infected。"
+          ],
+          "reference": [
+            "This wound might be infected.",
+            "This wound may be infected.",
+            "This wound could be infected.",
+            "The wound might be infected.",
+            "The wound may be infected."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r4",
+          "day": 6,
+          "zh": "他們一定已經回家了，燈都關了。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "根據線索推測過去。",
+            "must have gone home。"
+          ],
+          "reference": [
+            "They must have gone home. The lights are off.",
+            "They must have gone home. All the lights are off.",
+            "They must have gone home because the lights are off.",
+            "They must have gone home; the lights are all off."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        },
+        {
+          "id": "u45-r5",
+          "day": 6,
+          "zh": "你一定很想念你的家人。",
+          "grammar": [
+            "推測"
+          ],
+          "hints": [
+            "確定的推測（現在）。",
+            "must + 原形 miss。"
+          ],
+          "reference": [
+            "You must miss your family.",
+            "You must miss your family a lot.",
+            "You must really miss your family."
+          ],
+          "why": "根據線索推測現在：很確定用 must be，有可能用 might／may／could be，確定不是用 can't be。推測過去：must／might／can't 後面接 have + 過去分詞（He must have forgotten.）。這是推論，不是確定的事實；不確定時用 might，話會說得比較保留。",
+          "newWords": []
+        }
+      ],
+      "cando": "根據線索推測現在和過去的事，分清楚確定、可能和不可能"
+    },
+    {
+      "id": 46,
+      "unit": 46,
+      "stage": "BR",
+      "title": "第三類假設：跟過去事實相反",
+      "rule": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+      "examples": [
+        "If I had left earlier, I wouldn't have been late.",
+        "If he had seen a doctor earlier, the wound wouldn't have gotten infected."
+      ],
+      "examplesZh": [
+        "如果我早點出門，我就不會遲到了。",
+        "如果他早點去看醫生，傷口就不會感染了。"
+      ],
+      "days": [
+        {
+          "id": "u46-d1",
+          "day": 1,
+          "zh": "如果我早點出門，我就不會遲到了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實是：沒早點出門，所以遲到了。",
+            "If + had left, wouldn't have been late。"
+          ],
+          "reference": [
+            "If I had left earlier, I wouldn't have been late.",
+            "If I had left earlier, I would not have been late.",
+            "If I'd left earlier, I wouldn't have been late.",
+            "If I had left home earlier, I wouldn't have been late.",
+            "I wouldn't have been late if I had left earlier."
+          ],
+          "why": "跟過去事實相反：if 子句用 had + 過去分詞，主要句子用 wouldn't have + 過去分詞。",
+          "newWords": [
+            {
+              "en": "consequence",
+              "zh": "後果、結果",
+              "example": "Every choice has consequences.",
+              "exampleZh": "每個選擇都有後果。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "mistake",
+              "zh": "錯誤、誤會",
+              "example": "I made a big mistake.",
+              "exampleZh": "我犯了大錯。",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "words": [
+            {
+              "en": "consequence",
+              "zh": "後果、結果",
+              "example": "Every choice has consequences.",
+              "exampleZh": "每個選擇都有後果。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "mistake",
+              "zh": "錯誤、誤會",
+              "example": "I made a big mistake.",
+              "exampleZh": "我犯了大錯。",
+              "source": "level1",
+              "level": 1
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u46-d1",
+              "day": 1,
+              "zh": "如果我早點出門，我就不會遲到了。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實是：沒早點出門，所以遲到了。",
+                "If + had left, wouldn't have been late。"
+              ],
+              "reference": [
+                "If I had left earlier, I wouldn't have been late.",
+                "If I had left earlier, I would not have been late.",
+                "If I'd left earlier, I wouldn't have been late.",
+                "If I had left home earlier, I wouldn't have been late.",
+                "I wouldn't have been late if I had left earlier."
+              ],
+              "why": "跟過去事實相反：if 子句用 had + 過去分詞，主要句子用 wouldn't have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If I had left earlier, I wouldn't have been late.",
+              "zh": "如果我早點出門，我就不會遲到了。"
+            },
+            {
+              "en": "If I had left earlier, I wouldn't have been late.",
+              "zh": "如果我早點出門，我就不會遲到了。"
+            }
+          ]
+        },
+        {
+          "id": "u46-d2",
+          "day": 2,
+          "zh": "如果她有吃早餐，她就不會頭暈了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實是她沒吃，所以頭暈。",
+            "had eaten breakfast, wouldn't have felt dizzy。"
+          ],
+          "reference": [
+            "If she had eaten breakfast, she wouldn't have felt dizzy.",
+            "If she had eaten breakfast, she would not have felt dizzy.",
+            "If she had had breakfast, she wouldn't have felt dizzy.",
+            "If she'd eaten breakfast, she wouldn't have felt dizzy."
+          ],
+          "why": "had had breakfast 的第一個 had 是過去完成式的助動詞，第二個是「吃」。",
+          "newWords": [
+            {
+              "en": "dizzy",
+              "zh": "頭暈的",
+              "example": "I feel dizzy.",
+              "exampleZh": "我覺得頭暈。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "appetite",
+              "zh": "食慾、慾望",
+              "example": "He has no appetite.",
+              "exampleZh": "他沒有食慾。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "dizzy",
+              "zh": "頭暈的",
+              "example": "I feel dizzy.",
+              "exampleZh": "我覺得頭暈。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "appetite",
+              "zh": "食慾、慾望",
+              "example": "He has no appetite.",
+              "exampleZh": "他沒有食慾。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u46-d2",
+              "day": 2,
+              "zh": "如果她有吃早餐，她就不會頭暈了。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實是她沒吃，所以頭暈。",
+                "had eaten breakfast, wouldn't have felt dizzy。"
+              ],
+              "reference": [
+                "If she had eaten breakfast, she wouldn't have felt dizzy.",
+                "If she had eaten breakfast, she would not have felt dizzy.",
+                "If she had had breakfast, she wouldn't have felt dizzy.",
+                "If she'd eaten breakfast, she wouldn't have felt dizzy."
+              ],
+              "why": "had had breakfast 的第一個 had 是過去完成式的助動詞，第二個是「吃」。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If she had eaten breakfast, she wouldn't have felt dizzy.",
+              "zh": "如果她有吃早餐，她就不會頭暈了。"
+            },
+            {
+              "en": "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
+              "zh": "如果他早點去看醫生，傷口就不會感染了。"
+            }
+          ]
+        },
+        {
+          "id": "u46-d3",
+          "day": 3,
+          "zh": "如果我知道你生病了，我就會去看你。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實是：當時不知道。",
+            "If I had known…, I would have visited you。"
+          ],
+          "reference": [
+            "If I had known you were sick, I would have visited you.",
+            "If I had known you were sick, I would have come to see you.",
+            "If I'd known you were sick, I would have visited you.",
+            "If I had known that you were sick, I would have visited you.",
+            "If I had known you were ill, I would have visited you."
+          ],
+          "why": "know 的過去分詞是 known。主要句子用 would have visited。",
+          "newWords": [
+            {
+              "en": "inform",
+              "zh": "通知、告知",
+              "example": "Please inform the nurse.",
+              "exampleZh": "請通知護理師。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "warn",
+              "zh": "警告、提醒",
+              "example": "I warned him.",
+              "exampleZh": "我提醒過他。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "words": [
+            {
+              "en": "inform",
+              "zh": "通知、告知",
+              "example": "Please inform the nurse.",
+              "exampleZh": "請通知護理師。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "warn",
+              "zh": "警告、提醒",
+              "example": "I warned him.",
+              "exampleZh": "我提醒過他。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u46-d3",
+              "day": 3,
+              "zh": "如果我知道你生病了，我就會去看你。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實是：當時不知道。",
+                "If I had known…, I would have visited you。"
+              ],
+              "reference": [
+                "If I had known you were sick, I would have visited you.",
+                "If I had known you were sick, I would have come to see you.",
+                "If I'd known you were sick, I would have visited you.",
+                "If I had known that you were sick, I would have visited you.",
+                "If I had known you were ill, I would have visited you."
+              ],
+              "why": "know 的過去分詞是 known。主要句子用 would have visited。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If I had known you were sick, I would have visited you.",
+              "zh": "如果我知道你生病了，我就會去看你。"
+            },
+            {
+              "en": "If I had left earlier, I wouldn't have been late.",
+              "zh": "如果我早點出門，我就不會遲到了。"
+            }
+          ]
+        },
+        {
+          "id": "u46-d4",
+          "day": 4,
+          "zh": "如果他早點去看醫生，傷口就不會感染了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：他太晚看醫生，傷口感染了。",
+            "had seen a doctor, wouldn't have gotten infected。"
+          ],
+          "reference": [
+            "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
+            "If he had seen a doctor earlier, the wound wouldn't have got infected.",
+            "If he had seen a doctor earlier, the wound wouldn't have become infected.",
+            "If he had gone to the doctor earlier, the wound wouldn't have gotten infected.",
+            "If he had seen a doctor earlier, the wound would not have become infected."
+          ],
+          "why": "get／become infected 是「感染了」。主要句子用 wouldn't have + 過去分詞。",
+          "newWords": [
+            {
+              "en": "wound",
+              "zh": "傷口；使受傷",
+              "example": "Keep the wound clean.",
+              "exampleZh": "保持傷口乾淨。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "infection",
+              "zh": "感染",
+              "example": "The infection is getting worse.",
+              "exampleZh": "感染越來越嚴重。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "words": [
+            {
+              "en": "wound",
+              "zh": "傷口；使受傷",
+              "example": "Keep the wound clean.",
+              "exampleZh": "保持傷口乾淨。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "infection",
+              "zh": "感染",
+              "example": "The infection is getting worse.",
+              "exampleZh": "感染越來越嚴重。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u46-d4",
+              "day": 4,
+              "zh": "如果他早點去看醫生，傷口就不會感染了。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實：他太晚看醫生，傷口感染了。",
+                "had seen a doctor, wouldn't have gotten infected。"
+              ],
+              "reference": [
+                "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
+                "If he had seen a doctor earlier, the wound wouldn't have got infected.",
+                "If he had seen a doctor earlier, the wound wouldn't have become infected.",
+                "If he had gone to the doctor earlier, the wound wouldn't have gotten infected.",
+                "If he had seen a doctor earlier, the wound would not have become infected."
+              ],
+              "why": "get／become infected 是「感染了」。主要句子用 wouldn't have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
+              "zh": "如果他早點去看醫生，傷口就不會感染了。"
+            },
+            {
+              "en": "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
+              "zh": "如果他早點去看醫生，傷口就不會感染了。"
+            }
+          ]
+        },
+        {
+          "id": "u46-d5",
+          "day": 5,
+          "zh": "如果我沒有複習，我就考不過了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實是：有複習，所以過了。",
+            "hadn't reviewed, wouldn't have passed。"
+          ],
+          "reference": [
+            "If I hadn't reviewed, I wouldn't have passed.",
+            "If I had not reviewed, I would not have passed.",
+            "If I hadn't studied, I wouldn't have passed.",
+            "If I hadn't reviewed, I wouldn't have passed the test.",
+            "If I hadn't reviewed, I wouldn't have passed the exam."
+          ],
+          "why": "否定的假設用 hadn't + 過去分詞；事實剛好相反（其實有複習）。",
+          "newWords": [
+            {
+              "en": "helmet",
+              "zh": "安全帽、頭盔",
+              "example": "Always wear a helmet.",
+              "exampleZh": "一定要戴安全帽。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "umbrella",
+              "zh": "雨傘",
+              "example": "Take an umbrella with you.",
+              "exampleZh": "帶一把傘。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "helmet",
+              "zh": "安全帽、頭盔",
+              "example": "Always wear a helmet.",
+              "exampleZh": "一定要戴安全帽。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "umbrella",
+              "zh": "雨傘",
+              "example": "Take an umbrella with you.",
+              "exampleZh": "帶一把傘。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u46-d5",
+              "day": 5,
+              "zh": "如果我沒有複習，我就考不過了。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實是：有複習，所以過了。",
+                "hadn't reviewed, wouldn't have passed。"
+              ],
+              "reference": [
+                "If I hadn't reviewed, I wouldn't have passed.",
+                "If I had not reviewed, I would not have passed.",
+                "If I hadn't studied, I wouldn't have passed.",
+                "If I hadn't reviewed, I wouldn't have passed the test.",
+                "If I hadn't reviewed, I wouldn't have passed the exam."
+              ],
+              "why": "否定的假設用 hadn't + 過去分詞；事實剛好相反（其實有複習）。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If I hadn't reviewed, I wouldn't have passed.",
+              "zh": "如果我沒有複習，我就考不過了。"
+            },
+            {
+              "en": "If I had left earlier, I wouldn't have been late.",
+              "zh": "如果我早點出門，我就不會遲到了。"
+            }
+          ],
+          "recall": [
+            "u46-d1",
+            "u46-d2"
+          ]
+        },
+        {
+          "id": "u46-c1",
+          "day": 6,
+          "zh": "如果你有告訴我，我就會幫你。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：你沒告訴我。",
+            "had told me, would have helped you。"
+          ],
+          "reference": [
+            "If you had told me, I would have helped you.",
+            "If you'd told me, I would have helped you.",
+            "I would have helped you if you had told me."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u46-c1",
+              "day": 6,
+              "zh": "如果你有告訴我，我就會幫你。",
+              "grammar": [
+                "第三類假設"
+              ],
+              "hints": [
+                "事實：你沒告訴我。",
+                "had told me, would have helped you。"
+              ],
+              "reference": [
+                "If you had told me, I would have helped you.",
+                "If you'd told me, I would have helped you.",
+                "I would have helped you if you had told me."
+              ],
+              "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If you had told me, I would have helped you.",
+              "zh": "如果你有告訴我，我就會幫你。"
+            },
+            {
+              "en": "If we had taken a taxi, we would have arrived on time.",
+              "zh": "如果我們搭計程車，我們就會準時到了。"
+            },
+            {
+              "en": "If he had worn a helmet, he wouldn't have been hurt so badly.",
+              "zh": "如果他有戴安全帽，他就不會傷得這麼重。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u46-c1",
+          "day": 6,
+          "zh": "如果你有告訴我，我就會幫你。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：你沒告訴我。",
+            "had told me, would have helped you。"
+          ],
+          "reference": [
+            "If you had told me, I would have helped you.",
+            "If you'd told me, I would have helped you.",
+            "I would have helped you if you had told me."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-c2",
+          "day": 6,
+          "zh": "如果我們搭計程車，我們就會準時到了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒搭，遲到了。",
+            "had taken a taxi, would have arrived on time。"
+          ],
+          "reference": [
+            "If we had taken a taxi, we would have arrived on time.",
+            "If we had taken a taxi, we would have been on time.",
+            "If we had taken a taxi, we would have gotten there on time.",
+            "If we had taken a taxi, we would have got there on time.",
+            "If we'd taken a taxi, we would have arrived on time."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-c3",
+          "day": 6,
+          "zh": "如果他有戴安全帽，他就不會傷得這麼重。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒戴，傷得很重。",
+            "had worn a helmet, wouldn't have been hurt so badly。"
+          ],
+          "reference": [
+            "If he had worn a helmet, he wouldn't have been hurt so badly.",
+            "If he had worn a helmet, he wouldn't have been injured so badly.",
+            "If he had been wearing a helmet, he wouldn't have been hurt so badly.",
+            "If he had worn a helmet, he wouldn't have been so badly hurt.",
+            "If he had worn a helmet, he would not have been hurt so badly."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u46-r1",
+          "day": 4,
+          "zh": "如果她早點吃藥，她就會睡得比較好。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：太晚吃藥。",
+            "had taken her medicine, would have slept better。"
+          ],
+          "reference": [
+            "If she had taken her medicine earlier, she would have slept better.",
+            "If she had taken the medicine earlier, she would have slept better.",
+            "If she had taken her medication earlier, she would have slept better."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r2",
+          "day": 5,
+          "zh": "如果我沒有帶傘，我就會淋濕了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：有帶傘。",
+            "hadn't brought an umbrella, would have gotten wet。"
+          ],
+          "reference": [
+            "If I hadn't brought an umbrella, I would have gotten wet.",
+            "If I hadn't brought an umbrella, I would have got wet.",
+            "If I had not brought an umbrella, I would have gotten wet.",
+            "If I hadn't taken an umbrella, I would have gotten wet."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r3",
+          "day": 6,
+          "zh": "如果我有看到訊息，我就會打給你。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒看到。",
+            "had seen the message, would have called you。"
+          ],
+          "reference": [
+            "If I had seen the message, I would have called you.",
+            "If I'd seen the message, I would have called you.",
+            "If I had seen your message, I would have called you.",
+            "I would have called you if I had seen the message."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r4",
+          "day": 6,
+          "zh": "如果天氣好一點，我們就會去爬山了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：天氣不好。",
+            "had been better, would have gone hiking。"
+          ],
+          "reference": [
+            "If the weather had been better, we would have gone hiking.",
+            "If the weather had been nicer, we would have gone hiking.",
+            "If the weather had been better, we would have gone mountain climbing.",
+            "We would have gone hiking if the weather had been better."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r5",
+          "day": 6,
+          "zh": "如果我有存錢，我就可以買那支手機了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒存錢。",
+            "could have bought that phone（could 表示「能夠」）。"
+          ],
+          "reference": [
+            "If I had saved money, I could have bought that phone.",
+            "If I had saved some money, I could have bought that phone.",
+            "If I had saved money, I would have bought that phone.",
+            "If I'd saved money, I could have bought that phone."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u46-r1",
+          "day": 4,
+          "zh": "如果她早點吃藥，她就會睡得比較好。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：太晚吃藥。",
+            "had taken her medicine, would have slept better。"
+          ],
+          "reference": [
+            "If she had taken her medicine earlier, she would have slept better.",
+            "If she had taken the medicine earlier, she would have slept better.",
+            "If she had taken her medication earlier, she would have slept better."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r2",
+          "day": 5,
+          "zh": "如果我沒有帶傘，我就會淋濕了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：有帶傘。",
+            "hadn't brought an umbrella, would have gotten wet。"
+          ],
+          "reference": [
+            "If I hadn't brought an umbrella, I would have gotten wet.",
+            "If I hadn't brought an umbrella, I would have got wet.",
+            "If I had not brought an umbrella, I would have gotten wet.",
+            "If I hadn't taken an umbrella, I would have gotten wet."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r3",
+          "day": 6,
+          "zh": "如果我有看到訊息，我就會打給你。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒看到。",
+            "had seen the message, would have called you。"
+          ],
+          "reference": [
+            "If I had seen the message, I would have called you.",
+            "If I'd seen the message, I would have called you.",
+            "If I had seen your message, I would have called you.",
+            "I would have called you if I had seen the message."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r4",
+          "day": 6,
+          "zh": "如果天氣好一點，我們就會去爬山了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：天氣不好。",
+            "had been better, would have gone hiking。"
+          ],
+          "reference": [
+            "If the weather had been better, we would have gone hiking.",
+            "If the weather had been nicer, we would have gone hiking.",
+            "If the weather had been better, we would have gone mountain climbing.",
+            "We would have gone hiking if the weather had been better."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        },
+        {
+          "id": "u46-r5",
+          "day": 6,
+          "zh": "如果我有存錢，我就可以買那支手機了。",
+          "grammar": [
+            "第三類假設"
+          ],
+          "hints": [
+            "事實：沒存錢。",
+            "could have bought that phone（could 表示「能夠」）。"
+          ],
+          "reference": [
+            "If I had saved money, I could have bought that phone.",
+            "If I had saved some money, I could have bought that phone.",
+            "If I had saved money, I would have bought that phone.",
+            "If I'd saved money, I could have bought that phone."
+          ],
+          "why": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+          "newWords": []
+        }
+      ],
+      "cando": "說出「當初如果…，結果就會…」，談過去的後悔和教訓"
+    },
+    {
+      "id": 47,
+      "unit": 47,
+      "stage": "BR",
+      "title": "願望和遺憾：wish、if only、should have",
+      "rule": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+      "examples": [
+        "I wish I had more time.",
+        "I shouldn't have eaten so much."
+      ],
+      "examplesZh": [
+        "我希望我有更多時間。",
+        "我不應該吃那麼多。"
+      ],
+      "days": [
+        {
+          "id": "u47-d1",
+          "day": 1,
+          "zh": "我希望我有更多時間。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在沒有，所以才希望。",
+            "wish + 過去式：I wish I had more time。"
+          ],
+          "reference": [
+            "I wish I had more time.",
+            "If only I had more time.",
+            "I wish that I had more time."
+          ],
+          "why": "對現在的願望用 wish + 過去式：事實上現在沒有更多時間。",
+          "newWords": [
+            {
+              "en": "regret",
+              "zh": "後悔、遺憾",
+              "example": "I regret saying that.",
+              "exampleZh": "我後悔說了那句話。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "fluent",
+              "zh": "流利的",
+              "example": "She is fluent in English.",
+              "exampleZh": "她英文很流利。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "words": [
+            {
+              "en": "regret",
+              "zh": "後悔、遺憾",
+              "example": "I regret saying that.",
+              "exampleZh": "我後悔說了那句話。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "fluent",
+              "zh": "流利的",
+              "example": "She is fluent in English.",
+              "exampleZh": "她英文很流利。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u47-d1",
+              "day": 1,
+              "zh": "我希望我有更多時間。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "現在沒有，所以才希望。",
+                "wish + 過去式：I wish I had more time。"
+              ],
+              "reference": [
+                "I wish I had more time.",
+                "If only I had more time.",
+                "I wish that I had more time."
+              ],
+              "why": "對現在的願望用 wish + 過去式：事實上現在沒有更多時間。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I wish I had more time.",
+              "zh": "我希望我有更多時間。"
+            },
+            {
+              "en": "I wish I had more time.",
+              "zh": "我希望我有更多時間。"
+            }
+          ]
+        },
+        {
+          "id": "u47-d2",
+          "day": 2,
+          "zh": "我真希望我昨天晚上有早點睡。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "對過去的遺憾。",
+            "wish + had + 過去分詞：I wish I had gone to bed earlier。"
+          ],
+          "reference": [
+            "I wish I had gone to bed earlier last night.",
+            "I wish I'd gone to bed earlier last night.",
+            "I wish I had slept earlier last night.",
+            "If only I had gone to bed earlier last night."
+          ],
+          "why": "對過去的遺憾：wish + 過去完成式。",
+          "newWords": [
+            {
+              "en": "habit",
+              "zh": "習慣",
+              "example": "Sleeping late is a bad habit.",
+              "exampleZh": "晚睡是壞習慣。",
+              "source": "level1",
+              "level": 1
+            },
+            {
+              "en": "midnight",
+              "zh": "午夜",
+              "example": "I went to bed after midnight.",
+              "exampleZh": "我過了午夜才睡。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "habit",
+              "zh": "習慣",
+              "example": "Sleeping late is a bad habit.",
+              "exampleZh": "晚睡是壞習慣。",
+              "source": "level1",
+              "level": 1
+            },
+            {
+              "en": "midnight",
+              "zh": "午夜",
+              "example": "I went to bed after midnight.",
+              "exampleZh": "我過了午夜才睡。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u47-d2",
+              "day": 2,
+              "zh": "我真希望我昨天晚上有早點睡。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "對過去的遺憾。",
+                "wish + had + 過去分詞：I wish I had gone to bed earlier。"
+              ],
+              "reference": [
+                "I wish I had gone to bed earlier last night.",
+                "I wish I'd gone to bed earlier last night.",
+                "I wish I had slept earlier last night.",
+                "If only I had gone to bed earlier last night."
+              ],
+              "why": "對過去的遺憾：wish + 過去完成式。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I wish I had gone to bed earlier last night.",
+              "zh": "我真希望我昨天晚上有早點睡。"
+            },
+            {
+              "en": "I shouldn't have eaten so much.",
+              "zh": "我不應該吃那麼多。"
+            }
+          ]
+        },
+        {
+          "id": "u47-d3",
+          "day": 3,
+          "zh": "你應該先告訴護理師的。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初應該做卻沒做。",
+            "should have + 過去分詞：should have told。"
+          ],
+          "reference": [
+            "You should have told the nurse first.",
+            "You should've told the nurse first.",
+            "You should have told a nurse first."
+          ],
+          "why": "should have + 過去分詞：當初應該做（但沒做）。",
+          "newWords": [
+            {
+              "en": "advice",
+              "zh": "忠告、勸告",
+              "example": "Thank you for your advice.",
+              "exampleZh": "謝謝你的建議。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "apologize",
+              "zh": "道歉",
+              "example": "I want to apologize.",
+              "exampleZh": "我想道歉。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "words": [
+            {
+              "en": "advice",
+              "zh": "忠告、勸告",
+              "example": "Thank you for your advice.",
+              "exampleZh": "謝謝你的建議。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "apologize",
+              "zh": "道歉",
+              "example": "I want to apologize.",
+              "exampleZh": "我想道歉。",
+              "source": "level3",
+              "level": 3
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u47-d3",
+              "day": 3,
+              "zh": "你應該先告訴護理師的。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "當初應該做卻沒做。",
+                "should have + 過去分詞：should have told。"
+              ],
+              "reference": [
+                "You should have told the nurse first.",
+                "You should've told the nurse first.",
+                "You should have told a nurse first."
+              ],
+              "why": "should have + 過去分詞：當初應該做（但沒做）。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "You should have told the nurse first.",
+              "zh": "你應該先告訴護理師的。"
+            },
+            {
+              "en": "I wish I had more time.",
+              "zh": "我希望我有更多時間。"
+            }
+          ]
+        },
+        {
+          "id": "u47-d4",
+          "day": 4,
+          "zh": "我不應該吃那麼多。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初不該做卻做了。",
+            "shouldn't have eaten。"
+          ],
+          "reference": [
+            "I shouldn't have eaten so much.",
+            "I should not have eaten so much.",
+            "I shouldn't have eaten that much."
+          ],
+          "why": "shouldn't have + 過去分詞：當初不該做（卻做了）。eat 的過去分詞是 eaten。",
+          "newWords": [
+            {
+              "en": "stomach",
+              "zh": "胃、肚子",
+              "example": "My stomach hurts.",
+              "exampleZh": "我肚子痛。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "lift",
+              "zh": "舉起、抬起",
+              "example": "Don't lift heavy boxes alone.",
+              "exampleZh": "不要一個人搬重的箱子。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "stomach",
+              "zh": "胃、肚子",
+              "example": "My stomach hurts.",
+              "exampleZh": "我肚子痛。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "lift",
+              "zh": "舉起、抬起",
+              "example": "Don't lift heavy boxes alone.",
+              "exampleZh": "不要一個人搬重的箱子。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u47-d4",
+              "day": 4,
+              "zh": "我不應該吃那麼多。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "當初不該做卻做了。",
+                "shouldn't have eaten。"
+              ],
+              "reference": [
+                "I shouldn't have eaten so much.",
+                "I should not have eaten so much.",
+                "I shouldn't have eaten that much."
+              ],
+              "why": "shouldn't have + 過去分詞：當初不該做（卻做了）。eat 的過去分詞是 eaten。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I shouldn't have eaten so much.",
+              "zh": "我不應該吃那麼多。"
+            },
+            {
+              "en": "I shouldn't have eaten so much.",
+              "zh": "我不應該吃那麼多。"
+            }
+          ]
+        },
+        {
+          "id": "u47-d5",
+          "day": 5,
+          "zh": "要是我會說英文就好了。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "對現在的願望。",
+            "If only I could speak English。"
+          ],
+          "reference": [
+            "If only I could speak English.",
+            "I wish I could speak English.",
+            "If only I spoke English.",
+            "I wish I spoke English."
+          ],
+          "why": "if only 比 wish 更強烈。「會」說用 could（can 的過去式）。",
+          "newWords": [
+            {
+              "en": "opportunity",
+              "zh": "機會、時機",
+              "example": "This is a great opportunity.",
+              "exampleZh": "這是很好的機會。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "decision",
+              "zh": "決定",
+              "example": "It was a hard decision.",
+              "exampleZh": "那是個很難的決定。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "opportunity",
+              "zh": "機會、時機",
+              "example": "This is a great opportunity.",
+              "exampleZh": "這是很好的機會。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "decision",
+              "zh": "決定",
+              "example": "It was a hard decision.",
+              "exampleZh": "那是個很難的決定。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u47-d5",
+              "day": 5,
+              "zh": "要是我會說英文就好了。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "對現在的願望。",
+                "If only I could speak English。"
+              ],
+              "reference": [
+                "If only I could speak English.",
+                "I wish I could speak English.",
+                "If only I spoke English.",
+                "I wish I spoke English."
+              ],
+              "why": "if only 比 wish 更強烈。「會」說用 could（can 的過去式）。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "If only I could speak English.",
+              "zh": "要是我會說英文就好了。"
+            },
+            {
+              "en": "I wish I had more time.",
+              "zh": "我希望我有更多時間。"
+            }
+          ],
+          "recall": [
+            "u47-d1",
+            "u47-d2"
+          ]
+        },
+        {
+          "id": "u47-c1",
+          "day": 6,
+          "zh": "我希望我住得離醫院近一點。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I lived closer to the hospital。"
+          ],
+          "reference": [
+            "I wish I lived closer to the hospital.",
+            "I wish I lived nearer to the hospital.",
+            "If only I lived closer to the hospital."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u47-c1",
+              "day": 6,
+              "zh": "我希望我住得離醫院近一點。",
+              "grammar": [
+                "wish 和 should have"
+              ],
+              "hints": [
+                "現在的願望。",
+                "wish I lived closer to the hospital。"
+              ],
+              "reference": [
+                "I wish I lived closer to the hospital.",
+                "I wish I lived nearer to the hospital.",
+                "If only I lived closer to the hospital."
+              ],
+              "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "I wish I lived closer to the hospital.",
+              "zh": "我希望我住得離醫院近一點。"
+            },
+            {
+              "en": "He wishes he had worn gloves.",
+              "zh": "他真希望他當時有戴手套。"
+            },
+            {
+              "en": "We should have left earlier.",
+              "zh": "我們應該早點出發的。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u47-c1",
+          "day": 6,
+          "zh": "我希望我住得離醫院近一點。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I lived closer to the hospital。"
+          ],
+          "reference": [
+            "I wish I lived closer to the hospital.",
+            "I wish I lived nearer to the hospital.",
+            "If only I lived closer to the hospital."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-c2",
+          "day": 6,
+          "zh": "他真希望他當時有戴手套。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "對過去的遺憾。",
+            "wishes he had worn gloves。"
+          ],
+          "reference": [
+            "He wishes he had worn gloves.",
+            "He wishes he had been wearing gloves.",
+            "He wished he had worn gloves."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-c3",
+          "day": 6,
+          "zh": "我們應該早點出發的。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初應該。",
+            "should have left earlier。"
+          ],
+          "reference": [
+            "We should have left earlier.",
+            "We should've left earlier.",
+            "We should have set off earlier."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u47-r1",
+          "day": 4,
+          "zh": "你不應該一個人搬病人。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初不該。",
+            "shouldn't have moved the patient by yourself。"
+          ],
+          "reference": [
+            "You shouldn't have moved the patient by yourself.",
+            "You shouldn't have moved the patient alone.",
+            "You shouldn't have moved the patient on your own.",
+            "You should not have moved the patient by yourself."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r2",
+          "day": 5,
+          "zh": "我希望今天不用上班。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I didn't have to work。"
+          ],
+          "reference": [
+            "I wish I didn't have to work today.",
+            "I wish I didn't have to go to work today.",
+            "If only I didn't have to work today."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r3",
+          "day": 6,
+          "zh": "要是我昨天有複習就好了。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "對過去的遺憾。",
+            "If only I had reviewed yesterday。"
+          ],
+          "reference": [
+            "If only I had reviewed yesterday.",
+            "I wish I had reviewed yesterday.",
+            "If only I'd reviewed yesterday.",
+            "I wish I had studied yesterday."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r4",
+          "day": 6,
+          "zh": "他應該早點去看醫生的。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初應該。",
+            "should have seen a doctor earlier。"
+          ],
+          "reference": [
+            "He should have seen a doctor earlier.",
+            "He should have gone to the doctor earlier.",
+            "He should've seen a doctor earlier.",
+            "He should have gone to see a doctor earlier."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r5",
+          "day": 6,
+          "zh": "我希望我會游泳。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I could swim。"
+          ],
+          "reference": [
+            "I wish I could swim.",
+            "If only I could swim."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u47-r1",
+          "day": 4,
+          "zh": "你不應該一個人搬病人。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初不該。",
+            "shouldn't have moved the patient by yourself。"
+          ],
+          "reference": [
+            "You shouldn't have moved the patient by yourself.",
+            "You shouldn't have moved the patient alone.",
+            "You shouldn't have moved the patient on your own.",
+            "You should not have moved the patient by yourself."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r2",
+          "day": 5,
+          "zh": "我希望今天不用上班。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I didn't have to work。"
+          ],
+          "reference": [
+            "I wish I didn't have to work today.",
+            "I wish I didn't have to go to work today.",
+            "If only I didn't have to work today."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r3",
+          "day": 6,
+          "zh": "要是我昨天有複習就好了。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "對過去的遺憾。",
+            "If only I had reviewed yesterday。"
+          ],
+          "reference": [
+            "If only I had reviewed yesterday.",
+            "I wish I had reviewed yesterday.",
+            "If only I'd reviewed yesterday.",
+            "I wish I had studied yesterday."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r4",
+          "day": 6,
+          "zh": "他應該早點去看醫生的。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "當初應該。",
+            "should have seen a doctor earlier。"
+          ],
+          "reference": [
+            "He should have seen a doctor earlier.",
+            "He should have gone to the doctor earlier.",
+            "He should've seen a doctor earlier.",
+            "He should have gone to see a doctor earlier."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        },
+        {
+          "id": "u47-r5",
+          "day": 6,
+          "zh": "我希望我會游泳。",
+          "grammar": [
+            "wish 和 should have"
+          ],
+          "hints": [
+            "現在的願望。",
+            "wish I could swim。"
+          ],
+          "reference": [
+            "I wish I could swim.",
+            "If only I could swim."
+          ],
+          "why": "對現在的願望（但事實不是這樣）：wish／if only + 過去式（I wish I had more time.）。對過去的遺憾：wish／if only + 過去完成式（I wish I had studied harder.）。檢討當初應該或不該做：should have／shouldn't have + 過去分詞。",
+          "newWords": []
+        }
+      ],
+      "cando": "說出現在的願望和對過去的遺憾，用 should have 檢討做錯的事"
+    },
+    {
+      "id": 48,
+      "unit": 48,
+      "stage": "BR",
+      "title": "非限定關係子句（加逗號的補充說明）",
+      "rule": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+      "examples": [
+        "My sister, who is a nurse, lives in Taipei.",
+        "He didn't come to work, which made everyone worried."
+      ],
+      "examplesZh": [
+        "我姐姐是護理師，她住在台北。",
+        "他沒有來上班，這讓大家很擔心。"
+      ],
+      "days": [
+        {
+          "id": "u48-d1",
+          "day": 1,
+          "zh": "我姐姐是護理師，她住在台北。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "把「是護理師」當補充說明，插在主詞後面。",
+            "My sister, who is a nurse, lives in Taipei（前後都要逗號）。"
+          ],
+          "reference": [
+            "My sister, who is a nurse, lives in Taipei.",
+            "My older sister, who is a nurse, lives in Taipei.",
+            "My big sister, who is a nurse, lives in Taipei."
+          ],
+          "why": "補充說明的子句前後加逗號；人用 who。這裡只是補充她的工作，不是用來分辨是哪一個姐姐。",
+          "newWords": [
+            {
+              "en": "colleague",
+              "zh": "同事",
+              "example": "My colleague helped me.",
+              "exampleZh": "我的同事幫了我。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "neighbor",
+              "zh": "鄰居",
+              "example": "Our neighbor is very kind.",
+              "exampleZh": "我們的鄰居人很好。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "colleague",
+              "zh": "同事",
+              "example": "My colleague helped me.",
+              "exampleZh": "我的同事幫了我。",
+              "source": "level4",
+              "level": 4
+            },
+            {
+              "en": "neighbor",
+              "zh": "鄰居",
+              "example": "Our neighbor is very kind.",
+              "exampleZh": "我們的鄰居人很好。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u48-d1",
+              "day": 1,
+              "zh": "我姐姐是護理師，她住在台北。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "把「是護理師」當補充說明，插在主詞後面。",
+                "My sister, who is a nurse, lives in Taipei（前後都要逗號）。"
+              ],
+              "reference": [
+                "My sister, who is a nurse, lives in Taipei.",
+                "My older sister, who is a nurse, lives in Taipei.",
+                "My big sister, who is a nurse, lives in Taipei."
+              ],
+              "why": "補充說明的子句前後加逗號；人用 who。這裡只是補充她的工作，不是用來分辨是哪一個姐姐。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "My sister, who is a nurse, lives in Taipei.",
+              "zh": "我姐姐是護理師，她住在台北。"
+            },
+            {
+              "en": "My sister, who is a nurse, lives in Taipei.",
+              "zh": "我姐姐是護理師，她住在台北。"
+            }
+          ]
+        },
+        {
+          "id": "u48-d2",
+          "day": 2,
+          "zh": "台南是我出生的地方，那裡的食物很好吃。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "地點的補充說明。",
+            "Tainan, where I was born, has great food。"
+          ],
+          "reference": [
+            "Tainan, where I was born, has great food.",
+            "Tainan, where I was born, has delicious food.",
+            "Tainan, where I was born, has very good food.",
+            "The food in Tainan, where I was born, is delicious."
+          ],
+          "why": "地點用 where，前後加逗號。",
+          "newWords": [
+            {
+              "en": "delicious",
+              "zh": "美味的",
+              "example": "The noodles are delicious.",
+              "exampleZh": "這碗麵很好吃。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "gather",
+              "zh": "聚集、集合",
+              "example": "We gather here every Sunday.",
+              "exampleZh": "我們每個星期天在這裡聚會。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "delicious",
+              "zh": "美味的",
+              "example": "The noodles are delicious.",
+              "exampleZh": "這碗麵很好吃。",
+              "source": "level2",
+              "level": 2
+            },
+            {
+              "en": "gather",
+              "zh": "聚集、集合",
+              "example": "We gather here every Sunday.",
+              "exampleZh": "我們每個星期天在這裡聚會。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u48-d2",
+              "day": 2,
+              "zh": "台南是我出生的地方，那裡的食物很好吃。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "地點的補充說明。",
+                "Tainan, where I was born, has great food。"
+              ],
+              "reference": [
+                "Tainan, where I was born, has great food.",
+                "Tainan, where I was born, has delicious food.",
+                "Tainan, where I was born, has very good food.",
+                "The food in Tainan, where I was born, is delicious."
+              ],
+              "why": "地點用 where，前後加逗號。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "Tainan, where I was born, has great food.",
+              "zh": "台南是我出生的地方，那裡的食物很好吃。"
+            },
+            {
+              "en": "He didn't come to work, which made everyone worried.",
+              "zh": "他沒有來上班，這讓大家很擔心。"
+            }
+          ]
+        },
+        {
+          "id": "u48-d3",
+          "day": 3,
+          "zh": "陳太太的兒子是醫生，她今天出院。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "「她的兒子」用所有格的關係代名詞。",
+            "Mrs. Chen, whose son is a doctor, …"
+          ],
+          "reference": [
+            "Mrs. Chen, whose son is a doctor, is going home today.",
+            "Mrs. Chen, whose son is a doctor, is being discharged today.",
+            "Mrs. Chen, whose son is a doctor, leaves the hospital today.",
+            "Mrs. Chen, whose son is a doctor, is leaving the hospital today."
+          ],
+          "why": "whose = 某人的；出院可以說 go home、be discharged、leave the hospital。",
+          "newWords": [
+            {
+              "en": "discharge",
+              "zh": "出院；排出（分泌物）",
+              "example": "She was discharged yesterday.",
+              "exampleZh": "她昨天出院了。",
+              "source": "level6",
+              "level": 6
+            },
+            {
+              "en": "surgery",
+              "zh": "手術；外科",
+              "example": "He needs surgery.",
+              "exampleZh": "他需要動手術。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "words": [
+            {
+              "en": "discharge",
+              "zh": "出院；排出（分泌物）",
+              "example": "She was discharged yesterday.",
+              "exampleZh": "她昨天出院了。",
+              "source": "level6",
+              "level": 6
+            },
+            {
+              "en": "surgery",
+              "zh": "手術；外科",
+              "example": "He needs surgery.",
+              "exampleZh": "他需要動手術。",
+              "source": "level4",
+              "level": 4
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u48-d3",
+              "day": 3,
+              "zh": "陳太太的兒子是醫生，她今天出院。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "「她的兒子」用所有格的關係代名詞。",
+                "Mrs. Chen, whose son is a doctor, …"
+              ],
+              "reference": [
+                "Mrs. Chen, whose son is a doctor, is going home today.",
+                "Mrs. Chen, whose son is a doctor, is being discharged today.",
+                "Mrs. Chen, whose son is a doctor, leaves the hospital today.",
+                "Mrs. Chen, whose son is a doctor, is leaving the hospital today."
+              ],
+              "why": "whose = 某人的；出院可以說 go home、be discharged、leave the hospital。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "Mrs. Chen, whose son is a doctor, is going home today.",
+              "zh": "陳太太的兒子是醫生，她今天出院。"
+            },
+            {
+              "en": "My sister, who is a nurse, lives in Taipei.",
+              "zh": "我姐姐是護理師，她住在台北。"
+            }
+          ]
+        },
+        {
+          "id": "u48-d4",
+          "day": 4,
+          "zh": "他沒有來上班，這讓大家很擔心。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "「這」指前面整件事。",
+            "…, which made everyone worried。"
+          ],
+          "reference": [
+            "He didn't come to work, which made everyone worried.",
+            "He didn't come to work, which worried everyone.",
+            "He didn't come to work, which made everybody worried.",
+            "He did not come to work, which made everyone worried."
+          ],
+          "why": "which 可以指前面整個句子說的事，前面要加逗號。",
+          "newWords": [
+            {
+              "en": "emergency",
+              "zh": "緊急情況；急診",
+              "example": "Call 119 in an emergency.",
+              "exampleZh": "緊急的時候打 119。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "admit",
+              "zh": "承認；讓……住院",
+              "example": "He was admitted last night.",
+              "exampleZh": "他昨晚住院了。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "emergency",
+              "zh": "緊急情況；急診",
+              "example": "Call 119 in an emergency.",
+              "exampleZh": "緊急的時候打 119。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "admit",
+              "zh": "承認；讓……住院",
+              "example": "He was admitted last night.",
+              "exampleZh": "他昨晚住院了。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u48-d4",
+              "day": 4,
+              "zh": "他沒有來上班，這讓大家很擔心。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "「這」指前面整件事。",
+                "…, which made everyone worried。"
+              ],
+              "reference": [
+                "He didn't come to work, which made everyone worried.",
+                "He didn't come to work, which worried everyone.",
+                "He didn't come to work, which made everybody worried.",
+                "He did not come to work, which made everyone worried."
+              ],
+              "why": "which 可以指前面整個句子說的事，前面要加逗號。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "He didn't come to work, which made everyone worried.",
+              "zh": "他沒有來上班，這讓大家很擔心。"
+            },
+            {
+              "en": "He didn't come to work, which made everyone worried.",
+              "zh": "他沒有來上班，這讓大家很擔心。"
+            }
+          ]
+        },
+        {
+          "id": "u48-d5",
+          "day": 5,
+          "zh": "這台機器是我們去年買的，現在壞了。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "事物的補充說明。",
+            "This machine, which we bought last year, is broken now。"
+          ],
+          "reference": [
+            "This machine, which we bought last year, is broken now.",
+            "This machine, which we bought last year, is now broken.",
+            "The machine, which we bought last year, is broken now.",
+            "This machine, which was bought last year, is broken now."
+          ],
+          "why": "事物用 which；非限定子句不能用 that。",
+          "newWords": [
+            {
+              "en": "missing",
+              "zh": "失蹤的、缺少的",
+              "example": "My key is missing.",
+              "exampleZh": "我的鑰匙不見了。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "disappear",
+              "zh": "消失、不見",
+              "example": "The pain disappeared.",
+              "exampleZh": "痛消失了。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "words": [
+            {
+              "en": "missing",
+              "zh": "失蹤的、缺少的",
+              "example": "My key is missing.",
+              "exampleZh": "我的鑰匙不見了。",
+              "source": "level3",
+              "level": 3
+            },
+            {
+              "en": "disappear",
+              "zh": "消失、不見",
+              "example": "The pain disappeared.",
+              "exampleZh": "痛消失了。",
+              "source": "level2",
+              "level": 2
+            }
+          ],
+          "sentences": [
+            {
+              "id": "u48-d5",
+              "day": 5,
+              "zh": "這台機器是我們去年買的，現在壞了。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "事物的補充說明。",
+                "This machine, which we bought last year, is broken now。"
+              ],
+              "reference": [
+                "This machine, which we bought last year, is broken now.",
+                "This machine, which we bought last year, is now broken.",
+                "The machine, which we bought last year, is broken now.",
+                "This machine, which was bought last year, is broken now."
+              ],
+              "why": "事物用 which；非限定子句不能用 that。",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "This machine, which we bought last year, is broken now.",
+              "zh": "這台機器是我們去年買的，現在壞了。"
+            },
+            {
+              "en": "My sister, who is a nurse, lives in Taipei.",
+              "zh": "我姐姐是護理師，她住在台北。"
+            }
+          ],
+          "recall": [
+            "u48-d1",
+            "u48-d2"
+          ]
+        },
+        {
+          "id": "u48-c1",
+          "day": 6,
+          "zh": "我的室友是護理系學生，她昨晚一定很晚睡。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "補充說明＋推測過去。",
+            "who is a nursing student, must have gone to bed late。"
+          ],
+          "reference": [
+            "My roommate, who is a nursing student, must have gone to bed late last night.",
+            "My roommate, who studies nursing, must have gone to bed late last night.",
+            "My roommate, who is a nursing student, must have stayed up late last night."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": [],
+          "words": [],
+          "sentences": [
+            {
+              "id": "u48-c1",
+              "day": 6,
+              "zh": "我的室友是護理系學生，她昨晚一定很晚睡。",
+              "grammar": [
+                "非限定關係子句"
+              ],
+              "hints": [
+                "補充說明＋推測過去。",
+                "who is a nursing student, must have gone to bed late。"
+              ],
+              "reference": [
+                "My roommate, who is a nursing student, must have gone to bed late last night.",
+                "My roommate, who studies nursing, must have gone to bed late last night.",
+                "My roommate, who is a nursing student, must have stayed up late last night."
+              ],
+              "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+              "newWords": []
+            }
+          ],
+          "bonusWords": [],
+          "listening": [
+            {
+              "en": "My roommate, who is a nursing student, must have gone to bed late last night.",
+              "zh": "我的室友是護理系學生，她昨晚一定很晚睡。"
+            },
+            {
+              "en": "Our head nurse, who is very kind, used to work in the US.",
+              "zh": "我們的護理長人很好，她以前在美國工作。"
+            },
+            {
+              "en": "The patient didn't sleep well at night, which made him tired during the day.",
+              "zh": "病人晚上睡不好，這讓他白天很累。"
+            }
+          ]
+        }
+      ],
+      "checkpoint": [
+        {
+          "id": "u48-c1",
+          "day": 6,
+          "zh": "我的室友是護理系學生，她昨晚一定很晚睡。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "補充說明＋推測過去。",
+            "who is a nursing student, must have gone to bed late。"
+          ],
+          "reference": [
+            "My roommate, who is a nursing student, must have gone to bed late last night.",
+            "My roommate, who studies nursing, must have gone to bed late last night.",
+            "My roommate, who is a nursing student, must have stayed up late last night."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-c2",
+          "day": 6,
+          "zh": "我們的護理長人很好，她以前在美國工作。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "補充說明＋以前的事。",
+            "who is very kind, used to work in the US。"
+          ],
+          "reference": [
+            "Our head nurse, who is very kind, used to work in the US.",
+            "Our head nurse, who is very nice, used to work in the US.",
+            "Our head nurse, who is very kind, used to work in America.",
+            "Our head nurse, who is very kind, used to work in the United States."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-c3",
+          "day": 6,
+          "zh": "病人晚上睡不好，這讓他白天很累。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "which 指前面整件事。",
+            "…, which made him tired during the day。"
+          ],
+          "reference": [
+            "The patient didn't sleep well at night, which made him tired during the day.",
+            "The patient didn't sleep well at night, which made him tired in the daytime.",
+            "The patient did not sleep well at night, which made him tired during the day."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        }
+      ],
+      "backup": [
+        {
+          "id": "u48-r1",
+          "day": 4,
+          "zh": "她通過了考試，這讓她的父母很開心。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "which 指整件事。",
+            "…, which made her parents very happy。"
+          ],
+          "reference": [
+            "She passed the exam, which made her parents very happy.",
+            "She passed the exam, which made her parents happy.",
+            "She passed the test, which made her parents very happy."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r2",
+          "day": 5,
+          "zh": "我的手機是我爸送我的，昨天不見了。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "事物的補充說明。",
+            "My phone, which my dad gave me, …"
+          ],
+          "reference": [
+            "My phone, which my dad gave me, went missing yesterday.",
+            "My phone, which my dad gave me, got lost yesterday.",
+            "My phone, which my father gave me, went missing yesterday.",
+            "My phone, which my dad gave me, disappeared yesterday."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r3",
+          "day": 6,
+          "zh": "台中是我讀書的地方，天氣很好。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "地點的補充說明。",
+            "Taichung, where I study, has nice weather。"
+          ],
+          "reference": [
+            "Taichung, where I study, has nice weather.",
+            "Taichung, where I study, has great weather.",
+            "Taichung, where I go to school, has nice weather.",
+            "The weather in Taichung, where I study, is nice."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r4",
+          "day": 6,
+          "zh": "王先生的太太是老師，他今天要動手術。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "所有格關係代名詞。",
+            "Mr. Wang, whose wife is a teacher, is having surgery today。"
+          ],
+          "reference": [
+            "Mr. Wang, whose wife is a teacher, is having surgery today.",
+            "Mr. Wang, whose wife is a teacher, is going to have surgery today.",
+            "Mr. Wang, whose wife is a teacher, will have surgery today."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r5",
+          "day": 6,
+          "zh": "我們的老師以前是護理師，她教得很好。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "補充說明＋used to。",
+            "Our teacher, who used to be a nurse, teaches very well。"
+          ],
+          "reference": [
+            "Our teacher, who used to be a nurse, teaches very well.",
+            "Our teacher, who used to be a nurse, is a very good teacher.",
+            "Our teacher, who was a nurse before, teaches very well."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        }
+      ],
+      "retrySentences": [
+        {
+          "id": "u48-r1",
+          "day": 4,
+          "zh": "她通過了考試，這讓她的父母很開心。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "which 指整件事。",
+            "…, which made her parents very happy。"
+          ],
+          "reference": [
+            "She passed the exam, which made her parents very happy.",
+            "She passed the exam, which made her parents happy.",
+            "She passed the test, which made her parents very happy."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r2",
+          "day": 5,
+          "zh": "我的手機是我爸送我的，昨天不見了。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "事物的補充說明。",
+            "My phone, which my dad gave me, …"
+          ],
+          "reference": [
+            "My phone, which my dad gave me, went missing yesterday.",
+            "My phone, which my dad gave me, got lost yesterday.",
+            "My phone, which my father gave me, went missing yesterday.",
+            "My phone, which my dad gave me, disappeared yesterday."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r3",
+          "day": 6,
+          "zh": "台中是我讀書的地方，天氣很好。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "地點的補充說明。",
+            "Taichung, where I study, has nice weather。"
+          ],
+          "reference": [
+            "Taichung, where I study, has nice weather.",
+            "Taichung, where I study, has great weather.",
+            "Taichung, where I go to school, has nice weather.",
+            "The weather in Taichung, where I study, is nice."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r4",
+          "day": 6,
+          "zh": "王先生的太太是老師，他今天要動手術。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "所有格關係代名詞。",
+            "Mr. Wang, whose wife is a teacher, is having surgery today。"
+          ],
+          "reference": [
+            "Mr. Wang, whose wife is a teacher, is having surgery today.",
+            "Mr. Wang, whose wife is a teacher, is going to have surgery today.",
+            "Mr. Wang, whose wife is a teacher, will have surgery today."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        },
+        {
+          "id": "u48-r5",
+          "day": 6,
+          "zh": "我們的老師以前是護理師，她教得很好。",
+          "grammar": [
+            "非限定關係子句"
+          ],
+          "hints": [
+            "補充說明＋used to。",
+            "Our teacher, who used to be a nurse, teaches very well。"
+          ],
+          "reference": [
+            "Our teacher, who used to be a nurse, teaches very well.",
+            "Our teacher, who used to be a nurse, is a very good teacher.",
+            "Our teacher, who was a nurse before, teaches very well."
+          ],
+          "why": "非限定關係子句是「補充說明」，前後要加逗號，拿掉之後句子意思還是完整：My sister, who is a nurse, lives in Taipei. 人用 who，事物用 which，所有格用 whose，地點用 where；這種子句不能用 that。which 也可以指前面整件事：He was late, which made the doctor angry.",
+          "newWords": []
+        }
+      ],
+      "cando": "用逗號加 who／which／whose／where 補充說明，把資訊整合成一句"
     }
   ],
   "schedule": {
     "source": "玄燁提供的英文課表第 3、5、6 節與更新版藍圖的長期維持期安排",
-    "preparedThroughUnit": 42,
+    "preparedThroughUnit": 48,
     "daysPerUnit": 6,
     "terms": {
       "semester": {

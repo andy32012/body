@@ -2,6 +2,8 @@
  *  what moves the level up. The daily lessons of the next step open once that certificate is passed or booked (an exam
  *  date is filled in), so waiting for a test date or a result never stops the study — a failed result closes the next
  *  step again until the next sitting is booked. */
+import curriculum from '../data/curriculum.json'
+
 export type LevelId = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'
 export const levelIds: readonly LevelId[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 export const levelIndex = (l: LevelId) => levelIds.indexOf(l)
@@ -43,14 +45,20 @@ export const exams: Record<ExamId, Exam> = {
   other: { id: 'other', name: '其他證照', how: '填證照名稱和成績單上的 CEFR 等級', sessions: '', pass: '成績單上的 CEFR 等級到這一級', fee: '' },
 }
 
+/** A step's daily-lesson units, from the course catalog: stage A, B, C (+ the bridge, BR) of curriculum.json, and C1 later.
+ *  Null while a step has no published units. */
+function unitsOf(stages: readonly string[]): [number, number] | null {
+  const ids = curriculum.overview.filter(o => stages.includes(o.stage)).map(o => o.unit)
+  return ids.length ? [Math.min(...ids), Math.max(...ids)] : null
+}
 export const steps: readonly Step[] = [
-  { from: 'A1', to: 'A2', units: [1, 16], words: [1, 2], target: '2027 年中', hours: '約 200 小時', exams: ['gept-a2', 'other'],
+  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], target: '2027 年中', hours: '約 200 小時', exams: ['gept-a2', 'other'],
     practice: '每日課單元 1–16、7000 單第 1–2 級、閱讀 A1–A2、寫作①句子、生活主題' },
-  { from: 'A2', to: 'B1', units: [17, 30], words: [3, 4], target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
+  { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
     practice: '每日課單元 17–30、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
-  { from: 'B1', to: 'B2', units: [31, 42], words: [5, 6], target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
-    practice: '每日課單元 31–42、7000 單第 5–6 級、閱讀 B2（雅思題型）、寫作④ Task 1 和⑤ Task 2、口說 Part 2' },
-  { from: 'B2', to: 'C1', units: null, words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
+  { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
+    practice: '每日課單元 31–42，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
+  { from: 'B2', to: 'C1', units: unitsOf(['C1']), words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
     practice: '每日課教材還在寫；先用雅思閱讀、寫作 Task 1／2、口說 Part 2 和 Emma 練，最後一年找真人老師練口說' },
   { from: 'C1', to: 'C2', units: null, words: null, target: '選修，到美國以後', hours: '約 1,000–1,200 小時', exams: ['ielts', 'other'], ielts: 8.5, optional: true,
     practice: '不排進五年計畫：美國 RN 不需要 C2' },
@@ -174,4 +182,17 @@ export function visaScreen(notes: Record<string, string>) {
 export function firstLockedUnit(notes: Record<string, string>, unit: number): number | null {
   const starts = [unit, ...steps.flatMap(s => s.units && s.units[0] > unit ? [s.units[0]] : [])]
   return starts.find(u => unitGate(notes, u)) ?? null
+}
+
+/** How Emma talks: her level follows the step the daily lessons are on, so the chat grows with the course. */
+export function emmaLevel(unit: number): { about: string; speak: string } {
+  const to = stepOfUnit(unit).to
+  if (to === 'A2') return { about: 'His English is around A1–A2 level (early junior-high).',
+    speak: 'Speak very simple, clear English (A1–A2), slowly, with short sentences and everyday words. Keep your turns to one or two short sentences, and end with an easy question so he talks more.' }
+  if (to === 'B1') return { about: 'His English is around A2–B1 level.',
+    speak: 'Speak simple, clear English (A2–B1) a bit slowly. Keep your turns short, usually one or two sentences, and end with an easy question so he talks more.' }
+  if (to === 'B2') return { about: 'His English is around B1–B2 level.',
+    speak: 'Speak clear, natural English (B1–B2) at a natural speed. Your turns can be two or three sentences. Ask follow-up "why" and "how" questions so he explains, gives reasons and examples, and talks in longer turns.' }
+  return { about: 'His English is around B2–C1 level.',
+    speak: 'Speak natural English (B2–C1) at a normal speed, with everyday idioms. Talk about abstract topics too (health systems, ethics, work and life), and push him to justify his opinions, compare and speculate.' }
 }

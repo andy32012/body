@@ -1,6 +1,10 @@
 /** 寫作階梯：句子 → 一段 → 多段 → IELTS Task 1 → Task 2. Feedback is given against each stage's criteria. */
-export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] } }
-export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number }
+export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
+  /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
+  unit?: number; focus?: string }
+export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
+  /** Tasks that belong to the units' skills packs: opened from the pack, never the suggested stage. */
+  pack?: boolean }
 export interface CriterionResult { name: string; score: number; comment: string }
 export interface WriteFeedback { criteria: CriterionResult[]; band?: number; next: string; fixes: { wrong: string; right: string; why: string }[]; revised?: string; summary?: string }
 export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number }
@@ -47,10 +51,11 @@ export function taskDone(r: WriteRecord | null, ielts: boolean) {
   return !!r && typeof r.best === 'number' && r.best <= (ielts ? 9 : 5) && r.best >= (ielts ? 5.5 : 3.5)
 }
 export const selfChecked = (r: WriteRecord | null) => !!r && (r.self ?? 0) >= 1 && typeof r.best !== 'number'
-/** The first stage with fewer than two tasks done by checked feedback. */
+/** The first stage with fewer than two tasks done by checked feedback. Pack stages are opened from their unit, not suggested. */
 export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>) {
-  for (const s of stages) if (s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length < Math.min(2, s.tasks.length)) return s.id
-  return stages[stages.length - 1].id
+  const ladder = stages.filter(s => !s.pack)
+  for (const s of ladder) if (s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length < Math.min(2, s.tasks.length)) return s.id
+  return ladder[ladder.length - 1].id
 }
 /** Reads Claude's JSON. Anything that is not a usable assessment — a missing or out-of-range score (band 99, 0, "7"),
  *  the wrong number of criteria, a name that is not one of this stage's criteria or the same one twice, a missing
@@ -96,8 +101,11 @@ export const essays: Record<Essay, { name: string; outline: string[]; response: 
     outline: ['Introduction：改寫題目＋你同意到什麼程度（完全同意／部分同意／不同意）', 'Body 1：支持你立場的第一個理由＋解釋＋例子', 'Body 2：第二個理由，或先承認對方的道理再說為什麼你仍這樣想', 'Conclusion：重申同意的程度，不加新論點'],
     response: 'Task Response：回答題目所有部分，同意的程度清楚，論點有發展' },
 }
-/** The criteria for this task: in Task 2 the first one follows the kind of essay the question asks for. */
+/** The criteria for this task: in Task 2 the first one follows the kind of essay the question asks for;
+ *  in a bridge task it names the unit's grammar. */
 export function criteriaFor(stage: WriteStage, task: WriteTask) {
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
-  return kind ? stage.criteria.map((c, i) => i === 0 ? essays[kind].response : c) : stage.criteria
+  if (kind) return stage.criteria.map((c, i) => i === 0 ? essays[kind].response : c)
+  if (stage.pack && task.focus) return stage.criteria.map((c, i) => i === 0 ? '用到這一課的文法（' + task.focus + '），而且用對' : c)
+  return stage.criteria
 }

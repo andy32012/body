@@ -3078,5 +3078,489 @@
    "zh": "寫一則簡短訊息給老師：你生病了要請假，用到兩個這單元的片語。",
    "sample": "Hi, Ms. Chen. I came down with a cold, so I need to take a day off today. I will make an appointment with a doctor. I will catch up on the homework tomorrow."
   }
+ },
+ {
+  "unit": 43,
+  "dialogue": [
+   {
+    "who": "Mia",
+    "en": "How was the night shift?",
+    "zh": "夜班還好嗎？"
+   },
+   {
+    "who": "Ken",
+    "en": "Busy. Mr. Lee fell while he was walking to the bathroom.",
+    "zh": "很忙。李先生走去廁所的時候跌倒了。"
+   },
+   {
+    "who": "Mia",
+    "en": "Oh no! Was he hurt?",
+    "zh": "天啊！他有受傷嗎？"
+   },
+   {
+    "who": "Ken",
+    "en": "Not badly. When I got there, he had already stood up by himself.",
+    "zh": "不嚴重。我到的時候，他已經自己站起來了。"
+   },
+   {
+    "who": "Mia",
+    "en": "He used to be very careful.",
+    "zh": "他以前很小心的。"
+   },
+   {
+    "who": "Ken",
+    "en": "I know. He had taken a sleeping pill, so he was a little dizzy.",
+    "zh": "我知道。他吃了安眠藥，所以有點頭暈。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "What happened to Mr. Lee?",
+    "options": [
+     "He fell on the way to the bathroom.",
+     "He forgot his medicine.",
+     "He woke up at five."
+    ],
+    "answer": 0
+   },
+   {
+    "q": "Why was he dizzy?",
+    "options": [
+     "He had not eaten dinner.",
+     "He had taken a sleeping pill.",
+     "He had walked too fast."
+    ],
+    "answer": 1
+   }
+  ],
+  "variations": [
+   {
+    "zh": "我到的時候，會議已經開始了。",
+    "en": "When I arrived, the meeting had already started.",
+    "alt": [
+     "When I got there, the meeting had already started.",
+     "The meeting had already started when I arrived."
+    ]
+   },
+   {
+    "zh": "她以前每天早上都跑步。",
+    "en": "She used to run every morning.",
+    "alt": [
+     "She used to go running every morning.",
+     "She used to jog every morning."
+    ]
+   }
+  ],
+  "cando": "用過去式、過去進行式、過去完成式和 used to 把一件事的先後講清楚",
+  "scene": "交班時說昨晚發生的事",
+  "prompt": {
+   "en": "Write four sentences about something that happened to you or a friend. Use the past simple, the past continuous (was/were + -ing), the past perfect (had + past participle) and used to — one in each sentence.",
+   "zh": "寫四句，說一件你或朋友身上發生過的事：過去式、過去進行式、過去完成式和 used to 各用一次。",
+   "sample": "I used to ride my scooter to school. Last winter, I was riding home in the rain when I slipped. When my friend arrived, I had already called my mom. Luckily, I only hurt my knee."
+  }
+ },
+ {
+  "unit": 44,
+  "dialogue": [
+   {
+    "who": "Mia",
+    "en": "Are you working on Friday?",
+    "zh": "你週五有上班嗎？"
+   },
+   {
+    "who": "Ken",
+    "en": "No, I'm taking the GEPT on Friday morning.",
+    "zh": "沒有，我週五早上要考全民英檢。"
+   },
+   {
+    "who": "Mia",
+    "en": "Good luck! This time next week, you'll be sitting in the exam room.",
+    "zh": "加油！下週這個時候，你就會坐在考場裡了。"
+   },
+   {
+    "who": "Ken",
+    "en": "I know. By then, I'll have reviewed all the units.",
+    "zh": "對啊。到時候，我就會把所有單元都複習完了。"
+   },
+   {
+    "who": "Mia",
+    "en": "Will you have finished the writing practice too?",
+    "zh": "寫作練習你也會寫完嗎？"
+   },
+   {
+    "who": "Ken",
+    "en": "I hope so. I'm meeting my tutor on Wednesday to check it.",
+    "zh": "希望會。我週三要跟家教見面，請他幫我看。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "Why isn't Ken working on Friday?",
+    "options": [
+     "He is taking an exam.",
+     "He is meeting his tutor.",
+     "He is sick."
+    ],
+    "answer": 0
+   },
+   {
+    "q": "When is Ken meeting his tutor?",
+    "options": [
+     "On Monday",
+     "On Wednesday",
+     "On Friday"
+    ],
+    "answer": 1
+   }
+  ],
+  "variations": [
+   {
+    "zh": "我週六要跟朋友吃晚餐。",
+    "en": "I'm having dinner with my friends on Saturday.",
+    "alt": [
+     "I'm having dinner with friends on Saturday.",
+     "I am having dinner with my friends on Saturday.",
+     "I'm going to have dinner with my friends on Saturday."
+    ]
+   },
+   {
+    "zh": "到了十點，我就會寫完報告了。",
+    "en": "By ten o'clock, I'll have finished the report.",
+    "alt": [
+     "By 10 o'clock, I will have finished the report.",
+     "I'll have finished the report by ten.",
+     "By ten, I'll have finished the report."
+    ]
+   }
+  ],
+  "cando": "說清楚未來的安排、某個時間正在做的事，以及在那之前會完成什麼",
+  "scene": "安排下週的班表和考試",
+  "prompt": {
+   "en": "Write four sentences about next week: one arrangement you have made (present continuous), what you will be doing at a certain time (will be + -ing), and two things you will have finished by the end of the week (will have + past participle).",
+   "zh": "寫四句，說你下週的計畫：一個已經約好的安排（現在進行式）、某個時間你會正在做什麼（will be + -ing），還有兩件週末前會完成的事（will have + 過去分詞）。",
+   "sample": "I'm meeting my study group on Monday evening. At nine on Wednesday morning, I'll be taking a pharmacology quiz. By Friday, I'll have finished my care plan. I'll also have learned sixty new words by the end of the week."
+  }
+ },
+ {
+  "unit": 45,
+  "dialogue": [
+   {
+    "who": "Ken",
+    "en": "Mrs. Chen didn't touch her lunch.",
+    "zh": "陳太太午餐都沒動。"
+   },
+   {
+    "who": "Mia",
+    "en": "She must be feeling sick. Did she have a fever?",
+    "zh": "她一定是不舒服。她有發燒嗎？"
+   },
+   {
+    "who": "Ken",
+    "en": "No, her temperature was normal. She might be worried about her surgery.",
+    "zh": "沒有，體溫正常。她可能在擔心手術。"
+   },
+   {
+    "who": "Mia",
+    "en": "That could be it. Her daughter didn't come this morning.",
+    "zh": "有可能。她女兒今天早上沒來。"
+   },
+   {
+    "who": "Ken",
+    "en": "Her daughter must have been busy. She usually visits every day.",
+    "zh": "她女兒一定是在忙。她平常每天都會來。"
+   },
+   {
+    "who": "Mia",
+    "en": "Let's talk to Mrs. Chen. She might not have slept well last night either.",
+    "zh": "我們去跟陳太太聊聊。她昨晚可能也沒睡好。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "Why do the nurses think something is wrong?",
+    "options": [
+     "Mrs. Chen didn't eat her lunch.",
+     "Mrs. Chen had a fever.",
+     "Mrs. Chen fell down."
+    ],
+    "answer": 0
+   },
+   {
+    "q": "What does Ken say about Mrs. Chen's daughter?",
+    "options": [
+     "She must have been busy.",
+     "She can't have known.",
+     "She visits once a week."
+    ],
+    "answer": 0
+   }
+  ],
+  "variations": [
+   {
+    "zh": "他一定是走錯路了。",
+    "en": "He must have gone the wrong way.",
+    "alt": [
+     "He must have taken the wrong way.",
+     "He must have taken a wrong turn.",
+     "He must have taken the wrong road."
+    ]
+   },
+   {
+    "zh": "她不可能在家，她的車不在。",
+    "en": "She can't be at home. Her car isn't there.",
+    "alt": [
+     "She can't be home. Her car isn't there.",
+     "She can't be at home because her car isn't there.",
+     "She cannot be at home. Her car is not there."
+    ]
+   }
+  ],
+  "cando": "根據線索推測現在和過去的事，分清楚確定、可能和不可能",
+  "scene": "照顧病人時根據線索推測",
+  "prompt": {
+   "en": "Look at the clues and write four guesses: a patient's bed is empty, his slippers are gone, and the bathroom light is on. Use must, might and can't — two guesses about now and two about the past (must/might/can't have + past participle).",
+   "zh": "看線索寫四句推測：病人的床是空的、拖鞋不見了、廁所的燈亮著。用 must、might、can't：兩句推測現在，兩句推測過去（must／might／can't have + 過去分詞）。",
+   "sample": "He must be in the bathroom. He might need help getting back to bed. He must have woken up before breakfast. He can't have left the ward, because his shoes are still under the bed."
+  }
+ },
+ {
+  "unit": 46,
+  "dialogue": [
+   {
+    "who": "Mia",
+    "en": "I almost gave Mr. Wu the wrong medicine today.",
+    "zh": "我今天差點給吳先生錯的藥。"
+   },
+   {
+    "who": "Ken",
+    "en": "What happened?",
+    "zh": "怎麼了？"
+   },
+   {
+    "who": "Mia",
+    "en": "Two patients had the same last name. If I hadn't checked his wristband, I would have made a mistake.",
+    "zh": "有兩個病人同姓。如果我沒有核對他的手圈，我就會出錯了。"
+   },
+   {
+    "who": "Ken",
+    "en": "Good thing you checked. If you had given it, he might have had a reaction.",
+    "zh": "還好你有核對。如果你給了，他可能會出現不良反應。"
+   },
+   {
+    "who": "Mia",
+    "en": "I know. If I had been more tired, I might have missed it.",
+    "zh": "對啊。如果我當時更累，可能就沒發現了。"
+   },
+   {
+    "who": "Ken",
+    "en": "That's why we always check two identifiers.",
+    "zh": "所以我們一定要核對兩種身分資料。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "Why did Mia almost make a mistake?",
+    "options": [
+     "Two patients had the same last name.",
+     "She forgot her wristband.",
+     "The medicine was new."
+    ],
+    "answer": 0
+   },
+   {
+    "q": "What stopped the mistake?",
+    "options": [
+     "Mia asked a doctor.",
+     "Mia checked the wristband.",
+     "Mr. Wu said no."
+    ],
+    "answer": 1
+   }
+  ],
+  "variations": [
+   {
+    "zh": "如果我有帶傘，我就不會淋濕了。",
+    "en": "If I had brought an umbrella, I wouldn't have gotten wet.",
+    "alt": [
+     "If I had brought an umbrella, I wouldn't have got wet.",
+     "If I'd brought an umbrella, I wouldn't have gotten wet.",
+     "If I had taken an umbrella, I wouldn't have gotten wet."
+    ]
+   },
+   {
+    "zh": "如果她早點睡，她就不會遲到了。",
+    "en": "If she had gone to bed earlier, she wouldn't have been late.",
+    "alt": [
+     "If she had slept earlier, she wouldn't have been late.",
+     "If she'd gone to bed earlier, she wouldn't have been late."
+    ]
+   }
+  ],
+  "cando": "說出「當初如果…，結果就會…」，談過去的後悔和教訓",
+  "scene": "檢討一次差點出錯的事",
+  "prompt": {
+   "en": "Think of a time something went wrong. Write four sentences: what happened, and three 'If I had…, I would/wouldn't have…' sentences about what could have been different.",
+   "zh": "想一次出錯的經驗。寫四句：發生了什麼事，再用三句「If I had…, I would／wouldn't have…」說當初如果不一樣，結果會怎樣。",
+   "sample": "Last month I missed my train to Taichung. If I had checked the time, I wouldn't have missed it. If I had left home earlier, I would have caught it easily. If I hadn't missed it, I would have arrived at class on time."
+  }
+ },
+ {
+  "unit": 47,
+  "dialogue": [
+   {
+    "who": "Ken",
+    "en": "I wish I had more time to practice English.",
+    "zh": "我希望我有更多時間練英文。"
+   },
+   {
+    "who": "Mia",
+    "en": "Me too. I wish I had started earlier.",
+    "zh": "我也是。真希望我早點開始。"
+   },
+   {
+    "who": "Ken",
+    "en": "Yesterday I stayed up late. I shouldn't have done that.",
+    "zh": "昨天我熬夜了。我不應該那樣做的。"
+   },
+   {
+    "who": "Mia",
+    "en": "You should have gone to bed. You have an early shift today.",
+    "zh": "你應該去睡覺的。你今天上早班。"
+   },
+   {
+    "who": "Ken",
+    "en": "If only I could sleep for one more hour!",
+    "zh": "要是我能再睡一個小時就好了！"
+   },
+   {
+    "who": "Mia",
+    "en": "Next time, put your phone away at eleven.",
+    "zh": "下次十一點就把手機收起來吧。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "What does Ken regret?",
+    "options": [
+     "Staying up late",
+     "Missing his shift",
+     "Forgetting his phone"
+    ],
+    "answer": 0
+   },
+   {
+    "q": "What does Mia wish?",
+    "options": [
+     "She had started earlier.",
+     "She had more money.",
+     "She could change her shift."
+    ],
+    "answer": 0
+   }
+  ],
+  "variations": [
+   {
+    "zh": "我希望我不用上夜班。",
+    "en": "I wish I didn't have to work night shifts.",
+    "alt": [
+     "I wish I didn't have to work the night shift.",
+     "If only I didn't have to work night shifts."
+    ]
+   },
+   {
+    "zh": "你不應該跳過早餐的。",
+    "en": "You shouldn't have skipped breakfast.",
+    "alt": [
+     "You should not have skipped breakfast."
+    ]
+   }
+  ],
+  "cando": "說出現在的願望和對過去的遺憾，用 should have 檢討做錯的事",
+  "scene": "下班後聊願望和遺憾",
+  "prompt": {
+   "en": "Write four sentences: two wishes about your life now (I wish / If only + past tense) and two regrets about the past (I wish I had… / I should have…).",
+   "zh": "寫四句：兩句現在的願望（I wish／If only + 過去式），兩句對過去的遺憾（I wish I had… 或 I should have…）。",
+   "sample": "I wish I had more free time. If only my English were better. I wish I had started learning English earlier. I should have practiced speaking more last year."
+  }
+ },
+ {
+  "unit": 48,
+  "dialogue": [
+   {
+    "who": "Mia",
+    "en": "This is Mr. Wang, who came in last night.",
+    "zh": "這是王先生，他昨晚住進來的。"
+   },
+   {
+    "who": "Ken",
+    "en": "Oh, Mr. Wang, whose daughter works here?",
+    "zh": "喔，就是女兒在這裡上班的王先生？"
+   },
+   {
+    "who": "Mia",
+    "en": "Yes. He's in Room 12, which is next to the nurses' station.",
+    "zh": "對。他在 12 號房，就在護理站旁邊。"
+   },
+   {
+    "who": "Ken",
+    "en": "OK. His blood pressure was high this morning, which worried the doctor.",
+    "zh": "好。他今天早上血壓偏高，這讓醫生有點擔心。"
+   },
+   {
+    "who": "Mia",
+    "en": "He used to work in Kaohsiung, where he was a bus driver.",
+    "zh": "他以前在高雄工作，在那裡當公車司機。"
+   },
+   {
+    "who": "Ken",
+    "en": "I'll check on him after lunch.",
+    "zh": "我午餐後去看看他。"
+   }
+  ],
+  "questions": [
+   {
+    "q": "Where is Mr. Wang's room?",
+    "options": [
+     "Next to the nurses' station",
+     "Near the elevator",
+     "On the third floor"
+    ],
+    "answer": 0
+   },
+   {
+    "q": "What worried the doctor?",
+    "options": [
+     "His high blood pressure",
+     "His daughter",
+     "His old job"
+    ],
+    "answer": 0
+   }
+  ],
+  "variations": [
+   {
+    "zh": "我的老師是美國人，她教寫作。",
+    "en": "My teacher, who is American, teaches writing.",
+    "alt": [
+     "My teacher, who is from America, teaches writing.",
+     "My teacher, who is from the US, teaches writing."
+    ]
+   },
+   {
+    "zh": "他忘了帶鑰匙，這讓他很生氣。",
+    "en": "He forgot his keys, which made him angry.",
+    "alt": [
+     "He forgot to bring his keys, which made him angry.",
+     "He forgot his keys, which made him very angry."
+    ]
+   }
+  ],
+  "cando": "用逗號加 who／which／whose／where 補充說明，把資訊整合成一句",
+  "scene": "介紹病房裡的人和地方",
+  "prompt": {
+   "en": "Write four sentences about people and places in your life. Use who, which, whose and where with commas — one in each sentence.",
+   "zh": "寫四句介紹你生活裡的人和地方：用逗號加 who、which、whose、where，每句用一個。",
+   "sample": "My best friend, who studies nursing with me, lives in Taichung. Our school library, which opens at eight, is my favorite place to study. My neighbor, whose dog barks every night, is very friendly. Tainan, where my grandparents live, has the best food in Taiwan."
+  }
  }
 ]

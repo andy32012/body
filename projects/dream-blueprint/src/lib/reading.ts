@@ -3,7 +3,9 @@
 export type ReadLevel = 'A1' | 'A2' | 'B1' | 'B2'
 export type QType = 'main' | 'detail' | 'reference' | 'vocab' | 'evidence' | 'tfng' | 'heading'
 export interface ReadQuestion { type: QType; q: string; options: string[]; answer: number; why: string; evidence?: string }
-export interface ReadPassage { id: string; level: ReadLevel; title: string; topic: string; words: number; paras: string[]; zh: string; qs: ReadQuestion[]; ielts?: boolean }
+export interface ReadPassage { id: string; level: ReadLevel; title: string; topic: string; words: number; paras: string[]; zh: string; qs: ReadQuestion[]; ielts?: boolean
+  /** Bridge-unit passages: the unit they belong to; held = the unseen test passage, never shown for browsing. */
+  unit?: number; held?: boolean }
 
 export const readLevels: { id: ReadLevel; name: string; note: string }[] = [
   { id: 'A1', name: 'A1 入門', note: '短文 70 字左右，現在式、日常和看診' },

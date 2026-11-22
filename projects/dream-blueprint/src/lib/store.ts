@@ -47,7 +47,8 @@ const schema = z.object({
   workload:z.object({extraWords:natural,lastAssessment:z.union([day,z.literal('')]),lastReduction:z.union([day,z.literal('')])}).default({extraWords:0,lastAssessment:'',lastReduction:''}),
   cards:z.array(z.object({id,box:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5),z.literal(6),z.literal(7),z.literal(8)]),lastDay:day,due:day,mastered:z.boolean()})),
   reviewEvents:z.array(z.object({id,day,gap:natural,remembered:z.boolean(),shownAnswer:z.boolean()})),
-  curriculum:z.object({unit:z.number().int().min(1).max(43),day:z.number().int().min(1).max(6),retry:natural,stableUnits:z.array(z.number().int().min(1).max(42))}),
+  // Units come from the published course (42 + bridge units, more later); the cap only rejects nonsense.
+  curriculum:z.object({unit:z.number().int().min(1).max(200),day:z.number().int().min(1).max(6),retry:natural,stableUnits:z.array(z.number().int().min(1).max(200))}),
   knownWords:stringList,learningWords:stringList,customWords:z.array(customWord),
   checks:z.record(safeKey,z.boolean()),notes:z.record(safeKey,str),flagged:stringList,
 })

@@ -6,12 +6,15 @@ import {
 import { projectCalendar } from '../src/lib/projection.ts'
 import { createInitialState, importBackup } from '../src/lib/store.ts'
 
-test('程度階梯：A1→A2→B1→B2→C1→C2，現有 42 單元分成前三段', () => {
+test('程度階梯：A1→A2→B1→B2→C1→C2，主線 42 單元＋橋接單元分成前三段', () => {
   assert.deepEqual(steps.map(s => s.from + '→' + s.to), ['A1→A2', 'A2→B1', 'B1→B2', 'B2→C1', 'C1→C2'])
   assert.equal(stepOfUnit(1).to, 'A2'); assert.equal(stepOfUnit(16).to, 'A2')
   assert.equal(stepOfUnit(17).to, 'B1'); assert.equal(stepOfUnit(30).to, 'B1')
   assert.equal(stepOfUnit(31).to, 'B2'); assert.equal(stepOfUnit(42).to, 'B2')
-  assert.equal(stepOfUnit(43).to, 'C1', '42 單元之後是還在寫的 B2→C1')
+  assert.equal(stepOfUnit(43).to, 'B2', '橋接單元在 B2 證照之前')
+  assert.equal(stepOfUnit(48).to, 'B2')
+  assert.deepEqual(steps[2].units, [31, 48])
+  assert.equal(stepOfUnit(49).to, 'C1', '橋接之後是還在寫的 B2→C1')
   assert.deepEqual(courseProgress(3), { step: steps[0], done: 2, total: 16 })
   assert.ok(steps.at(-1)!.optional, 'C2 是選修，不排進五年')
 })

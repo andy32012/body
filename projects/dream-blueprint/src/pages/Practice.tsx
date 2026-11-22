@@ -52,6 +52,8 @@ import StuckButton from "../components/StuckButton";
 import UseWord from "../components/UseWord";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
+import UnitPack from "../components/UnitPack";
+import { hasPack, packUnits } from "../lib/bridge";
 import { useTaskContext } from "../lib/taskContext";
 import {
   heardKey,
@@ -1121,8 +1123,11 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit"];
+  // #library/writing/<task id> opens that task (from a unit's pack).
+  const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
+  const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
   const fromHash = (): Mode => {
     const m = location.hash.split("/")[1] as Mode;
     return modes.includes(m) ? m : "words";
@@ -1133,6 +1138,7 @@ function Extras({
       if (location.hash.startsWith("#library/")) {
         setMode(fromHash());
         if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
+        if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
         document.querySelector(".pr-extras")?.scrollIntoView({ block: "start" });
       }
     };
@@ -1284,12 +1290,14 @@ function Extras({
             ["translate", "中翻英"],
             ["reading", "閱讀理解"],
             ["writing", "寫作階梯"],
+            ["unit", "單元讀聽說寫"],
             ["passage", "7000 單短文"],
             ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
             ["case", "臨床情境"],
             ["screen", "單字快篩"],
           ] as const
         )
+          .filter(([key]) => key !== "unit" || mode === "unit" || hasPack(state.curriculum.unit) || state.curriculum.unit > packUnits[0])
           .filter(
             ([key]) =>
               !quiet ||
@@ -1429,7 +1437,8 @@ function Extras({
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
       {mode === "reading" && <ReadingPath state={state} onActivity={onActivity} date={date} />}
-      {mode === "writing" && <WritingLadder state={state} onActivity={onActivity} date={date} />}
+      {mode === "writing" && <WritingLadder key={writingTask ?? "ladder"} initialTask={writingTask} state={state} onActivity={onActivity} date={date} />}
+      {mode === "unit" && <UnitPack state={state} onActivity={onActivity} date={date} />}
       {mode === "quiz" && (!quiet || periodQuiet) && (
         <QuizPractice state={state} update={update} onActivity={onActivity} date={date}
           sections={periodQuiet ? ["nursing"] : undefined} />

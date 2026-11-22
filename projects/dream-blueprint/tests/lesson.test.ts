@@ -6,8 +6,9 @@ import { lessonFinished, markLessonStep, readLessonRecord, variationFor, type Le
 const lessons = JSON.parse(readFileSync(new URL('../src/data/lessons.json', import.meta.url), 'utf8')) as Lesson[]
 const curriculum = JSON.parse(readFileSync(new URL('../src/data/curriculum.json', import.meta.url), 'utf8'))
 
-test('42 個單元都有今天這一堂的內容：目標、對話、兩題聽力、兩個變化、開放題', () => {
-  assert.equal(lessons.length, 42)
+test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內容：目標、對話、兩題聽力、兩個變化、開放題', () => {
+  assert.equal(lessons.length, curriculum.units.length)
+  assert.ok(lessons.length >= 48, '42 個主線單元加上至少 6 個橋接單元')
   for (const l of lessons) {
     const unit = curriculum.units.find((u: { id: number }) => u.id === l.unit)
     assert.equal(unit.cando, l.cando, '單元 ' + l.unit + ' 的目標要和課表一致')

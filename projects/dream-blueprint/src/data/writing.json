@@ -228,6 +228,128 @@
      "sample": "Some people believe that building more sports facilities is the best way to improve public health, while others think that other measures work better. I partly agree that sports facilities are helpful, but I believe they are not the most effective solution on their own.\n\nIt is true that sports facilities can make people healthier. When there is a park, a swimming pool or a basketball court near their home, people are more likely to exercise regularly. Regular exercise lowers the risk of heart disease, diabetes and obesity, and it can also reduce stress. Free or cheap facilities are especially important for families who cannot pay for a gym.\n\nHowever, facilities alone do not change people's habits. Many people are too busy or too tired to exercise after work, and some do not know why exercise matters. In addition, public health depends on more than exercise. A healthy diet, clean air, regular health checks and not smoking are just as important. For example, a city with many gyms will still have health problems if fast food is cheaper than vegetables or if people cannot afford to see a doctor early.\n\nFor these reasons, I think governments should use several measures together. They can build sports facilities, but they should also teach healthy eating at school, put clear labels on unhealthy food, offer free health checks and support people who want to quit smoking.\n\nIn conclusion, more sports facilities are a good step, but public health improves most when exercise is combined with education, prevention and healthy food choices."
     }
    ]
+  },
+  {
+   "id": "bridge",
+   "name": "⑥ 橋接段落",
+   "goal": "用這一課的文法寫一段，句子之間接得順",
+   "pack": true,
+   "criteria": [
+    "用到這一課的文法，而且用對",
+    "內容回答了題目每一點",
+    "句子之間接得順（時間、因果、轉折）",
+    "文法和用字正確"
+   ],
+   "tasks": [
+    {
+     "id": "br43a",
+     "prompt": "Write a paragraph (about 100 words) about a time something unexpected happened to you at school, at work or on a trip. Use the past simple, the past continuous and the past perfect.",
+     "zh": "寫一段（約 100 字）：一次在學校、打工或旅行時發生的意外事件。要用到過去式、過去進行式和過去完成式。",
+     "min": 100,
+     "sample": "Last winter, something unexpected happened on my way to school. I was waiting for the bus in the rain when an old man near me suddenly fell down. At first, nobody moved, because everyone was looking at their phones. I had learned basic first aid in class the week before, so I knelt next to him and asked if he was hurt. He told me that he had not eaten anything since the night before and felt dizzy. I gave him my sandwich and asked another student to call an ambulance. By the time the ambulance arrived, he was feeling better. I missed my first class that day, but I did not mind at all.",
+     "unit": 43,
+     "focus": "敘事時態：過去式、過去進行式、過去完成式、used to"
+    },
+    {
+     "id": "br43b",
+     "prompt": "Write a paragraph (about 120 words) comparing your life now with your life when you were a child. Use \"used to\" for things that are no longer true, and the past simple for one special memory.",
+     "zh": "寫一段（約 120 字）：比較你現在和小時候的生活。已經不再這樣的習慣用 used to，再用過去式講一個特別的回憶。",
+     "min": 120,
+     "sample": "When I was a child, my life was very different from my life now. I used to live with my grandparents in a small town in Chiayi. I used to wake up early because my grandfather took me to the market every morning. I also used to be afraid of doctors and hospitals, and I cried every time I had an injection. Now I live in a busy city, I usually sleep late, and I am studying to become a nurse. One memory is still very clear. When I was eight, my grandmother was in hospital for a week. A kind nurse let me help her check my grandmother's temperature. I had never felt so useful before. Maybe that was the day I first wanted to be a nurse.",
+     "unit": 43,
+     "focus": "敘事時態：過去式、過去進行式、過去完成式、used to"
+    },
+    {
+     "id": "br44a",
+     "prompt": "Write a paragraph (about 100 words) about your plans for next weekend. Include an arrangement you have made (present continuous), what you will be doing at a certain time (will be + -ing), and something you will have finished by Sunday night (will have + past participle).",
+     "zh": "寫一段（約 100 字）：下個週末的計畫。要有已經約好的安排（現在進行式）、某個時間你會正在做的事（will be + -ing），以及星期天晚上以前會完成的事（will have + 過去分詞）。",
+     "min": 100,
+     "sample": "I have a busy weekend ahead. On Saturday morning, I'm meeting my classmates at the library, because we have a pharmacology test next week. At ten o'clock, we will be going through the chapter on antibiotics together. In the afternoon, I'm visiting my grandmother, who lives near the station. This time on Saturday evening, I will probably be helping her cook dinner. On Sunday, I'm going to sleep late and then do some shopping. By Sunday night, I will have finished my notes for the test, and I will have cleaned my room. I hope I will also have time to watch a movie.",
+     "unit": 44,
+     "focus": "未來的說法：已經約好的安排（現在進行式）、will be + -ing、will have + 過去分詞"
+    },
+    {
+     "id": "br44b",
+     "prompt": "Write a paragraph (about 120 words) about where you see yourself in five years. Use \"will be + -ing\" and \"will have + past participle\", and give reasons.",
+     "zh": "寫一段（約 120 字）：五年後的你會在哪裡、在做什麼？用 will be + -ing 和 will have + 過去分詞，並說明理由。",
+     "min": 120,
+     "sample": "In five years, I hope my life will look very different. By then, I will have graduated from university, and I will have passed the nursing licensing exam. I will probably be working in a large hospital in Taipei, because I want to gain experience in an intensive care unit. I will also be preparing for the IELTS test, since my dream is to work as a nurse in the United States. By the time I am twenty-six, I will have saved enough money to take the exam and apply for a visa. I know that it will not be easy at all. However, if I keep studying a little every day, I believe I will be ready when the chance comes.",
+     "unit": 44,
+     "focus": "未來的說法：已經約好的安排（現在進行式）、will be + -ing、will have + 過去分詞"
+    },
+    {
+     "id": "br45a",
+     "prompt": "Look at the clues and write a paragraph (about 100 words). Your roommate's bed hasn't been slept in, her umbrella is wet, there are two concert tickets on the table, and her phone is switched off. What must, might or can't have happened? Explain each guess with a clue.",
+     "zh": "看線索寫一段（約 100 字）：室友的床沒有睡過的痕跡、她的雨傘是濕的、桌上有兩張演唱會門票、她的手機關機。用 must／might／can't (have) 推測發生了什麼，每個推測都要說是根據哪個線索。",
+     "min": 100,
+     "sample": "My roommate must have gone out last night, because her bed hasn't been slept in. She can't have stayed at home all evening, since her umbrella is wet and it only started raining after eight o'clock. The two concert tickets on the table are a clue too. She might have planned to go to a concert with a friend, but the tickets are still here, so perhaps the concert is on another day. Her phone is switched off, so the battery might have died. I don't think she is in danger. She must have stayed at a friend's place, and she will probably come home this morning.",
+     "unit": 45,
+     "focus": "推測：must／might／can't be（現在）、must／might／can't have + 過去分詞（過去）"
+    },
+    {
+     "id": "br45b",
+     "prompt": "Write a paragraph (about 120 words) about a time you had to guess what was wrong with someone, such as a friend, a family member or a patient. What clues did you notice, and what did you think must, might or can't have happened?",
+     "zh": "寫一段（約 120 字）：有一次你必須猜朋友、家人或病人怎麼了。你注意到哪些線索？你推測一定、可能、不可能發生了什麼？",
+     "min": 120,
+     "sample": "Last month, my younger brother came home from school and went straight to his room without saying hello. This was strange, because he usually talks non-stop about his day. At first, I thought he must be tired, since he had a basketball game that afternoon. Then I noticed that his school bag was much lighter than usual. He might have left his books at school, or someone might have taken them. When I knocked on his door, I saw that his eyes were red. He can't have been only tired; something must have upset him. In the end, he told me that he had lost his new phone and was afraid our parents would be angry. We looked for it together and found it in his basketball shoes.",
+     "unit": 45,
+     "focus": "推測：must／might／can't be（現在）、must／might／can't have + 過去分詞（過去）"
+    },
+    {
+     "id": "br46a",
+     "prompt": "Write a paragraph (about 100 words) about a time something went wrong because of a small decision. Describe what happened, then write at least three sentences with \"If I had…, I would/wouldn't have…\".",
+     "zh": "寫一段（約 100 字）：一個小決定讓事情出錯的經驗。先說發生了什麼，再寫至少三句 If I had…, I would/wouldn't have…。",
+     "min": 100,
+     "sample": "Last semester, I made a small decision that caused a big problem. The night before my anatomy exam, I decided to watch just one episode of a drama. One episode became four, and I went to bed at three in the morning. The next day, I overslept and arrived at the exam twenty minutes late. If I had turned off my computer after one episode, I wouldn't have stayed up so late. If I had set two alarms, I would have woken up on time. If I had arrived earlier, I could have finished all the questions. I passed the exam, but only just. Now I never start a drama before an exam.",
+     "unit": 46,
+     "focus": "第三類假設：If + had + 過去分詞，would／could／might have + 過去分詞"
+    },
+    {
+     "id": "br46b",
+     "prompt": "Write a paragraph (about 120 words) about an important event in history or in your family. How would things have been different if it hadn't happened? Use the third conditional at least three times.",
+     "zh": "寫一段（約 120 字）：歷史上或你家裡的一件重要事件。如果它當初沒有發生，事情會有什麼不同？至少用三次第三類假設。",
+     "min": 120,
+     "sample": "An important event in my family happened in 1999, when my grandparents moved from a small village in Yunlin to Taichung. My grandfather had found a job in a factory there. If they hadn't moved, my father wouldn't have gone to a good high school in the city, and he might not have become an engineer. He also met my mother in Taichung, so if my grandparents had stayed in the village, my parents would probably never have met. Of course, the move was hard for my grandmother. She missed her friends, and she often says that if she had known how lonely she would feel, she might have refused to go. Still, I am grateful that they took the risk.",
+     "unit": 46,
+     "focus": "第三類假設：If + had + 過去分詞，would／could／might have + 過去分詞"
+    },
+    {
+     "id": "br47a",
+     "prompt": "Write a paragraph (about 100 words) about two things you wish were different in your life now, and why. Then write about one thing you wish you had done differently in the past.",
+     "zh": "寫一段（約 100 字）：你希望現在生活中哪兩件事不一樣、為什麼（wish + 過去式）；再寫一件你希望過去做得不一樣的事（wish + had + 過去分詞）。",
+     "min": 100,
+     "sample": "There are two things I wish were different in my life right now. First, I wish I had more free time. Between classes, homework and my part-time job, I hardly have time to see my friends. Second, I wish my English were better, because I want to work abroad one day and I still feel nervous when I speak. I also have one regret about the past. When I was in high school, I spent most evenings playing games. I wish I had used that time to read English books or practise speaking. If only I could go back and tell my younger self to start earlier!",
+     "unit": 47,
+     "focus": "願望和遺憾：wish／if only + 過去式（現在）、wish／if only + had + 過去分詞（過去）、should／shouldn't have + 過去分詞"
+    },
+    {
+     "id": "br47b",
+     "prompt": "Write a paragraph (about 120 words) giving advice to a first-year nursing student, based on your own mistakes. Use \"should have\" / \"shouldn't have\" for your mistakes and \"should\" for your advice.",
+     "zh": "寫一段（約 120 字）：用你自己犯過的錯給大一護理系學生建議。說自己的錯用 should have／shouldn't have，給建議用 should。",
+     "min": 120,
+     "sample": "If I could give one piece of advice to a first-year nursing student, it would be this: take care of yourself as well as your patients. In my first year, I made a few mistakes. I shouldn't have stayed up so late before early classes, because I was always tired and couldn't concentrate. I should have joined a study group, too. I tried to learn everything alone, and when I didn't understand something, I just gave up. I also should have asked my teachers more questions instead of worrying about what others thought. So, my advice is simple. You should sleep enough, find classmates to study with, and never be afraid to ask. These small habits will make the next four years much easier.",
+     "unit": 47,
+     "focus": "願望和遺憾：wish／if only + 過去式（現在）、wish／if only + had + 過去分詞（過去）、should／shouldn't have + 過去分詞"
+    },
+    {
+     "id": "br48a",
+     "prompt": "Write a paragraph (about 100 words) introducing three people in your life. Use non-defining relative clauses with who, whose and where, and remember the commas.",
+     "zh": "寫一段（約 100 字）：介紹你生活中的三個人。用加逗號的 who、whose、where 補充說明。",
+     "min": 100,
+     "sample": "I would like to introduce three important people in my life. The first is my mother, who works as an accountant in Kaohsiung. She is the most patient person I know. The second is my best friend, Jenny, whose family runs a small noodle shop near our old school. We have been friends since we were seven, and I still visit the shop every summer. The third is my high school biology teacher, Mr. Chen, who made me interested in the human body. He now teaches in Pingtung, where he grew up. Without these three people, I would not be studying nursing today.",
+     "unit": 48,
+     "focus": "非限定關係子句：加逗號的 who／which／whose／where 補充說明（不能用 that）"
+    },
+    {
+     "id": "br48b",
+     "prompt": "Write a paragraph (about 120 words) describing a place you know well, such as your school, your hometown or a hospital. Use at least four non-defining relative clauses with who, which, whose or where, and remember the commas.",
+     "zh": "寫一段（約 120 字）：介紹一個你很熟的地方（學校、家鄉或醫院）。至少用四個加逗號的 who／which／whose／where 補充說明。",
+     "min": 120,
+     "sample": "I would like to describe my nursing school, which is on a hill just outside Taichung. The main building, which was built in the 1970s, is old but full of character. On the first floor is the skills lab, where we practise giving injections on plastic arms. Our favourite teacher, Ms. Wang, who worked in an intensive care unit for fifteen years, teaches most of our lab classes. Next to the lab is the library, whose big windows look out over the city. In the evenings, many students study there until it closes at ten. Behind the school there is a small night market, where we often eat after class. I will miss this place when I graduate, which will be in two years.",
+     "unit": 48,
+     "focus": "非限定關係子句：加逗號的 who／which／whose／where 補充說明（不能用 that）"
+    }
+   ]
   }
  ]
 }

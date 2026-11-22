@@ -7,7 +7,8 @@ import { markAssisted } from '../lib/grammarRetention'
 
 export default function AIHandoff({ state, update }: Pick<PageProps, 'state' | 'update'>) {
   const today = dayKey()
-  const [unit, setUnit] = useState(Math.min(42, state.curriculum.unit))
+  // Past the last published unit (course finished) the picker shows the last one.
+  const [unit, setUnit] = useState(Math.min(curriculum.units[curriculum.units.length - 1].id, state.curriculum.unit))
   const [day, setDay] = useState(state.curriculum.day)
   const [copied, setCopied] = useState('')
   const [saved, setSaved] = useState('')

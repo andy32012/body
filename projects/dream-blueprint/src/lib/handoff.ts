@@ -3,6 +3,7 @@ import curriculum from '../data/curriculum.json'
 import { activePeriod } from './progress'
 import { assistedUnits } from './grammarRetention'
 import { certStatus, courseProgress, exams, officialLevel, unitGate } from './cefr'
+import { hasPack, readHeld, type HeldPart } from './bridge'
 
 type Sentence = { id: string; zh: string; reference: string[]; grammar: string[] }
 const units = curriculum.units
@@ -47,11 +48,12 @@ export function handoffText(state: AppState, today: string) {
     '- 英文大約國中程度。方法是「一次一句中翻英」加「背 7000 單」（大考中心 108 年版詞彙表，六級 6,012 個）。',
     '',
     '## 目前進度（' + today + '，' + (periodNames[activePeriod(today, state.settings.periods)] ?? '') + '）',
-    '- 課表共 42 個文法單元，每單元 6 天：第 1–5 天各一句中翻英，第 6 天三句小關卡。',
-    finished ? '- 42 個單元都做完了，接下來以複習和雅思口說為主。'
+    '- 課表共 ' + units.length + ' 個文法單元（42 個主線＋B1→B2 橋接），每單元 6 天：第 1–5 天各一句中翻英，第 6 天三句小關卡。',
+    finished ? '- ' + units.length + ' 個單元都做完了，接下來以複習和雅思閱讀、寫作、口說為主（B2→C1 每日課還在寫）。'
       : '- 現在：單元 ' + unitId + '（' + unit?.title + '）第 ' + day + ' 天。',
     levelLine(state),
     unit ? '- 這個單元的規則：' + unit.rule : null,
+    packLine(state),
     lesson ? '- 今天這句：「' + lesson.zh + '」（不要先給答案）' : null,
     lesson && lesson.newWords.length ? '- 今天的新字：' + lesson.newWords.map(w => w.en + ' ' + w.zh).join('、') : null,
     checkpoint.length ? '- 今天是小關卡，三句：' + checkpoint.map(s => '「' + s.zh + '」').join('、') + '。對兩句以上就過關，進下一個單元。' : null,
@@ -89,4 +91,14 @@ function levelLine(state: AppState) {
     + (status.state === 'waiting' && status.next ? '（已報名，' + status.next.date + ' 考）' : '')
     + (gate ? '。單元 ' + state.curriculum.unit + ' 要等' + exams[gate.exams[0]].name + '報名或考過才開。' : '。')
     + '每天 1.5 小時（週一到六），寒假 3–4 小時。'
+}
+
+/** A bridge unit also has a skills pack and a held-out test; the first test result tells another teacher how well it carries over. */
+function packLine(state: AppState) {
+  const u = state.curriculum.unit
+  if (!hasPack(u)) return null
+  const h = readHeld(state.notes, u)
+  const part = (name: string, p?: HeldPart) => p ? name + ' ' + p.correct + '/' + p.total : null
+  const done = [part('閱讀', h.reading), part('聽力', h.listening)].filter(Boolean)
+  return '- 這是 B1→B2 橋接單元，另有一包讀聽說寫（兩篇閱讀、一段聽力、兩題段落寫作、兩個口說任務）和一次沒看過的回測' + (done.length ? '；回測第一次成績：' + done.join('、') : '（第 6 天開放）') + '。'
 }
