@@ -8,6 +8,7 @@ import { driveLog } from '../lib/drive'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
 import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
+import { topicById, topicInstructions, type TopicPart } from '../lib/topics'
 import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCard } from '../lib/ieltsSpeaking'
 import cueCards from '../data/cue-cards.json'
 import { markLessonStep, readLessonRecord } from '../lib/lesson'
@@ -33,10 +34,16 @@ function instructions(memory: string[], lesson = '') {
 
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
 
-export default function Speaking({ state, update, lessonMode = false, ieltsMode = false }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean }) {
+export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string }) {
   const memory = useMemory()
   const [today] = useState(dayKey)
   const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
+  // "t1-B": role-play the speaking situation of a life topic.
+  const [topic] = useState(() => {
+    const [id, part] = (topicMode ?? '').split('-')
+    const t = id ? topicById(id) : undefined
+    return t && ['A', 'B', 'C'].includes(part) ? { topic: t, part: part as TopicPart } : null
+  })
   const [task, setTask] = useState<string>()
   const [cardSkip, setCardSkip] = useState<string[]>([])
   const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
@@ -89,7 +96,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     setError(''); setLines([]); setNotes(''); setFixes([])
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : lesson ? emmaLessonInstructions(lesson, task) : ''),
+        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : ''),
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
@@ -164,6 +171,13 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         <a href="#speaking">改回一般聊天</a>
       </div>}
 
+      {topic && <div className="sp-lesson">
+        <small>生活主題 {topic.topic.n} · {topic.topic.title}</small>
+        <strong>{(topic.part === 'C' ? topic.topic.review.speak : topic.topic.speak).situation}</strong>
+        <span>Emma 會演情境裡的另一個人。她聽的是語音辨識的文字，不會評你的發音。</span>
+        <a href="#practice/normal">回到生活主題</a>
+      </div>}
+
       {card && <div className="sp-lesson sp-cue">
         <small>雅思口說 Part 2 · 題目卡</small>
         <strong lang="en">{card.topic}</strong>
@@ -179,7 +193,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         {status === 'live' && liveAt && <p className="sp-timer">已經說了 {Math.floor((tick - liveAt) / 60000)}:{String(Math.floor((tick - liveAt) / 1000) % 60).padStart(2, '0')}（Part 2 目標 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
-      {!card && !lesson && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
+      {!card && !lesson && !topic && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
 
       {settings && <div className="sp-settings">
         <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>

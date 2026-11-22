@@ -7,6 +7,7 @@ import { rivalSummary } from '../lib/rivals'
 import { activeLesson, coreSaved, lessonFinished, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../pages/Practice'
 import { nextFocus } from '../lib/nextFocus'
+import { dueTopic, partNumber, partPlan, skipKey, topicDoneToday, topicGoal } from '../lib/topics'
 import ScenePhoto from './ScenePhoto'
 import TodayPlan from './TodayPlan'
 import './dock.css'
@@ -61,6 +62,10 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
 }) {
   const choice = useEnergyChoice(state, today)
   const { energy, quiet, period } = choice
+  // A life-topic session takes today's slot when one is due (they take turns with grammar lessons).
+  const topic = !quiet && energy !== 'low' ? dueTopic(state, today) : null
+  const topicDone = topicDoneToday(state.notes, today)
+  const skipTopic = () => update(prev => ({ ...prev, notes: { ...prev.notes, [skipKey(today)]: '1' } }))
   // An unfinished lesson: today (continue it), or an earlier day whose 表達 is still open (offered on the side).
   const active = !quiet && energy !== 'low' ? activeLesson(state.notes) : null
   const resume = !active ? null : coreSaved(active.rec)
@@ -71,13 +76,15 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const finished = lessonFinished(state.notes, today)
   // Other earlier lessons still missing 表達 (the active pointer only remembers the latest one).
   const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => p.date !== today && p.date !== (resume === 'later' ? active?.date : '')) : []
-  const nextStep = active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
+  const nextStep = !topic && active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const focus = quiet ? null : nextFocus(state, today, energy)
   const practised = state.sessions.some(s => s.day === today)
-  const label = quiet ? (period === 'exam' ? '考週' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
+  const label = topic ? '生活主題 ' + topic.topic.n + ' · ' + topic.topic.title + ' · 第 ' + partNumber(topic.part) + ' 次（共 3 次）'
+    : topicDone && !finished && !quiet && energy !== 'low' ? '加練 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
+    : quiet ? (period === 'exam' ? '考週' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
     : lesson.review ? (energy === 'low' ? '今天 2 分鐘 · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
     : lesson.checkpoint ? '單元 ' + lesson.unit + ' 小關卡' : '今天這一堂 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-  const goal = quiet ? (energy === 'normal' ? '10–15 分鐘護理英文：複習、幾題護理英文、用英文說一件事' : '今天只要 2 分鐘：回想一句熟悉的英文')
+  const goal = topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? '10–15 分鐘護理英文：複習、幾題護理英文、用英文說一件事' : '今天只要 2 分鐘：回想一句熟悉的英文')
     : lesson.review ? (energy === 'low' ? '今天只要 2 分鐘：回想一句熟悉的英文' : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
   const showPlan = energy !== 'low'
@@ -87,24 +94,27 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
       <div className="hero-body lesson-body">
         <div className="hero-label"><span aria-hidden="true" className="hero-dash" />{label}</div>
         <h2 className="lesson-goal" id="lesson-goal">{goal}</h2>
-        {!quiet && <p className="lesson-sentence">今天的句子：<span>{lesson.zh}</span></p>}
-        {focus?.reason && <p className="lesson-why"><b>為什麼這樣排</b>{focus.reason}
+        {topic ? <p className="lesson-sentence">今天：<span>{partPlan[topic.part]}</span></p>
+          : !quiet && <p className="lesson-sentence">今天的句子：<span>{lesson.zh}</span></p>}
+        {topic && <p className="lesson-why"><b>今天輪到生活主題</b>生活主題和文法課輪流上：先學會在情境裡聽、讀，再說和寫，最後隔幾天換個情境複習。
+          <button type="button" onClick={skipTopic}>今天先上文法課</button></p>}
+        {focus?.reason && (!topic || focus.action) && <p className="lesson-why"><b>為什麼這樣排</b>{focus.reason}
           {focus.action && <button type="button" onClick={() => { location.hash = focus.action!.hash }}>{focus.action.label}</button>}</p>}
         <EnergyChoices choice={choice} label="今天的時間" />
         <div className="lesson-actions">
           {quiet && energy === 'normal'
             ? <button type="button" className="launch" onClick={() => document.getElementById('today-plan')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><ListChecks size={16} />看今天的清單<ArrowRight size={16} /></button>
-            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : practised && lesson.review ? '再複習一句' : energy === 'low' ? '開始 2 分鐘' : '開始這一堂'}<ArrowRight size={16} /></button>}
+            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? '開始 2 分鐘' : '開始這一堂'}<ArrowRight size={16} /></button>}
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
-        {resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
+        {!topic && resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
         {others.length > 0 && <details className="lesson-pending">
           <summary>還有 {others.length} 堂沒做完「表達」</summary>
           <ul>{others.slice(0, 6).map(p => <li key={p.date}>
             <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume-' + p.date }}>{p.date.slice(5).replace('-', '/')} · 單元 {p.rec.unit} 第 {p.rec.day} 天，補完表達</button>
           </li>)}</ul>
         </details>}
-        <p className="lesson-stats">{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
+        <p className="lesson-stats">{topicDone ? '今天的生活主題完成了 ✓ · ' : ''}{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
       </div>
     </section>
     {showPlan && <div id="today-plan" className="lesson-plan"><TodayPlan state={state} update={update} today={today} energy={energy} onStart={start} mode={quiet ? 'nursing' : 'regular'} focus={focus ?? undefined} /></div>}
@@ -140,6 +150,12 @@ export function LessonBanner({ state, today, start }: Pick<PageProps, 'state'> &
   const choice = useEnergyChoice(state, today)
   const lesson = getLessonPreview(state, choice.energy, today)
   const finished = lessonFinished(state.notes, today)
+  const topic = !choice.quiet && choice.energy !== 'low' ? dueTopic(state, today) : null
+  if (topic) return <section className="lesson-banner">
+    <div><small>今天這一堂 · 生活主題 {topic.topic.n} · 第 {partNumber(topic.part)} 次</small>
+      <strong>{topic.topic.title}：{partPlan[topic.part]}</strong></div>
+    <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{topic.step > 0 ? '繼續' : '開始'}</button>
+  </section>
   return <section className="lesson-banner">
     <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : '今天這一堂'}</small>
       <strong>{choice.quiet ? '單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : lesson.cando || lesson.title}</strong></div>

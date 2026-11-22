@@ -5,6 +5,8 @@ import { seasonHistory } from "../lib/rivals";
 import type { PageProps } from "../lib/store";
 import { getRetentionStatus } from "../lib/grammarRetention";
 import EvidencePanel from "../components/EvidencePanel";
+import { levelNames, type Level } from "../lib/evidence";
+import { readTopic, topicStatus, topics } from "../lib/topics";
 import "./history.css";
 
 const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
@@ -94,14 +96,17 @@ function WeeklyChart({ sessions, today }: { sessions: Sessions; today: string })
 
 function GrammarHistory({ sessions }: { sessions: Sessions }) {
   const logs = [...sessions].sort((a, b) => a.day.localeCompare(b.day));
-  const history = new Map<string, { date: string, rating: Rating, revealed: boolean }[]>();
+  type Entry = { date: string, rating: Rating, revealed: boolean, verified: boolean };
+  const history = new Map<string, Entry[]>();
+  // Counts toward 穩了 only when written alone and checked (Claude's first check or the exact reference).
+  const alone = (e: Entry) => e.rating === "correct" && !e.revealed && e.verified;
   const counts = { correct: 0, minor: 0, again: 0 };
   for (const session of logs) {
     for (const translation of session.translations ?? []) {
       counts[translation.rating]++;
       for (const tag of new Set(translation.grammar)) {
         const seen = history.get(tag) ?? [];
-        seen.push({ date: session.day, rating: translation.rating, revealed: translation.revealed });
+        seen.push({ date: session.day, rating: translation.rating, revealed: translation.revealed, verified: translation.verified === true });
         history.set(tag, seen);
       }
     }
@@ -112,8 +117,7 @@ function GrammarHistory({ sessions }: { sessions: Sessions }) {
     const lastTwo = entries.slice(-2);
     if (lastTwo.length === 2 && lastTwo.every(e => e.rating !== "correct")) {
       categories["還常錯"].push(tag);
-    } else if (latest.rating === "correct" && !latest.revealed &&
-        entries.some(e => e.rating === "correct" && !e.revealed && e.date <= addDays(latest.date, -4))) {
+    } else if (alone(latest) && entries.some(e => alone(e) && e.date <= addDays(latest.date, -4))) {
       categories["穩了"].push(tag);
     } else {
       categories["練習中"].push(tag);
@@ -121,12 +125,28 @@ function GrammarHistory({ sessions }: { sessions: Sessions }) {
   });
   return <section className="history-section history-grammar">
     <h2>文法星圖</h2>
-    <p className="history-note">兩次相隔至少四天，都能自己答對的文法點會標成「穩了」。</p>
+    <p className="history-note">兩次相隔至少四天、都自己答對而且確認過（Claude 看過，或跟參考答案一樣）的文法點，才會標成「穩了」。沒人確認的自評「對了」不算。</p>
     {history.size === 0 ? <p>完成中翻英並自評後，這裡會出現你練過的文法點。</p> :
       Object.entries(categories).filter(([, tags]) => tags.length).map(([label, tags]) =>
         <div key={label}><h3>{label}</h3>{tags.map(tag => <span className="history-chip" key={tag}>{tag}</span>)}</div>)}
     <h3>中翻英自評</h3>
     <div>{(Object.keys(ratings) as Rating[]).map(key => <span key={key} className="history-chip">{ratings[key]} {counts[key]} 句</span>)}</div>
+  </section>;
+}
+
+const levelText = (l: Level | null | undefined) => (l ? levelNames[l] : "未作答");
+/** Life topics: three sessions each; only the delayed, changed-context one can show 「延後換題仍能完成」. */
+function TopicHistory({ state }: { state: PageProps["state"] }) {
+  const rows = topics.map(t => ({ t, rec: readTopic(state.notes, t.id), open: state.curriculum.unit > t.after }));
+  return <section className="history-section history-topics">
+    <h2>生活主題</h2>
+    <p className="history-note">每個主題分三次：理解 → 說和寫 → 隔幾天換情境。換情境時有兩句以上自己寫對、而且確認過，才算「延後換題仍能完成」。口說只看文字稿，發音沒有評估。</p>
+    <ul>{rows.map(({ t, rec, open }) => <li key={t.id}>
+      <div><strong>{t.n}. {t.title}</strong><span className="history-chip">{open ? topicStatus(rec) : "上完單元 " + t.after + " 後開始"}</span></div>
+      {rec.done.A && rec.listen && <small>只聽不看字：大意 {rec.listen?.noVoice ? "—" : rec.listen?.gist ? "✓" : "✗"}、細節 {rec.listen?.details ?? 0} / {rec.listen?.total ?? 0}{rec.listen?.replays ? "（另外重聽 " + rec.listen.replays + " 次）" : ""} · 讀：{rec.read ? rec.read.correct + " / " + rec.read.total : "—"}</small>}
+      {rec.done.B && <small>說：{levelText(rec.speak?.level)}（發音未評估）· 寫訊息：{levelText(rec.write?.level)}</small>}
+      {rec.done.C && <small>換情境說：{levelText(rec.review?.speak?.level)}</small>}
+    </li>)}</ul>
   </section>;
 }
 
@@ -160,6 +180,7 @@ export default function History({ state, update }: PageProps) {
     <WeeklyChart sessions={sessions} today={today} />
     <EvidencePanel state={state} update={update} />
     <GrammarHistory sessions={sessions} />
+    <TopicHistory state={state} />
     {state.curriculum.stableUnits.length>0 && <section className="history-section"><h2>單元回想</h2><p className="history-note">隔三個單元回想舊句。連續兩次想不起來的單元會優先複習。</p>{state.curriculum.stableUnits.map(id=><span key={id} className="history-chip">單元 {id} · {getRetentionStatus(state.notes,id)}</span>)}</section>}
     <section className="history-section history-recall">
       <h2>隔幾天，還記得嗎？</h2>

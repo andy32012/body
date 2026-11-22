@@ -79,6 +79,8 @@ import {
   recordRetention,
   retentionDrawCount,
 } from "../lib/grammarRetention";
+import { dueTopic, topics } from "../lib/topics";
+import TopicLesson from "../components/TopicLesson";
 import "./practice.css";
 
 type Word = { en: string; zh: string; example?: string; exampleZh?: string };
@@ -109,7 +111,8 @@ const units: Unit[] = curriculum.units;
 const allSentences: Sentence[] = units
   .flatMap((unit) => [...unit.days, ...unit.checkpoint, ...unit.backup])
   .concat(sentences)
-  .concat(starters);
+  .concat(starters)
+  .concat(topics.flatMap((t) => [...t.practice, ...t.review.practice]));
 const sentenceById = new Map(allSentences.map((s) => [s.id, s]));
 /** Sentences saved from Emma, passages or lessons live in state.notes as "say.<id>". */
 function syncCustom(notes: Record<string, string>) {
@@ -138,15 +141,17 @@ export function PracticeCover({ title, children }: { title: string; children?: R
 
 /** Hint levels: 1 self-check after writing, 2 a clearer hint, 3 a sentence frame, 4 the model answer.
  *  With saved/onHint the level survives a reload, so a hint once seen is never forgotten. */
-function Translation({
+export function Translation({
   sentence,
   onMark,
   checkpoint,
   preparation,
   saved,
   onHint,
+  label,
 }: {
   preparation?: ReactNode;
+  label?: string;
   sentence: Sentence;
   onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict }) => void;
   checkpoint: boolean;
@@ -192,7 +197,7 @@ function Translation({
   }
   return (
     <>
-      <div className="pr-label">{checkpoint ? "單元小關卡" : "一句中翻英"}</div>
+      <div className="pr-label">{label ?? (checkpoint ? "單元小關卡" : "一句中翻英")}</div>
       <h2 className="pr-question">{sentence.zh}</h2>
       <div className="pr-tags">
         {sentence.grammar.map((tag) => (
@@ -1024,7 +1029,33 @@ function PracticeSession({
     </section>
   );
 }
-export default PracticeSession;
+/** Today's main lesson: a life-topic session when one is due (normal or high energy, outside exam and internship weeks,
+ *  not continuing a grammar lesson), otherwise the grammar lesson. Decided once, so the page does not switch mid-way. */
+function PracticeEntry(props: PageProps & { energy: Energy; resume?: boolean | string }) {
+  const { state, update, energy, resume } = props;
+  const [date] = useState(() => dayKey());
+  const [period] = useState(() => activePeriod(date, state.settings.periods));
+  const [topic, setTopic] = useState(() =>
+    resume || energy === "low" || period === "exam" || period === "internship" ? null : dueTopic(state, date));
+  if (!topic) return <PracticeSession {...props} />;
+  return (
+    <TopicLesson
+      {...props}
+      key={topic.topic.id + topic.part}
+      topic={topic.topic}
+      part={topic.part}
+      startStep={topic.step}
+      date={date}
+      period={period}
+      onSkip={() => {
+        update((prev) => ({ ...prev, notes: { ...prev.notes, ["topic.skip." + date]: "1" } }));
+        setTopic(null);
+      }}
+    />
+  );
+}
+
+export default PracticeEntry;
 
 export function PracticeLibrary({ state, update, navigate }: PageProps) {
   const today = dayKey();

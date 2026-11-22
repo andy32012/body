@@ -1,0 +1,448 @@
+[
+ {
+  "id": "t1",
+  "n": 1,
+  "after": 1,
+  "title": "認識新同學",
+  "titleEn": "Meeting a new classmate",
+  "goal": "能用英文自我介紹（名字、從哪裡來、讀什麼），問新同學三件事，並聽懂對方的回答。",
+  "scene": "開學後班上來了一位轉學生，下課時你們第一次聊天。",
+  "grammar": {
+   "title": "be 動詞、代名詞與基本問句",
+   "points": [
+    "I am、you are、he／she is。說「我的、你的、他的、她的」用 my、your、his、her，放在名詞前面：my name、her major。",
+    "疑問詞問句把疑問詞放最前面，be 動詞接在後面：Where are you from? What is your name?",
+    "問「是不是」把 be 動詞移到主詞前面：Are you new here? 回答 Yes, I am. ／ No, I'm not.",
+    "一般動詞（study、live）問問題要用 do：What do you study? Do you live in the dorm?"
+   ],
+   "examples": [
+    { "en": "My name is Mei. I'm from Hualien.", "zh": "我叫美，我是花蓮人。" },
+    { "en": "Are you a nursing student? — Yes, I am.", "zh": "你是護理系學生嗎？——是。" },
+    { "en": "What do you study? — I study nursing.", "zh": "你讀什麼？——我讀護理。" }
+   ]
+  },
+  "words": [
+   { "en": "classmate", "zh": "同學", "use": "a new classmate", "example": "She is my new classmate.", "exampleZh": "她是我的新同學。" },
+   { "en": "be from", "zh": "來自、是……人", "use": "be from Taichung", "example": "I'm from Taichung.", "exampleZh": "我是台中人。" },
+   { "en": "major", "zh": "主修（科系）", "use": "my major is nursing", "example": "My major is nursing.", "exampleZh": "我主修護理。" },
+   { "en": "second-year", "zh": "二年級的", "use": "a second-year student", "example": "I'm a second-year student.", "exampleZh": "我是二年級學生。" },
+   { "en": "dorm", "zh": "宿舍", "use": "live in the dorm", "example": "Do you live in the dorm?", "exampleZh": "你住宿舍嗎？" },
+   { "en": "hometown", "zh": "家鄉", "use": "my hometown", "example": "My hometown is small.", "exampleZh": "我的家鄉很小。" },
+   { "en": "introduce", "zh": "介紹", "use": "introduce yourself", "example": "Please introduce yourself.", "exampleZh": "請自我介紹。" },
+   { "en": "transfer student", "zh": "轉學生", "use": "a transfer student", "example": "He is a transfer student.", "exampleZh": "他是轉學生。" }
+  ],
+  "chunks": [
+   { "en": "Nice to meet you.", "zh": "很高興認識你。" },
+   { "en": "Nice to meet you, too.", "zh": "我也很高興認識你。" },
+   { "en": "How about you?", "zh": "那你呢？" },
+   { "en": "Me too!", "zh": "我也是！" }
+  ],
+  "wordCheck": [
+   { "sentence": "My major is nursing.", "q": "這句的 major 是什麼意思？", "options": ["主修", "主要的", "少校"], "answer": 0 },
+   { "sentence": "I'm from Hualien.", "q": "be from 在這裡是什麼意思？", "options": ["是……人、來自", "離開", "寄自"], "answer": 0 }
+  ],
+  "practice": [
+   { "id": "t1-p1", "zh": "你是哪裡人？", "grammar": ["疑問詞問句"], "hints": ["問「哪裡」用 where，放在最前面。", "Where + are + you + from?"], "reference": ["Where are you from?"], "why": "疑問詞 where 放最前面，be 動詞 are 在主詞 you 前面；「是哪裡人」說 be from。", "newWords": [] },
+   { "id": "t1-p2", "zh": "她是二年級的護理系學生。", "grammar": ["be 動詞", "a + 形容詞 + 名詞"], "hints": ["主詞 she 配哪個 be 動詞？", "a + second-year + nursing student"], "reference": ["She is a second-year nursing student.", "She's a second-year nursing student."], "why": "she 配 is；「一位二年級的護理系學生」是 a second-year nursing student。", "newWords": [] }
+  ],
+  "listen": {
+   "scene": "下課時，Ken 跟新來的同學 Mei 聊天。",
+   "dialogue": [
+    { "who": "Ken", "en": "Hi, I'm Ken. Are you new here?", "zh": "嗨，我是 Ken。你是新來的嗎？" },
+    { "who": "Mei", "en": "Yes, I am. I'm Mei. Nice to meet you.", "zh": "對，我是美。很高興認識你。" },
+    { "who": "Ken", "en": "Nice to meet you, too. Where are you from?", "zh": "我也很高興認識你。你是哪裡人？" },
+    { "who": "Mei", "en": "I'm from Hualien. I just moved to Taichung.", "zh": "我是花蓮人，剛搬來台中。" },
+    { "who": "Ken", "en": "Cool. What do you study?", "zh": "不錯耶。你讀什麼？" },
+    { "who": "Mei", "en": "I study nursing. I'm a second-year student.", "zh": "我讀護理，二年級。" },
+    { "who": "Ken", "en": "Me too! Do you live in the dorm?", "zh": "我也是！你住宿舍嗎？" },
+    { "who": "Mei", "en": "No, I live with my aunt. Her house is near the school.", "zh": "沒有，我跟阿姨住。她家在學校附近。" }
+   ],
+   "gist": { "q": "What are they doing?", "options": ["Meeting each other for the first time", "Studying for a test", "Buying lunch"], "answer": 0 },
+   "details": [
+    { "q": "Where is Mei from?", "options": ["Hualien", "Taichung", "Taipei"], "answer": 0 },
+    { "q": "What year is Mei in?", "options": ["First year", "Second year", "Third year"], "answer": 1 },
+    { "q": "Where does Mei live?", "options": ["In the dorm", "With her aunt", "With her parents"], "answer": 1 }
+   ],
+   "shadow": [5, 6],
+   "retell": "不看稿，用兩三句英文說 Mei 是誰：She is…／She is from…／She lives…",
+   "retellSample": "Mei is from Hualien. She is a second-year nursing student, like Ken. She lives with her aunt near the school."
+  },
+  "read": {
+   "kind": "班級群組訊息",
+   "title": "A message in the class group",
+   "lines": [
+    { "en": "Hi everyone! I'm Mei, a new student in Class B.", "zh": "大家好！我是美，B 班的新同學。" },
+    { "en": "I'm from Hualien, and I like hiking and cooking.", "zh": "我是花蓮人，喜歡爬山和做菜。" },
+    { "en": "My English is not very good, but I want to practice.", "zh": "我的英文不太好，但是我想練習。" },
+    { "en": "If you want to study English together, please message me.", "zh": "如果你想一起讀英文，請傳訊息給我。" },
+    { "en": "See you in class!", "zh": "上課見！" }
+   ],
+   "questions": [
+    { "skill": "主旨", "q": "Why does Mei write this message?", "options": ["To make friends and find study partners", "To sell food", "To ask about homework"], "answer": 0 },
+    { "skill": "細節", "q": "What does Mei like?", "options": ["Hiking and cooking", "Singing and dancing", "Swimming"], "answer": 0 },
+    { "skill": "指涉", "q": "In \"please message me\", who is \"me\"?", "options": ["Mei", "The teacher", "Class B"], "answer": 0 },
+    { "skill": "有沒有提供", "q": "Does the message say how old Mei is?", "options": ["Yes", "No, it does not say"], "answer": 1 }
+   ]
+  },
+  "speak": {
+   "situation": "班上來了一位交換生，剛好坐你旁邊。先跟他打招呼。",
+   "conditions": ["打招呼，說你的名字", "說你從哪裡來、讀什麼", "問對方兩個問題（例如哪裡人、住哪裡、讀什麼）"],
+   "followUps": ["What year are you in?", "Do you like your classes?"],
+   "sample": "Hi, I'm Xuanye. Nice to meet you. I'm from Taichung, and I study nursing. Where are you from? Do you live in the dorm?"
+  },
+  "write": {
+   "task": "在新班級的群組傳一則自我介紹訊息。",
+   "conditions": ["名字、從哪裡來、讀什麼", "一個興趣", "想跟大家一起做的一件事"],
+   "minSentences": 3,
+   "sample": "Hi everyone! I'm Xuanye. I'm from Taichung, and I'm a second-year nursing student. I like movies and music. I want to practice English, so let's study together!"
+  },
+  "review": {
+   "situation": "換個情境：實習第一天，你在病房認識一位新的護理師同事。",
+   "practice": [
+    { "id": "t1-r1", "zh": "你是新來的嗎？", "grammar": ["be 動詞問句"], "hints": ["問「是不是」，be 動詞放前面。", "Are + you + new + here?"], "reference": ["Are you new here?"], "why": "問是不是，把 are 放在 you 前面；「新來的」說 new here。", "newWords": [] },
+    { "id": "t1-r2", "zh": "她是台南人。", "grammar": ["be 動詞", "be from"], "hints": ["主詞 she 配哪個 be 動詞？「是……人」怎麼說？", "She + is + from + Tainan."], "reference": ["She is from Tainan.", "She's from Tainan.", "She comes from Tainan."], "why": "she 配 is；「是台南人」說 be from Tainan。", "newWords": [] },
+    { "id": "t1-r3", "zh": "我是護理系的學生，不是護理師。", "grammar": ["be 動詞", "be 動詞否定"], "hints": ["「是」用 am，「不是」在後面接 not。", "I'm a nursing student, not a nurse."], "reference": ["I'm a nursing student, not a nurse.", "I am a nursing student, not a nurse.", "I'm a nursing student. I'm not a nurse.", "I am a nursing student. I am not a nurse."], "why": "I 配 am；「不是護理師」可以接在逗號後面說 not a nurse，也可以另寫一句 I'm not a nurse。", "newWords": [] }
+   ],
+   "speak": {
+    "situation": "你在病房認識一位新的護理師同事。",
+    "conditions": ["打招呼並說你是誰（實習學生、學校或年級）", "問對方兩個問題（例如是不是新來的、是哪裡人）"],
+    "sample": "Hi, I'm Xuanye. I'm a nursing student, and today is my first day here. Nice to meet you. Are you a nurse here? Where are you from?"
+   }
+  }
+ },
+ {
+  "id": "t2",
+  "n": 2,
+  "after": 5,
+  "title": "一天的作息",
+  "titleEn": "My daily routine",
+  "goal": "能說平日和假日的作息有什麼不同（幾點、做什麼、多常做），也聽得懂別人的作息。",
+  "scene": "新室友問你平常幾點起床、幾點睡。",
+  "grammar": {
+   "title": "一般現在式與頻率副詞",
+   "points": [
+    "說習慣用現在式。主詞是 he、she 或一個人時，動詞加 s：She gets up at six.",
+    "頻率副詞 always、usually、sometimes、never 放在一般動詞前面：I usually get up at seven. 放在 be 動詞後面：I am never late.",
+    "時間：幾點用 at（at seven）、早上用 in（in the morning）、週末說 on weekends、平日說 on weekdays。",
+    "意思要分清楚：get up 是起床、wake up 是醒來；go to bed 是上床、fall asleep 是睡著。醒來不一定起床，上床也不一定睡著。"
+   ],
+   "examples": [
+    { "en": "On weekdays, I get up at six.", "zh": "平日我六點起床。" },
+    { "en": "My brother usually goes to bed at eleven.", "zh": "我弟弟通常十一點上床睡覺。" },
+    { "en": "I wake up at six, but I get up at six thirty.", "zh": "我六點醒來，但六點半才起床。" }
+   ]
+  },
+  "words": [
+   { "en": "get up", "zh": "起床（離開床）", "use": "get up at six", "example": "I get up at six.", "exampleZh": "我六點起床。" },
+   { "en": "wake up", "zh": "醒來", "use": "wake up early", "example": "I wake up before my alarm.", "exampleZh": "我在鬧鐘響之前就醒了。" },
+   { "en": "go to bed", "zh": "上床睡覺", "use": "go to bed at eleven", "example": "I go to bed at eleven.", "exampleZh": "我十一點上床。" },
+   { "en": "fall asleep", "zh": "睡著", "use": "fall asleep quickly", "example": "I can't fall asleep.", "exampleZh": "我睡不著。" },
+   { "en": "usually", "zh": "通常", "use": "usually get up at seven", "example": "I usually walk to school.", "exampleZh": "我通常走路上學。" },
+   { "en": "weekday", "zh": "平日（週一到週五）", "use": "on weekdays", "example": "On weekdays, I have class.", "exampleZh": "平日我要上課。" },
+   { "en": "weekend", "zh": "週末", "use": "on weekends", "example": "On weekends, I sleep late.", "exampleZh": "週末我睡到很晚。" },
+   { "en": "part-time job", "zh": "打工", "use": "have a part-time job", "example": "I have a part-time job at a café.", "exampleZh": "我在咖啡店打工。" }
+  ],
+  "chunks": [
+   { "en": "What time do you get up?", "zh": "你幾點起床？" },
+   { "en": "How often do you…?", "zh": "你多常……？" },
+   { "en": "once a week / twice a week", "zh": "一週一次／一週兩次" },
+   { "en": "sleep late", "zh": "睡晚一點（晚起）" }
+  ],
+  "wordCheck": [
+   { "sentence": "I wake up at six, but I get up at seven.", "q": "這句話的意思是？", "options": ["六點醒來，七點才起床", "六點起床，七點出門", "六點睡著，七點醒來"], "answer": 0 },
+   { "sentence": "I go to bed at eleven, but I fall asleep at one.", "q": "他幾點睡著？", "options": ["一點", "十一點", "沒有說"], "answer": 0 }
+  ],
+  "practice": [
+   { "id": "t2-p1", "zh": "我通常七點起床。", "grammar": ["頻率副詞", "時間 at"], "hints": ["usually 放在一般動詞前面。", "I + usually + get up + at seven."], "reference": ["I usually get up at seven.", "I usually get up at seven o'clock."], "why": "頻率副詞 usually 放在一般動詞 get up 前面；「起床」是 get up，不是 wake up（醒來）。", "newWords": [] },
+   { "id": "t2-p2", "zh": "她週末在咖啡店打工。", "grammar": ["第三人稱單數", "on weekends"], "hints": ["主詞 she，動詞要加 s。", "She works at a café on weekends."], "reference": ["She works at a café on weekends.", "She works at a coffee shop on weekends.", "She has a part-time job at a café on weekends."], "why": "she 的動詞加 s：works；「週末」on weekends。", "newWords": [] }
+  ],
+  "listen": {
+   "scene": "Amy 問同學 Leo 平常的作息。",
+   "dialogue": [
+    { "who": "Amy", "en": "What time do you usually get up?", "zh": "你通常幾點起床？" },
+    { "who": "Leo", "en": "On weekdays, I get up at six. My first class starts at eight.", "zh": "平日我六點起床，第一堂課八點開始。" },
+    { "who": "Amy", "en": "Six? That's early! Do you have breakfast?", "zh": "六點？好早！你吃早餐嗎？" },
+    { "who": "Leo", "en": "Yes, I always have breakfast at home. Then I take the bus to school.", "zh": "有，我都在家吃早餐，然後搭公車上學。" },
+    { "who": "Amy", "en": "What about weekends?", "zh": "那週末呢？" },
+    { "who": "Leo", "en": "On weekends, I sleep late. I usually get up at ten, and I work at a café in the afternoon.", "zh": "週末我睡晚一點，通常十點起床，下午在咖啡店打工。" },
+    { "who": "Amy", "en": "Do you work every weekend?", "zh": "你每個週末都打工嗎？" },
+    { "who": "Leo", "en": "No, only on Saturdays. On Sundays, I clean my room and study.", "zh": "沒有，只有星期六。星期天我打掃房間、讀書。" }
+   ],
+   "gist": { "q": "What are they talking about?", "options": ["Their daily routines", "A test", "A trip"], "answer": 0 },
+   "details": [
+    { "q": "What time does Leo get up on weekdays?", "options": ["Six", "Eight", "Ten"], "answer": 0 },
+    { "q": "How does Leo go to school?", "options": ["By bus", "On foot", "By car"], "answer": 0 },
+    { "q": "When does Leo work at the café?", "options": ["On Saturdays", "On Sundays", "Every day"], "answer": 0 }
+   ],
+   "shadow": [1, 5],
+   "retell": "不看稿，用兩三句英文說 Leo 平日和週末的不同：On weekdays, he…／On weekends, he…（he 的動詞要加 s）",
+   "retellSample": "On weekdays, Leo gets up at six and takes the bus to school. On weekends, he gets up at ten. He works at a café on Saturdays."
+  },
+  "read": {
+   "kind": "宿舍公告",
+   "title": "DORM NOTICE",
+   "lines": [
+    { "en": "Quiet hours are from 11 p.m. to 7 a.m.", "zh": "安靜時間是晚上十一點到早上七點。" },
+    { "en": "The front door closes at 11:30 p.m.", "zh": "大門晚上十一點半關。" },
+    { "en": "The laundry room is open every day from 8 a.m. to 10 p.m.", "zh": "洗衣間每天早上八點到晚上十點開放。" },
+    { "en": "Please do not use it after 10 p.m.", "zh": "晚上十點以後請不要使用。" },
+    { "en": "Cleaning day is every Sunday morning.", "zh": "每週日早上是打掃日。" }
+   ],
+   "questions": [
+    { "skill": "主旨", "q": "What is this notice mainly about?", "options": ["Rules and times in the dorm", "A party in the dorm", "How to cook in the dorm"], "answer": 0 },
+    { "skill": "細節", "q": "When does the front door close?", "options": ["At 11:30 p.m.", "At 11 p.m.", "At 7 a.m."], "answer": 0 },
+    { "skill": "指涉", "q": "In \"Please do not use it after 10 p.m.\", what does \"it\" mean?", "options": ["The laundry room", "The front door", "Your dorm room"], "answer": 0 },
+    { "skill": "推論", "q": "How often is cleaning day?", "options": ["Once a week", "Every day", "Twice a week"], "answer": 0 },
+    { "skill": "有沒有提供", "q": "Does the notice say where the laundry room is?", "options": ["Yes, on the first floor", "No, it does not say"], "answer": 1 }
+   ]
+  },
+  "speak": {
+   "situation": "新室友問你平常的作息，好安排誰先用浴室。",
+   "conditions": ["平日幾點起床、幾點出門", "假日跟平日哪裡不一樣（至少一件）", "用一個頻率副詞（always、usually、sometimes、never）"],
+   "followUps": ["What time do you go to bed?", "How often do you exercise?"],
+   "sample": "On weekdays, I get up at six thirty and leave home at seven thirty. I usually take a shower at night. On weekends, I sleep late, and I sometimes go to the library in the afternoon."
+  },
+  "write": {
+   "task": "傳訊息給新室友，說明你的作息，並請對方配合一件事。",
+   "conditions": ["幾點起床、幾點上床", "什麼時候需要安靜（例如讀書或考試前）", "有禮貌地請對方配合一件事"],
+   "minSentences": 3,
+   "sample": "Hi! I usually get up at six thirty on weekdays, and I go to bed at eleven. I often study in the room after nine. Could you keep the music low at night? Thank you!"
+  },
+  "review": {
+   "situation": "換個情境：說你家人的作息（主詞換成 he 或 she）。",
+   "practice": [
+    { "id": "t2-r1", "zh": "她每天六點起床。", "grammar": ["第三人稱單數", "時間 at"], "hints": ["主詞 she，動詞要加 s。", "She gets up at six every day."], "reference": ["She gets up at six every day.", "She gets up at six o'clock every day.", "Every day she gets up at six."], "why": "she 的動詞加 s：gets up；「起床」用 get up。", "newWords": [] },
+    { "id": "t2-r2", "zh": "我通常十二點上床，但是一點才睡著。", "grammar": ["go to bed／fall asleep", "頻率副詞"], "hints": ["上床和睡著是兩個不同的說法。", "I usually go to bed at twelve, but I fall asleep at one."], "reference": ["I usually go to bed at twelve, but I fall asleep at one.", "I usually go to bed at midnight, but I fall asleep at one.", "I usually go to bed at twelve, but I don't fall asleep until one."], "why": "「上床」是 go to bed，「睡著」是 fall asleep；usually 放在一般動詞前面。", "newWords": [] },
+    { "id": "t2-r3", "zh": "他週末不工作。", "grammar": ["現在式否定", "on weekends"], "hints": ["主詞 he，否定用 does not。", "He doesn't work on weekends."], "reference": ["He doesn't work on weekends.", "He does not work on weekends."], "why": "he 的否定用 does not（doesn't），後面的動詞用原形 work。", "newWords": [] }
+   ],
+   "speak": {
+    "situation": "跟同學聊你家裡一個人（爸爸、媽媽或兄弟姊妹）平常的作息。",
+    "conditions": ["主詞用 he 或 she，動詞要加 s", "至少說兩個時間", "用一個頻率副詞"],
+    "sample": "My mom gets up at five thirty every day. She usually cooks breakfast for us. She works at a bank, and she comes home at six. She never goes to bed before eleven."
+   }
+  }
+ },
+ {
+  "id": "t3",
+  "n": 3,
+  "after": 6,
+  "title": "房間與住處",
+  "titleEn": "My room",
+  "goal": "能描述房間裡有什麼、東西在哪裡，也聽得懂別人說的位置。",
+  "scene": "搬進新住處，家人視訊時想看你的房間。",
+  "grammar": {
+   "title": "there is／there are、位置和 a／the",
+   "points": [
+    "某個地方「有」什麼：There is 加單數（There is a desk），There are 加複數（There are two windows）。",
+    "位置：in（在裡面）、on（在上面）、under（在下面）、next to（在旁邊）、between A and B（在兩者之間）、in front of（在前面）、behind（在後面）。",
+    "第一次提到用 a，再提到同一個東西用 the：There is a lamp on the desk. The lamp is new."
+   ],
+   "examples": [
+    { "en": "There is a desk next to the window.", "zh": "窗戶旁邊有一張書桌。" },
+    { "en": "There are two books under the bed.", "zh": "床底下有兩本書。" },
+    { "en": "There is a lamp on the desk. The lamp is white.", "zh": "書桌上有一盞檯燈，那盞燈是白色的。" }
+   ]
+  },
+  "words": [
+   { "en": "desk", "zh": "書桌", "use": "on the desk", "example": "My laptop is on the desk.", "exampleZh": "我的筆電在書桌上。" },
+   { "en": "shelf", "zh": "架子、層架", "use": "on the shelf", "example": "There are books on the shelf.", "exampleZh": "架子上有書。" },
+   { "en": "drawer", "zh": "抽屜", "use": "in the drawer", "example": "The keys are in the drawer.", "exampleZh": "鑰匙在抽屜裡。" },
+   { "en": "closet", "zh": "衣櫃", "use": "in the closet", "example": "My coat is in the closet.", "exampleZh": "我的外套在衣櫃裡。" },
+   { "en": "next to", "zh": "在……旁邊", "use": "next to the bed", "example": "The lamp is next to the bed.", "exampleZh": "檯燈在床旁邊。" },
+   { "en": "between", "zh": "在兩者之間", "use": "between the bed and the desk", "example": "The chair is between the bed and the desk.", "exampleZh": "椅子在床和書桌中間。" },
+   { "en": "in front of", "zh": "在……前面", "use": "in front of the window", "example": "My desk is in front of the window.", "exampleZh": "我的書桌在窗戶前面。" },
+   { "en": "bright", "zh": "明亮的", "use": "a bright room", "example": "The room is bright.", "exampleZh": "房間很亮。" }
+  ],
+  "chunks": [
+   { "en": "There is / There are…", "zh": "有……" },
+   { "en": "What's on the shelf?", "zh": "架子上有什麼？" },
+   { "en": "It's next to…", "zh": "它在……旁邊。" },
+   { "en": "I like the window the most.", "zh": "我最喜歡那扇窗。" }
+  ],
+  "wordCheck": [
+   { "sentence": "The chair is between the bed and the desk.", "q": "椅子在哪裡？", "options": ["在床和書桌中間", "在床底下", "在書桌上面"], "answer": 0 },
+   { "sentence": "There are two windows, so the room is bright.", "q": "bright 在這裡是什麼意思？", "options": ["明亮的", "聰明的", "鮮豔的"], "answer": 0 }
+  ],
+  "practice": [
+   { "id": "t3-p1", "zh": "書桌上有一台筆電。", "grammar": ["there is", "on"], "hints": ["一台：單數用 There is。", "There is a laptop on the desk."], "reference": ["There is a laptop on the desk.", "There's a laptop on the desk."], "why": "某處有一個東西：There is a + 單數名詞；「在書桌上」on the desk。", "newWords": [] },
+   { "id": "t3-p2", "zh": "床底下有兩個箱子。", "grammar": ["there are", "under"], "hints": ["兩個：複數用 There are。", "There are two boxes under the bed."], "reference": ["There are two boxes under the bed."], "why": "複數用 There are；box 的複數是 boxes；「在床底下」under the bed。", "newWords": [] }
+  ],
+  "listen": {
+   "scene": "Ken 找不到鑰匙，室友 Sam 幫他看房間。",
+   "dialogue": [
+    { "who": "Ken", "en": "I can't find my keys. Are they on the desk?", "zh": "我找不到鑰匙。在書桌上嗎？" },
+    { "who": "Sam", "en": "No, there are only books on the desk.", "zh": "沒有，書桌上只有書。" },
+    { "who": "Ken", "en": "What about the shelf?", "zh": "那架子上呢？" },
+    { "who": "Sam", "en": "There is a lamp on the shelf, and there are two plants. No keys.", "zh": "架子上有一盞燈，還有兩盆植物，沒有鑰匙。" },
+    { "who": "Ken", "en": "Hmm. Is there anything under the bed?", "zh": "嗯……床底下有東西嗎？" },
+    { "who": "Sam", "en": "Yes! There is a black bag under the bed. Your keys are in the bag.", "zh": "有！床底下有一個黑色包包，你的鑰匙在包包裡。" },
+    { "who": "Ken", "en": "Great, thanks! Is the bag next to my shoes?", "zh": "太好了，謝謝！包包在我的鞋子旁邊嗎？" },
+    { "who": "Sam", "en": "Yes. It's between your shoes and the closet.", "zh": "對，在你的鞋子和衣櫃中間。" }
+   ],
+   "gist": { "q": "What is Ken doing?", "options": ["Looking for his keys", "Buying a lamp", "Cleaning his room"], "answer": 0 },
+   "details": [
+    { "q": "What is on the shelf?", "options": ["A lamp and two plants", "Books", "Keys"], "answer": 0 },
+    { "q": "Where are the keys?", "options": ["In the bag", "On the desk", "In the closet"], "answer": 0 },
+    { "q": "Where is the bag?", "options": ["Under the bed", "On the shelf", "In front of the window"], "answer": 0 }
+   ],
+   "shadow": [3, 7],
+   "retell": "不看稿，用兩三句英文說鑰匙最後在哪裡：The keys are…／The bag is…",
+   "retellSample": "Ken can't find his keys. They are in a black bag under the bed. The bag is between his shoes and the closet."
+  },
+  "read": {
+   "kind": "租屋資訊",
+   "title": "ROOM FOR RENT",
+   "lines": [
+    { "en": "A quiet room near the university.", "zh": "大學附近的安靜房間。" },
+    { "en": "The room has a bed, a desk and a closet.", "zh": "房間裡有一張床、一張書桌和一個衣櫃。" },
+    { "en": "It has two windows, so it is very bright.", "zh": "它有兩扇窗，所以很亮。" },
+    { "en": "The bathroom is next to the room, and there is a small kitchen on the first floor.", "zh": "浴室在房間旁邊，一樓有一個小廚房。" },
+    { "en": "Rent: NT$6,000 a month. No pets.", "zh": "租金：每月新台幣六千元。不可養寵物。" }
+   ],
+   "questions": [
+    { "skill": "主旨", "q": "What is this ad for?", "options": ["A room for rent", "A furniture sale", "A new school"], "answer": 0 },
+    { "skill": "指涉", "q": "In \"It has two windows\", what does \"It\" mean?", "options": ["The room", "The bathroom", "The kitchen"], "answer": 0 },
+    { "skill": "細節", "q": "Where is the bathroom?", "options": ["Next to the room", "On the first floor", "In the kitchen"], "answer": 0 },
+    { "skill": "推論", "q": "Can you keep a cat there?", "options": ["Yes", "No"], "answer": 1 },
+    { "skill": "有沒有提供", "q": "Does the ad say if there is Wi-Fi?", "options": ["Yes, there is Wi-Fi", "No, it does not say"], "answer": 1 }
+   ]
+  },
+  "speak": {
+   "situation": "家人視訊時想看你的新房間，請你介紹一下。",
+   "conditions": ["至少說三樣東西（用 there is／there are）", "至少用兩個位置說法（on、next to、under、between…）", "說一個你喜歡或不喜歡的地方"],
+   "followUps": ["Is there a window?", "Where do you study?"],
+   "sample": "My room is small, but it's bright. There is a bed next to the window, and there is a desk in front of the bed. There are some books on the shelf. I like the window the most."
+  },
+  "write": {
+   "task": "在租屋網站留言給房東，說你在找什麼樣的房間，並問一個問題。",
+   "conditions": ["你在找什麼樣的房間（要有什麼）", "什麼時候想搬進去", "問一個問題（例如附近有沒有公車站）"],
+   "minSentences": 3,
+   "sample": "Hello, I'm looking for a quiet room with a desk and a closet. I want to move in next month. Is there a bus stop near the room? Thank you."
+  },
+  "review": {
+   "situation": "換個情境：在病房告訴病人東西放在哪裡。",
+   "practice": [
+    { "id": "t3-r1", "zh": "呼叫鈴在你的床旁邊。", "grammar": ["位置 next to"], "hints": ["「在旁邊」用 next to。", "The call button is next to your bed."], "reference": ["The call button is next to your bed.", "The call bell is next to your bed."], "why": "東西在哪裡：主詞 + is + 位置；「在你的床旁邊」next to your bed。", "newWords": [] },
+    { "id": "t3-r2", "zh": "桌上有一杯水。", "grammar": ["there is", "a cup of"], "hints": ["一杯：單數用 There is。", "There is a cup of water on the table."], "reference": ["There is a cup of water on the table.", "There's a cup of water on the table.", "There is a glass of water on the table."], "why": "水不可數，用 a cup of water 計量；單數用 There is。", "newWords": [] },
+    { "id": "t3-r3", "zh": "浴室裡有兩條毛巾。", "grammar": ["there are", "in"], "hints": ["兩條：複數用 There are。", "There are two towels in the bathroom."], "reference": ["There are two towels in the bathroom."], "why": "複數用 There are；「在浴室裡」in the bathroom。", "newWords": [] }
+   ],
+   "speak": {
+    "situation": "病人剛住進病房，你告訴他東西放在哪裡。",
+    "conditions": ["至少說三樣東西在哪裡", "至少用兩個位置說法", "最後問他還需要什麼"],
+    "sample": "Your call button is next to your bed. There is a cup of water on the table, and there are two towels in the bathroom. Your bag is in the closet. Do you need anything else?"
+   }
+  }
+ },
+ {
+  "id": "t4",
+  "n": 4,
+  "after": 7,
+  "title": "點餐與買食物",
+  "titleEn": "Ordering food and drinks",
+  "goal": "能有禮貌地點餐、說數量和偏好（甜度、冰塊、不要什麼），也聽得懂店員常問的問題。",
+  "scene": "下課後到學校附近的飲料店和早餐店買東西。",
+  "grammar": {
+   "title": "禮貌請求、數量和可數／不可數",
+   "points": [
+    "有禮貌地點餐：Can I have…? ／ I'd like…（I would like 的縮寫）／ Could I get…?",
+    "數得出來的東西用 a、two、three：two egg tarts。數不出來的（tea、rice、water）用容器來數：a cup of tea、a bowl of rice、a bottle of water。",
+    "說偏好：less sugar（少糖）、half sugar（半糖）、no ice（去冰）、No onions, please.（不要洋蔥）",
+    "店員常問：For here or to go?（內用還是外帶？）Anything else?（還要別的嗎？）"
+   ],
+   "examples": [
+    { "en": "Can I have a large black tea, please?", "zh": "請給我一杯大杯紅茶。" },
+    { "en": "I'd like two egg tarts and a bowl of soup.", "zh": "我要兩個蛋塔和一碗湯。" },
+    { "en": "Half sugar and no ice, please.", "zh": "半糖去冰，謝謝。" }
+   ]
+  },
+  "words": [
+   { "en": "order", "zh": "點餐", "use": "order a drink", "example": "Are you ready to order?", "exampleZh": "可以點餐了嗎？" },
+   { "en": "menu", "zh": "菜單", "use": "on the menu", "example": "Can I see the menu?", "exampleZh": "可以看一下菜單嗎？" },
+   { "en": "for here", "zh": "內用", "use": "for here or to go", "example": "For here, please.", "exampleZh": "內用，謝謝。" },
+   { "en": "to go", "zh": "外帶", "use": "a coffee to go", "example": "I'd like it to go.", "exampleZh": "我要外帶。" },
+   { "en": "a cup of", "zh": "一杯", "use": "a cup of tea", "example": "I'd like a cup of tea.", "exampleZh": "我要一杯茶。" },
+   { "en": "a bowl of", "zh": "一碗", "use": "a bowl of rice", "example": "Can I have a bowl of rice?", "exampleZh": "可以給我一碗白飯嗎？" },
+   { "en": "receipt", "zh": "收據、發票", "use": "ask for a receipt", "example": "Can I have a receipt?", "exampleZh": "可以給我收據嗎？" },
+   { "en": "less", "zh": "較少的", "use": "less ice", "example": "Less ice, please.", "exampleZh": "少冰，謝謝。" }
+  ],
+  "chunks": [
+   { "en": "What can I get for you?", "zh": "要點什麼？" },
+   { "en": "For here or to go?", "zh": "內用還是外帶？" },
+   { "en": "Anything else?", "zh": "還需要什麼嗎？" },
+   { "en": "Here you are.", "zh": "給你。" }
+  ],
+  "wordCheck": [
+   { "sentence": "Is that for here or to go?", "q": "店員在問什麼？", "options": ["內用還是外帶", "要不要袋子", "要大杯還是小杯"], "answer": 0 },
+   { "sentence": "Less ice, please.", "q": "顧客想要？", "options": ["少冰", "去冰", "多冰"], "answer": 0 }
+  ],
+  "practice": [
+   { "id": "t4-p1", "zh": "請給我一杯大杯的奶茶。", "grammar": ["禮貌請求", "a cup of"], "hints": ["點餐開頭可以用 Can I have…?", "Can I have a large milk tea, please?"], "reference": ["Can I have a large milk tea, please?", "I'd like a large milk tea, please.", "Could I get a large milk tea, please?"], "why": "禮貌點餐用 Can I have…? 或 I'd like…；大杯 large 放在飲料前面。", "newWords": [] },
+   { "id": "t4-p2", "zh": "我要兩個蛋塔，外帶。", "grammar": ["可數名詞複數", "to go"], "hints": ["兩個蛋塔：egg tart 要加 s。", "I'd like two egg tarts to go."], "reference": ["I'd like two egg tarts to go.", "I would like two egg tarts to go.", "Two egg tarts to go, please.", "Can I have two egg tarts to go?"], "why": "蛋塔數得出來，兩個要加 s：two egg tarts；外帶說 to go。", "newWords": [] }
+  ],
+  "listen": {
+   "scene": "下課後，你在飲料店排隊，聽到前面的客人點餐。",
+   "dialogue": [
+    { "who": "Clerk", "en": "Hi! What can I get for you?", "zh": "嗨！要點什麼？" },
+    { "who": "Customer", "en": "Can I have a large black tea, please?", "zh": "請給我一杯大杯紅茶。" },
+    { "who": "Clerk", "en": "Sure. How much sugar would you like?", "zh": "好的，甜度要多少？" },
+    { "who": "Customer", "en": "Half sugar, and less ice, please.", "zh": "半糖，少冰，謝謝。" },
+    { "who": "Clerk", "en": "OK. Is that for here or to go?", "zh": "好，內用還是外帶？" },
+    { "who": "Customer", "en": "To go. And could I get two egg tarts, too?", "zh": "外帶。也可以給我兩個蛋塔嗎？" },
+    { "who": "Clerk", "en": "Of course. That's ninety-five dollars.", "zh": "當然，一共九十五元。" },
+    { "who": "Customer", "en": "Here you are. Can I have a receipt?", "zh": "給你。可以給我收據嗎？" }
+   ],
+   "gist": { "q": "What is the customer doing?", "options": ["Ordering a drink and some food", "Returning a drink", "Asking for directions"], "answer": 0 },
+   "details": [
+    { "q": "What size is the black tea?", "options": ["Large", "Medium", "Small"], "answer": 0 },
+    { "q": "How much ice does the customer want?", "options": ["Less ice", "No ice", "Normal ice"], "answer": 0 },
+    { "q": "Is the order for here or to go?", "options": ["For here", "To go"], "answer": 1 }
+   ],
+   "shadow": [1, 3, 5],
+   "retell": "不看稿，用兩三句英文說客人點了什麼：The customer orders…／It's…",
+   "retellSample": "The customer orders a large black tea with half sugar and less ice. The customer also gets two egg tarts. The order is to go, and it costs ninety-five dollars."
+  },
+  "read": {
+   "kind": "早餐店菜單",
+   "title": "FRESH DAY CAFÉ — Breakfast 7–10 a.m.",
+   "lines": [
+    { "en": "Egg sandwich $45 · Ham and cheese toast $50", "zh": "蛋三明治 45 元・火腿起司吐司 50 元" },
+    { "en": "A bowl of oatmeal $40 (add fruit: +$15)", "zh": "一碗燕麥粥 40 元（加水果 +15 元）" },
+    { "en": "Black tea $25 · Milk tea $35 (sugar: full, half or none)", "zh": "紅茶 25 元・奶茶 35 元（甜度：全糖、半糖、無糖）" },
+    { "en": "Coffee $40 — before 9 a.m., we only serve it hot.", "zh": "咖啡 40 元——早上九點以前只有熱的。" },
+    { "en": "Free refill of black tea for customers who eat here.", "zh": "內用的客人紅茶可以免費續杯。" }
+   ],
+   "questions": [
+    { "skill": "主旨", "q": "What is this menu for?", "options": ["Breakfast at a café", "Lunch at a school", "A cooking class"], "answer": 0 },
+    { "skill": "細節", "q": "How much is a bowl of oatmeal with fruit?", "options": ["$55", "$40", "$15"], "answer": 0 },
+    { "skill": "指涉", "q": "In \"we only serve it hot\", what does \"it\" mean?", "options": ["Coffee", "Milk tea", "Oatmeal"], "answer": 0 },
+    { "skill": "推論", "q": "Can you order iced coffee at 8 a.m.?", "options": ["Yes", "No"], "answer": 1 },
+    { "skill": "有沒有提供", "q": "Does the menu say if they sell lunch?", "options": ["Yes", "No, it does not say"], "answer": 1 }
+   ]
+  },
+  "speak": {
+   "situation": "你在學校附近的飲料店點餐，店員問你要什麼。",
+   "conditions": ["點一杯飲料和一樣吃的（說大小或數量）", "說甜度或冰塊", "回答內用還是外帶，最後問一個問題（價錢或收據）"],
+   "followUps": ["Anything else?", "Would you like a bag?"],
+   "sample": "Hi, can I have a medium green tea, please? Half sugar and no ice. And I'd like an egg sandwich, too. It's to go. How much is it?"
+  },
+  "write": {
+   "task": "同學請你幫忙買午餐，傳訊息跟他確認要買什麼。",
+   "conditions": ["你打算買什麼、各要幾個", "問他一個偏好（甜度、辣不辣、要不要飯）", "說你大概幾點拿給他"],
+   "minSentences": 3,
+   "sample": "Hi! I'm at the lunch shop now. I'm getting a bowl of chicken rice and a green tea for you. Do you want half sugar or no sugar? I'll bring it to you at twelve thirty."
+  },
+  "review": {
+   "situation": "換個情境：在餐廳幫不會說英文的家人點兩人份的餐。",
+   "practice": [
+    { "id": "t4-r1", "zh": "我要一碗白飯和一杯熱茶。", "grammar": ["a bowl of／a cup of", "禮貌請求"], "hints": ["飯和茶要用容器來數。", "I'd like a bowl of rice and a cup of hot tea."], "reference": ["I'd like a bowl of rice and a cup of hot tea.", "Can I have a bowl of rice and a cup of hot tea?", "I would like a bowl of rice and a cup of hot tea.", "Could I get a bowl of rice and a cup of hot tea?"], "why": "rice 和 tea 不可數，用 a bowl of、a cup of 來數；點餐用 I'd like 或 Can I have。", "newWords": [] },
+    { "id": "t4-r2", "zh": "請不要加洋蔥。", "grammar": ["偏好的說法"], "hints": ["最簡單的說法：No + 東西, please.", "No onions, please."], "reference": ["No onions, please.", "Please don't add onions.", "Please do not add any onions."], "why": "說不要什麼，最常用 No + 複數名詞, please；也可以說 Please don't add onions。", "newWords": [] },
+    { "id": "t4-r3", "zh": "我們要內用。", "grammar": ["for here"], "hints": ["內用是 for here。", "It's for here."], "reference": ["It's for here.", "For here, please.", "We'd like to eat here.", "We will eat here.", "We'll eat here.", "We're eating here."], "why": "內用說 for here；外帶是 to go。", "newWords": [] }
+   ],
+   "speak": {
+    "situation": "你在餐廳幫爸媽點餐，爸爸不吃牛肉。",
+    "conditions": ["點兩人份的餐（說數量）", "說一個偏好或不要的東西（例如不要牛肉）", "回答內用還是外帶，並問一個問題"],
+    "sample": "Hi, we'd like two bowls of chicken rice and two cups of hot tea, please. My father doesn't eat beef, so no beef in his soup, please. It's for here. How long will it take?"
+   }
+  }
+ }
+]

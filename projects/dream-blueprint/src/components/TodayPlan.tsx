@@ -7,6 +7,7 @@ import quizData from '../data/quiz.json'
 
 const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
 import { activeLesson, lessonFinished } from '../lib/lesson'
+import { dueTopic, partNumber, partPlan, topicDoneToday } from '../lib/topics'
 import type { Focus } from '../lib/nextFocus'
 import './today-plan.css'
 
@@ -24,6 +25,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   // Only nursing questions count toward the nursing plan; an English question is not nursing practice.
   const quizToday = answeredOn(state.notes, today, nursingIds)
   const casesToday = casesFinishedOn(state.notes, today)
+  const topic = mode === 'regular' && energy !== 'low' ? dueTopic(state, today) : null
+  const topicDone = topicDoneToday(state.notes, today)
   const tasks: Task[] = mode === 'nursing' ? [
     { id: 'n-review', min: 5, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，這步跳過',
       auto: due === 0, go: due ? () => { location.hash = 'library/words' } : undefined },
@@ -37,7 +40,11 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
       go: () => { location.hash = focus!.action!.hash }, goLabel: '去做' }] : []),
     { id: 'review', min: 8 - Math.min(5, focusMin), title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
       auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
-    { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
+    topic ? { id: 'lesson', min: 20, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
+      auto: false, go: () => onStart(energy), goLabel: topic.step > 0 ? '繼續' : '開始' }
+    : topicDone && !lessonFinished(state.notes, today) ? { id: 'lesson', min: 20, title: '今天的生活主題', detail: '完成了。文法課下次上；想多練也可以現在上。',
+      auto: true, go: () => onStart(energy), goLabel: '加練' }
+    : { id: 'lesson', min: 20, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
       auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' },
     { id: 'more', min: energy === 'high' ? 15 : 2, title: energy === 'high' ? '加練' : '收尾', detail: energy === 'high' ? '一篇閱讀理解、一題寫作階梯，或跟 Emma 聊 5 分鐘' : '把今天批改出來的錯句加入複習，明天會再出現',
       auto: false, go: energy === 'high' ? () => { location.hash = 'library/reading' } : undefined, goLabel: '閱讀', go2: energy === 'high' ? () => { location.hash = 'speaking' } : undefined },

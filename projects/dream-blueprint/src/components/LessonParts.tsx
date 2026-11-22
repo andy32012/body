@@ -21,7 +21,7 @@ export function StepBar({ current, done }: { current: LessonStep; done: LessonSt
 }
 
 /** Reads lines aloud one after another; the second speaker gets a different voice (or pitch). */
-function useDialogueVoice(rate: number) {
+export function useDialogueVoice(rate: number) {
   const [playing, setPlaying] = useState<number | null>(null)
   const run = useRef(0)
   useEffect(() => () => { run.current++; window.speechSynthesis?.cancel() }, [])
@@ -51,7 +51,7 @@ function useDialogueVoice(rate: number) {
   return { playing, play, stop }
 }
 
-function Transcript({ lines, playing, onPlayLine, showZh }: { lines: LessonLine[]; playing: number | null; onPlayLine: (i: number) => void; showZh: boolean }) {
+export function Transcript({ lines, playing, onPlayLine, showZh }: { lines: LessonLine[]; playing: number | null; onPlayLine: (i: number) => void; showZh: boolean }) {
   return <ol className="ls-lines">
     {lines.map((l, i) => <li key={i} data-playing={playing === i}>
       <button type="button" className="ls-line-play" aria-label={'播放這一句：' + l.en} onClick={() => onPlayLine(i)}><Volume2 size={14} /></button>
