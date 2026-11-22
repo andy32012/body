@@ -73,9 +73,9 @@ export function dayBudget(day: string, settings: DaySettings): DayBudget {
     winter: '寒假 3 小時：一堂課，加上大量聽讀說寫和證照準備；有電就 4 小時。',
     rest: (holidayBreak(day) ? '過年休息。' : '今天休息。') + '想動一下的話 ' + fmt(minutes.low) + '複習（選做）。',
     light: '今天沒排課。想動一下就 ' + fmt(minutes.low) + '複習（選做），不然休息。',
-    exam: '考試優先。想動一下就 15 分鐘複習，或 30 分鐘護理英文，都是選做。',
-    internship: '護理英文 20–30 分鐘：複習、幾題護理英文、用英文說一件實習的事；太忙就 10 分鐘複習。',
-    sprint: '國考衝刺：15 分鐘護理英文，跟國考讀到的科目同步；太忙就 5 分鐘複習。',
+    exam: '考試優先。想動一下就 15 分鐘複習，或 30 分鐘護理英文（複習、聽或讀一段、再輪流練單字／口說／護理題），都是選做。',
+    internship: '護理英文 20–30 分鐘：複習，聽或讀一段護理英文（有聽力稿），再輪流練護理單字、跟 Emma 演一段或護理題；太忙就 10 分鐘複習。',
+    sprint: '國考衝刺：15 分鐘護理英文，複習加一段聽或讀，再輪流練單字、口說或護理題；太忙就 5 分鐘複習。',
   }[kind]
   return { day, weekday, period, kind, quiet, defaultEnergy, minutes, labels, optional: defaultEnergy === 'low', english }
 }

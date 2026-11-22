@@ -78,7 +78,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
     : lesson.checkpoint ? '單元 ' + lesson.unit + ' 小關卡' : '今天這一堂 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
   const short = optional ? '想動一下的話，花 ' + low + '複習：回想一句熟悉的英文、翻幾張複習卡（選做）' : '今天只要 ' + low + '：回想一句熟悉的英文，再翻幾張複習卡'
   const goal = gate && gateExam ? '去報名' + gateExam.name + '：填上考試日期就能先上下一段，考過才正式升到 ' + gate.to
-    : topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? choice.labels.normal + '護理英文：複習、幾題護理英文、用英文說一件事' : short)
+    : topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? choice.labels.normal + '護理英文：複習、聽或讀一段，再練單字、口說或護理題' : short)
     : lesson.review ? (energy === 'low' ? short : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
   const progress = courseProgress(state.curriculum.unit)

@@ -29,10 +29,9 @@
 .daily-word-progress i.done {background:#85dfc5}
 .daily-word-progress i.now {background:#fff}
 .daily-word-progress i.look {background:#fdf0dc;box-shadow:0 0 0 1px #fdf0dc}
-.daily-word-choice {margin:0;font-size:14px;color:#d9d3ee}
-.daily-word-choice b {color:#fff}
-.daily-word-nav {display:flex;justify-content:space-between;gap:10px;margin-top:-4px}
-.daily-word-back {display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:#d9d3ee;font-size:13px;padding:6px 2px;cursor:pointer}
+.daily-word-steps {display:flex;align-items:center;gap:10px}
+.daily-word-steps .daily-word-progress {flex:1}
+.daily-word-back {display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:#d9d3ee;font-size:13px;padding:6px 0;cursor:pointer;white-space:nowrap}
 .daily-word-back:disabled {opacity:.35;cursor:default}
 .daily-word-finished .daily-word-back {justify-self:start}
 .daily-word-finished .daily-word-term {font-size:clamp(24px,7vw,32px);letter-spacing:.02em}

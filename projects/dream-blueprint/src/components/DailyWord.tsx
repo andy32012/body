@@ -95,7 +95,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
 
       {word ? <>
         <div className="daily-word-body">
-          <span className="daily-word-meta">第 {word.level} 級{past ? ' · 今天的第 ' + (done - back + 1) + ' 個' : ''}</span>
+          <span className="daily-word-meta">第 {word.level} 級{past ? ' · 今天第 ' + (done - back + 1) + ' 個 · 你選了「' + (past.known ? '認得' : '還不熟') + '」' : ''}</span>
           <strong className="daily-word-term" lang="en">{word.en}</strong>
           {reveal || past
             ? formLines(word).length
@@ -107,23 +107,20 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}
         </div>
         <div className="daily-word-foot">
-          {past ? <>
-            <p className="daily-word-choice" role="status">你剛剛選：<b>{past.known ? '認得' : '還不熟'}</b>{past.known ? '' : '（明天會進複習）'}</p>
-            <div className="daily-word-actions">
-              <button type="button" onClick={() => change(!past.known)}>{past.known ? <><RotateCcw size={15} />改成還不熟</> : <><Check size={15} />改成認得</>}</button>
-              <button type="button" className="primary" onClick={() => setBack(0)}>{current ? '回到第 ' + (done + 1) + ' 個' : '回到最後'}<ArrowRight size={15} /></button>
-            </div>
-          </> : <div className="daily-word-actions">
+          {past ? <div className="daily-word-actions">
+            <button type="button" onClick={() => change(!past.known)}>{past.known ? <><RotateCcw size={15} />改成還不熟</> : <><Check size={15} />改成認得</>}</button>
+            <button type="button" className="primary" onClick={() => setBack(0)}>{current ? '回到第 ' + (done + 1) + ' 個' : '回到最後'}<ArrowRight size={15} /></button>
+          </div> : <div className="daily-word-actions">
             <button type="button" onClick={() => sort(false)}><RotateCcw size={15} />還不熟</button>
             <button type="button" className="primary" onClick={() => sort(true)}><Check size={15} />認得</button>
           </div>}
-          <div className="daily-word-nav">
-            <button type="button" className="daily-word-back" disabled={back >= sorted.length} onClick={stepBack}><ArrowLeft size={14} />上一個</button>
-            {back > 0 && <button type="button" className="daily-word-back" onClick={stepForward}>下一個<ArrowRight size={14} /></button>}
-          </div>
+          <div className="daily-word-steps">
+          <button type="button" className="daily-word-back" disabled={back >= sorted.length} onClick={stepBack} aria-label="上一個單字"><ArrowLeft size={14} />上一個</button>
           <div className="daily-word-progress" role="progressbar" aria-label="今天的單字" aria-valuemin={0} aria-valuemax={target} aria-valuenow={done}
             aria-valuetext={'看完 ' + done + ' 個，共 ' + target + ' 個，現在是第 ' + (done + 1) + ' 個'}>
             {Array.from({ length: target }, (_, i) => <i key={i} aria-hidden="true" className={past && i === done - back ? 'look' : i < done ? 'done' : i === done && !past ? 'now' : ''} />)}
+          </div>
+          {back > 0 && <button type="button" className="daily-word-back" onClick={stepForward} aria-label="下一個單字">下一個<ArrowRight size={14} /></button>}
           </div>
         </div>
       </> : <div className="daily-word-body daily-word-finished">

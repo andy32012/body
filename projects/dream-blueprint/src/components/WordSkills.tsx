@@ -3,7 +3,7 @@ import { Volume2 } from 'lucide-react'
 import { orderForSkill, spellingMatches, type Skill } from '../lib/wordSkills'
 
 /** `en` may list accepted spellings ("airplane/plane"); `key` is the word-table entry the skill is recorded on. */
-type Word = { en: string; zh: string; key?: string }
+type Word = { en: string; zh: string; key?: string; ex?: string; exZh?: string }
 
 /** Reads every accepted form ("airplane/plane" → "airplane, plane"). `onPlay` runs once the sound really starts
  *  (or the engine reports it is speaking), not merely when it was asked to speak. */
@@ -23,9 +23,10 @@ function say(text: string, rate = 0.85, onPlay?: () => void) {
   } catch { return false }
 }
 
-/** 聽懂 / 說出 / 寫出 drills over the words being learned. Words missing the skill come first. */
+/** 看懂 / 聽懂 / 說出 / 寫出 drills over the words being learned. Words missing the skill come first.
+ *  A word list with example sentences (the nursing words) shows the example once the word is answered. */
 export default function WordSkills({ skill, words, distractors, notes, keyOf, rate, onPass }: {
-  skill: Exclude<Skill, 'read'>; words: Word[]; distractors: Word[]; notes: Record<string, string>
+  skill: Skill; words: Word[]; distractors: Word[]; notes: Record<string, string>
   keyOf: (w: Word) => string; rate: number; onPass: (w: Word) => void
 }) {
   const [order] = useState(() => orderForSkill(words, keyOf, notes, skill).slice(0, 10))
@@ -64,8 +65,16 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
     setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false); setHelped(false)
   }
   const right = picked !== undefined && options[picked]?.en === word.en
+  const answered = picked !== undefined || shown
   return <div className="pr-stack ws">
-    <p className="qz-meta"><span>{i + 1} / {order.length}</span><span>{skill === 'listen' ? '聽發音，選意思' : skill === 'say' ? '看中文，說出英文' : '看中文，拼出英文'}</span></p>
+    <p className="qz-meta"><span>{i + 1} / {order.length}</span><span>{skill === 'read' ? '看英文，選意思' : skill === 'listen' ? '聽發音，選意思' : skill === 'say' ? '看中文，說出英文' : '看中文，拼出英文'}</span></p>
+    {skill === 'read' && <>
+      <h3 className="ws-term" lang="en">{word.en} <button type="button" className="ws-mini" aria-label="聽發音" onClick={() => say(word.en, rate)}><Volume2 size={15} /></button></h3>
+      <div className="pr-options">{options.map((o, j) => <button key={o.zh} type="button" disabled={picked !== undefined} aria-pressed={picked === j}
+        className={picked === undefined ? undefined : o.en === word.en ? 'qz-right' : picked === j ? 'qz-wrong' : undefined}
+        onClick={() => setPicked(j)}>{o.zh}</button>)}</div>
+      {picked !== undefined && <button type="button" className="pr-main" onClick={() => next(right)}>下一個</button>}
+    </>}
     {skill === 'listen' && <>
       <button type="button" className="ws-play" onClick={() => { if (!playFor(i, word)) setHeard(false) }}><Volume2 size={18} />播放{picked !== undefined ? '（' + word.en + '）' : ''}</button>
       <div className="pr-options">{options.map((o, j) => <button key={o.zh} type="button" disabled={picked !== undefined || !heard} aria-pressed={picked === j}
@@ -96,5 +105,6 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
         <button type="button" className="pr-main" onClick={() => next(spellingMatches(answer, word.en))}>下一個</button>
       </>}
     </>}
+    {answered && word.ex && <p className="ws-ex"><span lang="en">{word.ex}</span><br />{word.exZh}</p>}
   </div>
 }

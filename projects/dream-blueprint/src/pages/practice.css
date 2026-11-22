@@ -327,8 +327,9 @@
 .passage-note { color: var(--practice-secondary); font-size: .92rem; }
 .passage-library .pr-reference p[lang="en"] { font-size: 1.08rem; line-height: 1.7; }
 .passage-again { margin: 0; padding: .55rem .8rem; border-radius: 10px; border-left: 3px solid var(--practice-accent); background: var(--practice-accent-wash); color: var(--practice-ink); font-size: .92rem; line-height: 1.6; }
-.pr-pane .qz-tabs.pr-options { display: inline-flex; justify-self: start; gap: 2px; padding: 3px; border: 1px solid var(--practice-line); border-radius: 999px; }
-.pr-pane .qz-tabs.pr-options button { min-height: 34px; padding: .2rem 1.05rem; border: 0; border-radius: 999px; background: transparent; color: var(--practice-secondary); font-size: .92rem; box-shadow: none; font-weight: 500; }
+.pr-pane .qz-tabs.pr-options { display: inline-flex; flex-wrap: wrap; max-width: 100%; justify-self: start; gap: 2px; padding: 3px; border: 1px solid var(--practice-line); border-radius: 22px; }
+.pr-pane .qz-tabs.pr-options button { white-space: nowrap; min-height: 34px; padding: .2rem 1.05rem; border: 0; border-radius: 999px; background: transparent; color: var(--practice-secondary); font-size: .92rem; box-shadow: none; font-weight: 500; }
+@media (max-width: 480px) { .pr-pane .qz-tabs.pr-options button { padding: .2rem .7rem; } }
 .pr-pane .qz-tabs.pr-options button[aria-pressed="true"] { background: var(--practice-accent-wash); color: var(--practice-ink); box-shadow: inset 0 0 0 1px var(--practice-accent); font-weight: 650; }
 .qz-meta { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: 0; color: var(--practice-secondary); font-size: .88rem; font-variant-numeric: tabular-nums; }
 .qz-zh { justify-self: start; }
@@ -356,6 +357,13 @@
 .ws-write { display: flex; gap: .6rem; flex-wrap: wrap; }
 .ws-write input { flex: 1 1 12rem; min-height: 44px; font-size: 1.1rem; padding: .5rem .8rem; border-radius: 12px; border: 1px solid var(--practice-line); background: var(--practice-inset); color: var(--practice-ink); }
 .ws h3 { margin: .3rem 0; font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.ws-term { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ws-ex { margin: 0; padding: .6rem .8rem; border-radius: 10px; background: color-mix(in srgb, var(--practice-accent) 8%, transparent); line-height: 1.6; }
+.ws-ex [lang=en] { font-weight: 600; }
+.nw-area { display: flex; align-items: center; gap: .5rem; font-size: .92rem; }
+.nl-words ul, .nl-list ol { margin: .4rem 0 0; padding-inline-start: 1.3rem; display: grid; gap: .3rem; }
+.nl-list button[aria-current] { font-weight: 700; text-decoration: underline; }
+.nl details summary, .nl-words summary, .nl-list summary { cursor: pointer; }
 .cc-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .cc-steps li { text-align: center; font-size: .78rem; padding: .3rem .2rem; border-radius: 8px; color: var(--practice-secondary); background: var(--practice-inset); }
 .cc-steps li[data-state=now] { color: var(--practice-ink); box-shadow: inset 0 0 0 1.5px var(--practice-accent); font-weight: 650; }

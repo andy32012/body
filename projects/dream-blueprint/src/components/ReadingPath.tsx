@@ -19,13 +19,15 @@ function Highlight({ text, marks }: { text: string; marks: string[] }) {
 }
 
 /** 閱讀理解：A1 → B2 (IELTS question types). Answer one question at a time; a wrong answer asks why.
- *  `only`: just these passages (a unit's pack), without the level picker. Held-out test passages are never listed here. */
-export default function ReadingPath({ state, onActivity, date, only }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; only?: readonly string[] }) {
+ *  `only`: just these passages (a unit's pack), without the level picker. Held-out test passages are never listed here.
+ *  `set="nursing"`: the nursing passages (護理閱讀) instead of the graded reading; only the levels they have are offered. */
+export default function ReadingPath({ state, onActivity, date, only, set }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; only?: readonly string[]; set?: 'nursing' }) {
   const [all, setAll] = useState<ReadPassage[] | null>(null)
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     let alive = true
-    import('../data/reading.json').then(f => { if (alive) setAll((f.default as ReadPassage[]).filter(p => only ? only.includes(p.id) : !p.held)) }).catch(() => { if (alive) setFailed(true) })
+    const load = set === 'nursing' ? import('../data/nursing-reading.json') : import('../data/reading.json')
+    load.then(f => { if (alive) setAll((f.default as ReadPassage[]).filter(p => only ? only.includes(p.id) : !p.held)) }).catch(() => { if (alive) setFailed(true) })
     return () => { alive = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -77,7 +79,7 @@ export default function ReadingPath({ state, onActivity, date, only }: Pick<Page
   if (failed) return <p>閱讀教材載入失敗，重新整理再試一次。</p>
   if (!all) return <p>載入中……</p>
   const levelButtons = only ? null : <div className="pr-options rd-levels" role="group" aria-label="閱讀程度">
-    {readLevels.map(l => {
+    {readLevels.filter(l => !set || all.some(p => p.level === l.id)).map(l => {
       const here = all.filter(p => p.level === l.id)
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length
       return <button key={l.id} type="button" aria-pressed={l.id === lvl} onClick={() => chooseLevel(l.id)}>

@@ -12,6 +12,8 @@ import sentences from "../data/sentences.json";
 import words from "../data/words.json";
 import starters from "../data/starters.json";
 import SpeechPractice from "../components/SpeechPractice";
+import NursingListen from "../components/NursingListen";
+import NursingWords from "../components/NursingWords";
 import type { AppState, PageProps, Session } from "../lib/store";
 import {
   activePeriod,
@@ -1127,8 +1129,8 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords"];
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
@@ -1306,6 +1308,9 @@ function Extras({
             ["passage", "7000 單短文"],
             ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
             ["case", "臨床情境"],
+            ["nlisten", "護理聽力"],
+            ["nread", "護理閱讀"],
+            ["nwords", "護理單字"],
             ["screen", "單字快篩"],
           ] as const
         )
@@ -1318,6 +1323,9 @@ function Extras({
               key === "translate" ||
               key === "passage" ||
               key === "reading" ||
+              key === "nlisten" ||
+              key === "nread" ||
+              key === "nwords" ||
               ((key === "quiz" || key === "case") && periodQuiet),
           )
           .map(([key, label]) => (
@@ -1462,7 +1470,10 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
-      {mode === "reading" && <ReadingPath state={state} onActivity={onActivity} date={date} />}
+      {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
+      {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
+      {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
+      {mode === "nwords" && <NursingWords state={state} onActivity={onActivity} date={date} />}
       {mode === "writing" && <WritingLadder key={writingTask ?? "ladder"} initialTask={writingTask} state={state} onActivity={onActivity} date={date} />}
       {mode === "unit" && <UnitPack state={state} onActivity={onActivity} date={date} />}
       {mode === "quiz" && (!quiet || periodQuiet) && (

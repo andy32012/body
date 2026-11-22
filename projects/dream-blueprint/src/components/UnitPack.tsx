@@ -49,7 +49,7 @@ function Chunks({ pack, rate }: { pack: Pack; rate: number }) {
 
 /** Listen without the text, answer, then read along. Questions open after one complete play; a play that cannot be
  *  confirmed still lets him answer, but it is not recorded as understood by ear. */
-function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: number; last: ListenRecord | null; onSave: (r: Omit<ListenRecord, 'day'>) => void }) {
+export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: number; last: ListenRecord | null; onSave: (r: Omit<ListenRecord, 'day'>) => void }) {
   useVoiceList()
   const voice = useDialogueVoice(rate, l.accent)
   const hasAccent = accentVoices(l.accent).length > 0

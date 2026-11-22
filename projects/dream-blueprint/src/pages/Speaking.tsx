@@ -15,6 +15,7 @@ import { markLessonStep, readLessonRecord } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import { emmaLevel } from '../lib/cefr'
 import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
+import { nurseInstructions, nurseSpeakKey, type NurseListening } from '../lib/nursing'
 import { PairPaste } from '../components/PairDevice'
 import './speaking.css'
 
@@ -37,7 +38,7 @@ function instructions(memory: string[], lesson = '', level = emmaLevel(1)) {
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
 const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
 
-export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string }) {
+export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode, nurseMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string; nurseMode?: string }) {
   const memory = useMemory()
   const [today] = useState(dayKey)
   const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
@@ -57,6 +58,14 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     return () => { alive = false }
   }, [packRef])
   const packTask = pack && packRef ? pack.speak[packRef.i] : null
+  // "nl-07": act out a nursing listening dialogue; Emma plays the other person.
+  const [nurse, setNurse] = useState<NurseListening | null>(null)
+  useEffect(() => {
+    if (!nurseMode) return
+    let alive = true
+    import('../data/nursing-listening.json').then(f => { const l = (f.default as NurseListening[]).find(x => x.id === nurseMode); if (alive && l) setNurse(l) }).catch(() => {})
+    return () => { alive = false }
+  }, [nurseMode])
   const [task, setTask] = useState<string>()
   const [cardSkip, setCardSkip] = useState<string[]>([])
   const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
@@ -112,10 +121,11 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   async function start() {
     if (!openaiKey()) { setSettings(true); return }
     if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
+    if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
     setError(''); setLines([]); setNotes(''); setFixes([]); setYouMs(0); setYouFrom(undefined)
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : '', emmaLevel(state.curriculum.unit)),
+        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : '', emmaLevel(state.curriculum.unit)),
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
@@ -141,7 +151,11 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     const spoke = userLines.length >= 2 || userWords >= 15
     if (!spoke) return
     // Speaking counts toward the week's balance of skills, whatever the mode.
-    update(prev => ({ ...prev, notes: logSkill(packRef && packTask ? { ...prev.notes, [speakKey(packRef.unit, packRef.i)]: today } : prev.notes, 'speak', today) }))
+    update(prev => {
+      const marked = packRef && packTask ? { ...prev.notes, [speakKey(packRef.unit, packRef.i)]: today }
+        : nurse ? { ...prev.notes, [nurseSpeakKey(nurse.id)]: today } : prev.notes
+      return { ...prev, notes: logSkill(marked, 'speak', today) }
+    })
     // The attempt is kept whether or not Claude is connected to give feedback.
     if (card) update(prev => ({ ...prev, notes: { ...prev.notes, [cueKey(card.id)]: today } }))
     if (lesson) update(prev => {
@@ -203,6 +217,13 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         <strong>{packTask ? packTask.title : '載入中……'}</strong>
         {packTask && <span>{packTask.zh}</span>}
         <a href={'#library/unit/speak/' + packRef.unit}>回到單元讀聽說寫</a>
+      </div>}
+
+      {nurseMode && <div className="sp-lesson">
+        <small>護理英文 · 演一段{nurse ? ' · ' + nurse.level : ''}</small>
+        <strong lang="en">{nurse ? nurse.title : '載入中……'}</strong>
+        {nurse && <span>{nurse.scene}。你演 {nurse.you}，Emma 演 {nurse.emma}。她聽的是語音辨識的文字，不會評你的發音。</span>}
+        <a href={'#library/nlisten/' + (nurse?.id ?? '')}>回到這段聽力</a>
       </div>}
 
       {topic && <div className="sp-lesson">

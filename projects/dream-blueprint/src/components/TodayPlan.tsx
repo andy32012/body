@@ -11,6 +11,7 @@ import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
 import { dailyTarget, doneKey } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
+import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
 import './today-plan.css'
 
 const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
@@ -22,7 +23,9 @@ const savedToday = (notes: Record<string, string>, prefix: string, today: string
   Object.entries(notes).some(([k, v]) => k.startsWith(prefix) && v.includes('"day":"' + today + '"'))
 
 /** Today's list. Its minutes come from the day's plan — the same numbers as the choices above — and add up to them.
- *  During exams and internship it is a short nursing-English plan and the curriculum does not move. */
+ *  During exams and internship it is a short nursing-English plan and the curriculum does not move: review, then listen
+ *  or read a nursing text (whichever was done on fewer days this week), then one slot that takes turns day by day —
+ *  nursing word drills, acting a scene out with Emma, or nursing questions. */
 export default function TodayPlan({ state, update, today, energy, onStart, onWord, mode = 'regular', focus }:
   Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; onWord?: () => void; mode?: 'regular' | 'nursing'; focus?: Focus }) {
   const budget = dayBudget(today, state.settings)
@@ -118,14 +121,27 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     const nReview: Task = { id: 'n-review', min: total, title: '複習', detail: left || reviewedToday ? reviewDetail : '今天沒有到期的卡，這步跳過',
       auto: left === 0, ...(left ? reviewGo : {}) }
     const third = Math.round(total / 3)
-    tasks = energy === 'low' ? [nReview] : [
-      { ...nReview, min: third },
-      { id: 'n-quiz', min: third, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),
+    const rest = total - 2 * third
+    const nInput: Task = { id: 'n-input', min: third, title: '護理英文：聽或讀', auto: listenedToday || readToday,
+      detail: '這週聽 ' + week.listen + ' 天、讀 ' + week.read + ' 天 → 今天先' + (listenFirst
+        ? '聽一段護理師和病人的對話：先不看字作答，再看聽力稿和中文'
+        : '讀一篇護理短文，做完 3–4 題；錯的題目選「卡在哪」'),
+      go: to(listenFirst ? 'library/nlisten' : 'library/nread'), goLabel: listenFirst ? '聽' : '讀',
+      go2: to(listenFirst ? 'library/nread' : 'library/nlisten'), go2Label: listenFirst ? '讀' : '聽' }
+    const slot = nurseSlot(today)
+    const heard = readLastHeard(state.notes)
+    const wordsToday = nurseWordsOn(state.notes, today)
+    const nSlot: Task = slot === 'words'
+      ? { id: 'n-words', min: rest, title: '護理單字題', detail: '練一輪 10 個護理單字（看懂、聽懂或寫出），答完會出例句' + (wordsToday ? '（今天過關 ' + wordsToday + ' 個）' : ''),
+        auto: wordsToday >= 5, go: to('library/nwords'), goLabel: '單字' }
+      : slot === 'speak'
+      ? { id: 'n-speak', min: rest, title: '口說：演一段', auto: spokeToday,
+        detail: heard ? '跟 Emma 演你最近聽的「' + heard.title + '」，你演 ' + heard.you + '；沒有語音金鑰就自己唸你的台詞' : '跟 Emma 用英文說一件今天實習或讀書遇到的事，三句就好',
+        go: to(heard ? 'speaking/nurse-' + heard.id : 'speaking'), goLabel: 'Emma' }
+      : { id: 'n-quiz', min: rest, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),
         auto: quizToday >= 3 || casesToday >= 1, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
-        goLabel: '題目', go2: to('library/case'), go2Label: '情境' },
-      { id: 'n-say', min: total - 2 * third, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
-        auto: false, go: to('speaking'), goLabel: 'Emma' },
-    ]
+        goLabel: '題目', go2: to('library/case'), go2Label: '情境' }
+    tasks = energy === 'low' ? [nReview] : [{ ...nReview, min: third }, nInput, nSlot]
   } else {
     tasks = planBlocks(total, focus?.action ? focus.minutes : 0, shown.minutes).map(b =>
       b.id === 'review' ? { ...review, min: b.min } : b.id === 'lesson' ? { ...lesson, min: b.min } : { ...catalog[b.id], min: b.min })
