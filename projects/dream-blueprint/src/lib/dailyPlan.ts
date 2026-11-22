@@ -86,7 +86,11 @@ export interface Block { id: BlockId; min: number }
 const dayOf: Block[] = [{ id: 'review', min: 15 }, { id: 'lesson', min: 25 }, { id: 'words', min: 10 }, { id: 'input', min: 20 }, { id: 'output', min: 20 }]
 const winterOf: Block[] = [{ id: 'review', min: 20 }, { id: 'lesson', min: 25 }, { id: 'words', min: 20 }, { id: 'listen', min: 25 }, { id: 'read', min: 25 },
   { id: 'write', min: 25 }, { id: 'speak', min: 20 }, { id: 'cert', min: 20 }]
-export function planBlocks(total: number, focusWanted = 0): Block[] {
+/** On a full day, review grows up to 10 minutes past its block when today's cards need it (word cards plus a few
+ *  sentences). The time comes from the extra block, then 今日單字 (down to 5 minutes), then 說或寫 (down to 15),
+ *  so the day keeps its length. */
+const donors: readonly [BlockId, number][] = [['extra', 0], ['words', 5], ['output', 15]]
+export function planBlocks(total: number, focusWanted = 0, reviewNeed = 0): Block[] {
   if (total <= 30) {
     const words = total >= 30 ? 10 : total >= 15 ? 5 : 0
     return [{ id: 'review', min: total - words }, ...(words ? [{ id: 'words' as const, min: words }] : [])]
@@ -101,7 +105,13 @@ export function planBlocks(total: number, focusWanted = 0): Block[] {
   const review = blocks[0]
   const focus = Math.max(0, Math.min(focusWanted, review.min - 5))
   if (focus) { review.min -= focus; blocks.unshift({ id: 'focus', min: focus }) }
-  return blocks
+  let grow = total >= 90 ? Math.min(Math.ceil(reviewNeed / 5) * 5 - review.min, 10) : 0
+  for (const [id, floor] of donors) {
+    const b = blocks.find(x => x.id === id)
+    const take = b ? Math.min(grow, b.min - floor) : 0
+    if (b && take > 0) { b.min -= take; review.min += take; grow -= take }
+  }
+  return blocks.filter(b => b.id !== 'extra' || b.min > 0)
 }
 
 /** The calendar line for an exam or internship day. */

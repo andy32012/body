@@ -19,9 +19,12 @@ import {
   dueCards,
   newCard,
   reviewBudget,
-  dueCount,
   reviewCard,
   applyAnswer,
+  reviewEnergy,
+  reviewLoad,
+  sentenceReviewKey,
+  SENTENCE_QUOTA,
 } from "../lib/progress";
 import { isKnownWord, wordKey, officialWords, spellingTargets } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
@@ -388,7 +391,8 @@ function lesson(state: AppState, energy: Energy, date: string, at?: { unit: numb
       ? [...entry.newWords, ...(entry.bonusWords ?? [])]
       : entry.newWords;
   const base = proposed.filter((w) => !isKnownWord(w.en, state.knownWords));
-  const busyReview = dueCount(state.cards, date) > 30;
+  // Same brake as the daily words: only word cards piling up past today's review hold back the extra words.
+  const busyReview = reviewLoad(state, date, reviewEnergy(date, state.settings.periods)).backlog > 30;
   const added = review || checkpoint || busyReview ? [] : workloadWords(state, base);
   const vocabulary = review || checkpoint ? [] : [...base, ...added];
   return {
@@ -1170,7 +1174,8 @@ function Extras({
       : sentences;
   const [repeatIndex, setRepeatIndex] = useState(0);
   const [repeatDone, setRepeatDone] = useState(false);
-  const [translationPool] = useState(() => {
+  // Due sentence cards come first (oldest first), then familiar sentences, then new ones.
+  const [{ pool: translationPool, due: dueSentenceIds }] = useState(() => {
     syncCustom(state.notes);
     const due = dueCards(
       state.cards.filter((c) => sentenceById.has(c.id)),
@@ -1184,8 +1189,11 @@ function Extras({
         ...(!quiet ? sentences.map((s) => s.id) : []),
       ]),
     ];
-    return ids.flatMap((id) => sentenceById.get(id) ?? []);
+    return { pool: ids.flatMap((id) => sentenceById.get(id) ?? []), due: new Set(due) };
   });
+  // What today's review still holds: the word screen points to 中翻英 when sentence cards are waiting.
+  const load = reviewLoad(state, date, reviewEnergy(date, state.settings.periods));
+  const sentencesDone = Number(state.notes[sentenceReviewKey(date)]) || 0;
   const repeat = translationPool[repeatIndex];
   /** Same rule as the lesson: only a checked answer written alone counts as remembered. */
   function logRepeat(mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
@@ -1207,9 +1215,13 @@ function Extras({
       const cards = result
         ? prev.cards.map((c) => (c.id === repeat.id ? result.card : c))
         : [...prev.cards, newCard(repeat.id, date)];
+      // A due sentence card answered here counts toward today's sentence review, whatever the mark.
+      const wasDue = !!found && found.due <= date && found.lastDay < date;
+      const counted = sentenceReviewKey(date);
       return {
         ...prev,
         cards,
+        notes: wasDue ? { ...prev.notes, [counted]: String((Number(prev.notes[counted]) || 0) + 1) } : prev.notes,
         reviewEvents: result?.event
           ? [...prev.reviewEvents, result.event]
           : prev.reviewEvents,
@@ -1363,7 +1375,14 @@ function Extras({
             </div>
           </div>
         ) : (
-          <p>{offset ? "這次的複習卡完成了。" : "今天沒有到期的單字卡。"}</p>
+          <div className="pr-stack">
+            <p>{offset ? "這次的複習卡完成了。" : "今天沒有到期的單字卡。"}</p>
+            {load.sentences > 0 && (
+              <p>還有 {load.sentences} 句句子卡要複習。{" "}
+                <button onClick={() => setMode("translate")}>去中翻英</button>
+              </p>
+            )}
+          </div>
         ))}
       {mode === "listen" &&
         (listening ? (
@@ -1403,6 +1422,13 @@ function Extras({
         ))}
       {mode === "translate" && (
         <div className="pr-stack">
+          {dueSentenceIds.size > 0 && (
+            <p className="qz-meta">
+              {sentencesDone < SENTENCE_QUOTA
+                ? "句子卡複習：今天 " + sentencesDone + " / " + SENTENCE_QUOTA + " 句" + (load.queued ? "，另有 " + load.queued + " 句排在之後的日子" : "")
+                : "今天的 " + SENTENCE_QUOTA + " 句句子卡做完了。想多做可以繼續" + (load.queued ? "，排在後面的 " + load.queued + " 句會早點做到" : "") + "。"}
+            </p>
+          )}
           {repeat ? (
             repeatDone ? (
               <>

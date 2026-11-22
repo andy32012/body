@@ -52,22 +52,22 @@ test('時期含起訖日，日期重疊時以考週和實習優先', () => {
     ],
   )
 })
-test('八格卡片，熟字間隔拉長到 120 天，忘記時退兩格，同日防刷', () => {
+test('十格卡片，熟字間隔拉長到 240、365 天，忘記時退兩格，同日防刷', () => {
   let card = newCard('word', '2026-11-01')
   assert.equal(card.due, '2026-11-02')
-  for (const gap of [2, 4, 8, 16, 30, 60, 120, 120]) {
+  for (const gap of [2, 4, 8, 16, 30, 60, 120, 240, 365, 365]) {
     const day = card.due
     const result = reviewCard(card, day, true)
     card = result.card
     assert.equal(daysBetween(day, card.due), gap)
     assert.equal(reviewCard(card, day, true).event, null)
   }
-  assert.equal(card.box, 8)
+  assert.equal(card.box, 10)
   assert.equal(card.mastered, true)
   const forgotten = reviewCard(card, card.due, false)
-  assert.equal(forgotten.card.box, 6)
+  assert.equal(forgotten.card.box, 8, '365 天忘了退回 120 天')
   assert.equal(forgotten.card.mastered, true)
-  assert.equal(daysBetween(forgotten.card.lastDay, forgotten.card.due), 30)
+  assert.equal(daysBetween(forgotten.card.lastDay, forgotten.card.due), 120)
   let young = reviewCard(newCard('w2', '2026-11-01'), '2026-11-02', true).card
   young = reviewCard(young, young.due, false).card
   assert.equal(young.box, 1)
@@ -82,8 +82,10 @@ test('每日複習依時間分配，未到期的卡片不出現', () => {
     ['low', 'normal', 'high'].map(
       (e) => dueCards(cards, '2026-11-02', e).length,
     ),
-    [50, 75, 100],
+    [50, 100, 100],
   )
+  const more = Array.from({ length: 140 }, (_, i) => newCard(String(i), '2026-11-01'))
+  assert.equal(dueCards(more, '2026-11-02', 'high').length, 125)
 })
 const day = '2026-11-23'
 const sessions = [0, 3, 8, 10].map((n) => ({

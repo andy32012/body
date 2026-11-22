@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "tsx --test tests/*.test.*",
-    "check:offline": "node scripts/check-offline.mjs"
+    "check:offline": "node scripts/check-offline.mjs",
+    "words:pace": "tsx scripts/words-pace.ts"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.5",

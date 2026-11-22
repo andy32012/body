@@ -1,6 +1,6 @@
 import ScenePhoto from "../components/ScenePhoto";
 import { useState } from "react";
-import { addDays, attendance, dayKey, weekKey } from "../lib/progress";
+import { addDays, attendance, dayKey, intervals, weekKey } from "../lib/progress";
 import { seasonHistory } from "../lib/rivals";
 import type { PageProps } from "../lib/store";
 import { getRetentionStatus } from "../lib/grammarRetention";
@@ -186,7 +186,7 @@ export default function History({ state, update }: PageProps) {
       <h2>隔幾天，還記得嗎？</h2>
       <p>{delayed.length ? "相隔至少四天再複習且未看答案，共 " + delayed.length + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
         {delayed.length > 0 && <strong> {Math.round(recalled / delayed.length * 100)}%</strong>}</p>
-      <h3>單字複習盒</h3><div className="history-boxes">{[1, 2, 4, 8, 16, 30, 60, 120].map((interval, index) =>
+      <h3>單字複習盒</h3><div className="history-boxes">{intervals.map((interval, index) =>
         <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval} 天格</small></div>)}</div>
       <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 快篩已認得 {state.knownWords.length} 個字</p>
     </section>

@@ -102,7 +102,7 @@
 .history-page .history-chip { display: inline-block; border: 1px solid var(--history-line); border-radius: 99px; padding: .3rem .65rem; margin: .15rem .25rem .15rem 0; font-size: .86rem; }
 .history-page .history-grammar { border-top: 2px solid #a791c8; }
 .history-page .history-recall { border-top: 2px solid #beab84; }
-.history-boxes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; margin: .65rem 0; }
+.history-boxes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem; margin: .65rem 0; }
 .history-boxes div { text-align: center; background: var(--history-panel); border-radius: 9px; padding: .6rem .1rem; }
 .history-boxes b, .history-boxes small { display: block; }
 .history-boxes b { font-size: 1.16rem; font-variant-numeric: tabular-nums; }

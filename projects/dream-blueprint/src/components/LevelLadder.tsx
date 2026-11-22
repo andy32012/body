@@ -100,7 +100,7 @@ export default function LevelLadder({ state, update }: Pick<PageProps, 'state' |
       <h2>英文程度階梯</h2>
       <p className="ll-now">證照上的程度 <b>{level}</b> · 每日課正在上 <b>{course.step.from}→{course.step.to}</b>
         {course.total ? '（單元 ' + Math.min(course.done + 1, course.total) + ' / ' + course.total + '）' : '（這一段的每日課還在寫）'}</p>
-      <p>每天：週一到週六 1.5 小時，寒假 3–4 小時；實習時 20–30 分鐘護理英文，國考衝刺 15 分鐘。每一級最後考一張證照，考過才算升級。報名後填上考試日期，就能先讀下一段，等成績也不用停；沒過就補最弱的那一項，報名下一場再繼續。</p>
+      <p>每天：週一到週六 1.5 小時，寒假 3–4 小時；實習時 20–30 分鐘護理英文，國考衝刺 15 分鐘。每一級最後考一張證照，考過才算升級。報名後填上考試日期，就能先讀下一段，等成績也不用停；沒過就補最弱的那一項，報名下一場再繼續。7000 單的日期是照每天打開今日單字（週日也開）、看 8 個新字、先做複習算的；週日沒開會晚 1–4 個月，第 3 級會拖進實習期間。</p>
       {visa ? <p className="ll-visa">✓ 美國 RN 的 VisaScreen 英文達標（雅思 {md(visa.date)}）。雅思成績一般兩年有效，大約 {md(visa.until)} 前要送件。</p>
         : <p className="ll-goal">美國 RN 的 VisaScreen 要雅思學術組總分 6.5、口說 7：整體 B2 以上、口說到 C1。</p>}
     </section>
@@ -122,7 +122,7 @@ export default function LevelLadder({ state, update }: Pick<PageProps, 'state' |
             <p className="ll-meta">教材：{step.practice}</p>
             {step.units && <div className="ll-bar"><span>每日課 {units} / {step.units[1] - step.units[0] + 1} 單元（單元 {step.units[0]}–{step.units[1]}）</span>
               <progress max={step.units[1] - step.units[0] + 1} value={units} /></div>}
-            {step.words && <div className="ll-bar"><span>7000 單第 {step.words[0]}–{step.words[1]} 級：看過 {known} / {words.length} 個</span>
+            {step.words && <div className="ll-bar"><span>7000 單第 {step.words[0]}–{step.words[1]} 級：看過 {known} / {words.length} 個{step.wordsBy ? ' · 照計畫' + step.wordsBy : ''}</span>
               <progress max={words.length} value={known} /></div>}
             <details className="ll-exams"><summary>怎麼考、多少錢</summary>
               {step.exams.filter(id => id !== 'other').map(id => { const e = exams[id]; return <div key={id} className="ll-exam">

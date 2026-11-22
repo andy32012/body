@@ -17,19 +17,21 @@ export const doneKey = (day: string) => 'daily-word.done.' + day
 export const seenKey = (day: string) => 'daily-word.seen.' + day
 export const moreKey = (day: string) => 'daily-word.more.' + day
 
-export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, due = 0) {
+/** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */
+export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0) {
   const chosen = Number(notes[countKey])
   const full = DAILY_CHOICES.includes(chosen as (typeof DAILY_CHOICES)[number]) ? chosen : DEFAULT_DAILY
   // Exam and internship days show one word unless the learner asks for the full set.
   if (quiet && notes[moreKey(day)] !== '1') return 1
-  return Math.min(full, newWordAllowance(due))
+  return Math.min(full, newWordAllowance(backlog))
 }
 
-/** New words share one budget with review: the more cards are waiting, the fewer new words. */
-export function newWordAllowance(due: number) {
-  if (due >= 80) return 0
-  if (due <= 30) return 99
-  return Math.max(2, 15 - Math.ceil((due - 30) / 10) * 3)
+/** New words share one budget with review: the more word cards pile up past today's review, the fewer new words.
+ *  Cards today's review will clear, and sentence cards waiting their turn, never hold new words back. */
+export function newWordAllowance(backlog: number) {
+  if (backlog >= 80) return 0
+  if (backlog <= 30) return 99
+  return Math.max(2, 15 - Math.ceil((backlog - 30) / 10) * 3)
 }
 
 /** About one in four words marked "認得" comes back two weeks later as a quick recall check. */

@@ -42,7 +42,7 @@ export function activePeriod(
 
 export interface ReviewCard {
   id: string
-  box: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  box: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
   lastDay: string
   due: string
   mastered: boolean
@@ -57,8 +57,10 @@ export interface ReviewEvent {
 export function newCard(id: string, day: string): ReviewCard {
   return { id, box: 1, lastDay: day, due: addDays(day, 1), mastered: false }
 }
-/** Days until the next check for each box. Cards only climb after an unaided recall. */
-export const intervals = [1, 2, 4, 8, 16, 30, 60, 120]
+/** Days until the next check for each box. Cards only climb after an unaided recall.
+ *  After 120 days a card still remembered waits 240, then 365 days, so cards known well stop filling the daily review;
+ *  a card forgotten there steps back two boxes (365 → 120, 240 → 60). */
+export const intervals = [1, 2, 4, 8, 16, 30, 60, 120, 240, 365]
 export const TOP_BOX = intervals.length
 export function reviewCard(
   card: ReviewCard,
@@ -98,12 +100,49 @@ export function applyAnswer(card: ReviewCard, day: string, a: { rating: 'correct
   if (a.rating === 'correct' && !a.revealed && a.verified !== true) return { card: holdCard(card, day), event: null }
   return reviewCard(card, day, a.rating === 'correct', a.revealed)
 }
-/** Review is limited by time, not a fixed handful: roughly five cards a minute (the review block of the day's plan). */
-export const reviewMinutes = { low: 10, normal: 15, high: 20 } as const
+/** Word-card review is limited by time, not a fixed handful: roughly five cards a minute. */
+export const reviewMinutes = { low: 10, normal: 20, high: 25 } as const
 export const reviewBudget = (energy: Energy) => reviewMinutes[energy] * 5
-/** How many cards are waiting today, used to slow down new words when review piles up. */
+/** The cap the 單字複習 screen uses: the short plan in exam and internship periods, otherwise a normal day. */
+export const reviewEnergy = (day: string, periods: readonly PeriodRange[]): Energy => {
+  const period = activePeriod(day, periods)
+  return period === 'exam' || period === 'internship' ? 'low' : 'normal'
+}
+/** Sentence cards (lesson sentences, mistakes saved from Emma or passages) are reviewed in 中翻英, about a minute
+ *  each, so the daily review takes a few of them; the rest wait their turn, oldest first. */
+export const SENTENCE_QUOTA = 5
+export const sentenceReviewKey = (day: string) => 'review.sentences.' + day
+const isDue = (c: ReviewCard, day: string) => c.due <= day && c.lastDay < day
+const isWordCard = (id: string) => id.startsWith('word:')
+/** How many cards are waiting today. */
 export const dueCount = (cards: readonly ReviewCard[], day: string) =>
-  cards.filter((c) => c.due <= day && c.lastDay < day).length
+  cards.filter((c) => isDue(c, day)).length
+
+export interface ReviewLoad {
+  /** Word cards today's review still takes (up to what is left of the day's cap). */
+  words: number
+  /** Word cards due beyond today's cap: the backlog that slows down new words. */
+  backlog: number
+  /** Sentence cards today's review still takes (up to what is left of the daily quota). */
+  sentences: number
+  /** Due sentence cards waiting for a later day. They never hold back new words. */
+  queued: number
+  /** Minutes today's remaining review needs: five word cards a minute, a minute a sentence. */
+  minutes: number
+}
+/** Today's review in one place, so the plan, the daily words and the review screens agree. */
+export function reviewLoad(
+  s: { cards: readonly ReviewCard[]; reviewEvents: readonly ReviewEvent[]; notes: Record<string, string> },
+  day: string,
+  energy: Energy,
+): ReviewLoad {
+  let wordsDue = 0, sentencesDue = 0
+  for (const c of s.cards) if (isDue(c, day)) { if (isWordCard(c.id)) wordsDue++; else sentencesDue++ }
+  const wordsReviewed = new Set(s.reviewEvents.filter((e) => e.day === day && isWordCard(e.id)).map((e) => e.id)).size
+  const words = Math.min(wordsDue, Math.max(0, reviewBudget(energy) - wordsReviewed))
+  const sentences = Math.min(sentencesDue, Math.max(0, SENTENCE_QUOTA - (Number(s.notes[sentenceReviewKey(day)]) || 0)))
+  return { words, backlog: wordsDue - words, sentences, queued: sentencesDue - sentences, minutes: Math.ceil(words / 5) + sentences }
+}
 export function dueCards<T extends ReviewCard>(
   cards: readonly T[],
   day: string,
