@@ -1,0 +1,45 @@
+.ll { display: grid; gap: 14px; margin-top: 1rem; }
+.ll-head { display: grid; gap: 8px; background: var(--space-reading, var(--panel)); border: 1px solid var(--pl-line, var(--line)); border-radius: 16px; padding: clamp(14px, 3vw, 20px); }
+.ll-head h2 { margin: 0; font-size: 1.15rem; }
+.ll-head p { margin: 0; font-size: .9rem; line-height: 1.7; color: var(--pl-text, var(--muted)); }
+.ll-head .ll-now { color: inherit; font-size: .95rem; }
+.ll-head b { color: var(--pl-accent, #e2c98c); }
+.ll-visa { color: var(--practice-ok, #59c08a) !important; font-weight: 600; }
+.ll-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ll-step { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: start; }
+/* The ladder's rail: from under one rung down to the next. */
+.ll-step:not(:last-child)::before { content: ""; position: absolute; left: 25px; top: 54px; bottom: -10px; width: 2px; background: var(--pl-line, var(--line)); }
+.ll-rung { position: relative; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--pl-line, var(--line)); background: var(--space-reading, var(--panel)); font-size: 1.05rem; }
+.ll-step[data-state="passed"] .ll-rung { border-color: var(--practice-ok, #59c08a); color: var(--practice-ok, #59c08a); }
+.ll-step[data-current] .ll-rung { border-color: var(--pl-accent, #e2c98c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--pl-accent, #e2c98c) 22%, transparent); }
+.ll-step[data-optional] { opacity: .78; }
+.ll-body { display: grid; gap: 8px; min-width: 0; background: var(--space-reading, var(--panel)); border: 1px solid var(--pl-line, var(--line)); border-radius: 16px; padding: clamp(12px, 3vw, 18px); }
+.ll-step[data-current] .ll-body { border-color: color-mix(in srgb, var(--pl-accent, #e2c98c) 60%, transparent); }
+.ll-body header { display: grid; gap: 2px; }
+.ll-body h3 { margin: 0; font-size: 1.02rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.ll-body h3 small { font-size: .74rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--pl-accent, #e2c98c) 20%, transparent); }
+.ll-status { margin: 0; font-size: .9rem; font-weight: 600; }
+.ll-step[data-state="passed"] .ll-status { color: var(--practice-ok, #59c08a); }
+.ll-meta { margin: 0; font-size: .84rem; line-height: 1.6; color: var(--pl-text, var(--muted)); }
+.ll-bar { display: grid; gap: 3px; font-size: .8rem; color: var(--pl-text, var(--muted)); }
+.ll-bar progress { width: 100%; height: 6px; accent-color: var(--pl-accent, #e2c98c); }
+.ll-exams summary { cursor: pointer; font-size: .86rem; }
+.ll-exams > small { display: block; margin-top: 6px; font-size: .76rem; color: var(--pl-text, var(--muted)); }
+.ll-exam { display: grid; gap: 2px; margin-top: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--pl-line, var(--line)); font-size: .84rem; line-height: 1.55; }
+.ll-exam a { justify-self: start; color: inherit; }
+.ll-attempts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ll-attempts li { display: grid; gap: 6px; padding: 8px 10px; border-radius: 10px; background: var(--pl-tint, rgba(158, 145, 229, .1)); font-size: .86rem; }
+.ll-attempts small { font-size: .78rem; color: var(--pl-text, var(--muted)); }
+.ll-score, .ll-book { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.ll-score label, .ll-book label { display: grid; gap: 3px; font-size: .78rem; color: var(--pl-text, var(--muted)); }
+.ll-score input { width: 92px; }
+.ll-score input, .ll-book input, .ll-book select { font: inherit; font-size: .9rem; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--pl-line, var(--line)); background: var(--panel); color: inherit; min-width: 0; }
+.ll-score button, .ll-book button, .ll-add { font: inherit; font-size: .86rem; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--pl-accent, #e2c98c); background: color-mix(in srgb, var(--pl-accent, #e2c98c) 14%, transparent); color: inherit; }
+.ll-score button:disabled, .ll-book button:disabled { opacity: .5; }
+.ll-add { justify-self: start; }
+.ll-remove { justify-self: start; border: 0; background: none; padding: 0; font-size: .76rem; color: var(--pl-text, var(--muted)); text-decoration: underline; }
+@media (max-width: 520px) {
+  .ll-step { grid-template-columns: 40px minmax(0, 1fr); gap: 8px; }
+  .ll-step:not(:last-child)::before { left: 19px; top: 42px; }
+  .ll-rung { width: 40px; height: 40px; font-size: .92rem; }
+}

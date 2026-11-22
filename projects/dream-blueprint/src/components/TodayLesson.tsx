@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, ChevronRight, Compass, GraduationCap, ListChecks,
 import type { AppState, PageProps } from '../lib/store'
 import type { Energy } from '../lib/progress'
 import { dayBudget } from '../lib/dailyPlan'
+import { courseProgress, exams, officialLevel } from '../lib/cefr'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
 import { activeLesson, coreSaved, lessonFinished, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
@@ -20,7 +21,7 @@ export function useEnergyChoice(state: AppState, today: string) {
   const [choice, setChoice] = useState<{ key: string; energy: Energy } | null>(null)
   const scheduleKey = today + budget.period + ':' + budget.defaultEnergy
   const picked = choice?.key === scheduleKey ? choice.energy : budget.defaultEnergy
-  // Exams and internship have no 有電 choice: no new lessons, 普通 is the 10–15 minute nursing-English plan.
+  // Exams and internship have no 有電 choice: no new lessons, 普通 is the short nursing-English plan.
   const energy: Energy = budget.minutes[picked] === null ? 'normal' : picked
   return { ...budget, energy, durations: budget.labels, choose: (e: Energy) => setChoice({ key: scheduleKey, energy: e }) }
 }
@@ -65,16 +66,23 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const nextStep = !topic && active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const focus = quiet ? null : nextFocus(state, today, energy)
   const practised = state.sessions.some(s => s.day === today)
-  const label = topic ? '生活主題 ' + topic.topic.n + ' · ' + topic.topic.title + ' · 第 ' + partNumber(topic.part) + ' 次（共 3 次）'
+  const low = choice.labels.low
+  // The next level's lessons wait for the certificate of the level before them.
+  const gate = !quiet && !topic && energy !== 'low' ? lesson.gate : null
+  const gateExam = gate ? exams[gate.exams[0]] : null
+  const label = gate ? '升級關卡 · ' + gate.from + '→' + gate.to + ' 上完了'
+    : topic ? '生活主題 ' + topic.topic.n + ' · ' + topic.topic.title + ' · 第 ' + partNumber(topic.part) + ' 次（共 3 次）'
     : topicDone && !finished && !quiet && energy !== 'low' ? '加練 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
     : quiet ? (kind === 'exam' ? '考週' : kind === 'sprint' ? '國考衝刺' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-    : lesson.review ? (energy === 'low' ? (optional ? (kind === 'rest' ? '今天休息' : '今天沒排課') + ' · 2 分鐘是選做' : '今天 2 分鐘') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
+    : lesson.review ? (energy === 'low' ? (optional ? (kind === 'rest' ? '今天休息' : '今天沒排課') + ' · ' + low + '是選做' : '今天 ' + low) + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
     : lesson.checkpoint ? '單元 ' + lesson.unit + ' 小關卡' : '今天這一堂 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-  const twoMinutes = optional ? '想動一下的話，花 2 分鐘回想一句熟悉的英文（選做）' : '今天只要 2 分鐘：回想一句熟悉的英文'
-  const goal = topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? '10–15 分鐘護理英文：複習、幾題護理英文、用英文說一件事' : twoMinutes)
-    : lesson.review ? (energy === 'low' ? twoMinutes : '今天複習舊句，課表明天繼續')
+  const short = optional ? '想動一下的話，花 ' + low + '複習：回想一句熟悉的英文、翻幾張複習卡（選做）' : '今天只要 ' + low + '：回想一句熟悉的英文，再翻幾張複習卡'
+  const goal = gate && gateExam ? '去報名' + gateExam.name + '：填上考試日期就能先上下一段，考過才正式升到 ' + gate.to
+    : topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? choice.labels.normal + '護理英文：複習、幾題護理英文、用英文說一件事' : short)
+    : lesson.review ? (energy === 'low' ? short : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
-  const showPlan = energy !== 'low'
+  const progress = courseProgress(state.curriculum.unit)
+  const level = officialLevel(state.notes)
   return <>
     <section className="flight-deck lesson-deck" aria-labelledby="lesson-goal">
       <ScenePhoto className="flight-photo" />
@@ -89,9 +97,11 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
           {focus.action && <button type="button" onClick={() => { location.hash = focus.action!.hash }}>{focus.action.label}</button>}</p>}
         <EnergyChoices choice={choice} label="今天的時間" />
         <div className="lesson-actions">
-          {quiet && energy === 'normal'
+          {gate
+            ? <button type="button" className="launch" onClick={() => { location.hash = 'plan/levels' }}><ListChecks size={16} />去填證照<ArrowRight size={16} /></button>
+            : quiet && energy === 'normal'
             ? <button type="button" className="launch" onClick={() => document.getElementById('today-plan')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><ListChecks size={16} />看今天的清單<ArrowRight size={16} /></button>
-            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? (optional ? '選做：2 分鐘' : '開始 2 分鐘') : '開始這一堂'}<ArrowRight size={16} /></button>}
+            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? (optional ? '選做：' + low : '開始 ' + low) : '開始這一堂'}<ArrowRight size={16} /></button>}
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
         {!topic && resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
@@ -102,9 +112,12 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
           </li>)}</ul>
         </details>}
         <p className="lesson-stats">{topicDone ? '今天的生活主題完成了 ✓ · ' : ''}{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
+        <button type="button" className="lesson-level" onClick={() => { location.hash = 'plan/levels' }}>
+          英文程度 <b>{level}</b> · 正在上 {progress.step.from}→{progress.step.to}{progress.total ? '（單元 ' + Math.min(progress.done + 1, progress.total) + ' / ' + progress.total + '）' : ''} · 升級要考{exams[progress.step.exams[0]].name}
+        </button>
       </div>
     </section>
-    {showPlan && <div id="today-plan" className="lesson-plan"><TodayPlan state={state} update={update} today={today} energy={energy} onStart={start} mode={quiet ? 'nursing' : 'regular'} focus={focus ?? undefined} /></div>}
+    <div id="today-plan" className="lesson-plan"><TodayPlan state={state} update={update} today={today} energy={energy} onStart={start} onWord={openWord} mode={quiet ? 'nursing' : 'regular'} focus={focus ?? undefined} /></div>
   </>
 }
 
@@ -136,9 +149,15 @@ export function LessonBanner({ state, today, start }: Pick<PageProps, 'state'> &
       <strong>{topic.topic.title}：{partPlan[topic.part]}</strong></div>
     <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{topic.step > 0 ? '繼續' : '開始'}</button>
   </section>
+  const gate = !choice.quiet && choice.energy !== 'low' ? lesson.gate : null
+  if (gate) return <section className="lesson-banner">
+    <div><small>升級關卡 · {gate.from}→{gate.to} 上完了</small>
+      <strong>報名{exams[gate.exams[0]].name}，填上考試日期就能先上下一段</strong></div>
+    <button type="button" onClick={() => { location.hash = 'plan/levels' }}><ListChecks size={14} />去填</button>
+  </section>
   return <section className="lesson-banner">
-    <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : choice.optional && choice.energy === 'low' ? (choice.kind === 'rest' ? '今天休息' : '今天沒排課') + ' · 2 分鐘是選做' : '今天這一堂'}</small>
+    <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : choice.optional && choice.energy === 'low' ? (choice.kind === 'rest' ? '今天休息' : '今天沒排課') + ' · ' + choice.labels.low + '是選做' : '今天這一堂'}</small>
       <strong>{choice.quiet ? '單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : lesson.cando || lesson.title}</strong></div>
-    <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{finished ? '再上一次' : choice.energy === 'low' ? '2 分鐘複習' : '開始'}</button>
+    <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{finished ? '再上一次' : choice.energy === 'low' ? choice.labels.low + '複習' : '開始'}</button>
   </section>
 }

@@ -4,25 +4,28 @@ import { dueCount, type Energy } from '../lib/progress'
 import { answeredOn, quizSectionKey, sectionOf, type QuizItem } from '../lib/quiz'
 import { casesFinishedOn } from '../lib/scenarios'
 import quizData from '../data/quiz.json'
-
-const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
 import { activeLesson, lessonFinished } from '../lib/lesson'
 import { dueTopic, partNumber, partPlan, topicDoneToday } from '../lib/topics'
 import type { Focus } from '../lib/nextFocus'
-import { dayBudget, NURSING_LABEL, splitMinutes } from '../lib/dailyPlan'
+import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
+import { dailyTarget, doneKey } from '../lib/dailyWords'
+import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import './today-plan.css'
 
-type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
+const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
 
-/** The regular day (its minutes come from the day's plan, the same numbers as the choices above), or during exams and
- *  internship a 10–15 minute nursing-English plan. Built from features that already exist; the curriculum does not
- *  move in the nursing plan. */
-export default function TodayPlan({ state, update, today, energy, onStart, mode = 'regular', focus }:
-  Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; mode?: 'regular' | 'nursing'; focus?: Focus }) {
-  // The tasks add up to the minutes shown for this choice; a focus for today takes its minutes out of review.
-  const total = dayBudget(today, state.settings).minutes[energy] ?? 30
-  const split = splitMinutes(total, mode === 'regular' && focus?.action ? focus.minutes : 0)
-  const focusMin = split.focus
+type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
+const to = (hash: string) => () => { location.hash = hash }
+/** Something saved today under notes '<prefix>.<id>' (a reading or a writing record). */
+const savedToday = (notes: Record<string, string>, prefix: string, today: string) =>
+  Object.entries(notes).some(([k, v]) => k.startsWith(prefix) && v.includes('"day":"' + today + '"'))
+
+/** Today's list. Its minutes come from the day's plan — the same numbers as the choices above — and add up to them.
+ *  During exams and internship it is a short nursing-English plan and the curriculum does not move. */
+export default function TodayPlan({ state, update, today, energy, onStart, onWord, mode = 'regular', focus }:
+  Pick<PageProps, 'state' | 'update'> & { today: string; energy: Energy; onStart: (e: Energy) => void; onWord?: () => void; mode?: 'regular' | 'nursing'; focus?: Focus }) {
+  const budget = dayBudget(today, state.settings)
+  const total = budget.minutes[energy] ?? budget.minutes.normal ?? 30
   const due = dueCount(state.cards, today)
   const reviewedToday = state.reviewEvents.some(e => e.day === today)
   const key = (id: string) => 'plan.' + today + '.' + id
@@ -31,29 +34,61 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
   const casesToday = casesFinishedOn(state.notes, today)
   const topic = mode === 'regular' && energy !== 'low' ? dueTopic(state, today) : null
   const topicDone = topicDoneToday(state.notes, today)
-  const tasks: Task[] = mode === 'nursing' ? [
-    { id: 'n-review', min: 5, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，這步跳過',
-      auto: due === 0, go: due ? () => { location.hash = 'library/words' } : undefined },
-    { id: 'n-quiz', min: 5, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),
-      auto: quizToday >= 3 || casesToday >= 1, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
-      goLabel: '題目', go2: () => { location.hash = 'library/case' }, go2Label: '情境' },
-    { id: 'n-say', min: 4, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
-      auto: false, go: () => { location.hash = 'speaking' }, goLabel: 'Emma' },
-  ] : [
-    ...(focusMin ? [{ id: 'focus', min: focusMin, title: '先補強', detail: focus!.reason, auto: false,
-      go: () => { location.hash = focus!.action!.hash }, goLabel: '去做' }] : []),
-    { id: 'review', min: split.review, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
-      auto: reviewedToday && due === 0, go: () => { location.hash = 'library/words' } },
-    topic ? { id: 'lesson', min: split.lesson, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
+  const wordTarget = dailyTarget(state.notes, budget.quiet, today, due)
+  const wordsDone = Number(state.notes[doneKey(today)] || 0)
+  const readToday = savedToday(state.notes, 'read.', today)
+  const wroteToday = savedToday(state.notes, 'write.', today)
+  // The certificate to prepare for: the step after the level already shown on a certificate.
+  const level = officialLevel(state.notes)
+  const nextStep = steps.find(s => s.from === level)
+  const cert = nextStep ? certStatus(state.notes, nextStep.to) : null
+  const exam = nextStep ? exams[nextStep.exams[0]] : null
+
+  const review: Task = { id: 'review', min: 0, title: '複習卡', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，可以快篩幾個新字',
+    auto: reviewedToday && due === 0, go: to('library/words') }
+  const lesson: Task = topic ? { id: 'lesson', min: 0, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
       auto: false, go: () => onStart(energy), goLabel: topic.step > 0 ? '繼續' : '開始' }
-    : topicDone && !lessonFinished(state.notes, today) ? { id: 'lesson', min: split.lesson, title: '今天的生活主題', detail: '完成了。文法課下次上；想多練也可以現在上。',
+    : topicDone && !lessonFinished(state.notes, today) ? { id: 'lesson', min: 0, title: '今天的生活主題', detail: '完成了。文法課下次上；想多練也可以現在上。',
       auto: true, go: () => onStart(energy), goLabel: '加練' }
-    : { id: 'lesson', min: split.lesson, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
-      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' },
-    ...(split.extra ? [{ id: 'extra', min: split.extra, title: '加練', detail: split.extra >= 15 ? '一篇閱讀理解、一題寫作階梯，或跟 Emma 聊 5 分鐘' : '跟 Emma 聊幾分鐘，或多做幾張複習卡',
-      auto: false, go: () => { location.hash = 'library/reading' }, goLabel: '閱讀', go2: () => { location.hash = 'speaking' } }] : []),
-    ...(split.wrap ? [{ id: 'more', min: split.wrap, title: '收尾', detail: '把今天批改出來的錯句加入複習，明天會再出現', auto: false }] : []),
-  ]
+    : { id: 'lesson', min: 0, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
+      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
+  const catalog: Record<Exclude<BlockId, 'review' | 'lesson'>, Omit<Task, 'min'>> = {
+    focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: false, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
+    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 15–20）' : '') : '複習卡比較多，今天先不加新字',
+      auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
+    input: { id: 'input', title: '聽或讀', detail: '一篇閱讀理解；或 7000 單短文挑一段，聽一次再跟著念', auto: readToday,
+      go: to('library/reading'), goLabel: '閱讀', go2: to('library/passage'), go2Label: '短文' },
+    output: { id: 'output', title: '說或寫', detail: '跟 Emma 聊 10 分鐘，或寫一題寫作階梯', auto: wroteToday,
+      go: to('speaking'), goLabel: 'Emma', go2: to('library/writing'), go2Label: '寫作' },
+    listen: { id: 'listen', title: '聽力跟讀', detail: '句子跟讀，或 7000 單短文聽一段再跟著念', auto: false,
+      go: to('library/listen'), goLabel: '跟讀', go2: to('library/passage'), go2Label: '短文' },
+    read: { id: 'read', title: '閱讀理解', detail: '一到兩篇；錯的題目選「卡在哪」', auto: readToday, go: to('library/reading'), goLabel: '閱讀' },
+    write: { id: 'write', title: '寫作', detail: '寫作階梯一題，批改完改一版', auto: wroteToday, go: to('library/writing'), goLabel: '寫作' },
+    speak: { id: 'speak', title: '口說', detail: '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: false,
+      go: to('speaking'), goLabel: 'Emma', go2: to('speaking/ielts'), go2Label: 'Part 2' },
+    cert: { id: 'cert', title: '證照準備', auto: false, go: to('plan/levels'), goLabel: '關卡',
+      detail: !exam ? '照下一張證照的題型練一回' : cert?.state === 'waiting' && cert.next ? exam.name + ' ' + cert.next.date.slice(5).replace('-', '/') + ' 考，考前聽讀、說寫的題型各練一回'
+        : '下一張：' + exam.name + '。照它的題型練一回' + (exam.link ? '（官網有練習題）' : ''),
+      ...(exam?.link ? { go2: () => { window.open(exam.link, '_blank', 'noopener') }, go2Label: '官網' } : {}) },
+    extra: { id: 'extra', title: '加練', detail: '再一篇閱讀、多寫一題，或再跟 Emma 聊', auto: false, go: to('library/reading'), goLabel: '閱讀', go2: to('speaking'), go2Label: 'Emma' },
+  }
+  let tasks: Task[]
+  if (mode === 'nursing') {
+    const nReview: Task = { id: 'n-review', min: total, title: '複習', detail: due ? '到期的單字卡和錯句 ' + due + ' 張，先不看答案回想' : '今天沒有到期的卡，這步跳過',
+      auto: due === 0, go: due ? to('library/words') : undefined }
+    const third = Math.round(total / 3)
+    tasks = energy === 'low' ? [nReview] : [
+      { ...nReview, min: third },
+      { id: 'n-quiz', min: third, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),
+        auto: quizToday >= 3 || casesToday >= 1, go: () => { update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } })); location.hash = 'library/quiz' },
+        goLabel: '題目', go2: to('library/case'), go2Label: '情境' },
+      { id: 'n-say', min: total - 2 * third, title: '說一件事', detail: '用英文跟 Emma 說一件今天實習或讀書遇到的事，三句就好',
+        auto: false, go: to('speaking'), goLabel: 'Emma' },
+    ]
+  } else {
+    tasks = planBlocks(total, focus?.action ? focus.minutes : 0).map(b =>
+      b.id === 'review' ? { ...review, min: b.min } : b.id === 'lesson' ? { ...lesson, min: b.min } : { ...catalog[b.id], min: b.min })
+  }
   const isDone = (t: Task) => t.auto || state.notes[key(t.id)] === '1'
   const finished = tasks.filter(isDone).length
   const toggle = (id: string) => update(prev => {
@@ -61,7 +96,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, mode 
     if (notes[key(id)] === '1') delete notes[key(id)]; else notes[key(id)] = '1'
     return { ...prev, notes }
   })
-  const title = mode === 'nursing' ? '今天的護理英文 ' + NURSING_LABEL : '今天的 ' + total + ' 分鐘'
+  const title = mode === 'nursing' ? '今天的護理英文 ' + budget.labels[energy] : '今天的 ' + budget.labels[energy]
   return <section className="tp-card" aria-label={title}>
     <header><strong>{title}</strong><span>{finished} / {tasks.length}</span></header>
     <div className="tp-bar" aria-hidden="true"><i style={{ width: finished / tasks.length * 100 + '%' }} /></div>

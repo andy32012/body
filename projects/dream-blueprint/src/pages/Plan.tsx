@@ -9,6 +9,8 @@ import plan from "../data/plan.json";
 import curriculum from "../data/curriculum.json";
 import Roadmap from "../components/Roadmap";
 import ExamMap from "../components/ExamMap";
+import LevelLadder from "../components/LevelLadder";
+import { firstLockedUnit } from "../lib/cefr";
 import Rivals from "./Rivals";
 import "./plan.css";
 
@@ -38,7 +40,7 @@ const baseGoals: Goal[] = plan.months.flatMap((m) =>
   })),
 );
 
-export type PlanTab = "calendar" | "timeline" | "map" | "exam" | "rivals";
+export type PlanTab = "calendar" | "levels" | "timeline" | "map" | "exam" | "rivals";
 const firstMonth = plan.months[0].month;
 const lastMonth = "2034-12";
 export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
@@ -79,6 +81,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
     weekdays: state.settings.regularDays,
     restDays: state.settings.restDays,
     retry: Boolean(state.curriculum.retry),
+    lockedUnit: firstLockedUnit(state.notes, state.curriculum.unit),
     topics: lifeTopics.map((t) => {
       const rec = readTopic(state.notes, t.id);
       return { n: t.n, title: t.title, after: t.after, done: rec.done, open: rec.cur && !rec.done[rec.cur.part] ? rec.cur.part : undefined };
@@ -161,7 +164,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   }
   const practicedDays = new Set(state.sessions.map((session) => session.day));
   const plannedLessons = calendar.filter(entry => entry.kind === "lesson").length;
-  const heroDetail = tab === "rivals" ? "跟虛擬對手比每週練習" : tab === "exam" ? "台灣護理師國考 5 科，對應的英文練習" : tab === "calendar"
+  const heroDetail = tab === "levels" ? "A1 → C2，每一級考一張證照才升級" : tab === "rivals" ? "跟虛擬對手比每週練習" : tab === "exam" ? "台灣護理師國考 5 科，對應的英文練習" : tab === "calendar"
     ? `${Number(month.slice(5))} 月預排 ${plannedLessons} 天課程`
     : tab === "timeline"
       ? `${plan.years[0].year} — ${plan.years[plan.years.length - 1].year}`
@@ -179,6 +182,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
         {(
           [
             ["calendar", "每月行程"],
+            ["levels", "英文程度"],
             ["timeline", "年度目標"],
             ["map", "赴美路線"],
             ["exam", "國考對照"],
@@ -196,6 +200,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
       </div>
       {tab === "rivals" && <Rivals {...props} />}
       {tab === "exam" && <ExamMap state={state} update={props.update} />}
+      {tab === "levels" && <LevelLadder state={state} update={update} />}
       {tab === "map" && (
         <>
           <Roadmap {...props} />

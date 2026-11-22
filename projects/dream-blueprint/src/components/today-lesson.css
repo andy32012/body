@@ -13,6 +13,8 @@
 .lesson-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 2px; }
 .lesson-actions .word-chip { margin-left: 0; }
 .lesson-stats { margin: 0; color: #d6cfc3; font-size: 12.5px; letter-spacing: .03em; font-variant-numeric: tabular-nums; }
+.lesson-level { justify-self: start; border: 0; background: none; padding: 0; color: #d6cfc3; font-size: 12.5px; text-align: left; text-decoration: underline; text-decoration-color: rgba(214, 207, 195, .4); text-underline-offset: 3px; }
+.lesson-level b { color: #f4c589; font-weight: 700; }
 .lesson-plan .tp-card { margin-top: 0; background: var(--panel); border-radius: 18px; padding: 16px 18px; }
 
 .today-things { padding-block: 14px; }

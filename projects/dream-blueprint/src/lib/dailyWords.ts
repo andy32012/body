@@ -10,7 +10,7 @@ export function dailyWordPhoto(key: string) {
   return wordPhotos[index % wordPhotos.length]
 }
 
-export const DAILY_CHOICES = [5, 8, 10, 15] as const
+export const DAILY_CHOICES = [5, 8, 10, 15, 20] as const
 export const DEFAULT_DAILY = 8
 export const countKey = 'daily-word.count'
 export const doneKey = (day: string) => 'daily-word.done.' + day

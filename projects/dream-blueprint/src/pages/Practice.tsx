@@ -46,6 +46,7 @@ import {
   type Verdict,
 } from "../lib/evidence";
 import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
+import { unitGate } from "../lib/cefr";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import StuckButton from "../components/StuckButton";
 import UseWord from "../components/UseWord";
@@ -350,8 +351,10 @@ function lesson(state: AppState, energy: Energy, date: string, at?: { unit: numb
   );
   const period = activePeriod(date, state.settings.periods);
   const quiet = period === "exam" || period === "internship";
+  // The next level's units wait for the certificate before them (passed, or at least booked).
+  const gate = at ? null : unitGate(state.notes, cursor.unit);
   const review =
-    !at && (quiet || energy==="low" || cursor.unit > units.length || advancedToday);
+    !at && (quiet || energy==="low" || cursor.unit > units.length || advancedToday || !!gate);
   const checkpoint = index === 6 && !review;
   const completed = state.sessions
     .flatMap((s) => s.translations?.map((t) => t.sentenceId) ?? [s.sentenceId])
@@ -406,6 +409,7 @@ function lesson(state: AppState, energy: Energy, date: string, at?: { unit: numb
     previousPair,
     vacation,
     freshReview: review && !previous,
+    gate,
   };
 }
 
@@ -1148,7 +1152,7 @@ function Extras({
   const [offset, setOffset] = useState(0);
   const [see, setSee] = useState(false);
   const [listen, setListen] = useState(0);
-  // Exams and internship: no new content, but the nursing-English questions stay open (10–15 minutes).
+  // Exams and internship: no new content, but the nursing-English questions stay open (the short nursing plan).
   const periodQuiet = ["exam", "internship"].includes(activePeriod(date, state.settings.periods));
   const quiet = energy === "low" || periodQuiet;
   const familiar = state.sessions.flatMap(

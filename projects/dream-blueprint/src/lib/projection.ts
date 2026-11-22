@@ -1,6 +1,7 @@
 import schedule from '../data/curriculumSchedule.json' with { type: 'json' }
 import { activePeriod, addDays, daysBetween, type Energy, type Period, type PeriodRange } from './progress.ts'
-import { calendarGaps, holidayBreak, longExam, quietLabel } from './dailyPlan.ts'
+import { busyMinutes, calendarGaps, holidayBreak, longExam, quietLabel } from './dailyPlan.ts'
+import { exams, stepEndingAt, stepOfUnit, steps } from './cefr.ts'
 
 const initial = new Map(schedule.initialDays.map(entry => [entry.day, entry]))
 const weekday = (date: string) => new Date(date + 'T12:00:00Z').getUTCDay()
@@ -42,6 +43,8 @@ interface CalendarInput {
   retry?: boolean
   /** Life topics take turns with grammar lessons (one main lesson a day; C at least 3 days after B). */
   topics?: readonly TopicPlan[]
+  /** A unit that waits for a certificate (the level before it is neither passed nor booked): lessons stop there. */
+  lockedUnit?: number | null
 }
 export interface ProjectedDay {
   day: string
@@ -53,6 +56,8 @@ export interface ProjectedDay {
   original: string
   /** A life-topic session instead of a grammar lesson: the topic number and part. */
   topic?: { n: number; part: Part }
+  /** This lesson finishes a level's units: time to book its certificate. */
+  gate?: string
 }
 
 // Count eligible days only. A period of rest has no weight in the next term's forecast.
@@ -112,9 +117,10 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
       item.kind = 'review'
       const maintenance = schedule.periods.find(p =>
         p.start >= '2028-02-01' && !p.tentative && p.type === period && p.start <= day && day <= p.end)
+      const kind = period === 'internship' ? 'internship' : longExam(day, forecast ? [forecast as PeriodRange] : input.ranges) ? 'sprint' : 'exam'
       item.label = maintenance
-        ? maintenance.label + ' · 忙的日子 2 分鐘'
-        : quietLabel(period === 'internship' ? 'internship' : longExam(day, forecast ? [forecast as PeriodRange] : input.ranges) ? 'sprint' : 'exam')
+        ? maintenance.label + ' · 忙的日子 ' + busyMinutes(kind) + ' 分鐘'
+        : quietLabel(kind)
     } else if (holidayBreak(day)) {
       item.label = '過年休息'
     } else if (advanced.has(day)) {
@@ -136,6 +142,11 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
             item.kind = 'lesson'
             item.topic = { n: topic.t.n, part: topic.part }
             item.label = '生活主題 ' + topic.t.n + '：' + topic.t.title + ' · 第 ' + ('ABC'.indexOf(topic.part) + 1) + ' 次（' + partLabel[topic.part] + '）'
+          } else if (cursor < limit && input.lockedUnit && cursor % schedule.daysPerUnit === 0 && Math.floor(cursor / schedule.daysPerUnit) + 1 === input.lockedUnit) {
+            // The next level's lessons open once the certificate before it is booked.
+            const before = steps[steps.indexOf(stepOfUnit(input.lockedUnit)) - 1]
+            item.kind = 'review'
+            item.label = '升級關卡：報名' + exams[before.exams[0]].name + '，填上考試日期就接著上單元 ' + input.lockedUnit
           } else if (cursor < limit) {
             topicTurn = true
             item.kind = 'lesson'
@@ -143,10 +154,15 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
             item.lessonDay = cursor % schedule.daysPerUnit + 1
             item.label = label(item.unit, item.lessonDay)
             if (input.retry && item.unit === Math.floor(input.cursor / schedule.daysPerUnit) + 1) item.label += ' · 換句再練'
+            const ending = item.lessonDay === schedule.daysPerUnit ? stepEndingAt(item.unit) : null
+            if (ending) {
+              item.gate = ending.to
+              item.label += ' · ' + ending.from + '→' + ending.to + ' 上完，報名' + exams[ending.exams[0]].name
+            }
             cursor++
           } else {
             item.kind = 'future'
-            item.label = '複習已學單元 · 後續教材待加入'
+            item.label = 'B2→C1 每日課還在寫 · 先練雅思閱讀、寫作和口說'
           }
         } else {
           item.kind = 'review'
@@ -154,7 +170,7 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
         }
       } else if (!restDays.includes(dow) && period !== 'vacation') {
         item.kind = 'review'
-        item.label = '複習 2 分鐘或休息'
+        item.label = '複習 15 分鐘或休息（選做）'
       }
     }
     if (forecast && day >= input.today) item.label += '（月份暫排）'

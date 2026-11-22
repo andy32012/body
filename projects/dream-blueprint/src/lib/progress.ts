@@ -98,8 +98,8 @@ export function applyAnswer(card: ReviewCard, day: string, a: { rating: 'correct
   if (a.rating === 'correct' && !a.revealed && a.verified !== true) return { card: holdCard(card, day), event: null }
   return reviewCard(card, day, a.rating === 'correct', a.revealed)
 }
-/** Review is limited by time, not a fixed handful: roughly five cards a minute. */
-export const reviewMinutes = { low: 1, normal: 8, high: 15 } as const
+/** Review is limited by time, not a fixed handful: roughly five cards a minute (the review block of the day's plan). */
+export const reviewMinutes = { low: 10, normal: 15, high: 20 } as const
 export const reviewBudget = (energy: Energy) => reviewMinutes[energy] * 5
 /** How many cards are waiting today, used to slow down new words when review piles up. */
 export const dueCount = (cards: readonly ReviewCard[], day: string) =>

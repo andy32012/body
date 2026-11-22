@@ -86,14 +86,14 @@ export function createInitialState(startedDay=dayKey()):AppState {
     workload:{extraWords:0,lastAssessment:'',lastReduction:''},
     settings:{
       theme:'dark',why:'',rivalsEnabled:true,taunt:'gentle',showStreak:false,speechRate:0.85,
-      regularDays:[2,4,6],restDays:[0,5],officeAsked:false,officeReply:'',examPromptSeen:true,
+      regularDays:[1,2,3,4,5,6],restDays:[0],officeAsked:false,officeReply:'',examPromptSeen:true,
       periodDefaultsRevision:1,profileRevision:1,internshipSeason:'暑假',
       periods:[{...novemberExam},{type:'exam',start:'2027-01-03',end:'2027-01-16'},{type:'vacation',start:'2027-01-17',end:'2027-02-20'},...plannedMaintenance.map(r=>({...r}))],
     },
     school:JSON.parse(JSON.stringify(defaultSchool)),sessions:[],cards:[],reviewEvents:[],
     curriculum:{unit:1,day:1,retry:0,stableUnits:[]},knownWords:[],learningWords:[],customWords:[],
     // A new start has nothing to reschedule, so every material update counts as already applied.
-    checks:{},notes:{'migrate.study30':'1',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
+    checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
   }
 }
 export function exportBackup(state:AppState):string {
@@ -133,6 +133,19 @@ export function importBackup(raw:string):AppState {
   if (!state.notes['migrate.study30']) {
     state.school.study=state.school.study.map(s=>s.minutes===8?{...s,minutes:30}:s)
     state.notes={...state.notes,'migrate.study30':'1'}
+  }
+  // 2026-11 plan: 1.5 hours every day Monday to Saturday instead of 30 minutes three times a week. Only the old
+  // defaults move; days or minutes changed by hand stay as they are.
+  if (!state.notes['migrate.daily90']) {
+    const same = (a:readonly number[],b:readonly number[]) => a.length===b.length && a.every((x,i)=>x===b[i])
+    if (same([...state.settings.regularDays].sort(),[2,4,6]) && same([...state.settings.restDays].sort(),[0,5])) {
+      state.settings.regularDays=[1,2,3,4,5,6]
+      state.settings.restDays=[0]
+    }
+    const oldStudy=[0,2,30,2,30,0,30]
+    if (state.school.study.length===7 && state.school.study.every(s=>s.minutes===oldStudy[s.weekday]))
+      state.school.study=state.school.study.map(s=>({...s,minutes:s.weekday===0?0:90}))
+    state.notes={...state.notes,'migrate.daily90':'1'}
   }
   applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.

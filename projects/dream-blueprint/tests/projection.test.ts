@@ -42,7 +42,7 @@ test('42 個單元都有教材，單元 7 之後接著排單元 8；全部做完
   assert.equal(curriculum.units.length,42)
   assert.ok(curriculum.units.every(u=>u.days.length===6&&u.checkpoint.length===3&&u.backup.length===5))
 })
-test('全年實習與國考共 547 天，寒暑假維持每天 2 分鐘，沒有新課', () => {
+test('全年實習與國考共 547 天：實習 20–30 分鐘、國考衝刺 15 分鐘護理英文，沒有新課', () => {
   const ranges = [
     {type:'internship' as const,start:'2028-02-01',end:'2029-01-31'},
     {type:'exam' as const,start:'2029-02-01',end:'2029-07-31'},
@@ -50,7 +50,9 @@ test('全年實習與國考共 547 天，寒暑假維持每天 2 分鐘，沒有
   ]
   const calendar=projectCalendar({...base,cursor:3,today:'2028-02-01',from:'2028-02-01',to:'2029-07-31',ranges})
   assert.equal(calendar.length,547)
-  assert.ok(calendar.every(d=>d.kind==='review' && !d.unit && d.label.includes('2 分鐘')))
+  assert.ok(calendar.every(d=>d.kind==='review' && !d.unit && d.label.includes('忙的日子')))
+  assert.match(calendar.find(d=>d.day==='2028-03-01')!.label, /20–30 分鐘.*忙的日子 10 分鐘/)
+  assert.match(calendar.find(d=>d.day==='2029-03-01')!.label, /15 分鐘.*忙的日子 5 分鐘/)
   assert.equal(calendar.find(d=>d.day==='2028-07-01')?.period,'internship')
   assert.equal(calendar.find(d=>d.day==='2029-02-01')?.period,'exam')
   assert.ok(calendar.every(d=>d.original.includes('維持期') && d.original.includes('7000 單')))

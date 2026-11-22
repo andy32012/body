@@ -8,7 +8,7 @@ import { passed, readRecord, saveRead } from '../src/lib/reading.ts'
 import { projectCalendar } from '../src/lib/projection.ts'
 import { emptyCheck, sectionScore } from '../src/lib/baseline.ts'
 import { spellingMatches } from '../src/lib/wordSkills.ts'
-import { dayBudget, holidayMinutes, splitMinutes } from '../src/lib/dailyPlan.ts'
+import { dayBudget, planBlocks } from '../src/lib/dailyPlan.ts'
 import sentences from '../src/data/sentences.json' with { type: 'json' }
 import curriculum from '../src/data/curriculum.json' with { type: 'json' }
 
@@ -112,39 +112,42 @@ test('拼字：只去掉縮寫的點（a.m.、Mr.），字中間多一個點算�
   assert.ok(!spellingMatches('nur.se', 'nurse'))
 })
 
-test('今天多久：首頁選項、清單分鐘和待辦用同一套；2 分鐘在沒排課的日子是選做', () => {
+test('今天多久：首頁選項、清單分鐘和待辦用同一套；平常 1.5 小時、寒假 3 小時，沒排課的日子是選做', () => {
   const settings = { periods: [
     { type: 'exam' as const, start: '2026-11-13', end: '2026-11-19' },
     { type: 'vacation' as const, start: '2027-01-17', end: '2027-02-20' },
-    { type: 'vacation' as const, start: '2028-01-01', end: '2028-01-31' },
     { type: 'internship' as const, start: '2028-02-01', end: '2029-01-31' },
     { type: 'exam' as const, start: '2029-02-01', end: '2029-07-31' },
     { type: 'vacation' as const, start: '2029-08-01', end: '2029-08-31' },
-  ], regularDays: [2, 4, 6], restDays: [0, 5] }
+  ], regularDays: [1, 2, 3, 4, 5, 6], restDays: [0] }
   const b = (day: string) => dayBudget(day, settings)
-  // 一般學期：週二普通 30，週日休息、週一沒排課，都預設選做的 2 分鐘。
-  assert.deepEqual([b('2026-11-24').kind, b('2026-11-24').defaultEnergy, b('2026-11-24').minutes.normal], ['regular', 'normal', 30])
-  assert.deepEqual([b('2026-11-29').kind, b('2026-11-29').optional], ['rest', true])
-  assert.deepEqual([b('2026-11-30').kind, b('2026-11-30').optional], ['light', true])
-  // 段考週 2 分鐘選做；實習和國考衝刺預設 10–15 分鐘護理英文。
-  assert.deepEqual([b('2026-11-16').kind, b('2026-11-16').defaultEnergy], ['exam', 'low'])
-  assert.deepEqual([b('2028-03-01').kind, b('2028-03-01').defaultEnergy, b('2028-03-01').labels.normal], ['internship', 'normal', '10–15 分鐘'])
-  assert.deepEqual([b('2029-03-01').kind, b('2029-03-01').defaultEnergy], ['sprint', 'normal'])
-  assert.equal(b('2028-03-01').minutes.high, null)
-  // 寒暑假：每天 20 → 30 → 40 → 60 分鐘，就是「普通」那一格；有電再加 15。過年和週日休息。
-  for (const [day, min] of [['2027-01-18', 20], ['2027-07-05', 30], ['2028-01-04', 40], ['2029-08-06', 60]] as const) {
-    assert.equal(holidayMinutes(day), min)
-  }
-  assert.deepEqual([b('2027-01-18').kind, b('2027-01-18').minutes.normal, b('2027-01-18').minutes.high], ['holiday', 20, 35])
-  assert.equal(b('2027-02-08').kind, 'rest')
+  // 一般學期週一到週六：預設 1.5 小時，有電 2 小時，累爆 15 分鐘；週日休息，15 分鐘是選做。
+  assert.deepEqual([b('2026-11-30').kind, b('2026-11-30').defaultEnergy, b('2026-11-30').minutes.normal, b('2026-11-30').labels.normal], ['regular', 'normal', 90, '1.5 小時'])
+  assert.deepEqual(b('2026-11-30').minutes, { low: 15, normal: 90, high: 120 })
+  assert.deepEqual([b('2026-11-29').kind, b('2026-11-29').optional, b('2026-11-29').labels.low], ['rest', true, '15 分鐘'])
+  // 寒假（週一到六）3 小時、有電 4 小時；週日和過年休息。
+  assert.deepEqual([b('2027-01-18').kind, b('2027-01-18').minutes.normal, b('2027-01-18').minutes.high, b('2027-01-18').labels.normal], ['winter', 180, 240, '3 小時'])
   assert.equal(b('2027-01-24').kind, 'rest')
-  // 清單加起來就是畫面上的分鐘。
-  for (const total of [20, 30, 35, 40, 45, 60, 75]) {
+  assert.equal(b('2027-02-08').kind, 'rest')
+  // 暑假和其他假期 1.5 小時（暑假可能有實習）。
+  assert.deepEqual([b('2029-08-06').kind, b('2029-08-06').minutes.normal], ['holiday', 90])
+  // 段考週 15 分鐘選做；實習 20–30 分鐘、國考衝刺 15 分鐘護理英文，沒有「有電」。
+  assert.deepEqual([b('2026-11-16').kind, b('2026-11-16').defaultEnergy, b('2026-11-16').minutes.low], ['exam', 'low', 15])
+  assert.deepEqual([b('2028-03-01').kind, b('2028-03-01').defaultEnergy, b('2028-03-01').labels.normal, b('2028-03-01').minutes.low], ['internship', 'normal', '20–30 分鐘', 10])
+  assert.deepEqual([b('2029-03-01').kind, b('2029-03-01').minutes.normal, b('2029-03-01').minutes.low], ['sprint', 15, 5])
+  assert.equal(b('2028-03-01').minutes.high, null)
+  // 清單加起來就是畫面上的分鐘；今天要「先補強」時從複習撥出來，複習至少留 5 分鐘。
+  for (const total of [5, 10, 15, 30, 90, 120, 180, 240]) {
     for (const focus of [0, 5]) {
-      const s = splitMinutes(total, focus)
-      assert.equal(s.focus + s.review + s.lesson + s.extra + s.wrap, total, total + ' 分鐘（補強 ' + focus + '）')
-      assert.ok(s.review >= 2)
+      const blocks = planBlocks(total, focus)
+      assert.equal(blocks.reduce((n, x) => n + x.min, 0), total, total + ' 分鐘（補強 ' + focus + '）')
+      assert.ok(blocks.every(x => x.min > 0))
     }
   }
-  assert.deepEqual(splitMinutes(45), { focus: 0, review: 8, lesson: 20, extra: 15, wrap: 2 })
+  assert.deepEqual(planBlocks(90).map(x => [x.id, x.min]), [['review', 15], ['lesson', 25], ['words', 10], ['input', 20], ['output', 20]])
+  assert.deepEqual(planBlocks(180).map(x => x.id), ['review', 'lesson', 'words', 'listen', 'read', 'write', 'speak', 'cert'])
+  assert.deepEqual(planBlocks(240).at(-1), { id: 'extra', min: 60 })
+  assert.deepEqual(planBlocks(90, 5).slice(0, 2), [{ id: 'focus', min: 5 }, { id: 'review', min: 10 }])
+  // 寒假文法課還是一天一堂：清單裡只有一個「今天這一堂」。
+  assert.equal(planBlocks(240).filter(x => x.id === 'lesson').length, 1)
 })
