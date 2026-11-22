@@ -54,6 +54,49 @@ export function spellingForms(en: string) {
   return [...forms]
 }
 export function spellingMatches(answer: string, en: string) {
+  // Abbreviation dots (a.m., U.S.) are ignored only for words that are written with dots: t.i.s.s.u.e is not tissue.
+  if (!en.includes('.') && /[a-z]\.[a-z]/i.test(answer.trim())) return false
   const a = spelled(answer)
   return !!a && /^[a-z' -]+$/.test(a) && spellingForms(en).includes(a)
+}
+
+/** Irregular forms, so "I went yesterday" uses go and "I grew tomatoes" does not. */
+const irregularTable = 'be:am,is,are,was,were,been,being;have:has,had,having;do:does,did,done,doing;go:goes,went,gone,going;'
+  + 'eat:ate,eaten;drink:drank,drunk;run:ran;come:came;become:became;see:saw,seen;give:gave,given;take:took,taken;'
+  + 'make:made;get:got,gotten;sleep:slept;feel:felt;fall:fell,fallen;tell:told;say:said;know:knew,known;think:thought;'
+  + 'bring:brought;buy:bought;catch:caught;teach:taught;fight:fought;find:found;hold:held;keep:kept;leave:left;lose:lost;'
+  + 'meet:met;pay:paid;put:put;read:read;send:sent;sit:sat;stand:stood;understand:understood;write:wrote,written;'
+  + 'speak:spoke,spoken;break:broke,broken;choose:chose,chosen;drive:drove,driven;ride:rode,ridden;rise:rose,risen;'
+  + 'wake:woke,woken;wear:wore,worn;win:won;begin:began,begun;sing:sang,sung;swim:swam,swum;ring:rang,rung;'
+  + 'grow:grew,grown;throw:threw,thrown;blow:blew,blown;draw:drew,drawn;fly:flew,flown;show:showed,shown;'
+  + 'forget:forgot,forgotten;hide:hid,hidden;bite:bit,bitten;steal:stole,stolen;spend:spent;build:built;lend:lent;'
+  + 'mean:meant;hear:heard;hurt:hurt;cut:cut;hit:hit;let:let;set:set;shut:shut;cost:cost;quit:quit;spread:spread;'
+  + 'lie:lay,lain,lying;lay:laid;die:dying;tie:tying;sell:sold;shoot:shot;sweep:swept;weep:wept;feed:fed;lead:led;'
+  + 'light:lit;slide:slid;stick:stuck;strike:struck;swing:swung;dig:dug;hang:hung;shake:shook,shaken;forgive:forgave,forgiven;'
+  + 'child:children;man:men;woman:women;foot:feet;tooth:teeth;mouse:mice;person:people;good:better,best;bad:worse,worst;'
+  + 'he:him,his,himself;she:her,hers,herself;i:me,my,mine,myself;we:us,our,ours,ourselves;they:them,their,theirs,themselves'
+const irregular = new Map(irregularTable.split(';').map(x => { const [k, v] = x.split(':'); return [k, v.split(',')] as const }))
+/** A word with its everyday endings: plural, -ed, -ing, -er/-est, with the usual spelling changes and irregular forms. */
+function inflections(word: string): string[] {
+  const w = word.toLowerCase(), out = new Set([w, ...(irregular.get(w) ?? [])])
+  const ends = ['s', 'es', 'ed', 'd', 'ing', 'er', 'est', 'ly']
+  for (const e of ends) out.add(w + e)
+  if (/[^aeiou]y$/.test(w)) for (const e of ['ies', 'ied', 'ier', 'iest', 'ily']) out.add(w.slice(0, -1) + e)
+  if (/e$/.test(w)) for (const e of ['ing', 'er', 'est', 'ed']) out.add(w.slice(0, -1) + e)
+  if (/[^aeiou][aeiou][^aeiouwxy]$/.test(w)) for (const e of ['ed', 'ing', 'er', 'est']) out.add(w + w.slice(-1) + e)
+  if (/ie$/.test(w)) out.add(w.slice(0, -2) + 'ying')
+  if (/(f|fe)$/.test(w)) out.add(w.replace(/fe?$/, 'ves'))
+  return [...out]
+}
+/** Whether a sentence uses the word (or one of its listed forms), counting inflected and irregular forms. */
+export function wordUsed(answer: string, en: string) {
+  const tokens = plain(answer).match(/[a-z']+/g) ?? []
+  return spellingForms(en).some(form => {
+    const words = form.split(' ').filter(Boolean)
+    if (!words.length) return false
+    const first = new Set(inflections(words[0]))
+    if (words.length === 1) return tokens.some(t => first.has(t))
+    // A phrase (look for, work from home): its first word may change, the rest follow in order.
+    return tokens.some((t, i) => first.has(t) && words.slice(1).every((x, j) => tokens[i + 1 + j] === x))
+  })
 }

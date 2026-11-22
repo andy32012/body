@@ -71,7 +71,7 @@
       "unit": 9,
       "stage": "A",
       "title": "過去式（不規則動詞）",
-      "rule": "最常用的 40 個直接背",
+      "rule": "常用的不規則動詞直接背，先背這一課的 12 個",
       "example": "He ate breakfast at seven.",
       "available": true
     },
@@ -1188,7 +1188,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "He is busy now.",
@@ -1206,7 +1206,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "Are you ready?",
@@ -1224,7 +1224,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "She is awake now.",
@@ -1259,7 +1259,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "We are not hungry.",
@@ -1279,7 +1279,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "He is busy now.",
@@ -1297,7 +1297,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "Are you ready?",
@@ -1315,7 +1315,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "She is awake now.",
@@ -1350,7 +1350,7 @@
           ],
           "hints": [
             "先看主詞和 be 動詞的位置。",
-            "將主詞換成代名詞。I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
+            "先把主詞想成 I、you、he、she、it 或 they，再選 be 動詞：I 配 am，you 和複數配 are，he、she 和 it 配 is；問句把 be 動詞放在主詞前。"
           ],
           "reference": [
             "We are not hungry.",
@@ -1644,7 +1644,8 @@
           ],
           "reference": [
             "Are those your pills?",
-            "Are those pills yours?"
+            "Are those pills yours?",
+            "Are those your medicines?"
           ],
           "why": "those 是複數，用 are 提問；your 已經限定 pills。",
           "newWords": [
@@ -1711,7 +1712,8 @@
               ],
               "reference": [
                 "Are those your pills?",
-                "Are those pills yours?"
+                "Are those pills yours?",
+                "Are those your medicines?"
               ],
               "why": "those 是複數，用 are 提問；your 已經限定 pills。",
               "newWords": []
@@ -3887,7 +3889,8 @@
           ],
           "reference": [
             "She washes the cup after class.",
-            "After class, she washes the cup."
+            "After class, she washes the cup.",
+            "She washes this cup after class."
           ],
           "why": "談習慣，用現在簡單式。I、you、we、they 配原形，he、she、it 和單數主詞的動詞要加 -s 或 -es；have 變 has。",
           "newWords": [
@@ -3956,7 +3959,8 @@
               ],
               "reference": [
                 "She washes the cup after class.",
-                "After class, she washes the cup."
+                "After class, she washes the cup.",
+                "She washes this cup after class."
               ],
               "why": "談習慣，用現在簡單式。I、you、we、they 配原形，he、she、it 和單數主詞的動詞要加 -s 或 -es；have 變 has。",
               "newWords": []
@@ -7320,7 +7324,7 @@
       "unit": 8,
       "stage": "A",
       "title": "過去式（規則動詞）",
-      "rule": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+      "rule": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
       "examples": [
         "He walked to the bathroom.",
         "She studied last night."
@@ -7345,7 +7349,7 @@
             "He walked to school yesterday.",
             "Yesterday he walked to school."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
             {
               "en": "walk",
@@ -7398,7 +7402,7 @@
                 "He walked to school yesterday.",
                 "Yesterday he walked to school."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7429,7 +7433,7 @@
             "We watched TV last night.",
             "Last night we watched TV."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
             {
               "en": "watch",
@@ -7482,7 +7486,7 @@
                 "We watched TV last night.",
                 "Last night we watched TV."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7517,7 +7521,7 @@
             "She called the doctor last week.",
             "Last week she called the doctor."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
             {
               "en": "call",
@@ -7570,7 +7574,7 @@
                 "She called the doctor last week.",
                 "Last week she called the doctor."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7606,7 +7610,7 @@
             "The nurse washed the patient's hands for him.",
             "The nurse washed the patient's hands for her."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
             {
               "en": "wash",
@@ -7660,7 +7664,7 @@
                 "The nurse washed the patient's hands for him.",
                 "The nurse washed the patient's hands for her."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7695,7 +7699,7 @@
             "He was tired yesterday, so he stayed home.",
             "He was tired yesterday, so he stayed at home."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
             {
               "en": "stay",
@@ -7748,7 +7752,7 @@
                 "He was tired yesterday, so he stayed home.",
                 "He was tired yesterday, so he stayed at home."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7787,7 +7791,7 @@
             "I cleaned the room yesterday.",
             "Yesterday I cleaned the room."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -7806,7 +7810,7 @@
                 "I cleaned the room yesterday.",
                 "Yesterday I cleaned the room."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             },
             {
@@ -7823,7 +7827,7 @@
               "reference": [
                 "The patient walked to the bathroom."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             },
             {
@@ -7841,7 +7845,7 @@
                 "She studied English last night.",
                 "Last night she studied English."
               ],
-              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+              "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
             }
           ],
@@ -7878,7 +7882,7 @@
             "I cleaned the room yesterday.",
             "Yesterday I cleaned the room."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -7895,7 +7899,7 @@
           "reference": [
             "The patient walked to the bathroom."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -7913,7 +7917,7 @@
             "She studied English last night.",
             "Last night she studied English."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         }
       ],
@@ -7933,7 +7937,7 @@
             "We helped the old lady yesterday.",
             "We helped the old woman yesterday."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -7951,7 +7955,7 @@
             "He called me last week.",
             "Last week he called me."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -7968,7 +7972,7 @@
           "reference": [
             "I washed my hands."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -7986,7 +7990,7 @@
             "She stayed home yesterday.",
             "She stayed at home yesterday."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -8004,7 +8008,7 @@
             "They watched a movie last night.",
             "Last night they watched a movie."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         }
       ],
@@ -8024,7 +8028,7 @@
             "We helped the old lady yesterday.",
             "We helped the old woman yesterday."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -8042,7 +8046,7 @@
             "He called me last week.",
             "Last week he called me."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -8059,7 +8063,7 @@
           "reference": [
             "I washed my hands."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -8077,7 +8081,7 @@
             "She stayed home yesterday.",
             "She stayed at home yesterday."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         },
         {
@@ -8095,7 +8099,7 @@
             "They watched a movie last night.",
             "Last night they watched a movie."
           ],
-          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
+          "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": []
         }
       ],
@@ -12215,8 +12219,8 @@
               "zh": "我有很多書。"
             },
             {
-              "en": "I have a few questions.",
-              "zh": "我有幾個問題。"
+              "en": "I need a little time.",
+              "zh": "我需要一點時間。"
             }
           ]
         },
@@ -12387,8 +12391,8 @@
               "zh": "你有任何問題嗎？"
             },
             {
-              "en": "I have a few questions.",
-              "zh": "我有幾個問題。"
+              "en": "I need a little time.",
+              "zh": "我需要一點時間。"
             }
           ]
         },
@@ -12487,38 +12491,38 @@
         {
           "id": "u14-c1",
           "day": 6,
-          "zh": "我有幾個問題。",
+          "zh": "我需要一點時間。",
           "grammar": [
             "可數與不可數名詞"
           ],
           "hints": [
             "先判斷這個名詞數不數得出來。",
-            "question 可數，「幾個」用 a few。"
+            "time（時間）數不出來，「一點」用 a little。"
           ],
           "reference": [
-            "I have a few questions.",
-            "I have some questions."
+            "I need a little time.",
+            "I need some time."
           ],
-          "why": "question 數得出來，「幾個」用 a few 加複數 questions。",
+          "why": "time（時間）數不出來，「一點」用 a little；數得出來的才用 a few（a few questions）。",
           "newWords": [],
           "words": [],
           "sentences": [
             {
               "id": "u14-c1",
               "day": 6,
-              "zh": "我有幾個問題。",
+              "zh": "我需要一點時間。",
               "grammar": [
                 "可數與不可數名詞"
               ],
               "hints": [
                 "先判斷這個名詞數不數得出來。",
-                "question 可數，「幾個」用 a few。"
+                "time（時間）數不出來，「一點」用 a little。"
               ],
               "reference": [
-                "I have a few questions.",
-                "I have some questions."
+                "I need a little time.",
+                "I need some time."
               ],
-              "why": "question 數得出來，「幾個」用 a few 加複數 questions。",
+              "why": "time（時間）數不出來，「一點」用 a little；數得出來的才用 a few（a few questions）。",
               "newWords": []
             },
             {
@@ -12560,8 +12564,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "I have a few questions.",
-              "zh": "我有幾個問題。"
+              "en": "I need a little time.",
+              "zh": "我需要一點時間。"
             },
             {
               "en": "He does not have any allergies.",
@@ -12578,19 +12582,19 @@
         {
           "id": "u14-c1",
           "day": 6,
-          "zh": "我有幾個問題。",
+          "zh": "我需要一點時間。",
           "grammar": [
             "可數與不可數名詞"
           ],
           "hints": [
             "先判斷這個名詞數不數得出來。",
-            "question 可數，「幾個」用 a few。"
+            "time（時間）數不出來，「一點」用 a little。"
           ],
           "reference": [
-            "I have a few questions.",
-            "I have some questions."
+            "I need a little time.",
+            "I need some time."
           ],
-          "why": "question 數得出來，「幾個」用 a few 加複數 questions。",
+          "why": "time（時間）數不出來，「一點」用 a little；數得出來的才用 a few（a few questions）。",
           "newWords": []
         },
         {
@@ -12993,8 +12997,8 @@
               "zh": "我比我弟弟高。"
             },
             {
-              "en": "This is the biggest room.",
-              "zh": "這是最大的房間。"
+              "en": "He is the tallest student in our class.",
+              "zh": "他是我們班最高的學生。"
             }
           ]
         },
@@ -13167,8 +13171,8 @@
               "zh": "今天比昨天好嗎？"
             },
             {
-              "en": "This is the biggest room.",
-              "zh": "這是最大的房間。"
+              "en": "He is the tallest student in our class.",
+              "zh": "他是我們班最高的學生。"
             }
           ]
         },
@@ -13304,17 +13308,17 @@
             {
               "id": "u15-c2",
               "day": 6,
-              "zh": "這是最大的房間。",
+              "zh": "他是我們班最高的學生。",
               "grammar": [
                 "比較級和最高級"
               ],
               "hints": [
                 "看是兩個在比，還是三個以上裡面最怎樣。",
-                "兩個相比用比較級加 than；最怎樣用 the 加最高級。"
+                "最怎樣用 the 加最高級；tall 是短的形容詞，加 -est。"
               ],
               "reference": [
-                "This is the biggest room.",
-                "This is the largest room."
+                "He is the tallest student in our class.",
+                "He is the tallest student in my class."
               ],
               "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
               "newWords": []
@@ -13344,8 +13348,8 @@
               "zh": "她比我年輕。"
             },
             {
-              "en": "This is the biggest room.",
-              "zh": "這是最大的房間。"
+              "en": "He is the tallest student in our class.",
+              "zh": "他是我們班最高的學生。"
             },
             {
               "en": "This medicine is more expensive.",
@@ -13376,17 +13380,17 @@
         {
           "id": "u15-c2",
           "day": 6,
-          "zh": "這是最大的房間。",
+          "zh": "他是我們班最高的學生。",
           "grammar": [
             "比較級和最高級"
           ],
           "hints": [
             "看是兩個在比，還是三個以上裡面最怎樣。",
-            "兩個相比用比較級加 than；最怎樣用 the 加最高級。"
+            "最怎樣用 the 加最高級；tall 是短的形容詞，加 -est。"
           ],
           "reference": [
-            "This is the biggest room.",
-            "This is the largest room."
+            "He is the tallest student in our class.",
+            "He is the tallest student in my class."
           ],
           "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
           "newWords": []
@@ -14045,38 +14049,38 @@
         {
           "id": "u16-c1",
           "day": 6,
-          "zh": "你為什麼遲到？",
+          "zh": "你為什麼這麼累？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "問原因用 Why，late 是形容詞，所以用 are。"
+            "問原因用 Why；tired 是形容詞，所以用 are。"
           ],
           "reference": [
-            "Why are you late?",
-            "Why were you late?"
+            "Why are you so tired?",
+            "Why are you tired?"
           ],
-          "why": "Why 放最前面；late 是形容詞，句子用 be 動詞，把 are 提前：Why are you late?",
+          "why": "Why 放最前面；tired 是形容詞，句子用 be 動詞，把 are 提前：Why are you so tired?",
           "newWords": [],
           "words": [],
           "sentences": [
             {
               "id": "u16-c1",
               "day": 6,
-              "zh": "你為什麼遲到？",
+              "zh": "你為什麼這麼累？",
               "grammar": [
                 "疑問詞問句"
               ],
               "hints": [
                 "先選對疑問詞，再照問句的順序排。",
-                "問原因用 Why，late 是形容詞，所以用 are。"
+                "問原因用 Why；tired 是形容詞，所以用 are。"
               ],
               "reference": [
-                "Why are you late?",
-                "Why were you late?"
+                "Why are you so tired?",
+                "Why are you tired?"
               ],
-              "why": "Why 放最前面；late 是形容詞，句子用 be 動詞，把 are 提前：Why are you late?",
+              "why": "Why 放最前面；tired 是形容詞，句子用 be 動詞，把 are 提前：Why are you so tired?",
               "newWords": []
             },
             {
@@ -14117,8 +14121,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "Why are you late?",
-              "zh": "你為什麼遲到？"
+              "en": "Why are you so tired?",
+              "zh": "你為什麼這麼累？"
             },
             {
               "en": "Where did he go yesterday?",
@@ -14135,19 +14139,19 @@
         {
           "id": "u16-c1",
           "day": 6,
-          "zh": "你為什麼遲到？",
+          "zh": "你為什麼這麼累？",
           "grammar": [
             "疑問詞問句"
           ],
           "hints": [
             "先選對疑問詞，再照問句的順序排。",
-            "問原因用 Why，late 是形容詞，所以用 are。"
+            "問原因用 Why；tired 是形容詞，所以用 are。"
           ],
           "reference": [
-            "Why are you late?",
-            "Why were you late?"
+            "Why are you so tired?",
+            "Why are you tired?"
           ],
-          "why": "Why 放最前面；late 是形容詞，句子用 be 動詞，把 are 提前：Why are you late?",
+          "why": "Why 放最前面；tired 是形容詞，句子用 be 動詞，把 are 提前：Why are you so tired?",
           "newWords": []
         },
         {
@@ -14856,17 +14860,18 @@
             {
               "id": "u17-c2",
               "day": 6,
-              "zh": "外面在下雨，所以我待在家。",
+              "zh": "昨天很冷，所以我穿了外套。",
               "grammar": [
                 "連接詞 and／but／so／because"
               ],
               "hints": [
-                "先看兩個句子的關係是並列、轉折、結果還是原因。",
-                "because 和 so 只能用一個。"
+                "先找出哪一句是原因、哪一句是結果。",
+                "結果前面用 so；昨天的事用過去式，wear 的過去式是 wore。"
               ],
               "reference": [
-                "It was raining, so I stayed home.",
-                "It is raining, so I will stay home."
+                "It was cold yesterday, so I wore a coat.",
+                "It was cold yesterday, so I wore my coat.",
+                "Yesterday it was cold, so I wore a coat."
               ],
               "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
               "newWords": []
@@ -14897,8 +14902,8 @@
               "zh": "我想去，但是我很忙。"
             },
             {
-              "en": "It was raining, so I stayed home.",
-              "zh": "外面在下雨，所以我待在家。"
+              "en": "It was cold yesterday, so I wore a coat.",
+              "zh": "昨天很冷，所以我穿了外套。"
             },
             {
               "en": "He did not come because he had a fever.",
@@ -14928,17 +14933,18 @@
         {
           "id": "u17-c2",
           "day": 6,
-          "zh": "外面在下雨，所以我待在家。",
+          "zh": "昨天很冷，所以我穿了外套。",
           "grammar": [
             "連接詞 and／but／so／because"
           ],
           "hints": [
-            "先看兩個句子的關係是並列、轉折、結果還是原因。",
-            "because 和 so 只能用一個。"
+            "先找出哪一句是原因、哪一句是結果。",
+            "結果前面用 so；昨天的事用過去式，wear 的過去式是 wore。"
           ],
           "reference": [
-            "It was raining, so I stayed home.",
-            "It is raining, so I will stay home."
+            "It was cold yesterday, so I wore a coat.",
+            "It was cold yesterday, so I wore my coat.",
+            "Yesterday it was cold, so I wore a coat."
           ],
           "why": "用連接詞把兩句接成一句：and（而且）、but（但是）、so（所以）、because（因為）。so 前面是原因，because 後面是原因。中文可以說「因為…所以…」，英文只能選一個用。",
           "newWords": []
@@ -15145,7 +15151,7 @@
       "unit": 18,
       "stage": "B",
       "title": "when／before／after／if",
-      "rule": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+      "rule": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
       "examples": [
         "Wash your hands before you eat.",
         "Call me if you need help."
@@ -15170,7 +15176,7 @@
             "Wash your hands before you eat.",
             "Wash your hands before eating."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": [
             {
               "en": "before",
@@ -15223,7 +15229,7 @@
                 "Wash your hands before you eat.",
                 "Wash your hands before eating."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             }
           ],
@@ -15250,7 +15256,7 @@
             "I will call you after I get home.",
             "After I get home, I will call you."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": [
             {
               "en": "home",
@@ -15303,7 +15309,7 @@
                 "I will call you after I get home.",
                 "After I get home, I will call you."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             }
           ],
@@ -15338,7 +15344,7 @@
             "Call me if you need help.",
             "If you need help, call me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": [
             {
               "en": "need",
@@ -15391,7 +15397,7 @@
                 "Call me if you need help.",
                 "If you need help, call me."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             }
           ],
@@ -15426,7 +15432,7 @@
             "Take this medicine after meals.",
             "Take this medicine after you eat."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [
             {
               "en": "meal",
@@ -15479,7 +15485,7 @@
                 "Take this medicine after meals.",
                 "Take this medicine after you eat."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             }
           ],
@@ -15510,7 +15516,7 @@
             "When you feel dizzy, you should sit down.",
             "You should sit down when you feel dizzy."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": [
             {
               "en": "breathe",
@@ -15563,7 +15569,7 @@
                 "When you feel dizzy, you should sit down.",
                 "You should sit down when you feel dizzy."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             }
           ],
@@ -15602,7 +15608,7 @@
             "Brush your teeth before you go to bed.",
             "Brush your teeth before bed."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -15621,7 +15627,7 @@
                 "Brush your teeth before you go to bed.",
                 "Brush your teeth before bed."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             },
             {
@@ -15639,7 +15645,7 @@
                 "If it rains tomorrow, I will stay home.",
                 "I will stay home if it rains tomorrow."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             },
             {
@@ -15657,7 +15663,7 @@
                 "I will tell him when he comes.",
                 "When he comes, I will tell him."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
               "newWords": []
             }
           ],
@@ -15694,7 +15700,7 @@
             "Brush your teeth before you go to bed.",
             "Brush your teeth before bed."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15712,7 +15718,7 @@
             "If it rains tomorrow, I will stay home.",
             "I will stay home if it rains tomorrow."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15730,7 +15736,7 @@
             "I will tell him when he comes.",
             "When he comes, I will tell him."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         }
       ],
@@ -15750,7 +15756,7 @@
             "You cannot eat after the surgery.",
             "You can't eat after surgery."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
           "newWords": []
         },
         {
@@ -15768,7 +15774,7 @@
             "Please tell me if you have a question.",
             "If you have any questions, please tell me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15786,7 +15792,7 @@
             "I will study after I eat lunch.",
             "I will study after lunch."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15803,7 +15809,7 @@
           "reference": [
             "Please close the door before you leave."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15821,7 +15827,7 @@
             "When he is tired, he is very quiet.",
             "He is very quiet when he is tired."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         }
       ],
@@ -15841,7 +15847,7 @@
             "You cannot eat after the surgery.",
             "You can't eat after surgery."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
           "newWords": []
         },
         {
@@ -15859,7 +15865,7 @@
             "Please tell me if you have a question.",
             "If you have any questions, please tell me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15877,7 +15883,7 @@
             "I will study after I eat lunch.",
             "I will study after lunch."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15894,7 +15900,7 @@
           "reference": [
             "Please close the door before you leave."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         },
         {
@@ -15912,7 +15918,7 @@
             "When he is tired, he is very quiet.",
             "He is very quiet when he is tired."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 27 會教。）",
           "newWords": []
         }
       ],
@@ -19797,7 +19803,7 @@
       "unit": 24,
       "stage": "B",
       "title": "頻率和時間的說法",
-      "rule": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+      "rule": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
       "examples": [
         "Take this pill twice a day.",
         "He never eats breakfast."
@@ -19821,7 +19827,7 @@
           "reference": [
             "I usually get up at seven."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [
             {
               "en": "usually",
@@ -19873,7 +19879,7 @@
               "reference": [
                 "I usually get up at seven."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -19903,7 +19909,7 @@
           "reference": [
             "He never eats breakfast."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [
             {
               "en": "never",
@@ -19955,7 +19961,7 @@
               "reference": [
                 "He never eats breakfast."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -19985,7 +19991,7 @@
           "reference": [
             "How often do you exercise?"
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [
             {
               "en": "exercise",
@@ -20037,7 +20043,7 @@
               "reference": [
                 "How often do you exercise?"
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -20072,7 +20078,7 @@
             "Take this pill twice a day.",
             "Take this pill two times a day."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [
             {
               "en": "pill",
@@ -20125,7 +20131,7 @@
                 "Take this pill twice a day.",
                 "Take this pill two times a day."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -20160,7 +20166,7 @@
             "She always takes her medicine after meals, but she sometimes forgets at night.",
             "She always takes the medicine after meals, but sometimes she forgets at night."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [
             {
               "en": "forget",
@@ -20213,7 +20219,7 @@
                 "She always takes her medicine after meals, but she sometimes forgets at night.",
                 "She always takes the medicine after meals, but sometimes she forgets at night."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -20248,7 +20254,7 @@
             "I check the blood pressure every four hours.",
             "I take the blood pressure every four hours."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -20267,7 +20273,7 @@
                 "I check the blood pressure every four hours.",
                 "I take the blood pressure every four hours."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             },
             {
@@ -20284,7 +20290,7 @@
               "reference": [
                 "He is often late."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             },
             {
@@ -20301,7 +20307,7 @@
               "reference": [
                 "I go three times a week."
               ],
-              "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+              "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
               "newWords": []
             }
           ],
@@ -20338,7 +20344,7 @@
             "I check the blood pressure every four hours.",
             "I take the blood pressure every four hours."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20355,7 +20361,7 @@
           "reference": [
             "He is often late."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20372,7 +20378,7 @@
           "reference": [
             "I go three times a week."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         }
       ],
@@ -20392,7 +20398,7 @@
             "She is sometimes late.",
             "Sometimes she is late."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20410,7 +20416,7 @@
             "Take one pill at bedtime.",
             "Take one pill before bed."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20427,7 +20433,7 @@
           "reference": [
             "We always wash our hands first."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20445,7 +20451,7 @@
             "What time do you usually go to bed?",
             "When do you usually go to bed?"
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20462,7 +20468,7 @@
           "reference": [
             "I play basketball three times a week."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         }
       ],
@@ -20482,7 +20488,7 @@
             "She is sometimes late.",
             "Sometimes she is late."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20500,7 +20506,7 @@
             "Take one pill at bedtime.",
             "Take one pill before bed."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20517,7 +20523,7 @@
           "reference": [
             "We always wash our hands first."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20535,7 +20541,7 @@
             "What time do you usually go to bed?",
             "When do you usually go to bed?"
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         },
         {
@@ -20552,7 +20558,7 @@
           "reference": [
             "I play basketball three times a week."
           ],
-          "why": "頻率副詞 always、usually、often、sometimes、never 放在一般動詞前面、be 動詞後面。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
+          "why": "頻率副詞 always、usually、often、sometimes、never 通常放在一般動詞前面、be 動詞後面；sometimes、usually、often 也可以放句首或句尾（Sometimes she is late.）。次數說法 once a day、twice a week、three times a day、every four hours 放句尾。",
           "newWords": []
         }
       ],
@@ -22609,16 +22615,18 @@
             {
               "id": "u27-c2",
               "day": 6,
-              "zh": "你知道現在幾點嗎？",
+              "zh": "你知道洗手間在哪裡嗎？",
               "grammar": [
                 "間接問句"
               ],
               "hints": [
                 "先找出藏在句子裡的那個問題。",
-                "間接問句用「疑問詞加主詞加動詞」的順序，不倒裝。"
+                "間接問句用「疑問詞加主詞加動詞」的順序：where the bathroom is，不倒裝。"
               ],
               "reference": [
-                "Do you know what time it is?"
+                "Do you know where the bathroom is?",
+                "Do you know where the restroom is?",
+                "Do you know where the toilet is?"
               ],
               "why": "把問句放進另一句裡（Can you tell me…、Do you know…、I do not know…）時，後面要變回一般句子的順序：疑問詞加主詞加動詞，不用 do、does、did。沒有疑問詞的用 if 或 whether。",
               "newWords": []
@@ -22649,8 +22657,8 @@
               "zh": "我不知道他為什麼遲到。"
             },
             {
-              "en": "Do you know what time it is?",
-              "zh": "你知道現在幾點嗎？"
+              "en": "Do you know where the bathroom is?",
+              "zh": "你知道洗手間在哪裡嗎？"
             },
             {
               "en": "Can you tell me where you live?",
@@ -22681,16 +22689,18 @@
         {
           "id": "u27-c2",
           "day": 6,
-          "zh": "你知道現在幾點嗎？",
+          "zh": "你知道洗手間在哪裡嗎？",
           "grammar": [
             "間接問句"
           ],
           "hints": [
             "先找出藏在句子裡的那個問題。",
-            "間接問句用「疑問詞加主詞加動詞」的順序，不倒裝。"
+            "間接問句用「疑問詞加主詞加動詞」的順序：where the bathroom is，不倒裝。"
           ],
           "reference": [
-            "Do you know what time it is?"
+            "Do you know where the bathroom is?",
+            "Do you know where the restroom is?",
+            "Do you know where the toilet is?"
           ],
           "why": "把問句放進另一句裡（Can you tell me…、Do you know…、I do not know…）時，後面要變回一般句子的順序：疑問詞加主詞加動詞，不用 do、does、did。沒有疑問詞的用 if 或 whether。",
           "newWords": []
@@ -22996,7 +23006,7 @@
         {
           "id": "u28-d2",
           "day": 2,
-          "zh": "他們在吃晚餐。",
+          "zh": "那時候他們在吃晚餐。",
           "grammar": [
             "過去進行式"
           ],
@@ -23005,6 +23015,9 @@
             "they 配 were，eat 加 ing。"
           ],
           "reference": [
+            "They were eating dinner at that time.",
+            "They were having dinner at that time.",
+            "They were eating dinner then.",
             "They were eating dinner.",
             "They were having dinner."
           ],
@@ -23049,7 +23062,7 @@
             {
               "id": "u28-d2",
               "day": 2,
-              "zh": "他們在吃晚餐。",
+              "zh": "那時候他們在吃晚餐。",
               "grammar": [
                 "過去進行式"
               ],
@@ -23058,6 +23071,9 @@
                 "they 配 were，eat 加 ing。"
               ],
               "reference": [
+                "They were eating dinner at that time.",
+                "They were having dinner at that time.",
+                "They were eating dinner then.",
                 "They were eating dinner.",
                 "They were having dinner."
               ],
@@ -23068,8 +23084,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "They were eating dinner.",
-              "zh": "他們在吃晚餐。"
+              "en": "They were eating dinner at that time.",
+              "zh": "那時候他們在吃晚餐。"
             },
             {
               "en": "I was studying at eight last night.",
@@ -23158,8 +23174,8 @@
               "zh": "你跌倒的時候在做什麼？"
             },
             {
-              "en": "They were eating dinner.",
-              "zh": "他們在吃晚餐。"
+              "en": "They were eating dinner at that time.",
+              "zh": "那時候他們在吃晚餐。"
             },
             {
               "en": "He was sleeping when I came in.",
@@ -31058,7 +31074,7 @@
         {
           "id": "u38-d5",
           "day": 5,
-          "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。",
+          "zh": "高血壓可能會導致心臟病，因此你應該照醫師的指示吃藥。",
           "grammar": [
             "因果的書面說法"
           ],
@@ -31067,10 +31083,10 @@
             "can lead to 是「可能導致」，不是一定會；therefore 後面接 should。"
           ],
           "reference": [
-            "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
             "High blood pressure can lead to heart disease. Therefore, you should take your medicine as your doctor told you.",
-            "High blood pressure can cause heart disease. Therefore, you should take the medicine your doctor gave you.",
-            "High blood pressure can lead to heart disease. Therefore, you should take the medicine that your doctor gave you."
+            "High blood pressure can lead to heart disease. Therefore, you should take your medicine as prescribed.",
+            "High blood pressure can cause heart disease. Therefore, you should take your medicine as your doctor told you.",
+            "High blood pressure can lead to heart disease. Therefore, you should take the medicine the way your doctor told you."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": [
@@ -31113,7 +31129,7 @@
             {
               "id": "u38-d5",
               "day": 5,
-              "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。",
+              "zh": "高血壓可能會導致心臟病，因此你應該照醫師的指示吃藥。",
               "grammar": [
                 "因果的書面說法"
               ],
@@ -31122,10 +31138,10 @@
                 "can lead to 是「可能導致」，不是一定會；therefore 後面接 should。"
               ],
               "reference": [
-                "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
                 "High blood pressure can lead to heart disease. Therefore, you should take your medicine as your doctor told you.",
-                "High blood pressure can cause heart disease. Therefore, you should take the medicine your doctor gave you.",
-                "High blood pressure can lead to heart disease. Therefore, you should take the medicine that your doctor gave you."
+                "High blood pressure can lead to heart disease. Therefore, you should take your medicine as prescribed.",
+                "High blood pressure can cause heart disease. Therefore, you should take your medicine as your doctor told you.",
+                "High blood pressure can lead to heart disease. Therefore, you should take the medicine the way your doctor told you."
               ],
               "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
               "newWords": []
@@ -31134,8 +31150,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
-              "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。"
+              "en": "High blood pressure can lead to heart disease. Therefore, you should take your medicine as your doctor told you.",
+              "zh": "高血壓可能會導致心臟病，因此你應該照醫師的指示吃藥。"
             },
             {
               "en": "The surgery was delayed due to a fever.",
@@ -33422,7 +33438,7 @@
             "The medicine on the table is for the patient in bed 5, and it is the most expensive medicine here.",
             "The medicine on the table is for the patient in bed five, and it is the most expensive drug here."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
           "newWords": [
             {
               "en": "cancer",
@@ -33475,7 +33491,7 @@
                 "The medicine on the table is for the patient in bed 5, and it is the most expensive medicine here.",
                 "The medicine on the table is for the patient in bed five, and it is the most expensive drug here."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
               "newWords": []
             }
           ],
@@ -39713,7 +39729,7 @@
         "from": "2028-02",
         "to": "2029-01",
         "units": [],
-        "goal": "計畫好的長期實習維持期：每天 2 分鐘舊句聽說或休息，不開新單元與 7000 單。"
+        "goal": "計畫好的長期實習維持期：每天 20–30 分鐘護理英文（忙的日子 10 分鐘），不開新單元與 7000 單。"
       }
     ],
     "longRange": [
@@ -39721,7 +39737,7 @@
         "from": "2029-02",
         "to": "2029-07",
         "units": [],
-        "goal": "計畫好的國考維持期：每天 2 分鐘複習舊句或休息，暫停新單元與 7000 單。"
+        "goal": "計畫好的國考維持期：每天 15 分鐘護理英文（忙的日子 5 分鐘），暫停新單元與 7000 單。"
       },
       {
         "from": "2029-08",

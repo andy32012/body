@@ -613,15 +613,15 @@
     "level": "A2",
     "title": "A Message from the Head Nurse",
     "topic": "職場訊息",
-    "words": 104,
+    "words": 122,
     "paras": [
       "Hi everyone,",
       "There will be a fire drill on Thursday at 10 a.m. When you hear the alarm, please follow the plan on the wall next to the nurses' station. Do not use the elevators.",
-      "Patients who can walk should go to the stairs with a staff member. Patients who cannot walk will stay in their rooms, and a team will help them. Please check that all oxygen is turned off near the exit doors.",
+      "Patients who can walk should go to the stairs with a staff member. Patients who cannot walk will stay in their rooms, and a team will help them. Please keep the exit doors clear. Tell the nurse in charge which patients use oxygen, and do not turn off any oxygen unless she asks you to.",
       "The drill will take about twenty minutes. If you are on a break at that time, please come back to the ward by 9:50.",
       "Thank you,\nMs. Chen, Head Nurse"
     ],
-    "zh": "大家好：週四早上十點有消防演習。聽到警報請照護理站旁牆上的計畫走，不要搭電梯。能走的病人由工作人員陪同走樓梯，不能走的留在病房由小組協助。請確認出口附近的氧氣都關了。演習約二十分鐘，那時在休息的人請九點五十前回病房。護理長陳小姐",
+    "zh": "大家好：週四早上十點有消防演習。聽到警報請照護理站旁牆上的計畫走，不要搭電梯。能走的病人由工作人員陪同走樓梯，不能走的留在病房由小組協助。請保持出口淨空；告訴負責的護理師哪些病人在用氧氣，除非她要你關，不要自己關氧氣。演習約二十分鐘，那時在休息的人請九點五十前回病房。護理長陳小姐",
     "qs": [
       {
         "type": "main",

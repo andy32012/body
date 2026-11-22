@@ -4,6 +4,7 @@ import CorrectBox from './CorrectBox'
 import { tutorKey } from '../lib/tutor'
 import type { SayCard } from '../lib/sayCards'
 import { useTaskContext } from '../lib/taskContext'
+import { wordUsed } from '../lib/wordSkills'
 import './use-word.css'
 
 /** 「用它寫一句」: knowing a word means using it, so write one sentence of your own and get it checked. */
@@ -18,7 +19,7 @@ export default function UseWord({ en, zh, example, onGood, onSave }: {
   const [run, setRun] = useState(0)
   const [checked, setChecked] = useState(false)
   const keyed = !!tutorKey()
-  const used = new RegExp('\\b' + en.split(/[ /(]/)[0].replace(/[^a-z'-]/gi, '').slice(0, -1), 'i').test(answer)
+  const used = wordUsed(answer, en)
   useTaskContext(open ? {
     label: '用單字造句：' + en,
     detail: '他要用 ' + en + (zh ? '（' + zh + '）' : '') + ' 自己造一個英文句子。幫他想情境或句型，不要替他寫。' + (example ? '課本例句（只供參考）：' + example : ''),

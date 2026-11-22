@@ -74,7 +74,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         go: to('library/unit/test'), goLabel: '回測' }
       : { id: 'input', title: '聽或讀', auto: readToday || listenedToday,
         detail: '這週聽 ' + week.listen + ' 天、讀 ' + week.read + ' 天 → 今天先' + (listenFirst
-          ? '聽：' + (pack ? '單元 ' + pack + ' 的聽力，先不看字' : '句子跟讀，或 7000 單短文聽一段再跟著念')
+          ? '聽：' + (pack ? '單元 ' + pack + ' 的聽力，先不看字' : '句子跟讀，聽一句、跟著念，再自己說一次')
           : '讀：' + (pack ? '單元 ' + pack + ' 的閱讀' : '一篇閱讀理解')),
         go: to(listenFirst ? where('listen', 'library/listen') : where('read', 'library/reading')), goLabel: listenFirst ? '聽' : '讀',
         go2: to(listenFirst ? where('read', 'library/reading') : where('listen', 'library/listen')), go2Label: listenFirst ? '讀' : '聽' },
@@ -84,8 +84,9 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : '寫作階梯一題')),
       go: to(speakFirst ? where('speak', 'speaking') : where('write', 'library/writing')), goLabel: speakFirst ? '說' : '寫',
       go2: to(speakFirst ? where('write', 'library/writing') : where('speak', 'speaking')), go2Label: speakFirst ? '寫' : '說' },
-    listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '句子跟讀，或 7000 單短文聽一段再跟著念', auto: listenedToday,
-      go: to(where('listen', 'library/listen')), goLabel: pack ? '聽力' : '跟讀', go2: to('library/passage'), go2Label: '短文' },
+    // The 7000-word passages are a translation exercise with no audio, so listening points at sentence shadowing.
+    listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '句子跟讀：聽一句、跟著念，再自己說一次', auto: listenedToday,
+      go: to(where('listen', 'library/listen')), goLabel: pack ? '聽力' : '跟讀', ...(pack ? { go2: to('library/listen'), go2Label: '跟讀' } : {}) },
     read: testDay ? { id: 'read', title: '單元回測', detail: '單元 ' + pack + ' 最後一天：沒看過的閱讀和聽力，各只有一次機會', auto: !!(held.reading && held.listening), go: to('library/unit/test'), goLabel: '回測' }
       : { id: 'read', title: '閱讀理解', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '一到兩篇；錯的題目選「卡在哪」', auto: readToday,
         go: to(where('read', 'library/reading')), goLabel: '閱讀', ...(pack ? { go2: to('library/reading'), go2Label: '其他文章' } : {}) },
