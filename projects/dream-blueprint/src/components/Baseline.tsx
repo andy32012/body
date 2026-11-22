@@ -9,7 +9,17 @@ import './baseline.css'
 import { addResult, cefrOf, emptyCheck, forms, formSeen, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
 
-const FEEDBACK = '你是英文老師，評一位台灣護理系學生（英文約國中程度）的作品。用繁體中文、口語、很短：第一行寫「大約 CEFR ○○ 左右（只是單次小樣本，不是正式程度）」；接著兩個做得好的地方、兩個最該先改的地方（附正確寫法）。總共不超過 6 行，不要 Markdown 標題。'
+/** The listening clip after the test: English, Chinese and the right answers, so he can see what he missed. */
+function ListenScript({ form }: { form: (typeof forms)[keyof typeof forms] }) {
+  return <>
+    <p className="bl-label">聽力稿</p>
+    <p lang="en" className="bl-work">{form.listen}</p>
+    <p className="bl-work">{form.listenZh}</p>
+    <ol className="bl-key">{form.listenQs.map(q => <li key={q.q}><span lang="en">{q.q}</span> → <b lang="en">{q.options[q.answer]}</b></li>)}</ol>
+  </>
+}
+
+const FEEDBACK ='你是英文老師，評一位台灣護理系學生（英文約國中程度）的作品。用繁體中文、口語、很短：第一行寫「大約 CEFR ○○ 左右（只是單次小樣本，不是正式程度）」；接著兩個做得好的地方、兩個最該先改的地方（附正確寫法）。總共不超過 6 行，不要 Markdown 標題。'
 
 // A transcript shows words and grammar only: no level, no pronunciation, no fluency estimate from it.
 const SPEAK_FEEDBACK = '你是英文老師。下面是一位台灣護理系學生（英文約國中程度）口說的語音辨識逐字稿，可能有辨識錯字。用繁體中文、口語、很短：第一行固定寫「只看逐字稿：發音、流暢度和停頓沒有評估」；接著兩個做得好的地方（內容、用字、文法）、兩個最該先改的地方（附正確說法）。不要寫 CEFR、雅思分數或任何等級。總共不超過 6 行，不要 Markdown 標題。'
@@ -123,9 +133,10 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
         first.writing.text.trim() && last.writing.text.trim() ? '寫作 ' + sign(wordCount(last.writing.text) - wordCount(first.writing.text)) + ' 字' : '',
         first.speaking.seconds && last.speaking.seconds ? '口說 ' + sign(last.speaking.seconds - first.speaking.seconds) + ' 秒' : '',
       ].filter(Boolean).join('、') || '還沒有兩次都做的項目'}{last.repeat ? '。這次的題本以前做過，分數會偏高。' : ''}</p>}
-      <details><summary>看每次的作品和回饋</summary>
+      <details open={last.date === dayKey()}><summary>看每次的聽力稿、作品和回饋</summary>
         {[...results].reverse().map(r => <div key={r.date + r.form} className="bl-past">
           <p className="bl-label">{name(r)} · {r.date} · 題本 {r.form ?? 'A'}</p>
+          <ListenScript form={forms[r.form ?? 'A']} />
           <p className="bl-label">寫作</p><p lang="en" className="bl-work">{r.writing.text || '（沒寫）'}</p>
           {r.writing.feedback.split('\n').map((l, i) => l.trim() ? <p key={i}>{l}</p> : null)}
           <p className="bl-label">口說逐字稿</p><p lang="en" className="bl-work">{r.speaking.transcript || '（沒有逐字稿）'}</p>

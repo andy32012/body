@@ -218,6 +218,8 @@
   line-height: 1.65;
 }
 .practice-page .speech-practice blockquote [lang=en] { font-size:1.14rem; font-weight:600; }
+.practice-page .speech-practice blockquote small { color:var(--practice-secondary); font-size:.8rem; letter-spacing:.04em; }
+.practice-page .speech-practice .speech-hint { margin:0; color:var(--practice-secondary); font-size:.9rem; }
 .practice-page .speech-practice button:disabled { color:var(--practice-secondary); cursor:default; }
 .practice-page .speech-practice [role=status] { color:var(--practice-secondary); }
 .practice-page .speech-practice audio { display:block; margin-block-start:.65rem; }

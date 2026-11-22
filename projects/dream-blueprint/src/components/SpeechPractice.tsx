@@ -56,6 +56,11 @@ function SentenceAudio({ english, chinese, rate = 0.85, onSpoken }: Props) {
     setReading(true)
   }
 
+  /** The transcript can open while the sentence is still playing, so he can read along without stopping it. */
+  function toggleScript() {
+    setReading(open => !open)
+  }
+
   function speak() {
     stopSpeech()
     player.current?.pause()
@@ -135,9 +140,10 @@ function SentenceAudio({ english, chinese, rate = 0.85, onSpoken }: Props) {
       <h3>聽一次，跟著念一句</h3>
       <div className="speech-controls">
         <button type="button" disabled={micBusy || speaking} onClick={speak}>{speaking ? '朗讀中…' : '聽英文'}</button>
-        <button type="button" onClick={readInstead}>沒有聲音，改用看的</button>
+        <button type="button" aria-expanded={reading} onClick={toggleScript}>{reading ? '收起聽力稿' : '看聽力稿'}</button>
       </div>
-      {reading && <blockquote><span lang="en">{english}</span><br />{chinese}</blockquote>}
+      {!reading && <p className="speech-hint">先只用耳朵聽，聽完再打開聽力稿對對看自己聽懂多少。沒有聲音時也可以直接看稿。</p>}
+      {reading && <blockquote aria-label="聽力稿"><small>聽力稿</small><br /><span lang="en">{english}</span><br />{chinese}</blockquote>}
       <button type="button" disabled={spoken} onClick={() => {
         setSpoken(true)
         onSpoken?.()

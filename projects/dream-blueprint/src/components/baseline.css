@@ -28,6 +28,8 @@
 .bl-card details { display: grid; gap: 6px; }
 .bl-card summary { cursor: pointer; color: var(--lav); font-size: 14px; }
 .bl-work { padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.bl-key { margin: 0; padding-inline-start: 1.3em; display: grid; gap: 4px; font-size: 14px; }
+.bl-key b { color: var(--lav); }
 .bl-table-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
 .bl-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
 .bl-table th, .bl-table td { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); white-space: nowrap; }

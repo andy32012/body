@@ -3,7 +3,8 @@ import { addDays, daysBetween } from './progress'
 /** A short level check (listening, reading, writing, speaking), repeated every 12 weeks with a new form of similar difficulty. */
 export type FormId = 'A' | 'B' | 'C'
 export type Q = { q: string; options: string[]; answer: number }
-export interface Form { listen: string; listenQs: Q[]; read: string; readQs: Q[]; write: string; speak: string }
+/** listenZh: the clip in Chinese, shown with the English transcript only after the test is saved. */
+export interface Form { listen: string; listenZh: string; listenQs: Q[]; read: string; readQs: Q[]; write: string; speak: string }
 export interface BaselineResult {
   form?: FormId
   date: string
@@ -25,6 +26,7 @@ export const RETEST_DAYS = 84
 export const forms: Record<FormId, Form> = {
   A: {
     listen: 'Hi, this is Amy from Green Valley Clinic. I am calling about your appointment on Thursday at ten a.m. The doctor is sick that day, so we need to change the time. We have two choices: Friday at two p.m., or next Monday at nine a.m. Please call us back before Wednesday at five p.m. Thank you.',
+    listenZh: '嗨，我是綠谷診所的 Amy。我打來是要談你星期四早上十點的預約。那天醫師生病了，所以我們需要改時間。有兩個時間可以選：星期五下午兩點，或下星期一早上九點。請在星期三下午五點前回電給我們。謝謝。',
     listenQs: [
       { q: 'Why is the clinic calling?', options: ['To change an appointment', 'To ask about your medicine', 'To talk about your bill'], answer: 0 },
       { q: 'Which time is NOT one of the new choices?', options: ['Friday at 2 p.m.', 'Monday at 9 a.m.', 'Thursday at 10 a.m.'], answer: 2 },
@@ -41,6 +43,7 @@ export const forms: Record<FormId, Form> = {
   },
   B: {
     listen: 'Hello, this is Mike from Sunrise Pharmacy. Your medicine is ready. You can pick it up today until eight p.m., or tomorrow from nine a.m. Please bring your health card. The medicine costs two hundred dollars. If you have any questions, call us at 2345-6789. Thank you.',
+    listenZh: '你好，我是日出藥局的 Mike。你的藥已經準備好了。你可以今天晚上八點前來拿，或明天早上九點以後來拿。請帶你的健保卡。這個藥是兩百元。有任何問題，請打 2345-6789 給我們。謝謝。',
     listenQs: [
       { q: 'Why is Mike calling?', options: ['Your appointment changed.', 'Your medicine is ready.', 'You forgot your health card.'], answer: 1 },
       { q: 'What does Mike ask you to bring?', options: ['A note from your doctor', 'Your old medicine', 'Your health card'], answer: 2 },
@@ -57,6 +60,7 @@ export const forms: Record<FormId, Form> = {
   },
   C: {
     listen: 'Hi everyone, this is Lisa from the nursing office. Tomorrow\'s CPR class will start at one thirty, not at one. It will be in Room 402 on the fourth floor. Please wear comfortable clothes and bring a pen. The class will finish at four. If you cannot come, please email me before noon. See you tomorrow.',
+    listenZh: '大家好，我是護理部的 Lisa。明天的 CPR 課改成一點半開始，不是一點。上課地點在四樓的 402 教室。請穿舒服的衣服，帶一支筆。課程四點結束。如果不能來，請在中午前寄 email 給我。明天見。',
     listenQs: [
       { q: 'What time will the class start?', options: ['At 1:00', 'At 1:30', 'At 4:00'], answer: 1 },
       { q: 'Where is the class?', options: ['Room 204', 'Room 420', 'Room 402'], answer: 2 },
