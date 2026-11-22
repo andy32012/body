@@ -313,6 +313,634 @@
     ]
   },
   {
+    "id": "a1-family",
+    "level": "A1",
+    "title": "My Family",
+    "topic": "家人",
+    "words": 72,
+    "paras": [
+      "There are five people in my family. My father is a bus driver. My mother is a teacher. They are both forty-eight years old.",
+      "I am twenty. I have one brother and one sister. My brother Kevin is sixteen. He likes basketball. My sister Mei is ten. She likes to draw.",
+      "We live in a small apartment in Tainan. On Sundays, we eat dinner at my grandparents' house. I love my family."
+    ],
+    "zh": "我家有五個人。爸爸是公車司機，媽媽是老師，他們都四十八歲。我二十歲，有一個弟弟和一個妹妹。弟弟 Kevin 十六歲，喜歡籃球；妹妹 Mei 十歲，喜歡畫畫。我們住在台南的一間小公寓。星期天我們會到爺爺奶奶家吃晚餐。我愛我的家人。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "What is the father's job?",
+        "options": [
+          "He is a teacher.",
+          "He is a bus driver.",
+          "He is a doctor."
+        ],
+        "answer": 1,
+        "why": "第一段：My father is a bus driver.（爸爸是公車司機）；teacher 是媽媽。",
+        "evidence": "My father is a bus driver."
+      },
+      {
+        "type": "detail",
+        "q": "How many children are there in the family?",
+        "options": [
+          "Two",
+          "Five",
+          "Three"
+        ],
+        "answer": 2,
+        "why": "作者自己，加上一個弟弟、一個妹妹，一共三個小孩。five 是全家的人數。",
+        "evidence": "I have one brother and one sister."
+      },
+      {
+        "type": "reference",
+        "q": "In \"They are both forty-eight years old,\" who are \"They\"?",
+        "options": [
+          "The writer's father and mother",
+          "Kevin and Mei",
+          "The grandparents"
+        ],
+        "answer": 0,
+        "why": "They 指前面兩句剛提到的 my father 和 my mother。",
+        "evidence": "They are both forty-eight years old."
+      },
+      {
+        "type": "detail",
+        "q": "Where does the family eat dinner on Sundays?",
+        "options": [
+          "At a restaurant",
+          "In their apartment",
+          "At the grandparents' house"
+        ],
+        "answer": 2,
+        "why": "最後一段：On Sundays, we eat dinner at my grandparents' house.",
+        "evidence": "On Sundays, we eat dinner at my grandparents' house."
+      }
+    ]
+  },
+  {
+    "id": "a1-weekend",
+    "level": "A1",
+    "title": "My Saturday",
+    "topic": "日常",
+    "words": 67,
+    "paras": [
+      "On Saturday, I do not go to school. I get up at nine and eat breakfast with my mother.",
+      "In the morning, I clean my room and wash my clothes. Then I go to the supermarket. I buy fruit, eggs, and milk.",
+      "In the afternoon, I play basketball with my friends in the park. At night, I watch a movie at home. Saturday is my favorite day."
+    ],
+    "zh": "星期六我不用上學。我九點起床，和媽媽一起吃早餐。早上我打掃房間、洗衣服，然後去超市買水果、蛋和牛奶。下午我和朋友在公園打籃球。晚上我在家看電影。星期六是我最喜歡的一天。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is this text about?",
+        "options": [
+          "What the writer does on Saturday",
+          "How to play basketball",
+          "The writer's school"
+        ],
+        "answer": 0,
+        "why": "整篇從起床講到晚上，都是星期六做的事。"
+      },
+      {
+        "type": "detail",
+        "q": "What time does the writer get up on Saturday?",
+        "options": [
+          "At six",
+          "At nine",
+          "At noon"
+        ],
+        "answer": 1,
+        "why": "第一段：I get up at nine.",
+        "evidence": "I get up at nine and eat breakfast with my mother."
+      },
+      {
+        "type": "detail",
+        "q": "What does the writer buy at the supermarket?",
+        "options": [
+          "Bread and tea",
+          "Clothes and shoes",
+          "Fruit, eggs, and milk"
+        ],
+        "answer": 2,
+        "why": "I buy fruit, eggs, and milk.（水果、蛋和牛奶）",
+        "evidence": "I buy fruit, eggs, and milk."
+      },
+      {
+        "type": "vocab",
+        "q": "\"Saturday is my favorite day.\" Here \"favorite\" means…",
+        "options": [
+          "the one I like best",
+          "the busiest",
+          "the last"
+        ],
+        "answer": 0,
+        "why": "favorite 是「最喜歡的」。星期六不用上學、可以打球看電影，所以是最喜歡的一天。",
+        "evidence": "Saturday is my favorite day."
+      }
+    ]
+  },
+  {
+    "id": "a1-room",
+    "level": "A1",
+    "title": "My Room",
+    "topic": "住處",
+    "words": 72,
+    "paras": [
+      "This is my room. It is small, but it is clean. There is a bed next to the window.",
+      "My desk is in front of the bed. There are many books on the desk. My computer is on the desk, too. My bag is under the chair.",
+      "There is a picture of my family on the wall. I study in my room every night. I like my room because it is quiet."
+    ],
+    "zh": "這是我的房間。它很小，但是很乾淨。窗戶旁邊有一張床。書桌在床的前面，桌上有很多書，我的電腦也在桌上。我的包包在椅子下面。牆上有一張全家福照片。我每天晚上在房間讀書。我喜歡我的房間，因為它很安靜。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "Where is the bed?",
+        "options": [
+          "Next to the window",
+          "Under the desk",
+          "In front of the door"
+        ],
+        "answer": 0,
+        "why": "There is a bed next to the window.（next to 是「在…旁邊」）",
+        "evidence": "There is a bed next to the window."
+      },
+      {
+        "type": "detail",
+        "q": "What is under the chair?",
+        "options": [
+          "The computer",
+          "The bag",
+          "The books"
+        ],
+        "answer": 1,
+        "why": "My bag is under the chair.（under 是「在…下面」）；電腦和書在桌上。",
+        "evidence": "My bag is under the chair."
+      },
+      {
+        "type": "reference",
+        "q": "In \"because it is quiet,\" what does \"it\" mean?",
+        "options": [
+          "The wall",
+          "The picture",
+          "The room"
+        ],
+        "answer": 2,
+        "why": "it 指同一句前面的 my room。",
+        "evidence": "I like my room because it is quiet."
+      },
+      {
+        "type": "detail",
+        "q": "Which is true about the room?",
+        "options": [
+          "It is big and dirty.",
+          "It is small and clean.",
+          "It has no window."
+        ],
+        "answer": 1,
+        "why": "第一段：It is small, but it is clean.；床在窗戶旁邊，所以有窗戶。",
+        "evidence": "It is small, but it is clean."
+      }
+    ]
+  },
+  {
+    "id": "a1-breakfast",
+    "level": "A1",
+    "title": "The Breakfast Shop",
+    "topic": "飲食",
+    "words": 69,
+    "paras": [
+      "There is a breakfast shop near my school. It opens at six in the morning and closes at eleven.",
+      "The shop sells sandwiches, egg pancakes, and noodles. A sandwich is thirty dollars. A cup of milk tea is twenty dollars.",
+      "I go there every morning before class. I usually buy an egg pancake and a cup of soy milk. The owner is very nice. She always says, \"Good morning!\""
+    ],
+    "zh": "我的學校附近有一家早餐店，早上六點開，十一點關。店裡賣三明治、蛋餅和麵。三明治三十元，一杯奶茶二十元。我每天早上上課前都會去，通常買一份蛋餅和一杯豆漿。老闆人很好，她總是說「早安！」",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "When does the shop close?",
+        "options": [
+          "At six in the morning",
+          "At eleven",
+          "At noon"
+        ],
+        "answer": 1,
+        "why": "It opens at six in the morning and closes at eleven. opens 是開門，closes 是關門。",
+        "evidence": "It opens at six in the morning and closes at eleven."
+      },
+      {
+        "type": "detail",
+        "q": "How much are a sandwich and a cup of milk tea together?",
+        "options": [
+          "Thirty dollars",
+          "Twenty dollars",
+          "Fifty dollars"
+        ],
+        "answer": 2,
+        "why": "三明治 30 元，加一杯奶茶 20 元，一共 50 元。"
+      },
+      {
+        "type": "detail",
+        "q": "What does the writer usually buy?",
+        "options": [
+          "An egg pancake and soy milk",
+          "A sandwich and milk tea",
+          "Noodles and water"
+        ],
+        "answer": 0,
+        "why": "I usually buy an egg pancake and a cup of soy milk.（蛋餅和豆漿）",
+        "evidence": "I usually buy an egg pancake and a cup of soy milk."
+      },
+      {
+        "type": "reference",
+        "q": "\"I go there every morning.\" Where is \"there\"?",
+        "options": [
+          "The school",
+          "The breakfast shop",
+          "The writer's home"
+        ],
+        "answer": 1,
+        "why": "前兩段都在講 the breakfast shop，there 指那家早餐店。",
+        "evidence": "I go there every morning before class."
+      }
+    ]
+  },
+  {
+    "id": "a1-weather",
+    "level": "A1",
+    "title": "This Week's Weather",
+    "topic": "天氣",
+    "words": 68,
+    "paras": [
+      "Here is the weather for this week in Taipei.",
+      "Monday and Tuesday are sunny and hot. Please drink a lot of water. Wednesday is cloudy, but it is not cold. It is rainy on Thursday and Friday, so take an umbrella with you.",
+      "The weekend is cool and windy. It is a good time to walk in the park, but you need a jacket. Have a nice week!"
+    ],
+    "zh": "這是台北這一週的天氣。星期一和星期二晴朗炎熱，請多喝水。星期三多雲，但是不冷。星期四和星期五會下雨，所以要帶傘。週末涼爽有風，很適合去公園散步，但是需要穿外套。祝你有愉快的一週！",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "How is the weather on Monday?",
+        "options": [
+          "Sunny and hot",
+          "Rainy",
+          "Cool and windy"
+        ],
+        "answer": 0,
+        "why": "Monday and Tuesday are sunny and hot.（晴朗又熱）",
+        "evidence": "Monday and Tuesday are sunny and hot."
+      },
+      {
+        "type": "detail",
+        "q": "Which days are rainy?",
+        "options": [
+          "Monday and Tuesday",
+          "Saturday and Sunday",
+          "Thursday and Friday"
+        ],
+        "answer": 2,
+        "why": "It is rainy on Thursday and Friday.（星期四和星期五下雨）",
+        "evidence": "It is rainy on Thursday and Friday, so take an umbrella with you."
+      },
+      {
+        "type": "detail",
+        "q": "What do you need on the weekend?",
+        "options": [
+          "An umbrella",
+          "A jacket",
+          "A lot of water"
+        ],
+        "answer": 1,
+        "why": "週末涼又有風，you need a jacket（外套）。雨傘是星期四、五用的。",
+        "evidence": "It is a good time to walk in the park, but you need a jacket."
+      },
+      {
+        "type": "main",
+        "q": "What is this text?",
+        "options": [
+          "A weather report for one week",
+          "A story about a park",
+          "A letter to a friend"
+        ],
+        "answer": 0,
+        "why": "第一句就說 Here is the weather for this week，後面一天一天講天氣。"
+      }
+    ]
+  },
+  {
+    "id": "a1-dog",
+    "level": "A1",
+    "title": "My Dog Lucky",
+    "topic": "寵物",
+    "words": 75,
+    "paras": [
+      "I have a dog. His name is Lucky. He is three years old. He is white and has short legs.",
+      "Lucky likes to eat and sleep. He eats two times a day. He does not like baths, so he runs away when he sees water.",
+      "Every evening, I walk Lucky in the park. He plays with other dogs there. When I come home from school, he is always at the door. He makes me happy."
+    ],
+    "zh": "我有一隻狗，名字叫 Lucky。牠三歲，白色，腿短短的。Lucky 喜歡吃和睡，一天吃兩次。牠不喜歡洗澡，所以看到水就跑走。每天傍晚我帶 Lucky 去公園散步，牠在那裡和其他的狗玩。我放學回家時，牠總是在門口。牠讓我很開心。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "What does Lucky look like?",
+        "options": [
+          "He is black and big.",
+          "He is white and has short legs.",
+          "He is brown and has long ears."
+        ],
+        "answer": 1,
+        "why": "He is white and has short legs.（白色、腿短）",
+        "evidence": "He is white and has short legs."
+      },
+      {
+        "type": "detail",
+        "q": "How often does Lucky eat?",
+        "options": [
+          "Once a day",
+          "Three times a day",
+          "Twice a day"
+        ],
+        "answer": 2,
+        "why": "two times a day 就是 twice a day，一天兩次。",
+        "evidence": "He eats two times a day."
+      },
+      {
+        "type": "detail",
+        "q": "Why does Lucky run away when he sees water?",
+        "options": [
+          "He does not like baths.",
+          "He is thirsty.",
+          "He wants to swim."
+        ],
+        "answer": 0,
+        "why": "so 前面是原因：He does not like baths（不喜歡洗澡）。",
+        "evidence": "He does not like baths, so he runs away when he sees water."
+      },
+      {
+        "type": "reference",
+        "q": "\"He plays with other dogs there.\" Where is \"there\"?",
+        "options": [
+          "At school",
+          "At the door",
+          "In the park"
+        ],
+        "answer": 2,
+        "why": "前一句說 I walk Lucky in the park，there 指公園。",
+        "evidence": "He plays with other dogs there."
+      }
+    ]
+  },
+  {
+    "id": "a1-note",
+    "level": "A1",
+    "title": "A Note from Mom",
+    "topic": "便條",
+    "words": 69,
+    "paras": [
+      "Dear Jay,",
+      "I am at work today. I will be home at seven. Your lunch is in the fridge. Please heat it before you eat.",
+      "After lunch, please do two things. First, take the clothes inside, because it may rain this afternoon. Second, feed the cat at five. Her food is on the kitchen table.",
+      "Do not play games all day. Call me if you need help.",
+      "Love,\nMom"
+    ],
+    "zh": "親愛的 Jay：我今天要上班，七點會到家。你的午餐在冰箱裡，吃之前請先加熱。午餐後請做兩件事：第一，把衣服收進來，因為今天下午可能會下雨；第二，五點餵貓，牠的食物在廚房的桌上。不要整天打電動。需要幫忙就打電話給我。愛你的媽媽",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "Where is Jay's lunch?",
+        "options": [
+          "On the kitchen table",
+          "In the fridge",
+          "At Mom's office"
+        ],
+        "answer": 1,
+        "why": "Your lunch is in the fridge.（在冰箱裡）；廚房桌上的是貓的食物。",
+        "evidence": "Your lunch is in the fridge."
+      },
+      {
+        "type": "detail",
+        "q": "Why should Jay take the clothes inside?",
+        "options": [
+          "Because it may rain",
+          "Because they are dirty",
+          "Because Mom needs them at work"
+        ],
+        "answer": 0,
+        "why": "because 後面是原因：it may rain this afternoon（下午可能下雨）。",
+        "evidence": "First, take the clothes inside, because it may rain this afternoon."
+      },
+      {
+        "type": "detail",
+        "q": "What should Jay do at five?",
+        "options": [
+          "Call Mom",
+          "Eat lunch",
+          "Feed the cat"
+        ],
+        "answer": 2,
+        "why": "Second, feed the cat at five.（五點餵貓）",
+        "evidence": "Second, feed the cat at five."
+      },
+      {
+        "type": "reference",
+        "q": "\"Please heat it before you eat.\" What is \"it\"?",
+        "options": [
+          "The fridge",
+          "The lunch",
+          "The cat's food"
+        ],
+        "answer": 1,
+        "why": "it 指前一句的 your lunch：午餐吃之前先加熱。",
+        "evidence": "Please heat it before you eat."
+      }
+    ]
+  },
+  {
+    "id": "a1-market",
+    "level": "A1",
+    "title": "The Night Market",
+    "topic": "休閒",
+    "words": 73,
+    "paras": [
+      "There is a night market near my home. It is open every Friday and Saturday night.",
+      "Many people go there after dinner. They can eat fried chicken, noodles, and fruit. They can also buy cheap clothes and shoes. The food smells very good.",
+      "My favorite food at the night market is stinky tofu. My sister does not like it, so she always buys a cup of bubble tea. We go home at ten."
+    ],
+    "zh": "我家附近有一個夜市，每個星期五和星期六晚上營業。很多人晚餐後去那裡，可以吃炸雞、麵和水果，也可以買便宜的衣服和鞋子。食物聞起來很香。我在夜市最喜歡吃臭豆腐。我妹妹不喜歡，所以她總是買一杯珍珠奶茶。我們十點回家。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "When is the night market open?",
+        "options": [
+          "Every night",
+          "On Friday and Saturday nights",
+          "On Sunday mornings"
+        ],
+        "answer": 1,
+        "why": "It is open every Friday and Saturday night.（每個星期五、六晚上）",
+        "evidence": "It is open every Friday and Saturday night."
+      },
+      {
+        "type": "detail",
+        "q": "What can people buy at the night market?",
+        "options": [
+          "Cheap clothes and shoes",
+          "Books and pens",
+          "Cars and bikes"
+        ],
+        "answer": 0,
+        "why": "They can also buy cheap clothes and shoes.（便宜的衣服和鞋子）",
+        "evidence": "They can also buy cheap clothes and shoes."
+      },
+      {
+        "type": "reference",
+        "q": "\"My sister does not like it.\" What is \"it\"?",
+        "options": [
+          "Bubble tea",
+          "The night market",
+          "Stinky tofu"
+        ],
+        "answer": 2,
+        "why": "it 指前一句的 stinky tofu（臭豆腐）；她不喜歡，所以改買珍珠奶茶。",
+        "evidence": "My sister does not like it, so she always buys a cup of bubble tea."
+      },
+      {
+        "type": "vocab",
+        "q": "\"Cheap\" clothes are clothes that…",
+        "options": [
+          "cost a lot of money",
+          "do not cost much money",
+          "are very old"
+        ],
+        "answer": 1,
+        "why": "cheap 是「便宜的」，相反是 expensive（貴的）。",
+        "evidence": "They can also buy cheap clothes and shoes."
+      }
+    ]
+  },
+  {
+    "id": "a1-library",
+    "level": "A1",
+    "title": "Library Rules",
+    "topic": "公告",
+    "words": 67,
+    "paras": [
+      "Welcome to the school library. The library is open from eight in the morning to nine at night, Monday to Friday. It is closed on weekends.",
+      "You can borrow five books for two weeks. Please bring your student card.",
+      "Please be quiet in the library. Do not eat or drink here. You can use your phone, but you cannot talk on it. Thank you for your help."
+    ],
+    "zh": "歡迎來到學校圖書館。圖書館星期一到星期五，從早上八點開到晚上九點，週末不開。你可以借五本書，借兩個星期，請帶學生證。在圖書館請保持安靜，不要在這裡吃東西或喝飲料。可以用手機，但是不能講電話。謝謝你的配合。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "When is the library closed?",
+        "options": [
+          "On Mondays",
+          "At eight in the morning",
+          "On weekends"
+        ],
+        "answer": 2,
+        "why": "It is closed on weekends.（週末不開）",
+        "evidence": "It is closed on weekends."
+      },
+      {
+        "type": "detail",
+        "q": "How long can you keep the books?",
+        "options": [
+          "For two weeks",
+          "For five days",
+          "For one month"
+        ],
+        "answer": 0,
+        "why": "You can borrow five books for two weeks. five 是可以借幾本，two weeks 才是可以借多久。",
+        "evidence": "You can borrow five books for two weeks."
+      },
+      {
+        "type": "vocab",
+        "q": "To \"borrow\" a book means to…",
+        "options": [
+          "buy it",
+          "take it and give it back later",
+          "write it"
+        ],
+        "answer": 1,
+        "why": "borrow 是「借（進來）」：拿走，之後要還。",
+        "evidence": "You can borrow five books for two weeks."
+      },
+      {
+        "type": "detail",
+        "q": "Which of these is OK in the library?",
+        "options": [
+          "Eating a sandwich",
+          "Talking on the phone",
+          "Reading a message on your phone"
+        ],
+        "answer": 2,
+        "why": "可以用手機（You can use your phone），但不能講電話；也不能吃東西。",
+        "evidence": "You can use your phone, but you cannot talk on it."
+      }
+    ]
+  },
+  {
+    "id": "a1-teeth",
+    "level": "A1",
+    "title": "Clean Teeth",
+    "topic": "健康",
+    "words": 66,
+    "paras": [
+      "Your teeth are important. You use them to eat and to talk. Clean teeth also give you a nice smile.",
+      "Brush your teeth two times a day, in the morning and before bed. Brush for two minutes each time. Do not brush too hard.",
+      "Sweet food and sweet drinks are bad for your teeth. Drink water after you eat candy. Visit the dentist every six months."
+    ],
+    "zh": "牙齒很重要，你用它們吃東西和說話。乾淨的牙齒也讓你笑起來好看。一天刷兩次牙，早上和睡前各一次，每次刷兩分鐘，不要刷太用力。甜食和含糖飲料對牙齒不好，吃完糖果後要喝水。每六個月看一次牙醫。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is this text about?",
+        "options": [
+          "How to take care of your teeth",
+          "How to cook sweet food",
+          "How to become a dentist"
+        ],
+        "answer": 0,
+        "why": "整篇在說牙齒為什麼重要、怎麼刷牙、什麼對牙齒不好。"
+      },
+      {
+        "type": "detail",
+        "q": "How long should you brush each time?",
+        "options": [
+          "Six months",
+          "Two minutes",
+          "Two hours"
+        ],
+        "answer": 1,
+        "why": "Brush for two minutes each time.（每次兩分鐘）；six months 是多久看一次牙醫。",
+        "evidence": "Brush for two minutes each time."
+      },
+      {
+        "type": "reference",
+        "q": "\"You use them to eat and to talk.\" What are \"them\"?",
+        "options": [
+          "Your hands",
+          "Sweet drinks",
+          "Your teeth"
+        ],
+        "answer": 2,
+        "why": "them 指前一句的 your teeth。",
+        "evidence": "You use them to eat and to talk."
+      },
+      {
+        "type": "detail",
+        "q": "What is bad for your teeth?",
+        "options": [
+          "Water",
+          "Sweet food and sweet drinks",
+          "A nice smile"
+        ],
+        "answer": 1,
+        "why": "Sweet food and sweet drinks are bad for your teeth.（甜食和含糖飲料）",
+        "evidence": "Sweet food and sweet drinks are bad for your teeth."
+      }
+    ]
+  },
+  {
     "id": "a2-first-shift",
     "level": "A2",
     "title": "My First Day on the Ward",
@@ -680,6 +1308,766 @@
         ],
         "answer": 2,
         "why": "fire drill 是消防演習，是為了緊急狀況做的練習。"
+      }
+    ]
+  },
+  {
+    "id": "a2-tainan",
+    "level": "A2",
+    "title": "An Email from Tainan",
+    "topic": "電子郵件",
+    "words": 110,
+    "paras": [
+      "Hi Emma,",
+      "How are you? Last weekend, I visited my cousin in Tainan. I took the train on Friday night, and she met me at the station.",
+      "On Saturday, we rode bikes around the old city. We saw an old fort and took a lot of pictures. The weather was hot, so we stopped for mango ice. It was delicious! In the evening, we walked to a night market and tried beef soup.",
+      "On Sunday, it rained all morning. We stayed home and cooked lunch together. I came back to Taichung at six.",
+      "Next time, you should come with us. I think you will love the food.",
+      "Take care,\nYu-ting"
+    ],
+    "zh": "嗨 Emma：妳好嗎？上週末我去台南找我表姊。我星期五晚上搭火車，她到車站接我。星期六我們在老城區騎腳踏車，看了一座古堡，拍了很多照片。天氣很熱，所以我們停下來吃芒果冰，好好吃！傍晚我們走去夜市，喝了牛肉湯。星期天下了一整個早上的雨，我們待在家一起煮午餐。我六點回到台中。下次妳應該跟我們一起來，我想妳會愛上那裡的食物。保重，Yu-ting",
+    "qs": [
+      {
+        "type": "main",
+        "q": "Why did Yu-ting write this email?",
+        "options": [
+          "To tell Emma about her trip to Tainan",
+          "To ask Emma for money",
+          "To say sorry for being late"
+        ],
+        "answer": 0,
+        "why": "整封信在說上週末去台南做了什麼，最後邀 Emma 下次一起去。"
+      },
+      {
+        "type": "detail",
+        "q": "How did Yu-ting get to Tainan?",
+        "options": [
+          "By bike",
+          "By train",
+          "By bus"
+        ],
+        "answer": 1,
+        "why": "I took the train on Friday night.（搭火車）；腳踏車是到了台南才騎的。",
+        "evidence": "I took the train on Friday night, and she met me at the station."
+      },
+      {
+        "type": "detail",
+        "q": "Why did they stop for mango ice?",
+        "options": [
+          "It was raining.",
+          "They were lost.",
+          "The weather was hot."
+        ],
+        "answer": 2,
+        "why": "so 前面是原因：The weather was hot（天氣很熱）。",
+        "evidence": "The weather was hot, so we stopped for mango ice."
+      },
+      {
+        "type": "reference",
+        "q": "\"It was delicious!\" What was delicious?",
+        "options": [
+          "The beef soup",
+          "The mango ice",
+          "The lunch"
+        ],
+        "answer": 1,
+        "why": "It 指前一句剛提到的 mango ice；牛肉湯是後面才說的。",
+        "evidence": "It was delicious!"
+      },
+      {
+        "type": "detail",
+        "q": "What did they do on Sunday morning?",
+        "options": [
+          "They stayed home and cooked.",
+          "They rode bikes.",
+          "They visited an old fort."
+        ],
+        "answer": 0,
+        "why": "星期天早上下雨：We stayed home and cooked lunch together. 騎車和看古堡是星期六。",
+        "evidence": "We stayed home and cooked lunch together."
+      }
+    ]
+  },
+  {
+    "id": "a2-wallet",
+    "level": "A2",
+    "title": "The Lost Wallet",
+    "topic": "生活故事",
+    "words": 111,
+    "paras": [
+      "Last Tuesday, Ming lost his wallet on the bus. He did not notice until he tried to buy lunch. His money, his student card, and his bank card were all inside. He felt terrible.",
+      "Ming called the bus company, but they did not have his wallet. He went home and told his mother. \"Don't worry,\" she said. \"Maybe someone will return it.\"",
+      "Two days later, a police officer called. An old woman found the wallet under a seat and took it to the police station. Nothing was missing.",
+      "Ming wanted to thank her, so he bought some fruit and visited her. She smiled and said, \"Just help someone else next time.\""
+    ],
+    "zh": "上星期二，Ming 在公車上弄丟了皮夾。他一直到要買午餐時才發現。他的錢、學生證和提款卡都在裡面，他覺得糟透了。Ming 打電話給公車公司，但是他們沒有他的皮夾。他回家告訴媽媽。媽媽說：「別擔心，也許有人會送回來。」兩天後，一位警察打電話來。一位老太太在座位下面找到皮夾，把它送到警察局。裡面的東西一樣都沒少。Ming 想謝謝她，所以買了一些水果去拜訪她。她笑著說：「下次你也幫助別人就好了。」",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is the story mainly about?",
+        "options": [
+          "A student who lost his wallet and got it back",
+          "A bus driver who lost his job",
+          "An old woman who needed money"
+        ],
+        "answer": 0,
+        "why": "故事從丟皮夾開始，到有人撿到送回來、Ming 去道謝結束。"
+      },
+      {
+        "type": "detail",
+        "q": "When did Ming notice that his wallet was gone?",
+        "options": [
+          "When he got on the bus",
+          "When the police called",
+          "When he tried to buy lunch"
+        ],
+        "answer": 2,
+        "why": "He did not notice until he tried to buy lunch. not … until … 是「直到…才…」。",
+        "evidence": "He did not notice until he tried to buy lunch."
+      },
+      {
+        "type": "detail",
+        "q": "Who found the wallet?",
+        "options": [
+          "A police officer",
+          "An old woman",
+          "Ming's mother"
+        ],
+        "answer": 1,
+        "why": "An old woman found the wallet under a seat. 警察只是打電話通知的人。",
+        "evidence": "An old woman found the wallet under a seat and took it to the police station."
+      },
+      {
+        "type": "vocab",
+        "q": "\"Nothing was missing.\" This means…",
+        "options": [
+          "Everything was still in the wallet.",
+          "The wallet was empty.",
+          "The wallet was lost again."
+        ],
+        "answer": 0,
+        "why": "missing 是「不見的」；nothing was missing 就是沒有東西不見，全部都在。",
+        "evidence": "Nothing was missing."
+      },
+      {
+        "type": "detail",
+        "q": "How did Ming thank the woman?",
+        "options": [
+          "He gave her money.",
+          "He wrote her a letter.",
+          "He bought some fruit and visited her."
+        ],
+        "answer": 2,
+        "why": "he bought some fruit and visited her（買水果去拜訪她）。",
+        "evidence": "Ming wanted to thank her, so he bought some fruit and visited her."
+      }
+    ]
+  },
+  {
+    "id": "a2-cafe",
+    "level": "A2",
+    "title": "My Part-Time Job",
+    "topic": "打工",
+    "words": 119,
+    "paras": [
+      "Last summer, I got my first part-time job at a small coffee shop. I worked three days a week, from seven in the morning to noon.",
+      "On the first day, I was slow. I forgot a customer's order and gave another customer the wrong change. My manager, Mr. Wu, did not get angry. He showed me how to use the cash register again.",
+      "After two weeks, I could make most of the drinks by myself. I also learned to smile and say hello to every customer. Some of them remembered my name.",
+      "I only made a little money, but I learned to be on time and to work with other people. I want to work there again next summer."
+    ],
+    "zh": "去年夏天，我在一家小咖啡店找到第一份打工。我一週工作三天，從早上七點到中午。第一天我動作很慢，忘了一位客人點的東西，還找錯錢給另一位客人。我的店長吳先生沒有生氣，他再教我一次怎麼用收銀機。兩個星期後，大部分的飲料我都可以自己做了。我也學會對每位客人微笑、打招呼，有些客人還記得我的名字。我只賺了一點錢，但是我學會準時，也學會和別人一起工作。明年夏天我想再去那裡打工。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "When did the writer work?",
+        "options": [
+          "Every day, all day",
+          "Three days a week, in the morning",
+          "Only on weekends, at night"
+        ],
+        "answer": 1,
+        "why": "I worked three days a week, from seven in the morning to noon.（一週三天，早上七點到中午）",
+        "evidence": "I worked three days a week, from seven in the morning to noon."
+      },
+      {
+        "type": "detail",
+        "q": "What mistake did the writer make on the first day?",
+        "options": [
+          "The writer came late.",
+          "The writer broke a cup.",
+          "The writer gave a customer the wrong change."
+        ],
+        "answer": 2,
+        "why": "gave another customer the wrong change：找錯錢。change 在這裡是「零錢、找的錢」。",
+        "evidence": "I forgot a customer's order and gave another customer the wrong change."
+      },
+      {
+        "type": "detail",
+        "q": "What did Mr. Wu do after the mistakes?",
+        "options": [
+          "He showed the writer how to use the cash register again.",
+          "He got angry and shouted.",
+          "He told the writer to go home."
+        ],
+        "answer": 0,
+        "why": "Mr. Wu did not get angry（沒有生氣），而是再教一次怎麼用收銀機。",
+        "evidence": "He showed me how to use the cash register again."
+      },
+      {
+        "type": "reference",
+        "q": "\"Some of them remembered my name.\" Who are \"them\"?",
+        "options": [
+          "The drinks",
+          "The customers",
+          "The managers"
+        ],
+        "answer": 1,
+        "why": "them 指前一句的 every customer（客人們）。",
+        "evidence": "Some of them remembered my name."
+      },
+      {
+        "type": "evidence",
+        "q": "Which sentence shows what the writer learned from the job?",
+        "options": [
+          "\"I only made a little money.\"",
+          "\"I worked three days a week.\"",
+          "\"I learned to be on time and to work with other people.\""
+        ],
+        "answer": 2,
+        "why": "I learned to… 後面就是學到的事：準時、和別人一起工作。",
+        "evidence": "I learned to be on time and to work with other people"
+      }
+    ]
+  },
+  {
+    "id": "a2-class-ad",
+    "level": "A2",
+    "title": "Evening English Class",
+    "topic": "廣告",
+    "words": 109,
+    "paras": [
+      "Do you want to speak English with more confidence? Join our evening English class!",
+      "Time: Tuesdays and Thursdays, 7:00 p.m. to 8:30 p.m.",
+      "Place: Room 302, City Library",
+      "Teacher: Ms. Sarah Brown from Canada",
+      "Price: NT$2,000 for eight weeks",
+      "The class is for adults who studied English before but are afraid to speak. Each class has only ten students, so everyone gets a chance to talk. We practice everyday topics, such as ordering food, asking for directions, and seeing a doctor.",
+      "The first class is free. Come and try it on March 3. To sign up, call 2555-0134 or visit the front desk of the library before February 28."
+    ],
+    "zh": "你想更有自信地說英文嗎？來參加我們的晚間英文課！時間：每週二、四晚上七點到八點半。地點：市立圖書館 302 教室。老師：來自加拿大的 Sarah Brown 老師。費用：八週新台幣 2,000 元。這門課是給以前學過英文、但不敢開口的成人。每班只有十位學生，所以每個人都有機會說話。我們練習日常主題，例如點餐、問路和看醫生。第一堂課免費，歡迎 3 月 3 日來試上。報名請在 2 月 28 日前打 2555-0134，或到圖書館櫃台。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is this text?",
+        "options": [
+          "An advertisement for an English class",
+          "A letter from a teacher to a student",
+          "A library rule about books"
+        ],
+        "answer": 0,
+        "why": "有時間、地點、老師、費用和報名方式，是招生廣告。"
+      },
+      {
+        "type": "detail",
+        "q": "How many times a week does the class meet?",
+        "options": [
+          "Once",
+          "Twice",
+          "Eight times"
+        ],
+        "answer": 1,
+        "why": "Tuesdays and Thursdays：每週二和週四，一週兩次。eight 是總共八週。",
+        "evidence": "Time: Tuesdays and Thursdays, 7:00 p.m. to 8:30 p.m."
+      },
+      {
+        "type": "detail",
+        "q": "Who is this class for?",
+        "options": [
+          "Children who are new to English",
+          "Teachers from Canada",
+          "Adults who are afraid to speak English"
+        ],
+        "answer": 2,
+        "why": "The class is for adults who studied English before but are afraid to speak.（學過但不敢說的成人）",
+        "evidence": "The class is for adults who studied English before but are afraid to speak."
+      },
+      {
+        "type": "detail",
+        "q": "Why does everyone get a chance to talk?",
+        "options": [
+          "Because each class has only ten students",
+          "Because the first class is free",
+          "Because the teacher is from Canada"
+        ],
+        "answer": 0,
+        "why": "so 前面是原因：Each class has only ten students（每班只有十個人）。",
+        "evidence": "Each class has only ten students, so everyone gets a chance to talk."
+      },
+      {
+        "type": "detail",
+        "q": "What should you do if you want to join?",
+        "options": [
+          "Send an email to Ms. Brown",
+          "Call or visit the library's front desk before February 28",
+          "Go to Room 302 on February 28"
+        ],
+        "answer": 1,
+        "why": "To sign up（報名），call … or visit the front desk of the library before February 28.",
+        "evidence": "To sign up, call 2555-0134 or visit the front desk of the library before February 28."
+      }
+    ]
+  },
+  {
+    "id": "a2-typhoon",
+    "level": "A2",
+    "title": "A Typhoon Day",
+    "topic": "天氣",
+    "words": 124,
+    "paras": [
+      "Last September, a strong typhoon came to Taiwan. The day before, my father checked the windows, and my mother bought rice, noodles, and bottled water. Schools and offices were closed the next day.",
+      "In the morning, the wind was very loud and the rain hit the windows hard. At ten o'clock, the lights went out. We had no power for five hours. We could not watch TV or charge our phones, so we played cards and talked. My grandmother told us stories about typhoons when she was a child.",
+      "In the evening, the rain stopped and the power came back. Some trees on our street fell down, but nobody was hurt. It was a scary day, but I enjoyed the time with my family."
+    ],
+    "zh": "去年九月，一個強烈颱風來到台灣。前一天，爸爸檢查了窗戶，媽媽買了米、麵和瓶裝水。隔天學校和公司都放假。早上風聲很大，雨重重打在窗戶上。十點的時候停電了，我們五個小時沒有電，不能看電視也不能幫手機充電，所以我們玩撲克牌、聊天。奶奶跟我們說她小時候遇到颱風的故事。傍晚雨停了，電也來了。我們街上有些樹倒了，但是沒有人受傷。那是可怕的一天，但我很喜歡和家人在一起的時光。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "What did the writer's mother do before the typhoon?",
+        "options": [
+          "She checked the windows.",
+          "She bought food and water.",
+          "She went to the office."
+        ],
+        "answer": 1,
+        "why": "my mother bought rice, noodles, and bottled water（買了食物和水）；檢查窗戶的是爸爸。",
+        "evidence": "The day before, my father checked the windows, and my mother bought rice, noodles, and bottled water."
+      },
+      {
+        "type": "detail",
+        "q": "How long was the power out?",
+        "options": [
+          "For ten hours",
+          "All day and all night",
+          "For five hours"
+        ],
+        "answer": 2,
+        "why": "We had no power for five hours.（五個小時）；ten 是停電的時間點（十點）。",
+        "evidence": "We had no power for five hours."
+      },
+      {
+        "type": "vocab",
+        "q": "\"The lights went out.\" This means…",
+        "options": [
+          "The lights stopped working.",
+          "The lights became brighter.",
+          "Someone took the lights outside."
+        ],
+        "answer": 0,
+        "why": "go out 用在燈、火上是「熄滅」。下一句 We had no power（沒有電）就是線索。",
+        "evidence": "At ten o'clock, the lights went out."
+      },
+      {
+        "type": "detail",
+        "q": "What did the family do when there was no power?",
+        "options": [
+          "They watched TV.",
+          "They slept all day.",
+          "They played cards and talked."
+        ],
+        "answer": 2,
+        "why": "不能看電視、不能充電，so we played cards and talked（玩牌、聊天）。",
+        "evidence": "We could not watch TV or charge our phones, so we played cards and talked."
+      },
+      {
+        "type": "main",
+        "q": "How did the writer feel about the day?",
+        "options": [
+          "It was boring and sad.",
+          "It was scary, but the family time was nice.",
+          "It was the best day of the year."
+        ],
+        "answer": 1,
+        "why": "最後一句：It was a scary day, but I enjoyed the time with my family.",
+        "evidence": "It was a scary day, but I enjoyed the time with my family."
+      }
+    ]
+  },
+  {
+    "id": "a2-cooking",
+    "level": "A2",
+    "title": "My First Dinner",
+    "topic": "生活故事",
+    "words": 130,
+    "paras": [
+      "Last Mother's Day, I decided to cook dinner for my family. It was my first time cooking a full meal, so I watched some videos first.",
+      "I planned three dishes: fried rice, tomato and egg soup, and a salad. I went to the market in the morning and bought everything. In the afternoon, I started to cook.",
+      "The salad was easy. The soup was fine, too. But I put too much salt in the fried rice, and the bottom of the pan burned a little. The kitchen was a mess.",
+      "At dinner, my mother ate two bowls of rice. \"It's a little salty,\" she said, \"but it's the best meal this year.\" My father washed all the dishes. Next time, I will taste the food before I add more salt."
+    ],
+    "zh": "去年母親節，我決定幫家人煮晚餐。那是我第一次煮一整頓飯，所以我先看了一些影片。我計畫煮三道菜：炒飯、番茄蛋花湯和沙拉。早上我去市場把東西都買齊，下午開始煮。沙拉很簡單，湯也還可以。可是炒飯我放了太多鹽，鍋底還有點燒焦。廚房一團亂。晚餐時，媽媽吃了兩碗飯。她說：「有點鹹，但這是今年最棒的一餐。」爸爸洗了所有的碗盤。下次我會先嚐味道，再決定要不要加鹽。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is the text mainly about?",
+        "options": [
+          "The writer's first time cooking dinner for the family",
+          "How to buy food at a market",
+          "A famous restaurant"
+        ],
+        "answer": 0,
+        "why": "從決定煮飯、買菜、煮壞一點點，到家人吃得開心，都是第一次煮晚餐的經過。"
+      },
+      {
+        "type": "detail",
+        "q": "Why did the writer watch videos first?",
+        "options": [
+          "Because the writer was bored",
+          "Because it was the writer's first time cooking a full meal",
+          "Because the market was closed"
+        ],
+        "answer": 1,
+        "why": "so 前面是原因：It was my first time cooking a full meal（第一次煮一整頓飯）。",
+        "evidence": "It was my first time cooking a full meal, so I watched some videos first."
+      },
+      {
+        "type": "detail",
+        "q": "What went wrong with the fried rice?",
+        "options": [
+          "It was too sweet.",
+          "There was not enough rice.",
+          "It had too much salt."
+        ],
+        "answer": 2,
+        "why": "I put too much salt in the fried rice（放了太多鹽），所以媽媽說有點鹹。",
+        "evidence": "But I put too much salt in the fried rice, and the bottom of the pan burned a little."
+      },
+      {
+        "type": "vocab",
+        "q": "\"The kitchen was a mess.\" This means the kitchen was…",
+        "options": [
+          "very clean",
+          "dirty and untidy",
+          "too small"
+        ],
+        "answer": 1,
+        "why": "a mess 是「一團亂」：又髒又亂。",
+        "evidence": "The kitchen was a mess."
+      },
+      {
+        "type": "detail",
+        "q": "How did the mother feel about the dinner?",
+        "options": [
+          "She was happy with it.",
+          "She was angry about the salt.",
+          "She did not eat anything."
+        ],
+        "answer": 0,
+        "why": "她吃了兩碗飯，還說這是今年最棒的一餐；雖然有點鹹，還是很開心。",
+        "evidence": "At dinner, my mother ate two bowls of rice."
+      }
+    ]
+  },
+  {
+    "id": "a2-eyes",
+    "level": "A2",
+    "title": "Rest Your Eyes",
+    "topic": "健康",
+    "words": 124,
+    "paras": [
+      "Many people look at screens for hours every day. We use phones on the bus, computers at work, and tablets in bed. After a long day, our eyes can feel dry and tired, and some people get headaches.",
+      "Eye doctors often suggest the 20-20-20 rule. Every twenty minutes, look at something about twenty feet (six meters) away for twenty seconds. This gives the small muscles in your eyes a short rest.",
+      "There are other easy things you can do. Keep the screen about an arm's length from your face. Remember to blink, because we blink less when we look at a screen. Turn on a light when you read at night. If your eyes still hurt after a few days, see an eye doctor."
+    ],
+    "zh": "很多人每天看螢幕好幾個小時。我們在公車上用手機、上班用電腦、在床上用平板。一整天下來，眼睛會覺得又乾又累，有些人還會頭痛。眼科醫師常建議「20-20-20 法則」：每二十分鐘，看大約二十英尺（六公尺）遠的東西二十秒。這樣可以讓眼睛裡的小肌肉休息一下。還有其他簡單的方法：螢幕離臉大約一個手臂的距離；記得眨眼，因為我們看螢幕時眨眼的次數會變少；晚上閱讀要開燈。如果過了幾天眼睛還是不舒服，就去看眼科醫師。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is the main idea of the text?",
+        "options": [
+          "Screens can tire our eyes, and simple habits can help.",
+          "Phones are better than computers.",
+          "Everyone needs glasses."
+        ],
+        "answer": 0,
+        "why": "第一段說看螢幕眼睛會累，後兩段教幾個簡單的習慣。"
+      },
+      {
+        "type": "detail",
+        "q": "In the 20-20-20 rule, how long should you look away?",
+        "options": [
+          "Twenty minutes",
+          "Twenty seconds",
+          "Twenty hours"
+        ],
+        "answer": 1,
+        "why": "每二十分鐘（every twenty minutes）看遠方 twenty seconds（二十秒）。兩個 twenty 不要弄混。",
+        "evidence": "Every twenty minutes, look at something about twenty feet (six meters) away for twenty seconds."
+      },
+      {
+        "type": "detail",
+        "q": "Why should we remember to blink?",
+        "options": [
+          "Because blinking makes the screen brighter",
+          "Because the light is off",
+          "Because we blink less when we look at a screen"
+        ],
+        "answer": 2,
+        "why": "because 後面是原因：看螢幕時眨眼的次數會變少。",
+        "evidence": "Remember to blink, because we blink less when we look at a screen."
+      },
+      {
+        "type": "vocab",
+        "q": "In \"Eye doctors often suggest the 20-20-20 rule,\" \"suggest\" means…",
+        "options": [
+          "say that it is a good idea",
+          "say that it is wrong",
+          "forget"
+        ],
+        "answer": 0,
+        "why": "suggest 是「建議」：告訴你這樣做比較好。",
+        "evidence": "Eye doctors often suggest the 20-20-20 rule."
+      },
+      {
+        "type": "detail",
+        "q": "What should you do if your eyes still hurt after a few days?",
+        "options": [
+          "Buy a new phone",
+          "See an eye doctor",
+          "Read in the dark"
+        ],
+        "answer": 1,
+        "why": "最後一句：If your eyes still hurt after a few days, see an eye doctor.",
+        "evidence": "If your eyes still hurt after a few days, see an eye doctor."
+      }
+    ]
+  },
+  {
+    "id": "a2-grandpa",
+    "level": "A2",
+    "title": "Visiting Grandpa",
+    "topic": "醫院",
+    "words": 127,
+    "paras": [
+      "Last month, my grandfather fell in the bathroom and broke his leg. He had surgery and stayed in the hospital for a week. I visited him every day after class.",
+      "On the second day, he was in pain and did not want to eat. A nurse named Ms. Lin came in. She did not hurry. She asked him about the pain, gave him his medicine, and then talked with him about his garden. Soon he was smiling.",
+      "Later, she showed him how to move from the bed to a wheelchair safely. She also taught my mother how to help him at home.",
+      "My grandfather went home last Friday. He still needs a walker, but he is getting stronger. I will never forget how kind Ms. Lin was."
+    ],
+    "zh": "上個月，我爺爺在浴室跌倒，摔斷了腿。他開了刀，住院一個星期。我每天下課後都去看他。第二天他很痛，不想吃東西。一位姓林的護理師走進來，她不急不忙，先問他痛的情形，給他吃藥，然後跟他聊他的花園。沒多久他就笑了。後來，她教他怎麼安全地從床上移到輪椅上，也教我媽媽回家後怎麼幫他。爺爺上星期五出院了。他還需要用助行器，但是越來越有力氣。我永遠不會忘記林護理師有多親切。",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "Why was the grandfather in the hospital?",
+        "options": [
+          "He had a bad cold.",
+          "He broke his leg.",
+          "He worked there."
+        ],
+        "answer": 1,
+        "why": "第一句：my grandfather fell in the bathroom and broke his leg（跌倒摔斷腿）。",
+        "evidence": "Last month, my grandfather fell in the bathroom and broke his leg."
+      },
+      {
+        "type": "detail",
+        "q": "What did Ms. Lin talk about with the grandfather?",
+        "options": [
+          "His garden",
+          "His job",
+          "The weather"
+        ],
+        "answer": 0,
+        "why": "talked with him about his garden（跟他聊他的花園）。",
+        "evidence": "She asked him about the pain, gave him his medicine, and then talked with him about his garden."
+      },
+      {
+        "type": "reference",
+        "q": "\"She also taught my mother how to help him at home.\" Who is \"She\"?",
+        "options": [
+          "The writer's mother",
+          "The writer",
+          "Ms. Lin"
+        ],
+        "answer": 2,
+        "why": "這一段的 she 都是林護理師；她教的對象才是 my mother。",
+        "evidence": "She also taught my mother how to help him at home."
+      },
+      {
+        "type": "vocab",
+        "q": "A \"walker\" in this text is…",
+        "options": [
+          "a person who likes walking",
+          "a tool that helps a person walk",
+          "a kind of medicine"
+        ],
+        "answer": 1,
+        "why": "腿斷了剛出院，still needs a walker：這裡是「助行器」，幫忙走路的器具。",
+        "evidence": "He still needs a walker, but he is getting stronger."
+      },
+      {
+        "type": "main",
+        "q": "What does the writer think of Ms. Lin?",
+        "options": [
+          "She was too slow.",
+          "She talked too much.",
+          "She was kind and helpful."
+        ],
+        "answer": 2,
+        "why": "最後一句：I will never forget how kind Ms. Lin was.",
+        "evidence": "I will never forget how kind Ms. Lin was."
+      }
+    ]
+  },
+  {
+    "id": "a2-plans",
+    "level": "A2",
+    "title": "A Change of Plans",
+    "topic": "訊息",
+    "words": 117,
+    "paras": [
+      "Amy: Hi Ben! Are we still going to the movies tonight?",
+      "Ben: I'm sorry, Amy. I can't go. My boss asked me to work late because a coworker is sick. I will finish at nine.",
+      "Amy: That's OK. The movie starts at seven, so that's too late. How about tomorrow?",
+      "Ben: Tomorrow is Saturday. I'm free all day! There is a show at two in the afternoon and another at eight.",
+      "Amy: Let's see the afternoon one. Then we can have dinner after the movie. I'll buy the tickets online.",
+      "Ben: Great. I'll pay for dinner because I changed our plans. Where should we meet?",
+      "Amy: In front of the theater at one forty. Don't be late!"
+    ],
+    "zh": "Amy：嗨 Ben！我們今晚還要去看電影嗎？ Ben：對不起，Amy，我不能去。老闆要我加班，因為有同事生病了。我九點才會下班。 Amy：沒關係。電影七點開始，那樣太晚了。明天呢？ Ben：明天是星期六，我整天有空！下午兩點有一場，晚上八點還有一場。 Amy：看下午那一場吧，這樣看完可以去吃晚餐。我上網買票。 Ben：太好了。晚餐我請，因為是我改了計畫。我們在哪裡碰面？ Amy：一點四十分在電影院前面。不要遲到！",
+    "qs": [
+      {
+        "type": "detail",
+        "q": "Why can't Ben go to the movies tonight?",
+        "options": [
+          "He is sick.",
+          "He has to work late.",
+          "He has no money."
+        ],
+        "answer": 1,
+        "why": "老闆要他加班（work late）；生病的是同事，不是 Ben。",
+        "evidence": "My boss asked me to work late because a coworker is sick."
+      },
+      {
+        "type": "reference",
+        "q": "Amy says, \"Let's see the afternoon one.\" Which show does she mean?",
+        "options": [
+          "The show tonight at seven",
+          "The show on Saturday at eight",
+          "The show on Saturday at two"
+        ],
+        "answer": 2,
+        "why": "one 代替 show。Ben 說明天（星期六）下午兩點和晚上八點各一場，下午那場就是兩點。",
+        "evidence": "Amy: Let's see the afternoon one."
+      },
+      {
+        "type": "detail",
+        "q": "Who will buy the movie tickets?",
+        "options": [
+          "Amy",
+          "Ben",
+          "Ben's boss"
+        ],
+        "answer": 0,
+        "why": "Amy 說：I'll buy the tickets online.（我上網買票）",
+        "evidence": "I'll buy the tickets online."
+      },
+      {
+        "type": "detail",
+        "q": "Why will Ben pay for dinner?",
+        "options": [
+          "Because Amy bought lunch",
+          "Because he changed their plans",
+          "Because it is his birthday"
+        ],
+        "answer": 1,
+        "why": "because 後面是原因：I changed our plans（是他改了計畫）。",
+        "evidence": "I'll pay for dinner because I changed our plans."
+      },
+      {
+        "type": "detail",
+        "q": "Where and when will they meet?",
+        "options": [
+          "At Ben's office at nine",
+          "At a restaurant at seven",
+          "In front of the theater at one forty"
+        ],
+        "answer": 2,
+        "why": "最後一則訊息：In front of the theater at one forty.（一點四十分在電影院前面）",
+        "evidence": "Amy: In front of the theater at one forty."
+      }
+    ]
+  },
+  {
+    "id": "a2-flu-notice",
+    "level": "A2",
+    "title": "Flu Shots at Sunshine Clinic",
+    "topic": "診所公告",
+    "words": 133,
+    "paras": [
+      "Flu season is coming. Sunshine Clinic will give flu shots from October 1 to November 30.",
+      "You do not need an appointment. Just come on a weekday between 9 a.m. and 5 p.m. Please bring your ID card and your health insurance card. The shot is free for children and for adults over sixty-five. For other people, it costs NT$500.",
+      "Before the shot, a nurse will check your temperature and ask a few questions. If you have a fever that day, please come back when you feel better. Tell the nurse if you had a problem after a shot before, or if you have any allergies.",
+      "After the shot, please sit in the waiting area for thirty minutes. Your arm may feel a little sore for one or two days. This is normal."
+    ],
+    "zh": "流感季節快到了。陽光診所從 10 月 1 日到 11 月 30 日提供流感疫苗接種。不需要預約，平日早上九點到下午五點直接來就可以。請帶身分證和健保卡。兒童和 65 歲以上的成人免費，其他人要付新台幣 500 元。打針前，護理師會幫你量體溫，並問幾個問題。如果當天發燒，請等身體好一點再來。如果你以前打針後有不舒服，或是有任何過敏，請告訴護理師。打完針後，請在等候區坐三十分鐘。手臂可能會有一點痠痛一兩天，這是正常的。",
+    "qs": [
+      {
+        "type": "main",
+        "q": "What is this notice about?",
+        "options": [
+          "Getting a flu shot at a clinic",
+          "A new doctor at the clinic",
+          "The clinic's new address"
+        ],
+        "answer": 0,
+        "why": "整張公告在說流感疫苗：什麼時候打、帶什麼、多少錢、打完要注意什麼。"
+      },
+      {
+        "type": "detail",
+        "q": "Who has to pay NT$500 for the shot?",
+        "options": [
+          "A six-year-old child",
+          "A thirty-year-old adult",
+          "A seventy-year-old adult"
+        ],
+        "answer": 1,
+        "why": "兒童和 65 歲以上免費，其他人（for other people）要付 500 元，所以是三十歲的成人。",
+        "evidence": "The shot is free for children and for adults over sixty-five."
+      },
+      {
+        "type": "detail",
+        "q": "What should you do if you have a fever on that day?",
+        "options": [
+          "Get the shot anyway",
+          "Go to the waiting area",
+          "Come back when you feel better"
+        ],
+        "answer": 2,
+        "why": "If you have a fever that day, please come back when you feel better.（好一點再來）",
+        "evidence": "If you have a fever that day, please come back when you feel better."
+      },
+      {
+        "type": "detail",
+        "q": "What should you do after the shot?",
+        "options": [
+          "Sit in the waiting area for thirty minutes",
+          "Go home right away",
+          "Check your temperature every hour"
+        ],
+        "answer": 0,
+        "why": "After the shot, please sit in the waiting area for thirty minutes.（在等候區坐三十分鐘）",
+        "evidence": "After the shot, please sit in the waiting area for thirty minutes."
+      },
+      {
+        "type": "reference",
+        "q": "\"This is normal.\" What is normal?",
+        "options": [
+          "Having a fever for a week",
+          "A little soreness in the arm for a day or two",
+          "Having a problem after every shot"
+        ],
+        "answer": 1,
+        "why": "This 指前一句：手臂痠痛一兩天（a little sore for one or two days）。",
+        "evidence": "This is normal."
       }
     ]
   },

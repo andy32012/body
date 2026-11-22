@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import type { Passage } from '../lib/passages'
@@ -20,12 +20,15 @@ const tabNotes: Record<StoryTab, string> = {
 const tabDone: Record<StoryTab, string> = { read: '讀過', listen: '聽過', dictate: '聽寫過' }
 
 /** The sentences of a passage. Each word can be tapped for its meaning; each sentence can be played. */
-function Sentences({ list, playing, onPlay, onWord, picked }: { list: string[]; playing?: number | null; onPlay?: (i: number) => void; onWord?: (w: string) => void; picked?: string }) {
+/** `detail` (the meaning of the tapped word) is shown right under the sentence the word is in, so it never covers the text. */
+function Sentences({ list, playing, onPlay, onWord, picked, detail, detailLine }: { list: string[]; playing?: number | null; onPlay?: (i: number) => void
+  onWord?: (w: string, line: number) => void; picked?: string; detail?: ReactNode; detailLine?: number }) {
   return <ol className="st-lines">
     {list.map((s, i) => <li key={i} data-playing={playing === i}>
       {onPlay && <button type="button" className="st-say" aria-label={'播放這一句：' + s} onClick={() => onPlay(i)}><Volume2 size={14} /></button>}
       <p lang="en">{s.split(/([A-Za-z][A-Za-z'’-]*)/).map((t, j) => j % 2 && onWord
-        ? <button key={j} type="button" className="st-w" data-on={picked === t.toLowerCase()} onClick={() => onWord(t)}>{t}</button> : t)}</p>
+        ? <button key={j} type="button" className="st-w" data-on={detailLine === i && picked === t.toLowerCase()} onClick={() => onWord(t, i)}>{t}</button> : t)}</p>
+      {onWord && detailLine === i && detail}
     </li>)}
   </ol>
 }
@@ -113,10 +116,14 @@ function LookedUp({ items, state, onActivity, date }: { items: Lookup[]; state: 
   </section>
 }
 
+/** The first spelling of a word-table entry: "it (its, itself)" → it, "airplane/plane" → airplane. */
+const headword = (en: string) => en.split(/[\s(/]/)[0].toLowerCase()
 function useLookup(passage: Passage) {
   const [picked, setPicked] = useState<Lookup | { form: string; miss: true }>()
   const [seen, setSeen] = useState<Lookup[]>([])
-  function tap(word: string) {
+  const [line, setLine] = useState<number>()
+  function tap(word: string, at: number) {
+    setLine(at)
     const found = lookupWord(word, passage)
     if (!found) { setPicked({ form: word, miss: true }); return }
     setPicked(found)
@@ -125,9 +132,9 @@ function useLookup(passage: Passage) {
   const box = picked && <p className="st-lookup" role="status">
     <b lang="en">{picked.form}</b>
     {'miss' in picked ? <span>字表裡沒有這個字（可能是名字、數字或字表以外的字），可以按「問問 Claude」。</span>
-      : <><span>{picked.zh}</span><small>{picked.from === 'passage' ? '這段裡的意思' : '字表的意思' + (picked.form.toLowerCase() !== picked.en.toLowerCase() ? '（原形 ' + picked.en + '）' : '')}</small></>}
+      : <><span>{picked.zh}</span><small>{picked.from === 'passage' ? '這段裡的意思' : '字表的意思' + (picked.form.toLowerCase() !== headword(picked.en) ? '（原形 ' + headword(picked.en) + '）' : '')}</small></>}
   </p>
-  return { tap, box, seen, pickedForm: picked?.form.toLowerCase() }
+  return { tap, box, line, seen, pickedForm: picked?.form.toLowerCase() }
 }
 
 function StoryRead({ passage, all, state, onActivity, date, onNext }: PartProps & { all: Passage[] }) {
@@ -163,8 +170,8 @@ function StoryRead({ passage, all, state, onActivity, date, onNext }: PartProps 
   return <>
     <article className="rd-passage st-text">
       <header><small>{label(passage)}{before.r ? ' · 上次 ' + before.r.slice(5).replace('-', '/') + ' 讀過' : ''}</small></header>
-      <Sentences list={sentences} playing={voice.playing} onPlay={i => voice.play(lines, i, true)} onWord={phase === 'quiz' ? undefined : look.tap} picked={look.pickedForm} />
-      {look.box}
+      <Sentences list={sentences} playing={voice.playing} onPlay={i => voice.play(lines, i, true)} onWord={phase === 'quiz' ? undefined : look.tap} picked={look.pickedForm}
+        detail={look.box} detailLine={look.line} />
       {zh ? <p className="rd-zh">{passage.zh}</p>
         : phase === 'read' && <button type="button" className="pr-link" onClick={() => { setZh(true); setZhEarly(true) }}>真的看不懂？看整段中文（這次就不考字義）</button>}
     </article>
@@ -237,8 +244,7 @@ function StoryListen({ passage, state, onActivity, date, onNext, onDictate }: Pa
     {rated && <>
       <article className="rd-passage st-text">
         <header><small>一句一句點來聽，跟著念出聲。不會的字點一下。</small></header>
-        <Sentences list={sentences} playing={voice.playing} onPlay={i => voice.play(lines, i, true)} onWord={look.tap} picked={look.pickedForm} />
-        {look.box}
+        <Sentences list={sentences} playing={voice.playing} onPlay={i => voice.play(lines, i, true)} onWord={look.tap} picked={look.pickedForm} detail={look.box} detailLine={look.line} />
         {showZh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => setShowZh(true)}>看中文</button>}
       </article>
       <div className="pr-actions">

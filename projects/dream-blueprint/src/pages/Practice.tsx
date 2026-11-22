@@ -795,7 +795,8 @@ function PracticeSession({
             onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
             onFinish={(answer, rec) => {
               if (!settled()) return;
-              save({ express: rec });
+              // Something written counts as the step done, with or without Claude's correction (the summary said 「今天跳過」).
+              save({ express: rec }, rec.first || answer.trim() ? "express" : undefined);
               evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.firstHelp ?? rec.help, answered: !!(rec.first || answer.trim()) }),
                 { source: "express", skill: "write", answer: rec.first || answer, prompt: lessonData.prompt.en, ref: lessonData.prompt.sample });
               go("done", {}, "done");

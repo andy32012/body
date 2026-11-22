@@ -83,7 +83,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       const here = all.filter(p => p.level === l.id)
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length
       return <button key={l.id} type="button" aria-pressed={l.id === lvl} onClick={() => chooseLevel(l.id)}>
-        {l.name}<small>{ok} / {here.length}{l.id === suggested ? ' · 建議' : ''}</small></button>
+        {l.name}<small>過關 {ok} / {here.length}{l.id === suggested ? ' · 建議' : ''}</small></button>
     })}
   </div>
   if (!passage) {
@@ -129,7 +129,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const prevRec = readRecord(state.notes, passage.id)
   return <div className="pr-stack rd">
     {levelButtons}
-    {moved && <p className="rd-moved" role="status">前面這一級已經有三篇過關，升到 {readLevels.find(l => l.id === moved)!.name}。想留在原本那一級，按上面的程度就好。</p>}
+    {moved && <p className="rd-moved" role="status">前面這一級過關的篇數夠了，升到 {readLevels.find(l => l.id === moved)!.name}。想留在原本那一級多讀幾篇，按上面的程度就好。</p>}
     <p className="qz-meta">
       {!only && <span>{readLevels.find(l => l.id === lvl)!.note}</span>}
       <span>{only ? '這個單元' : ''}讀過 {summary.done} / {summary.total} 篇</span>

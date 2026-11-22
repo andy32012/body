@@ -114,3 +114,21 @@ test('有題目的一般閱讀（A1–B1）篇數和 QUESTION_PASSAGES 一致，
   const notes = Object.fromEntries([...graded.slice(0, 3).map(p => ['read.' + p.id, '{}']), ['read.n-a2-falls', '{}'], ['read.br43-r1', '{}'], ['read.b2-telehealth', '{}']])
   assert.equal(plainReadCount(notes), 3, '護理閱讀、單元閱讀和 B2 不算在內')
 })
+
+test('閱讀理解：A1、A2 各 15 篇，字數標示正確，每題三個不重複選項，證據句在同一段裡', () => {
+  const all = reading as ReadPassage[]
+  for (const level of ['A1', 'A2'] as const) assert.ok(all.filter(p => p.level === level && !p.unit).length >= 15, level + ' 至少 15 篇')
+  assert.equal(new Set(all.map(p => p.id)).size, all.length, 'id 不重複')
+  for (const p of all.filter(x => x.level === 'A1' || x.level === 'A2')) {
+    const count = p.paras.join(' ').split(/\s+/).filter(Boolean).length
+    assert.ok(Math.abs(count - p.words) <= 2, p.id + ' 標的字數 ' + p.words + '，實際 ' + count)
+    assert.ok(p.level === 'A1' ? count <= 90 : count <= 140, p.id + ' 太長：' + count)
+    assert.ok(p.zh.length > 30 && p.title && p.topic, p.id + ' 有標題、主題和中文大意')
+    assert.ok(p.qs.length >= 4, p.id + ' 至少四題')
+    for (const q of p.qs) {
+      assert.equal(new Set(q.options).size, q.options.length, p.id + ' 選項不重複：' + q.q)
+      assert.ok(q.why.length > 5, p.id + ' 每題有解說')
+      if (q.evidence) assert.ok(p.paras.some(para => para.includes(q.evidence!)), p.id + ' 證據句要在同一段裡才標得出來：' + q.evidence)
+    }
+  }
+})

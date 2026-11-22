@@ -8,8 +8,8 @@ export interface ReadPassage { id: string; level: ReadLevel; title: string; topi
   unit?: number; held?: boolean }
 
 export const readLevels: { id: ReadLevel; name: string; note: string }[] = [
-  { id: 'A1', name: 'A1 入門', note: '短文 70 字左右，現在式、日常和看診' },
-  { id: 'A2', name: 'A2 基礎', note: '120 字左右，過去式、訊息和衛教' },
+  { id: 'A1', name: 'A1 入門', note: '短文 70 字左右，現在式：日常、便條、公告和看診' },
+  { id: 'A2', name: 'A2 基礎', note: '120 字左右，過去式：故事、信件、廣告、訊息和衛教' },
   { id: 'B1', name: 'B1 進階', note: '150–200 字，需要推論和找證據' },
   { id: 'B2', name: 'B2 雅思題型', note: '200 字以上，段落標題、是非不知（T/F/NG）' },
 ]
@@ -25,7 +25,7 @@ export interface ReadRecord { day: string; picks: number[]; correct: number; tot
 export const readKey = (id: string) => 'read.' + id
 /** The general passages below B2 that come with comprehension questions (A1, A2, B1 in reading.json; a test keeps this number true).
  *  Today's list sends reading there until they have all been read, then to the graded passages. */
-export const QUESTION_PASSAGES = 14
+export const QUESTION_PASSAGES = 34
 /** How many of those have been read: their ids start with the level (read.a1-…, read.a2-…, read.b1-…). */
 export const plainReadCount = (notes: Record<string, string>) => Object.keys(notes).filter(k => /^read\.(a1|a2|b1)-/.test(k)).length
 
@@ -45,11 +45,14 @@ export function saveRead(notes: Record<string, string>, id: string, rec: Omit<Re
 /** A passage is passed at 70% or better without opening the Chinese, on an attempt that counts. */
 export const passed = (r: ReadRecord | null) => !!r && clean(r.best ?? r)
 
-/** The level to work on: the lowest one with fewer than three passed passages. */
+/** How many passed passages finish a level. A level with more than five passages is read almost in full (80%) before
+ *  moving up — reading a lot at an easy level is the point of having that many; small levels keep the old rule of three. */
+export const levelTarget = (count: number) => count <= 5 ? Math.min(3, count) : Math.ceil(count * 0.8)
+/** The level to work on: the lowest one that has not reached its target of passed passages. */
 export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadLevel {
   for (const l of readLevels) {
     const here = all.filter(p => p.level === l.id)
-    if (here.filter(p => passed(readRecord(notes, p.id))).length < Math.min(3, here.length)) return l.id
+    if (here.filter(p => passed(readRecord(notes, p.id))).length < levelTarget(here.length)) return l.id
   }
   return 'B2'
 }

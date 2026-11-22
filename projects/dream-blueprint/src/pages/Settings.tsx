@@ -234,7 +234,7 @@ export default function Settings(props: PageProps) {
       {s.rivalsEnabled && <label>對手的嗆聲強度<select value={s.taunt} onChange={e=>set('taunt', e.target.value as SettingsData['taunt'])}><option value="off">關</option><option value="gentle">普通</option><option value="bold">毒舌</option></select></label>}
       <label className="set-toggle"><span>在紀錄頁顯示連續天數與請假卡</span><input type="checkbox" checked={s.showStreak} onChange={e=>set('showStreak',e.target.checked)}/></label>
     </Panel>
-    <Panel icon={BookOpen} title="使用說明與資料來源" hint="練習規則與赴美護理資料"><h3>兩分鐘也算一天</h3><p>兩分鐘能幫你留住習慣。要達到英文檢定分數，仍需在負荷穩定時逐步增加聽、說、讀、寫的練習。</p><p>每天依手機當地時間凌晨 4 點換日。普通或有電完成後，課表往前一天。累爆只練舊內容。</p><h3>資料來源</h3><p>課程與學籍依你提供的藍圖更新，修課和實習安排以校方公告為準。</p>{sourceLinks.map(([name,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{name} ↗</a>)}</Panel>
+    <Panel icon={BookOpen} title="使用說明與資料來源" hint="練習規則與赴美護理資料"><h3>累爆的日子，15 分鐘也算一天</h3><p>只複習 15 分鐘也算有練，能幫你留住習慣。要達到英文檢定分數，平常還是照一般日的 1.5 小時（複習、一堂課、單字、聽或讀、說或寫）走。</p><p>每天依手機當地時間凌晨 4 點換日。普通或有電完成後，課表往前一天。累爆只練舊內容。</p><h3>資料來源</h3><p>課程與學籍依你提供的藍圖更新，修課和實習安排以校方公告為準。</p>{sourceLinks.map(([name,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{name} ↗</a>)}</Panel>
     </section>
     </div>
   </section>

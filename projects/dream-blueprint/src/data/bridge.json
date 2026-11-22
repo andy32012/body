@@ -162,19 +162,19 @@
       "q": "What was Mr. Lee doing when he fell?",
       "options": [
        "Getting out of a chair",
-       "Walking to the toilet",
-       "Calling for a nurse"
+       "Calling for a nurse",
+       "Walking to the toilet"
       ],
-      "answer": 1
+      "answer": 2
      },
      {
       "q": "What had Sarah done before the doctor arrived?",
       "options": [
-       "Cleaned the cut and checked his blood pressure",
+       "Moved him to another bed",
        "Called his family",
-       "Moved him to another bed"
+       "Cleaned the cut and checked his blood pressure"
       ],
-      "answer": 0
+      "answer": 2
      },
      {
       "q": "Why can't Mrs. Chen sleep at night?",
@@ -259,37 +259,37 @@
      "q": "What did Jason do today?",
      "options": [
       "He had his own flu shot.",
-      "He helped give a flu shot.",
-      "He taught a class in the lab."
+      "He taught a class in the lab.",
+      "He helped give a flu shot."
      ],
-     "answer": 1
+     "answer": 2
     },
     {
      "q": "When were Jason's hands shaking?",
      "options": [
-      "While he was cleaning the patient's arm",
+      "When he was practising in the lab",
       "After he finished the injection",
-      "When he was practising in the lab"
+      "While he was cleaning the patient's arm"
      ],
-     "answer": 0
+     "answer": 2
     },
     {
      "q": "What do we learn about the patient?",
      "options": [
       "She was afraid of needles.",
-      "She used to work as a nurse.",
-      "She was Jason's teacher."
+      "She was Jason's teacher.",
+      "She used to work as a nurse."
      ],
-     "answer": 1
+     "answer": 2
     },
     {
      "q": "What happened during the patient's own first injection, long ago?",
      "options": [
-      "She dropped the needle.",
+      "She forgot to clean the arm.",
       "The patient fainted.",
-      "She forgot to clean the arm."
+      "She dropped the needle."
      ],
-     "answer": 0
+     "answer": 2
     }
    ]
   },
@@ -485,11 +485,11 @@
      {
       "q": "What will Mia be doing this time next week?",
       "options": [
-       "Sitting an exam",
+       "Going to a wedding",
        "Working a night shift",
-       "Going to a wedding"
+       "Sitting an exam"
       ],
-      "answer": 0
+      "answer": 2
      }
     ]
    }
@@ -554,11 +554,11 @@
     {
      "q": "Why can't the patient come at ten o'clock?",
      "options": [
-      "He will be travelling for work.",
+      "The clinic will be closed.",
       "He has a blood test then.",
-      "The clinic will be closed."
+      "He will be travelling for work."
      ],
-     "answer": 0
+     "answer": 2
     },
     {
      "q": "What time is the appointment?",
@@ -572,11 +572,11 @@
     {
      "q": "Why should the patient have the blood test at least three days before?",
      "options": [
-      "So that the doctor will have the results in time",
+      "Because he must not eat for three days",
       "Because the lab is closed on Fridays",
-      "Because he must not eat for three days"
+      "So that the doctor will have the results in time"
      ],
-     "answer": 0
+     "answer": 2
     },
     {
      "q": "What does the receptionist ask him to bring?",
@@ -782,11 +782,11 @@
      {
       "q": "Why does Lisa say the phone can't be on the bus?",
       "options": [
-       "Because he used it at the café after the bus",
+       "Because he never takes the bus",
        "Because the bus driver called him",
-       "Because he never takes the bus"
+       "Because he used it at the café after the bus"
       ],
-      "answer": 0
+      "answer": 2
      },
      {
       "q": "Where does Kevin think the phone is in the end?",
