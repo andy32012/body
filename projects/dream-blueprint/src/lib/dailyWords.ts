@@ -1,4 +1,5 @@
 import { officialWords, wordKey } from './vocab'
+import { addDays, newCard, type ReviewCard } from './progress'
 import { createSceneDeck } from './backgroundRotation'
 import { seedOf } from './starfield'
 
@@ -16,6 +17,46 @@ export const countKey = 'daily-word.count'
 export const doneKey = (day: string) => 'daily-word.done.' + day
 export const seenKey = (day: string) => 'daily-word.seen.' + day
 export const moreKey = (day: string) => 'daily-word.more.' + day
+/** Today's sorted words in order, so the card can step back to the word before. */
+export const sortedKey = (day: string) => 'daily-word.sorted.' + day
+export interface SortedWord { k: string; known: boolean }
+export const officialByKey = new Map(officialWords.map(w => [wordKey(w.en), w]))
+
+export function readSorted(notes: Record<string, string>, day: string): SortedWord[] {
+  try {
+    const list = JSON.parse(notes[sortedKey(day)] ?? '[]') as unknown
+    return Array.isArray(list) ? list.filter((e): e is SortedWord => !!e && typeof e.k === 'string' && typeof e.known === 'boolean') : []
+  } catch { return [] }
+}
+/** Adds a word to today's order; a word already there keeps its place and takes the new choice. */
+export function recordSorted(notes: Record<string, string>, day: string, k: string, known: boolean) {
+  const list = readSorted(notes, day)
+  const next = list.some(e => e.k === k) ? list.map(e => e.k === k ? { k, known } : e) : [...list, { k, known }]
+  return { ...notes, [sortedKey(day)]: JSON.stringify(next) }
+}
+
+type Sortable = { knownWords: string[]; learningWords: string[]; cards: ReviewCard[]; notes: Record<string, string> }
+/** Changes the choice for a word sorted today, after stepping back to it.
+ *  還不熟 → 認得: the new card made today goes away (a spot check, as for any 認得, may still bring it back in two weeks).
+ *  認得 → 還不熟: the word becomes a new card for tomorrow, replacing a two-week spot check. The day's count stays the same. */
+export function changeSorted<S extends Sortable>(prev: S, k: string, known: boolean, day: string): S {
+  const id = 'word:' + k
+  const others = (list: string[]) => list.filter(w => wordKey(w) !== k)
+  let cards = prev.cards
+  if (known) {
+    cards = cards.filter(c => !(c.id === id && c.box === 1 && c.lastDay === day))
+    if (spotCheck(k) && !cards.some(c => c.id === id)) cards = [...cards, { id, box: 4 as const, lastDay: day, due: addDays(day, 14), mastered: false }]
+  } else {
+    cards = cards.some(c => c.id === id) ? cards.map(c => c.id === id ? newCard(id, day) : c) : [...cards, newCard(id, day)]
+  }
+  return {
+    ...prev,
+    knownWords: known ? [...others(prev.knownWords), k] : others(prev.knownWords),
+    learningWords: known ? others(prev.learningWords) : [...others(prev.learningWords), k],
+    cards,
+    notes: recordSorted(prev.notes, day, k, known),
+  }
+}
 
 /** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */
 export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0) {

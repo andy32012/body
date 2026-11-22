@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getScreeningQueue, isKnownWord, officialWords, wordKey } from '../src/lib/vocab'
-import { dailyQueue, dailyTarget, dailyWordPhoto } from '../src/lib/dailyWords'
+import { changeSorted, dailyQueue, dailyTarget, dailyWordPhoto, readSorted, recordSorted, spotCheck } from '../src/lib/dailyWords'
 import { photos } from '../src/lib/cosmos'
 import passages from '../src/data/passages.json'
 import { doneKey, levelProgress, nextPassage, redoKey } from '../src/lib/passages'
@@ -80,4 +80,30 @@ test('交接內容：寫出目前單元、今天這句與教法；沒有紀錄�
   assert.ok(text.includes('她的血壓很高'))
   assert.ok(text.includes('不要先給答案'))
   assert.ok(text.includes('還沒有作答紀錄'))
+})
+
+test('今日單字往回看：記下今天的順序，改選擇時單字表和複習卡跟著改，看過的個數不變', () => {
+  const day = '2026-11-22'
+  let notes: Record<string, string> = { 'daily-word.done.2026-11-22': '2' }
+  notes = recordSorted(notes, day, 'apple', true)
+  notes = recordSorted(notes, day, 'green', false)
+  assert.deepEqual(readSorted(notes, day), [{ k: 'apple', known: true }, { k: 'green', known: false }])
+  assert.deepEqual(readSorted({ 'daily-word.sorted.2026-11-22': 'not json' }, day), [], '壞掉的紀錄當成空的')
+  // 還不熟 → 認得: the new card made today goes away; the count stays 2.
+  const start = { knownWords: ['apple'], learningWords: ['green'], notes,
+    cards: [{ id: 'word:green', box: 1 as const, lastDay: day, due: '2026-11-23', mastered: false }] }
+  const known = changeSorted(start, 'green', true, day)
+  assert.deepEqual(known.learningWords, [])
+  assert.ok(known.knownWords.includes('green'))
+  assert.equal(known.cards.some(c => c.id === 'word:green' && c.box === 1), false)
+  assert.equal(known.cards.some(c => c.id === 'word:green'), spotCheck('green'), '跟一般的「認得」一樣，四分之一兩週後抽查')
+  assert.equal(known.notes['daily-word.done.2026-11-22'], '2')
+  assert.deepEqual(readSorted(known.notes, day)[1], { k: 'green', known: true })
+  // 認得 → 還不熟: becomes a new card due tomorrow.
+  const back = changeSorted(known, 'apple', false, day)
+  assert.ok(back.learningWords.includes('apple') && !back.knownWords.includes('apple'))
+  const card = back.cards.find(c => c.id === 'word:apple')!
+  assert.equal(card.box, 1)
+  assert.equal(card.due, '2026-11-23')
+  assert.deepEqual(readSorted(back.notes, day).map(e => e.k), ['apple', 'green'], '順序不變')
 })

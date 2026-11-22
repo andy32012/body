@@ -28,6 +28,13 @@
 .daily-word-progress i {flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.22)}
 .daily-word-progress i.done {background:#85dfc5}
 .daily-word-progress i.now {background:#fff}
+.daily-word-progress i.look {background:#fdf0dc;box-shadow:0 0 0 1px #fdf0dc}
+.daily-word-choice {margin:0;font-size:14px;color:#d9d3ee}
+.daily-word-choice b {color:#fff}
+.daily-word-nav {display:flex;justify-content:space-between;gap:10px;margin-top:-4px}
+.daily-word-back {display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:#d9d3ee;font-size:13px;padding:6px 2px;cursor:pointer}
+.daily-word-back:disabled {opacity:.35;cursor:default}
+.daily-word-finished .daily-word-back {justify-self:start}
 .daily-word-finished .daily-word-term {font-size:clamp(24px,7vw,32px);letter-spacing:.02em}
 .daily-word-count {display:inline-flex;align-items:center;gap:9px;font-size:13px;color:#d9d3ee}
 .daily-word-count select {border-radius:8px;border:1px solid rgba(255,255,255,.3);background:#0d1220;color:#fff;padding:6px 8px;font-size:13px}
