@@ -557,13 +557,17 @@
     ],
     "hints": [
       "禮貌地請人幫忙，用 Could you 或 Can you。",
-      "take a picture，後面說「幫我們/我」。"
+      "take a picture，後面說「替我拍」或「拍我」。"
     ],
     "reference": [
       "Could you take a picture for me?",
-      "Can you take a picture for me?"
+      "Can you take a picture for me?",
+      "Could you take a picture of me?",
+      "Can you take a picture of me?",
+      "Could you take a photo for me?",
+      "Could you take a photo of me?"
     ],
-    "why": "Could you 加原形動詞是禮貌的請求；take a picture 是拍照。 「幫我拍張照」把相機交給對方時說 take a picture for me（替我拍）；如果是要拍你這個人，也可以說 take a picture of me。",
+    "why": "Could you 加原形動詞是禮貌的請求；take a picture／photo 是拍照。這句兩種都對：take a picture for me 是「替我拍」（把手機交給對方，拍什麼都可以），take a picture of me 是「拍我這個人」。",
     "newWords": [
       {
         "en": "take a picture",

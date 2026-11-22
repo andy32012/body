@@ -23,9 +23,12 @@ export function part2Instructions(card: CueCard, notes: string) {
   ].filter(Boolean).join('\n')
 }
 
+// Only what a transcript can show: content, organisation, words and grammar. No band — not per criterion, not overall:
+// fluency (pace, pauses, hesitation) and pronunciation need the audio, so they are marked as not assessed.
 export const part2FeedbackPrompt = [
   '下面是玄燁做雅思口說 Part 2（獨白）和 Part 3（討論）的逐字稿，語音辨識可能有小錯字。',
-  '用繁體中文給回饋，照雅思四個評分項目各一行：流暢與連貫、詞彙、文法範圍與正確度、發音（逐字稿看不出發音，就寫「這項要聽錄音才知道」）。每行先寫一個估計分數（例如 5 或 5.5），再寫一句做得好的和一句要改的。',
-  '最後一行寫「估計整體：x–y」並提醒這是練習估計。不要用 Markdown 標題。',
+  '用繁體中文給回饋，只評逐字稿看得出來的：內容和連貫（有沒有回答到題目、有沒有講長）、詞彙、文法範圍與正確度，各一行，每行寫一句做得好的和一句要改的。',
+  '接著一行固定寫：「流暢度和發音：只看逐字稿沒辦法評估，要聽錄音。」',
+  '不要寫任何分數或等級（不要 band、不要估計整體分數、不要 CEFR）。不要用 Markdown 標題。',
   '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因',
 ].join('\n')

@@ -87,6 +87,17 @@ export function reviewCard(
     },
   }
 }
+/** A self-marked "correct" nobody could check: the card neither climbs nor drops, and no recall is recorded. */
+export function holdCard(card: ReviewCard, day: string): ReviewCard {
+  if (day <= card.lastDay || day < card.due) return card
+  return { ...card, lastDay: day, due: addDays(day, intervals[card.box - 1]) }
+}
+/** A written answer applied to its review card: checked and correct climbs, wrong or seen drops,
+ *  correct but unchecked (自評完成・待確認) holds — self-marking alone never makes a card look learned. */
+export function applyAnswer(card: ReviewCard, day: string, a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; verified?: boolean }): { card: ReviewCard; event: ReviewEvent | null } {
+  if (a.rating === 'correct' && !a.revealed && a.verified !== true) return { card: holdCard(card, day), event: null }
+  return reviewCard(card, day, a.rating === 'correct', a.revealed)
+}
 /** Review is limited by time, not a fixed handful: roughly five cards a minute. */
 export const reviewMinutes = { low: 1, normal: 8, high: 15 } as const
 export const reviewBudget = (energy: Energy) => reviewMinutes[energy] * 5

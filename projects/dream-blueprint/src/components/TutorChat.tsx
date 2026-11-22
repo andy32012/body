@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { askTutor, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
+import { sameEnglish } from '../lib/evidence'
 import './tutor.css'
 
 const verdictNames = { good: '對了', small: '小錯', again: '再試一次', changed: '意思不一樣' }
@@ -9,8 +10,8 @@ const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
 /** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
 export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
   sentence: TutorSentence; answer: string; onReveal?: () => void
-  /** Claude's verdict on each submitted try (1 = the first try, before any feedback). */
-  onVerdict?: (verdict: 'good' | 'small' | 'again' | 'changed', attempt: number) => void
+  /** Claude's verdict on each submitted try (1 = the first try, before any feedback), with the exact text it judged. */
+  onVerdict?: (verdict: 'good' | 'small' | 'again' | 'changed', attempt: number, text: string) => void
 }) {
   const [turns, setTurns] = useState<TutorTurn[]>([])
   const [busy, setBusy] = useState(false)
@@ -29,7 +30,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
       setTurns([...next, { role: 'assistant', content: reply }])
       const tries = next.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
       const v = verdictOf(reply)
-      if (v && (content.startsWith('我的翻譯') || content.startsWith('我改成'))) onVerdict?.(v, tries)
+      if (v && (content.startsWith('我的翻譯') || content.startsWith('我改成'))) onVerdict?.(v, tries, content.replace(/^(我的翻譯|我改成)：/, ''))
       if (verdictOf(reply) !== 'good' && sentence.reference.some(r => squash(r).length > 6 && squash(reply).includes(squash(r)))) onReveal?.()
     } catch (e) {
       setTurns(turns)
@@ -40,6 +41,9 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
   const attempts = turns.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
   const last = [...turns].reverse().find(t => t.role === 'assistant')
   const verdict = last ? verdictOf(last.content) : null
+  const lastSent = [...turns].reverse().find(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成')))
+  const sentText = lastSent?.content.replace(/^(我的翻譯|我改成)：/, '') ?? ''
+  const edited = !!verdict && !!sentText && !sameEnglish(sentText, answer)
 
   return <section className="tu-box" aria-live="polite">
     <strong>Claude 老師</strong>
@@ -48,7 +52,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
     </div>)}
     {busy && <p className="tu-wait">老師在看你寫的……</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
-    {verdict && <p className="tu-verdict">判定：<b>{verdictNames[verdict]}</b></p>}
+    {verdict && <p className="tu-verdict">判定：<b>{verdictNames[verdict]}</b>{edited && <small>（這是你改之前那一版的判定；改過的答案還沒批改）</small>}</p>}
     <div className="pr-actions">
       {attempts === 0
         ? <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim())}>請老師批改</button>

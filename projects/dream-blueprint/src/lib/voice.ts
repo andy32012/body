@@ -96,28 +96,35 @@ export async function startVoice(opts: {
     else if (msg.type === 'session.input_transcript.delta' && msg.delta) append('user', msg.delta)
     else if (msg.type === 'session.output_transcript.delta' && msg.delta) append('assistant', msg.delta)
     else if (msg.type === 'session.closed') stop()
-    else if (msg.type === 'error') opts.onState('closed', msg.error?.message || msg.message || '連線出錯了')
+    // A provider error ends the session the same way as hanging up: microphone off, connection closed.
+    else if (msg.type === 'error') { stop(); opts.onState('closed', msg.error?.message || msg.message || '連線出錯了') }
   }
   pc.onconnectionstatechange = () => { if (['failed', 'disconnected'].includes(pc.connectionState)) stop() }
 
-  const offer = await pc.createOffer()
-  await pc.setLocalDescription(offer)
-  const res = await fetch('https://api.openai.com/v1/live/sessions', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      session: { model: 'gpt-live-1.1', instructions: opts.instructions, audio: { output: { voice: voiceName() } } },
-      transport: { type: 'webrtc', sdp: offer.sdp },
-    }),
-  })
-  const data = await res.json().catch(() => null)
-  if (!res.ok) {
+  // Every failure while connecting (no network, an HTTP error, a bad answer) goes through the same clean-up.
+  try {
+    const offer = await pc.createOffer()
+    await pc.setLocalDescription(offer)
+    const res = await fetch('https://api.openai.com/v1/live/sessions', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session: { model: 'gpt-live-1.1', instructions: opts.instructions, audio: { output: { voice: voiceName() } } },
+        transport: { type: 'webrtc', sdp: offer.sdp },
+      }),
+    })
+    const data = await res.json().catch(() => null)
+    if (!res.ok) {
+      const msg = data?.error?.message ?? res.statusText
+      if (res.status === 401) throw new Error('OpenAI 金鑰不對或被停用了，重新貼一次。')
+      if (res.status === 429) throw new Error('OpenAI 額度用完或打太快了。（' + msg + '）')
+      throw new Error('OpenAI 連線失敗：' + msg)
+    }
+    if (!data?.transport?.sdp) throw new Error('OpenAI 回傳的連線資料不完整，等一下再試。')
+    await pc.setRemoteDescription({ type: 'answer', sdp: data.transport.sdp })
+  } catch (e) {
     stop()
-    const msg = data?.error?.message ?? res.statusText
-    if (res.status === 401) throw new Error('OpenAI 金鑰不對或被停用了，重新貼一次。')
-    if (res.status === 429) throw new Error('OpenAI 額度用完或打太快了。（' + msg + '）')
-    throw new Error('OpenAI 連線失敗：' + msg)
+    throw e instanceof TypeError ? new Error('連不上 OpenAI：檢查網路後再試一次。') : e
   }
-  await pc.setRemoteDescription({ type: 'answer', sdp: data.transport.sdp })
   return { stop }
 }

@@ -31,8 +31,10 @@ export function handoffText(state: AppState, today: string) {
   const recent = state.sessions.flatMap(s => (s.translations ?? []).map(t => ({ ...t, day: s.day }))).slice(-10)
   const weak = new Map<string, number>()
   const solid = new Map<string, number>()
+  // Solid only when written alone and checked; a self-marked "correct" nobody confirmed counts neither way.
   for (const t of state.sessions.flatMap(s => s.translations ?? [])) {
-    for (const g of t.grammar) (t.rating === 'correct' && !t.revealed ? solid : weak).set(g, ((t.rating === 'correct' && !t.revealed ? solid : weak).get(g) ?? 0) + 1)
+    const bucket = t.rating === 'correct' && !t.revealed ? (t.verified === true ? solid : null) : weak
+    if (bucket) for (const g of t.grammar) bucket.set(g, (bucket.get(g) ?? 0) + 1)
   }
   const stable = state.curriculum.stableUnits.map(id => units.find(u => u.id === id)?.title).filter(Boolean)
   const lines = [

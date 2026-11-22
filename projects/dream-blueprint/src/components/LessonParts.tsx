@@ -20,20 +20,33 @@ export function StepBar({ current, done }: { current: LessonStep; done: LessonSt
   </ol>
 }
 
-/** Reads lines aloud one after another; the second speaker gets a different voice (or pitch). */
+/** Reads lines aloud one after another; the second speaker gets a different voice (or pitch).
+ *  `completed` counts plays that reached the last line without being stopped or failing — pressing play is not listening.
+ *  `status`: error = the voice could not play (treated as no audio, so nothing counts as "understood by ear"). */
 export function useDialogueVoice(rate: number) {
   const [playing, setPlaying] = useState<number | null>(null)
+  const [completed, setCompleted] = useState(0)
+  const [status, setStatus] = useState<'idle' | 'playing' | 'done' | 'stopped' | 'error'>('idle')
   const run = useRef(0)
   useEffect(() => () => { run.current++; window.speechSynthesis?.cancel() }, [])
-  function stop() { run.current++; window.speechSynthesis?.cancel(); setPlaying(null) }
+  function stop() {
+    run.current++; window.speechSynthesis?.cancel(); setPlaying(null)
+    setStatus(s => s === 'playing' ? 'stopped' : s)
+  }
   function play(lines: LessonLine[], start = 0, only = false) {
     if (!('speechSynthesis' in window)) return false
-    stop()
-    const id = ++run.current
+    run.current++; window.speechSynthesis.cancel()
+    const id = run.current
+    const full = start === 0 && !only
     const speakers = [...new Set(lines.map(l => l.who))]
     const voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'))
     const say = (i: number) => {
-      if (id !== run.current || i >= lines.length || (only && i > start)) { if (id === run.current) setPlaying(null); return }
+      if (id !== run.current) return
+      if (i >= lines.length || (only && i > start)) {
+        setPlaying(null)
+        if (full) { setCompleted(n => n + 1); setStatus('done') } else setStatus('idle')
+        return
+      }
       const u = new SpeechSynthesisUtterance(lines[i].en)
       const who = speakers.indexOf(lines[i].who)
       u.lang = 'en-US'
@@ -41,14 +54,19 @@ export function useDialogueVoice(rate: number) {
       if (voices.length > 1) u.voice = voices[who % 2 === 0 ? 0 : Math.min(voices.length - 1, 1)]
       u.pitch = who % 2 === 0 ? 1 : 1.25
       u.onend = () => say(i + 1)
-      u.onerror = () => { if (id === run.current) setPlaying(null) }
+      u.onerror = e => {
+        if (id !== run.current) return
+        setPlaying(null)
+        setStatus(e.error === 'interrupted' || e.error === 'canceled' ? 'stopped' : 'error')
+      }
       setPlaying(i)
       speechSynthesis.speak(u)
     }
+    setStatus(full ? 'playing' : 'idle')
     say(start)
     return true
   }
-  return { playing, play, stop }
+  return { playing, play, stop, completed, status }
 }
 
 export function Transcript({ lines, playing, onPlayLine, showZh }: { lines: LessonLine[]; playing: number | null; onPlayLine: (i: number) => void; showZh: boolean }) {
@@ -60,39 +78,48 @@ export function Transcript({ lines, playing, onPlayLine, showZh }: { lines: Less
   </ol>
 }
 
-/** Listen first without the text, answer two questions, then read along. Later days: listen and shadow. */
+/** Listen first without the text, answer two questions, then read along. Later days: listen and shadow.
+ *  The questions open after one complete play. A play that cannot be confirmed (no voice, an error, or a device that never
+ *  reports the end) still lets him answer, but the result is not counted as understood by ear (onDone gets -1). */
 export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Lesson; firstTime: boolean; rate: number; onDone: (correct: number, total: number, plays: number) => void }) {
   const voice = useDialogueVoice(rate)
   const mountedAt = useRef(Date.now())
   const ready = () => Date.now() - mountedAt.current > 450
-  const [plays, setPlays] = useState(0)
+  const [started, setStarted] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
   const [checked, setChecked] = useState(!firstTime)
   const [showZh, setShowZh] = useState(false)
   const [noVoice, setNoVoice] = useState(false)
+  const [unsure, setUnsure] = useState(false)
+  const heard = voice.completed > 0
+  const open = heard || unsure
+  const counted = firstTime && heard && !unsure && !noVoice
   const correct = lesson.questions.filter((q, i) => answers[i] === q.answer).length
+  useEffect(() => { if (voice.status === 'error') { setNoVoice(true); setChecked(true) } }, [voice.status])
   function playAll() {
     if (voice.playing !== null) { voice.stop(); return }
     if (!voice.play(lesson.dialogue)) { setNoVoice(true); setChecked(true); return }
-    setPlays(n => n + 1)
+    setStarted(n => n + 1)
   }
   return <section className="ls-listen">
     <div className="pr-label">聽懂 · 情境：{lesson.scene}</div>
     <h2 className="pr-question">{firstTime && !checked ? '先只聽，不看字' : '看著字再聽一次，跟著唸'}</h2>
-    <p className="ls-help">{firstTime && !checked ? '聽一到兩次，再回答下面兩題。聽不懂的字先猜。' : '一句一句點來聽，跟著念出聲；想確認意思再打開中文。'}</p>
+    <p className="ls-help">{firstTime && !checked ? '完整聽一到兩次，再回答下面兩題。聽不懂的字先猜。' : '一句一句點來聽，跟著念出聲；想確認意思再打開中文。'}</p>
     <button type="button" className="ls-play" onClick={playAll}>
-      {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />播放對話{plays ? '（聽過 ' + plays + ' 次）' : ''}</>}
+      {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />播放對話{voice.completed ? '（完整聽過 ' + voice.completed + ' 次）' : ''}</>}
     </button>
-    {noVoice && <p className="ls-help">這個瀏覽器不能播放語音，直接讀下面的對話。</p>}
+    {noVoice && <p className="ls-help">這個瀏覽器沒辦法播放語音，直接讀下面的對話。這次不算「只聽也懂」。</p>}
     {firstTime && !checked && <ol className="ls-qs">
       {lesson.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
-        <div className="pr-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={answers[i] === j} disabled={!plays}
-          onClick={() => { if (!ready() || !plays) return; const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
+        <div className="pr-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={answers[i] === j} disabled={!open}
+          onClick={() => { if (!ready() || !open) return; const a = [...answers]; a[i] = j; setAnswers(a) }}>{o}</button>)}</div>
       </li>)}
     </ol>}
-    {firstTime && !checked && !plays && <p className="ls-help ls-need">先按「播放對話」聽一次，題目才能作答。</p>}
-    {firstTime && !checked && <button type="button" className="pr-main" disabled={!plays || answers.filter(a => a !== undefined).length < lesson.questions.length}
+    {firstTime && !checked && !open && <p className="ls-help ls-need">先按「播放對話」完整聽一次，題目才能作答。中途停掉不算聽完。</p>}
+    {firstTime && !checked && !open && started > 0 && voice.playing === null && <button type="button" className="pr-link" onClick={() => setUnsure(true)}>播完了，但題目沒有打開？</button>}
+    {unsure && !heard && !checked && <p className="ls-help">這台裝置沒有回報播放結束，可以作答，但這次不算「只聽也懂」。</p>}
+    {firstTime && !checked && <button type="button" className="pr-main" disabled={!open || answers.filter(a => a !== undefined).length < lesson.questions.length}
       onClick={() => { voice.stop(); setChecked(true) }}>對答案、看全文</button>}
     {firstTime && checked && !noVoice && <ul className="ls-results">
       {lesson.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}>
@@ -103,14 +130,14 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
       <Transcript lines={lesson.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(lesson.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(firstTime && !noVoice && plays ? correct : -1, firstTime && !noVoice && plays ? lesson.questions.length : 0, plays) }}>下一步：句型</button>
+        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(counted ? correct : -1, counted ? lesson.questions.length : 0, voice.completed) }}>下一步：句型</button>
       </div>
     </>}
   </section>
 }
 
 /** One more sentence with the same pattern, written from Chinese, answer revealed after trying. */
-export function LessonVariation({ item, onDone }: { item: { zh: string; en: string }; onDone: (mark: 'good' | 'small' | 'again', answer: string) => void }) {
+export function LessonVariation({ item, onDone }: { item: { zh: string; en: string; alt?: string[] }; onDone: (mark: 'good' | 'small' | 'again', answer: string) => void }) {
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
   const mountedAt = useRef(Date.now())
@@ -124,7 +151,7 @@ export function LessonVariation({ item, onDone }: { item: { zh: string; en: stri
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再看答案" />
     </label>
     {!shown ? <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (ready()) { shownAt.current = Date.now(); setShown(true) } }}>看答案</button></div> : <>
-      <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p></section>
+      <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
       <fieldset className="pr-marks"><legend>我寫得…</legend>
         <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
         <button type="button" disabled={!answer.trim()} onClick={() => done('small')}>差一點（加入複習）</button>

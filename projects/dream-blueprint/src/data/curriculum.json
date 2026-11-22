@@ -7551,17 +7551,18 @@
         {
           "id": "u8-d4",
           "day": 4,
-          "zh": "護理師幫他洗了手。",
+          "zh": "護理師幫病人洗了手。",
           "grammar": [
             "過去式（規則動詞）"
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "wash 加 -ed。"
+            "wash 加 -ed；「病人的手」是 the patient's hands。"
           ],
           "reference": [
-            "The nurse washed his hands.",
-            "The nurse washed the patient's hands."
+            "The nurse washed the patient's hands.",
+            "The nurse washed the patient's hands for him.",
+            "The nurse washed the patient's hands for her."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
           "newWords": [
@@ -7604,17 +7605,18 @@
             {
               "id": "u8-d4",
               "day": 4,
-              "zh": "護理師幫他洗了手。",
+              "zh": "護理師幫病人洗了手。",
               "grammar": [
                 "過去式（規則動詞）"
               ],
               "hints": [
                 "先找時間線索，確認是不是過去的事。",
-                "wash 加 -ed。"
+                "wash 加 -ed；「病人的手」是 the patient's hands。"
               ],
               "reference": [
-                "The nurse washed his hands.",
-                "The nurse washed the patient's hands."
+                "The nurse washed the patient's hands.",
+                "The nurse washed the patient's hands for him.",
+                "The nurse washed the patient's hands for her."
               ],
               "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d；子音加 y 要把 y 改成 ied。主詞是誰都一樣。",
               "newWords": []
@@ -7623,8 +7625,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "The nurse washed his hands.",
-              "zh": "護理師幫他洗了手。"
+              "en": "The nurse washed the patient's hands.",
+              "zh": "護理師幫病人洗了手。"
             },
             {
               "en": "She called the doctor last week.",
@@ -7715,8 +7717,8 @@
               "zh": "他昨天很累，所以待在家。"
             },
             {
-              "en": "The nurse washed his hands.",
-              "zh": "護理師幫他洗了手。"
+              "en": "The nurse washed the patient's hands.",
+              "zh": "護理師幫病人洗了手。"
             },
             {
               "en": "He walked to the bathroom.",
@@ -10408,13 +10410,13 @@
       "title": "助動詞",
       "rule": "can（能、可以）、should（應該）、must（必須）、may（可以、可能）是助動詞：後面接原形動詞，否定直接在後面加 not（cannot、should not、must not），問句把它放最前面（Can you…?）。have to（必須）比較特別，它像一般動詞：否定用 don't／doesn't have to，問句用 Do／Does…have to…?。注意意思不同：must not 是「不准」，don't have to 是「不必」。",
       "examples": [
-        "You should drink more water.",
+        "It's hot today, so you should drink more water.",
         "Can you stand up?",
         "Does she have to work today?",
         "You must not smoke here, but you don't have to leave."
       ],
       "examplesZh": [
-        "你應該多喝水。",
+        "今天很熱，你應該多喝點水。",
         "你可以站起來嗎？",
         "她今天必須上班嗎？",
         "你不准在這裡抽菸，但你不必離開。"
@@ -10423,18 +10425,21 @@
         {
           "id": "u12-d1",
           "day": 1,
-          "zh": "你應該多喝水。",
+          "zh": "今天很熱，你應該多喝點水。",
           "grammar": [
             "助動詞"
           ],
           "hints": [
             "先決定要表達「能、應該、必須、可以」哪一種。",
-            "should 後面接原形 drink。"
+            "前半說天氣 It is hot today；後半 should 後面接原形 drink。"
           ],
           "reference": [
-            "You should drink more water."
+            "It's hot today, so you should drink more water.",
+            "It is hot today, so you should drink more water.",
+            "It's hot today. You should drink more water.",
+            "It is hot today. You should drink more water."
           ],
-          "why": "「應該」用 should，後面接原形動詞 drink，不加 s、不加 to。",
+          "why": "「應該」用 should，後面接原形動詞 drink，不加 s、不加 to。這是天氣熱時的日常提醒；病人每天該喝多少水要照醫囑，有些人要限水，不能當成每個人都適用的衛教。",
           "newWords": [
             {
               "en": "should",
@@ -10475,26 +10480,29 @@
             {
               "id": "u12-d1",
               "day": 1,
-              "zh": "你應該多喝水。",
+              "zh": "今天很熱，你應該多喝點水。",
               "grammar": [
                 "助動詞"
               ],
               "hints": [
                 "先決定要表達「能、應該、必須、可以」哪一種。",
-                "should 後面接原形 drink。"
+                "前半說天氣 It is hot today；後半 should 後面接原形 drink。"
               ],
               "reference": [
-                "You should drink more water."
+                "It's hot today, so you should drink more water.",
+                "It is hot today, so you should drink more water.",
+                "It's hot today. You should drink more water.",
+                "It is hot today. You should drink more water."
               ],
-              "why": "「應該」用 should，後面接原形動詞 drink，不加 s、不加 to。",
+              "why": "「應該」用 should，後面接原形動詞 drink，不加 s、不加 to。這是天氣熱時的日常提醒；病人每天該喝多少水要照醫囑，有些人要限水，不能當成每個人都適用的衛教。",
               "newWords": []
             }
           ],
           "bonusWords": [],
           "listening": [
             {
-              "en": "You should drink more water.",
-              "zh": "你應該多喝水。"
+              "en": "It's hot today, so you should drink more water.",
+              "zh": "今天很熱，你應該多喝點水。"
             }
           ]
         },
@@ -10577,8 +10585,8 @@
               "zh": "我會說一點英文。"
             },
             {
-              "en": "You should drink more water.",
-              "zh": "你應該多喝水。"
+              "en": "It's hot today, so you should drink more water.",
+              "zh": "今天很熱，你應該多喝點水。"
             },
             {
               "en": "Can you stand up?",
@@ -10667,8 +10675,8 @@
               "zh": "我會說一點英文。"
             },
             {
-              "en": "You should drink more water.",
-              "zh": "你應該多喝水。"
+              "en": "It's hot today, so you should drink more water.",
+              "zh": "今天很熱，你應該多喝點水。"
             }
           ]
         },
@@ -10759,88 +10767,101 @@
         {
           "id": "u12-d5",
           "day": 5,
-          "zh": "你今天不應該吃東西，因為你明天要手術。",
+          "zh": "過了禁食說明上寫的時間，你就不應該再吃東西。",
           "grammar": [
             "助動詞"
           ],
           "hints": [
             "先決定要表達「能、應該、必須、可以」哪一種。",
-            "前半 should not eat；because 後面用 will 說明天的事。"
+            "「不應該」是 should not，後面接原形 eat；「過了說明上寫的時間」是 after the time on your fasting instructions。"
           ],
           "reference": [
-            "You should not eat today because you will have surgery tomorrow.",
-            "You shouldn't eat today because you are going to have surgery tomorrow."
+            "You should not eat after the time on your fasting instructions.",
+            "You shouldn't eat after the time on your fasting instructions.",
+            "You should not eat after the time on the fasting instructions.",
+            "You shouldn't eat after the time on the fasting instructions.",
+            "After the time on your fasting instructions, you should not eat.",
+            "After the time on your fasting instructions, you shouldn't eat."
           ],
-          "why": "否定在 should 後面加 not：should not eat。明天的手術是未來的事，用 will have surgery。",
+          "why": "否定在 should 後面加 not：should not eat，後面接原形動詞。手術前什麼時候開始不能吃、能不能喝水，要照醫院和麻醉團隊給的禁食說明；手術和病人不同，時間就不同，不能自己猜一個時間。",
           "newWords": [
             {
               "en": "because",
               "zh": "因為",
-              "example": "I am late because I was sick.",
-              "exampleZh": "我遲到因為我生病了。",
-              "source": "level1",
-              "level": 1
+              "example": "I stayed home because I was sick.",
+              "exampleZh": "我因為生病待在家。"
             },
             {
-              "en": "allergy",
-              "zh": "過敏",
-              "example": "Do you have any allergy?",
-              "exampleZh": "你有過敏嗎？",
-              "source": "level5",
-              "level": 5
+              "en": "instruction",
+              "zh": "指示、說明",
+              "example": "Please read the instructions first.",
+              "exampleZh": "請先看說明。"
             }
           ],
           "words": [
             {
               "en": "because",
               "zh": "因為",
-              "example": "I am late because I was sick.",
-              "exampleZh": "我遲到因為我生病了。",
-              "source": "level1",
-              "level": 1
+              "example": "I stayed home because I was sick.",
+              "exampleZh": "我因為生病待在家。"
             },
             {
-              "en": "allergy",
-              "zh": "過敏",
-              "example": "Do you have any allergy?",
-              "exampleZh": "你有過敏嗎？",
-              "source": "level5",
-              "level": 5
+              "en": "instruction",
+              "zh": "指示、說明",
+              "example": "Please read the instructions first.",
+              "exampleZh": "請先看說明。"
             }
           ],
           "sentences": [
             {
               "id": "u12-d5",
               "day": 5,
-              "zh": "你今天不應該吃東西，因為你明天要手術。",
+              "zh": "過了禁食說明上寫的時間，你就不應該再吃東西。",
               "grammar": [
                 "助動詞"
               ],
               "hints": [
                 "先決定要表達「能、應該、必須、可以」哪一種。",
-                "前半 should not eat；because 後面用 will 說明天的事。"
+                "「不應該」是 should not，後面接原形 eat；「過了說明上寫的時間」是 after the time on your fasting instructions。"
               ],
               "reference": [
-                "You should not eat today because you will have surgery tomorrow.",
-                "You shouldn't eat today because you are going to have surgery tomorrow."
+                "You should not eat after the time on your fasting instructions.",
+                "You shouldn't eat after the time on your fasting instructions.",
+                "You should not eat after the time on the fasting instructions.",
+                "You shouldn't eat after the time on the fasting instructions.",
+                "After the time on your fasting instructions, you should not eat.",
+                "After the time on your fasting instructions, you shouldn't eat."
               ],
-              "why": "否定在 should 後面加 not：should not eat。明天的手術是未來的事，用 will have surgery。",
-              "newWords": []
+              "why": "否定在 should 後面加 not：should not eat，後面接原形動詞。手術前什麼時候開始不能吃、能不能喝水，要照醫院和麻醉團隊給的禁食說明；手術和病人不同，時間就不同，不能自己猜一個時間。",
+              "newWords": [
+                {
+                  "en": "because",
+                  "zh": "因為",
+                  "example": "I stayed home because I was sick.",
+                  "exampleZh": "我因為生病待在家。"
+                },
+                {
+                  "en": "instruction",
+                  "zh": "指示、說明",
+                  "example": "Please read the instructions first.",
+                  "exampleZh": "請先看說明。"
+                }
+              ]
             }
           ],
           "bonusWords": [],
           "listening": [
             {
-              "en": "You should not eat today because you will have surgery tomorrow.",
-              "zh": "你今天不應該吃東西，因為你明天要手術。"
+              "en": "You should not eat after the time on your fasting instructions.",
+              "zh": "過了禁食說明上寫的時間，你就不應該再吃東西。"
             },
             {
               "en": "You must take this medicine every day.",
               "zh": "你必須每天吃這個藥。"
             },
             {
-              "en": "You should drink more water.",
-              "zh": "你應該多喝水。"
+              "en": "It's hot today, so you should drink more water.",
+              "zh": "今天很熱，你應該多喝點水。"
             }
           ],
           "recall": [
@@ -10851,38 +10872,46 @@
         {
           "id": "u12-c1",
           "day": 6,
-          "zh": "他不會走路。",
+          "zh": "他現在沒辦法走路。",
           "grammar": [
             "助動詞"
           ],
           "hints": [
             "先決定要表達「能、應該、必須、可以」哪一種。",
-            "「不會」用 cannot，後面接原形 walk。"
+            "「沒辦法」用 cannot，後面接原形 walk；「現在」可以放句尾 now。"
           ],
           "reference": [
-            "He cannot walk.",
-            "He can't walk."
+            "He cannot walk now.",
+            "He can't walk now.",
+            "He cannot walk right now.",
+            "He can't walk right now.",
+            "Right now he cannot walk.",
+            "Right now he can't walk."
           ],
-          "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。",
+          "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。加 now 表示是現在這個時候，不是說他一直都不會走路。",
           "newWords": [],
           "words": [],
           "sentences": [
             {
               "id": "u12-c1",
               "day": 6,
-              "zh": "他不會走路。",
+              "zh": "他現在沒辦法走路。",
               "grammar": [
                 "助動詞"
               ],
               "hints": [
                 "先決定要表達「能、應該、必須、可以」哪一種。",
-                "「不會」用 cannot，後面接原形 walk。"
+                "「沒辦法」用 cannot，後面接原形 walk；「現在」可以放句尾 now。"
               ],
               "reference": [
-                "He cannot walk.",
-                "He can't walk."
+                "He cannot walk now.",
+                "He can't walk now.",
+                "He cannot walk right now.",
+                "He can't walk right now.",
+                "Right now he cannot walk.",
+                "Right now he can't walk."
               ],
-              "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。",
+              "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。加 now 表示是現在這個時候，不是說他一直都不會走路。",
               "newWords": []
             },
             {
@@ -10925,8 +10954,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "He cannot walk.",
-              "zh": "他不會走路。"
+              "en": "He cannot walk now.",
+              "zh": "他現在沒辦法走路。"
             },
             {
               "en": "May I come in?",
@@ -10943,19 +10972,23 @@
         {
           "id": "u12-c1",
           "day": 6,
-          "zh": "他不會走路。",
+          "zh": "他現在沒辦法走路。",
           "grammar": [
             "助動詞"
           ],
           "hints": [
             "先決定要表達「能、應該、必須、可以」哪一種。",
-            "「不會」用 cannot，後面接原形 walk。"
+            "「沒辦法」用 cannot，後面接原形 walk；「現在」可以放句尾 now。"
           ],
           "reference": [
-            "He cannot walk.",
-            "He can't walk."
+            "He cannot walk now.",
+            "He can't walk now.",
+            "He cannot walk right now.",
+            "He can't walk right now.",
+            "Right now he cannot walk.",
+            "Right now he can't walk."
           ],
-          "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。",
+          "why": "能力的否定用 cannot（can not 寫成一個字），後面接原形 walk，不是 walks。加 now 表示是現在這個時候，不是說他一直都不會走路。",
           "newWords": []
         },
         {
@@ -11623,8 +11656,8 @@
               "zh": "你的手術在星期五早上九點。"
             },
             {
-              "en": "Your surgery is on Monday at nine.",
-              "zh": "你的手術在星期一九點。"
+              "en": "Her surgery is on Monday at nine.",
+              "zh": "她的手術在星期一九點。"
             }
           ],
           "recall": [
@@ -13100,17 +13133,19 @@
         {
           "id": "u15-d5",
           "day": 5,
-          "zh": "你今天應該比昨天喝更多水。",
+          "zh": "今天比昨天熱，你應該比昨天多喝一點水。",
           "grammar": [
             "比較級和最高級"
           ],
           "hints": [
             "看是兩個在比，還是三個以上裡面最怎樣。",
-            "should 加原形；more 加 than。"
+            "hot 的比較級是 hotter（t 要重複）；more water than yesterday。"
           ],
           "reference": [
-            "You should drink more water today than yesterday.",
-            "Today you should drink more water than yesterday."
+            "It is hotter today than yesterday, so you should drink more water than yesterday.",
+            "It's hotter today than yesterday, so you should drink more water than yesterday.",
+            "It is hotter today, so you should drink more water than yesterday.",
+            "It's hotter today, so you should drink more water than yesterday."
           ],
           "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
           "newWords": [
@@ -13153,17 +13188,19 @@
             {
               "id": "u15-d5",
               "day": 5,
-              "zh": "你今天應該比昨天喝更多水。",
+              "zh": "今天比昨天熱，你應該比昨天多喝一點水。",
               "grammar": [
                 "比較級和最高級"
               ],
               "hints": [
                 "看是兩個在比，還是三個以上裡面最怎樣。",
-                "should 加原形；more 加 than。"
+                "hot 的比較級是 hotter（t 要重複）；more water than yesterday。"
               ],
               "reference": [
-                "You should drink more water today than yesterday.",
-                "Today you should drink more water than yesterday."
+                "It is hotter today than yesterday, so you should drink more water than yesterday.",
+                "It's hotter today than yesterday, so you should drink more water than yesterday.",
+                "It is hotter today, so you should drink more water than yesterday.",
+                "It's hotter today, so you should drink more water than yesterday."
               ],
               "why": "短的形容詞加 -er 和 -est（taller、the tallest）；長的形容詞用 more 和 the most。比較兩個用 than。不規則：good→better→best，bad→worse→worst。",
               "newWords": []
@@ -13172,8 +13209,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "You should drink more water today than yesterday.",
-              "zh": "你今天應該比昨天喝更多水。"
+              "en": "It is hotter today than yesterday, so you should drink more water than yesterday.",
+              "zh": "今天比昨天熱，你應該比昨天多喝一點水。"
             },
             {
               "en": "The pain is worse than yesterday.",
@@ -15347,7 +15384,7 @@
             "Take this medicine after meals.",
             "Take this medicine after you eat."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [
             {
               "en": "meal",
@@ -15400,7 +15437,7 @@
                 "Take this medicine after meals.",
                 "Take this medicine after you eat."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面接一個完整的句子。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             }
           ],
@@ -18670,16 +18707,19 @@
             {
               "id": "u22-c3",
               "day": 6,
-              "zh": "她需要喝更多水。",
+              "zh": "外面很熱，她需要多喝點水。",
               "grammar": [
                 "不定詞和動名詞"
               ],
               "hints": [
                 "看前面那個動詞是接 to 加原形，還是接 ing。",
-                "need 後面接 to 加原形。"
+                "need 後面接 to 加原形；主詞 she 要用 needs。"
               ],
               "reference": [
-                "She needs to drink more water."
+                "It's hot outside, so she needs to drink more water.",
+                "It is hot outside, so she needs to drink more water.",
+                "It's hot outside. She needs to drink more water.",
+                "It is hot outside. She needs to drink more water."
               ],
               "why": "need 後面接 to 加原形；主詞 she 單數，所以是 needs to drink。",
               "newWords": []
@@ -18696,8 +18736,8 @@
               "zh": "我做完功課了。"
             },
             {
-              "en": "She needs to drink more water.",
-              "zh": "她需要喝更多水。"
+              "en": "It's hot outside, so she needs to drink more water.",
+              "zh": "外面很熱，她需要多喝點水。"
             }
           ]
         }
@@ -18741,16 +18781,19 @@
         {
           "id": "u22-c3",
           "day": 6,
-          "zh": "她需要喝更多水。",
+          "zh": "外面很熱，她需要多喝點水。",
           "grammar": [
             "不定詞和動名詞"
           ],
           "hints": [
             "看前面那個動詞是接 to 加原形，還是接 ing。",
-            "need 後面接 to 加原形。"
+            "need 後面接 to 加原形；主詞 she 要用 needs。"
           ],
           "reference": [
-            "She needs to drink more water."
+            "It's hot outside, so she needs to drink more water.",
+            "It is hot outside, so she needs to drink more water.",
+            "It's hot outside. She needs to drink more water.",
+            "It is hot outside. She needs to drink more water."
           ],
           "why": "need 後面接 to 加原形；主詞 she 單數，所以是 needs to drink。",
           "newWords": []
@@ -21631,7 +21674,7 @@
             "This is the medicine that you should take before meals.",
             "This is the medicine you should take before meals."
           ],
-          "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
+          "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [
             {
               "en": "side effect",
@@ -21684,7 +21727,7 @@
                 "This is the medicine that you should take before meals.",
                 "This is the medicine you should take before meals."
               ],
-              "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。",
+              "why": "用 who（人）、which（事物）、that（人或事物都可以）接一個句子來補充說明前面的名詞。關係子句緊跟在它說明的名詞後面。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             }
           ],
@@ -24074,7 +24117,7 @@
             {
               "id": "u29-c2",
               "day": 6,
-              "zh": "如果你不吃藥，你不會好起來。",
+              "zh": "如果你不讀書，你考試就不會過。",
               "grammar": [
                 "第一類假設（有可能發生）"
               ],
@@ -24083,8 +24126,12 @@
                 "if 那一句用現在式，結果那一句用 will 或祈使句。"
               ],
               "reference": [
-                "If you do not take the medicine, you will not get better.",
-                "If you don't take your medicine, you won't get better."
+                "If you do not study, you will not pass the test.",
+                "If you don't study, you won't pass the test.",
+                "If you do not study, you will not pass the exam.",
+                "If you don't study, you won't pass the exam.",
+                "You will not pass the test if you do not study.",
+                "You won't pass the test if you don't study."
               ],
               "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。初學先記：講條件的 if 那一句用現在式，不用 will（If it rains, I will stay home）。進階才會遇到 if 句用 will 表示「願意」的少數情況（If you will wait here, I will get the doctor），現在先不用。unless 的意思是「除非」。",
               "newWords": []
@@ -24115,8 +24162,8 @@
               "zh": "如果你需要我，我會在這裡。"
             },
             {
-              "en": "If you do not take the medicine, you will not get better.",
-              "zh": "如果你不吃藥，你不會好起來。"
+              "en": "If you do not study, you will not pass the test.",
+              "zh": "如果你不讀書，你考試就不會過。"
             },
             {
               "en": "If you feel cold, tell me.",
@@ -24147,7 +24194,7 @@
         {
           "id": "u29-c2",
           "day": 6,
-          "zh": "如果你不吃藥，你不會好起來。",
+          "zh": "如果你不讀書，你考試就不會過。",
           "grammar": [
             "第一類假設（有可能發生）"
           ],
@@ -24156,8 +24203,12 @@
             "if 那一句用現在式，結果那一句用 will 或祈使句。"
           ],
           "reference": [
-            "If you do not take the medicine, you will not get better.",
-            "If you don't take your medicine, you won't get better."
+            "If you do not study, you will not pass the test.",
+            "If you don't study, you won't pass the test.",
+            "If you do not study, you will not pass the exam.",
+            "If you don't study, you won't pass the exam.",
+            "You will not pass the test if you do not study.",
+            "You won't pass the test if you don't study."
           ],
           "why": "有可能發生的條件：If 加現在式，主要句用 will 加原形（或用祈使句、can、should）。初學先記：講條件的 if 那一句用現在式，不用 will（If it rains, I will stay home）。進階才會遇到 if 句用 will 表示「願意」的少數情況（If you will wait here, I will get the doctor），現在先不用。unless 的意思是「除非」。",
           "newWords": []
@@ -27771,7 +27822,7 @@
             "This drug should be given with food.",
             "This medication should be given with food."
           ],
-          "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
+          "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [
             {
               "en": "food",
@@ -27824,7 +27875,7 @@
                 "This drug should be given with food.",
                 "This medication should be given with food."
               ],
-              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
+              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             }
           ],
@@ -27947,7 +27998,7 @@
             "This pill must not be crushed.",
             "This pill mustn't be crushed."
           ],
-          "why": "「不可以」是禁止，用 must not be crushed（助動詞＋be＋過去分詞）。should not 是「不應該」，語氣比較弱，意思不一樣。",
+          "why": "「不可以」是禁止，用 must not be crushed（助動詞＋be＋過去分詞）。should not 是「不應該」，語氣比較弱，意思不一樣。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -27966,7 +28017,7 @@
                 "This pill must not be crushed.",
                 "This pill should not be crushed."
               ],
-              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
+              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             },
             {
@@ -28039,7 +28090,7 @@
             "This pill must not be crushed.",
             "This pill mustn't be crushed."
           ],
-          "why": "「不可以」是禁止，用 must not be crushed（助動詞＋be＋過去分詞）。should not 是「不應該」，語氣比較弱，意思不一樣。",
+          "why": "「不可以」是禁止，用 must not be crushed（助動詞＋be＋過去分詞）。should not 是「不應該」，語氣比較弱，意思不一樣。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": []
         },
         {
@@ -28268,11 +28319,11 @@
       "title": "名詞子句",
       "rule": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
       "examples": [
-        "It is important that you finish the antibiotics.",
+        "It is important that you take the antibiotics as your doctor told you.",
         "I think he is right."
       ],
       "examplesZh": [
-        "把抗生素吃完很重要。",
+        "照醫師的指示吃抗生素很重要。",
         "我覺得他是對的。"
       ],
       "days": [
@@ -28355,8 +28406,8 @@
               "zh": "我覺得他是對的。"
             },
             {
-              "en": "It is important that you finish the antibiotics.",
-              "zh": "把抗生素吃完很重要。"
+              "en": "It is important that you take the antibiotics as your doctor told you.",
+              "zh": "照醫師的指示吃抗生素很重要。"
             }
           ]
         },
@@ -28527,25 +28578,27 @@
               "zh": "我希望你早日康復。"
             },
             {
-              "en": "It is important that you finish the antibiotics.",
-              "zh": "把抗生素吃完很重要。"
+              "en": "It is important that you take the antibiotics as your doctor told you.",
+              "zh": "照醫師的指示吃抗生素很重要。"
             }
           ]
         },
         {
           "id": "u35-d4",
           "day": 4,
-          "zh": "把抗生素吃完很重要。",
+          "zh": "照醫師的指示吃抗生素很重要。",
           "grammar": [
             "名詞子句"
           ],
           "hints": [
             "找出主要動詞後面那一整句的內容。",
-            "It is important that 加 you finish。"
+            "It is important that 加 you take…；「照醫師的指示」是 as your doctor told you。"
           ],
           "reference": [
-            "It is important that you finish the antibiotics.",
-            "It is important that you finish all the antibiotics."
+            "It is important that you take the antibiotics as your doctor told you.",
+            "It's important that you take the antibiotics as your doctor told you.",
+            "It is important that you take the antibiotics the way your doctor told you.",
+            "It is important that you take your antibiotics as the doctor told you."
           ],
           "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
           "newWords": [
@@ -28588,17 +28641,19 @@
             {
               "id": "u35-d4",
               "day": 4,
-              "zh": "把抗生素吃完很重要。",
+              "zh": "照醫師的指示吃抗生素很重要。",
               "grammar": [
                 "名詞子句"
               ],
               "hints": [
                 "找出主要動詞後面那一整句的內容。",
-                "It is important that 加 you finish。"
+                "It is important that 加 you take…；「照醫師的指示」是 as your doctor told you。"
               ],
               "reference": [
-                "It is important that you finish the antibiotics.",
-                "It is important that you finish all the antibiotics."
+                "It is important that you take the antibiotics as your doctor told you.",
+                "It's important that you take the antibiotics as your doctor told you.",
+                "It is important that you take the antibiotics the way your doctor told you.",
+                "It is important that you take your antibiotics as the doctor told you."
               ],
               "why": "用 that 帶出一整句話當受詞或補充：I think (that)…、I hope (that)…、I am sure (that)…。It is important that…、It is possible that… 也是用 that 接完整句子。口語裡 that 常省略。",
               "newWords": []
@@ -28607,8 +28662,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "It is important that you finish the antibiotics.",
-              "zh": "把抗生素吃完很重要。"
+              "en": "It is important that you take the antibiotics as your doctor told you.",
+              "zh": "照醫師的指示吃抗生素很重要。"
             },
             {
               "en": "Are you sure the door is locked?",
@@ -28699,8 +28754,8 @@
               "zh": "醫師認為感染正在好轉，但是你還是需要吃完所有的藥。"
             },
             {
-              "en": "It is important that you finish the antibiotics.",
-              "zh": "把抗生素吃完很重要。"
+              "en": "It is important that you take the antibiotics as your doctor told you.",
+              "zh": "照醫師的指示吃抗生素很重要。"
             }
           ],
           "recall": [
@@ -30961,17 +31016,19 @@
         {
           "id": "u38-d5",
           "day": 5,
-          "zh": "高血壓會導致心臟病，因此你應該每天吃藥。",
+          "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。",
           "grammar": [
             "因果的書面說法"
           ],
           "hints": [
             "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-            "can lead to 接結果；therefore 接 should。"
+            "can lead to 是「可能導致」，不是一定會；therefore 後面接 should。"
           ],
           "reference": [
-            "High blood pressure can lead to heart disease. Therefore, you should take your medicine every day.",
-            "High blood pressure can cause heart disease. Therefore, you should take your medication daily."
+            "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
+            "High blood pressure can lead to heart disease. Therefore, you should take your medicine as your doctor told you.",
+            "High blood pressure can cause heart disease. Therefore, you should take the medicine your doctor gave you.",
+            "High blood pressure can lead to heart disease. Therefore, you should take the medicine that your doctor gave you."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
           "newWords": [
@@ -31014,17 +31071,19 @@
             {
               "id": "u38-d5",
               "day": 5,
-              "zh": "高血壓會導致心臟病，因此你應該每天吃藥。",
+              "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。",
               "grammar": [
                 "因果的書面說法"
               ],
               "hints": [
                 "找出哪個是原因、哪個是結果，再看原因是名詞還是句子。",
-                "can lead to 接結果；therefore 接 should。"
+                "can lead to 是「可能導致」，不是一定會；therefore 後面接 should。"
               ],
               "reference": [
-                "High blood pressure can lead to heart disease. Therefore, you should take your medicine every day.",
-                "High blood pressure can cause heart disease. Therefore, you should take your medication daily."
+                "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
+                "High blood pressure can lead to heart disease. Therefore, you should take your medicine as your doctor told you.",
+                "High blood pressure can cause heart disease. Therefore, you should take the medicine your doctor gave you.",
+                "High blood pressure can lead to heart disease. Therefore, you should take the medicine that your doctor gave you."
               ],
               "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
               "newWords": []
@@ -31033,8 +31092,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "High blood pressure can lead to heart disease. Therefore, you should take your medicine every day.",
-              "zh": "高血壓會導致心臟病，因此你應該每天吃藥。"
+              "en": "High blood pressure can lead to heart disease. Therefore, you should take the medicine your doctor gave you.",
+              "zh": "高血壓可能會導致心臟病，因此你應該照醫師開的藥按時吃。"
             },
             {
               "en": "The surgery was delayed due to a fever.",
@@ -31386,11 +31445,11 @@
       "title": "描述數字的變化",
       "rule": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
       "examples": [
-        "His blood pressure dropped from 150 to 120.",
+        "His systolic blood pressure dropped from 150 to 120.",
         "The number of students increased by ten."
       ],
       "examplesZh": [
-        "他的血壓從 150 降到 120。",
+        "他的收縮壓從 150 降到 120。",
         "學生人數增加了十個。"
       ],
       "days": [
@@ -31473,8 +31532,8 @@
               "zh": "價格去年上漲了。"
             },
             {
-              "en": "His blood pressure dropped from 150 to 120.",
-              "zh": "他的血壓從 150 降到 120。"
+              "en": "His systolic blood pressure dropped from 150 to 120.",
+              "zh": "他的收縮壓從 150 降到 120。"
             }
           ]
         },
@@ -31649,25 +31708,26 @@
               "zh": "學生人數從三十降到二十。"
             },
             {
-              "en": "His blood pressure dropped from 150 to 120.",
-              "zh": "他的血壓從 150 降到 120。"
+              "en": "His systolic blood pressure dropped from 150 to 120.",
+              "zh": "他的收縮壓從 150 降到 120。"
             }
           ]
         },
         {
           "id": "u39-d4",
           "day": 4,
-          "zh": "他的血壓從 150 降到 120。",
+          "zh": "他的收縮壓從 150 降到 120。",
           "grammar": [
             "描述數字的變化"
           ],
           "hints": [
             "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-            "dropped from A to B。"
+            "收縮壓是 systolic blood pressure；dropped from A to B。"
           ],
           "reference": [
-            "His blood pressure dropped from 150 to 120.",
-            "His blood pressure decreased from 150 to 120."
+            "His systolic blood pressure dropped from 150 to 120.",
+            "His systolic blood pressure decreased from 150 to 120.",
+            "His systolic blood pressure fell from 150 to 120."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": [
@@ -31710,17 +31770,18 @@
             {
               "id": "u39-d4",
               "day": 4,
-              "zh": "他的血壓從 150 降到 120。",
+              "zh": "他的收縮壓從 150 降到 120。",
               "grammar": [
                 "描述數字的變化"
               ],
               "hints": [
                 "先看數字是上升、下降還是不變，再看有沒有起點和終點。",
-                "dropped from A to B。"
+                "收縮壓是 systolic blood pressure；dropped from A to B。"
               ],
               "reference": [
-                "His blood pressure dropped from 150 to 120.",
-                "His blood pressure decreased from 150 to 120."
+                "His systolic blood pressure dropped from 150 to 120.",
+                "His systolic blood pressure decreased from 150 to 120.",
+                "His systolic blood pressure fell from 150 to 120."
               ],
               "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
               "newWords": []
@@ -31729,8 +31790,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "His blood pressure dropped from 150 to 120.",
-              "zh": "他的血壓從 150 降到 120。"
+              "en": "His systolic blood pressure dropped from 150 to 120.",
+              "zh": "他的收縮壓從 150 降到 120。"
             },
             {
               "en": "Did the temperature remain the same?",
@@ -31745,7 +31806,7 @@
         {
           "id": "u39-d5",
           "day": 5,
-          "zh": "給藥之後，他的體溫從 39 度降到 37.5 度，而心跳維持穩定。",
+          "zh": "給藥之後，他的體溫從攝氏 39 度降到 37.5 度，而心跳維持穩定。",
           "grammar": [
             "描述數字的變化"
           ],
@@ -31754,8 +31815,9 @@
             "After 接名詞；dropped from…to；while 接 remained stable。"
           ],
           "reference": [
-            "After the medication, his temperature dropped from 39 to 37.5 degrees, while his heart rate remained stable.",
-            "After the medication was given, his temperature fell from 39 to 37.5 degrees, and his heart rate remained stable."
+            "After the medication, his temperature dropped from 39 to 37.5 degrees Celsius, while his heart rate remained stable.",
+            "After the medication was given, his temperature fell from 39 to 37.5 degrees Celsius, and his heart rate remained stable.",
+            "After the medication, his temperature dropped from 39 to 37.5°C, while his heart rate remained stable."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": [
@@ -31798,7 +31860,7 @@
             {
               "id": "u39-d5",
               "day": 5,
-              "zh": "給藥之後，他的體溫從 39 度降到 37.5 度，而心跳維持穩定。",
+              "zh": "給藥之後，他的體溫從攝氏 39 度降到 37.5 度，而心跳維持穩定。",
               "grammar": [
                 "描述數字的變化"
               ],
@@ -31807,8 +31869,9 @@
                 "After 接名詞；dropped from…to；while 接 remained stable。"
               ],
               "reference": [
-                "After the medication, his temperature dropped from 39 to 37.5 degrees, while his heart rate remained stable.",
-                "After the medication was given, his temperature fell from 39 to 37.5 degrees, and his heart rate remained stable."
+                "After the medication, his temperature dropped from 39 to 37.5 degrees Celsius, while his heart rate remained stable.",
+                "After the medication was given, his temperature fell from 39 to 37.5 degrees Celsius, and his heart rate remained stable.",
+                "After the medication, his temperature dropped from 39 to 37.5°C, while his heart rate remained stable."
               ],
               "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
               "newWords": []
@@ -31817,12 +31880,12 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "After the medication, his temperature dropped from 39 to 37.5 degrees, while his heart rate remained stable.",
-              "zh": "給藥之後，他的體溫從 39 度降到 37.5 度，而心跳維持穩定。"
+              "en": "After the medication, his temperature dropped from 39 to 37.5 degrees Celsius, while his heart rate remained stable.",
+              "zh": "給藥之後，他的體溫從攝氏 39 度降到 37.5 度，而心跳維持穩定。"
             },
             {
-              "en": "His blood pressure dropped from 150 to 120.",
-              "zh": "他的血壓從 150 降到 120。"
+              "en": "His systolic blood pressure dropped from 150 to 120.",
+              "zh": "他的收縮壓從 150 降到 120。"
             }
           ],
           "recall": [
@@ -31870,7 +31933,7 @@
             {
               "id": "u39-c2",
               "day": 6,
-              "zh": "疼痛從 8 分降到 3 分。",
+              "zh": "他的疼痛分數從 8 分降到 3 分。",
               "grammar": [
                 "描述數字的變化"
               ],
@@ -31879,8 +31942,9 @@
                 "from A to B 是起點到終點；by 是變化的量。"
               ],
               "reference": [
-                "The pain decreased from eight to three.",
-                "The pain went down from 8 to 3."
+                "His pain score decreased from eight to three.",
+                "His pain score went down from 8 to 3.",
+                "His pain score dropped from eight to three."
               ],
               "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
               "newWords": []
@@ -31911,8 +31975,8 @@
               "zh": "他的體重增加了三公斤。"
             },
             {
-              "en": "The pain decreased from eight to three.",
-              "zh": "疼痛從 8 分降到 3 分。"
+              "en": "His pain score decreased from eight to three.",
+              "zh": "他的疼痛分數從 8 分降到 3 分。"
             },
             {
               "en": "The price remained the same.",
@@ -31943,7 +32007,7 @@
         {
           "id": "u39-c2",
           "day": 6,
-          "zh": "疼痛從 8 分降到 3 分。",
+          "zh": "他的疼痛分數從 8 分降到 3 分。",
           "grammar": [
             "描述數字的變化"
           ],
@@ -31952,8 +32016,9 @@
             "from A to B 是起點到終點；by 是變化的量。"
           ],
           "reference": [
-            "The pain decreased from eight to three.",
-            "The pain went down from 8 to 3."
+            "His pain score decreased from eight to three.",
+            "His pain score went down from 8 to 3.",
+            "His pain score dropped from eight to three."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
           "newWords": []
@@ -34310,7 +34375,7 @@
         {
           "id": "u42-r1",
           "day": 4,
-          "zh": "我會幫你拍照。",
+          "zh": "我會拍一張你的照片。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
@@ -34322,7 +34387,7 @@
             "I will take a picture of you.",
             "I will take a photo of you."
           ],
-          "why": "「幫你拍照」是拍你：take a picture／photo of you。take a picture for you 是「替你拍（拍的可能不是你）」，意思不同。",
+          "why": "「拍一張你的照片」拍的是你：take a picture／photo of you。如果是「替你拍」（用你的手機幫你拍，拍的不一定是你），才說 take a picture for you。",
           "newWords": []
         },
         {
@@ -34402,7 +34467,7 @@
         {
           "id": "u42-r1",
           "day": 4,
-          "zh": "我會幫你拍照。",
+          "zh": "我會拍一張你的照片。",
           "grammar": [
             "常見搭配和片語動詞"
           ],
@@ -34414,7 +34479,7 @@
             "I will take a picture of you.",
             "I will take a photo of you."
           ],
-          "why": "「幫你拍照」是拍你：take a picture／photo of you。take a picture for you 是「替你拍（拍的可能不是你）」，意思不同。",
+          "why": "「拍一張你的照片」拍的是你：take a picture／photo of you。如果是「替你拍」（用你的手機幫你拍，拍的不一定是你），才說 take a picture for you。",
           "newWords": []
         },
         {

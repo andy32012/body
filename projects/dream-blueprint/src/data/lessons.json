@@ -611,11 +611,11 @@
   ],
   "questions": [
    {
-    "q": "Why did Mr. Chen fall?",
+    "q": "How did Mr. Chen feel before he fell?",
     "options": [
-     "He ran too fast.",
+     "He felt hungry.",
      "He felt dizzy.",
-     "The floor was wet."
+     "He felt cold."
     ],
     "answer": 1
    },
@@ -744,8 +744,8 @@
    },
    {
     "who": "Nurse Chen",
-    "en": "You will eat after the test.",
-    "zh": "你檢查完再吃。"
+    "en": "This test needs an empty stomach, so you will eat after the test.",
+    "zh": "這項檢查要空腹，所以你檢查完再吃。"
    },
    {
     "who": "Mr. Lin",
@@ -776,7 +776,12 @@
   "variations": [
    {
     "zh": "我明天會早一點來。",
-    "en": "I will come early tomorrow."
+    "en": "I will come early tomorrow.",
+    "alt": [
+     "I'll come early tomorrow.",
+     "I will come earlier tomorrow.",
+     "I'll come earlier tomorrow."
+    ]
    },
    {
     "zh": "我們下週要去看醫生。",
@@ -1074,9 +1079,9 @@
   "cando": "用比較級和最高級比較兩樣東西、說出「最…」",
   "scene": "病人比較今天和昨天的狀況",
   "prompt": {
-   "en": "Compare two people or two places you know. Then say which one is the best at something.",
-   "zh": "比較兩個你認識的人或地方，再說哪一個「最…」。",
-   "sample": "Taichung is bigger than my hometown. My hometown is quieter. Taipei is the busiest city in Taiwan."
+   "en": "Compare two people or two places you know. Then use a superlative to say that one of them is the most … in a bigger group (your family, your class, Taiwan…).",
+   "zh": "比較兩個你認識的人或地方，再用最高級說其中一個在更大的範圍裡「最…」（全家、全班、全台灣……）。",
+   "sample": "My sister is taller than I am. I am more patient than she is. She is the tallest person in our family."
   }
  },
  {
@@ -1248,8 +1253,8 @@
    },
    {
     "who": "Nurse Chen",
-    "en": "If you forget, take it when you remember. But do not take two at once.",
-    "zh": "忘了的話，想起來就吃，但不要一次吃兩顆。"
+    "en": "If you forget a dose, read the instructions for this medicine or ask the pharmacist.",
+    "zh": "如果忘了吃一次，看這個藥的用藥說明，或問藥師該怎麼做。"
    },
    {
     "who": "Mr. Lin",
@@ -1300,7 +1305,7 @@
   "cando": "用 when／before／after／if 說明步驟和條件（衛教）",
   "scene": "出院衛教：吃藥和換藥",
   "prompt": {
-   "en": "Explain how you take care of yourself when you have a cold. Use when, before, after, or if.",
+   "en": "Write three sentences about how you take care of yourself when you have a cold. Use when, before, after, or if.",
    "zh": "用三句說明你感冒時怎麼照顧自己，用到 when、before、after 或 if。",
    "sample": "When I have a cold, I drink a lot of water. I take medicine after I eat. If I have a fever, I see a doctor."
   }
@@ -1732,8 +1737,8 @@
   "cando": "用 always／usually／sometimes／never 和 once／twice a day 說頻率",
   "scene": "問病人吃藥和運動的頻率",
   "prompt": {
-   "en": "Write about your week: two things you always or usually do, and one thing you never do. Add how often.",
-   "zh": "寫你的一週：兩件總是或通常做的事、一件從來不做的事，加上次數（once a week、every day…）。",
+   "en": "Write about your week: two things you always or usually do, and one thing you never do. Add how often (twice a week, every day…) to at least one of them.",
+   "zh": "寫你的一週：兩件總是或通常做的事、一件從來不做的事；至少一句加上次數（once a week、every day…），其他句可以只說時間。",
    "sample": "I usually get up at seven. I go to the gym twice a week. I never skip breakfast."
   }
  },
@@ -1762,13 +1767,18 @@
    },
    {
     "who": "Nurse Chen",
-    "en": "OK, all done. Could you press here for one minute?",
-    "zh": "好了。可以請你壓著這裡一分鐘嗎？"
+    "en": "OK, all done. Could you hold this gauze here and keep your arm straight?",
+    "zh": "好了。可以請你用這塊紗布壓著這裡，手臂伸直嗎？"
    },
    {
     "who": "Mr. Lin",
-    "en": "No problem. Thank you.",
-    "zh": "沒問題，謝謝。"
+    "en": "Sure. Can I go now?",
+    "zh": "好。我可以走了嗎？"
+   },
+   {
+    "who": "Nurse Chen",
+    "en": "Not yet. I will check that the bleeding has stopped first.",
+    "zh": "還不行，我要先確認已經不流血了。"
    }
   ],
   "questions": [
@@ -1782,11 +1792,11 @@
     "answer": 2
    },
    {
-    "q": "How long should he press the spot?",
+    "q": "What will the nurse check before Mr. Lin goes?",
     "options": [
-     "Five minutes",
-     "Ten seconds",
-     "One minute"
+     "His temperature",
+     "His sleeve",
+     "That the bleeding has stopped"
     ],
     "answer": 2
    }
@@ -2050,13 +2060,13 @@
    },
    {
     "who": "Mr. Lin",
-    "en": "Will I be OK if I walk every day?",
-    "zh": "如果我每天走路，會沒事嗎？"
+    "en": "Is it OK to walk every day?",
+    "zh": "我可以每天走路嗎？"
    },
    {
     "who": "Nurse Chen",
-    "en": "Yes. If you walk a little every day, you will get better faster.",
-    "zh": "會的。每天走一點，你會好得更快。"
+    "en": "Yes, the doctor wants you to walk. If you walk a little every day, you will feel stronger.",
+    "zh": "可以，醫師希望你多走動。每天走一點，你會覺得比較有力氣。"
    }
   ],
   "questions": [
@@ -2070,10 +2080,10 @@
     "answer": 1
    },
    {
-    "q": "What will happen if he walks every day?",
+    "q": "What does the nurse say about walking every day?",
     "options": [
      "The wound will hurt.",
-     "He will get better faster.",
+     "He will feel stronger.",
      "He will get a fever."
     ],
     "answer": 1
@@ -2085,8 +2095,8 @@
     "en": "If you are free tomorrow, let's see a movie."
    },
    {
-    "zh": "如果他不吃藥，他的血壓會變高。",
-    "en": "If he does not take his medicine, his blood pressure will go up."
+    "zh": "如果你明天很忙，我們下週再去。",
+    "en": "If you are busy tomorrow, we will go next week."
    }
   ],
   "cando": "用 If ＋ 現在式, will／祈使句 說可能發生的情況和怎麼處理",
@@ -2094,7 +2104,7 @@
   "prompt": {
    "en": "Give a patient three if-instructions for after they go home.",
    "zh": "給出院病人三個 if 的提醒（如果…就…）。",
-   "sample": "If you feel dizzy, sit down and rest. If the pain gets worse, call us. If you take your medicine every day, you will feel better."
+   "sample": "If you feel dizzy, sit down and rest. If the pain gets worse, call us. If you have questions about your medicine, ask your pharmacist."
   }
  },
  {
@@ -2238,7 +2248,7 @@
   "prompt": {
    "en": "Write three sentences about things you have been doing lately. Use for or since.",
    "zh": "用三句寫你最近一直在做的事，加上 for 或 since。",
-   "sample": "I have been studying English for two months. I have been going to bed late since my exams started. My mom has been working a lot this week."
+   "sample": "I have been studying English for two months. I have been going to bed late since my exams started. I have been drinking more water since last week."
   }
  },
  {
@@ -2601,9 +2611,9 @@
   "cando": "用 -ing／過去分詞片語接在名詞後面，說清楚是哪一位",
   "scene": "交班時指認病人",
   "prompt": {
-   "en": "Describe three people in a place you know, using -ing phrases like \"the man standing…\" or \"the girl wearing…\".",
-   "zh": "用 -ing 片語描述一個場景裡的三個人（the man standing…、the girl wearing…）。",
-   "sample": "The man standing at the door is a security guard. The girl wearing a pink coat is waiting for her mom. The doctor talking on the phone looks busy."
+   "en": "Describe three people or things in a place you know. Use -ing phrases (\"the man standing…\", \"the girl wearing…\") in two sentences and a past participle phrase (\"a book written in English\", \"the medicine kept in the fridge\") in one.",
+   "zh": "描述一個場景裡的三個人或東西：兩句用 -ing 片語（the man standing…、the girl wearing…），一句用過去分詞片語（a book written in English、the medicine kept in the fridge）。",
+   "sample": "The man standing at the door is a security guard. The girl wearing a pink coat is waiting for her mom. The medicine kept in the fridge is for the patient in Bed 5."
   }
  },
  {
@@ -2673,8 +2683,8 @@
   "cando": "用 although／despite／however 說出兩件相反的事",
   "scene": "跟醫師報告病人狀況",
   "prompt": {
-   "en": "Write two sentences about yourself that show a contrast. Use although in one and however in the other.",
-   "zh": "用 although 和 however 各寫一句，說出你身上相反的兩件事。",
+   "en": "Write two contrasts about yourself: one with although (in one sentence), and one with however (two short sentences, the second starting with However).",
+   "zh": "寫你身上兩組相反的事：一組用 although（一句寫完）；一組用 however（先寫一句，下一句用 However 開頭說相反的事）。",
    "sample": "Although English is hard for me, I practice every day. I love nursing. However, night shifts are tiring."
   }
  },
@@ -2760,8 +2770,8 @@
    },
    {
     "who": "Nurse B",
-    "en": "His temperature rose from 37 to 39 degrees last night.",
-    "zh": "他的體溫昨晚從 37 度升到 39 度。"
+    "en": "His temperature rose from 37 to 39 degrees Celsius last night.",
+    "zh": "他的體溫昨晚從攝氏 37 度升到 39 度。"
    },
    {
     "who": "Nurse A",
@@ -2819,9 +2829,9 @@
   "prompt": {
    "en": "Describe the chart in three or four sentences: where it starts, how it changes, and where it ends. Use the numbers.",
    "zh": "用三到四句描述這張圖：一開始多少、怎麼變化、最後多少（要寫出數字）。",
-   "sample": "On Monday, her blood pressure was 150. It dropped to 130 on Wednesday. Then it remained stable for one day. On Friday, it was 128.",
+   "sample": "On Monday, her systolic blood pressure was 150 mmHg. It dropped to 130 on Wednesday. Then it remained stable for one day. On Friday, it was 128.",
    "chart": {
-    "title": "Mrs. Chen's blood pressure (mmHg)",
+    "title": "Mrs. Chen's systolic blood pressure (mmHg)",
     "points": [
      {
       "label": "Mon",

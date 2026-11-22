@@ -15,7 +15,8 @@ export interface Lesson {
   scene: string
   dialogue: LessonLine[]
   questions: LessonQuestion[]
-  variations: { zh: string; en: string }[]
+  /** alt: other answers that are just as right (I'll come earlier tomorrow / I will come early tomorrow). */
+  variations: { zh: string; en: string; alt?: string[] }[]
   prompt: LessonPrompt
 }
 
@@ -39,7 +40,8 @@ export type LessonPhase = 'recall' | 'listen' | 'write' | 'sound' | 'vary' | 'ex
 export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'again'; grammar: string[]; revealed: boolean }
 /** h: how far the hints went (1 self-check, 2 clearer hint, 3 sentence frame, 4 the answer); r: an answer was shown. */
 /** c: asked Claude for help with 「我卡住了」 before marking. */
-export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' | 'changed'; c?: boolean }
+/** h hint level, r answer seen, v Claude's verdict on the first try and vt the exact text it judged, c asked Claude for help. */
+export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' | 'changed'; vt?: string; c?: boolean }
 
 /** Hints used outside the guided lesson (checkpoint, review, extra drills) live in "hints.<date>". */
 export const hintsKey = (day: string) => 'hints.' + day

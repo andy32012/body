@@ -68,6 +68,8 @@
 .ai-empty p { margin: 0; line-height: 1.6; }
 .ai-go { padding: 8px 14px; border-radius: 10px; background: var(--lav); color: var(--bg); text-decoration: none; font-weight: 600; }
 
+/* While a dialog is open the page behind it is inert; the floating button would look tappable but is not, so it hides. */
+.ai-fab[inert], [inert] .ai-fab { visibility: hidden; }
 .ai-fab {
   position: fixed; z-index: 30;
   right: max(24px, env(safe-area-inset-right, 0px)); bottom: 24px;

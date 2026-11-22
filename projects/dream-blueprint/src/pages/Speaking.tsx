@@ -116,7 +116,18 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   async function wrapUp() {
     const said = linesRef.current
     driveLog('英文口說', said.map(l => ({ role: l.role === 'user' ? 'user' : NAME, text: l.text })))
-    if (said.filter(l => l.role === 'user').length < 2 || !tutorKey()) return
+    // One long answer (a Part 2 monologue arrives as one line) counts as much as a back-and-forth.
+    const userLines = said.filter(l => l.role === 'user')
+    const userWords = userLines.map(l => l.text).join(' ').split(/\s+/).filter(Boolean).length
+    const spoke = userLines.length >= 2 || userWords >= 15
+    if (!spoke) return
+    // The attempt is kept whether or not Claude is connected to give feedback.
+    if (card) update(prev => ({ ...prev, notes: { ...prev.notes, [cueKey(card.id)]: today } }))
+    if (lesson) update(prev => {
+      const rec = readLessonRecord(prev.notes, today)
+      return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
+    })
+    if (!tutorKey()) return
     setNoting(true)
     try {
       const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
@@ -127,11 +138,6 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         memoryPrompt(memory.notes),
       ].join('\n'), [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
-      if (card) update(prev => ({ ...prev, notes: { ...prev.notes, [cueKey(card.id)]: today } }))
-      if (lesson) update(prev => {
-        const rec = readLessonRecord(prev.notes, today)
-        return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
-      })
       if (remember.length || forget.length) memory.update(remember, forget)
       const found: Fix[] = []
       const text = clean.split('\n').filter(line => {
@@ -186,8 +192,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         <span lang="en">{card.explain}</span>
         {!live && status !== 'closed' && <>
           {!prepEnd ? <button type="button" onClick={() => setPrepEnd(Date.now() + 60000)}>開始 1 分鐘準備</button>
-            : <p className="sp-timer">{prepEnd > tick ? '準備時間剩 ' + Math.ceil((prepEnd - tick) / 1000) + ' 秒' : '準備時間到，按麥克風開始說'}</p>}
-          {prepEnd && <textarea lang="en" rows={3} value={prepNotes} onChange={e => setPrepNotes(e.target.value)} placeholder="只寫關鍵字，例如：grandma / nurse / hospital / kind" />}
+            // The countdown is for the eyes; a screen reader hears only the start and the end (the status line below).
+            : <p className="sp-timer" aria-hidden="true">{prepEnd > tick ? '準備時間剩 ' + Math.ceil((prepEnd - tick) / 1000) + ' 秒' : '準備時間到，按麥克風開始說'}</p>}
+          <p className="sp-sr" role="status">{!prepEnd ? '' : prepEnd > tick ? '1 分鐘準備開始了' : '準備時間到，按麥克風開始說'}</p>
+          {prepEnd && <label className="sp-prep">準備筆記（選填，只寫關鍵字）
+            <textarea lang="en" rows={3} value={prepNotes} onChange={e => setPrepNotes(e.target.value)} placeholder="例如：grandma / nurse / hospital / kind" />
+          </label>}
           <button type="button" className="sp-link" onClick={() => { setCardSkip(s => [...s, card.id]); setPrepEnd(undefined); setPrepNotes('') }}>換一張題目卡</button>
         </>}
         {status === 'live' && liveAt && <p className="sp-timer">已經說了 {Math.floor((tick - liveAt) / 60000)}:{String(Math.floor((tick - liveAt) / 1000) % 60).padStart(2, '0')}（Part 2 目標 1–2 分鐘，之後 Emma 會問 Part 3）</p>}

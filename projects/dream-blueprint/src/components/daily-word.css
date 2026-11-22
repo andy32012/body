@@ -9,7 +9,11 @@
 .daily-word-label {display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.2em;color:#f4c589}
 .daily-word-label i {width:22px;height:1px;background:#f4c589}
 .daily-word-close {display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(8,12,22,.45);color:#fff}
-.daily-word-body {display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;min-height:0;padding:8px 22px}
+.daily-word-body {display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px;min-height:0;padding:8px 22px;overflow-y:auto;overscroll-behavior:contain}
+/* Centred while it fits; when the forms, the AI button and the sentence check open on a short screen, it scrolls
+   from the top instead of cutting the first lines off. The close button and the two answers stay in view. */
+.daily-word-body > :first-child {margin-top:auto}
+.daily-word-body > :last-child {margin-bottom:auto}
 .daily-word-meta {font-size:12px;letter-spacing:.08em;color:#d9d3ee}
 .daily-word-term {font-family:"DM Sans","Segoe UI",sans-serif;font-size:clamp(34px,10vw,54px);font-weight:600;letter-spacing:-.02em;line-height:1.08;overflow-wrap:anywhere;text-shadow:0 2px 18px rgba(0,0,0,.55)}
 .daily-word-meaning {margin:0;font-size:19px;line-height:1.5;color:#f3eefc}

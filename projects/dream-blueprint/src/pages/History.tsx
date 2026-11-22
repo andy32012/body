@@ -140,12 +140,12 @@ function TopicHistory({ state }: { state: PageProps["state"] }) {
   const rows = topics.map(t => ({ t, rec: readTopic(state.notes, t.id), open: state.curriculum.unit > t.after }));
   return <section className="history-section history-topics">
     <h2>生活主題</h2>
-    <p className="history-note">每個主題分三次：理解 → 說和寫 → 隔幾天換情境。換情境時有兩句以上自己寫對、而且確認過，才算「延後換題仍能完成」。口說只看文字稿，發音沒有評估。</p>
+    <p className="history-note">每個主題分三次：理解 → 說和寫 → 隔幾天換情境。換情境的筆答有兩句以上自己寫對、而且確認過，才算「延後換題仍能完成」；口說另外記，只用打字的不算口說，發音沒有評估。</p>
     <ul>{rows.map(({ t, rec, open }) => <li key={t.id}>
       <div><strong>{t.n}. {t.title}</strong><span className="history-chip">{open ? topicStatus(rec) : "上完單元 " + t.after + " 後開始"}</span></div>
-      {rec.done.A && rec.listen && <small>只聽不看字：大意 {rec.listen?.noVoice ? "—" : rec.listen?.gist ? "✓" : "✗"}、細節 {rec.listen?.details ?? 0} / {rec.listen?.total ?? 0}{rec.listen?.replays ? "（另外重聽 " + rec.listen.replays + " 次）" : ""} · 讀：{rec.read ? rec.read.correct + " / " + rec.read.total : "—"}</small>}
-      {rec.done.B && <small>說：{levelText(rec.speak?.level)}（發音未評估）· 寫訊息：{levelText(rec.write?.level)}</small>}
-      {rec.done.C && <small>換情境說：{levelText(rec.review?.speak?.level)}</small>}
+      {rec.done.A && rec.listen && <small>{rec.listen.unsure && !rec.listen.plays ? "播放沒有確認：" : "只聽不看字："}大意 {rec.listen?.noVoice ? "—" : rec.listen?.gist ? "✓" : "✗"}、細節 {rec.listen?.details ?? 0} / {rec.listen?.total ?? 0}{rec.listen?.replays ? "（另外重聽 " + rec.listen.replays + " 次）" : ""} · 讀：{rec.read ? rec.read.correct + " / " + rec.read.total : "—"}</small>}
+      {rec.done.B && <small>說：{rec.speak?.mode === "typed" ? "只用打字（不算口說）" : levelText(rec.speak?.level) + "（發音未評估）"} · 寫訊息：{levelText(rec.write?.level)}</small>}
+      {rec.done.C && <small>換情境說：{rec.review?.speak?.mode === "typed" ? "只用打字（不算口說）" : levelText(rec.review?.speak?.level)}</small>}
     </li>)}</ul>
   </section>;
 }

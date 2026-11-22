@@ -6,10 +6,13 @@ import { askTutor, tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import './baseline.css'
 
-import { addResult, cefrOf, forms, nextForm, readResults, retestInfo, wordCount, type BaselineResult, type Q } from '../lib/baseline'
+import { addResult, cefrOf, emptyCheck, forms, formSeen, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
 
 const FEEDBACK = '你是英文老師，評一位台灣護理系學生（英文約國中程度）的作品。用繁體中文、口語、很短：第一行寫「大約 CEFR ○○ 左右（只是單次小樣本，不是正式程度）」；接著兩個做得好的地方、兩個最該先改的地方（附正確寫法）。總共不超過 6 行，不要 Markdown 標題。'
+
+// A transcript shows words and grammar only: no level, no pronunciation, no fluency estimate from it.
+const SPEAK_FEEDBACK = '你是英文老師。下面是一位台灣護理系學生（英文約國中程度）口說的語音辨識逐字稿，可能有辨識錯字。用繁體中文、口語、很短：第一行固定寫「只看逐字稿：發音、流暢度和停頓沒有評估」；接著兩個做得好的地方（內容、用字、文法）、兩個最該先改的地方（附正確說法）。不要寫 CEFR、雅思分數或任何等級。總共不超過 6 行，不要 Markdown 標題。'
 
 function Quiz({ qs, answers, setAnswers }: { qs: Q[]; answers: number[]; setAnswers: (a: number[]) => void }) {
   return <ol className="bl-qs">{qs.map((q, i) => <li key={i}>
@@ -73,18 +76,23 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     return ((await res.json()).text as string) || ''
   }
   async function finish() {
+    // Skipped parts are 缺測 (null), not zero; a listening answer without playing the clip is not a listening score.
+    const listening = plays ? sectionScore(form.listenQs, listen) : null
+    const reading = sectionScore(form.readQs, read)
+    if (emptyCheck({ listening, reading, writing: { text: writing, feedback: '' }, speaking: { transcript: '', feedback: '', seconds: audio ? seconds : 0 } })) {
+      setBusy('這次每一項都跳過了：沒有存結果，題本也沒有用掉。'); return
+    }
     setBusy('整理結果中……')
-    const score = (qs: Q[], a: number[]) => qs.filter((q, i) => a[i] === q.answer).length
     let transcript = '', speakFeedback = '', writeFeedback = ''
     try {
       if (audio) transcript = await transcribe(audio)
       if (tutorKey()) {
         if (writing.trim()) writeFeedback = await askTutor(FEEDBACK, [{ role: 'user', content: '題目：' + form.write + '\n作品：' + writing }])
-        if (transcript) speakFeedback = await askTutor(FEEDBACK + '（這是口說的語音辨識逐字稿，只評內容與文法，不評發音。）', [{ role: 'user', content: '題目：' + form.speak + '\n逐字稿（約 ' + seconds + ' 秒）：' + transcript }])
+        if (transcript) speakFeedback = await askTutor(SPEAK_FEEDBACK, [{ role: 'user', content: '題目：' + form.speak + '\n逐字稿（約 ' + seconds + ' 秒）：' + transcript }])
       }
     } catch { /* keep whatever we have */ }
     const result: BaselineResult = {
-      form: formId, date: dayKey(), listening: score(form.listenQs, listen), plays, reading: score(form.readQs, read),
+      form: formId, date: dayKey(), listening, plays, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
       writing: { text: writing, feedback: writeFeedback },
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
@@ -101,15 +109,20 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     return <section className="bl-card">
       <header><strong>英文程度紀錄</strong><span>{retest.due ? '可以回測了' : '下次回測：' + retest.date + '（還有 ' + retest.days + ' 天）'}</span></header>
       <div className="bl-table-wrap"><table className="bl-table">
-        <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.date + r.form}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}</small></th>)}</tr></thead>
+        <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.date + r.form}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}{r.repeat ? '（做過）' : ''}</small></th>)}</tr></thead>
         <tbody>
-          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.date}>{r.listening} / 3{r.plays !== undefined && <small>聽了 {r.plays} 次</small>}</td>)}</tr>
-          <tr><th scope="row">閱讀</th>{shown.map(r => <td key={r.date}>{r.reading} / 3</td>)}</tr>
-          <tr><th scope="row">寫作</th>{shown.map(r => <td key={r.date}>{wordCount(r.writing.text)} 字{cefrOf(r.writing.feedback) && <small>{cefrOf(r.writing.feedback)}</small>}</td>)}</tr>
-          <tr><th scope="row">口說</th>{shown.map(r => <td key={r.date}>{r.speaking.seconds} 秒{r.speaking.transcript && <small>{wordCount(r.speaking.transcript)} 字{cefrOf(r.speaking.feedback) && ' · ' + cefrOf(r.speaking.feedback)}</small>}</td>)}</tr>
+          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.date}>{r.listening === null ? '缺測' : r.listening + ' / 3'}{r.plays !== undefined && r.listening !== null && <small>聽了 {r.plays} 次</small>}</td>)}</tr>
+          <tr><th scope="row">閱讀</th>{shown.map(r => <td key={r.date}>{r.reading === null ? '缺測' : r.reading + ' / 3'}</td>)}</tr>
+          <tr><th scope="row">寫作</th>{shown.map(r => <td key={r.date}>{r.writing.text.trim() ? wordCount(r.writing.text) + ' 字' : '缺測'}{cefrOf(r.writing.feedback) && <small>{cefrOf(r.writing.feedback)}</small>}</td>)}</tr>
+          <tr><th scope="row">口說</th>{shown.map(r => <td key={r.date}>{r.speaking.seconds ? r.speaking.seconds + ' 秒' : '缺測'}{r.speaking.transcript && <small>{wordCount(r.speaking.transcript)} 字</small>}</td>)}</tr>
         </tbody>
       </table></div>
-      {results.length > 1 && <p className="bl-delta">跟起點比（題目不同，只當參考）：聽力 {sign(last.listening - first.listening)}、閱讀 {sign(last.reading - first.reading)}、寫作 {sign(wordCount(last.writing.text) - wordCount(first.writing.text))} 字、口說 {sign(last.speaking.seconds - first.speaking.seconds)} 秒</p>}
+      {results.length > 1 && <p className="bl-delta">跟起點比（題目不同，只當參考；缺測的不比）：{[
+        first.listening !== null && last.listening !== null ? '聽力 ' + sign(last.listening - first.listening) : '',
+        first.reading !== null && last.reading !== null ? '閱讀 ' + sign(last.reading - first.reading) : '',
+        first.writing.text.trim() && last.writing.text.trim() ? '寫作 ' + sign(wordCount(last.writing.text) - wordCount(first.writing.text)) + ' 字' : '',
+        first.speaking.seconds && last.speaking.seconds ? '口說 ' + sign(last.speaking.seconds - first.speaking.seconds) + ' 秒' : '',
+      ].filter(Boolean).join('、') || '還沒有兩次都做的項目'}{last.repeat ? '。這次的題本以前做過，分數會偏高。' : ''}</p>}
       <details><summary>看每次的作品和回饋</summary>
         {[...results].reverse().map(r => <div key={r.date + r.form} className="bl-past">
           <p className="bl-label">{name(r)} · {r.date} · 題本 {r.form ?? 'A'}</p>
@@ -120,8 +133,8 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
         </div>)}
       </details>
       {retest.due
-        ? <button type="button" className="bl-main" onClick={() => setOpen(true)}>開始第 {results.length} 次回測（新題本 {formId}，約 15 分鐘）</button>
-        : <button type="button" className="bl-early" onClick={() => setOpen(true)}>想提早回測（新題本 {formId}）</button>}
+        ? <button type="button" className="bl-main" onClick={() => setOpen(true)}>開始第 {results.length} 次回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}，約 15 分鐘）</button>
+        : <button type="button" className="bl-early" onClick={() => setOpen(true)}>想提早回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}）</button>}
       <small>每次換一份新題本，題型、長度和作答條件都一樣（聽力最多聽 2 次、不看字；寫作和口說不查字典、不用翻譯）。題目不同，差一兩題可能只是題目難易，比較「寫得多不多、說得長不長、需要的幫忙有沒有變少」更準。只拿來和自己比，不代表正式程度或雅思分數。</small>
     </section>
   }

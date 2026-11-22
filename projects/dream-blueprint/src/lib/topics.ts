@@ -1,5 +1,5 @@
 import data from '../data/topics.json'
-import { addDays, daysBetween, newCard, reviewCard, type Energy, type Period } from './progress'
+import { addDays, applyAnswer, daysBetween, newCard, type Energy, type Period } from './progress'
 import type { AppState } from './store'
 import { judgeCheckpoint, judgeExpress, levelNames, type Level, type Verdict } from './evidence'
 import { readLessonRecord } from './lesson'
@@ -43,7 +43,11 @@ export const REVIEW_GAP = 3
 export type Rating = 'correct' | 'minor' | 'again'
 export interface ItemResult { level: Level | null; rating: Rating; revealed: boolean }
 export interface SpeakRecord {
+  /** Speaking itself: null when it was only typed (typing is not speech) or skipped. */
   level: Level | null
+  /** The transcript's content and grammar, judged like any open answer. */
+  textLevel?: Level | null
+  mode?: 'recorded' | 'spoken' | 'typed'
   help: string[]
   firstVerdict?: Verdict
   recorded?: boolean
@@ -62,6 +66,8 @@ export interface ListenRecord {
   shadowed?: boolean
   retell?: Level | null
   noVoice?: boolean
+  /** The device never reported a finished play; answers are kept but not counted as understood by ear. */
+  unsure?: boolean
 }
 export interface TopicRecord {
   /** The day each part was finished. */
@@ -73,10 +79,10 @@ export interface TopicRecord {
   listen?: ListenRecord
   read?: { correct: number; total: number; missed: ReadSkill[] }
   speak?: SpeakRecord
-  write?: { level: Level | null; sentences: number; help: string[]; firstVerdict?: Verdict }
+  write?: { level: Level | null; sentences: number; covered?: number; help: string[]; firstVerdict?: Verdict }
   review?: { level: Level | null; speak?: SpeakRecord }
   /** Help and Claude's first check while a speaking or writing task is still open (kept across a reload). */
-  open?: Record<string, { help: string[]; firstVerdict?: Verdict }>
+  open?: Record<string, { help: string[]; firstVerdict?: Verdict; checkedText?: string }>
 }
 
 export const topicKey = (id: string) => 'topic.' + id
@@ -148,15 +154,16 @@ export function speakGoals(fixes: readonly { why?: string }[], unmet: readonly s
   return goals.slice(0, 2)
 }
 
-/** Sentences in a short message: a.m. / p.m. and titles do not end a sentence; a line break does. */
+/** Sentences in a short message: a.m. / p.m. and titles do not end a sentence; a line break does; a piece needs at least
+ *  two words to count ("Hi!" alone does not). This only measures length — it says nothing about grammar or meaning. */
 export function countSentences(text: string) {
   const plain = text.replace(/\b(a\.m|p\.m|mr|mrs|ms|dr|e\.g|i\.e)\./gi, m => m.replace(/\./g, ''))
-  return plain.split(/[.!?]+(?=\s|$)|\n+/).filter(s => /[a-z]/i.test(s)).length
+  return plain.split(/[.!?]+(?=\s|$)|\n+/).filter(s => (s.match(/[a-z]+(?:['’][a-z]+)?/gi) ?? []).length >= 2).length
 }
 
 /** The overall line shown in the record. */
 export function topicStatus(rec: TopicRecord): string {
-  if (rec.done.C) return '換情境複習：' + (rec.review?.level ? levelNames[rec.review.level] : '未作答')
+  if (rec.done.C) return '換情境筆答：' + (rec.review?.level ? levelNames[rec.review.level] : '未作答')
   if (rec.done.B) return '說和寫完成，等換情境複習'
   if (rec.done.A) return '理解完成，下次說和寫'
   return rec.cur ? '進行中' : '還沒開始'
@@ -178,7 +185,7 @@ export function completePart(prev: AppState, topic: Topic, part: TopicPart, toda
     const i = cards.findIndex(c => c.id === t.sentenceId)
     if (i === -1) cards.push(newCard(t.sentenceId, today))
     else {
-      const { card, event } = reviewCard(cards[i], today, t.rating === 'correct', t.revealed)
+      const { card, event } = applyAnswer(cards[i], today, t)
       cards[i] = card
       if (event) events.push(event)
     }

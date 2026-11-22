@@ -42,19 +42,71 @@ export function bestLevel(list: readonly Evidence[], skill: 'write' | 'listen' =
   return own.length ? own.reduce((a, e) => rank[e.level] > rank[a] ? e.level : a, own[0].level) : null
 }
 
+// Contractions with only one reading are always expanded.
 const contractions: [RegExp, string][] = [
   [/\bi'm\b/g, 'i am'], [/\byou're\b/g, 'you are'], [/\bwe're\b/g, 'we are'], [/\bthey're\b/g, 'they are'],
-  [/\b(it|that|he|she|there|what|where|who)'s\b/g, '$1 is'], [/\bcan't\b/g, 'cannot'], [/\bwon't\b/g, 'will not'],
-  [/\b(\w+)n't\b/g, '$1 not'], [/\b(i|you|we|they|he|she|it)'ll\b/g, '$1 will'], [/\b(i|you|we|they)'ve\b/g, '$1 have'],
-  [/\b(i|you|we|they|he|she)'d\b/g, '$1 would'], [/\bcan not\b/g, 'cannot'],
+  [/\bcan't\b/g, 'cannot'], [/\bwon't\b/g, 'will not'], [/\b(\w+)n't\b/g, '$1 not'],
+  [/\b(i|you|we|they|he|she|it|there|that)'ll\b/g, '$1 will'], [/\b(i|you|we|they|who|there)'ve\b/g, '$1 have'], [/\bcan not\b/g, 'cannot'],
 ]
-export function normalizeEnglish(t: string) {
-  let s = t.toLowerCase().replace(/[’‘]/g, "'")
-  for (const [re, to] of contractions) s = s.replace(re, to)
-  return s.replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim()
+// 's can be is or has, 'd can be would or had. A reference is read by the word after it; an answer may mean either.
+const sSubject = /\b(it|that|he|she|there|what|where|who|here)'s\b/g
+const dSubject = /\b(i|you|we|they|he|she|it|there)'d\b/g
+const adverbs = new Set(['never', 'already', 'just', 'ever', 'always', 'not', 'also', 'really', 'still', 'recently', 'often'])
+const participles = new Set(['been', 'gone', 'done', 'seen', 'eaten', 'taken', 'given', 'had', 'made', 'written', 'known', 'got', 'gotten', 'come',
+  'become', 'begun', 'broken', 'chosen', 'driven', 'fallen', 'forgotten', 'flown', 'grown', 'hidden', 'left', 'lost', 'met', 'paid', 'put',
+  'run', 'said', 'sent', 'sold', 'spoken', 'stolen', 'thought', 'told', 'understood', 'won', 'worn', 'woken', 'felt', 'found', 'heard',
+  'kept', 'slept', 'spent', 'stood', 'brought', 'bought', 'caught', 'taught', 'fought', 'held', 'built', 'meant', 'shut', 'cut', 'hit',
+  'hurt', 'set', 'let', 'sat', 'drunk', 'swum', 'rung', 'sung', 'shown', 'risen', 'ridden', 'thrown', 'grown', 'blown', 'drawn', 'worn'])
+// -ed words that usually follow "is" (He's tired), not "has".
+const adjectives = new Set(['tired', 'worried', 'married', 'excited', 'bored', 'interested', 'scared', 'surprised', 'pleased', 'satisfied',
+  'confused', 'embarrassed', 'disappointed', 'relaxed', 'shocked', 'frightened', 'injured', 'retired', 'located', 'allowed', 'supposed',
+  'used', 'required', 'dressed', 'prepared', 'stressed', 'annoyed', 'amazed', 'exhausted', 'qualified', 'related', 'closed', 'crowded',
+  'delayed', 'discharged', 'admitted', 'scheduled', 'covered', 'involved', 'concerned', 'dehydrated', 'infected', 'swollen', 'broken'])
+function nextVerb(rest: string) {
+  const words = rest.trim().split(/\s+/)
+  return words.find(w => !adverbs.has(w)) ?? ''
 }
-export const matchesReference = (answer: string, refs: readonly string[]) =>
-  !!answer.trim() && refs.some(r => normalizeEnglish(r) === normalizeEnglish(answer))
+const isParticiple = (w: string) => !adjectives.has(w) && (participles.has(w) || /ed$/.test(w))
+function base(t: string) {
+  let s = t.toLowerCase().replace(/[’‘]/g, "'").normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  for (const [re, to] of contractions) s = s.replace(re, to)
+  return s
+}
+const clean = (s: string) => s.replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim()
+/** One reading of a reference: 's / 'd expanded by the word that follows (He's lived → has, He's tired → is, I'd like → would). */
+function referenceForm(t: string) {
+  const s = clean(base(t))
+  return s.replace(sSubject, (_m, who: string, off: number) => who + (isParticiple(nextVerb(s.slice(off + _m.length))) ? ' has' : ' is'))
+    .replace(dSubject, (_m, who: string, off: number, all: string) => {
+      const next = nextVerb(all.slice(off + _m.length))
+      return who + (next === 'better' || isParticiple(next) ? ' had' : ' would')
+    })
+}
+/** Every reading of an answer: a learner's contraction is right if either expansion matches. */
+function answerForms(t: string): string[] {
+  let forms = [clean(base(t))]
+  for (const [re, tos] of [[sSubject, ['is', 'has']], [dSubject, ['would', 'had']]] as const) {
+    forms = forms.flatMap(f => {
+      const parts: string[] = []; const whos: string[] = []; let last = 0
+      f.replace(re, (m: string, who: string, off: number) => { parts.push(f.slice(last, off)); whos.push(who); last = off + m.length; return m })
+      if (!whos.length) return [f]
+      let out = ['']
+      whos.forEach((who, i) => { out = out.flatMap(o => tos.map(to => o + parts[i] + who + ' ' + to)) })
+      return out.map(o => o + f.slice(last))
+    }).slice(0, 16)
+  }
+  return [...new Set(forms)]
+}
+/** The form used to compare and show word differences. */
+export function normalizeEnglish(t: string) {
+  return referenceForm(t)
+}
+export const sameEnglish = (a: string, b: string) => normalizeEnglish(a) === normalizeEnglish(b)
+export function matchesReference(answer: string, refs: readonly string[]) {
+  if (!answer.trim()) return false
+  const forms = new Set(answerForms(answer))
+  return refs.some(r => forms.has(referenceForm(r)))
+}
 
 /** Word-by-word comparison with the closest reference, shown only after the reference itself is open:
  *  `extra` words are not in that reference, `missing` are reference words the answer does not have.
@@ -86,20 +138,23 @@ export const answered = (answer?: string) => !!answer?.trim()
 /** One standard for every place an answer is written — the lesson, the checkpoint, recall, review and redo:
  *  nothing written → 未作答 (null); hints or the answer seen → 有提示完成; Claude's first check or an exact match → 當次獨立完成;
  *  a self-marked "correct" with neither → 自評完成・待確認. 「不會」 leaves no evidence. 「穩了」 needs 當次獨立完成 later, on another item. */
-export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; answer?: string; references: readonly string[]; firstVerdict?: Verdict }): Level | null {
+export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; answer?: string; references: readonly string[]; firstVerdict?: Verdict; checkedText?: string }): Level | null {
   if (a.rating === 'again' || !answered(a.answer)) return null
   if (a.revealed || a.rating === 'minor') return 'assisted'
-  if (a.firstVerdict === 'good' || matchesReference(a.answer ?? '', a.references)) return 'independent'
-  if (a.firstVerdict) return 'assisted'
+  // Fixed after Claude pointed at a problem: the feedback helped, even if the result now matches the reference.
+  if (a.firstVerdict && a.firstVerdict !== 'good') return 'assisted'
+  // Claude's "good" belongs to the text it checked; an answer changed afterwards is unchecked again.
+  if (a.firstVerdict === 'good' && (a.checkedText === undefined || sameEnglish(a.checkedText, a.answer ?? ''))) return 'independent'
+  if (matchesReference(a.answer ?? '', a.references)) return 'independent'
   return 'pending'
 }
 /** Whether a written answer may count toward 「穩了」: answered alone and checked (exact match or Claude's first verdict). */
 export const verifiedAlone = (a: Parameters<typeof judgeWritten>[0]) => judgeWritten(a) === 'independent'
 /** The variation is written first and only then compared with the answer. */
-export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string): Level | null {
+export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string | readonly string[]): Level | null {
   if (mark === 'again' || !answered(answer)) return null
   if (mark === 'small') return 'assisted'
-  return matchesReference(answer, [en]) ? 'independent' : 'pending'
+  return matchesReference(answer, typeof en === 'string' ? [en] : en) ? 'independent' : 'pending'
 }
 /** The open task: a frame, the model answer or asking Claude (「我卡住了」) counts as help; the first feedback decides "alone". */
 export function judgeExpress(r: { firstVerdict?: Verdict; help: readonly string[]; answered: boolean }): Level | null {

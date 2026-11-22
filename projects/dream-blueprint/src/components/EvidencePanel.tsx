@@ -9,7 +9,6 @@ const CHECK = '你是英文老師。判斷學生的英文是否正確表達了�
 function Pending({ e, onLevel }: { e: Evidence; onLevel: (level: Level) => void }) {
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
-  const later = e.source === 'retention' || e.source === 'checkpoint'
   return <div className="ev-pending">
     <small>{sourceNames[e.source]} · {e.day.slice(5).replace('-', '/')} · 自評完成・待確認</small>
     {e.prompt && <span className="ev-prompt">{e.prompt}</span>}
@@ -22,7 +21,8 @@ function Pending({ e, onLevel }: { e: Evidence; onLevel: (level: Level) => void 
             const reply = (await askTutor(CHECK, [{ role: 'user', content: '題目：' + (e.prompt ?? '') + '\n參考：' + (e.ref ?? '') + '\n學生：' + (e.answer ?? '') }])).trim()
             const ok = /^對/.test(reply)
             setMsg(reply.split('\n')[0])
-            setTimeout(() => onLevel(ok ? (later ? 'delayed' : 'independent') : 'assisted'), 1800)
+            // One confirmed answer is 當次獨立完成; 延後換題 needs new sentences days later (the unit checkpoint).
+            setTimeout(() => onLevel(ok ? 'independent' : 'assisted'), 1800)
           } catch { setMsg('沒連上 Claude，等一下再試。') } finally { setBusy(false) }
         }}>{busy ? '確認中…' : '請 Claude 看看'}</button>
       : <small>連接 Claude 之後可以在這裡確認。</small>}
@@ -44,7 +44,7 @@ export default function EvidencePanel({ state, update }: Pick<PageProps, 'state'
       return <li key={u}>
         <div className="ev-head"><b>單元 {u} · {title}</b>
           <span data-level={write ?? ''}>寫／說：{write ? levelNames[write] : '還沒有'}</span>
-          <span data-level={listen ?? ''}>聽：{listen ? (listen === 'assisted' ? '要看字才懂' : '只聽也懂') : '還沒有'}</span>
+          <span data-level={listen ?? ''}>聽：{listen ? (listen === 'assisted' ? '只聽還沒全對' : '只聽也懂') : '還沒有'}</span>
         </div>
         {pending.map(({ e, i }) => <Pending key={i} e={e} onLevel={level => update(prev => ({ ...prev, notes: setEvidenceLevel(prev.notes, u, i, level) }))} />)}
       </li>

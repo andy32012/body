@@ -115,7 +115,8 @@ export default function PassageLibrary({ state, onActivity }: Props) {
         onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {show === 'words' && passage.words && <div className="pr-tags">
         {passage.words.map(word => <span key={word.en + (word.form ?? '')}><HintWord word={word} /> · {word.zh}{' '}
-          <ContextMeaning word={word.en} context={(passage.en ?? '') + '\n' + passage.zh} cacheKey={'ctx.' + passage.id + '.' + word.en}
+          <ContextMeaning word={word.form && word.form.toLowerCase() !== word.en.toLowerCase() ? word.form + '（' + word.en + '）' : word.en} context={(passage.en ?? '') + '\n' + passage.zh}
+            cacheKey={'ctx.' + passage.id + '.' + word.en + '.' + (word.form ?? '') + '.' + word.zh}
             notes={state.notes} onSave={(k, v) => onActivity(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} />{' '}
           <AskWord en={word.en} zh={word.zh} /></span>)}
       </div>}

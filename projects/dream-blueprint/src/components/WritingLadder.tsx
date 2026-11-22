@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import data from '../data/writing.json'
 import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { parseFeedback, readWrite, scoreOf, selfChecked, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { criteriaFor, essayKind, essays, parseFeedback, readWrite, scoreOf, selfChecked, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage, type WriteTask } from '../lib/writing'
 import { MiniChart } from './LessonParts'
 import StuckButton from './StuckButton'
 import './writing.css'
@@ -16,13 +16,14 @@ const outlines: Record<string, string[]> = {
   task1: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
   task2: ['Introduction：改寫題目＋你的立場', 'Body 1：第一個論點＋解釋＋例子', 'Body 2：第二個論點（或另一方看法）＋解釋＋例子', 'Conclusion：重申立場，不加新論點'],
 }
-
-function system(stage: WriteStage, prompt: string) {
+function system(stage: WriteStage, task: WriteTask, prompt: string) {
   const ielts = !!stage.ielts
+  const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
   return [
     '你是英文寫作老師，批改台灣護理系學生（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
-    '這一階的評分項目：' + stage.criteria.join('；'),
+    ...(kind ? ['這題是「' + essays[kind].name + '」題，照這種題目該有的結構評：' + essays[kind].outline.join('；')] : []),
+    '這一階的評分項目（name 一定要照這些名稱、照這個順序）：' + criteriaFor(stage, task).join('；'),
     ielts ? '每個項目給雅思分數（1–9 的數字，可用 .5；初學者寫得很短、錯很多就如實給 1–3.5，不要為了鼓勵而墊高到 4），再給整體 band（四項平均，四捨五入到 .5）。分數要誠實，寧可保守；這只是練習估計，不是正式分數。字數不足要在 Task 項目扣分並說明。'
       : '這一階不是考試作文，不給雅思分數。每個項目給 1–5 的整數（5 = 完全做到），comment 要具體說出哪個字、哪個文法或哪句表達要改，以及怎麼改。',
     '只輸出 JSON：{"criteria":[{"name":"項目名","score":數字,"comment":"一句繁體中文說明做得好的和要改的"}],' + (ielts ? '"band":數字,' : '') + '"summary":"一句整體評語","next":"下一版最重要、只改一件事的建議","fixes":[{"wrong":"原文片段","right":"改成","why":"一句原因"}],"revised":"保留他內容的修改版全文"}',
@@ -48,36 +49,44 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
   const [checks, setChecks] = useState<boolean[]>([])
   const [endAt, setEndAt] = useState<number>()
   const [now, setNow] = useState(Date.now())
-  useEffect(() => { setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setChecks([]); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Each check carries a number; switching task cancels it, so a late reply never lands on another question.
+  const request = useRef(0)
+  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setChecks([]); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.id])
   useEffect(() => { if (!endAt) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [endAt])
   const words = wordCount(text)
   const keyed = !!tutorKey()
   const rec = readWrite(state.notes, task.id)
   const left = endAt ? Math.max(0, endAt - now) : 0
-  useTaskContext({ label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n這一階的評分項目：' + stage.criteria.join('；') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text })
-  const outline = outlines[stage.id]
+  useTaskContext({ label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n評分項目：' + criteriaFor(stage, task).join('；') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text })
+  const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
+  const outline = kind ? essays[kind].outline : outlines[stage.id]
+  const criteria = criteriaFor(stage, task)
   const prompt = task.prompt + (task.chart ? '\n圖表資料：' + task.chart.title + ' ' + task.chart.points.map(p => p.label + ' ' + p.value).join(', ') : '')
 
-  function save(patch: Partial<NonNullable<typeof rec>>) {
+  function save(patch: Partial<NonNullable<typeof rec>>, id = task.id, count = words) {
     onActivity(prev => {
-      const old = readWrite(prev.notes, task.id)
-      const next = { ...old, ...patch, day: date, words, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0) }
-      return { ...prev, notes: { ...prev.notes, [writeKey(task.id)]: JSON.stringify(next) } }
+      const old = readWrite(prev.notes, id)
+      // The best score is worked out from the saved record, so two checks in a row cannot overwrite each other.
+      const best = patch.best === undefined ? old?.best : Math.max(old?.best ?? 0, patch.best)
+      const next = { ...old, ...patch, best, day: date, words: count, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0) }
+      return { ...prev, notes: { ...prev.notes, [writeKey(id)]: JSON.stringify(next) } }
     })
   }
   async function check() {
     if (!text.trim() || busy) return
+    const mine = ++request.current
+    const asked = { id: task.id, words, ielts: !!stage.ielts }
     setBusy(true); setError(''); setShowRevised(false)
     try {
-      const reply = await askTutor(system(stage, prompt), [{ role: 'user', content: text.trim() }])
-      const f = parseFeedback(reply, stage.criteria, !!stage.ielts)
-      if (!f) { setError('評估失敗：回傳的分數不完整或不在合理範圍（' + (stage.ielts ? '每項和 band 都要在 1–9' : '每項要在 1–5') + '），這次不算數，也不會記成過關。再按一次批改。'); return }
+      const reply = await askTutor(system(stage, task, prompt), [{ role: 'user', content: text.trim() }])
+      if (mine !== request.current) return
+      const f = parseFeedback(reply, criteria, asked.ielts)
+      if (!f) { setError('評估失敗：回傳的分數不完整、項目對不上，或不在合理範圍（' + (asked.ielts ? '每項 1–9，band 要跟四項平均差不多' : '每項是 1–5 的整數') + '），這次不算數，也不會記成過關。再按一次批改。'); return }
       setFb(f)
-      const sc = scoreOf(f, !!stage.ielts)
-      save({ last: f, best: Math.max(rec?.best ?? 0, sc) })
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)) }
-    finally { setBusy(false) }
+      save({ last: f, best: scoreOf(f, asked.ielts) }, asked.id, asked.words)
+    } catch (e) { if (mine === request.current) setError(e instanceof Error ? e.message : String(e)) }
+    finally { if (mine === request.current) setBusy(false) }
   }
   const stageDone = useMemo(() => Object.fromEntries(stages.map(s => [s.id, s.tasks.filter(t => taskDone(readWrite(state.notes, t.id), !!s.ielts)).length])), [state.notes])
 
@@ -93,8 +102,8 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>
       {task.chart && <MiniChart chart={task.chart} />}
-      {outline && <details className="wl-outline"><summary>結構提示</summary><ol>{outline.map(o => <li key={o}>{o}</li>)}</ol></details>}
-      <details className="wl-criteria"><summary>這一階怎麼評分（{stage.criteria.length} 項）</summary><ul>{stage.criteria.map(c => <li key={c}>{c}</li>)}</ul></details>
+      {outline && <details className="wl-outline"><summary>結構提示{kind ? '（' + essays[kind].name + '題）' : ''}</summary><ol>{outline.map(o => <li key={o}>{o}</li>)}</ol></details>}
+      <details className="wl-criteria"><summary>這{kind ? '題' : '一階'}怎麼評分（{criteria.length} 項）</summary><ul>{criteria.map(c => <li key={c}>{c}</li>)}</ul></details>
     </section>
     <label className="pr-field">我的英文
       <textarea lang="en" rows={stage.id === 'sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
@@ -104,11 +113,12 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
       <span data-ok={words >= task.min}>{words} / {task.min} 字</span>
       {stage.ielts && (endAt ? <span data-ok={left > 0}>{left > 0 ? '剩 ' + Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0') : '時間到（可以繼續寫完）'}</span>
         : <button type="button" className="pr-link" onClick={() => { setEndAt(Date.now() + (stage.minutes ?? 20) * 60000); setNow(Date.now()) }}>開始計時 {stage.minutes} 分鐘</button>)}
-      {rec?.best !== undefined && <span>最佳：{stage.ielts ? '練習估計 ' + rec.best : rec.best.toFixed(1) + ' / 5'}</span>}
+      {rec?.best !== undefined && rec.best <= (stage.ielts ? 9 : 5) && <span>最佳：{stage.ielts ? '練習估計 ' + rec.best : rec.best.toFixed(1) + ' / 5'}</span>}
     </div>
+    {stage.ielts && <small className="wl-count">字數怎麼算：英文字和數字各算一個（well-known、don't、37.5 都算一個），標點不算。跟考場算法接近，但不完全一樣，寧可多寫幾個字。</small>}
     <div className="pr-actions">
       {keyed ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? '批改中……' : fb ? '改好了，再批一次' : '照評分項目批改'}</button>
-        : <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setChecks(stage.criteria.map(() => false))}>自己對照評分項目檢查</button>}
+        : <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setChecks(criteria.map(() => false))}>自己對照評分項目檢查</button>}
       <StuckButton />
       {task.sample && <button type="button" className="pr-link" onClick={() => setShowSample(!showSample)}>{showSample ? '收起參考範文' : '看參考範文'}</button>}
     </div>
@@ -116,7 +126,7 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
     {showSample && <section className="pr-reference"><small>參考範文（只是一種寫法；看完先自己改，不要照抄）</small>{task.sample.split('\n').map((l, i) => l.trim() ? <p key={i} lang="en">{l}</p> : null)}</section>}
     {!keyed && checks.length > 0 && <section className="wl-self">
       <strong>逐項檢查，做到就打勾</strong>
-      {stage.criteria.map((c, i) => <label key={c}><input type="checkbox" checked={!!checks[i]} onChange={e => { const n = [...checks]; n[i] = e.target.checked; setChecks(n) }} /> {c}</label>)}
+      {criteria.map((c, i) => <label key={c}><input type="checkbox" checked={!!checks[i]} onChange={e => { const n = [...checks]; n[i] = e.target.checked; setChecks(n) }} /> {c}</label>)}
       <button type="button" disabled={!checks.length || checks.some(x => !x)} onClick={() => save({ self: 1, day: date, words })}>都做到了，記下來</button>
       <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 批改過才算。</small>
     </section>}

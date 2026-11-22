@@ -1,15 +1,23 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import { orderForSkill, spellingMatches, type Skill } from '../lib/wordSkills'
 
 /** `en` may list accepted spellings ("airplane/plane"); `key` is the word-table entry the skill is recorded on. */
 type Word = { en: string; zh: string; key?: string }
 
-function say(text: string, rate = 0.85) {
+/** Reads every accepted form ("airplane/plane" → "airplane, plane"). `onPlay` runs once the sound really starts
+ *  (or the engine reports it is speaking), not merely when it was asked to speak. */
+function say(text: string, rate = 0.85, onPlay?: () => void) {
   try {
     speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text.split('/')[0].replace(/\(.*?\)/g, ''))
+    const u = new SpeechSynthesisUtterance(text.split('/').map(f => f.replace(/\(.*?\)/g, '').trim()).filter(Boolean).join(', '))
     u.lang = 'en-US'; u.rate = rate
+    if (onPlay) {
+      let done = false
+      const go = () => { if (!done) { done = true; onPlay() } }
+      u.onstart = go
+      setTimeout(() => { try { if (speechSynthesis.speaking) go() } catch { /* no engine */ } }, 1200)
+    }
     speechSynthesis.speak(u)
     return true
   } catch { return false }
@@ -28,6 +36,10 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   const [passed, setPassed] = useState(0)
   const [heard, setHeard] = useState(false)
   const [helped, setHelped] = useState(false)
+  // Which word a sound belongs to: a late start event from the word before must not unlock this one.
+  const at = useRef(0)
+  at.current = i
+  const playFor = (n: number, w: Word) => say(w.en, rate, () => { if (at.current === n) setHeard(true) })
   const word = order[i]
   const options = useMemo(() => {
     if (!word) return []
@@ -47,20 +59,20 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
     // Spelled after 「給我第一個字母」 is done with help: it does not count as 寫出.
     if (ok && !helped) { onPass(word); setPassed(n => n + 1) }
     const upcoming = order[i + 1]
-    // The tap on 下一個 is a user gesture, so the next word can play right away.
-    const played = skill === 'listen' && !!upcoming && say(upcoming.en, rate)
-    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(played); setHelped(false)
+    // The tap on 下一個 is a user gesture, so the next word can play right away; its choices open once it sounds.
+    if (skill === 'listen' && upcoming) playFor(i + 1, upcoming)
+    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false); setHelped(false)
   }
   const right = picked !== undefined && options[picked]?.en === word.en
   return <div className="pr-stack ws">
     <p className="qz-meta"><span>{i + 1} / {order.length}</span><span>{skill === 'listen' ? '聽發音，選意思' : skill === 'say' ? '看中文，說出英文' : '看中文，拼出英文'}</span></p>
     {skill === 'listen' && <>
-      <button type="button" className="ws-play" onClick={() => { if (say(word.en, rate)) setHeard(true) }}><Volume2 size={18} />播放{picked !== undefined ? '（' + word.en + '）' : ''}</button>
+      <button type="button" className="ws-play" onClick={() => { if (!playFor(i, word)) setHeard(false) }}><Volume2 size={18} />播放{picked !== undefined ? '（' + word.en + '）' : ''}</button>
       <div className="pr-options">{options.map((o, j) => <button key={o.zh} type="button" disabled={picked !== undefined || !heard} aria-pressed={picked === j}
         className={picked === undefined ? undefined : o.en === word.en ? 'qz-right' : picked === j ? 'qz-wrong' : undefined}
         onClick={() => { setPicked(j); say(word.en, rate) }}>{o.zh}</button>)}</div>
       {!heard && typeof speechSynthesis === 'undefined' && <p className="ls-help">這個瀏覽器不能播放語音，聽懂練習先換別的模式。</p>}
-      {!heard && <p className="ls-help">先按播放聽一次，再選意思（這樣才算「聽懂」）。</p>}
+      {!heard && <p className="ls-help">先按播放聽一次，聲音出來後才能選意思（這樣才算「聽懂」）。按了沒聲音，檢查音量或換個瀏覽器。</p>}
       {picked !== undefined && <button type="button" className="pr-main" onClick={() => next(right)}>下一個</button>}
     </>}
     {skill === 'say' && <>
@@ -68,6 +80,7 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
       {!shown ? <button type="button" className="pr-main" onClick={() => { setShown(true); say(word.en, rate) }}>我說出來了，看答案</button> : <>
         <p className="ws-answer" lang="en">{word.en} <button type="button" className="ws-mini" aria-label="再聽一次" onClick={() => say(word.en, rate)}><Volume2 size={15} /></button></p>
         <div className="pr-actions"><button type="button" onClick={() => next(true)}>我說對了（自評）</button><button type="button" onClick={() => next(false)}>沒說出來</button></div>
+        <small className="ls-help">還沒有錄音核對，這裡記成「說出（自評）」，不算確認過的口說。</small>
       </>}
     </>}
     {skill === 'write' && <>

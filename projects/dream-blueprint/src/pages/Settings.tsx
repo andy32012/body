@@ -155,7 +155,7 @@ export default function Settings(props: PageProps) {
       else { setText(raw); announce('words','已讀取檔案，可檢查內容再匯入。') }
     } catch (e) { announce(mode, e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。') }
   }
-  return <main className="settings-page">
+  return <section className="settings-page" aria-label="設定">
     <header className="set-hero">
       <div className="set-hero-copy">
         <h1>設定</h1>
@@ -237,7 +237,7 @@ export default function Settings(props: PageProps) {
     <Panel icon={BookOpen} title="使用說明與資料來源" hint="練習規則與赴美護理資料"><h3>兩分鐘也算一天</h3><p>兩分鐘能幫你留住習慣。要達到英文檢定分數，仍需在負荷穩定時逐步增加聽、說、讀、寫的練習。</p><p>每天依手機當地時間凌晨 4 點換日。普通或有電完成後，課表往前一天。累爆只練舊內容。</p><h3>資料來源</h3><p>課程與學籍依你提供的藍圖更新，修課和實習安排以校方公告為準。</p>{sourceLinks.map(([name,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{name} ↗</a>)}</Panel>
     </section>
     </div>
-  </main>
+  </section>
 }
 
 

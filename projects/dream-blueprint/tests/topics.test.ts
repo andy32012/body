@@ -126,6 +126,7 @@ test('changed-context review: two sentences written alone and checked make it å»
 
 test('sentence count for 3â€“5 sentence messages', () => {
   assert.equal(countSentences("Hi everyone! I'm Xuanye. I get up at 7 a.m. every day."), 3)
-  assert.equal(countSentences('Hi\nI am new here\nSee you'), 3)
+  assert.equal(countSentences('Hi\nI am new here\nSee you'), 2, 'a one-word line is not a sentence')
+  assert.equal(countSentences('Hi!\nOK.\nYes.'), 0)
   assert.equal(countSentences('   '), 0)
 })

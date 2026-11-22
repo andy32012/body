@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { ArrowRight, BookOpen, ChevronRight, Compass, GraduationCap, ListChecks, Play, Star, Trophy } from 'lucide-react'
 import type { AppState, PageProps } from '../lib/store'
-import { activePeriod, type Energy, type Period } from '../lib/progress'
+import type { Energy } from '../lib/progress'
+import { dayBudget } from '../lib/dailyPlan'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
 import { activeLesson, coreSaved, lessonFinished, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
@@ -13,30 +14,15 @@ import TodayPlan from './TodayPlan'
 import './dock.css'
 import './today-lesson.css'
 
-function holidayMinutes(day: string) {
-  if (day >= '2029-08-01') return 60
-  if (day >= '2028-01-01') return 40
-  if (day >= '2027-07-01') return 30
-  return 20
-}
-
-/** Today's energy: a default from the period and weekday, changeable for today only. */
+/** Today's energy: a default from the day's plan (one source for every minute shown), changeable for today only. */
 export function useEnergyChoice(state: AppState, today: string) {
-  const weekday = new Date(today + 'T12:00:00').getDay()
-  const period: Period = activePeriod(today, state.settings.periods)
-  const quiet = period === 'exam' || period === 'internship'
-  const regular = state.settings.regularDays.includes(weekday)
-  const holiday = period === 'vacation'
-  const defaultEnergy: Energy = quiet ? 'low' : holiday && weekday !== 0 ? 'high' : !holiday && regular ? 'normal' : 'low'
+  const budget = dayBudget(today, state.settings)
   const [choice, setChoice] = useState<{ key: string; energy: Energy } | null>(null)
-  const scheduleKey = today + period + ':' + defaultEnergy
-  const picked = choice?.key === scheduleKey ? choice.energy : defaultEnergy
-  // Exams and internship: no new lessons, but 普通 opens a 10–15 minute nursing-English plan.
-  const energy: Energy = quiet && picked === 'high' ? 'normal' : picked
-  const highMinutes = holidayMinutes(today)
-  const durations: Record<Energy, string> = quiet ? { low: '2 分鐘', normal: '10–15 分鐘', high: '先不用' }
-    : { low: '2 分鐘', normal: '30 分鐘', high: holiday ? highMinutes + ' 分鐘' : '45 分鐘' }
-  return { weekday, period, quiet, regular, holiday, energy, durations, highMinutes, choose: (e: Energy) => setChoice({ key: scheduleKey, energy: e }) }
+  const scheduleKey = today + budget.period + ':' + budget.defaultEnergy
+  const picked = choice?.key === scheduleKey ? choice.energy : budget.defaultEnergy
+  // Exams and internship have no 有電 choice: no new lessons, 普通 is the 10–15 minute nursing-English plan.
+  const energy: Energy = budget.minutes[picked] === null ? 'normal' : picked
+  return { ...budget, energy, durations: budget.labels, choose: (e: Energy) => setChoice({ key: scheduleKey, energy: e }) }
 }
 export type EnergyChoice = ReturnType<typeof useEnergyChoice>
 
@@ -51,7 +37,7 @@ export function EnergyChoices({ choice, label }: { choice: EnergyChoice; label: 
     {options.map(({ energy, name, note, cells }) => <button className="dock-choice" type="button" key={energy} data-energy={energy}
       aria-pressed={choice.energy === energy} disabled={choice.quiet && energy === 'high'} onClick={() => choice.choose(energy)}>
       <span className="dock-battery" aria-hidden="true">{[1, 2, 3].map(n => <i key={n} data-filled={n <= cells} />)}</span>
-      <strong>{choice.durations[energy]}</strong><small>{choice.quiet ? (energy === 'normal' ? '護理英文' : energy === 'low' ? '只複習' : name) : note}</small>
+      <strong>{choice.durations[energy]}</strong><small>{energy === 'low' && choice.optional ? '選做' : choice.quiet ? (energy === 'normal' ? '護理英文' : energy === 'low' ? '只複習' : name) : note}</small>
     </button>)}
   </div>
 }
@@ -61,7 +47,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   today: string; start: (e: Energy) => void; openWord: () => void; days: number; weekCount: number
 }) {
   const choice = useEnergyChoice(state, today)
-  const { energy, quiet, period } = choice
+  const { energy, quiet, kind, optional } = choice
   // A life-topic session takes today's slot when one is due (they take turns with grammar lessons).
   const topic = !quiet && energy !== 'low' ? dueTopic(state, today) : null
   const topicDone = topicDoneToday(state.notes, today)
@@ -81,11 +67,12 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const practised = state.sessions.some(s => s.day === today)
   const label = topic ? '生活主題 ' + topic.topic.n + ' · ' + topic.topic.title + ' · 第 ' + partNumber(topic.part) + ' 次（共 3 次）'
     : topicDone && !finished && !quiet && energy !== 'low' ? '加練 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-    : quiet ? (period === 'exam' ? '考週' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-    : lesson.review ? (energy === 'low' ? '今天 2 分鐘 · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
+    : quiet ? (kind === 'exam' ? '考週' : kind === 'sprint' ? '國考衝刺' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
+    : lesson.review ? (energy === 'low' ? (optional ? (kind === 'rest' ? '今天休息' : '今天沒排課') + ' · 2 分鐘是選做' : '今天 2 分鐘') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
     : lesson.checkpoint ? '單元 ' + lesson.unit + ' 小關卡' : '今天這一堂 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-  const goal = topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? '10–15 分鐘護理英文：複習、幾題護理英文、用英文說一件事' : '今天只要 2 分鐘：回想一句熟悉的英文')
-    : lesson.review ? (energy === 'low' ? '今天只要 2 分鐘：回想一句熟悉的英文' : '今天複習舊句，課表明天繼續')
+  const twoMinutes = optional ? '想動一下的話，花 2 分鐘回想一句熟悉的英文（選做）' : '今天只要 2 分鐘：回想一句熟悉的英文'
+  const goal = topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? '10–15 分鐘護理英文：複習、幾題護理英文、用英文說一件事' : twoMinutes)
+    : lesson.review ? (energy === 'low' ? twoMinutes : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
   const showPlan = energy !== 'low'
   return <>
@@ -104,7 +91,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
         <div className="lesson-actions">
           {quiet && energy === 'normal'
             ? <button type="button" className="launch" onClick={() => document.getElementById('today-plan')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><ListChecks size={16} />看今天的清單<ArrowRight size={16} /></button>
-            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? '開始 2 分鐘' : '開始這一堂'}<ArrowRight size={16} /></button>}
+            : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? (optional ? '選做：2 分鐘' : '開始 2 分鐘') : '開始這一堂'}<ArrowRight size={16} /></button>}
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
         {!topic && resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
@@ -123,17 +110,10 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
 
 /** School, the English task and the next dream step — folded away so the lesson stays first. */
 export function TodayThings({ state, navigate, today, nextStep }: Pick<PageProps, 'state' | 'navigate'> & { today: string; nextStep: string }) {
-  const choice = useEnergyChoice(state, today)
-  const { weekday, quiet, period, holiday, regular, highMinutes } = choice
-  const restDay = state.settings.restDays.includes(weekday)
   const school = schoolToday(state.school, today)
   const schoolSummary = [school.classes, ...school.events, '原訂讀書時段 · ' + school.study].join(' ／ ')
   const rivalry = state.settings.rivalsEnabled ? rivalSummary(state) : ''
-  const englishTask = quiet ? (period === 'exam'
-    ? '考試優先。想動一下英文就選 10 分鐘護理英文；不然複習 2 分鐘或休息。'
-    : '護理英文 10–15 分鐘：複習、幾題護理英文、用英文說一件實習的事；太累就複習 2 分鐘。') :
-    holiday ? (weekday === 0 ? '今天休息。' : '放假練習 ' + highMinutes + ' 分鐘。') :
-    regular ? '一般日 30 分鐘：複習卡＋今天這一堂。' : restDay ? '今天休息。' : '複習 2 分鐘。'
+  const englishTask = dayBudget(today, state.settings).english
   return <details className="orbit-card today-things">
     <summary><ListChecks size={18} aria-hidden="true" /><span>今天的學校和待辦</span><small>{school.events.length ? school.events[0] : school.study}</small></summary>
     <dl className="dock-list">
@@ -157,7 +137,7 @@ export function LessonBanner({ state, today, start }: Pick<PageProps, 'state'> &
     <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{topic.step > 0 ? '繼續' : '開始'}</button>
   </section>
   return <section className="lesson-banner">
-    <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : '今天這一堂'}</small>
+    <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : choice.optional && choice.energy === 'low' ? (choice.kind === 'rest' ? '今天休息' : '今天沒排課') + ' · 2 分鐘是選做' : '今天這一堂'}</small>
       <strong>{choice.quiet ? '單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : lesson.cando || lesson.title}</strong></div>
     <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{finished ? '再上一次' : choice.energy === 'low' ? '2 分鐘複習' : '開始'}</button>
   </section>

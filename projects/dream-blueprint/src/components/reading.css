@@ -17,3 +17,4 @@
 .rd-review { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: .2rem; font-size: .9rem; }
 .rd-review li[data-ok="false"] { color: var(--practice-miss, #b4483c); }
 .rd-words { margin: 0; font-size: .85rem; line-height: 2; }
+.rd-moved { margin: 0; padding: .55rem .8rem; border-radius: 10px; background: var(--practice-accent-wash); color: var(--practice-ink); line-height: 1.55; }

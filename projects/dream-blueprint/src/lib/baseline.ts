@@ -7,10 +7,13 @@ export interface Form { listen: string; listenQs: Q[]; read: string; readQs: Q[]
 export interface BaselineResult {
   form?: FormId
   date: string
-  listening: number
+  /** null = 缺測 (skipped, or the clip was never played) — never stored as 0, which would look like a drop. */
+  listening: number | null
   /** How many times the listening clip was played (max 2), so results are compared under the same conditions. */
   plays?: number
-  reading: number
+  reading: number | null
+  /** This form was done before, so the questions were already seen. */
+  repeat?: boolean
   writing: { text: string; feedback: string }
   speaking: { transcript: string; feedback: string; seconds: number }
 }
@@ -83,12 +86,22 @@ export function addResult(notes: Record<string, string>, result: BaselineResult)
   return { ...notes, [resultsKey]: JSON.stringify([...readResults(notes), result]) }
 }
 export const nextForm = (results: readonly BaselineResult[]): FormId => order[results.length % order.length]
+/** Whether the next form has already been done (there are only three, so the fourth check reuses A). */
+export const formSeen = (results: readonly BaselineResult[], form: FormId) => results.some(r => (r.form ?? 'A') === form)
+/** Score of one section: null when nothing was answered (缺測), otherwise the number right. */
+export function sectionScore(qs: readonly Q[], answers: readonly (number | undefined)[]): number | null {
+  if (!answers.some(a => a !== undefined)) return null
+  return qs.filter((q, i) => answers[i] === q.answer).length
+}
+/** A check with every part skipped is not saved, so it neither looks like zero nor uses up a form. */
+export const emptyCheck = (r: Pick<BaselineResult, 'listening' | 'reading' | 'writing' | 'speaking'>) =>
+  r.listening === null && r.reading === null && !r.writing.text.trim() && !r.speaking.seconds
 export function retestInfo(results: readonly BaselineResult[], today: string) {
   const last = results.at(-1)
   if (!last) return { due: true, date: today, days: 0 }
   const date = addDays(last.date, RETEST_DAYS)
   return { due: today >= date, date, days: Math.max(0, daysBetween(today, date)) }
 }
-export const wordCount = (t: string) => t.trim().split(/\s+/).filter(Boolean).length
+export { wordCount } from './writing'
 /** The CEFR guess Claude put on the first line of its feedback, if any. */
 export const cefrOf = (feedback: string) => feedback.match(/\b([ABC][12])\b/)?.[1] ?? ''

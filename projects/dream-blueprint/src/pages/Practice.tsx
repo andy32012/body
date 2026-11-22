@@ -21,6 +21,7 @@ import {
   reviewBudget,
   dueCount,
   reviewCard,
+  applyAnswer,
 } from "../lib/progress";
 import { isKnownWord, wordKey, officialWords, spellingTargets } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
@@ -32,6 +33,7 @@ import {
   answered,
   compareWithReference,
   matchesReference,
+  sameEnglish,
   judgeCheckpoint,
   judgeExpress,
   judgeVariation,
@@ -153,7 +155,7 @@ export function Translation({
   preparation?: ReactNode;
   label?: string;
   sentence: Sentence;
-  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict }) => void;
+  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) => void;
   checkpoint: boolean;
   saved?: HintUse;
   onHint?: (use: HintUse) => void;
@@ -164,12 +166,15 @@ export function Translation({
   const [manualCopy, setManualCopy] = useState("");
   const [seenHint, setSeen] = useState(() => !!saved?.r || (saved?.h ?? 0) >= 2);
   const [firstVerdict, setFirstVerdict] = useState<Verdict | undefined>(() => saved?.v);
+  // The exact text Claude's first verdict was about: editing the answer afterwards makes that verdict stale.
+  const [checkedText, setCheckedText] = useState<string | undefined>(() => saved?.vt);
   const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
-  function record(h: number, r: boolean, v = firstVerdict, c = askedHelp) {
+  function record(h: number, r: boolean, v = firstVerdict, c = askedHelp, vt = checkedText) {
     setHintLevel(h);
     setSeen(r);
-    onHint?.({ h, r, ...(v ? { v } : {}), ...(c ? { c } : {}) });
+    onHint?.({ h, r, ...(v ? { v } : {}), ...(v && vt !== undefined ? { vt } : {}), ...(c ? { c } : {}) });
   }
+  const verdictStale = !!firstVerdict && checkedText !== undefined && !sameEnglish(checkedText, answer);
   useTaskContext({
     label: (checkpoint ? "小關卡" : "中翻英") + "：" + sentence.zh,
     detail: ["題目（中翻英）：" + sentence.zh, "這題練的文法：" + sentence.grammar.join("、"), "課本提示：" + sentence.hints.join(" ／ "),
@@ -233,7 +238,7 @@ export function Translation({
         </div>
       )}
       {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
-        onVerdict={(v, attempt) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); record(hint, seenHint, v); } }} />}
+        onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
           <strong>自己檢查看看</strong>
@@ -309,7 +314,7 @@ export function Translation({
             <button
               key={mark}
               disabled={mark !== "again" && !answered(answer)}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict }); }}
+              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}
             >
               {label}
             </button>
@@ -317,9 +322,10 @@ export function Translation({
           {!answered(answer) && <p className="pr-blank-note">還沒寫答案：寫下來才能按「對了」或「小錯」。真的不會就按「不會」，沒寫的題目不算作答。</p>}
           {answered(answer) && (
             <p className="pr-mark-note">
-              {firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
+              {firstVerdict === "good" && verdictStale ? (matchesReference(answer, sentence.reference) ? "你在 Claude 確認之後改了答案，改過的跟參考答案一樣：按「對了」仍記成當次獨立完成。" : "你在 Claude 確認之後又改了答案：改過的這一版還沒人確認，按「對了」會記成「自評完成・待確認」。")
+                : firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
                 : firstVerdict === "changed" ? "Claude 說意思跟題目不一樣：改好之後也只算有提示完成。"
-                : firstVerdict ? "Claude 指出要改的地方：這次記成有提示完成。"
+                : firstVerdict ? "Claude 指出要改的地方：照著改好，這次記成有提示完成。"
                 : matchesReference(answer, sentence.reference) ? "跟參考答案一樣，已確認：按「對了」會記成當次獨立完成。"
                 : "寫法跟參考答案不完全一樣，可能也對。沒有人確認前，按「對了」會先記成「自評完成・待確認」，之後可以請 Claude 看。意思如果變了，請按「小錯」。"}
             </p>
@@ -532,12 +538,12 @@ function PracticeSession({
     else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
   };
   const item = current.items[pos];
-  function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict }) {
+  function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
     // Each sentence counts once, even if the button is pressed twice.
     if (!settled() || records.some((r) => r.sentenceId === item.id)) return;
     // Nothing written: marking it "correct" cannot count as done alone, so it is kept as done with help.
     if (!info?.answer?.trim()) revealed = true;
-    const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict });
+    const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict, checkedText: info?.checkedText });
     if (current.checkpoint) checkpointLevels.current.push(level);
     else if (guided)
       evidence(current.unit, level, { source: "pattern", skill: "write", item: item.id, hints: hintFor(item.id)?.h,
@@ -566,18 +572,16 @@ function PracticeSession({
       if (prev.sessions.some((s) => s.id === sessionId)) return prev;
       const cards = [...prev.cards];
       const events = [...prev.reviewEvents];
-      function addCard(id: string, remembered: boolean, shown: boolean) {
-        const i = cards.findIndex((card) => card.id === id);
-        if (i === -1) cards.push(newCard(id, date));
+      function addCard(t: TranslationRecord) {
+        const i = cards.findIndex((card) => card.id === t.sentenceId);
+        if (i === -1) cards.push(newCard(t.sentenceId, date));
         else {
-          const { card, event } = reviewCard(cards[i], date, remembered, shown);
+          const { card, event } = applyAnswer(cards[i], date, t);
           cards[i] = card;
           if (event) events.push(event);
         }
       }
-      results.forEach((t) =>
-        addCard(t.sentenceId, t.rating === "correct", t.revealed),
-      );
+      results.forEach(addCard);
       current.newWords.forEach((w) => {
         const id = "word:" + wordKey(w.en);
         if (!cards.some((c) => c.id === id)) cards.push(newCard(id, date));
@@ -708,9 +712,9 @@ function PracticeSession({
                 onMark={(mark, revealed, info) => {
                   if (recalls.some((r) => r.sentenceId === recallNow.sentence.id)) return;
                   if (!answered(info.answer)) revealed = true;
-                  const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recallNow.sentence.reference, firstVerdict: info.firstVerdict });
+                  const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recallNow.sentence.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText });
                   if (retention && recallNow.sentence.id === retention.sentence.id) {
-                    evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recallNow.sentence.id,
+                    evidence(retention.unit, level, { source: "retention", skill: "write", item: recallNow.sentence.id,
                       answer: info.answer, prompt: recallNow.sentence.zh, ref: recallNow.sentence.reference[0] });
                   }
                   const list = [
@@ -738,7 +742,8 @@ function PracticeSession({
             onDone={(correct, total, plays) => {
               if (total > 0) {
                 update((prev) => ({ ...prev, notes: { ...prev.notes, [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total, plays }) } }));
-                evidence(current.unit, correct === total ? "independent" : "assisted", { source: "listen", skill: "listen" });
+                // Only all-correct after a complete play counts; a miss is just a miss, not "done with help".
+                if (correct === total) evidence(current.unit, "independent", { source: "listen", skill: "listen" });
               }
               go("write", {}, "listen");
             }}
@@ -750,7 +755,7 @@ function PracticeSession({
             onDone={(m, answer) => {
               if (!settled()) return;
               const v = variationFor(lessonData, current.day);
-              evidence(current.unit, judgeVariation(m, answer, v.en), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
+              evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])]), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
               if (m !== "good")
                 update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
               finish(false, "express");
@@ -812,9 +817,9 @@ function PracticeSession({
                       onHint={(use) => update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, recall.sentence.id, use) }))}
                       onMark={(mark, revealed, info) => {
                         if (!answered(info.answer)) revealed = true;
-                        const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict });
+                        const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText });
                         if (retention && recall.sentence.id === retention.sentence.id) {
-                          evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recall.sentence.id,
+                          evidence(retention.unit, level, { source: "retention", skill: "write", item: recall.sentence.id,
                             answer: info.answer, prompt: recall.sentence.zh, ref: recall.sentence.reference[0] });
                         }
                         setRecalls([
@@ -1172,18 +1177,22 @@ function Extras({
     return ids.flatMap((id) => sentenceById.get(id) ?? []);
   });
   const repeat = translationPool[repeatIndex];
-  function logRepeat(mark: Mark, revealed: boolean) {
+  /** Same rule as the lesson: only a checked answer written alone counts as remembered. */
+  function logRepeat(mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
     if (!repeat || repeatDone) return;
+    if (!answered(info.answer)) revealed = true;
+    const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: repeat.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText });
     const translation = {
       sentenceId: repeat.id,
       rating: ratingOf[mark],
       grammar: repeat.grammar,
       revealed,
+      verified: level === "independent",
     };
     onActivity((prev) => {
       const found = prev.cards.find((c) => c.id === repeat.id);
       const result = found
-        ? reviewCard(found, date, mark === "good", revealed)
+        ? applyAnswer(found, date, translation)
         : null;
       const cards = result
         ? prev.cards.map((c) => (c.id === repeat.id ? result.card : c))
@@ -1308,7 +1317,7 @@ function Extras({
             </div>
             <p className="qz-meta">
               <span>在學的 {learning.length} 個字：</span>
-              {skills.map(([key, label]) => <span key={key}>{label}{key === "say" ? "（自評）" : ""} {count[key]}</span>)}
+              {skills.map(([key, label]) => <span key={key}>{label} {count[key]}</span>)}
             </p>
           </div>
         );

@@ -16,18 +16,27 @@ export const typeNames: Record<QType, string> = {
 }
 export const readCauses = ['單字不認得', '句子看不懂', '找不到答案在哪', '題型不熟', '看太快']
 
-export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number }
+/** The latest attempt, plus `best`: the best attempt that counts. A redo on the same day comes right after seeing the
+ *  answers, so it is practice and never replaces the record; a lower score later never erases a pass. */
+export interface ReadAttempt { day: string; correct: number; total: number; zh?: boolean }
+export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean }
 export const readKey = (id: string) => 'read.' + id
 
 export function readRecord(notes: Record<string, string>, id: string): ReadRecord | null {
   try { const v = notes[readKey(id)]; return v ? JSON.parse(v) as ReadRecord : null } catch { return null }
 }
-export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries'>) {
+const clean = (a: ReadAttempt) => !a.zh && a.correct / Math.max(1, a.total) >= 0.7
+const better = (a: ReadAttempt, b?: ReadAttempt) => !b || (clean(a) && !clean(b)) || (clean(a) === clean(b) && a.correct / Math.max(1, a.total) > b.correct / Math.max(1, b.total))
+export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries' | 'best' | 'practice'>) {
   const old = readRecord(notes, id)
-  return { ...notes, [readKey(id)]: JSON.stringify({ ...rec, tries: (old?.tries ?? 0) + 1 }) }
+  const oldBest: ReadAttempt | undefined = old?.best ?? (old ? { day: old.day, correct: old.correct, total: old.total, ...(old.zh ? { zh: true } : {}) } : undefined)
+  const practice = !!old && old.day === rec.day
+  const attempt: ReadAttempt = { day: rec.day, correct: rec.correct, total: rec.total, ...(rec.zh ? { zh: true } : {}) }
+  const best = !practice && better(attempt, oldBest) ? attempt : oldBest ?? attempt
+  return { ...notes, [readKey(id)]: JSON.stringify({ ...rec, tries: (old?.tries ?? 0) + 1, best, ...(practice ? { practice: true } : {}) }) }
 }
-/** A passage is passed at 70% or better without opening the Chinese. */
-export const passed = (r: ReadRecord | null) => !!r && !r.zh && r.correct / Math.max(1, r.total) >= 0.7
+/** A passage is passed at 70% or better without opening the Chinese, on an attempt that counts. */
+export const passed = (r: ReadRecord | null) => !!r && clean(r.best ?? r)
 
 /** The level to work on: the lowest one with fewer than three passed passages. */
 export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadLevel {

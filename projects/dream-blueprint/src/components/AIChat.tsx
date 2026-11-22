@@ -5,6 +5,7 @@ import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '.
 import { askEvent, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
+import { useModal } from '../lib/modal'
 import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
 import { HoverPet, PixelPet, usePet } from './PixelPet'
 import './ai-chat.css'
@@ -122,13 +123,12 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
 
 /** Floating panel (bottom sheet on phones) that sits above everything, including other dialogs. */
 export function AISheet({ title, onClose, children }: { title: ReactNode; onClose: () => void; children: ReactNode }) {
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onClose() } }
-    window.addEventListener('keydown', key, true)
-    return () => window.removeEventListener('keydown', key, true)
-  }, [onClose])
-  return createPortal(<div className="ai-veil" onClick={e => { e.stopPropagation(); onClose() }}>
-    <section className="ai-sheet" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : '問問 Claude'} onClick={e => e.stopPropagation()}>
+  const veil = useRef<HTMLDivElement>(null)
+  const sheet = useRef<HTMLElement>(null)
+  // Focus starts on the sheet itself (not the input, so a phone keyboard does not jump up) and returns to the button.
+  useModal(veil, onClose, { initial: () => sheet.current })
+  return createPortal(<div className="ai-veil" ref={veil} onClick={e => { e.stopPropagation(); onClose() }}>
+    <section className="ai-sheet" ref={sheet} tabIndex={-1} role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : '問問 Claude'} onClick={e => e.stopPropagation()}>
       <header><HoverPet size={26} /><strong>{title}</strong>
         <button type="button" className="ai-close" aria-label="關閉" onClick={onClose}><X size={18} /></button></header>
       {children}

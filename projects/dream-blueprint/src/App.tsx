@@ -26,8 +26,8 @@ import { clearPairing, pairEvent, pairPrefix, takePairing } from './lib/pairing'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import Baseline from './components/Baseline'
-import { MemoryContext, applyMemory, readMemory, writeMemory, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced } from './lib/drive'
+import { MemoryContext, applyMemory, readMemory, writeMemory, replaceMemory, mergeMemory, readDeleted, memoryDeletedKey, type MemoryApi } from './lib/memory'
+import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision } from './lib/drive'
 import { localModified, restoreBackup, setLocalModified } from './lib/store'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
@@ -91,7 +91,7 @@ function ContentNotice({state,update}:Pick<PageProps,'state'|'update'>) {
   const total=pending.reduce((n,u)=>n+Number(state.notes['content.'+u.id]),0)
   return <section className="orbit-card content-notice" role="status">
     <strong>教材修正了</strong>
-    <p>{pending.map(u=>u.note).join('；')}。你學過的 {total} 張卡片內容有改，已經排進今天的複習，進度和紀錄都保留。</p>
+    <p>{pending.map(u=>u.note).join('；')}。你學過的 {total} 張卡片內容有改，已經排回複習：沒練過的今天就會出現，今天已經練過的明天出現。進度和紀錄都保留。</p>
     <button type="button" onClick={()=>update(prev=>({...prev,notes:{...prev.notes,...Object.fromEntries(pending.map(u=>['content.seen.'+u.id,'1']))}}))}>知道了</button>
   </section>
 }
@@ -153,18 +153,21 @@ function App() {
   const props:PageProps={state,update,navigate}
   const memoryNotes=readMemory(state.notes)
   const memory:MemoryApi={notes:memoryNotes,
-    update:(remember,forget)=>update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
-    remove:i=>update(s=>({...s,notes:writeMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
-    clear:()=>update(s=>({...s,notes:writeMemory(s.notes,[])}))}
+    update:(remember,forget)=>update(s=>({...s,notes:replaceMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
+    remove:i=>update(s=>({...s,notes:replaceMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
+    clear:()=>update(s=>({...s,notes:replaceMemory(s.notes,[])}))}
   const stateJson=JSON.stringify(state)
   const cloudReady=useRef(false)
   useEffect(()=>{
     if(!driveConnected())return
+    // Compare with the snapshot this device last synced, not just clocks: if both sides changed, keep both and ask.
     loadDriveState().then(remote=>{
-      if(remote?.state&&remote.savedAt>localModified()){
-        restoreBackup(remote.state,remote.savedAt)
+      const decision=syncDecision(remote?.state?remote.savedAt:null,cloudBase(),localModified())
+      if(decision==='pull'&&remote?.state){
+        restoreBackup(remote.state,remote.savedAt); setCloudBase(remote.savedAt)
         noteSynced('已從雲端硬碟載入最新的學習進度')
-      } else {
+      } else if(decision==='conflict'&&remote) markConflict(remote.savedAt)
+      else if(decision==='push'){
         const at=localModified()||Date.now(); setLocalModified(at)
         void saveDriveState(JSON.stringify(state),at)
       }
@@ -172,22 +175,25 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   useEffect(()=>{
-    if(!cloudReady.current||!driveConnected())return
+    if(!cloudReady.current||!driveConnected()||cloudConflict())return
     const t=setTimeout(()=>void saveDriveState(stateJson,localModified()||Date.now()),5000)
     return ()=>clearTimeout(t)
   },[stateJson])
-  const memoryJson=JSON.stringify(memoryNotes)
+  const memoryJson=JSON.stringify([memoryNotes,readDeleted(state.notes)])
   const driveReady=useRef(!driveConnected())
   useEffect(()=>{
     if(!driveConnected())return
-    loadDriveMemory().then(list=>{
-      if(list)update(s=>({...s,notes:writeMemory(s.notes,applyMemory(readMemory(s.notes),list,[]))}))
+    loadDriveMemory().then(remote=>{
+      if(remote)update(s=>{
+        const merged=mergeMemory(readMemory(s.notes),readDeleted(s.notes),remote.notes,remote.deleted)
+        return {...s,notes:{...writeMemory(s.notes,merged.notes),[memoryDeletedKey]:JSON.stringify(merged.deleted)}}
+      })
     }).catch(()=>{}).finally(()=>{driveReady.current=true})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   useEffect(()=>{
     if(!driveReady.current||!driveConnected())return
-    const t=setTimeout(()=>saveDriveMemory(JSON.parse(memoryJson)),1500)
+    const t=setTimeout(()=>{const [list,deleted]=JSON.parse(memoryJson);saveDriveMemory(list,deleted)},1500)
     return ()=>clearTimeout(t)
   },[memoryJson])
   const available=links
@@ -208,7 +214,7 @@ function App() {
       <div className="profile"><span>玄</span><div><b>玄燁</b><small>{state.school.schoolName} · {state.school.program}</small></div></div></div>
     </aside>
     <div className="viewport"><div className="mobile-brand"><Brand/><a className="home-link" href="/" title="回到 Body 首頁"><House size={16}/>回首頁</a><button className="icon-control" aria-label="設定" onClick={()=>setView('settings')}><Settings2 size={20}/></button></div>
-    <div className="desktop-content" id="content" tabIndex={-1}>
+    <main className="desktop-content" id="content" tabIndex={-1}>
       <header className="global-head"><div>{page==='today'?<><h1>今日航行</h1><p><CalendarDays size={14}/>{dateText}</p></>:<button className="back-home" onClick={()=>setView('today')}><Compass size={16}/> 今日航行 <span className="back-context"><ChevronRight size={14}/> {pageName}</span></button>}</div>
       <div className="header-controls"><button className="phase-pill" title="編輯目前時期" onClick={()=>setView('settings')}><i/>{status}{until&&daysBetween(today,until)<32?' · 還有 '+(daysBetween(today,until)+1)+' 天':''}</button>
       <a className="home-link" href="/" title="回到 Body 首頁"><House size={16}/>回首頁</a>
@@ -216,7 +222,7 @@ function App() {
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined}/>:<Settings {...props}/>}
-    </div></div>
+    </main></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
     {pairing&&<PairReceive payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}

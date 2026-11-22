@@ -4,6 +4,7 @@ import type { PageProps } from "../lib/store";
 import { dayKey } from "../lib/progress";
 import { schoolToday, makeSchoolId } from "../lib/school";
 import { originalPlan, projectCalendar } from "../lib/projection";
+import { readTopic, topics as lifeTopics } from "../lib/topics";
 import plan from "../data/plan.json";
 import curriculum from "../data/curriculum.json";
 import Roadmap from "../components/Roadmap";
@@ -78,6 +79,10 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
     weekdays: state.settings.regularDays,
     restDays: state.settings.restDays,
     retry: Boolean(state.curriculum.retry),
+    topics: lifeTopics.map((t) => {
+      const rec = readTopic(state.notes, t.id);
+      return { n: t.n, title: t.title, after: t.after, done: rec.done, open: rec.cur && !rec.done[rec.cur.part] ? rec.cur.part : undefined };
+    }),
   });
   const dailySchool = schoolToday(state.school, selected);
   const selectedEntry = calendar.find((item) => item.day === selected);
@@ -162,7 +167,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
       ? `${plan.years[0].year} — ${plan.years[plan.years.length - 1].year}`
       : "從學校課程到赴美就業";
   return (
-    <main className="pl-page">
+    <section className="pl-page" aria-label="計畫">
       <header className="pl-title">
         <ScenePhoto className="pl-photo" />
         <div>
@@ -326,7 +331,9 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                         ? "已練"
                         : entry.day < today
                           ? ""
-                          : entry.kind === "lesson" && entry.unit
+                          : entry.topic
+                            ? "主題 " + entry.topic.n
+                            : entry.kind === "lesson" && entry.unit
                             ? entry.unit + "－" + entry.lessonDay
                             : entry.kind === "rest"
                               ? "休息"
@@ -339,7 +346,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
               })}
             </div>
             <p className="pl-fine">
-              依最近四週的進度預排。考週、實習和休息日保留原進度。
+              依最近四週的進度預排，生活主題和文法課輪流排。考週、實習和休息日保留原進度。
             </p>
           </section>
           <section className="pl-day" aria-live="polite">
@@ -355,7 +362,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                     ? "這天沒有練習紀錄"
                     : selectedEntry?.label || "課表待確認"}
               </h3>
-              {selected >= today && selectedEntry?.kind === "lesson" && (
+              {selected >= today && selectedEntry?.kind === "lesson" && !selectedEntry.topic && (
                 <p>
                   {lesson?.title}
                   {sentence?.zh && " · " + sentence.zh}
@@ -515,7 +522,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
           </p>
         </>
       )}
-    </main>
+    </section>
   );
 }
 

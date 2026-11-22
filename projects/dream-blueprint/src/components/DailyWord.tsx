@@ -7,6 +7,7 @@ import { AskWord } from './AIChat'
 import UseWord from './UseWord'
 import { markSkill } from '../lib/wordSkills'
 import { paintSky, seedOf } from '../lib/starfield'
+import { useModal } from '../lib/modal'
 import { formLines, meaningLine, wordKey } from '../lib/vocab'
 import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
@@ -30,13 +31,10 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   const [reveal, setReveal] = useState(false)
   const [silent, setSilent] = useState(false)
   const card = useRef<HTMLDivElement>(null)
-
-  useEffect(() => { card.current?.focus() }, [])
-  useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
-    window.addEventListener('keydown', key)
-    return () => { window.removeEventListener('keydown', key); window.speechSynthesis?.cancel() }
-  }, [onClose])
+  const veil = useRef<HTMLDivElement>(null)
+  // Opened by itself on the first visit of the day, focus lands on the 今日單字 button when it closes.
+  useModal(veil, onClose, { initial: () => card.current, fallback: () => document.querySelector<HTMLElement>('.word-chip') ?? document.getElementById('content') })
+  useEffect(() => () => window.speechSynthesis?.cancel(), [])
 
   function speak() {
     if (!word || !('speechSynthesis' in window)) { setSilent(true); return }
@@ -71,7 +69,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   const setNote = (key: string, value: string) =>
     update(prev => ({ ...prev, notes: { ...prev.notes, [key]: value } }))
 
-  return <div className="daily-word-veil" role="dialog" aria-modal="true" aria-label="今日單字" onClick={onClose}>
+  return <div className="daily-word-veil" ref={veil} role="dialog" aria-modal="true" aria-label="今日單字" onClick={onClose}>
     <div className="daily-word-card" ref={card} tabIndex={-1} onClick={event => event.stopPropagation()}>
       <canvas className="daily-word-photo" ref={sky} aria-hidden="true" />
       <RotatingPhoto className="daily-word-photo over" photo={photo}/>
@@ -98,8 +96,9 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
             <button type="button" onClick={() => sort(false)}><RotateCcw size={15} />還不熟</button>
             <button type="button" className="primary" onClick={() => sort(true)}><Check size={15} />認得</button>
           </div>
-          <div className="daily-word-progress" aria-label={'今天第 ' + (done + 1) + ' 個，共 ' + target + ' 個'}>
-            {Array.from({ length: target }, (_, i) => <i key={i} className={i < done ? 'done' : i === done ? 'now' : ''} />)}
+          <div className="daily-word-progress" role="progressbar" aria-label="今天的單字" aria-valuemin={0} aria-valuemax={target} aria-valuenow={done}
+            aria-valuetext={'看完 ' + done + ' 個，共 ' + target + ' 個，現在是第 ' + (done + 1) + ' 個'}>
+            {Array.from({ length: target }, (_, i) => <i key={i} aria-hidden="true" className={i < done ? 'done' : i === done ? 'now' : ''} />)}
           </div>
         </div>
       </> : <div className="daily-word-body daily-word-finished">

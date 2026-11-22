@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { Smartphone } from 'lucide-react'
 import { setTutorKey, setTutorModel, tutorKey, tutorModel } from '../lib/tutor'
 import { openaiKey, setOpenaiKey } from '../lib/voice'
 import { open, pairEvent, pairPrefix, payloadFrom, randomCode, seal } from '../lib/pairing'
+import { useModal } from '../lib/modal'
 import './pair.css'
 
 /** On the computer: a QR code + 6-digit code that carries the keys to an iPad or phone. */
@@ -50,6 +51,9 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
   const [msg, setMsg] = useState('')
   const [ok, setOk] = useState(false)
   const [voice, setVoice] = useState(false)
+  const veil = useRef<HTMLDivElement>(null)
+  // Escape is 取消; focus starts in the code box and the rest of the page waits behind the dialog.
+  useModal(veil, onDone, { initial: () => veil.current?.querySelector('input') ?? null, fallback: () => document.getElementById('content') })
   async function submit() {
     setBusy(true); setMsg('')
     const r = await open(payload, code.replace(/\D/g, ''))
@@ -61,16 +65,16 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
     window.dispatchEvent(new Event('dream-blueprint:keys'))
     setOk(true)
   }
-  return <div className="pair-veil" role="dialog" aria-modal="true" aria-labelledby="pair-title">
+  return <div className="pair-veil" ref={veil} role="dialog" aria-modal="true" aria-labelledby="pair-title">
     <form className="pair-box" onSubmit={e => { e.preventDefault(); if (!ok) void submit() }}>
       <h2 id="pair-title">{ok ? '這台也連上 Claude 了 ✓' : '連接這台裝置'}</h2>
       {ok ? <p>{voice ? '問問 Claude、批改和英文口說在這台都能用了。' : '問問 Claude 和批改在這台能用了。電腦上還沒存 OpenAI 金鑰，所以口說要另外在口說頁貼。'}金鑰只存在這台的瀏覽器裡。</p> : <>
         <p>輸入電腦畫面上的 6 位數配對碼。</p>
-        <input inputMode="numeric" autoComplete="one-time-code" maxLength={7} value={code} onChange={e => setCode(e.target.value)} placeholder="000 000" aria-label="配對碼" autoFocus />
+        <input inputMode="numeric" autoComplete="one-time-code" maxLength={7} value={code} onChange={e => setCode(e.target.value)} placeholder="000 000" aria-label="配對碼" />
         {msg && <p className="pair-err" role="alert">{msg}</p>}
       </>}
       <div className="set-actions">
-        {ok ? <button type="button" onClick={onDone}>開始用</button> : <>
+        {ok ? <button type="button" onClick={onDone} autoFocus>開始用</button> : <>
           <button type="submit" disabled={busy || code.replace(/\D/g, '').length !== 6}>{busy ? '解鎖中……' : '連接'}</button>
           <button type="button" onClick={onDone}>取消</button>
         </>}

@@ -14,6 +14,28 @@ export function writeMemory(notes: Record<string, string>, list: string[]) {
   return { ...notes, [memoryNoteKey]: JSON.stringify(list.slice(-MAX_MEMORY)) }
 }
 
+/** Notes the learner deleted (or asked to forget), kept so a synced copy from another device cannot bring them back. */
+export const memoryDeletedKey = 'ai.memory.deleted'
+export function readDeleted(notes: Record<string, string>): string[] {
+  try {
+    const list = JSON.parse(notes[memoryDeletedKey] || '[]')
+    return Array.isArray(list) ? list.filter((x): x is string => typeof x === 'string') : []
+  } catch { return [] }
+}
+/** Writes the list and records what disappeared from it as deleted; a note written again is no longer deleted. */
+export function replaceMemory(notes: Record<string, string>, next: string[]) {
+  const before = readMemory(notes)
+  const gone = before.filter(n => !next.includes(n))
+  const deleted = [...new Set([...readDeleted(notes).filter(n => !next.includes(n)), ...gone])].slice(-200)
+  return { ...writeMemory(notes, next), [memoryDeletedKey]: JSON.stringify(deleted) }
+}
+/** Merges the cloud copy: notes from both sides, minus anything deleted on either side. */
+export function mergeMemory(local: string[], localDeleted: string[], remote: string[], remoteDeleted: string[]) {
+  const deleted = [...new Set([...localDeleted, ...remoteDeleted])]
+  const keep = (n: string) => !deleted.includes(n)
+  return { notes: applyMemory(local.filter(keep), remote.filter(keep), []), deleted: deleted.slice(-200) }
+}
+
 export function memoryPrompt(list: string[]) {
   return [
     '',

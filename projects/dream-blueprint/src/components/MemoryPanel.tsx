@@ -1,7 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { applyMemory, useMemory } from '../lib/memory'
-import { localModified, restoreBackup } from '../lib/store'
-import { cloudStatus, loadDriveState, noteSynced, connectDrive, disconnectDrive, driveConfig, importSyncCode, syncCode } from '../lib/drive'
+import { exportBackup, getSnapshot, localModified, restoreBackup } from '../lib/store'
+import {
+  appsScriptCode, clearConflict, cloudBase, cloudCas, cloudConflict, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
+  importSyncCode, loadDriveState, noteSynced, saveDriveState, setCloudBase, setDriveLogs, syncCode, syncDecision, markConflict, type DriveMemory,
+} from '../lib/drive'
+
+function download(name: string, text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+  const a = document.createElement('a')
+  a.href = url; a.download = name; a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 export default function MemoryPanel() {
   const { notes, update, remove, clear } = useMemory()
@@ -9,28 +20,68 @@ export default function MemoryPanel() {
   const [url, setUrl] = useState('')
   const [code, setCode] = useState('')
   const [status, setStatus] = useState('')
+  const [conflict, setConflict] = useState(cloudConflict())
+  const [logs, setLogs] = useState(driveLogsOn())
+  const [busy, setBusy] = useState(false)
+  useEffect(() => {
+    const on = () => setConflict(cloudConflict())
+    window.addEventListener('dream-blueprint:cloud', on)
+    return () => window.removeEventListener('dream-blueprint:cloud', on)
+  }, [])
 
-  async function connect(fn: () => Promise<string[] | null>) {
+  async function connect(fn: () => Promise<DriveMemory | null>) {
     setStatus('連接中……')
     try {
       const list = await fn()
-      if (list) update(applyMemory([], list, []).filter(n => !notes.includes(n)), [])
+      if (list) update(applyMemory([], list.notes, []).filter(n => !notes.includes(n) && !list.deleted.includes(n)), [])
       setDrive(driveConfig())
       const remote = await loadDriveState().catch(() => null)
-      if (remote?.state && remote.savedAt > localModified()) {
-        restoreBackup(remote.state, remote.savedAt)
+      const decision = syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), localModified())
+      if (decision === 'pull' && remote?.state) {
+        restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt)
         noteSynced('已從雲端硬碟載入最新的學習進度')
         setStatus('連上了！已經換成雲端硬碟裡最新的學習進度。')
-      } else setStatus('連上了！之後的對話、記憶和學習進度都會存進雲端硬碟。')
+      } else if (decision === 'conflict' && remote) {
+        markConflict(remote.savedAt)
+        setStatus('連上了。雲端硬碟裡已經有一份進度，這台裝置也有自己的進度：請在下面選要留哪一份。')
+      } else setStatus('連上了！之後記住的事和學習進度都會存進雲端硬碟。')
     } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
   }
   async function copyCode() {
     try { await navigator.clipboard.writeText(syncCode()); setStatus('同步碼已複製，貼到手機的這一格就能連上同一份記憶。') }
     catch { setStatus('複製失敗，請手動選取下面的同步碼。') }
   }
+  async function copyScript() {
+    try { await navigator.clipboard.writeText(appsScriptCode); setStatus('雲端小程式已複製。') }
+    catch { setStatus('複製失敗，請手動選取下面的程式碼。') }
+  }
+  /** Take the cloud copy; this device's progress is downloaded first so nothing is lost. */
+  async function useCloud() {
+    setBusy(true)
+    try {
+      const remote = await loadDriveState()
+      if (!remote?.state) { setStatus('雲端硬碟裡沒有進度可以載入。'); return }
+      download('夢想藍圖-這台裝置的進度-' + Date.now() + '.json', exportBackup(getSnapshot().state))
+      restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt); clearConflict()
+      noteSynced('已換成雲端硬碟的進度（這台原本的進度已下載成備份檔）')
+      setStatus('已換成雲端硬碟的進度。這台原本的進度下載成備份檔了，需要時可以到「備份」匯入。')
+    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+  }
+  /** Keep this device's copy; the cloud copy is downloaded first, then overwritten on purpose. */
+  async function useLocal() {
+    setBusy(true)
+    try {
+      const remote = await loadDriveState()
+      if (remote?.state) download('夢想藍圖-雲端原本的進度-' + Date.now() + '.json', remote.state)
+      clearConflict()
+      const at = localModified() || Date.now()
+      await saveDriveState(JSON.stringify(getSnapshot().state), at, remote?.savedAt ?? 0, true)
+      setStatus('已用這台裝置的進度蓋掉雲端那份。雲端原本的進度下載成備份檔了。')
+    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+  }
 
   return <>
-    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，按「刪掉」就好。</p>
+    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，按「刪掉」就好；連著雲端硬碟時，刪掉的也會從雲端刪掉，別台裝置不會再加回來（雲端小程式要是新版）。</p>
     {notes.length ? <div className="set-list">
       {notes.map((n, i) => <div key={i + n}><span>{n}</span><button type="button" onClick={() => remove(i)}>刪掉</button></div>)}
     </div> : <p>目前還沒有記住任何事。</p>}
@@ -38,20 +89,47 @@ export default function MemoryPanel() {
 
     <h3 className="set-subhead">雲端硬碟</h3>
     {drive ? <>
-      <p>已連上。雲端硬碟的「夢想藍圖・記憶」試算表裡：「對話紀錄」是每一句對話，「記憶」是她們記住的事，「進度」是整份學習進度（課表、單字、複習卡、勾選），有變動 5 秒後自動存上去，換手機也會自動接上。</p>
-      {(() => { const c = cloudStatus(); return c ? <p className={c.ok ? 'set-ok' : 'set-warn'}>{c.message}（{new Date(c.at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}）</p> : <p>學習進度還沒同步過。</p> })()}
+      <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存：「記憶」是她們記住的事、「進度」是整份學習進度（課表、單字、複習卡、勾選、作答紀錄），有變動 5 秒後自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>
+      {conflict && <div className="set-warn" role="alert">
+        <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。為了不互相蓋掉，兩份都先留著，請選一份：</p>
+        <div className="set-actions">
+          <button type="button" disabled={busy} onClick={useCloud}>用雲端那份（這台的先下載成備份）</button>
+          <button type="button" disabled={busy} onClick={useLocal}>用這台這份（雲端的先下載成備份）</button>
+        </div>
+      </div>}
+      {(() => { const c = cloudStatus(); return c ? <p className={c.ok ? 'set-ok' : 'set-warn'}>{c.message}（{stamp(c.at)}）</p> : <p>學習進度還沒同步過。</p> })()}
       {drive.sheet && <p><a href={drive.sheet} target="_blank" rel="noreferrer">打開雲端硬碟裡的試算表</a></p>}
+      <label className="set-check"><input type="checkbox" checked={logs} onChange={e => { setDriveLogs(e.target.checked); setLogs(e.target.checked) }} />
+        這台裝置也把對話逐字稿（問問 Claude、英文口說）存進試算表的「對話紀錄」（預設關）</label>
       <div className="set-actions">
         <button type="button" onClick={copyCode}>複製同步碼（給手機用）</button>
         <button type="button" onClick={() => { disconnectDrive(); setDrive(null); setStatus('這台裝置已中斷雲端硬碟。') }}>這台裝置中斷連線</button>
       </div>
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
+      <details className="set-details">
+        <summary>{cloudCas() ? '雲端小程式是新版（存檔前會先檢查，兩台不會互相蓋掉）' : '更新雲端小程式（建議：新版存檔前會先檢查，兩台不會互相蓋掉）'}</summary>
+        <ol>
+          <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
+          <li>右上「部署」→「管理部署作業」→ 鉛筆圖示 → 版本選「新版本」→「部署」。網址不會變，不用重新連接。</li>
+        </ol>
+        <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
+        <textarea readOnly rows={6} value={appsScriptCode} aria-label="雲端小程式程式碼" onFocus={e => e.target.select()} />
+      </details>
     </> : <>
-      <p>連上之後，你說的話、記住的事和整份學習進度會自動存進你自己的 Google 雲端硬碟，電腦和手機會共用同一份。</p>
+      <p>連上之後，記住的事和整份學習進度會存進你自己的 Google 雲端硬碟，電腦和手機共用同一份。對話逐字稿預設不存。</p>
       <label className="set-field">網頁應用程式網址<input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/…/exec" /></label>
       <div className="set-actions"><button type="button" disabled={!url.trim()} onClick={() => connect(() => connectDrive(url))}>連接雲端硬碟</button></div>
       <label className="set-field">已經在別台裝置連過？貼上同步碼<input value={code} onChange={e => setCode(e.target.value)} placeholder="同步碼" /></label>
       <div className="set-actions"><button type="button" disabled={!code.trim()} onClick={() => connect(() => importSyncCode(code))}>用同步碼連接</button></div>
+      <details className="set-details">
+        <summary>還沒有雲端小程式？</summary>
+        <ol>
+          <li>到 script.google.com 開一個新專案，把下面的程式碼全部貼上，按儲存。</li>
+          <li>「部署」→「新增部署作業」→ 類型選「網頁應用程式」，執行身分選自己、存取權選「所有人」→ 部署，把網址貼到上面。</li>
+        </ol>
+        <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
+        <textarea readOnly rows={6} value={appsScriptCode} aria-label="雲端小程式程式碼" onFocus={e => e.target.select()} />
+      </details>
     </>}
     <small role="status">{status}</small>
   </>

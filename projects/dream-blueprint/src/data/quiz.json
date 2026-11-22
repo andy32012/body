@@ -127,7 +127,7 @@
       "請告訴我現在幾點。"
     ],
     "answerIndex": 0,
-    "explanation": "if 在這裡表示「如果」，hurts 表示「會痛」。"
+    "explanation": "這句單獨出現時最常見的意思是「如果會痛，請告訴我」（例如護理師要移動你的手之前）。if 也可以是「是否」：Tell me if it hurts 在某些情境也能理解成「告訴我會不會痛」。hurts 表示「會痛」。"
   },
   {
     "id": "q-011",
@@ -240,11 +240,11 @@
     "zh": "選出這句英文的意思。",
     "options": [
       "請按住傷口。",
-      "請指出痠痛的地方。",
+      "請指出痛的地方。",
       "請畫出你的身高。"
     ],
     "answerIndex": 1,
-    "explanation": "point to 是用手指向，sore spot 指痠痛的部位。"
+    "explanation": "point to 是用手指向；sore spot 指會痛、按了會痛的地方，不一定是「痠」。"
   },
   {
     "id": "q-020",
@@ -457,7 +457,7 @@
       "嚴重的藥物過敏反應"
     ],
     "answerIndex": 2,
-    "explanation": "用藥後起疹子加上呼吸困難，要懷疑嚴重藥物過敏（過敏性休克），立刻停藥求援。",
+    "explanation": "用藥後起疹子加上呼吸困難，要懷疑嚴重的全身性過敏反應，必須緊急處理（停藥、立刻求援）；它可能進展成過敏性休克，但這題的描述還沒有寫到休克。",
     "source": "https://medlineplus.gov/ency/article/000819.htm",
     "subjects": [
       "基礎醫學"
@@ -491,7 +491,7 @@
       "1 小時後"
     ],
     "answerIndex": 1,
-    "explanation": "先吃喝 15 公克醣類，等 15 分鐘再測；還低於 70 mg/dL 就再來一次。",
+    "explanation": "適用於清醒、能安全吞嚥的低血糖病人：先吃喝 15 公克醣類，等 15 分鐘再測；還低於 70 mg/dL 就再來一次。意識不清或不能安全吞嚥時不能用口服，要照醫院流程和醫囑處理。",
     "source": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html",
     "subjects": [
       "內外科護理學"
@@ -538,11 +538,11 @@
     "zh": "哪一個表現是嚴重脫水的徵象？",
     "options": [
       "剛喝完一杯水",
-      "沒有排尿或尿液很深",
+      "沒有排尿，或尿液非常深（琥珀色）",
       "有點口渴"
     ],
     "answerIndex": 1,
-    "explanation": "沒有尿或尿色很深、精神變差、心跳快，都是嚴重脫水的表現。小孩上吐下瀉時要特別注意。",
+    "explanation": "沒有尿或尿色非常深（琥珀色）、精神變差、心跳快，都是嚴重脫水可能的表現；尿色稍深只算輕到中度。不能只靠一種顏色判斷，小孩上吐下瀉時要特別注意並通報。",
     "source": "https://medlineplus.gov/ency/article/000982.htm",
     "subjects": [
       "產兒科護理學"

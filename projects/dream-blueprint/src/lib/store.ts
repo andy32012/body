@@ -152,7 +152,9 @@ export function applyContentUpdates(state:AppState, today=dayKey()) {
     state.cards=state.cards.map(c=>{
       if (!ids.has(c.id)) return c
       touched++
-      return c.due>today ? {...c,due:today,mastered:false} : {...c,mastered:false}
+      // A card already practised today cannot come back the same day: it is due tomorrow instead.
+      const due=c.lastDay>=today ? addDays(today,1) : c.due>today ? today : c.due
+      return {...c,due,mastered:false}
     })
     state.notes={...state.notes,[key]:String(touched)}
   }

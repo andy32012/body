@@ -27,36 +27,53 @@ async function post(body: object) {
   if (!d) return null
   const res = await fetch(d.url, { method: 'POST', body: JSON.stringify({ ...body, token: d.token }) })
   const json = await res.json()
-  if (!json.ok) throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
+  // "stale" is an answer, not a failure: the cloud has a newer snapshot than the one this device started from.
+  if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
   if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
+  if (json.cas) markCas()
   return json
+}
+/** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
+async function get(type: 'state' | 'memory') {
+  const d = read()
+  if (!d) return null
+  const json = await post({ type: type + '-get' })
+  if (json && (type === 'state' ? 'state' in json : Array.isArray(json.notes))) return json
+  const res = await fetch(d.url + (type === 'state' ? '?type=state&' : '?') + 'token=' + encodeURIComponent(d.token))
+  const old = await res.json()
+  if (!old.ok) throw new Error(old.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
+  if (old.url && old.url !== d.sheet) write({ ...d, sheet: old.url })
+  return old
 }
 
 export async function connectDrive(url: string, token = randomToken()) {
   const clean = url.trim()
   if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(clean)) throw new Error('網址格式不對，要是 https://script.google.com/macros/s/…/exec')
   write({ url: clean, token })
+  setCloudBase(0); clearConflict()
   try { return await loadDriveMemory() } catch (e) { write(null); throw e }
 }
 
-export async function loadDriveMemory(): Promise<string[] | null> {
-  const d = read()
-  if (!d) return null
-  const res = await fetch(d.url + '?token=' + encodeURIComponent(d.token))
-  const json = await res.json()
-  if (!json.ok) throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
-  if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
-  return Array.isArray(json.notes) ? json.notes.map(String) : []
+export type DriveMemory = { notes: string[]; deleted: string[] }
+export async function loadDriveMemory(): Promise<DriveMemory | null> {
+  const json = await get('memory')
+  if (!json) return null
+  return { notes: Array.isArray(json.notes) ? json.notes.map(String) : [], deleted: Array.isArray(json.deleted) ? json.deleted.map(String) : [] }
 }
 
-export function saveDriveMemory(notes: string[]) {
+/** Deleted notes travel too, so a note removed on one device does not come back from another. */
+export function saveDriveMemory(notes: string[], deleted: string[] = []) {
   if (!read()) return
-  post({ type: 'memory', notes }).catch(() => { /* offline: next change retries */ })
+  post({ type: 'memory', notes, deleted }).catch(() => { /* offline: next change retries */ })
 }
 
+/** Conversation transcripts go to the sheet only when turned on for this device (off by default). */
+const LOGS = 'dream-blueprint.drive-logs'
+export function driveLogsOn() { try { return localStorage.getItem(LOGS) === '1' } catch { return false } }
+export function setDriveLogs(on: boolean) { try { on ? localStorage.setItem(LOGS, '1') : localStorage.removeItem(LOGS) } catch { /* optional */ } }
 export function driveLog(source: string, rows: { role: string; text: string }[]) {
   const clean = rows.filter(r => r.text.trim())
-  if (!read() || !clean.length) return
+  if (!read() || !clean.length || !driveLogsOn()) return
   post({ type: 'log', source, rows: clean.map(r => ({ role: r.role === 'user' ? '玄燁' : r.role, text: r.text })) }).catch(() => { /* best effort */ })
 }
 
@@ -69,20 +86,51 @@ function setStatus(ok: boolean, message: string) {
   try { localStorage.setItem(STATUS, JSON.stringify({ at: Date.now(), ok, message })) } catch { /* optional */ }
 }
 
+/** The cloud snapshot this device last loaded or saved (its savedAt). A save says which snapshot it started from;
+ *  if the cloud has moved on since, nothing is overwritten and both copies are kept until the learner chooses. */
+const BASE = 'dream-blueprint.cloud-base'
+const CONFLICT = 'dream-blueprint.cloud-conflict'
+const CAS = 'dream-blueprint.cloud-cas'
+export function cloudBase() { try { return Number(localStorage.getItem(BASE)) || 0 } catch { return 0 } }
+export function setCloudBase(at: number) { try { localStorage.setItem(BASE, String(at)) } catch { /* optional */ } }
+export type CloudConflict = { remoteAt: number; found: number }
+export function cloudConflict(): CloudConflict | null { try { return JSON.parse(localStorage.getItem(CONFLICT) || 'null') } catch { return null } }
+export function markConflict(remoteAt: number) {
+  try { localStorage.setItem(CONFLICT, JSON.stringify({ remoteAt, found: Date.now() })) } catch { /* optional */ }
+  setStatus(false, '雲端硬碟有另一台裝置存的新進度，這台也有改動：先暫停同步、兩份都保留，請到設定 → 雲端硬碟選要留哪一份。')
+  window.dispatchEvent(new Event('dream-blueprint:cloud'))
+}
+export function clearConflict() { try { localStorage.removeItem(CONFLICT) } catch { /* optional */ } ; window.dispatchEvent?.(new Event('dream-blueprint:cloud')) }
+function markCas() { try { localStorage.setItem(CAS, '1') } catch { /* optional */ } }
+/** Whether the deployed script refuses stale saves by itself (the updated version does). */
+export function cloudCas() { try { return localStorage.getItem(CAS) === '1' } catch { return false } }
+
+/** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
+export function syncDecision(remoteAt: number | null, base: number, localAt: number): 'pull' | 'push' | 'conflict' | 'none' {
+  if (remoteAt !== null && remoteAt > base) return localAt > base ? 'conflict' : 'pull'
+  return remoteAt === null || localAt > base ? 'push' : 'none'
+}
+
 /** Whole progress, stored in chunks on the 「進度」 sheet. */
 export async function loadDriveState(): Promise<{ state: string | null; savedAt: number } | null> {
-  const d = read()
-  if (!d) return null
-  const res = await fetch(d.url + '?type=state&token=' + encodeURIComponent(d.token))
-  const json = await res.json()
-  if (!json.ok) throw new Error(json.error === 'token' ? '同步碼不對' : '雲端硬碟回傳錯誤')
+  const json = await get('state')
+  if (!json) return null
   return { state: typeof json.state === 'string' && json.state ? json.state : null, savedAt: Number(json.savedAt) || 0 }
 }
-export async function saveDriveState(state: string, savedAt: number) {
+/** Saves only if the cloud still holds the snapshot this device started from (`base`), unless `force` (a chosen overwrite). */
+export async function saveDriveState(state: string, savedAt: number, base = cloudBase(), force = false) {
   if (!read()) return
+  if (cloudConflict() && !force) return
   try {
-    const json = await post({ type: 'state', state, savedAt })
+    // An older script cannot check `base` itself, so look first.
+    if (!force && !cloudCas()) {
+      const remote = await loadDriveState()
+      if (remote?.state && remote.savedAt > base) { markConflict(remote.savedAt); return }
+    }
+    const json = await post({ type: 'state', state, savedAt, ...(force ? {} : { base }) })
+    if (json?.error === 'stale') { markConflict(Number(json.savedAt) || 0); return }
     if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
+    setCloudBase(savedAt)
     setStatus(true, '學習進度已存到雲端硬碟')
   } catch (e) {
     setStatus(false, '同步失敗：' + (e instanceof Error ? e.message : String(e)) + '，下次有變動會再試')
@@ -102,7 +150,8 @@ export async function importSyncCode(code: string) {
   return connectDrive(v.u, v.t)
 }
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶（貼到 script.google.com 新專案，部署成網頁應用程式）
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v2（貼到 script.google.com 的專案，部署成網頁應用程式）
+// v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
   var id=props().getProperty('SHEET');
@@ -119,40 +168,43 @@ function allowed(t){
   if(!saved){props().setProperty('TOKEN',t);return true}
   return saved===t;
 }
-function out(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function out(o){o.cas=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
 function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
+function column(name){var sh=tab(name),n=sh.getLastRow()-1;return n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[]}
+function setColumn(name,head,list){var sh=tab(name);sh.clear();sh.getRange(1,1).setValue(head);var rows=(list||[]).map(function(x){return [String(x)]});if(rows.length)sh.getRange(2,1,rows.length,1).setValues(rows)}
+function readState(){
+  var p=tab('進度'),rows=p.getLastRow()-1;
+  var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0]).slice(1)}):[];
+  return {ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0};
+}
+function readMemory(){return {ok:true,notes:column('記憶'),deleted:column('已刪除的記憶'),url:book().getUrl()}}
 function doGet(e){
   if(!allowed(e.parameter.token))return out({ok:false,error:'token'});
-  if(e.parameter.type==='state'){
-    var p=tab('進度'),rows=p.getLastRow()-1;
-    var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0]).slice(1)}):[];
-    return out({ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0});
-  }
-  var ss=book(),sh=ss.getSheetByName('記憶'),n=sh.getLastRow()-1;
-  var notes=n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[];
-  return out({ok:true,notes:notes,url:ss.getUrl()});
+  return out(e.parameter.type==='state'?readState():readMemory());
 }
 function doPost(e){
   var d=JSON.parse((e.postData&&e.postData.contents)||'{}');
   if(!allowed(d.token))return out({ok:false,error:'token'});
-  var ss=book();
-  if(d.type==='log'&&d.rows&&d.rows.length){
-    var sh=ss.getSheetByName('對話紀錄'),now=new Date();
-    sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));
-  }
-  if(d.type==='memory'){
-    var m=ss.getSheetByName('記憶');
-    if(m.getLastRow()>1)m.getRange(2,1,m.getLastRow()-1,1).clearContent();
-    var rows=(d.notes||[]).map(function(x){return [String(x)]});
-    if(rows.length)m.getRange(2,1,rows.length,1).setValues(rows);
-  }
-  if(d.type==='state'&&typeof d.state==='string'){
-    var p=tab('進度');p.clear();
-    p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
-    var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push(['~'+d.state.slice(i,i+45000)]);
-    if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
-    return out({ok:true,state:true,url:ss.getUrl()});
-  }
-  return out({ok:true,url:ss.getUrl()});
+  var lock=LockService.getScriptLock();lock.waitLock(20000);
+  try{
+    var ss=book();
+    if(d.type==='state-get')return out(readState());
+    if(d.type==='memory-get')return out(readMemory());
+    if(d.type==='log'&&d.rows&&d.rows.length){
+      var sh=ss.getSheetByName('對話紀錄'),now=new Date();
+      sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));
+    }
+    if(d.type==='memory'){setColumn('記憶','記住的事',d.notes);setColumn('已刪除的記憶','刪掉的記憶（別台裝置不會再加回來）',d.deleted)}
+    if(d.type==='state'&&typeof d.state==='string'){
+      var p=tab('進度'),current=Number(p.getRange(1,2).getValue())||0;
+      if(typeof d.base==='number'&&current>d.base)return out({ok:false,error:'stale',savedAt:current});
+      p.clear();
+      p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
+      var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push(['~'+d.state.slice(i,i+45000)]);
+      if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
+      return out({ok:true,state:true,url:ss.getUrl()});
+    }
+    return out({ok:true,url:ss.getUrl()});
+  }finally{lock.releaseLock()}
 }
 `
