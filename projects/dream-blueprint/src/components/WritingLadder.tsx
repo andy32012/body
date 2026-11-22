@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { parseFeedback, readWrite, scoreOf, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { parseFeedback, readWrite, scoreOf, selfChecked, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { MiniChart } from './LessonParts'
 import StuckButton from './StuckButton'
 import './writing.css'
@@ -23,8 +23,8 @@ function system(stage: WriteStage, prompt: string) {
     '你是英文寫作老師，批改台灣護理系學生（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
     '這一階的評分項目：' + stage.criteria.join('；'),
-    ielts ? '每個項目給雅思分數（1–9，可用 .5；初學者寫得很短、錯很多就如實給 1–3.5，不要為了鼓勵而墊高到 4），再給整體 band（四項平均，四捨五入到 .5）。分數要誠實，寧可保守；這只是練習估計，不是正式分數。字數不足要在 Task 項目扣分並說明。'
-      : '每個項目給 1–5 分（5 = 完全做到）。',
+    ielts ? '每個項目給雅思分數（1–9 的數字，可用 .5；初學者寫得很短、錯很多就如實給 1–3.5，不要為了鼓勵而墊高到 4），再給整體 band（四項平均，四捨五入到 .5）。分數要誠實，寧可保守；這只是練習估計，不是正式分數。字數不足要在 Task 項目扣分並說明。'
+      : '這一階不是考試作文，不給雅思分數。每個項目給 1–5 的整數（5 = 完全做到），comment 要具體說出哪個字、哪個文法或哪句表達要改，以及怎麼改。',
     '只輸出 JSON：{"criteria":[{"name":"項目名","score":數字,"comment":"一句繁體中文說明做得好的和要改的"}],' + (ielts ? '"band":數字,' : '') + '"summary":"一句整體評語","next":"下一版最重要、只改一件事的建議","fixes":[{"wrong":"原文片段","right":"改成","why":"一句原因"}],"revised":"保留他內容的修改版全文"}',
     'fixes 最多 6 個，挑最重要的；comment 和 why 用口語繁體中文。',
   ].join('\n')
@@ -71,8 +71,8 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
     setBusy(true); setError(''); setShowRevised(false)
     try {
       const reply = await askTutor(system(stage, prompt), [{ role: 'user', content: text.trim() }])
-      const f = parseFeedback(reply, stage.criteria)
-      if (!f) { setError('批改格式怪怪的，再按一次試試。'); return }
+      const f = parseFeedback(reply, stage.criteria, !!stage.ielts)
+      if (!f) { setError('評估失敗：回傳的分數不完整或不在合理範圍（' + (stage.ielts ? '每項和 band 都要在 1–9' : '每項要在 1–5') + '），這次不算數，也不會記成過關。再按一次批改。'); return }
       setFb(f)
       const sc = scoreOf(f, !!stage.ielts)
       save({ last: f, best: Math.max(rec?.best ?? 0, sc) })
@@ -88,7 +88,7 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
     </div>
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
     {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => <button key={t.id} type="button" aria-pressed={t.id === task.id} onClick={() => setTaskId(t.id)}>
-      題 {i + 1}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : ''}</button>)}</div>}
+      題 {i + 1}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>)}</div>}
     <section className="wl-task">
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>
@@ -104,7 +104,7 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
       <span data-ok={words >= task.min}>{words} / {task.min} 字</span>
       {stage.ielts && (endAt ? <span data-ok={left > 0}>{left > 0 ? '剩 ' + Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0') : '時間到（可以繼續寫完）'}</span>
         : <button type="button" className="pr-link" onClick={() => { setEndAt(Date.now() + (stage.minutes ?? 20) * 60000); setNow(Date.now()) }}>開始計時 {stage.minutes} 分鐘</button>)}
-      {rec?.best !== undefined && <span>最佳：{stage.ielts ? 'band ' + rec.best : rec.best.toFixed(1) + ' / 5'}</span>}
+      {rec?.best !== undefined && <span>最佳：{stage.ielts ? '練習估計 ' + rec.best : rec.best.toFixed(1) + ' / 5'}</span>}
     </div>
     <div className="pr-actions">
       {keyed ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? '批改中……' : fb ? '改好了，再批一次' : '照評分項目批改'}</button>
@@ -118,12 +118,12 @@ export default function WritingLadder({ state, onActivity, date }: Pick<PageProp
       <strong>逐項檢查，做到就打勾</strong>
       {stage.criteria.map((c, i) => <label key={c}><input type="checkbox" checked={!!checks[i]} onChange={e => { const n = [...checks]; n[i] = e.target.checked; setChecks(n) }} /> {c}</label>)}
       <button type="button" disabled={!checks.length || checks.some(x => !x)} onClick={() => save({ self: 1, day: date, words })}>都做到了，記下來</button>
-      <small>還沒連接 Claude，這一題會記成「自己檢查過」。</small>
+      <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 批改過才算。</small>
     </section>}
     {fb && <section className="wl-fb" aria-live="polite">
-      <div className="wl-fb-head"><strong>批改</strong>{stage.ielts && fb.band !== undefined && <span className="wl-band">估計 band {fb.band}</span>}</div>
+      <div className="wl-fb-head"><strong>批改</strong>{stage.ielts && fb.band !== undefined && <span className="wl-band">IELTS 練習估計分數 {fb.band}</span>}</div>
       {fb.summary && <p>{fb.summary}</p>}
-      <ul className="wl-crit">{fb.criteria.map(c => <li key={c.name}><span className="wl-score" data-level={stage.ielts ? (c.score >= 6.5 ? 'hi' : c.score >= 5.5 ? 'mid' : 'lo') : (c.score >= 4 ? 'hi' : c.score >= 3 ? 'mid' : 'lo')}>{stage.ielts ? c.score : c.score + '/5'}</span>
+      <ul className="wl-crit">{fb.criteria.map(c => <li key={c.name}><span className="wl-score" data-level={stage.ielts ? (c.score >= 6.5 ? 'hi' : c.score >= 5.5 ? 'mid' : 'lo') : (c.score >= 4 ? 'hi' : c.score >= 3 ? 'mid' : 'lo')}>{stage.ielts ? c.score : c.score >= 4 ? '做到' : '要改'}</span>
         <div><b>{c.name}</b><small>{c.comment}</small></div></li>)}</ul>
       {fb.next && <p className="wl-next"><b>下一版只改這件事：</b>{fb.next}</p>}
       {fb.fixes.length > 0 && <details><summary>文法和用字（{fb.fixes.length}）</summary><ul className="tu-fixes">{fb.fixes.map((f, i) => <li key={i}><span lang="en"><s>{f.wrong || '（漏寫）'}</s> → <b>{f.right}</b></span><small>{f.why}</small></li>)}</ul></details>}

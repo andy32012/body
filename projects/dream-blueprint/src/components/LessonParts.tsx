@@ -126,10 +126,11 @@ export function LessonVariation({ item, onDone }: { item: { zh: string; en: stri
     {!shown ? <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (ready()) { shownAt.current = Date.now(); setShown(true) } }}>看答案</button></div> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p></section>
       <fieldset className="pr-marks"><legend>我寫得…</legend>
-        <button type="button" onClick={() => done('good')}>對了</button>
-        <button type="button" onClick={() => done('small')}>差一點（加入複習）</button>
+        <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
+        <button type="button" disabled={!answer.trim()} onClick={() => done('small')}>差一點（加入複習）</button>
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
       </fieldset>
+      {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
     </>}
   </section>
 }
@@ -236,7 +237,7 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
       {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={submit}>{corrected ? '改好了，再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
-    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「答案待確認」。</p>}
+    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
     <CorrectBox run={run} mode="open" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
       previous={previous} selfFix={!corrected || !rec.revealed}

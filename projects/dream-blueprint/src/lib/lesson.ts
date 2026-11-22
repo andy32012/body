@@ -39,7 +39,7 @@ export type LessonPhase = 'recall' | 'listen' | 'write' | 'sound' | 'vary' | 'ex
 export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'again'; grammar: string[]; revealed: boolean }
 /** h: how far the hints went (1 self-check, 2 clearer hint, 3 sentence frame, 4 the answer); r: an answer was shown. */
 /** c: asked Claude for help with 「我卡住了」 before marking. */
-export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again'; c?: boolean }
+export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' | 'changed'; c?: boolean }
 
 /** Hints used outside the guided lesson (checkpoint, review, extra drills) live in "hints.<date>". */
 export const hintsKey = (day: string) => 'hints.' + day
@@ -49,7 +49,7 @@ export function readHints(notes: Record<string, string>, day: string): Record<st
 export function writeHint(notes: Record<string, string>, day: string, id: string, use: HintUse): Record<string, string> {
   return { ...notes, [hintsKey(day)]: JSON.stringify({ ...readHints(notes, day), [id]: use }) }
 }
-export interface CorrectionResult { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string; resolved?: number[]; still?: number[] }
+export interface CorrectionResult { verdict: 'good' | 'small' | 'again' | 'changed'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string; resolved?: number[]; still?: number[] }
 /** A rewrite counts as fixed when every issue from the round before is resolved, or nothing is left to fix.
  *  Sending the same answer again is a retry, not a fix. */
 export function issuesFixed(r: CorrectionResult, previous?: CorrectionResult): boolean {

@@ -30,12 +30,15 @@ export function pickRetentionUnit(
 export const retentionDrawCount = (notes: Notes, unit: number) =>
   value(notes, unit, "draws");
 
+/** A recheck only clears earlier misses when the answer was written alone and checked (`verified`).
+ *  A self-marked "correct" nobody checked, or one written after seeing hints, leaves the count as it was. */
 export function recordRetention(
   notes: Notes,
   unit: number,
   current: number,
   rating: "correct" | "minor" | "again",
   revealed: boolean,
+  verified = false,
 ) {
   return {
     ...notes,
@@ -43,13 +46,16 @@ export function recordRetention(
     [key(unit, "lastUnit")]: String(current),
     [key(unit, "misses")]: String(
       rating === "correct"
-        ? revealed
+        ? revealed || !verified
           ? value(notes, unit, "misses")
           : 0
         : value(notes, unit, "misses") + 1,
     ),
   };
 }
+/** 「穩了」 from a later recheck: only an answer written alone and checked, never a blank or self-marked one. */
+export const recheckMakesStable = (drawn: { rating: string; revealed: boolean; verified?: boolean } | undefined) =>
+  !!drawn && drawn.rating === "correct" && !drawn.revealed && drawn.verified === true;
 
 /** Units finished with help (hint or answer seen) wait here until an unaided recheck. */
 const assistedKey = (unit: number) => "unit-assisted." + unit;

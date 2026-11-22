@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { z } from 'zod'
 import { addDays, dayKey, type PeriodRange } from './progress'
 import { defaultSchool } from './school'
+import contentUpdates from '../data/content-updates.json'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
@@ -91,7 +92,8 @@ export function createInitialState(startedDay=dayKey()):AppState {
     },
     school:JSON.parse(JSON.stringify(defaultSchool)),sessions:[],cards:[],reviewEvents:[],
     curriculum:{unit:1,day:1,retry:0,stableUnits:[]},knownWords:[],learningWords:[],customWords:[],
-    checks:{},notes:{'migrate.study30':'1'},flagged:[],
+    // A new start has nothing to reschedule, so every material update counts as already applied.
+    checks:{},notes:{'migrate.study30':'1',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
   }
 }
 export function exportBackup(state:AppState):string {
@@ -132,8 +134,28 @@ export function importBackup(raw:string):AppState {
     state.school.study=state.school.study.map(s=>s.minutes===8?{...s,minutes:30}:s)
     state.notes={...state.notes,'migrate.study30':'1'}
   }
+  applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
+  return state
+}
+
+/** Teaching material corrected after it was learned: the review cards of those words and sentences come due today,
+ *  so the corrected version is seen soon. Nothing is reset — boxes, history and stable units stay as they were.
+ *  Each update runs once; how many cards it touched is kept in notes['content.'+id] for the notice on the home page. */
+export function applyContentUpdates(state:AppState, today=dayKey()) {
+  for (const u of contentUpdates as {id:string,words:string[],sentences:string[]}[]) {
+    const key='content.'+u.id
+    if (state.notes[key]!==undefined) continue
+    const ids=new Set([...u.words.map(w=>'word:'+w),...u.sentences])
+    let touched=0
+    state.cards=state.cards.map(c=>{
+      if (!ids.has(c.id)) return c
+      touched++
+      return c.due>today ? {...c,due:today,mastered:false} : {...c,mastered:false}
+    })
+    state.notes={...state.notes,[key]:String(touched)}
+  }
   return state
 }
 

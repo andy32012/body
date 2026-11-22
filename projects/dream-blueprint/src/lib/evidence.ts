@@ -1,9 +1,9 @@
 /** What a piece of work shows about a unit's goal. Finishing with help, doing it alone once,
  *  and still doing it later with a new item are different things, and are kept apart.
- *  A self-marked "correct" that no one checked stays 「答案待確認」 instead of counting either way. */
+ *  A self-marked "correct" that no one checked stays 「自評完成・待確認」 instead of counting either way. */
 export type Level = 'assisted' | 'independent' | 'delayed' | 'pending'
 export const levelNames: Record<Level, string> = {
-  assisted: '在協助下完成', independent: '當次獨立完成', delayed: '延後換題仍能完成', pending: '答案待確認',
+  assisted: '有提示完成', independent: '當次獨立完成', delayed: '延後換題仍能完成', pending: '自評完成・待確認',
 }
 const rank: Record<Level, number> = { pending: 0, assisted: 1, independent: 2, delayed: 3 }
 export type Source = 'pattern' | 'vary' | 'express' | 'checkpoint' | 'retention' | 'listen'
@@ -16,7 +16,9 @@ export interface Evidence {
   /** Kept only for 待確認, so the answer can be checked later. */
   answer?: string; prompt?: string; ref?: string
 }
-export type Verdict = 'good' | 'small' | 'again'
+/** Claude's check of a written answer: good = meaning right and natural; small / again = meaning clear but grammar or words
+ *  need fixing; changed = grammatical maybe, but it says something else (換貨 written as a refund). */
+export type Verdict = 'good' | 'small' | 'again' | 'changed'
 export const evidenceKey = (unit: number) => 'evidence.' + unit
 
 export function readEvidence(notes: Record<string, string>, unit: number): Evidence[] {
@@ -54,18 +56,48 @@ export function normalizeEnglish(t: string) {
 export const matchesReference = (answer: string, refs: readonly string[]) =>
   !!answer.trim() && refs.some(r => normalizeEnglish(r) === normalizeEnglish(answer))
 
-/** A written translation: hints or an answer shown → with help; Claude's first check or an exact match → alone;
- *  a self-marked "correct" with neither → 待確認. 「不會」 leaves no evidence. */
+/** Word-by-word comparison with the closest reference, shown only after the reference itself is open:
+ *  `extra` words are not in that reference, `missing` are reference words the answer does not have.
+ *  A different wording can still be right — this only points at where to look. */
+export function compareWithReference(answer: string, refs: readonly string[]) {
+  const a = normalizeEnglish(answer).split(' ').filter(Boolean)
+  let best: { ref: string; extra: Set<number>; missing: string[]; score: number } | null = null
+  for (const ref of refs) {
+    const r = normalizeEnglish(ref).split(' ').filter(Boolean)
+    // Longest common subsequence of words.
+    const dp = Array.from({ length: a.length + 1 }, () => new Array<number>(r.length + 1).fill(0))
+    for (let i = a.length - 1; i >= 0; i--) for (let j = r.length - 1; j >= 0; j--)
+      dp[i][j] = a[i] === r[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
+    const keepA = new Set<number>(), keepR = new Set<number>()
+    for (let i = 0, j = 0; i < a.length && j < r.length;) {
+      if (a[i] === r[j]) { keepA.add(i); keepR.add(j); i++; j++ } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++
+    }
+    const extra = new Set(a.map((_, i) => i).filter(i => !keepA.has(i)))
+    const missing = r.filter((_, j) => !keepR.has(j))
+    const score = extra.size + missing.length
+    if (!best || score < best.score) best = { ref, extra, missing, score }
+  }
+  return best ? { ref: best.ref, words: a.map((w, i) => ({ w, extra: best!.extra.has(i) })), missing: best.missing, same: best.score === 0 } : null
+}
+
+/** Nothing written is 「未作答」: it leaves no evidence, whichever button was pressed. */
+export const answered = (answer?: string) => !!answer?.trim()
+
+/** One standard for every place an answer is written — the lesson, the checkpoint, recall, review and redo:
+ *  nothing written → 未作答 (null); hints or the answer seen → 有提示完成; Claude's first check or an exact match → 當次獨立完成;
+ *  a self-marked "correct" with neither → 自評完成・待確認. 「不會」 leaves no evidence. 「穩了」 needs 當次獨立完成 later, on another item. */
 export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; answer?: string; references: readonly string[]; firstVerdict?: Verdict }): Level | null {
-  if (a.rating === 'again') return null
+  if (a.rating === 'again' || !answered(a.answer)) return null
   if (a.revealed || a.rating === 'minor') return 'assisted'
   if (a.firstVerdict === 'good' || matchesReference(a.answer ?? '', a.references)) return 'independent'
   if (a.firstVerdict) return 'assisted'
   return 'pending'
 }
+/** Whether a written answer may count toward 「穩了」: answered alone and checked (exact match or Claude's first verdict). */
+export const verifiedAlone = (a: Parameters<typeof judgeWritten>[0]) => judgeWritten(a) === 'independent'
 /** The variation is written first and only then compared with the answer. */
 export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string): Level | null {
-  if (mark === 'again') return null
+  if (mark === 'again' || !answered(answer)) return null
   if (mark === 'small') return 'assisted'
   return matchesReference(answer, [en]) ? 'independent' : 'pending'
 }

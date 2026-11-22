@@ -64,3 +64,8 @@
 .dg-why li { display: grid; gap: 0.1rem; overflow-wrap: anywhere; }
 .dg-why li[data-ok="true"] span { font-weight: 700; }
 .dg-why small { opacity: 0.85; }
+.tu-badge.tu-changed { color: #b48cf2; }
+.pr-compare { margin: .7rem 0 0; font-size: 14px; line-height: 1.6; }
+.pr-compare .pr-diff-extra { text-decoration: underline wavy #e06a5a; text-underline-offset: 3px; }
+.pr-compare .pr-diff-missing { color: #e0a83a; }
+.pr-mark-note { flex-basis: 100%; margin: .55rem 0 0; font-size: 13px; line-height: 1.55; opacity: .9; }

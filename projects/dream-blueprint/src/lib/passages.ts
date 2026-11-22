@@ -7,7 +7,10 @@ export interface Passage {
   n: number
   zh: string
   en?: string
-  words?: { en: string; zh: string }[]
+  /** The words this passage really uses: `form` is the word exactly as it appears in the English (saw, bounded, am),
+   *  `en` the word-table entry it belongs to (see, bound, be) and `zh` its meaning in this passage, not the table's
+   *  general meaning. Edit these per passage; never overwrite them from the word table. */
+  words?: { en: string; zh: string; form?: string }[]
 }
 export const doneKey = (id: string) => 'passage.' + id
 export const redoKey = (id: string) => 'passage.redo.' + id

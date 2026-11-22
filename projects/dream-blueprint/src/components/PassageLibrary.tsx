@@ -14,6 +14,13 @@ type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update'] }
 const marks = [['good', '對了'], ['small', '小錯'], ['again', '不會，明天再來']] as const
 
 // Short passages written around the 7000-word list. One passage at a time, in book order.
+/** The word as it is used in this passage; when that is another form of a table word, the table word follows: saw（see）. */
+function HintWord({ word }: { word: { en: string; form?: string } }) {
+  const form = word.form ?? word.en
+  const same = form.toLowerCase() === word.en.toLowerCase()
+  return <><span lang="en">{form}</span>{!same && <small className="passage-lemma">（<span lang="en">{word.en}</span>）</small>}</>
+}
+
 export default function PassageLibrary({ state, onActivity }: Props) {
   const [all, setAll] = useState<Passage[]>()
   const [failed, setFailed] = useState(false)
@@ -107,7 +114,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
         selfFix previous={previous} onResult={(_, __, r) => setLast(r)}
         onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {show === 'words' && passage.words && <div className="pr-tags">
-        {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh}{' '}
+        {passage.words.map(word => <span key={word.en + (word.form ?? '')}><HintWord word={word} /> · {word.zh}{' '}
           <ContextMeaning word={word.en} context={(passage.en ?? '') + '\n' + passage.zh} cacheKey={'ctx.' + passage.id + '.' + word.en}
             notes={state.notes} onSave={(k, v) => onActivity(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} />{' '}
           <AskWord en={word.en} zh={word.zh} /></span>)}
@@ -116,7 +123,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
         <small>參考翻譯（寫法不只一種，意思和文法對就算對）</small>
         <p lang="en">{passage.en}</p>
         {passage.words && passage.words.length > 0 && <div className="pr-tags">
-          {passage.words.map(word => <span key={word.en}><span lang="en">{word.en}</span> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
+          {passage.words.map(word => <span key={word.en + (word.form ?? '')}><HintWord word={word} /> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>)}
         </div>}
       </section>}
       {!passage.en && <p className="passage-note">這一級的參考翻譯還沒加入。寫完按下面的按鈕複製，貼到聊天裡請人批改。</p>}
@@ -125,7 +132,8 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       {manualCopy && <textarea aria-label="可複製的內容" readOnly value={manualCopy} onFocus={event => event.target.select()} />}
       <fieldset className="pr-marks">
         <legend>我的自評</legend>
-        {marks.map(([key, label]) => <button key={key} onClick={() => mark(key)}>{label}</button>)}
+        {marks.map(([key, label]) => <button key={key} disabled={key !== 'again' && !answer.trim()} onClick={() => mark(key)}>{label}</button>)}
+        {!answer.trim() && <p className="pr-blank-note">還沒寫翻譯：寫下來才能自評「對了／小錯」，沒寫的不算完成。</p>}
       </fieldset>
     </>}
   </div>

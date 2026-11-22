@@ -47,10 +47,12 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
     '',
     '批改方式：',
     '- 跟參考答案不一樣但文法和意思都對，就算對，明確說「對」，不要改成更難的寫法；可以順帶提一個更自然的說法，但要講清楚原本的也對。',
+    '- 先判斷意思，再看文法。分三種：意思對而且自然 → 對了（就算跟參考答案不一樣）；意思大致清楚但文法或用字有錯 → 小錯或再試一次，指出問題讓他自己改；意思變了（例如把「換貨」寫成退款、把「起床」寫成醒來、把「不可以」寫成不應該、主角或時間換了）→ 意思不同，要說清楚題目是什麼意思、他寫的變成什麼意思，就算他的英文本身沒有文法錯。',
+    '- 你自己也不確定他的意思對不對時，不要判「對了」，判「再試一次」並說你不確定的地方，讓他寫清楚一點。',
     '- 錯的地方照規則分層提示：他第一次錯只說錯的類型和大概位置；同一個錯第二次再錯，說清楚一點；第三次還錯或他說不會，才給答案並完整講原因。',
     '- 只錯標點或大小寫，算小錯，直接指出就好。',
     '- 講解用繁體中文，口氣像很熟的朋友，可以吐槽一下但要清楚。要有規則、一兩個例句、常見錯誤。不要用 Markdown 標題，段落短一點。',
-    '- 每次回覆最後一行固定寫：「判定：對了」「判定：小錯」或「判定：再試一次」三選一。',
+    '- 每次回覆最後一行固定寫：「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
   ].filter(Boolean).join('\n')
 }
 
@@ -78,9 +80,9 @@ export async function askTutor(system: string, turns: TutorTurn[], signal?: Abor
   return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
 }
 
-export function verdictOf(text: string): 'good' | 'small' | 'again' | null {
-  const m = text.match(/判定：\s*(對了|小錯|再試一次)/)
-  return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again' }) as const)[m[1] as '對了' | '小錯' | '再試一次'] : null
+export function verdictOf(text: string): 'good' | 'small' | 'again' | 'changed' | null {
+  const m = text.match(/判定：\s*(對了|小錯|再試一次|意思不同)/)
+  return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' }) as const)[m[1] as '對了' | '小錯' | '再試一次' | '意思不同'] : null
 }
 
 /** Who "問問 Claude" speaks as. Stored per device like the key. */

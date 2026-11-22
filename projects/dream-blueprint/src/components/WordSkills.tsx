@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import { orderForSkill, spellingMatches, type Skill } from '../lib/wordSkills'
 
-type Word = { en: string; zh: string }
+/** `en` may list accepted spellings ("airplane/plane"); `key` is the word-table entry the skill is recorded on. */
+type Word = { en: string; zh: string; key?: string }
 
 function say(text: string, rate = 0.85) {
   try {
@@ -26,6 +27,7 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   const [shown, setShown] = useState(false)
   const [passed, setPassed] = useState(0)
   const [heard, setHeard] = useState(false)
+  const [helped, setHelped] = useState(false)
   const word = order[i]
   const options = useMemo(() => {
     if (!word) return []
@@ -39,14 +41,15 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   if (!words.length) return <p>先在每天的課或今日單字學幾個字，這裡就會有字可以練。</p>
   if (!word) return <div className="pr-stack">
     <p>這一輪 {order.length} 個字練完了，{passed} 個過關。</p>
-    <button type="button" onClick={() => { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false) }}>再一輪</button>
+    <button type="button" onClick={() => { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false); setHelped(false) }}>再一輪</button>
   </div>
   const next = (ok: boolean) => {
-    if (ok) { onPass(word); setPassed(n => n + 1) }
+    // Spelled after 「給我第一個字母」 is done with help: it does not count as 寫出.
+    if (ok && !helped) { onPass(word); setPassed(n => n + 1) }
     const upcoming = order[i + 1]
     // The tap on 下一個 is a user gesture, so the next word can play right away.
     const played = skill === 'listen' && !!upcoming && say(upcoming.en, rate)
-    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(played)
+    setI(i + 1); setPicked(undefined); setAnswer(''); setShown(false); setHeard(played); setHelped(false)
   }
   const right = picked !== undefined && options[picked]?.en === word.en
   return <div className="pr-stack ws">
@@ -64,7 +67,7 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
       <h3>{word.zh}</h3>
       {!shown ? <button type="button" className="pr-main" onClick={() => { setShown(true); say(word.en, rate) }}>我說出來了，看答案</button> : <>
         <p className="ws-answer" lang="en">{word.en} <button type="button" className="ws-mini" aria-label="再聽一次" onClick={() => say(word.en, rate)}><Volume2 size={15} /></button></p>
-        <div className="pr-actions"><button type="button" onClick={() => next(true)}>我說對了</button><button type="button" onClick={() => next(false)}>沒說出來</button></div>
+        <div className="pr-actions"><button type="button" onClick={() => next(true)}>我說對了（自評）</button><button type="button" onClick={() => next(false)}>沒說出來</button></div>
       </>}
     </>}
     {skill === 'write' && <>
@@ -73,9 +76,10 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
         <input lang="en" value={answer} disabled={shown} autoCapitalize="off" autoComplete="off" spellCheck={false} onChange={e => setAnswer(e.target.value)} placeholder="拼出英文" />
         {!shown && <button type="submit" className="pr-main" disabled={!answer.trim()}>檢查</button>}
       </form>
-      {!shown && <button type="button" className="pr-link" onClick={() => setAnswer(word.en.slice(0, 1))}>給我第一個字母</button>}
+      {!shown && <button type="button" className="pr-link" onClick={() => { setHelped(true); setAnswer(word.en.slice(0, 1)) }}>給我第一個字母</button>}
       {shown && <>
         <p className={'ws-answer ' + (spellingMatches(answer, word.en) ? 'ok' : 'no')} lang="en">{spellingMatches(answer, word.en) ? '✓ ' : '✗ 正確是 '}{word.en}</p>
+        {helped && spellingMatches(answer, word.en) && <p className="ls-help">有用「第一個字母」提示，這次記成有提示完成，下一輪再自己拼一次。</p>}
         <button type="button" className="pr-main" onClick={() => next(spellingMatches(answer, word.en))}>下一個</button>
       </>}
     </>}

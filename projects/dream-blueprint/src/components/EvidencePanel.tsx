@@ -11,7 +11,7 @@ function Pending({ e, onLevel }: { e: Evidence; onLevel: (level: Level) => void 
   const [msg, setMsg] = useState('')
   const later = e.source === 'retention' || e.source === 'checkpoint'
   return <div className="ev-pending">
-    <small>{sourceNames[e.source]} · {e.day.slice(5).replace('-', '/')} · 答案待確認</small>
+    <small>{sourceNames[e.source]} · {e.day.slice(5).replace('-', '/')} · 自評完成・待確認</small>
     {e.prompt && <span className="ev-prompt">{e.prompt}</span>}
     <p lang="en">{e.answer}</p>
     {msg && <small role="status">{msg}</small>}
@@ -34,7 +34,7 @@ export default function EvidencePanel({ state, update }: Pick<PageProps, 'state'
   const units = unitsWithEvidence(state.notes)
   return <section className="history-section history-evidence">
     <h2>我會什麼</h2>
-    <p className="history-note">「完成」和「學會」分開記：在協助下完成 → 當次獨立完成 → 延後換題仍能完成。自己勾「對了」但沒人確認的，先放在「答案待確認」。</p>
+    <p className="history-note">「完成」和「學會」分開記：有提示完成 → 當次獨立完成 → 延後換題仍能完成。自己勾「對了」但沒人確認的，先放在「自評完成・待確認」；沒寫答案的不算作答。</p>
     {!units.length && <p>上完「今天這一堂」以後，這裡會開始有紀錄。</p>}
     <ul className="ev-list">{units.map(u => {
       const list = readEvidence(state.notes, u)

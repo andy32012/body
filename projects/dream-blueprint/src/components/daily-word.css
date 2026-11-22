@@ -35,3 +35,6 @@
 @media (prefers-reduced-motion:reduce) {.daily-word-veil,.daily-word-card {animation:none}}
 @media (max-width:760px) {.word-chip {margin:8px 0 0;font-size:12px;padding:8px 11px}}
 .daily-word-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.daily-word-forms { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .25rem; font-size: 15px; line-height: 1.45; }
+.daily-word-forms b { font-weight: 650; }
+.daily-word-forms small { opacity: .7; margin-inline: .15rem; }

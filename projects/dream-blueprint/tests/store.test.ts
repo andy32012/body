@@ -127,3 +127,25 @@ test('保留損壞原檔，還原後接續最新分頁進度，額滿時仍可�
   assert.deepEqual(importBackup(disk.get(STORAGE_KEY)!).knownWords,['another-tab'])
   assert.deepEqual(getSnapshot().state.knownWords,['hello','world','today','evening'])
 })
+
+test('教材修正後，學過的字和句子排進今天複習，進度不歸零', async () => {
+  const { applyContentUpdates, createInitialState } = await import('../src/lib/store.ts')
+  const s = createInitialState('2026-11-01')
+  s.notes = { 'migrate.study30': '1' }
+  s.cards = [
+    { id: 'word:even', box: 4, lastDay: '2026-11-20', due: '2026-12-05', mastered: false },
+    { id: 'u13-d1', box: 3, lastDay: '2026-11-20', due: '2026-11-30', mastered: true },
+    { id: 'word:apple', box: 2, lastDay: '2026-11-20', due: '2026-11-25', mastered: false },
+  ]
+  s.curriculum.stableUnits = [1]
+  const next = applyContentUpdates(s, '2026-11-22')
+  assert.equal(next.cards[0].due, '2026-11-22')
+  assert.equal(next.cards[0].box, 4, '盒子不歸零')
+  assert.equal(next.cards[1].due, '2026-11-22')
+  assert.equal(next.cards[2].due, '2026-11-25', '沒改過的不動')
+  assert.deepEqual(next.curriculum.stableUnits, [1])
+  assert.equal(next.notes['content.2026-11-22-meanings'], '2')
+  // 只跑一次：之後再開不會又把卡片拉回今天。
+  next.cards[0].due = '2026-12-01'
+  assert.equal(applyContentUpdates(next, '2026-11-23').cards[0].due, '2026-12-01')
+})

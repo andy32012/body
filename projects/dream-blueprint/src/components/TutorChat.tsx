@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { askTutor, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import './tutor.css'
 
-const verdictNames = { good: '對了', small: '小錯', again: '再試一次' }
+const verdictNames = { good: '對了', small: '小錯', again: '再試一次', changed: '意思不一樣' }
 
 const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
 
@@ -10,7 +10,7 @@ const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
 export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
   sentence: TutorSentence; answer: string; onReveal?: () => void
   /** Claude's verdict on each submitted try (1 = the first try, before any feedback). */
-  onVerdict?: (verdict: 'good' | 'small' | 'again', attempt: number) => void
+  onVerdict?: (verdict: 'good' | 'small' | 'again' | 'changed', attempt: number) => void
 }) {
   const [turns, setTurns] = useState<TutorTurn[]>([])
   const [busy, setBusy] = useState(false)

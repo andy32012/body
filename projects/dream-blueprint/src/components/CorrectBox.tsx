@@ -4,14 +4,14 @@ import { fixToCard, type SayCard } from '../lib/sayCards'
 import './tutor.css'
 
 type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string }
-export type Result = { verdict: 'good' | 'small' | 'again'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
-const verdictNames = { good: '全對', small: '小錯', again: '要再練' }
+export type Result = { verdict: 'good' | 'small' | 'again' | 'changed'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
+const verdictNames = { good: '全對', small: '小錯', again: '要再練', changed: '意思不一樣' }
 
 function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate', previous?: Result) {
   const tail = previous?.fixes.length ? ',"resolved":[上次問題中這次已改好的編號],"still":[上次問題中這次還沒改好的編號]' : ''
   const json = mode === 'open'
-    ? '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
-    : '{"verdict":"good|small|again","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
+    ? '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
+    : '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
   return [
     mode === 'open'
       ? '你是英文老師，批改台灣護理系學生（英文國中程度）的英文短寫作。這是開放題，內容是他自己想的。'
@@ -25,6 +25,8 @@ function system(zh: string, reference?: string, words?: string[], mode: 'transla
       ? '- 保留他的意思和內容，只改文法、用字和不自然的地方。意思和文法對就不要改成更難的說法。沒用到這課的句型，就在 note 提醒一句。'
       : '- 保留他的寫法，只改錯的地方。意思和文法對就不要改成更難或更漂亮的說法。',
     mode === 'open' ? '' : '- 漏翻的句子要補上。',
+    mode === 'open' ? '- verdict：good＝意思清楚、文法對；small／again＝文法或用字要改；changed＝寫出來的意思跟他想說的明顯不一樣。' : '- verdict 先看意思：good＝意思對而且自然（寫法跟參考翻譯不同也算）；small／again＝意思大致清楚但文法或用字要改；changed＝意思跟題目不一樣（例如換貨寫成退款、起床寫成醒來、不可以寫成不應該），就算英文本身沒有文法錯。changed 時第一個 fix 的 why 要說清楚：題目是什麼意思、他寫的變成什麼意思。',
+    '- 不確定他的意思對不對時，不要給 good，給 again，並在 note 寫你不確定的地方。',
     '- why 用繁體中文，一句話講清楚規則，像朋友一樣口語。',
     '- 第一次回覆只輸出 JSON，不要其他文字：' + json,
     '- 同一句有好幾個錯，合成一個 fix 就好；只是標點或大小寫的小問題不用列。',

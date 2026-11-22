@@ -14,6 +14,7 @@ import roadmap from './data/roadmap.json'
 import Plan, { type PlanTab } from './pages/Plan'
 import Practice, { PracticeCover, PracticeLibrary } from './pages/Practice'
 import { LessonBanner, TodayLesson, TodayThings } from './components/TodayLesson'
+import contentUpdates from './data/content-updates.json'
 import WorkloadRecommendation from './components/WorkloadRecommendation'
 import History from './pages/History'
 import Settings from './pages/Settings'
@@ -83,6 +84,17 @@ function Week({state,today}:{state:AppState,today:string}) {
     <div className="week-legend"><span><i className="done-key"/>已練習</span><span><i className="today-key"/>今天</span><span><Moon size={11}/>休息日</span></div>
   </section>
 }
+/** Once, after teaching material was corrected: says how many of the learner's cards changed and that they are due today. */
+function ContentNotice({state,update}:Pick<PageProps,'state'|'update'>) {
+  const pending=(contentUpdates as {id:string,note:string}[]).filter(u=>Number(state.notes['content.'+u.id])>0&&!state.notes['content.seen.'+u.id])
+  if (!pending.length) return null
+  const total=pending.reduce((n,u)=>n+Number(state.notes['content.'+u.id]),0)
+  return <section className="orbit-card content-notice" role="status">
+    <strong>教材修正了</strong>
+    <p>{pending.map(u=>u.note).join('；')}。你學過的 {total} 張卡片內容有改，已經排進今天的複習，進度和紀錄都保留。</p>
+    <button type="button" onClick={()=>update(prev=>({...prev,notes:{...prev.notes,...Object.fromEntries(pending.map(u=>['content.seen.'+u.id,'1']))}}))}>知道了</button>
+  </section>
+}
 function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:()=>void}) {
   const {state,update,navigate,today,start,openWord}=props
   const goal=nextAction(state), days=new Set(state.sessions.map(s=>s.day)).size
@@ -91,6 +103,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
   const weekStart=weekKey(today), practised=new Set(state.sessions.map(s=>s.day))
   const weekCount=Array.from({length:7},(_,i)=>addDays(weekStart,i)).filter(d=>practised.has(d)).length
   return <div className="home-stack">
+    <ContentNotice state={state} update={update}/>
     <TodayLesson state={state} update={update} today={today} start={start} openWord={openWord} days={days} weekCount={weekCount}/>
     <TodayThings state={state} navigate={navigate} today={today} nextStep={goal.title}/>
     <div className="overview-row">

@@ -4,9 +4,17 @@ import { markSkill } from '../lib/wordSkills'
 import { useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, dayKey, newCard, weekKey } from '../lib/progress'
-import { getScreeningQueue, officialWords, wordKey } from '../lib/vocab'
+import { formLines, getScreeningQueue, levelEntry, meaningLine, officialWords, wordKey } from '../lib/vocab'
 import wordParts from '../data/medical-parts.json'
 import './vocabulary.css'
+
+/** A table word shows each meaning with its part of speech, and a merged entry each of its forms. */
+function shownMeaning(w: { en: string; zh: string }) {
+  const e = levelEntry(w.en)
+  if (!e || e.zh !== w.zh) return w.zh
+  const forms = formLines(e)
+  return forms.length ? forms.map(f => f.en + ' ' + f.pos + ' ' + f.zh).join('　') : meaningLine(e)
+}
 
 export default function VocabScreen({state, update}: PageProps) {
   const today = dayKey()
@@ -71,7 +79,7 @@ export default function VocabScreen({state, update}: PageProps) {
             <small>今天第 {screened+1} 個／50 · {item.level ? '第 '+item.level+' 級' : '我的詞表'}</small>
             <strong className="vocab-term" lang="en">{item.en}</strong>
             <div><AskWord en={item.en} zh={reveal ? item.zh : undefined} label="問問 Claude" /></div>
-            {reveal ? <p>{item.zh || '匯入時未提供中文詞義。'}</p> :
+            {reveal ? <p>{item.zh ? shownMeaning(item) : '匯入時未提供中文詞義。'}</p> :
               <button type="button" onClick={() => setReveal(true)}>看中文意思</button>}
             <div className="vocab-tabs">
               <button type="button" onClick={() => classify(true)}>認得</button>
@@ -82,7 +90,7 @@ export default function VocabScreen({state, update}: PageProps) {
       </div>}
       {tab === 'learn' && <div className="vocab-panel">
         {practiceWord ? <><small>待學 {waiting.length} 個</small><strong className="vocab-term" lang="en">{practiceWord.en}</strong>
-          <p>{practiceWord.zh || '匯入時未提供中文詞義。'}</p>
+          <p>{practiceWord.zh ? shownMeaning(practiceWord) : '匯入時未提供中文詞義。'}</p>
           <div><AskWord en={practiceWord.en} zh={practiceWord.zh} label="問問 Claude" /> <UseWord key={practiceWord.en} en={practiceWord.en} zh={practiceWord.zh}
             onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(practiceWord.en), 'write', today) }))} /></div>
           <button type="button" onClick={() => {
@@ -99,7 +107,7 @@ export default function VocabScreen({state, update}: PageProps) {
           placeholder="輸入遇到的字" /></label>
         {lookupLevel >= 5 && !term ? <p>第 5、6 級只挑讀護理題或準備檢定時遇到的字。輸入一個字開始找。</p> :
           !lookup.length ? <p>這個級別沒有找到。可以切換級別或在設定匯入自己的單字。</p> :
-            <ul className="vocab-results">{lookup.map(word => <li key={word.en}><span><b lang="en">{word.en}</b> · {word.zh} <AskWord en={word.en} zh={word.zh} /></span>
+            <ul className="vocab-results">{lookup.map(word => <li key={word.en}><span><b lang="en">{word.en}</b> · {shownMeaning(word)} <AskWord en={word.en} zh={word.zh} /></span>
               <button type="button" disabled={classified.has(wordKey(word.en))} onClick={() => {
                 const key = wordKey(word.en)
                 update(prev => [...prev.knownWords,...prev.learningWords].some(w => wordKey(w) === key) ? prev :

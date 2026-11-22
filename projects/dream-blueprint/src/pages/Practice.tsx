@@ -22,13 +22,16 @@ import {
   dueCount,
   reviewCard,
 } from "../lib/progress";
-import { isKnownWord, wordKey, officialWords } from "../lib/vocab";
+import { isKnownWord, wordKey, officialWords, spellingTargets } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
 import { workloadWords } from "../lib/workloadWords";
 import { addSayCard, readSayCard, sayCardSentence } from "../lib/sayCards";
 import WordSkills from "../components/WordSkills";
 import {
   addEvidence,
+  answered,
+  compareWithReference,
+  matchesReference,
   judgeCheckpoint,
   judgeExpress,
   judgeVariation,
@@ -72,6 +75,7 @@ import {
   markAssisted,
   clearAssisted,
   checkpointOutcome,
+  recheckMakesStable,
   recordRetention,
   retentionDrawCount,
 } from "../lib/grammarRetention";
@@ -259,6 +263,17 @@ function Translation({
             </p>
           ))}
           <span>{sentence.why}</span>
+          {answered(answer) && (() => {
+            const diff = compareWithReference(answer, sentence.reference);
+            return diff && !diff.same && (
+              <p className="pr-compare">
+                <small>跟最接近的參考句比：</small>{" "}
+                <span lang="en">{diff.words.map((t, i) => <span key={i} className={t.extra ? "pr-diff-extra" : undefined}>{t.w} </span>)}</span>
+                {diff.missing.length > 0 && <><br /><small>參考句有、你沒寫到的字：</small> <span lang="en" className="pr-diff-missing">{diff.missing.join(" ")}</span></>}
+                <br /><small>畫波浪線的字跟參考句不一樣。寫法不同也可能是對的，重點是意思有沒有變：時間、人物、動作或否定換了，就是意思不一樣。</small>
+              </p>
+            );
+          })()}
           {sentence.newWords.length > 0 && (
             <div className="pr-tags">
               {sentence.newWords.map((word) => (
@@ -288,11 +303,22 @@ function Translation({
           {marks.map(([mark, label]) => (
             <button
               key={mark}
+              disabled={mark !== "again" && !answered(answer)}
               onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict }); }}
             >
               {label}
             </button>
           ))}
+          {!answered(answer) && <p className="pr-blank-note">還沒寫答案：寫下來才能按「對了」或「小錯」。真的不會就按「不會」，沒寫的題目不算作答。</p>}
+          {answered(answer) && (
+            <p className="pr-mark-note">
+              {firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
+                : firstVerdict === "changed" ? "Claude 說意思跟題目不一樣：改好之後也只算有提示完成。"
+                : firstVerdict ? "Claude 指出要改的地方：這次記成有提示完成。"
+                : matchesReference(answer, sentence.reference) ? "跟參考答案一樣，已確認：按「對了」會記成當次獨立完成。"
+                : "寫法跟參考答案不完全一樣，可能也對。沒有人確認前，按「對了」會先記成「自評完成・待確認」，之後可以請 Claude 看。意思如果變了，請按「小錯」。"}
+            </p>
+          )}
         </fieldset>
       )}
     </>
@@ -610,12 +636,14 @@ function PracticeSession({
                   current.unit,
                   drawn.rating,
                   drawn.revealed,
+                  drawn.verified === true,
                 )
               : prev.notes;
           if (current.checkpoint && success && !independent && !alreadyAdvanced)
             notes = markAssisted(notes, current.unit, date);
           if (current.checkpoint && independent) notes = clearAssisted(notes, current.unit);
-          if (drawn && retention && drawn.rating === "correct" && !drawn.revealed && notes["unit-assisted." + retention.unit]) {
+          // Same standard as the checkpoint: a blank, hinted or unchecked "correct" never makes a unit 「穩了」.
+          if (retention && recheckMakesStable(drawn) && notes["unit-assisted." + retention.unit]) {
             notes = clearAssisted(notes, retention.unit);
             next.stableUnits = [...new Set([...next.stableUnits, retention.unit])];
           }
@@ -674,14 +702,15 @@ function PracticeSession({
                 onHint={saveHint(recallNow.sentence.id)}
                 onMark={(mark, revealed, info) => {
                   if (recalls.some((r) => r.sentenceId === recallNow.sentence.id)) return;
+                  if (!answered(info.answer)) revealed = true;
+                  const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recallNow.sentence.reference, firstVerdict: info.firstVerdict });
                   if (retention && recallNow.sentence.id === retention.sentence.id) {
-                    const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recallNow.sentence.reference, firstVerdict: info.firstVerdict });
                     evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recallNow.sentence.id,
                       answer: info.answer, prompt: recallNow.sentence.zh, ref: recallNow.sentence.reference[0] });
                   }
                   const list = [
                     ...recalls,
-                    { sentenceId: recallNow.sentence.id, rating: ratingOf[mark], grammar: recallNow.sentence.grammar, revealed },
+                    { sentenceId: recallNow.sentence.id, rating: ratingOf[mark], grammar: recallNow.sentence.grammar, revealed, verified: level === "independent" },
                   ];
                   setRecalls(list);
                   save({ recalls: list, phase: "recall" });
@@ -777,8 +806,9 @@ function PracticeSession({
                       saved={readHints(state.notes, date)[recall.sentence.id]}
                       onHint={(use) => update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, recall.sentence.id, use) }))}
                       onMark={(mark, revealed, info) => {
+                        if (!answered(info.answer)) revealed = true;
+                        const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict });
                         if (retention && recall.sentence.id === retention.sentence.id) {
-                          const level = judgeWritten({ rating: ratingOf[mark], revealed, answer: info.answer, references: recall.sentence.reference, firstVerdict: info.firstVerdict });
                           evidence(retention.unit, level === "independent" ? "delayed" : level, { source: "retention", skill: "write", item: recall.sentence.id,
                             answer: info.answer, prompt: recall.sentence.zh, ref: recall.sentence.reference[0] });
                         }
@@ -789,6 +819,7 @@ function PracticeSession({
                             rating: ratingOf[mark],
                             grammar: recall.sentence.grammar,
                             revealed,
+                            verified: level === "independent",
                           },
                         ]);
                       }}
@@ -894,7 +925,7 @@ function PracticeSession({
                   <ul>{today.map((e) => (
                     <li key={e.source + (e.item ?? "")} data-level={e.level}><span>{sourceNames[e.source]}</span><b>{e.skill === "listen" ? (e.level === "assisted" ? "要看字才懂" : "只聽也懂") : levelNames[e.level]}</b></li>
                   ))}</ul>
-                  <small>「完成」和「學會」分開記。要算「延後換題仍能完成」，要等之後的小關卡或隔幾個單元的回想；「答案待確認」可以到「紀錄」請 Claude 看。</small>
+                  <small>「完成」和「學會」分開記。要算「延後換題仍能完成」，要等之後的小關卡或隔幾個單元的回想；「自評完成・待確認」可以到「紀錄」請 Claude 看；沒寫答案的不算作答。</small>
                 </div>
               );
             })()}
@@ -1163,6 +1194,11 @@ function Extras({
     const keys = [...new Set([...state.learningWords, ...state.cards.filter((c) => c.id.startsWith("word:")).map((c) => c.id.slice(5))])];
     return keys.flatMap((k) => { const w = lookup.get(k); return w ? [w] : []; });
   });
+  // Merged entries are drilled one form at a time (him = 他（當受詞）), rotating by day so every form comes up.
+  const [drillWords] = useState(() => {
+    const turn = Math.floor(Date.parse(date) / 86400000);
+    return learning.map((w, i) => { const t = spellingTargets(w, turn + i); return { en: t.accept, zh: t.zh, key: wordKey(w.en) }; });
+  });
   const [deck] = useState(() => {
     const due = dueCards(
       state.cards.filter((c) => c.id.startsWith("word:")),
@@ -1241,7 +1277,7 @@ function Extras({
             </div>
             <p className="qz-meta">
               <span>在學的 {learning.length} 個字：</span>
-              {skills.map(([key, label]) => <span key={key}>{label} {count[key]}</span>)}
+              {skills.map(([key, label]) => <span key={key}>{label}{key === "say" ? "（自評）" : ""} {count[key]}</span>)}
             </p>
           </div>
         );
@@ -1250,12 +1286,12 @@ function Extras({
         <WordSkills
           key={wordSkill}
           skill={wordSkill}
-          words={learning}
+          words={drillWords}
           distractors={officialWords.slice(0, 400)}
           notes={state.notes}
-          keyOf={(w) => wordKey(w.en)}
+          keyOf={(w) => w.key ?? wordKey(w.en)}
           rate={state.settings.speechRate}
-          onPass={(w) => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, wordKey(w.en), wordSkill, date) }))}
+          onPass={(w) => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, w.key ?? wordKey(w.en), wordSkill, date) }))}
         />
       )}
       {mode === "words" && wordSkill === "read" &&

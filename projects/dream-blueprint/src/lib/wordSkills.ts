@@ -25,9 +25,12 @@ export function orderForSkill<T>(items: readonly T[], keyOf: (t: T) => string, n
  *  "he (him, his, himself)" → any of the four. */
 /** Lower case, accents removed (café → cafe), curly apostrophes straightened. */
 const plain = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’‘]/g, "'")
+/** The only differences a spelling check ignores: capitals, accents, curly vs straight apostrophes, spaces around the word,
+ *  and full stops (a.m. = am, Mr. = Mr). Anything else — a digit or symbol inside the word — is a misspelling, never removed. */
+const spelled = (t: string) => plain(t).trim().replace(/\s+/g, ' ').replace(/\./g, '')
 export function spellingForms(en: string) {
   const forms = new Set<string>()
-  const add = (t: string) => { const v = plain(t).replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim(); if (v) forms.add(v) }
+  const add = (t: string) => { const v = spelled(t); if (v) forms.add(v) }
   for (const part of en.split('/')) {
     const m = part.match(/^(.*?)\s*[(（](.*?)[)）](.*)$/)
     if (!m) { add(part); continue }
@@ -46,6 +49,6 @@ export function spellingForms(en: string) {
   return [...forms]
 }
 export function spellingMatches(answer: string, en: string) {
-  const a = plain(answer).replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim()
-  return !!a && spellingForms(en).includes(a)
+  const a = spelled(answer)
+  return !!a && /^[a-z' -]+$/.test(a) && spellingForms(en).includes(a)
 }

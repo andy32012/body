@@ -7,7 +7,7 @@ import { AskWord } from './AIChat'
 import UseWord from './UseWord'
 import { markSkill } from '../lib/wordSkills'
 import { paintSky, seedOf } from '../lib/starfield'
-import { wordKey } from '../lib/vocab'
+import { formLines, meaningLine, wordKey } from '../lib/vocab'
 import { DAILY_CHOICES, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
 
@@ -82,10 +82,12 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
 
       {word ? <>
         <div className="daily-word-body">
-          <span className="daily-word-meta">第 {word.level} 級{word.pos ? ' · ' + word.pos : ''}</span>
+          <span className="daily-word-meta">第 {word.level} 級</span>
           <strong className="daily-word-term" lang="en">{word.en}</strong>
           {reveal
-            ? <p className="daily-word-meaning">{word.zh}</p>
+            ? formLines(word).length
+              ? <ul className="daily-word-forms">{formLines(word).map(f => <li key={f.en}><b lang="en">{f.en}</b> <small>{f.pos}</small> {f.zh}</li>)}</ul>
+              : <p className="daily-word-meaning">{meaningLine(word)}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
           <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal ? word.zh : undefined} label="問問 Claude" />{reveal && <UseWord key={word.en} en={word.en} zh={word.zh}
             onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), 'write', today) }))} />}</div>
