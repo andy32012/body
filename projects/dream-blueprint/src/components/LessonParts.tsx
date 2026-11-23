@@ -9,12 +9,15 @@ import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
 
-export function StepBar({ current, done }: { current: LessonStep; done: LessonStep[] }) {
+/** `pick` lists the earlier steps that can be looked at again; pressing one calls onPick. `review` is the one being looked at. */
+export function StepBar({ current, done, pick = [], onPick, review }: { current: LessonStep; done: LessonStep[]; pick?: LessonStep[]
+  onPick?: (id: LessonStep) => void; review?: LessonStep | null }) {
   return <ol className="ls-steps" aria-label="今天這一堂的步驟">
     {lessonSteps.map(([id, name]) => {
       const state = id === 'done' && done.includes('done') ? 'done' : id === current ? 'now' : done.includes(id) ? 'done' : 'todo'
-      return <li key={id} data-state={state} aria-current={state === 'now' ? 'step' : undefined}>
-        <i aria-hidden="true">{state === 'done' ? <Check size={11} strokeWidth={3} /> : null}</i><span>{name}</span>
+      const mark = <><i aria-hidden="true">{state === 'done' ? <Check size={11} strokeWidth={3} /> : null}</i><span>{name}</span></>
+      return <li key={id} data-state={state} data-review={review === id || undefined} aria-current={state === 'now' ? 'step' : undefined}>
+        {onPick && pick.includes(id) ? <button type="button" className="ls-step-pick" aria-label={'回頭看：' + name} onClick={() => onPick(id)}>{mark}</button> : mark}
       </li>
     })}
   </ol>
@@ -101,7 +104,8 @@ export function Transcript({ lines, playing, onPlayLine, showZh }: { lines: Less
 /** Listen first without the text, answer two questions, then read along. Later days: listen and shadow.
  *  The questions open after one complete play. A play that cannot be confirmed (no voice, an error, or a device that never
  *  reports the end) still lets him answer, but the result is not counted as understood by ear (onDone gets -1). */
-export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Lesson; firstTime: boolean; rate: number; onDone: (correct: number, total: number, plays: number) => void }) {
+export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下一步：句型' }: { lesson: Lesson; firstTime: boolean; rate: number
+  onDone: (correct: number, total: number, plays: number) => void; doneLabel?: string }) {
   const voice = useDialogueVoice(rate)
   const mountedAt = useRef(Date.now())
   const ready = () => Date.now() - mountedAt.current > 450
@@ -150,7 +154,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone }: { lesson: Less
       <Transcript lines={lesson.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(lesson.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(counted ? correct : -1, counted ? lesson.questions.length : 0, voice.completed) }}>下一步：句型</button>
+        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(counted ? correct : -1, counted ? lesson.questions.length : 0, voice.completed) }}>{doneLabel}</button>
       </div>
     </>}
   </section>

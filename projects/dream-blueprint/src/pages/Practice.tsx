@@ -58,7 +58,7 @@ import UseWord from "../components/UseWord";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
-import GrammarTeach, { GrammarBook } from "../components/GrammarTeach";
+import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/GrammarTeach";
 import StoryLibrary from "../components/StoryLibrary";
 import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
@@ -84,6 +84,7 @@ import {
   type Lesson,
   type LessonRecord,
   type LessonStep,
+  lessonSteps,
 } from "../lib/lesson";
 import {
   pickRetentionUnit,
@@ -540,6 +541,31 @@ function PracticeSession({
     setPhase(p);
     if (guided) save({ phase: p, ...patch }, s);
   }
+  // Looking back at an earlier step of a guided lesson. Nothing is recorded again and the lesson stays where it was:
+  // the current step is only hidden, so a half-written answer is still there on the way back.
+  type Review = "listen" | "pattern";
+  const [reviewing, setReviewing] = useState<Review | null>(null);
+  const pane = useRef<HTMLDivElement>(null);
+  const canReview: Record<Review, boolean> = {
+    // the dialogue, once it has been heard; the grammar and today's sentence, once the sentence has been written
+    listen: live && phase !== "recall" && phase !== "listen",
+    pattern: live && (phase === "sound" || phase === "vary" || phase === "express" || phase === "done"),
+  };
+  const reviewNames: Record<Review, string> = { listen: "聽懂", pattern: "句型" };
+  const stepNames = Object.fromEntries(lessonSteps) as Record<LessonStep, string>;
+  // Where the lesson really is, in the words of its own screens (shadowing and the variation are part of 句型).
+  const hereName = phase === "sound" ? "跟讀" : phase === "vary" ? "換個說法" : stepNames[stepNow];
+  // One step back from where the screen is now: 表達 → 句型 → 聽懂.
+  const backTo: Review | null = reviewing === "listen" ? null
+    : reviewing === "pattern" ? (canReview.listen ? "listen" : null)
+    : canReview.pattern ? "pattern" : canReview.listen ? "listen" : null;
+  function look(at: Review | null) {
+    if (!settled() || (at && !canReview[at])) return;
+    window.speechSynthesis?.cancel();
+    changedAt.current = Date.now();
+    setReviewing(at);
+    requestAnimationFrame(() => pane.current?.scrollIntoView({ block: "start" }));
+  }
   /** Evidence about a unit's goal; 待確認 entries keep the answer so it can be checked later. */
   function evidence(unit: number, level: Level | null, e: Omit<Evidence, "day" | "level">) {
     if (!level) return;
@@ -707,15 +733,49 @@ function PracticeSession({
           <ChevronLeft size={16} aria-hidden="true"/>回今天
         </button>
       </PracticeCover>
-      <div className="pr-pane pr-session" data-phase={phase}>
+      <div className="pr-pane pr-session" data-phase={phase} ref={pane}>
         <div className="pr-session-meta">
           <span className="pr-stage-icon" aria-hidden="true">
             {phase === "done" ? <Check size={17}/> : phase === "sound" || phase === "listen" ? <Headphones size={17}/> : <PenLine size={17}/>}
           </span>
           <span>{current.review ? "舊句複習" : "單元 " + current.unit + " · 第 " + current.day + " 天"}</span>
           {phase !== "done" && current.checkpoint && <span className="pr-item-index">{pos + 1} / {current.items.length}</span>}
+          {backTo && (
+            <button type="button" className="pr-step-back" onClick={() => look(backTo)}>
+              <ChevronLeft size={15} aria-hidden="true"/>上一步：{reviewNames[backTo]}
+            </button>
+          )}
         </div>
-        {live && <StepBar current={stepNow} done={stepsDone} />}
+        {live && <StepBar current={stepNow} done={stepsDone} review={reviewing}
+          pick={(["listen", "pattern"] as const).filter((r) => canReview[r] && r !== reviewing)} onPick={(id) => look(id as Review)} />}
+        {reviewing && (
+          <div className="ls-review-note" role="status">
+            <p>正在回頭看「{reviewNames[reviewing]}」。你的進度還在「{hereName}」，寫到一半的東西都留著。</p>
+            <button type="button" className="pr-main" onClick={() => look(null)}>回到{hereName}</button>
+          </div>
+        )}
+        {reviewing === "listen" && lessonData && (
+          <LessonListen key="review" lesson={lessonData} firstTime={false} rate={state.settings.speechRate}
+            doneLabel={"回到" + hereName} onDone={() => look(null)} />
+        )}
+        {reviewing === "pattern" && (
+          <section className="ls-review">
+            <div className="pr-label">句型 · {current.title}</div>
+            <h2 className="pr-question">再看一次這課的講解</h2>
+            {current.rule && <p className="gm-rule">{current.rule}</p>}
+            {grammarFor(current.unit)
+              ? <GrammarExplain unit={current.unit} rate={state.settings.speechRate} />
+              : current.examples.map((en, i) => <p key={en}><span lang="en">{en}</span><br/>{current.examplesZh[i]}</p>)}
+            {current.items.filter((it) => records.some((r) => r.sentenceId === it.id)).map((it) => (
+              <p key={it.id} className="ls-review-sentence">
+                <small>今天寫的句子：{it.zh}</small>
+                <b lang="en">{it.reference[0]}</b>
+              </p>
+            ))}
+            <button type="button" className="pr-main" onClick={() => look(null)}>回到{hereName}</button>
+          </section>
+        )}
+        <div className="pr-phase" hidden={!!reviewing}>
         {guided && lessonData === undefined && <p className="ls-help">準備今天這一堂…</p>}
         {live && phase === "recall" && (
           recallNow ? (
@@ -1051,6 +1111,7 @@ function PracticeSession({
             </div>
           </>
         )}
+        </div>
       </div>
       {phase === "done" && extra && (
         <Extras

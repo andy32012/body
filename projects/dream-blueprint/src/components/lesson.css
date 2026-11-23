@@ -5,6 +5,26 @@
 .ls-steps li[data-state=done] i { background: var(--practice-accent); border-color: var(--practice-accent); }
 .ls-steps li[data-state=now] i { border-color: var(--practice-accent); box-shadow: 0 0 0 4px var(--practice-accent-wash); }
 .ls-steps li[data-state=now] span { color: var(--practice-ink); font-weight: 650; }
+/* An earlier step that can be looked at again: the dot and its name are one button. */
+.practice-page .ls-steps button.ls-step-pick { display: grid; justify-items: center; gap: 5px; min-height: 0; padding: 0 .3rem 2px; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; border-radius: 8px; }
+.ls-steps button.ls-step-pick span { text-decoration: underline dotted; text-underline-offset: .3em; }
+.ls-steps button.ls-step-pick:hover span, .ls-steps button.ls-step-pick:focus-visible span { color: var(--practice-ink); }
+.ls-steps li[data-review] i { box-shadow: 0 0 0 4px var(--practice-accent-wash); }
+.ls-steps li[data-review] span { color: var(--practice-ink); font-weight: 650; text-decoration: none; }
+/* Looking back at an earlier step: where the lesson really is, and the way back to it. */
+.ls-review-note { display: flex; flex-wrap: wrap; gap: .4rem .9rem; align-items: center; justify-content: space-between; margin: 0 0 1.1rem; padding: .6rem .85rem; border-radius: 12px;
+  background: var(--practice-inset); border: 1px solid var(--practice-line); border-inline-start: 3px solid var(--practice-accent); font-size: .92rem; line-height: 1.55; }
+.ls-review-note p { margin: 0; flex: 1 1 14rem; }
+.practice-page .ls-review-note button { flex: none; min-height: 38px; padding: .3rem .9rem; }
+.ls-review { display: grid; gap: .8rem; }
+.ls-review > h2 { margin: 0; }
+.ls-review-sentence { margin: 0; display: grid; gap: .15rem; padding: .65rem .85rem; border-radius: 12px; border: 1px dashed var(--practice-line); }
+.ls-review-sentence small { color: var(--practice-secondary); font-size: .84rem; }
+.ls-review-sentence b { font-size: 1.08rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.ls-review .pr-main { justify-self: start; }
+.practice-page button.pr-step-back { margin-inline-start: auto; display: inline-flex; align-items: center; gap: .15rem; min-height: 36px; padding: .2rem .75rem .2rem .45rem; border-radius: 999px; font-size: .84rem; font-weight: 600;
+  color: var(--practice-secondary); }
+.practice-page button.pr-step-back:hover { color: var(--practice-ink); border-color: var(--practice-accent); }
 
 .ls-listen, .ls-vary, .ls-express { display: grid; gap: .75rem; min-width: 0; }
 .ls-help { margin: 0; color: var(--practice-secondary); line-height: 1.65; }
