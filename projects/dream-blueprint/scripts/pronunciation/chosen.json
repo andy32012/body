@@ -1,0 +1,776 @@
+{
+ "pairs": {
+  "p01": [
+   [
+    "sheep",
+    "ship"
+   ],
+   [
+    "eat",
+    "it"
+   ],
+   [
+    "sleep",
+    "slip"
+   ],
+   [
+    "heat",
+    "hit"
+   ],
+   [
+    "leave",
+    "live"
+   ],
+   [
+    "cheap",
+    "chip"
+   ]
+  ],
+  "p02": [
+   [
+    "bed",
+    "bad"
+   ],
+   [
+    "pen",
+    "pan"
+   ],
+   [
+    "said",
+    "sad"
+   ],
+   [
+    "guess",
+    "gas"
+   ],
+   [
+    "bet",
+    "bat"
+   ],
+   [
+    "dead",
+    "dad"
+   ]
+  ],
+  "p03": [
+   [
+    "luck",
+    "lock"
+   ],
+   [
+    "color",
+    "collar"
+   ],
+   [
+    "come",
+    "calm"
+   ],
+   [
+    "gut",
+    "got"
+   ],
+   [
+    "rubber",
+    "robber"
+   ],
+   [
+    "bucks",
+    "box"
+   ]
+  ],
+  "p04": [
+   [
+    "pool",
+    "pull"
+   ],
+   [
+    "fool",
+    "full"
+   ],
+   [
+    "Luke",
+    "look"
+   ]
+  ],
+  "p05": [
+   [
+    "pain",
+    "pen"
+   ],
+   [
+    "late",
+    "let"
+   ],
+   [
+    "wait",
+    "wet"
+   ],
+   [
+    "taste",
+    "test"
+   ],
+   [
+    "gate",
+    "get"
+   ],
+   [
+    "date",
+    "debt"
+   ]
+  ],
+  "p06": [
+   [
+    "think",
+    "sink"
+   ],
+   [
+    "thank",
+    "sank"
+   ],
+   [
+    "three",
+    "tree"
+   ],
+   [
+    "then",
+    "den"
+   ],
+   [
+    "breathe",
+    "breeze"
+   ],
+   [
+    "thing",
+    "sing"
+   ],
+   [
+    "thin",
+    "sin"
+   ]
+  ],
+  "p07": [
+   [
+    "light",
+    "right"
+   ],
+   [
+    "long",
+    "wrong"
+   ],
+   [
+    "fly",
+    "fry"
+   ],
+   [
+    "collect",
+    "correct"
+   ],
+   [
+    "late",
+    "rate"
+   ],
+   [
+    "play",
+    "pray"
+   ],
+   [
+    "night",
+    "light"
+   ],
+   [
+    "snow",
+    "slow"
+   ],
+   [
+    "net",
+    "let"
+   ]
+  ],
+  "p08": [
+   [
+    "vest",
+    "west"
+   ],
+   [
+    "very",
+    "berry"
+   ],
+   [
+    "fan",
+    "van"
+   ],
+   [
+    "vote",
+    "boat"
+   ],
+   [
+    "vent",
+    "went"
+   ],
+   [
+    "verse",
+    "worse"
+   ]
+  ],
+  "p09": [
+   [
+    "back",
+    "bag"
+   ],
+   [
+    "rice",
+    "rise"
+   ],
+   [
+    "hat",
+    "had"
+   ],
+   [
+    "write",
+    "ride"
+   ],
+   [
+    "wrote",
+    "road"
+   ],
+   [
+    "leaf",
+    "leave"
+   ],
+   [
+    "car",
+    "card"
+   ],
+   [
+    "why",
+    "white"
+   ],
+   [
+    "play",
+    "plate"
+   ]
+  ],
+  "p12": [
+   [
+    "I can swim.",
+    "I can't swim."
+   ],
+   [
+    "She can walk.",
+    "She can't walk."
+   ],
+   [
+    "thirteen",
+    "thirty"
+   ],
+   [
+    "fourteen",
+    "forty"
+   ],
+   [
+    "fifteen",
+    "fifty"
+   ],
+   [
+    "sixteen",
+    "sixty"
+   ]
+  ]
+ },
+ "voices": {
+  "f": {
+   "sheep": "af_bella",
+   "ship": "af_bella",
+   "eat": "af_heart",
+   "it": "af_heart",
+   "sleep": "af_bella",
+   "slip": "af_bella",
+   "heat": "af_bella",
+   "hit": "af_bella",
+   "cheap": "af_bella",
+   "chip": "af_bella",
+   "leave": "af_bella",
+   "live": "af_bella",
+   "bed": "af_heart",
+   "bad": "af_heart",
+   "pen": "af_bella",
+   "pan": "af_bella",
+   "said": "af_heart",
+   "sad": "af_heart",
+   "dead": "af_heart",
+   "dad": "af_heart",
+   "bet": "af_sarah",
+   "bat": "af_sarah",
+   "guess": "af_sarah",
+   "gas": "af_sarah",
+   "luck": "af_bella",
+   "lock": "af_bella",
+   "color": "af_bella",
+   "collar": "af_bella",
+   "come": "af_bella",
+   "calm": "af_bella",
+   "bucks": "af_sarah",
+   "box": "af_sarah",
+   "rubber": "af_bella",
+   "robber": "af_bella",
+   "gut": "af_heart",
+   "got": "af_heart",
+   "pool": "af_bella",
+   "pull": "af_bella",
+   "fool": "af_heart",
+   "full": "af_heart",
+   "luke": "af_sarah",
+   "look": "af_sarah",
+   "pain": "af_bella",
+   "late": "af_bella",
+   "let": "af_bella",
+   "wait": "af_bella",
+   "wet": "af_bella",
+   "taste": "af_bella",
+   "test": "af_bella",
+   "gate": "af_heart",
+   "get": "af_heart",
+   "date": "af_heart",
+   "debt": "af_heart",
+   "think": "af_heart",
+   "sink": "af_heart",
+   "thing": "af_bella",
+   "sing": "af_bella",
+   "thin": "af_bella",
+   "sin": "af_bella",
+   "breathe": "af_bella",
+   "breeze": "af_bella",
+   "then": "af_bella",
+   "den": "af_bella",
+   "three": "af_bella",
+   "tree": "af_bella",
+   "thank": "af_bella",
+   "sank": "af_bella",
+   "light": "af_bella",
+   "right": "af_bella",
+   "long": "af_bella",
+   "wrong": "af_bella",
+   "fly": "af_bella",
+   "fry": "af_bella",
+   "collect": "af_bella",
+   "correct": "af_bella",
+   "rate": "af_bella",
+   "play": "af_bella",
+   "pray": "af_bella",
+   "night": "af_bella",
+   "snow": "af_bella",
+   "slow": "af_bella",
+   "net": "af_bella",
+   "vest": "af_heart",
+   "west": "af_heart",
+   "very": "af_bella",
+   "berry": "af_bella",
+   "vote": "af_bella",
+   "boat": "af_bella",
+   "verse": "af_bella",
+   "worse": "af_bella",
+   "fan": "af_bella",
+   "van": "af_bella",
+   "vent": "af_bella",
+   "went": "af_bella",
+   "back": "af_bella",
+   "bag": "af_bella",
+   "rice": "af_bella",
+   "rise": "af_bella",
+   "write": "af_bella",
+   "ride": "af_bella",
+   "wrote": "af_bella",
+   "road": "af_bella",
+   "leaf": "af_bella",
+   "hat": "af_bella",
+   "had": "af_bella",
+   "car": "af_bella",
+   "card": "af_bella",
+   "why": "af_bella",
+   "white": "af_bella",
+   "plate": "af_bella",
+   "i-can-swim": "af_bella",
+   "i-cant-swim": "af_bella",
+   "she-can-walk": "af_bella",
+   "she-cant-walk": "af_bella",
+   "thirteen": "af_bella",
+   "thirty": "af_bella",
+   "fourteen": "af_bella",
+   "forty": "af_bella",
+   "fifteen": "af_bella",
+   "fifty": "af_bella",
+   "sixteen": "af_bella",
+   "sixty": "af_bella",
+   "see": "af_bella",
+   "sit": "af_bella",
+   "day": "af_bella",
+   "cat": "af_bella",
+   "hot": "af_bella",
+   "ball": "af_bella",
+   "go": "af_bella",
+   "book": "af_bella",
+   "food": "af_bella",
+   "sun": "af_bella",
+   "about": "af_bella",
+   "nurse": "af_bella",
+   "doctor": "af_bella",
+   "my": "af_bella",
+   "now": "af_bella",
+   "boy": "af_bella",
+   "this": "af_bella",
+   "she": "af_bella",
+   "usually": "af_bella",
+   "chair": "af_bella",
+   "job": "af_bella",
+   "yes": "af_bella",
+   "red": "af_bella",
+   "leg": "af_bella",
+   "zoo": "af_bella",
+   "i-need-to-sleep-a-little-bit": "af_bella",
+   "i-feel-a-little-ill": "af_bella",
+   "he-will-leave-but-i-live-here": "af_bella",
+   "the-man-said-he-was-sad": "af_bella",
+   "i-had-a-headache-in-bed": "af_bella",
+   "my-pen-is-in-the-pan": "af_bella",
+   "the-doctor-is-not-at-lunch": "af_bella",
+   "lock-the-door-and-good-luck": "af_bella",
+   "my-stomach-hurts-a-lot": "af_bella",
+   "moon": "af_bella",
+   "blue": "af_bella",
+   "good": "af_bella",
+   "foot": "af_bella",
+   "put": "af_bella",
+   "look-at-the-full-moon": "af_bella",
+   "the-food-is-good": "af_bella",
+   "put-your-foot-in-the-boot": "af_bella",
+   "where-is-the-pain": "af_bella",
+   "wait-the-floor-is-wet": "af_bella",
+   "take-the-test-later": "af_bella",
+   "take-a-deep-breath": "af_bella",
+   "breathe-in-through-your-mouth": "af_bella",
+   "thank-you-for-these-three-things": "af_bella",
+   "turn-on-the-light-on-the-right": "af_bella",
+   "please-read-the-label": "af_bella",
+   "i-need-a-little-rest": "af_bella",
+   "i-feel-very-weak": "af_bella",
+   "check-the-vital-signs-every-four-hours": "af_bella",
+   "we-have-five-visitors": "af_bella",
+   "i-need-a-card-not-a-car": "af_bella",
+   "put-the-bag-on-your-back": "af_bella",
+   "please-save-a-seat-for-me": "af_bella",
+   "walked": "af_bella",
+   "washed": "af_bella",
+   "stopped": "af_bella",
+   "helped": "af_bella",
+   "played": "af_bella",
+   "called": "af_bella",
+   "cleaned": "af_bella",
+   "moved": "af_bella",
+   "wanted": "af_bella",
+   "needed": "af_bella",
+   "started": "af_bella",
+   "visited": "af_bella",
+   "cups": "af_bella",
+   "books": "af_bella",
+   "cats": "af_bella",
+   "beds": "af_bella",
+   "bags": "af_bella",
+   "pills": "af_bella",
+   "nurses": "af_bella",
+   "watches": "af_bella",
+   "boxes": "af_bella",
+   "she-walked-to-the-ward-and-checked-the-beds": "af_bella",
+   "he-needed-help-so-i-called-the-doctor": "af_bella",
+   "the-nurses-washed-their-hands": "af_bella",
+   "hospital": "af_bella",
+   "medicine": "af_bella",
+   "patient": "af_bella",
+   "temperature": "af_bella",
+   "today": "af_bella",
+   "because": "af_bella",
+   "allergic": "af_bella",
+   "injection": "af_bella",
+   "important": "af_bella",
+   "information": "af_bella",
+   "understand": "af_bella",
+   "the-patient-is-in-the-hospital-today": "af_bella",
+   "i-am-allergic-to-this-medicine": "af_bella",
+   "it-is-important-to-understand-the-information": "af_bella",
+   "i-want-to-go-home": "af_bella",
+   "a-cup-of-tea-please": "af_bella",
+   "take-it-twice-a-day": "af_bella",
+   "an-apple": "af_bella",
+   "turn-it-off": "af_bella",
+   "check-it-out": "af_bella",
+   "pick-it-up": "af_bella",
+   "not-at-all": "af_bella",
+   "a-lot-of-water": "af_bella",
+   "sit-up": "af_bella",
+   "in-an-hour": "af_bella",
+   "what-is-it": "af_bella",
+   "can-you-turn-it-off": "af_bella",
+   "drink-a-lot-of-water": "af_bella",
+   "i-will-check-it-out-in-an-hour": "af_bella",
+   "are-you-okay": "af_heart",
+   "do-you-have-any-pain": "af_bella",
+   "can-you-walk": "af_heart",
+   "where-does-it-hurt": "af_bella",
+   "what-is-your-name": "af_heart",
+   "i-feel-much-better": "af_heart",
+   "please-sit-down": "af_sarah",
+   "do-you-take-any-medicine": "af_bella",
+   "what-time-is-it": "af_bella",
+   "are-you-ready": "af_bella",
+   "are-you-allergic-to-any-medicine": "af_bella",
+   "when-did-the-pain-start": "af_heart",
+   "please-take-a-deep-breath": "af_sarah"
+  },
+  "m": {
+   "sheep": "am_adam",
+   "ship": "am_adam",
+   "eat": "am_fenrir",
+   "it": "am_fenrir",
+   "sleep": "am_fenrir",
+   "slip": "am_fenrir",
+   "heat": "am_adam",
+   "hit": "am_adam",
+   "cheap": "am_adam",
+   "chip": "am_adam",
+   "leave": "am_adam",
+   "live": "am_adam",
+   "bed": "am_adam",
+   "bad": "am_adam",
+   "pen": "am_adam",
+   "pan": "am_adam",
+   "said": "am_adam",
+   "sad": "am_adam",
+   "dead": "am_adam",
+   "dad": "am_adam",
+   "bet": "am_fenrir",
+   "bat": "am_fenrir",
+   "guess": "am_adam",
+   "gas": "am_adam",
+   "luck": "am_michael",
+   "lock": "am_michael",
+   "color": "am_adam",
+   "collar": "am_adam",
+   "come": "am_adam",
+   "calm": "am_adam",
+   "bucks": "am_adam",
+   "box": "am_adam",
+   "rubber": "am_adam",
+   "robber": "am_adam",
+   "gut": "am_adam",
+   "got": "am_adam",
+   "pool": "am_adam",
+   "pull": "am_adam",
+   "fool": "am_adam",
+   "full": "am_adam",
+   "luke": "am_adam",
+   "look": "am_adam",
+   "pain": "am_adam",
+   "late": "am_adam",
+   "let": "am_adam",
+   "wait": "am_adam",
+   "wet": "am_adam",
+   "taste": "am_adam",
+   "test": "am_adam",
+   "gate": "am_adam",
+   "get": "am_adam",
+   "date": "am_fenrir",
+   "debt": "am_fenrir",
+   "think": "am_adam",
+   "sink": "am_adam",
+   "thing": "am_fenrir",
+   "sing": "am_fenrir",
+   "thin": "am_adam",
+   "sin": "am_adam",
+   "breathe": "am_adam",
+   "breeze": "am_adam",
+   "then": "am_adam",
+   "den": "am_adam",
+   "three": "am_fenrir",
+   "tree": "am_fenrir",
+   "thank": "am_adam",
+   "sank": "am_adam",
+   "light": "am_adam",
+   "right": "am_adam",
+   "long": "am_adam",
+   "wrong": "am_adam",
+   "fly": "am_adam",
+   "fry": "am_adam",
+   "collect": "am_adam",
+   "correct": "am_adam",
+   "rate": "am_adam",
+   "play": "am_adam",
+   "pray": "am_adam",
+   "night": "am_adam",
+   "snow": "am_adam",
+   "slow": "am_adam",
+   "net": "am_adam",
+   "vest": "am_adam",
+   "west": "am_adam",
+   "very": "am_adam",
+   "berry": "am_adam",
+   "vote": "am_adam",
+   "boat": "am_adam",
+   "verse": "am_adam",
+   "worse": "am_adam",
+   "fan": "am_adam",
+   "van": "am_adam",
+   "vent": "am_michael",
+   "went": "am_michael",
+   "back": "am_adam",
+   "bag": "am_adam",
+   "rice": "am_adam",
+   "rise": "am_adam",
+   "write": "am_adam",
+   "ride": "am_adam",
+   "wrote": "am_adam",
+   "road": "am_adam",
+   "leaf": "am_adam",
+   "hat": "am_fenrir",
+   "had": "am_fenrir",
+   "car": "am_adam",
+   "card": "am_adam",
+   "why": "am_adam",
+   "white": "am_adam",
+   "plate": "am_adam",
+   "i-can-swim": "am_adam",
+   "i-cant-swim": "am_adam",
+   "she-can-walk": "am_adam",
+   "she-cant-walk": "am_adam",
+   "thirteen": "am_adam",
+   "thirty": "am_adam",
+   "fourteen": "am_adam",
+   "forty": "am_adam",
+   "fifteen": "am_adam",
+   "fifty": "am_adam",
+   "sixteen": "am_adam",
+   "sixty": "am_adam",
+   "see": "am_adam",
+   "sit": "am_fenrir",
+   "day": "am_puck",
+   "cat": "am_adam",
+   "hot": "am_adam",
+   "ball": "am_adam",
+   "go": "am_adam",
+   "book": "am_adam",
+   "food": "am_adam",
+   "sun": "am_adam",
+   "about": "am_adam",
+   "nurse": "am_adam",
+   "doctor": "am_adam",
+   "my": "am_adam",
+   "now": "am_adam",
+   "boy": "am_adam",
+   "this": "am_adam",
+   "she": "am_adam",
+   "usually": "am_adam",
+   "chair": "am_adam",
+   "job": "am_adam",
+   "yes": "am_adam",
+   "red": "am_adam",
+   "leg": "am_adam",
+   "zoo": "am_adam",
+   "i-need-to-sleep-a-little-bit": "am_adam",
+   "i-feel-a-little-ill": "am_adam",
+   "he-will-leave-but-i-live-here": "am_adam",
+   "the-man-said-he-was-sad": "am_adam",
+   "i-had-a-headache-in-bed": "am_adam",
+   "my-pen-is-in-the-pan": "am_adam",
+   "the-doctor-is-not-at-lunch": "am_adam",
+   "lock-the-door-and-good-luck": "am_adam",
+   "my-stomach-hurts-a-lot": "am_adam",
+   "moon": "am_adam",
+   "blue": "am_adam",
+   "good": "am_adam",
+   "foot": "am_adam",
+   "put": "am_adam",
+   "look-at-the-full-moon": "am_adam",
+   "the-food-is-good": "am_adam",
+   "put-your-foot-in-the-boot": "am_adam",
+   "where-is-the-pain": "am_adam",
+   "wait-the-floor-is-wet": "am_adam",
+   "take-the-test-later": "am_adam",
+   "take-a-deep-breath": "am_adam",
+   "breathe-in-through-your-mouth": "am_adam",
+   "thank-you-for-these-three-things": "am_adam",
+   "turn-on-the-light-on-the-right": "am_adam",
+   "please-read-the-label": "am_adam",
+   "i-need-a-little-rest": "am_adam",
+   "i-feel-very-weak": "am_adam",
+   "check-the-vital-signs-every-four-hours": "am_adam",
+   "we-have-five-visitors": "am_adam",
+   "i-need-a-card-not-a-car": "am_adam",
+   "put-the-bag-on-your-back": "am_adam",
+   "please-save-a-seat-for-me": "am_adam",
+   "walked": "am_adam",
+   "washed": "am_adam",
+   "stopped": "am_adam",
+   "helped": "am_adam",
+   "played": "am_adam",
+   "called": "am_adam",
+   "cleaned": "am_adam",
+   "moved": "am_adam",
+   "wanted": "am_adam",
+   "needed": "am_adam",
+   "started": "am_adam",
+   "visited": "am_adam",
+   "cups": "am_adam",
+   "books": "am_adam",
+   "cats": "am_adam",
+   "beds": "am_adam",
+   "bags": "am_adam",
+   "pills": "am_adam",
+   "nurses": "am_adam",
+   "watches": "am_adam",
+   "boxes": "am_adam",
+   "she-walked-to-the-ward-and-checked-the-beds": "am_adam",
+   "he-needed-help-so-i-called-the-doctor": "am_adam",
+   "the-nurses-washed-their-hands": "am_adam",
+   "hospital": "am_fenrir",
+   "medicine": "am_adam",
+   "patient": "am_adam",
+   "temperature": "am_adam",
+   "today": "am_adam",
+   "because": "am_adam",
+   "allergic": "am_fenrir",
+   "injection": "am_adam",
+   "important": "am_adam",
+   "information": "am_adam",
+   "understand": "am_adam",
+   "the-patient-is-in-the-hospital-today": "am_adam",
+   "i-am-allergic-to-this-medicine": "am_adam",
+   "it-is-important-to-understand-the-information": "am_adam",
+   "i-want-to-go-home": "am_adam",
+   "a-cup-of-tea-please": "am_adam",
+   "take-it-twice-a-day": "am_adam",
+   "an-apple": "am_adam",
+   "turn-it-off": "am_adam",
+   "check-it-out": "am_adam",
+   "pick-it-up": "am_adam",
+   "not-at-all": "am_adam",
+   "a-lot-of-water": "am_adam",
+   "sit-up": "am_adam",
+   "in-an-hour": "am_fenrir",
+   "what-is-it": "am_adam",
+   "can-you-turn-it-off": "am_adam",
+   "drink-a-lot-of-water": "am_adam",
+   "i-will-check-it-out-in-an-hour": "am_adam",
+   "are-you-okay": "am_michael",
+   "do-you-have-any-pain": "am_michael",
+   "can-you-walk": "am_michael",
+   "where-does-it-hurt": "am_michael",
+   "what-is-your-name": "am_michael",
+   "i-feel-much-better": "am_michael",
+   "please-sit-down": "am_michael",
+   "do-you-take-any-medicine": "am_michael",
+   "what-time-is-it": "am_michael",
+   "are-you-ready": "am_michael",
+   "are-you-allergic-to-any-medicine": "am_michael",
+   "when-did-the-pain-start": "am_michael",
+   "please-take-a-deep-breath": "am_adam"
+  }
+ }
+}

@@ -195,3 +195,25 @@ test("分開儲存預設首圖、已看照片與整套圖鑑，斷線下載可�
   }
 });
 
+
+test("發音包不跟著安裝下載；開過的那一堂斷網也能播，換版本不清掉", async t => {
+  const app = await browserHarness();
+  const packs = Object.keys(app.config.sounds);
+  if (packs.length === 0) { t.skip("此建置尚未含發音包"); return; }
+  assert.ok(packs.every(file => /^pron\/p\d+-[fm]\.pack$/.test(file)));
+  assert.ok(!app.config.core.some(file => file.startsWith("pron/")));
+  await app.dispatch("install");
+  assert.equal(app.requests.filter(url => url.includes("/pron/")).length, 0);
+  await app.dispatch("activate");
+  const [first, second] = packs;
+  assert.deepEqual(Buffer.from(await (await app.request(first)).arrayBuffer()), await read(first));
+  const count = app.requests.length;
+  assert.deepEqual(Buffer.from(await (await app.request(first)).arrayBuffer()), await read(first));
+  assert.equal(app.requests.length, count);
+  app.controls.offline = true;
+  assert.deepEqual(Buffer.from(await (await app.request(first)).arrayBuffer()), await read(first));
+  assert.equal((await app.request(second)).type, "error");
+  await app.dispatch("activate");
+  assert.ok((await app.caches.keys()).includes(prefix + "sounds"));
+  assert.deepEqual(Buffer.from(await (await app.request(first)).arrayBuffer()), await read(first));
+});

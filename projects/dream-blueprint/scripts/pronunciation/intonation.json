@@ -1,0 +1,32 @@
+{
+ "f": {
+  "are-you-okay": "af_heart",
+  "do-you-have-any-pain": "af_bella",
+  "can-you-walk": "af_heart",
+  "where-does-it-hurt": "af_bella",
+  "what-is-your-name": "af_heart",
+  "i-feel-much-better": "af_heart",
+  "please-sit-down": "af_sarah",
+  "do-you-take-any-medicine": "af_bella",
+  "what-time-is-it": "af_bella",
+  "are-you-ready": "af_bella",
+  "are-you-allergic-to-any-medicine": "af_bella",
+  "when-did-the-pain-start": "af_heart",
+  "please-take-a-deep-breath": "af_sarah"
+ },
+ "m": {
+  "are-you-okay": "am_michael",
+  "do-you-have-any-pain": "am_michael",
+  "can-you-walk": "am_michael",
+  "where-does-it-hurt": "am_michael",
+  "what-is-your-name": "am_michael",
+  "i-feel-much-better": "am_michael",
+  "please-sit-down": "am_michael",
+  "do-you-take-any-medicine": "am_michael",
+  "what-time-is-it": "am_michael",
+  "are-you-ready": "am_michael",
+  "are-you-allergic-to-any-medicine": "am_michael",
+  "when-did-the-pain-start": "am_michael",
+  "please-take-a-deep-breath": "am_adam"
+ }
+}

@@ -14,6 +14,7 @@ import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bri
 import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
 import { readSkills } from '../lib/wordSkills'
 import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
+import { nextPron, pronLessons } from '../lib/pronunciation'
 import './today-plan.css'
 
 const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
@@ -70,6 +71,11 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const readHash = questionsLeft ? 'library/reading' : 'library/story/read'
   const readDetail = questionsLeft ? '一篇閱讀理解（有題目）；還有時間再讀一段短文' : '短文閱讀一兩段，不會的字點一下看意思'
   const listenHash = 'library/story/listen'
+  // Speaking: the pronunciation course first (it needs no key and no partner); once every lesson is passed, Emma.
+  const sound = nextPron(state.notes)
+  const speakHash = sound ? 'library/sound' : 'speaking'
+  const speakLabel = sound && !pack ? '發音' : '說'
+  const soundDetail = sound ? '發音課第 ' + (pronLessons.indexOf(sound) + 1) + ' 堂「' + sound.title + '」：聽男聲女聲，跟著念出聲' : ''
   // The certificate to prepare for: the step after the level already shown on a certificate.
   const level = officialLevel(state.notes)
   const nextStep = steps.find(s => s.from === level)
@@ -113,10 +119,10 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         go2: to(listenFirst ? where('read', readHash) : where('listen', listenHash)), go2Label: listenFirst ? '讀' : '聽' },
     output: { id: 'output', title: '說或寫', auto: wroteToday || spokeToday,
       detail: '這週說 ' + week.speak + ' 天、寫 ' + week.write + ' 天 → 今天先' + (speakFirst
-        ? '說：' + (pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務' : '跟 Emma 聊 10 分鐘')
+        ? '說：' + (pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務' : sound ? soundDetail + '；也可以跟 Emma 聊 10 分鐘' : '跟 Emma 聊 10 分鐘')
         : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : '寫作階梯一題')),
-      go: to(speakFirst ? where('speak', 'speaking') : where('write', 'library/writing')), goLabel: speakFirst ? '說' : '寫',
-      go2: to(speakFirst ? where('write', 'library/writing') : where('speak', 'speaking')), go2Label: speakFirst ? '寫' : '說' },
+      go: to(speakFirst ? where('speak', speakHash) : where('write', 'library/writing')), goLabel: speakFirst ? speakLabel : '寫',
+      go2: to(speakFirst ? where('write', 'library/writing') : where('speak', speakHash)), go2Label: speakFirst ? '寫' : speakLabel },
     // Listening is the graded passages (whole passage first, then line by line, then dictation); sentence shadowing stays one tap away.
     listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '短文聽力：先不看字聽一段，再看著字跟著念；還有時間就做一段聽寫', auto: listenedToday,
       go: to(where('listen', listenHash)), goLabel: pack ? '聽力' : '短文', go2: to('library/listen'), go2Label: '跟讀' },
@@ -125,8 +131,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         go: to(where('read', 'library/reading')), goLabel: pack ? '閱讀' : '閱讀理解', go2: to(pack ? 'library/reading' : 'library/story/read'), go2Label: pack ? '其他文章' : '短文' },
     write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : '寫作階梯一題，批改完改一版', auto: wroteToday,
       go: to(where('write', 'library/writing')), goLabel: '寫作' },
-    speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,
-      go: to(where('speak', 'speaking')), goLabel: 'Emma', go2: to('speaking/ielts'), go2Label: 'Part 2' },
+    speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : sound ? soundDetail + '；再跟 Emma 聊 10 分鐘' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,
+      go: to(where('speak', 'speaking')), goLabel: 'Emma', go2: to(sound && !pack ? 'library/sound' : 'speaking/ielts'), go2Label: sound && !pack ? '發音' : 'Part 2' },
     cert: { id: 'cert', title: '證照準備', auto: false, go: to('plan/levels'), goLabel: '關卡',
       detail: !exam ? '照下一張證照的題型練一回' : cert?.state === 'waiting' && cert.next ? exam.name + ' ' + cert.next.date.slice(5).replace('-', '/') + ' 考，考前聽讀、說寫的題型各練一回'
         : '下一張：' + exam.name + '。照它的題型練一回' + (exam.link ? '（官網有練習題）' : ''),

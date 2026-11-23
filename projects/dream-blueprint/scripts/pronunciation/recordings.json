@@ -1,0 +1,9644 @@
+{
+ "p00": {
+  "see": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈi.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 4.41,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "key",
+      5.31
+     ],
+     [
+      "say",
+      5.4
+     ],
+     [
+      "she",
+      5.88
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈi.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.53,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "say",
+      5.53
+     ],
+     [
+      "she",
+      6.02
+     ],
+     [
+      "key",
+      6.88
+     ]
+    ]
+   }
+  },
+  "sit": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪt.",
+    "speed": 0.97,
+    "secs": 0.53,
+    "grade": "strict",
+    "ahead": 4.11,
+    "partner": 6.81,
+    "rivals": [
+     [
+      "set",
+      4.4
+     ],
+     [
+      "seat",
+      7.11
+     ],
+     [
+      "sick",
+      7.95
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "sˈɪt.",
+    "speed": 0.97,
+    "secs": 0.51,
+    "grade": "strict",
+    "ahead": 3.01,
+    "partner": 7.46,
+    "rivals": [
+     [
+      "set",
+      3.27
+     ],
+     [
+      "city",
+      4.45
+     ],
+     [
+      "sick",
+      4.58
+     ]
+    ]
+   }
+  },
+  "day": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈA.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.62,
+    "partner": 4.77,
+    "rivals": [
+     [
+      "they",
+      4.84
+     ],
+     [
+      "due",
+      5.62
+     ],
+     [
+      "pay",
+      5.73
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_puck",
+    "phonemes": "dˈA.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 4.11,
+    "partner": 2.67,
+    "rivals": [
+     [
+      "they",
+      3.21
+     ],
+     [
+      "date",
+      4.62
+     ],
+     [
+      "die",
+      5.67
+     ]
+    ]
+   }
+  },
+  "bed": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "bˈɛd.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.87,
+    "partner": 4.19,
+    "rivals": [
+     [
+      "bad",
+      5.59
+     ],
+     [
+      "bread",
+      7.15
+     ],
+     [
+      "read",
+      8.79
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɛd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.9,
+    "partner": 6.31,
+    "rivals": [
+     [
+      "bread",
+      6.04
+     ],
+     [
+      "bad",
+      6.82
+     ],
+     [
+      "read",
+      7.89
+     ]
+    ]
+   }
+  },
+  "cat": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈæt.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.48,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bat",
+      5.48
+     ],
+     [
+      "catch",
+      6.79
+     ],
+     [
+      "hat",
+      7.87
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈæt.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 4.45,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "catch",
+      4.45
+     ],
+     [
+      "bat",
+      5.22
+     ],
+     [
+      "cab",
+      5.71
+     ]
+    ]
+   }
+  },
+  "hot": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈɑt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.1,
+    "partner": 6.43,
+    "rivals": [
+     [
+      "heart",
+      3.1
+     ],
+     [
+      "pot",
+      4.05
+     ],
+     [
+      "hat",
+      5.75
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˈɑt.",
+    "speed": 0.97,
+    "secs": 0.53,
+    "grade": "strict",
+    "ahead": 1.77,
+    "partner": 5.7,
+    "rivals": [
+     [
+      "heart",
+      2.02
+     ],
+     [
+      "hat",
+      4.56
+     ],
+     [
+      "hurt",
+      4.77
+     ]
+    ]
+   }
+  },
+  "ball": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈɔl.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 6.25,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bowl",
+      6.45
+     ],
+     [
+      "wall",
+      6.94
+     ],
+     [
+      "tall",
+      7.22
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɔl.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.58,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bowl",
+      6.13
+     ],
+     [
+      "tall",
+      6.62
+     ],
+     [
+      "bell",
+      7.19
+     ]
+    ]
+   }
+  },
+  "go": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɡˈO.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.95,
+    "partner": 7.09,
+    "rivals": [
+     [
+      "grow",
+      5.95
+     ],
+     [
+      "bow",
+      6.45
+     ],
+     [
+      "goat",
+      7.09
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈO.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.2,
+    "partner": 8.49,
+    "rivals": [
+     [
+      "grow",
+      7.2
+     ],
+     [
+      "goat",
+      8.49
+     ],
+     [
+      "guy",
+      8.91
+     ]
+    ]
+   }
+  },
+  "book": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈʊk.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.54,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "brook",
+      5.77
+     ],
+     [
+      "bike",
+      6.4
+     ],
+     [
+      "bake",
+      6.82
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈʊk.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 4.08,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "brook",
+      4.57
+     ],
+     [
+      "bake",
+      5.37
+     ],
+     [
+      "hook",
+      7.02
+     ]
+    ]
+   }
+  },
+  "food": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈud.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.16,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mood",
+      7.16
+     ],
+     [
+      "feed",
+      8.79
+     ],
+     [
+      "fool",
+      10.04
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈud.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 7.36,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mood",
+      7.36
+     ],
+     [
+      "feed",
+      7.89
+     ],
+     [
+      "fool",
+      10.37
+     ]
+    ]
+   }
+  },
+  "sun": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈʌn.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.3,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bun",
+      5.56
+     ],
+     [
+      "sunny",
+      5.81
+     ],
+     [
+      "sign",
+      6.99
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈʌn.",
+    "speed": 0.97,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.17,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "sunny",
+      4.17
+     ],
+     [
+      "bun",
+      5.2
+     ],
+     [
+      "sign",
+      6.36
+     ]
+    ]
+   }
+  },
+  "about": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "əbˈWt.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "heard": "About"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "əbˈWt.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "heard": "About"
+   }
+  },
+  "nurse": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 7.03,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "nerve",
+      7.03
+     ],
+     [
+      "verse",
+      7.42
+     ],
+     [
+      "niece",
+      8.13
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.06,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "nerve",
+      6.56
+     ],
+     [
+      "verse",
+      6.94
+     ],
+     [
+      "curse",
+      7.83
+     ]
+    ]
+   }
+  },
+  "doctor": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈɑktəɹ.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 8.37,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "daughter",
+      8.54
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈɑktəɹ.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 8.72,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "daughter",
+      8.77
+     ]
+    ]
+   }
+  },
+  "my": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˈI.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 3.62,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "may",
+      4.12
+     ],
+     [
+      "mine",
+      5.69
+     ],
+     [
+      "buy",
+      6.74
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˈI.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 2.6,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "may",
+      2.97
+     ],
+     [
+      "mine",
+      5.95
+     ],
+     [
+      "buy",
+      7.07
+     ]
+    ]
+   }
+  },
+  "now": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈW.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.47,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "how",
+      6.02
+     ],
+     [
+      "new",
+      6.23
+     ],
+     [
+      "know",
+      7.59
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈW.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.69,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "no",
+      4.84
+     ],
+     [
+      "new",
+      7.89
+     ],
+     [
+      "cow",
+      7.91
+     ]
+    ]
+   }
+  },
+  "boy": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈY.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.11,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "buy",
+      6.11
+     ],
+     [
+      "joy",
+      7.26
+     ],
+     [
+      "by",
+      7.63
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈY.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.38,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "buy",
+      7.67
+     ],
+     [
+      "joy",
+      8.15
+     ],
+     [
+      "toy",
+      9.06
+     ]
+    ]
+   }
+  },
+  "think": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "θˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 2.78,
+    "partner": 5.56,
+    "rivals": [
+     [
+      "thank",
+      3.22
+     ],
+     [
+      "link",
+      5.34
+     ],
+     [
+      "sink",
+      5.56
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.35,
+    "partner": 7.63,
+    "rivals": [
+     [
+      "thing",
+      5.49
+     ],
+     [
+      "thick",
+      7.41
+     ],
+     [
+      "pink",
+      7.46
+     ]
+    ]
+   }
+  },
+  "this": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðˈɪs.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 6.97,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "thus",
+      7.31
+     ],
+     [
+      "miss",
+      9.76
+     ],
+     [
+      "kiss",
+      9.9
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðˈɪs.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 6.51,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "thus",
+      6.84
+     ],
+     [
+      "miss",
+      8.63
+     ],
+     [
+      "kiss",
+      8.99
+     ]
+    ]
+   }
+  },
+  "she": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˈi.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 6.81,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "sea",
+      7.48
+     ],
+     [
+      "sheep",
+      7.51
+     ],
+     [
+      "see",
+      7.96
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˈi.",
+    "speed": 0.75,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 1.18,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "see",
+      1.7
+     ],
+     [
+      "sheep",
+      3.81
+     ],
+     [
+      "sea",
+      3.87
+     ]
+    ]
+   }
+  },
+  "usually": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "jˈuʒəwəli.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 9.73,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "usual",
+      10.21
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "jˈuʒəwəli.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "ahead": 9.69,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "usual",
+      9.89
+     ]
+    ]
+   }
+  },
+  "chair": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʧˈɛɹ.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 5.48,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "care",
+      6.23
+     ],
+     [
+      "share",
+      6.31
+     ],
+     [
+      "hair",
+      6.9
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʧˈɛɹ.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.8,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "share",
+      6.9
+     ],
+     [
+      "hair",
+      7.3
+     ],
+     [
+      "care",
+      7.42
+     ]
+    ]
+   }
+  },
+  "job": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʤˈɑb.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.56,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mob",
+      5.62
+     ],
+     [
+      "sob",
+      9.28
+     ],
+     [
+      "jar",
+      9.86
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʤˈɑb.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.85,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mob",
+      4.85
+     ],
+     [
+      "sob",
+      7.01
+     ],
+     [
+      "robe",
+      9.15
+     ]
+    ]
+   }
+  },
+  "sing": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪŋ.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.74,
+    "partner": 5.99,
+    "rivals": [
+     [
+      "ring",
+      4.74
+     ],
+     [
+      "singer",
+      5.55
+     ],
+     [
+      "thing",
+      6.13
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "sˈɪŋ.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 3.19,
+    "partner": 5.59,
+    "rivals": [
+     [
+      "ring",
+      3.19
+     ],
+     [
+      "singer",
+      4.88
+     ],
+     [
+      "swing",
+      4.94
+     ]
+    ]
+   }
+  },
+  "yes": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "jˈɛs.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.0,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "guess",
+      7.01
+     ],
+     [
+      "yet",
+      8.73
+     ],
+     [
+      "less",
+      9.75
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "jˈɛs.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 6.99,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "guess",
+      7.1
+     ],
+     [
+      "yet",
+      8.95
+     ],
+     [
+      "less",
+      9.85
+     ]
+    ]
+   }
+  },
+  "red": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈɛd.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 6.88,
+    "partner": 7.55,
+    "rivals": [
+     [
+      "lead",
+      6.95
+     ],
+     [
+      "bread",
+      7.02
+     ],
+     [
+      "raid",
+      7.69
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈɛd.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 7.06,
+    "partner": 8.81,
+    "rivals": [
+     [
+      "lead",
+      7.44
+     ],
+     [
+      "bread",
+      7.53
+     ],
+     [
+      "ready",
+      8.09
+     ]
+    ]
+   }
+  },
+  "leg": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɛɡ.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.17,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "lag",
+      3.64
+     ],
+     [
+      "beg",
+      7.86
+     ],
+     [
+      "log",
+      8.52
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈɛɡ.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.72,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "lag",
+      5.98
+     ],
+     [
+      "league",
+      7.23
+     ],
+     [
+      "beg",
+      7.43
+     ]
+    ]
+   }
+  },
+  "very": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.26,
+    "partner": 3.95,
+    "rivals": [
+     [
+      "fairy",
+      3.26
+     ],
+     [
+      "berry",
+      3.95
+     ],
+     [
+      "wary",
+      5.08
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.43,
+    "partner": 5.18,
+    "rivals": [
+     [
+      "berry",
+      5.64
+     ],
+     [
+      "fairy",
+      6.99
+     ],
+     [
+      "ferry",
+      7.85
+     ]
+    ]
+   }
+  },
+  "zoo": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "zˈu.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 9.43,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "dew",
+      9.85
+     ],
+     [
+      "due",
+      10.08
+     ],
+     [
+      "who",
+      10.82
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "zˈu.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 9.29,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "dew",
+      9.29
+     ],
+     [
+      "due",
+      9.35
+     ],
+     [
+      "who",
+      9.79
+     ]
+    ]
+   }
+  }
+ },
+ "p01": {
+  "sheep": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˈip.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 4.71,
+    "partner": 5.91,
+    "rivals": [
+     [
+      "jeep",
+      5.51
+     ],
+     [
+      "keep",
+      5.85
+     ],
+     [
+      "cheap",
+      5.87
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˈip.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 3.25,
+    "partner": 4.87,
+    "rivals": [
+     [
+      "jeep",
+      3.54
+     ],
+     [
+      "ship",
+      4.87
+     ],
+     [
+      "keep",
+      5.21
+     ]
+    ]
+   }
+  },
+  "ship": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˈɪp.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.2,
+    "partner": 3.28,
+    "rivals": [
+     [
+      "sheep",
+      3.28
+     ],
+     [
+      "chip",
+      5.26
+     ],
+     [
+      "shape",
+      5.76
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˈɪp.",
+    "speed": 0.97,
+    "secs": 0.55,
+    "grade": "strict",
+    "ahead": 6.01,
+    "partner": 4.31,
+    "rivals": [
+     [
+      "sheep",
+      4.72
+     ],
+     [
+      "shape",
+      6.37
+     ],
+     [
+      "chip",
+      7.84
+     ]
+    ]
+   }
+  },
+  "eat": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ˈit.",
+    "speed": 0.97,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 2.41,
+    "partner": 8.56,
+    "rivals": [
+     [
+      "each",
+      3.03
+     ],
+     [
+      "heat",
+      5.42
+     ],
+     [
+      "meet",
+      5.72
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "ˈit.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.08,
+    "partner": 9.05,
+    "rivals": [
+     [
+      "each",
+      5.24
+     ],
+     [
+      "heat",
+      6.57
+     ],
+     [
+      "meet",
+      6.89
+     ]
+    ]
+   }
+  },
+  "it": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ˈɪt.",
+    "speed": 0.97,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 7.12,
+    "partner": 8.46,
+    "rivals": [
+     [
+      "hit",
+      7.12
+     ],
+     [
+      "get",
+      7.5
+     ],
+     [
+      "if",
+      8.33
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "ˈɪt.",
+    "speed": 0.85,
+    "secs": 0.55,
+    "grade": "strict",
+    "ahead": 4.31,
+    "partner": 4.34,
+    "rivals": [
+     [
+      "hit",
+      4.64
+     ],
+     [
+      "get",
+      4.77
+     ],
+     [
+      "eat",
+      4.83
+     ]
+    ]
+   }
+  },
+  "sleep": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "slˈip.",
+    "speed": 0.97,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 5.46,
+    "partner": 8.0,
+    "rivals": [
+     [
+      "sleeve",
+      5.46
+     ],
+     [
+      "slip",
+      8.01
+     ],
+     [
+      "leap",
+      8.11
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "slˈip.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.45,
+    "partner": 7.67,
+    "rivals": [
+     [
+      "sleeve",
+      5.48
+     ],
+     [
+      "leap",
+      7.29
+     ],
+     [
+      "slip",
+      7.89
+     ]
+    ]
+   }
+  },
+  "slip": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "slˈɪp.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 4.3,
+    "partner": 7.74,
+    "rivals": [
+     [
+      "lip",
+      5.17
+     ],
+     [
+      "slim",
+      5.38
+     ],
+     [
+      "slipper",
+      7.36
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "slˈɪp.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 3.67,
+    "partner": 6.79,
+    "rivals": [
+     [
+      "slim",
+      3.67
+     ],
+     [
+      "lip",
+      4.85
+     ],
+     [
+      "slipper",
+      5.74
+     ]
+    ]
+   }
+  },
+  "heat": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈit.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.81,
+    "partner": 9.97,
+    "rivals": [
+     [
+      "height",
+      5.23
+     ],
+     [
+      "hate",
+      6.08
+     ],
+     [
+      "eat",
+      6.17
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˈit.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 6.09,
+    "partner": 9.55,
+    "rivals": [
+     [
+      "height",
+      6.64
+     ],
+     [
+      "eat",
+      7.42
+     ],
+     [
+      "hate",
+      8.3
+     ]
+    ]
+   }
+  },
+  "hit": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈɪt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.71,
+    "partner": 6.06,
+    "rivals": [
+     [
+      "heat",
+      6.09
+     ],
+     [
+      "hurt",
+      6.8
+     ],
+     [
+      "hate",
+      7.21
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˈɪt.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 6.85,
+    "partner": 5.59,
+    "rivals": [
+     [
+      "heat",
+      5.77
+     ],
+     [
+      "hate",
+      7.05
+     ],
+     [
+      "hurt",
+      7.33
+     ]
+    ]
+   }
+  },
+  "leave": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈiv.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.47,
+    "partner": 4.42,
+    "rivals": [
+     [
+      "live",
+      4.82
+     ],
+     [
+      "leaf",
+      4.94
+     ],
+     [
+      "leap",
+      5.49
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈiv.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.15,
+    "partner": 3.58,
+    "rivals": [
+     [
+      "live",
+      3.68
+     ],
+     [
+      "leaf",
+      5.76
+     ],
+     [
+      "lead",
+      6.18
+     ]
+    ]
+   }
+  },
+  "live": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈIv.",
+    "speed": 0.75,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 1.67,
+    "partner": 7.21,
+    "rivals": [
+     [
+      "lie",
+      1.67
+     ],
+     [
+      "life",
+      1.79
+     ],
+     [
+      "light",
+      4.81
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈIv.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.51,
+    "partner": 9.92,
+    "rivals": [
+     [
+      "life",
+      6.85
+     ],
+     [
+      "line",
+      8.96
+     ],
+     [
+      "leave",
+      10.07
+     ]
+    ]
+   }
+  },
+  "cheap": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʧˈip.",
+    "speed": 0.97,
+    "secs": 0.55,
+    "grade": "strict",
+    "ahead": 4.32,
+    "partner": 6.76,
+    "rivals": [
+     [
+      "cheat",
+      4.32
+     ],
+     [
+      "cheek",
+      4.9
+     ],
+     [
+      "sheep",
+      5.17
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʧˈip.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 2.41,
+    "partner": 5.77,
+    "rivals": [
+     [
+      "keep",
+      2.43
+     ],
+     [
+      "cheek",
+      2.79
+     ],
+     [
+      "sheep",
+      2.91
+     ]
+    ]
+   }
+  },
+  "chip": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʧˈɪp.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.22,
+    "partner": 4.98,
+    "rivals": [
+     [
+      "ship",
+      4.46
+     ],
+     [
+      "cheap",
+      5.15
+     ],
+     [
+      "lip",
+      6.01
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʧˈɪp.",
+    "speed": 0.97,
+    "secs": 0.55,
+    "grade": "strict",
+    "ahead": 4.15,
+    "partner": 5.15,
+    "rivals": [
+     [
+      "cheap",
+      5.26
+     ],
+     [
+      "ship",
+      5.54
+     ],
+     [
+      "lip",
+      5.67
+     ]
+    ]
+   }
+  },
+  "I need to sleep a little bit.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI nˈid tə slˈip ɐ lˈɪɾᵊl bˈɪt.",
+    "speed": 0.9,
+    "secs": 1.64,
+    "grade": "strict",
+    "heard": "I need to sleep a little bit."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI nˈid tə slˈip ɐ lˈɪɾᵊl bˈɪt.",
+    "speed": 0.9,
+    "secs": 1.64,
+    "grade": "strict",
+    "heard": "I need to sleep a little bit."
+   }
+  },
+  "I feel a little ill.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI fˈil ɐ lˈɪɾᵊl ˈɪl.",
+    "speed": 0.9,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "I feel a little ill."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI fˈil ɐ lˈɪɾᵊl ˈɪl.",
+    "speed": 0.9,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "I feel a little ill."
+   }
+  },
+  "He will leave, but I live here.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˌi wɪl lˈiv, bˌʌt ˌI lˈɪv hˈɪɹ.",
+    "speed": 0.9,
+    "secs": 1.96,
+    "grade": "strict",
+    "heard": "He will leave but I live here"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˌi wɪl lˈiv, bˌʌt ˌI lˈɪv hˈɪɹ.",
+    "speed": 0.9,
+    "secs": 1.71,
+    "grade": "strict",
+    "heard": "He will leave, but I live here."
+   }
+  }
+ },
+ "p02": {
+  "bed": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "bˈɛd.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.87,
+    "partner": 4.19,
+    "rivals": [
+     [
+      "bad",
+      5.59
+     ],
+     [
+      "bread",
+      7.15
+     ],
+     [
+      "read",
+      8.79
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɛd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.9,
+    "partner": 6.31,
+    "rivals": [
+     [
+      "bread",
+      6.04
+     ],
+     [
+      "bad",
+      6.82
+     ],
+     [
+      "read",
+      7.89
+     ]
+    ]
+   }
+  },
+  "bad": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "bˈæd.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 5.51,
+    "partner": 5.4,
+    "rivals": [
+     [
+      "bed",
+      5.45
+     ],
+     [
+      "bat",
+      5.51
+     ],
+     [
+      "band",
+      5.67
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈæd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.75,
+    "partner": 2.72,
+    "rivals": [
+     [
+      "bed",
+      2.81
+     ],
+     [
+      "bat",
+      5.75
+     ],
+     [
+      "band",
+      5.95
+     ]
+    ]
+   }
+  },
+  "pen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈɛn.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 4.38,
+    "partner": 4.5,
+    "rivals": [
+     [
+      "pin",
+      4.51
+     ],
+     [
+      "pan",
+      4.99
+     ],
+     [
+      "hen",
+      5.22
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈɛn.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.11,
+    "partner": 6.42,
+    "rivals": [
+     [
+      "pin",
+      4.26
+     ],
+     [
+      "penny",
+      5.07
+     ],
+     [
+      "hen",
+      5.43
+     ]
+    ]
+   }
+  },
+  "pan": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈæn.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.1,
+    "partner": 6.03,
+    "rivals": [
+     [
+      "fan",
+      5.93
+     ],
+     [
+      "pen",
+      6.19
+     ],
+     [
+      "can",
+      6.52
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈæn.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.04,
+    "partner": 5.78,
+    "rivals": [
+     [
+      "pin",
+      5.56
+     ],
+     [
+      "pen",
+      5.86
+     ],
+     [
+      "plan",
+      6.88
+     ]
+    ]
+   }
+  },
+  "said": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "sˈɛd.",
+    "speed": 0.97,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.21,
+    "partner": 6.76,
+    "rivals": [
+     [
+      "dead",
+      6.21
+     ],
+     [
+      "sad",
+      6.76
+     ],
+     [
+      "send",
+      9.24
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɛd.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.59,
+    "partner": 5.03,
+    "rivals": [
+     [
+      "sad",
+      6.07
+     ],
+     [
+      "dead",
+      7.22
+     ],
+     [
+      "read",
+      8.21
+     ]
+    ]
+   }
+  },
+  "sad": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "sˈæd.",
+    "speed": 0.97,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.28,
+    "partner": 6.79,
+    "rivals": [
+     [
+      "add",
+      5.28
+     ],
+     [
+      "bad",
+      6.62
+     ],
+     [
+      "said",
+      6.92
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈæd.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.4,
+    "partner": 4.8,
+    "rivals": [
+     [
+      "said",
+      5.13
+     ],
+     [
+      "lad",
+      5.4
+     ],
+     [
+      "sand",
+      5.48
+     ]
+    ]
+   }
+  },
+  "guess": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "ɡˈɛs.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 4.06,
+    "partner": 5.35,
+    "rivals": [
+     [
+      "yes",
+      4.2
+     ],
+     [
+      "gas",
+      6.22
+     ],
+     [
+      "goose",
+      6.33
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈɛs.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 6.54,
+    "partner": 8.12,
+    "rivals": [
+     [
+      "guest",
+      6.54
+     ],
+     [
+      "yes",
+      7.45
+     ],
+     [
+      "goose",
+      8.02
+     ]
+    ]
+   }
+  },
+  "gas": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "ɡˈæs.",
+    "speed": 0.97,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.01,
+    "partner": 3.14,
+    "rivals": [
+     [
+      "guess",
+      3.14
+     ],
+     [
+      "goose",
+      7.01
+     ],
+     [
+      "grass",
+      7.98
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈæs.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.86,
+    "partner": 3.17,
+    "rivals": [
+     [
+      "guess",
+      4.12
+     ],
+     [
+      "glass",
+      7.35
+     ],
+     [
+      "goose",
+      7.49
+     ]
+    ]
+   }
+  },
+  "bet": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "bˈɛt.",
+    "speed": 0.97,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.72,
+    "partner": 3.5,
+    "rivals": [
+     [
+      "bed",
+      4.15
+     ],
+     [
+      "bat",
+      4.25
+     ],
+     [
+      "belt",
+      5.9
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "bˈɛt.",
+    "speed": 0.97,
+    "secs": 0.51,
+    "grade": "strict",
+    "ahead": 2.42,
+    "partner": 3.16,
+    "rivals": [
+     [
+      "bat",
+      3.25
+     ],
+     [
+      "belt",
+      3.78
+     ],
+     [
+      "bed",
+      4.59
+     ]
+    ]
+   }
+  },
+  "bat": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "bˈæt.",
+    "speed": 0.97,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.83,
+    "partner": 6.16,
+    "rivals": [
+     [
+      "bet",
+      6.21
+     ],
+     [
+      "boat",
+      7.25
+     ],
+     [
+      "bite",
+      8.22
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "bˈæt.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 4.71,
+    "partner": 4.73,
+    "rivals": [
+     [
+      "bad",
+      4.72
+     ],
+     [
+      "bet",
+      4.73
+     ],
+     [
+      "boat",
+      5.68
+     ]
+    ]
+   }
+  },
+  "dead": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "dˈɛd.",
+    "speed": 0.97,
+    "secs": 0.72,
+    "grade": "strict",
+    "ahead": 5.98,
+    "partner": 5.4,
+    "rivals": [
+     [
+      "dad",
+      6.02
+     ],
+     [
+      "debt",
+      6.09
+     ],
+     [
+      "death",
+      6.93
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈɛd.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.82,
+    "partner": 5.47,
+    "rivals": [
+     [
+      "dad",
+      5.47
+     ],
+     [
+      "death",
+      5.82
+     ],
+     [
+      "debt",
+      6.72
+     ]
+    ]
+   }
+  },
+  "dad": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "dˈæd.",
+    "speed": 0.85,
+    "secs": 0.82,
+    "grade": "strict",
+    "ahead": 6.21,
+    "partner": 7.2,
+    "rivals": [
+     [
+      "add",
+      6.87
+     ],
+     [
+      "dead",
+      7.25
+     ],
+     [
+      "sad",
+      8.65
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈæd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.85,
+    "partner": 4.22,
+    "rivals": [
+     [
+      "dead",
+      4.4
+     ],
+     [
+      "add",
+      6.85
+     ],
+     [
+      "bad",
+      8.22
+     ]
+    ]
+   }
+  },
+  "The man said he was sad.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə mˈæn sˈɛd hi wʌz sˈæd.",
+    "speed": 0.9,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "The man said he was sad."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə mˈæn sˈɛd hi wʌz sˈæd.",
+    "speed": 0.9,
+    "secs": 1.54,
+    "grade": "strict",
+    "heard": "The man said he was sad."
+   }
+  },
+  "I had a headache in bed.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI hæd ɐ hˈɛdˌAk ɪn bˈɛd.",
+    "speed": 0.9,
+    "secs": 1.43,
+    "grade": "strict",
+    "heard": "I had a headache in bed."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI hæd ɐ hˈɛdˌAk ɪn bˈɛd.",
+    "speed": 0.9,
+    "secs": 1.49,
+    "grade": "strict",
+    "heard": "I had a headache in bed."
+   }
+  },
+  "My pen is in the pan.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˌI pˈɛn ɪz ɪn ðə pˈæn.",
+    "speed": 0.9,
+    "secs": 1.28,
+    "grade": "strict",
+    "heard": "My pen is in the pan."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˌI pˈɛn ɪz ɪn ðə pˈæn.",
+    "speed": 0.9,
+    "secs": 1.49,
+    "grade": "strict",
+    "heard": "My pen is in the pan"
+   }
+  }
+ },
+ "p03": {
+  "luck": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈʌk.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 7.74,
+    "partner": 5.55,
+    "rivals": [
+     [
+      "lock",
+      5.74
+     ],
+     [
+      "lucky",
+      7.99
+     ],
+     [
+      "lack",
+      8.15
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "lˈʌk.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 6.78,
+    "partner": 6.77,
+    "rivals": [
+     [
+      "lock",
+      7.0
+     ],
+     [
+      "look",
+      7.0
+     ],
+     [
+      "lucky",
+      7.73
+     ]
+    ]
+   }
+  },
+  "lock": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɑk.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.76,
+    "partner": 5.48,
+    "rivals": [
+     [
+      "luck",
+      5.83
+     ],
+     [
+      "block",
+      6.04
+     ],
+     [
+      "knock",
+      6.63
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "lˈɑk.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 4.98,
+    "partner": 3.94,
+    "rivals": [
+     [
+      "luck",
+      4.47
+     ],
+     [
+      "block",
+      5.41
+     ],
+     [
+      "clock",
+      6.52
+     ]
+    ]
+   }
+  },
+  "color": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈʌləɹ.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.73,
+    "partner": 4.25,
+    "rivals": [
+     [
+      "collar",
+      4.9
+     ],
+     [
+      "dollar",
+      7.44
+     ],
+     [
+      "cover",
+      8.21
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈʌləɹ.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 7.04,
+    "partner": 3.57,
+    "rivals": [
+     [
+      "collar",
+      3.82
+     ],
+     [
+      "dollar",
+      7.36
+     ],
+     [
+      "cover",
+      8.02
+     ]
+    ]
+   }
+  },
+  "collar": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɑləɹ.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 8.74,
+    "partner": 5.34,
+    "rivals": [
+     [
+      "color",
+      5.34
+     ],
+     [
+      "dollar",
+      8.74
+     ],
+     [
+      "scholar",
+      9.36
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɑləɹ.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 9.56,
+    "partner": 4.8,
+    "rivals": [
+     [
+      "color",
+      5.5
+     ],
+     [
+      "dollar",
+      10.12
+     ],
+     [
+      "scholar",
+      10.66
+     ]
+    ]
+   }
+  },
+  "come": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈʌm.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.2,
+    "partner": 5.57,
+    "rivals": [
+     [
+      "gum",
+      5.24
+     ],
+     [
+      "calm",
+      5.57
+     ],
+     [
+      "comb",
+      6.18
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈʌm.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.24,
+    "partner": 5.81,
+    "rivals": [
+     [
+      "comb",
+      4.24
+     ],
+     [
+      "calm",
+      5.81
+     ],
+     [
+      "gum",
+      6.11
+     ]
+    ]
+   }
+  },
+  "calm": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɑlm.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 3.59,
+    "partner": 6.3,
+    "rivals": [
+     [
+      "comb",
+      3.83
+     ],
+     [
+      "come",
+      6.78
+     ],
+     [
+      "comma",
+      8.23
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɑlm.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 3.85,
+    "partner": 4.45,
+    "rivals": [
+     [
+      "comb",
+      4.1
+     ],
+     [
+      "come",
+      5.83
+     ],
+     [
+      "comma",
+      10.42
+     ]
+    ]
+   }
+  },
+  "gut": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ɡˈʌt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 5.58,
+    "partner": 3.07,
+    "rivals": [
+     [
+      "got",
+      4.77
+     ],
+     [
+      "goat",
+      5.97
+     ],
+     [
+      "gate",
+      8.8
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈʌt.",
+    "speed": 0.97,
+    "secs": 0.53,
+    "grade": "strict",
+    "ahead": 7.1,
+    "partner": 4.65,
+    "rivals": [
+     [
+      "got",
+      5.38
+     ],
+     [
+      "goat",
+      7.88
+     ],
+     [
+      "cut",
+      9.07
+     ]
+    ]
+   }
+  },
+  "got": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ɡˈɑt.",
+    "speed": 0.85,
+    "secs": 0.82,
+    "grade": "strict",
+    "ahead": 4.82,
+    "partner": 3.62,
+    "rivals": [
+     [
+      "gut",
+      3.62
+     ],
+     [
+      "god",
+      5.01
+     ],
+     [
+      "goat",
+      6.65
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈɑt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 1.19,
+    "partner": 3.56,
+    "rivals": [
+     [
+      "god",
+      2.04
+     ],
+     [
+      "gut",
+      3.82
+     ],
+     [
+      "goat",
+      5.01
+     ]
+    ]
+   }
+  },
+  "rubber": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈʌbəɹ.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 11.14,
+    "partner": 7.08,
+    "rivals": [
+     [
+      "robber",
+      7.28
+     ],
+     [
+      "rub",
+      11.31
+     ],
+     [
+      "runner",
+      12.21
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈʌbəɹ.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.57,
+    "partner": 7.81,
+    "rivals": [
+     [
+      "rub",
+      6.85
+     ],
+     [
+      "robber",
+      8.11
+     ],
+     [
+      "runner",
+      9.9
+     ]
+    ]
+   }
+  },
+  "robber": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈɑbəɹ.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 8.42,
+    "partner": 3.48,
+    "rivals": [
+     [
+      "rubber",
+      3.56
+     ],
+     [
+      "robbery",
+      8.63
+     ],
+     [
+      "rob",
+      11.47
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈɑbəɹ.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 6.18,
+    "partner": 3.17,
+    "rivals": [
+     [
+      "rubber",
+      3.32
+     ],
+     [
+      "robbery",
+      6.29
+     ],
+     [
+      "rob",
+      7.56
+     ]
+    ]
+   }
+  },
+  "bucks": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "bˈʌks.",
+    "speed": 0.97,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.26,
+    "partner": 5.34,
+    "rivals": [
+     [
+      "box",
+      5.34
+     ],
+     [
+      "bus",
+      7.26
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈʌks.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 7.41,
+    "partner": 6.01,
+    "rivals": [
+     [
+      "box",
+      6.01
+     ],
+     [
+      "bus",
+      7.41
+     ]
+    ]
+   }
+  },
+  "box": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "bˈɑks.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 5.45,
+    "partner": 7.12,
+    "rivals": [
+     [
+      "ox",
+      5.86
+     ],
+     [
+      "fox",
+      5.88
+     ],
+     [
+      "boxer",
+      6.49
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɑks.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.52,
+    "partner": 5.45,
+    "rivals": [
+     [
+      "boxer",
+      5.52
+     ],
+     [
+      "bucks",
+      6.73
+     ],
+     [
+      "boss",
+      7.49
+     ]
+    ]
+   }
+  },
+  "The doctor is not at lunch.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə dˈɑktəɹ ɪz nˌɑt æt lˈʌnʧ.",
+    "speed": 0.9,
+    "secs": 1.47,
+    "grade": "strict",
+    "heard": "The doctor is not at lunch."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə dˈɑktəɹ ɪz nˌɑt æt lˈʌnʧ.",
+    "speed": 0.9,
+    "secs": 1.66,
+    "grade": "strict",
+    "heard": "The doctor is not at lunch."
+   }
+  },
+  "Lock the door, and good luck.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɑk ðə dˈɔɹ, ænd ɡˈʊd lˈʌk.",
+    "speed": 0.9,
+    "secs": 1.73,
+    "grade": "strict",
+    "heard": "Lock the door and good luck."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈɑk ðə dˈɔɹ, ænd ɡˈʊd lˈʌk.",
+    "speed": 0.9,
+    "secs": 1.64,
+    "grade": "strict",
+    "heard": "Lock the door and good luck!"
+   }
+  },
+  "My stomach hurts a lot.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˌI stˈʌmək hˈɜɹts ɐ lˈɑt.",
+    "speed": 0.9,
+    "secs": 1.37,
+    "grade": "strict",
+    "heard": "My stomach hurts a lot."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˌI stˈʌmək hˈɜɹts ɐ lˈɑt.",
+    "speed": 0.9,
+    "secs": 1.6,
+    "grade": "strict",
+    "heard": "My stomach hurts a lot"
+   }
+  }
+ },
+ "p04": {
+  "pool": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈul.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.26,
+    "partner": 5.33,
+    "rivals": [
+     [
+      "fool",
+      5.26
+     ],
+     [
+      "pull",
+      5.43
+     ],
+     [
+      "jewel",
+      6.66
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈul.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.01,
+    "partner": 2.82,
+    "rivals": [
+     [
+      "pull",
+      2.82
+     ],
+     [
+      "fool",
+      4.43
+     ],
+     [
+      "cool",
+      5.17
+     ]
+    ]
+   }
+  },
+  "pull": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈʊl.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 2.71,
+    "partner": 3.4,
+    "rivals": [
+     [
+      "bull",
+      3.62
+     ],
+     [
+      "pool",
+      4.67
+     ],
+     [
+      "peel",
+      5.0
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈʊl.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.02,
+    "partner": 5.52,
+    "rivals": [
+     [
+      "pool",
+      5.53
+     ],
+     [
+      "peel",
+      6.15
+     ],
+     [
+      "bull",
+      6.7
+     ]
+    ]
+   }
+  },
+  "fool": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "fˈul.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 5.51,
+    "partner": 6.57,
+    "rivals": [
+     [
+      "pool",
+      5.77
+     ],
+     [
+      "cool",
+      6.79
+     ],
+     [
+      "full",
+      7.05
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈul.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.28,
+    "partner": 6.38,
+    "rivals": [
+     [
+      "pool",
+      6.44
+     ],
+     [
+      "full",
+      6.78
+     ],
+     [
+      "cool",
+      7.65
+     ]
+    ]
+   }
+  },
+  "full": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "fˈʊl.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 4.41,
+    "partner": 3.51,
+    "rivals": [
+     [
+      "fool",
+      3.51
+     ],
+     [
+      "fall",
+      4.41
+     ],
+     [
+      "pull",
+      4.56
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈʊl.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.94,
+    "partner": 3.72,
+    "rivals": [
+     [
+      "fool",
+      3.72
+     ],
+     [
+      "bull",
+      6.0
+     ],
+     [
+      "pull",
+      6.23
+     ]
+    ]
+   }
+  },
+  "Luke": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "lˈuk.",
+    "speed": 0.97,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.87,
+    "partner": 3.89,
+    "rivals": [
+     [
+      "look",
+      4.08
+     ],
+     [
+      "luck",
+      6.19
+     ],
+     [
+      "lick",
+      9.19
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈuk.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 5.37,
+    "partner": 4.37,
+    "rivals": [
+     [
+      "look",
+      4.37
+     ],
+     [
+      "luck",
+      5.37
+     ],
+     [
+      "lake",
+      8.53
+     ]
+    ]
+   }
+  },
+  "look": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "lˈʊk.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 7.26,
+    "partner": 6.46,
+    "rivals": [
+     [
+      "Luke",
+      7.08
+     ],
+     [
+      "book",
+      7.49
+     ],
+     [
+      "luck",
+      8.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈʊk.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 1.89,
+    "partner": 3.23,
+    "rivals": [
+     [
+      "luck",
+      1.89
+     ],
+     [
+      "Luke",
+      3.23
+     ],
+     [
+      "lock",
+      5.37
+     ]
+    ]
+   }
+  },
+  "food": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈud.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.16,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mood",
+      7.16
+     ],
+     [
+      "feed",
+      8.79
+     ],
+     [
+      "fool",
+      10.04
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈud.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 7.36,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mood",
+      7.36
+     ],
+     [
+      "feed",
+      7.89
+     ],
+     [
+      "fool",
+      10.37
+     ]
+    ]
+   }
+  },
+  "moon": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˈun.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 1.41,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "moan",
+      1.41
+     ],
+     [
+      "move",
+      4.51
+     ],
+     [
+      "mood",
+      4.65
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˈun.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 6.36,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "mood",
+      6.58
+     ],
+     [
+      "noon",
+      6.82
+     ],
+     [
+      "move",
+      8.15
+     ]
+    ]
+   }
+  },
+  "blue": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "blˈu.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.62,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bloom",
+      4.62
+     ],
+     [
+      "glue",
+      5.08
+     ],
+     [
+      "blur",
+      5.76
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "blˈu.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 4.45,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bloom",
+      4.54
+     ],
+     [
+      "blur",
+      5.94
+     ],
+     [
+      "glue",
+      5.95
+     ]
+    ]
+   }
+  },
+  "good": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɡˈʊd.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 2.61,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "god",
+      2.75
+     ],
+     [
+      "goods",
+      7.4
+     ],
+     [
+      "get",
+      7.64
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈʊd.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 3.48,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "god",
+      4.25
+     ],
+     [
+      "goods",
+      8.3
+     ],
+     [
+      "wood",
+      9.5
+     ]
+    ]
+   }
+  },
+  "foot": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈʊt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.16,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "put",
+      5.04
+     ],
+     [
+      "fight",
+      7.22
+     ],
+     [
+      "fat",
+      9.39
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈʊt.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 1.37,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "put",
+      1.42
+     ],
+     [
+      "full",
+      3.61
+     ],
+     [
+      "fight",
+      5.46
+     ]
+    ]
+   }
+  },
+  "put": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈʊt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 2.25,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "foot",
+      2.25
+     ],
+     [
+      "pet",
+      4.76
+     ],
+     [
+      "pot",
+      5.23
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈʊt.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 3.72,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "foot",
+      3.93
+     ],
+     [
+      "pet",
+      7.45
+     ],
+     [
+      "pot",
+      7.48
+     ]
+    ]
+   }
+  },
+  "Look at the full moon.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈʊk æt ðə fˈʊl mˈun.",
+    "speed": 0.9,
+    "secs": 1.22,
+    "grade": "strict",
+    "heard": "Look at the full moon"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈʊk æt ðə fˈʊl mˈun.",
+    "speed": 0.9,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "Look at the full moon."
+   }
+  },
+  "The food is good.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə fˈud ɪz ɡˈʊd.",
+    "speed": 0.9,
+    "secs": 1.02,
+    "grade": "strict",
+    "heard": "The food is good."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə fˈud ɪz ɡˈʊd.",
+    "speed": 0.9,
+    "secs": 1.24,
+    "grade": "strict",
+    "heard": "The food is good"
+   }
+  },
+  "Put your foot in the boot.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˌʊt jʊɹ fˈʊt ɪn ðə bˈut.",
+    "speed": 0.9,
+    "secs": 1.34,
+    "grade": "strict",
+    "heard": "Put your foot in the boot"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˌʊt jʊɹ fˈʊt ɪn ðə bˈut.",
+    "speed": 0.9,
+    "secs": 1.28,
+    "grade": "strict",
+    "heard": "Put your foot in the boot"
+   }
+  }
+ },
+ "p05": {
+  "pain": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈAn.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 1.8,
+    "partner": 6.14,
+    "rivals": [
+     [
+      "gain",
+      1.8
+     ],
+     [
+      "chain",
+      2.01
+     ],
+     [
+      "main",
+      3.94
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈAn.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 5.41,
+    "partner": 6.1,
+    "rivals": [
+     [
+      "paint",
+      5.67
+     ],
+     [
+      "pay",
+      6.49
+     ],
+     [
+      "rain",
+      7.64
+     ]
+    ]
+   }
+  },
+  "pen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈɛn.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 4.38,
+    "partner": 4.5,
+    "rivals": [
+     [
+      "pin",
+      4.51
+     ],
+     [
+      "pan",
+      4.99
+     ],
+     [
+      "hen",
+      5.22
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈɛn.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.11,
+    "partner": 6.42,
+    "rivals": [
+     [
+      "pin",
+      4.26
+     ],
+     [
+      "penny",
+      5.07
+     ],
+     [
+      "hen",
+      5.43
+     ]
+    ]
+   }
+  },
+  "late": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.49,
+    "partner": 9.43,
+    "rivals": [
+     [
+      "light",
+      3.81
+     ],
+     [
+      "plate",
+      5.9
+     ],
+     [
+      "lake",
+      6.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈAt.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.34,
+    "partner": 9.83,
+    "rivals": [
+     [
+      "lake",
+      5.36
+     ],
+     [
+      "plate",
+      7.8
+     ],
+     [
+      "light",
+      8.19
+     ]
+    ]
+   }
+  },
+  "let": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɛt.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 3.12,
+    "partner": 6.04,
+    "rivals": [
+     [
+      "leg",
+      3.42
+     ],
+     [
+      "lot",
+      5.82
+     ],
+     [
+      "lead",
+      5.82
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈɛt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 4.03,
+    "partner": 5.56,
+    "rivals": [
+     [
+      "leg",
+      4.09
+     ],
+     [
+      "net",
+      5.91
+     ],
+     [
+      "lot",
+      6.15
+     ]
+    ]
+   }
+  },
+  "wait": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.07,
+    "partner": 8.41,
+    "rivals": [
+     [
+      "white",
+      5.07
+     ],
+     [
+      "wake",
+      6.09
+     ],
+     [
+      "late",
+      7.09
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 6.07,
+    "partner": 9.03,
+    "rivals": [
+     [
+      "white",
+      6.2
+     ],
+     [
+      "wake",
+      6.34
+     ],
+     [
+      "late",
+      7.34
+     ]
+    ]
+   }
+  },
+  "wet": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɛt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 7.52,
+    "partner": 6.16,
+    "rivals": [
+     [
+      "vet",
+      6.51
+     ],
+     [
+      "wear",
+      7.74
+     ],
+     [
+      "pet",
+      9.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɛt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.61,
+    "partner": 6.55,
+    "rivals": [
+     [
+      "vet",
+      6.67
+     ],
+     [
+      "wear",
+      6.68
+     ],
+     [
+      "pet",
+      8.98
+     ]
+    ]
+   }
+  },
+  "taste": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈAst.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.15,
+    "partner": 9.69,
+    "rivals": [
+     [
+      "tasty",
+      5.46
+     ],
+     [
+      "toast",
+      5.91
+     ],
+     [
+      "haste",
+      7.49
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈAst.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.07,
+    "partner": 9.61,
+    "rivals": [
+     [
+      "tasty",
+      4.45
+     ],
+     [
+      "toast",
+      5.95
+     ],
+     [
+      "haste",
+      7.74
+     ]
+    ]
+   }
+  },
+  "test": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈɛst.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.1,
+    "partner": 4.39,
+    "rivals": [
+     [
+      "taste",
+      4.51
+     ],
+     [
+      "chest",
+      5.36
+     ],
+     [
+      "best",
+      5.55
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈɛst.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.85,
+    "partner": 4.65,
+    "rivals": [
+     [
+      "taste",
+      4.65
+     ],
+     [
+      "chest",
+      4.88
+     ],
+     [
+      "best",
+      5.52
+     ]
+    ]
+   }
+  },
+  "gate": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ɡˈAt.",
+    "speed": 0.85,
+    "secs": 0.82,
+    "grade": "strict",
+    "ahead": 6.25,
+    "partner": 6.68,
+    "rivals": [
+     [
+      "goat",
+      6.25
+     ],
+     [
+      "get",
+      6.68
+     ],
+     [
+      "date",
+      7.06
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.56,
+    "partner": 7.97,
+    "rivals": [
+     [
+      "date",
+      7.89
+     ],
+     [
+      "get",
+      8.14
+     ],
+     [
+      "goat",
+      8.16
+     ]
+    ]
+   }
+  },
+  "get": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ɡˈɛt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 7.24,
+    "partner": 5.44,
+    "rivals": [
+     [
+      "gate",
+      5.44
+     ],
+     [
+      "pet",
+      7.24
+     ],
+     [
+      "gift",
+      7.45
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɡˈɛt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 7.83,
+    "partner": 5.09,
+    "rivals": [
+     [
+      "gate",
+      5.2
+     ],
+     [
+      "gift",
+      7.97
+     ],
+     [
+      "give",
+      9.67
+     ]
+    ]
+   }
+  },
+  "date": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "dˈAt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 4.42,
+    "partner": 4.17,
+    "rivals": [
+     [
+      "debt",
+      4.5
+     ],
+     [
+      "fate",
+      5.23
+     ],
+     [
+      "hate",
+      7.47
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "dˈAt.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 6.37,
+    "partner": 5.87,
+    "rivals": [
+     [
+      "debt",
+      5.97
+     ],
+     [
+      "data",
+      8.95
+     ],
+     [
+      "hate",
+      9.59
+     ]
+    ]
+   }
+  },
+  "debt": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "dˈɛt.",
+    "speed": 0.85,
+    "secs": 0.8,
+    "grade": "strict",
+    "ahead": 5.74,
+    "partner": 5.07,
+    "rivals": [
+     [
+      "date",
+      5.16
+     ],
+     [
+      "death",
+      5.96
+     ],
+     [
+      "dead",
+      6.92
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "dˈɛt.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 3.52,
+    "partner": 5.11,
+    "rivals": [
+     [
+      "dead",
+      3.52
+     ],
+     [
+      "death",
+      3.86
+     ],
+     [
+      "date",
+      5.24
+     ]
+    ]
+   }
+  },
+  "Where is the pain?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˌɛɹ ɪz ðə pˈAn?",
+    "speed": 0.9,
+    "secs": 1.07,
+    "grade": "strict",
+    "heard": "Where is the pain?"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˌɛɹ ɪz ðə pˈAn?",
+    "speed": 0.9,
+    "secs": 1.19,
+    "grade": "strict",
+    "heard": "Where is the pain?"
+   }
+  },
+  "Wait, the floor is wet.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈAt, ðə flˈɔɹ ɪz wˈɛt.",
+    "speed": 0.9,
+    "secs": 1.51,
+    "grade": "strict",
+    "heard": "Wait, the floor is wet."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈAt, ðə flˈɔɹ ɪz wˈɛt.",
+    "speed": 0.9,
+    "secs": 1.45,
+    "grade": "strict",
+    "heard": "Wait, the floor is wet."
+   }
+  },
+  "Take the test later.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈAk ðə tˈɛst lˈAɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.28,
+    "grade": "strict",
+    "heard": "Take the test later."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈAk ðə tˈɛst lˈAɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.39,
+    "grade": "strict",
+    "heard": "Take the test later"
+   }
+  }
+ },
+ "p06": {
+  "think": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "θˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 2.78,
+    "partner": 5.56,
+    "rivals": [
+     [
+      "thank",
+      3.22
+     ],
+     [
+      "link",
+      5.34
+     ],
+     [
+      "sink",
+      5.56
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.35,
+    "partner": 7.63,
+    "rivals": [
+     [
+      "thing",
+      5.49
+     ],
+     [
+      "thick",
+      7.41
+     ],
+     [
+      "pink",
+      7.46
+     ]
+    ]
+   }
+  },
+  "sink": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "sˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.84,
+    "grade": "strict",
+    "ahead": 1.24,
+    "partner": 4.76,
+    "rivals": [
+     [
+      "link",
+      1.56
+     ],
+     [
+      "singer",
+      5.2
+     ],
+     [
+      "stink",
+      5.42
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɪŋk.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.67,
+    "partner": 3.37,
+    "rivals": [
+     [
+      "think",
+      3.51
+     ],
+     [
+      "sing",
+      4.97
+     ],
+     [
+      "link",
+      5.2
+     ]
+    ]
+   }
+  },
+  "thank": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˈæŋk.",
+    "speed": 0.97,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.29,
+    "partner": 3.11,
+    "rivals": [
+     [
+      "sank",
+      3.11
+     ],
+     [
+      "think",
+      4.29
+     ],
+     [
+      "tank",
+      4.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈæŋk.",
+    "speed": 0.75,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 4.39,
+    "partner": 2.51,
+    "rivals": [
+     [
+      "sank",
+      4.29
+     ],
+     [
+      "tank",
+      5.14
+     ],
+     [
+      "think",
+      5.28
+     ]
+    ]
+   }
+  },
+  "sank": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈæŋk.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 7.12,
+    "partner": 4.9,
+    "rivals": [
+     [
+      "thank",
+      5.7
+     ],
+     [
+      "tank",
+      7.61
+     ],
+     [
+      "sink",
+      7.97
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈæŋk.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.72,
+    "partner": 5.39,
+    "rivals": [
+     [
+      "thank",
+      5.88
+     ],
+     [
+      "sink",
+      6.51
+     ],
+     [
+      "tank",
+      6.94
+     ]
+    ]
+   }
+  },
+  "three": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θɹˈi.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.61,
+    "partner": 7.15,
+    "rivals": [
+     [
+      "free",
+      5.62
+     ],
+     [
+      "through",
+      6.52
+     ],
+     [
+      "tree",
+      7.38
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "θɹˈi.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.1,
+    "partner": 7.23,
+    "rivals": [
+     [
+      "free",
+      5.21
+     ],
+     [
+      "through",
+      6.88
+     ],
+     [
+      "tree",
+      7.53
+     ]
+    ]
+   }
+  },
+  "tree": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tɹˈi.",
+    "speed": 0.75,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.57,
+    "partner": 3.32,
+    "rivals": [
+     [
+      "three",
+      3.51
+     ],
+     [
+      "tray",
+      5.79
+     ],
+     [
+      "tea",
+      7.05
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "tɹˈi.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 3.82,
+    "partner": 3.15,
+    "rivals": [
+     [
+      "three",
+      3.35
+     ],
+     [
+      "tray",
+      3.82
+     ],
+     [
+      "try",
+      6.3
+     ]
+    ]
+   }
+  },
+  "then": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðˈɛn.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 1.6,
+    "partner": 8.52,
+    "rivals": [
+     [
+      "than",
+      1.76
+     ],
+     [
+      "when",
+      5.83
+     ],
+     [
+      "pen",
+      8.06
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðˈɛn.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 2.43,
+    "partner": 5.83,
+    "rivals": [
+     [
+      "than",
+      3.16
+     ],
+     [
+      "when",
+      4.46
+     ],
+     [
+      "den",
+      5.88
+     ]
+    ]
+   }
+  },
+  "den": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈɛn.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 7.18,
+    "partner": 3.18,
+    "rivals": [
+     [
+      "then",
+      3.57
+     ],
+     [
+      "hen",
+      7.18
+     ],
+     [
+      "down",
+      7.55
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈɛn.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.61,
+    "partner": 3.74,
+    "rivals": [
+     [
+      "then",
+      3.81
+     ],
+     [
+      "dead",
+      4.61
+     ],
+     [
+      "death",
+      6.12
+     ]
+    ]
+   }
+  },
+  "breathe": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bɹˈið.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 7.47,
+    "partner": 2.82,
+    "rivals": [
+     [
+      "breeze",
+      3.47
+     ],
+     [
+      "brief",
+      7.71
+     ],
+     [
+      "breed",
+      8.13
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bɹˈið.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 8.62,
+    "partner": 13.22,
+    "rivals": [
+     [
+      "brief",
+      9.0
+     ],
+     [
+      "breed",
+      9.66
+     ],
+     [
+      "breeze",
+      13.62
+     ]
+    ]
+   }
+  },
+  "breeze": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bɹˈiz.",
+    "speed": 0.75,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 5.31,
+    "partner": 3.3,
+    "rivals": [
+     [
+      "breathe",
+      3.3
+     ],
+     [
+      "breed",
+      5.31
+     ],
+     [
+      "freeze",
+      5.63
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bɹˈiz.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 4.93,
+    "partner": 2.76,
+    "rivals": [
+     [
+      "breathe",
+      3.08
+     ],
+     [
+      "breed",
+      5.05
+     ],
+     [
+      "freeze",
+      5.23
+     ]
+    ]
+   }
+  },
+  "thing": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˈɪŋ.",
+    "speed": 0.97,
+    "secs": 0.55,
+    "grade": "strict",
+    "ahead": 4.97,
+    "partner": 4.95,
+    "rivals": [
+     [
+      "sing",
+      5.35
+     ],
+     [
+      "thin",
+      5.55
+     ],
+     [
+      "think",
+      6.12
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "θˈɪŋ.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 4.29,
+    "partner": 7.35,
+    "rivals": [
+     [
+      "thin",
+      4.41
+     ],
+     [
+      "think",
+      6.86
+     ],
+     [
+      "sing",
+      7.52
+     ]
+    ]
+   }
+  },
+  "sing": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪŋ.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 4.74,
+    "partner": 5.99,
+    "rivals": [
+     [
+      "ring",
+      4.74
+     ],
+     [
+      "singer",
+      5.55
+     ],
+     [
+      "thing",
+      6.13
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "sˈɪŋ.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 3.19,
+    "partner": 5.59,
+    "rivals": [
+     [
+      "ring",
+      3.19
+     ],
+     [
+      "singer",
+      4.88
+     ],
+     [
+      "swing",
+      4.94
+     ]
+    ]
+   }
+  },
+  "thin": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˈɪn.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 8.47,
+    "partner": 7.21,
+    "rivals": [
+     [
+      "thick",
+      8.61
+     ],
+     [
+      "tin",
+      9.13
+     ],
+     [
+      "sin",
+      9.63
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈɪn.",
+    "speed": 0.97,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.27,
+    "partner": 3.38,
+    "rivals": [
+     [
+      "sin",
+      3.73
+     ],
+     [
+      "tin",
+      7.32
+     ],
+     [
+      "thing",
+      7.58
+     ]
+    ]
+   }
+  },
+  "sin": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪn.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 6.54,
+    "partner": 4.57,
+    "rivals": [
+     [
+      "thin",
+      4.57
+     ],
+     [
+      "sign",
+      6.63
+     ],
+     [
+      "pin",
+      7.03
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɪn.",
+    "speed": 0.97,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 4.05,
+    "partner": 4.21,
+    "rivals": [
+     [
+      "sing",
+      4.89
+     ],
+     [
+      "thin",
+      4.9
+     ],
+     [
+      "sign",
+      5.83
+     ]
+    ]
+   }
+  },
+  "Take a deep breath.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈAk ɐ dˈip bɹˈɛθ.",
+    "speed": 0.9,
+    "secs": 1.17,
+    "grade": "strict",
+    "heard": "Take a deep breath"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈAk ɐ dˈip bɹˈɛθ.",
+    "speed": 0.9,
+    "secs": 1.22,
+    "grade": "strict",
+    "heard": "Take a deep breath."
+   }
+  },
+  "Breathe in through your mouth.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bɹˈið ɪn θɹu jʊɹ mˈWθ.",
+    "speed": 0.9,
+    "secs": 1.39,
+    "grade": "strict",
+    "heard": "Breathe in through your mouth."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bɹˈið ɪn θɹu jʊɹ mˈWθ.",
+    "speed": 0.9,
+    "secs": 1.54,
+    "grade": "strict",
+    "heard": "Breathe in through your mouth."
+   }
+  },
+  "Thank you for these three things.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˈæŋk ju fɔɹ ðiz θɹˈi θˈɪŋz.",
+    "speed": 0.9,
+    "secs": 1.58,
+    "grade": "strict",
+    "heard": "Thank you for these three things."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈæŋk ju fɔɹ ðiz θɹˈi θˈɪŋz.",
+    "speed": 0.9,
+    "secs": 1.75,
+    "grade": "strict",
+    "heard": "Thank you for these three things."
+   }
+  }
+ },
+ "p07": {
+  "light": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 8.14,
+    "partner": 9.15,
+    "rivals": [
+     [
+      "life",
+      8.37
+     ],
+     [
+      "lie",
+      8.95
+     ],
+     [
+      "night",
+      9.18
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈIt.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 8.52,
+    "partner": 8.72,
+    "rivals": [
+     [
+      "life",
+      8.68
+     ],
+     [
+      "night",
+      8.72
+     ],
+     [
+      "late",
+      9.08
+     ]
+    ]
+   }
+  },
+  "right": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.33,
+    "partner": 6.2,
+    "rivals": [
+     [
+      "bright",
+      5.33
+     ],
+     [
+      "light",
+      6.22
+     ],
+     [
+      "fight",
+      7.24
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.48,
+    "partner": 6.75,
+    "rivals": [
+     [
+      "bright",
+      5.81
+     ],
+     [
+      "light",
+      6.87
+     ],
+     [
+      "fight",
+      8.36
+     ]
+    ]
+   }
+  },
+  "long": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɔŋ.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 2.89,
+    "partner": 7.74,
+    "rivals": [
+     [
+      "lung",
+      2.89
+     ],
+     [
+      "lawn",
+      4.33
+     ],
+     [
+      "log",
+      5.41
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈɔŋ.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.05,
+    "partner": 8.46,
+    "rivals": [
+     [
+      "lung",
+      4.05
+     ],
+     [
+      "lawn",
+      5.96
+     ],
+     [
+      "log",
+      6.84
+     ]
+    ]
+   }
+  },
+  "wrong": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈɔŋ.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.89,
+    "partner": 4.59,
+    "rivals": [
+     [
+      "long",
+      4.59
+     ],
+     [
+      "ring",
+      7.89
+     ],
+     [
+      "song",
+      8.57
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈɔŋ.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.1,
+    "partner": 3.53,
+    "rivals": [
+     [
+      "long",
+      3.61
+     ],
+     [
+      "song",
+      4.1
+     ],
+     [
+      "ring",
+      6.32
+     ]
+    ]
+   }
+  },
+  "fly": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "flˈI.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.01,
+    "partner": 7.36,
+    "rivals": [
+     [
+      "sly",
+      7.01
+     ],
+     [
+      "fry",
+      7.4
+     ],
+     [
+      "flight",
+      7.97
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "flˈI.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.67,
+    "partner": 6.82,
+    "rivals": [
+     [
+      "sly",
+      6.5
+     ],
+     [
+      "fry",
+      7.0
+     ],
+     [
+      "flight",
+      7.98
+     ]
+    ]
+   }
+  },
+  "fry": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fɹˈI.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.34,
+    "partner": 8.99,
+    "rivals": [
+     [
+      "fries",
+      3.91
+     ],
+     [
+      "cry",
+      7.87
+     ],
+     [
+      "dry",
+      8.2
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fɹˈI.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 3.63,
+    "partner": 8.19,
+    "rivals": [
+     [
+      "fries",
+      4.13
+     ],
+     [
+      "cry",
+      7.47
+     ],
+     [
+      "fly",
+      8.33
+     ]
+    ]
+   }
+  },
+  "collect": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kəlˈɛkt.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 6.89,
+    "partner": 11.23,
+    "rivals": [
+     [
+      "select",
+      6.91
+     ],
+     [
+      "connect",
+      7.29
+     ],
+     [
+      "collector",
+      9.92
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kəlˈɛkt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 7.07,
+    "partner": 10.97,
+    "rivals": [
+     [
+      "select",
+      7.13
+     ],
+     [
+      "connect",
+      7.88
+     ],
+     [
+      "collector",
+      8.77
+     ]
+    ]
+   }
+  },
+  "correct": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kəɹˈɛkt.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.8,
+    "partner": 7.46,
+    "rivals": [
+     [
+      "direct",
+      6.21
+     ],
+     [
+      "collect",
+      8.02
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kəɹˈɛkt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 5.85,
+    "partner": 8.28,
+    "rivals": [
+     [
+      "direct",
+      5.88
+     ],
+     [
+      "collect",
+      8.28
+     ]
+    ]
+   }
+  },
+  "late": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.49,
+    "partner": 9.43,
+    "rivals": [
+     [
+      "light",
+      3.81
+     ],
+     [
+      "plate",
+      5.9
+     ],
+     [
+      "lake",
+      6.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈAt.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.34,
+    "partner": 9.83,
+    "rivals": [
+     [
+      "lake",
+      5.36
+     ],
+     [
+      "plate",
+      7.8
+     ],
+     [
+      "light",
+      8.19
+     ]
+    ]
+   }
+  },
+  "rate": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.96,
+    "partner": 10.09,
+    "rivals": [
+     [
+      "right",
+      4.39
+     ],
+     [
+      "great",
+      7.08
+     ],
+     [
+      "date",
+      7.38
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈAt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.76,
+    "partner": 10.42,
+    "rivals": [
+     [
+      "right",
+      8.23
+     ],
+     [
+      "date",
+      8.24
+     ],
+     [
+      "great",
+      8.77
+     ]
+    ]
+   }
+  },
+  "play": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈA.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.64,
+    "partner": 8.52,
+    "rivals": [
+     [
+      "clay",
+      6.74
+     ],
+     [
+      "player",
+      7.03
+     ],
+     [
+      "lay",
+      7.79
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈA.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.42,
+    "partner": 8.31,
+    "rivals": [
+     [
+      "clay",
+      6.42
+     ],
+     [
+      "plea",
+      7.85
+     ],
+     [
+      "pay",
+      7.88
+     ]
+    ]
+   }
+  },
+  "pray": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pɹˈA.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.33,
+    "partner": 9.43,
+    "rivals": [
+     [
+      "prayer",
+      7.11
+     ],
+     [
+      "spray",
+      7.19
+     ],
+     [
+      "praise",
+      7.44
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pɹˈA.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.1,
+    "partner": 9.26,
+    "rivals": [
+     [
+      "prayer",
+      6.1
+     ],
+     [
+      "praise",
+      6.85
+     ],
+     [
+      "spray",
+      7.14
+     ]
+    ]
+   }
+  },
+  "night": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈIt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.94,
+    "partner": 5.8,
+    "rivals": [
+     [
+      "light",
+      5.8
+     ],
+     [
+      "knife",
+      8.2
+     ],
+     [
+      "height",
+      9.35
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈIt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.79,
+    "partner": 6.09,
+    "rivals": [
+     [
+      "light",
+      6.15
+     ],
+     [
+      "knife",
+      6.79
+     ],
+     [
+      "height",
+      8.32
+     ]
+    ]
+   }
+  },
+  "snow": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "snˈO.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.57,
+    "partner": 8.26,
+    "rivals": [
+     [
+      "sow",
+      6.57
+     ],
+     [
+      "sew",
+      7.19
+     ],
+     [
+      "slow",
+      8.45
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "snˈO.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 6.13,
+    "partner": 7.64,
+    "rivals": [
+     [
+      "sew",
+      6.32
+     ],
+     [
+      "sow",
+      6.46
+     ],
+     [
+      "no",
+      6.93
+     ]
+    ]
+   }
+  },
+  "slow": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "slˈO.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 4.77,
+    "partner": 6.42,
+    "rivals": [
+     [
+      "slope",
+      4.77
+     ],
+     [
+      "blow",
+      6.24
+     ],
+     [
+      "snow",
+      6.42
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "slˈO.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.73,
+    "partner": 6.51,
+    "rivals": [
+     [
+      "blow",
+      5.89
+     ],
+     [
+      "slope",
+      5.97
+     ],
+     [
+      "low",
+      5.98
+     ]
+    ]
+   }
+  },
+  "net": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈɛt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 2.0,
+    "partner": 9.32,
+    "rivals": [
+     [
+      "pet",
+      2.58
+     ],
+     [
+      "not",
+      3.23
+     ],
+     [
+      "neck",
+      3.33
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈɛt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.42,
+    "partner": 10.21,
+    "rivals": [
+     [
+      "neck",
+      6.49
+     ],
+     [
+      "wet",
+      6.72
+     ],
+     [
+      "pet",
+      7.22
+     ]
+    ]
+   }
+  },
+  "let": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈɛt.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 3.12,
+    "partner": 6.04,
+    "rivals": [
+     [
+      "leg",
+      3.42
+     ],
+     [
+      "lot",
+      5.82
+     ],
+     [
+      "lead",
+      5.82
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈɛt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 4.03,
+    "partner": 5.56,
+    "rivals": [
+     [
+      "leg",
+      4.09
+     ],
+     [
+      "net",
+      5.91
+     ],
+     [
+      "lot",
+      6.15
+     ]
+    ]
+   }
+  },
+  "Turn on the light on the right.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈɜɹn ˌɔn ðə lˈIt ˌɔn ðə ɹˈIt.",
+    "speed": 0.9,
+    "secs": 1.54,
+    "grade": "strict",
+    "heard": "Turn on the light on the right."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈɜɹn ˌɔn ðə lˈIt ˌɔn ðə ɹˈIt.",
+    "speed": 0.9,
+    "secs": 1.51,
+    "grade": "strict",
+    "heard": "Turn on the light on the right"
+   }
+  },
+  "Please read the label.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈiz ɹˈid ðə lˈAbəl.",
+    "speed": 0.9,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "Please read the label."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈiz ɹˈid ðə lˈAbəl.",
+    "speed": 0.9,
+    "secs": 1.41,
+    "grade": "strict",
+    "heard": "Please read the label."
+   }
+  },
+  "I need a little rest.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI nˈid ɐ lˈɪɾᵊl ɹˈɛst.",
+    "speed": 0.9,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "I need a little rest."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI nˈid ɐ lˈɪɾᵊl ɹˈɛst.",
+    "speed": 0.9,
+    "secs": 1.22,
+    "grade": "strict",
+    "heard": "I need a little rest."
+   }
+  }
+ },
+ "p08": {
+  "vest": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "vˈɛst.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 8.92,
+    "partner": 8.54,
+    "rivals": [
+     [
+      "west",
+      8.77
+     ],
+     [
+      "guest",
+      9.11
+     ],
+     [
+      "rest",
+      9.16
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɛst.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.24,
+    "partner": 3.14,
+    "rivals": [
+     [
+      "west",
+      3.14
+     ],
+     [
+      "rest",
+      5.24
+     ],
+     [
+      "best",
+      6.46
+     ]
+    ]
+   }
+  },
+  "west": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "wˈɛst.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 6.55,
+    "partner": 7.15,
+    "rivals": [
+     [
+      "worst",
+      6.77
+     ],
+     [
+      "vest",
+      7.39
+     ],
+     [
+      "wet",
+      8.47
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɛst.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.19,
+    "partner": 6.96,
+    "rivals": [
+     [
+      "worst",
+      6.19
+     ],
+     [
+      "vest",
+      6.96
+     ],
+     [
+      "wet",
+      7.13
+     ]
+    ]
+   }
+  },
+  "very": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 3.26,
+    "partner": 3.95,
+    "rivals": [
+     [
+      "fairy",
+      3.26
+     ],
+     [
+      "berry",
+      3.95
+     ],
+     [
+      "wary",
+      5.08
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.43,
+    "partner": 5.18,
+    "rivals": [
+     [
+      "berry",
+      5.64
+     ],
+     [
+      "fairy",
+      6.99
+     ],
+     [
+      "ferry",
+      7.85
+     ]
+    ]
+   }
+  },
+  "berry": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.18,
+    "partner": 4.86,
+    "rivals": [
+     [
+      "merry",
+      4.56
+     ],
+     [
+      "marry",
+      5.75
+     ],
+     [
+      "very",
+      5.77
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɛɹi.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 3.27,
+    "partner": 4.39,
+    "rivals": [
+     [
+      "merry",
+      3.27
+     ],
+     [
+      "very",
+      4.45
+     ],
+     [
+      "marry",
+      4.64
+     ]
+    ]
+   }
+  },
+  "fan": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈæn.",
+    "speed": 0.75,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 3.97,
+    "partner": 4.61,
+    "rivals": [
+     [
+      "than",
+      4.04
+     ],
+     [
+      "van",
+      4.61
+     ],
+     [
+      "pan",
+      5.14
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈæn.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.81,
+    "partner": 4.81,
+    "rivals": [
+     [
+      "van",
+      5.05
+     ],
+     [
+      "than",
+      6.21
+     ],
+     [
+      "pan",
+      6.55
+     ]
+    ]
+   }
+  },
+  "van": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈæn.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 1.93,
+    "partner": 3.09,
+    "rivals": [
+     [
+      "than",
+      2.01
+     ],
+     [
+      "ban",
+      3.09
+     ],
+     [
+      "fan",
+      3.62
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈæn.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 4.93,
+    "partner": 6.03,
+    "rivals": [
+     [
+      "vein",
+      4.93
+     ],
+     [
+      "than",
+      5.18
+     ],
+     [
+      "ban",
+      6.03
+     ]
+    ]
+   }
+  },
+  "vote": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈOt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 4.57,
+    "partner": 4.51,
+    "rivals": [
+     [
+      "boat",
+      4.62
+     ],
+     [
+      "voter",
+      4.75
+     ],
+     [
+      "goat",
+      6.14
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈOt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 4.63,
+    "partner": 5.25,
+    "rivals": [
+     [
+      "voter",
+      5.1
+     ],
+     [
+      "boat",
+      5.25
+     ],
+     [
+      "goat",
+      6.91
+     ]
+    ]
+   }
+  },
+  "boat": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈOt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.06,
+    "partner": 6.72,
+    "rivals": [
+     [
+      "vote",
+      6.88
+     ],
+     [
+      "coat",
+      7.06
+     ],
+     [
+      "bite",
+      7.87
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈOt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 7.49,
+    "partner": 6.3,
+    "rivals": [
+     [
+      "vote",
+      6.3
+     ],
+     [
+      "coat",
+      7.74
+     ],
+     [
+      "both",
+      8.56
+     ]
+    ]
+   }
+  },
+  "vent": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɛnt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 3.78,
+    "partner": 4.33,
+    "rivals": [
+     [
+      "vest",
+      4.25
+     ],
+     [
+      "vet",
+      4.33
+     ],
+     [
+      "went",
+      4.47
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "vˈɛnt.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 4.38,
+    "partner": 2.78,
+    "rivals": [
+     [
+      "went",
+      2.78
+     ],
+     [
+      "cent",
+      4.38
+     ],
+     [
+      "rent",
+      4.73
+     ]
+    ]
+   }
+  },
+  "went": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɛnt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 4.92,
+    "partner": 5.93,
+    "rivals": [
+     [
+      "rent",
+      5.06
+     ],
+     [
+      "vent",
+      6.35
+     ],
+     [
+      "wet",
+      6.42
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "wˈɛnt.",
+    "speed": 0.85,
+    "secs": 0.89,
+    "grade": "strict",
+    "ahead": 4.86,
+    "partner": 5.85,
+    "rivals": [
+     [
+      "rent",
+      5.06
+     ],
+     [
+      "vent",
+      6.09
+     ],
+     [
+      "wet",
+      7.31
+     ]
+    ]
+   }
+  },
+  "verse": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 8.47,
+    "partner": 9.19,
+    "rivals": [
+     [
+      "voice",
+      8.66
+     ],
+     [
+      "worse",
+      9.38
+     ],
+     [
+      "vice",
+      9.75
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.24,
+    "partner": 4.89,
+    "rivals": [
+     [
+      "worse",
+      5.12
+     ],
+     [
+      "vice",
+      5.24
+     ],
+     [
+      "voice",
+      6.36
+     ]
+    ]
+   }
+  },
+  "worse": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 3.69,
+    "partner": 6.88,
+    "rivals": [
+     [
+      "worst",
+      3.69
+     ],
+     [
+      "verse",
+      6.88
+     ],
+     [
+      "worth",
+      7.67
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɜɹs.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 4.05,
+    "partner": 7.52,
+    "rivals": [
+     [
+      "worst",
+      4.08
+     ],
+     [
+      "worth",
+      7.52
+     ],
+     [
+      "verse",
+      7.62
+     ]
+    ]
+   }
+  },
+  "I feel very weak.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI fˈil vˈɛɹi wˈik.",
+    "speed": 0.9,
+    "secs": 1.22,
+    "grade": "strict",
+    "heard": "I feel very weak."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI fˈil vˈɛɹi wˈik.",
+    "speed": 0.9,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "I feel very weak."
+   }
+  },
+  "Check the vital signs every four hours.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʧˈɛk ðə vˈIɾᵊl sˈInz ˈɛvəɹi fˈɔɹ ˈWəɹz.",
+    "speed": 0.9,
+    "secs": 2.41,
+    "grade": "strict",
+    "heard": "Check the vital signs every four hours."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʧˈɛk ðə vˈIɾᵊl sˈInz ˈɛvəɹi fˈɔɹ ˈWəɹz.",
+    "speed": 0.9,
+    "secs": 2.39,
+    "grade": "strict",
+    "heard": "Check the vital signs every four hours."
+   }
+  },
+  "We have five visitors.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˌi hæv fˈIv vˈɪzəɾəɹz.",
+    "speed": 0.9,
+    "secs": 1.43,
+    "grade": "strict",
+    "heard": "We have five visitors."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˌi hæv fˈIv vˈɪzəɾəɹz.",
+    "speed": 0.9,
+    "secs": 1.45,
+    "grade": "strict",
+    "heard": "We have five visitors"
+   }
+  }
+ },
+ "p09": {
+  "back": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈæk.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.15,
+    "partner": 6.76,
+    "rivals": [
+     [
+      "black",
+      5.22
+     ],
+     [
+      "bat",
+      6.73
+     ],
+     [
+      "bag",
+      6.9
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈæk.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 4.93,
+    "partner": 5.94,
+    "rivals": [
+     [
+      "black",
+      5.31
+     ],
+     [
+      "bag",
+      6.15
+     ],
+     [
+      "bank",
+      6.35
+     ]
+    ]
+   }
+  },
+  "bag": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈæɡ.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.0,
+    "partner": 5.4,
+    "rivals": [
+     [
+      "beg",
+      5.66
+     ],
+     [
+      "bath",
+      6.19
+     ],
+     [
+      "rag",
+      6.58
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈæɡ.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.64,
+    "partner": 3.96,
+    "rivals": [
+     [
+      "beg",
+      3.96
+     ],
+     [
+      "rag",
+      5.8
+     ],
+     [
+      "bug",
+      6.56
+     ]
+    ]
+   }
+  },
+  "rice": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈIs.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 7.86,
+    "partner": 6.42,
+    "rivals": [
+     [
+      "rise",
+      6.42
+     ],
+     [
+      "ice",
+      7.86
+     ],
+     [
+      "race",
+      9.25
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈIs.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 7.75,
+    "partner": 5.99,
+    "rivals": [
+     [
+      "rise",
+      6.16
+     ],
+     [
+      "ice",
+      7.75
+     ],
+     [
+      "race",
+      8.59
+     ]
+    ]
+   }
+  },
+  "rise": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈIz.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.0,
+    "partner": 5.93,
+    "rivals": [
+     [
+      "rice",
+      6.12
+     ],
+     [
+      "raise",
+      6.34
+     ],
+     [
+      "wise",
+      7.41
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈIz.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 4.82,
+    "partner": 6.48,
+    "rivals": [
+     [
+      "raise",
+      4.88
+     ],
+     [
+      "rice",
+      6.65
+     ],
+     [
+      "wise",
+      7.36
+     ]
+    ]
+   }
+  },
+  "hat": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈæt.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 5.91,
+    "partner": 8.87,
+    "rivals": [
+     [
+      "cat",
+      6.22
+     ],
+     [
+      "at",
+      6.61
+     ],
+     [
+      "fat",
+      6.73
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "hˈæt.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.95,
+    "partner": 4.07,
+    "rivals": [
+     [
+      "had",
+      5.01
+     ],
+     [
+      "cat",
+      6.72
+     ],
+     [
+      "heat",
+      6.96
+     ]
+    ]
+   }
+  },
+  "had": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈæd.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 1.65,
+    "partner": 6.26,
+    "rivals": [
+     [
+      "add",
+      2.17
+     ],
+     [
+      "hide",
+      4.43
+     ],
+     [
+      "hand",
+      5.09
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "hˈæd.",
+    "speed": 0.97,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 3.71,
+    "partner": 3.09,
+    "rivals": [
+     [
+      "head",
+      4.14
+     ],
+     [
+      "hide",
+      4.24
+     ],
+     [
+      "add",
+      4.3
+     ]
+    ]
+   }
+  },
+  "write": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.15,
+    "partner": 8.06,
+    "rivals": [
+     [
+      "bright",
+      7.4
+     ],
+     [
+      "bite",
+      7.58
+     ],
+     [
+      "ride",
+      8.06
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.89,
+    "partner": 7.51,
+    "rivals": [
+     [
+      "bright",
+      6.21
+     ],
+     [
+      "bite",
+      6.83
+     ],
+     [
+      "height",
+      7.33
+     ]
+    ]
+   }
+  },
+  "ride": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈId.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.11,
+    "partner": 8.4,
+    "rivals": [
+     [
+      "right",
+      7.64
+     ],
+     [
+      "rise",
+      8.41
+     ],
+     [
+      "write",
+      9.54
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈId.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 8.0,
+    "partner": 9.83,
+    "rivals": [
+     [
+      "rise",
+      8.16
+     ],
+     [
+      "right",
+      8.5
+     ],
+     [
+      "wide",
+      9.31
+     ]
+    ]
+   }
+  },
+  "wrote": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈOt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.75,
+    "partner": 4.14,
+    "rivals": [
+     [
+      "road",
+      4.49
+     ],
+     [
+      "right",
+      5.77
+     ],
+     [
+      "boat",
+      6.53
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈOt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.76,
+    "partner": 6.28,
+    "rivals": [
+     [
+      "road",
+      8.06
+     ],
+     [
+      "right",
+      8.59
+     ],
+     [
+      "note",
+      10.32
+     ]
+    ]
+   }
+  },
+  "road": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈOd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 5.49,
+    "partner": 5.23,
+    "rivals": [
+     [
+      "wrote",
+      5.52
+     ],
+     [
+      "ride",
+      5.62
+     ],
+     [
+      "rope",
+      6.93
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈOd.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.59,
+    "partner": 6.83,
+    "rivals": [
+     [
+      "ride",
+      5.59
+     ],
+     [
+      "rope",
+      5.74
+     ],
+     [
+      "load",
+      6.83
+     ]
+    ]
+   }
+  },
+  "leaf": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈif.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 4.22,
+    "partner": 5.64,
+    "rivals": [
+     [
+      "leap",
+      4.61
+     ],
+     [
+      "beef",
+      5.28
+     ],
+     [
+      "thief",
+      5.81
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈif.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 4.74,
+    "partner": 6.36,
+    "rivals": [
+     [
+      "beef",
+      5.11
+     ],
+     [
+      "thief",
+      5.54
+     ],
+     [
+      "life",
+      6.01
+     ]
+    ]
+   }
+  },
+  "leave": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "lˈiv.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.47,
+    "partner": 4.42,
+    "rivals": [
+     [
+      "live",
+      4.82
+     ],
+     [
+      "leaf",
+      4.94
+     ],
+     [
+      "leap",
+      5.49
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "lˈiv.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 6.15,
+    "partner": 3.58,
+    "rivals": [
+     [
+      "live",
+      3.68
+     ],
+     [
+      "leaf",
+      5.76
+     ],
+     [
+      "lead",
+      6.18
+     ]
+    ]
+   }
+  },
+  "car": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɑɹ.",
+    "speed": 0.85,
+    "secs": 0.6,
+    "grade": "strict",
+    "ahead": 6.95,
+    "partner": 7.21,
+    "rivals": [
+     [
+      "care",
+      6.96
+     ],
+     [
+      "card",
+      7.21
+     ],
+     [
+      "cart",
+      7.59
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɑɹ.",
+    "speed": 0.75,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 5.61,
+    "partner": 4.84,
+    "rivals": [
+     [
+      "card",
+      5.12
+     ],
+     [
+      "cart",
+      5.98
+     ],
+     [
+      "care",
+      7.14
+     ]
+    ]
+   }
+  },
+  "card": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɑɹd.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 6.13,
+    "partner": 13.35,
+    "rivals": [
+     [
+      "guard",
+      6.13
+     ],
+     [
+      "cart",
+      6.36
+     ],
+     [
+      "cord",
+      8.21
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɑɹd.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.21,
+    "partner": 11.57,
+    "rivals": [
+     [
+      "cart",
+      6.23
+     ],
+     [
+      "guard",
+      6.33
+     ],
+     [
+      "cord",
+      6.66
+     ]
+    ]
+   }
+  },
+  "why": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈI.",
+    "speed": 0.85,
+    "secs": 0.58,
+    "grade": "strict",
+    "ahead": 5.77,
+    "partner": 6.59,
+    "rivals": [
+     [
+      "by",
+      5.77
+     ],
+     [
+      "lie",
+      6.36
+     ],
+     [
+      "white",
+      6.59
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈI.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 5.84,
+    "partner": 5.67,
+    "rivals": [
+     [
+      "white",
+      6.01
+     ],
+     [
+      "by",
+      6.12
+     ],
+     [
+      "lie",
+      6.86
+     ]
+    ]
+   }
+  },
+  "white": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.83,
+    "partner": 9.74,
+    "rivals": [
+     [
+      "light",
+      7.9
+     ],
+     [
+      "height",
+      8.62
+     ],
+     [
+      "bite",
+      8.83
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈIt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.78,
+    "partner": 9.76,
+    "rivals": [
+     [
+      "light",
+      7.95
+     ],
+     [
+      "height",
+      8.05
+     ],
+     [
+      "wait",
+      8.4
+     ]
+    ]
+   }
+  },
+  "play": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈA.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.64,
+    "partner": 8.52,
+    "rivals": [
+     [
+      "clay",
+      6.74
+     ],
+     [
+      "player",
+      7.03
+     ],
+     [
+      "lay",
+      7.79
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈA.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 6.42,
+    "partner": 8.31,
+    "rivals": [
+     [
+      "clay",
+      6.42
+     ],
+     [
+      "plea",
+      7.85
+     ],
+     [
+      "pay",
+      7.88
+     ]
+    ]
+   }
+  },
+  "plate": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈAt.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.76,
+    "partner": 8.81,
+    "rivals": [
+     [
+      "place",
+      6.19
+     ],
+     [
+      "plague",
+      7.47
+     ],
+     [
+      "plane",
+      8.68
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈAt.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 7.2,
+    "partner": 10.66,
+    "rivals": [
+     [
+      "place",
+      7.2
+     ],
+     [
+      "late",
+      8.5
+     ],
+     [
+      "plague",
+      8.51
+     ]
+    ]
+   }
+  },
+  "I need a card, not a car.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI nˈid ɐ kˈɑɹd, nˌɑt ɐ kˈɑɹ.",
+    "speed": 0.9,
+    "secs": 1.69,
+    "grade": "strict",
+    "heard": "I need a card, not a car."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI nˈid ɐ kˈɑɹd, nˌɑt ɐ kˈɑɹ.",
+    "speed": 0.9,
+    "secs": 1.69,
+    "grade": "strict",
+    "heard": "I need a card, not a car."
+   }
+  },
+  "Put the bag on your back.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˌʊt ðə bˈæɡ ˌɔn jʊɹ bˈæk.",
+    "speed": 0.9,
+    "secs": 1.38,
+    "grade": "strict",
+    "heard": "Put the bag on your back"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˌʊt ðə bˈæɡ ˌɔn jʊɹ bˈæk.",
+    "speed": 0.9,
+    "secs": 1.47,
+    "grade": "strict",
+    "heard": "Put the bag on your back"
+   }
+  },
+  "Please save a seat for me.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈiz sˈAv ɐ sˈit fɔɹ mˌi.",
+    "speed": 0.9,
+    "secs": 1.47,
+    "grade": "strict",
+    "heard": "Please save a seat for me."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈiz sˈAv ɐ sˈit fɔɹ mˌi.",
+    "speed": 0.9,
+    "secs": 1.45,
+    "grade": "strict",
+    "heard": "Please save a seat for me."
+   }
+  }
+ },
+ "p10": {
+  "walked": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɔkt.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 9.9,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "walk",
+      10.2
+     ],
+     [
+      "want",
+      13.71
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɔkt.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 9.61,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "walk",
+      9.89
+     ],
+     [
+      "want",
+      13.49
+     ]
+    ]
+   }
+  },
+  "washed": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɔʃt.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 6.07,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "wash",
+      6.07
+     ],
+     [
+      "want",
+      12.36
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɔʃt.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 6.45,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "wash",
+      6.83
+     ],
+     [
+      "want",
+      12.25
+     ]
+    ]
+   }
+  },
+  "stopped": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "stˈɑpt.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 5.14,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "stop",
+      5.19
+     ],
+     [
+      "start",
+      11.15
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "stˈɑpt.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 5.1,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "stop",
+      5.34
+     ],
+     [
+      "start",
+      11.09
+     ]
+    ]
+   }
+  },
+  "helped": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈɛlpt.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 7.96,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "help",
+      8.22
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˈɛlpt.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 7.67,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "help",
+      7.89
+     ]
+    ]
+   }
+  },
+  "played": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "plˈAd.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 9.07,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "blade",
+      9.07
+     ],
+     [
+      "play",
+      9.5
+     ],
+     [
+      "plead",
+      9.52
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈAd.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 6.95,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "plead",
+      6.95
+     ],
+     [
+      "blade",
+      7.3
+     ],
+     [
+      "plate",
+      7.52
+     ]
+    ]
+   }
+  },
+  "called": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɔld.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 6.79,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cold",
+      6.87
+     ],
+     [
+      "call",
+      7.02
+     ],
+     [
+      "bald",
+      8.0
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɔld.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 3.94,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cold",
+      4.79
+     ],
+     [
+      "call",
+      7.52
+     ],
+     [
+      "bald",
+      7.85
+     ]
+    ]
+   }
+  },
+  "cleaned": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "klˈind.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 9.79,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "clean",
+      10.08
+     ],
+     [
+      "cleaner",
+      11.95
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "klˈind.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 10.4,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "clean",
+      11.28
+     ],
+     [
+      "cleaner",
+      13.06
+     ]
+    ]
+   }
+  },
+  "moved": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˈuvd.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 7.87,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "move",
+      8.07
+     ],
+     [
+      "movie",
+      11.5
+     ],
+     [
+      "mood",
+      11.71
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˈuvd.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 9.99,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "move",
+      9.99
+     ],
+     [
+      "mood",
+      10.81
+     ],
+     [
+      "movie",
+      11.46
+     ]
+    ]
+   }
+  },
+  "wanted": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɑntᵻd.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "Wanted"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɑntᵻd.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Wanted"
+   }
+  },
+  "needed": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈidᵻd.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 11.47,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "needle",
+      12.55
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈidᵻd.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 11.6,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "needle",
+      11.6
+     ]
+    ]
+   }
+  },
+  "started": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "stˈɑɹɾᵻd.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "Started."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "stˈɑɹɾᵻd.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "started"
+   }
+  },
+  "visited": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɪzɪɾᵻd.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "heard": "Visited."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɪzɪɾᵻd.",
+    "speed": 0.97,
+    "secs": 0.75,
+    "grade": "strict",
+    "heard": "Visited"
+   }
+  },
+  "cups": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈʌps.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 7.53,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cup",
+      7.78
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈʌps.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 9.21,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cup",
+      9.25
+     ]
+    ]
+   }
+  },
+  "books": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈʊks.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 5.32,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "box",
+      5.6
+     ],
+     [
+      "book",
+      6.88
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈʊks.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "ahead": 6.83,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "book",
+      6.83
+     ],
+     [
+      "box",
+      8.58
+     ]
+    ]
+   }
+  },
+  "cats": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈæts.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 7.06,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cat",
+      7.14
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈæts.",
+    "speed": 0.85,
+    "secs": 0.62,
+    "grade": "strict",
+    "ahead": 5.22,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "cat",
+      6.54
+     ]
+    ]
+   }
+  },
+  "beds": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈɛdz.",
+    "speed": 0.85,
+    "secs": 0.68,
+    "grade": "strict",
+    "ahead": 7.24,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bed",
+      7.34
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɛdz.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 7.84,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bed",
+      7.92
+     ]
+    ]
+   }
+  },
+  "bags": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈæɡz.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "ahead": 9.59,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bag",
+      9.71
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈæɡz.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 10.56,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "bag",
+      10.72
+     ]
+    ]
+   }
+  },
+  "pills": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈɪlz.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 7.92,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "pill",
+      7.92
+     ],
+     [
+      "pillow",
+      13.46
+     ],
+     [
+      "pillar",
+      14.99
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈɪlz.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 9.05,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "pill",
+      9.85
+     ],
+     [
+      "pillar",
+      13.47
+     ],
+     [
+      "pillow",
+      17.24
+     ]
+    ]
+   }
+  },
+  "nurses": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈɜɹsᵻz.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "ahead": 12.56,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "versus",
+      12.72
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈɜɹsᵻz.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 11.86,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "versus",
+      11.86
+     ]
+    ]
+   }
+  },
+  "watches": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈɑʧᵻz.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "heard": "Watches"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈɑʧᵻz.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "heard": "watches"
+   }
+  },
+  "boxes": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bˈɑksᵻz.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "ahead": 8.45,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "boxing",
+      8.48
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bˈɑksᵻz.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "ahead": 6.69,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "boxing",
+      6.69
+     ]
+    ]
+   }
+  },
+  "She walked to the ward and checked the beds.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˌi wˈɔkt tə ðə wˈɔɹd ænd ʧˈɛkt ðə bˈɛdz.",
+    "speed": 0.9,
+    "secs": 2.11,
+    "grade": "strict",
+    "heard": "She walked to the ward and checked the beds."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˌi wˈɔkt tə ðə wˈɔɹd ænd ʧˈɛkt ðə bˈɛdz.",
+    "speed": 0.9,
+    "secs": 2.09,
+    "grade": "strict",
+    "heard": "She walked to the ward and checked the beds."
+   }
+  },
+  "He needed help, so I called the doctor.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˌi nˈidᵻd hˈɛlp, sˌO ˌI kˈɔld ðə dˈɑktəɹ.",
+    "speed": 0.9,
+    "secs": 2.3,
+    "grade": "strict",
+    "heard": "He needed help so I called the doctor"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "hˌi nˈidᵻd hˈɛlp, sˌO ˌI kˈɔld ðə dˈɑktəɹ.",
+    "speed": 0.9,
+    "secs": 2.13,
+    "grade": "strict",
+    "heard": "He needed help so I called the doctor"
+   }
+  },
+  "The nurses washed their hands.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə nˈɜɹsᵻz wˈɔʃt ðɛɹ hˈændz.",
+    "speed": 0.8,
+    "secs": 1.94,
+    "grade": "strict",
+    "heard": "The nurses washed their hands."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə nˈɜɹsᵻz wˈɔʃt ðɛɹ hˈændz.",
+    "speed": 0.9,
+    "secs": 1.75,
+    "grade": "strict",
+    "heard": "The nurses washed their hands."
+   }
+  }
+ },
+ "p11": {
+  "hospital": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "hˈɑspˌɪɾᵊl.",
+    "speed": 0.85,
+    "secs": 1.02,
+    "grade": "strict",
+    "heard": "hospital"
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "hˈɑspˌɪɾᵊl.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "HOSPITAL"
+   }
+  },
+  "medicine": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˈɛdəsᵊn.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "Medicine"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˈɛdəsᵊn.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "heard": "Medicine."
+   }
+  },
+  "patient": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈAʃənt.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "ahead": 3.16,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "patience",
+      3.16
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈAʃənt.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 2.68,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "patience",
+      2.71
+     ]
+    ]
+   }
+  },
+  "doctor": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈɑktəɹ.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "ahead": 8.37,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "daughter",
+      8.54
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈɑktəɹ.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 8.72,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "daughter",
+      8.77
+     ]
+    ]
+   }
+  },
+  "temperature": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈɛmpəɹəʧəɹ.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "heard": "Temperature"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈɛmpəɹəʧəɹ.",
+    "speed": 0.85,
+    "secs": 1.07,
+    "grade": "strict",
+    "heard": "temperature"
+   }
+  },
+  "today": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tədˈA.",
+    "speed": 0.85,
+    "secs": 0.64,
+    "grade": "strict",
+    "heard": "today."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tədˈA.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "today."
+   }
+  },
+  "because": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bəkˈʌz.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 8.29,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "become",
+      8.37
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bəkˈʌz.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 7.71,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "become",
+      7.71
+     ]
+    ]
+   }
+  },
+  "allergic": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "əlˈɜɹʤɪk.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "Allergic."
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "əlˈɜɹʤɪk.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "heard": "Allergic"
+   }
+  },
+  "injection": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɪnʤˈɛkʃən.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "ahead": 10.5,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "infection",
+      10.53
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɪnʤˈɛkʃən.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "ahead": 9.89,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "infection",
+      10.38
+     ]
+    ]
+   }
+  },
+  "important": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɪmpˈɔɹtᵊnt.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 4.31,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "importance",
+      4.58
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɪmpˈɔɹtᵊnt.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "ahead": 5.37,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "importance",
+      5.37
+     ]
+    ]
+   }
+  },
+  "information": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɪnfəɹmˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "Information."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌɪnfəɹmˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.15,
+    "grade": "strict",
+    "heard": "Information"
+   }
+  },
+  "understand": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌʌndəɹstˈænd.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Understand."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌʌndəɹstˈænd.",
+    "speed": 0.85,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "Understand."
+   }
+  },
+  "The patient is in the hospital today.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə pˈAʃənt ɪz ɪn ðə hˈɑspˌɪɾᵊl tədˈA.",
+    "speed": 0.9,
+    "secs": 2.28,
+    "grade": "strict",
+    "heard": "The patient is in the hospital today."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə pˈAʃənt ɪz ɪn ðə hˈɑspˌɪɾᵊl tədˈA.",
+    "speed": 0.9,
+    "secs": 2.18,
+    "grade": "strict",
+    "heard": "The patient is in the hospital today."
+   }
+  },
+  "I am allergic to this medicine.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI ɐm əlˈɜɹʤɪk tə ðɪs mˈɛdəsᵊn.",
+    "speed": 0.9,
+    "secs": 1.81,
+    "grade": "strict",
+    "heard": "I am allergic to this medicine."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI ɐm əlˈɜɹʤɪk tə ðɪs mˈɛdəsᵊn.",
+    "speed": 0.9,
+    "secs": 1.79,
+    "grade": "strict",
+    "heard": "I am allergic to this medicine."
+   }
+  },
+  "It is important to understand the information.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɪt ɪz ɪmpˈɔɹtᵊnt tʊ ˌʌndəɹstˈænd ði ˌɪnfəɹmˈAʃən.",
+    "speed": 0.9,
+    "secs": 2.67,
+    "grade": "strict",
+    "heard": "It is important to understand the information."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌɪt ɪz ɪmpˈɔɹtᵊnt tʊ ˌʌndəɹstˈænd ði ˌɪnfəɹmˈAʃən.",
+    "speed": 0.9,
+    "secs": 2.45,
+    "grade": "strict",
+    "heard": "It is important to understand the information."
+   }
+  }
+ },
+ "p12": {
+  "I can swim.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI kən swˈɪm.",
+    "speed": 0.9,
+    "secs": 1.0,
+    "grade": "strict",
+    "partner": 11.71,
+    "heard": "I can swim."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI kən swˈɪm.",
+    "speed": 0.9,
+    "secs": 1.02,
+    "grade": "strict",
+    "partner": 12.32,
+    "heard": "I can swim."
+   }
+  },
+  "I can't swim.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI kˈænt swˈɪm.",
+    "speed": 0.9,
+    "secs": 1.07,
+    "grade": "strict",
+    "partner": 6.27,
+    "heard": "I can't swim."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI kˈænt swˈɪm.",
+    "speed": 0.9,
+    "secs": 1.11,
+    "grade": "strict",
+    "partner": 6.47,
+    "heard": "I can't swim."
+   }
+  },
+  "She can walk.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˌi kən wˈɔk.",
+    "speed": 0.9,
+    "secs": 0.96,
+    "grade": "strict",
+    "partner": 10.29,
+    "heard": "She can walk."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˌi kən wˈɔk.",
+    "speed": 0.9,
+    "secs": 0.98,
+    "grade": "strict",
+    "partner": 10.2,
+    "heard": "She can walk."
+   }
+  },
+  "She can't walk.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʃˌi kˈænt wˈɔk.",
+    "speed": 0.9,
+    "secs": 1.07,
+    "grade": "strict",
+    "partner": 6.8,
+    "heard": "She can't walk."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʃˌi kˈænt wˈɔk.",
+    "speed": 0.9,
+    "secs": 1.09,
+    "grade": "strict",
+    "partner": 6.97,
+    "heard": "She can't walk"
+   }
+  },
+  "thirteen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˌɜɹtˈin.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 7.6,
+    "rivals": [
+     [
+      "thirty",
+      7.68
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˌɜɹtˈin.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 7.32,
+    "rivals": [
+     [
+      "thirty",
+      7.7
+     ]
+    ]
+   }
+  },
+  "thirty": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θˈɜɹɾi.",
+    "speed": 0.85,
+    "secs": 0.66,
+    "grade": "strict",
+    "ahead": 6.54,
+    "partner": 8.54,
+    "rivals": [
+     [
+      "dirty",
+      6.54
+     ],
+     [
+      "third",
+      7.92
+     ],
+     [
+      "thirteen",
+      8.54
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θˈɜɹɾi.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 6.57,
+    "partner": 8.04,
+    "rivals": [
+     [
+      "dirty",
+      6.75
+     ],
+     [
+      "third",
+      7.96
+     ],
+     [
+      "thirteen",
+      8.04
+     ]
+    ]
+   }
+  },
+  "fourteen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˌɔɹtˈin.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 8.7,
+    "rivals": [
+     [
+      "forty",
+      8.87
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˌɔɹtˈin.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 8.0,
+    "rivals": [
+     [
+      "forty",
+      8.48
+     ]
+    ]
+   }
+  },
+  "forty": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈɔɹɾi.",
+    "speed": 0.85,
+    "secs": 0.7,
+    "grade": "strict",
+    "ahead": 10.45,
+    "partner": 10.62,
+    "rivals": [
+     [
+      "fort",
+      10.45
+     ],
+     [
+      "fourteen",
+      10.62
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈɔɹɾi.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 10.6,
+    "partner": 10.28,
+    "rivals": [
+     [
+      "fourteen",
+      10.37
+     ],
+     [
+      "fort",
+      10.6
+     ]
+    ]
+   }
+  },
+  "fifteen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˌɪftˈin.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 6.94,
+    "rivals": [
+     [
+      "fifty",
+      6.94
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˌɪftˈin.",
+    "speed": 0.85,
+    "secs": 0.94,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 6.15,
+    "rivals": [
+     [
+      "fifty",
+      6.15
+     ]
+    ]
+   }
+  },
+  "fifty": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "fˈɪfti.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 8.62,
+    "rivals": [
+     [
+      "fifteen",
+      8.62
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "fˈɪfti.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 8.27,
+    "rivals": [
+     [
+      "fifteen",
+      8.33
+     ]
+    ]
+   }
+  },
+  "sixteen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˌɪkstˈin.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 5.61,
+    "rivals": [
+     [
+      "sixty",
+      5.67
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˌɪkstˈin.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 5.63,
+    "rivals": [
+     [
+      "sixty",
+      5.9
+     ]
+    ]
+   }
+  },
+  "sixty": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪksti.",
+    "speed": 0.85,
+    "secs": 0.79,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 8.06,
+    "rivals": [
+     [
+      "sixteen",
+      8.31
+     ]
+    ]
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɪksti.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "ahead": 9.0,
+    "partner": 7.17,
+    "rivals": [
+     [
+      "sixteen",
+      7.51
+     ]
+    ]
+   }
+  },
+  "I want to go home.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI wˈɑnt tə ɡˌO hˈOm.",
+    "speed": 0.9,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "I want to go home."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI wˈɑnt tə ɡˌO hˈOm.",
+    "speed": 0.9,
+    "secs": 1.28,
+    "grade": "strict",
+    "heard": "I want to go home."
+   }
+  },
+  "A cup of tea, please.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɐ kˈʌp ʌv tˈi, plˈiz.",
+    "speed": 0.9,
+    "secs": 1.43,
+    "grade": "strict",
+    "heard": "A cup of tea, please."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɐ kˈʌp ʌv tˈi, plˈiz.",
+    "speed": 0.9,
+    "secs": 1.41,
+    "grade": "strict",
+    "heard": "A cup of tea, please."
+   }
+  },
+  "Take it twice a day.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈAk ɪt twˈIs ɐ dˈA.",
+    "speed": 0.9,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "Take it twice a day."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈAk ɪt twˈIs ɐ dˈA.",
+    "speed": 0.9,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "Take it twice a day"
+   }
+  }
+ },
+ "p13": {
+  "an apple": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɐn ˈæpᵊl.",
+    "speed": 0.9,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "an apple."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɐn ˈæpᵊl.",
+    "speed": 1.02,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "an apple"
+   }
+  },
+  "turn it off": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈɜɹn ɪɾ ˈɔf.",
+    "speed": 0.9,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Turn it off."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈɜɹn ɪɾ ˈɔf.",
+    "speed": 0.9,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Turn it off"
+   }
+  },
+  "check it out": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ʧˈɛk ɪɾ ˈWt.",
+    "speed": 0.9,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "Check it out."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ʧˈɛk ɪɾ ˈWt.",
+    "speed": 0.9,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Check it out!"
+   }
+  },
+  "pick it up": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pˈɪk ɪɾ ˈʌp.",
+    "speed": 0.9,
+    "secs": 0.83,
+    "grade": "strict",
+    "heard": "Pick it up"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pˈɪk ɪɾ ˈʌp.",
+    "speed": 0.9,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Pick it up."
+   }
+  },
+  "not at all": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˌɑɾ əɾ ˈɔl.",
+    "speed": 0.9,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "Not at all."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˌɑɾ əɾ ˈɔl.",
+    "speed": 0.9,
+    "secs": 0.94,
+    "grade": "strict",
+    "heard": "Not at all."
+   }
+  },
+  "a lot of water": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɐ lˈɑɾ əv wˈɔɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "A lot of water."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɐ lˈɑɾ əv wˈɔɾəɹ.",
+    "speed": 1.02,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "A lot of water."
+   }
+  },
+  "sit up": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɪɾ ˈʌp.",
+    "speed": 0.9,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "Sit up."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɪɾ ˈʌp.",
+    "speed": 1.02,
+    "secs": 0.75,
+    "grade": "strict",
+    "heard": "Sit up."
+   }
+  },
+  "in an hour": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɪn ɐn ˈWəɹ.",
+    "speed": 0.9,
+    "secs": 0.81,
+    "grade": "strict",
+    "heard": "in an hour."
+   },
+   "m": {
+    "voice": "am_fenrir",
+    "phonemes": "ˌɪn ɐn ˈWəɹ.",
+    "speed": 0.9,
+    "secs": 0.81,
+    "grade": "strict",
+    "heard": "in an hour."
+   }
+  },
+  "What is it?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˈʌɾ ɪz ɪt?",
+    "speed": 0.9,
+    "secs": 0.79,
+    "grade": "strict",
+    "heard": "What is it?"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "wˈʌɾ ɪz ɪt?",
+    "speed": 0.9,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "What is it?"
+   }
+  },
+  "Can you turn it off?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kən ju tˈɜɹn ɪɾ ˈɔf?",
+    "speed": 0.9,
+    "secs": 1.09,
+    "grade": "strict",
+    "heard": "Can you turn it off?"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kən ju tˈɜɹn ɪɾ ˈɔf?",
+    "speed": 0.9,
+    "secs": 1.24,
+    "grade": "strict",
+    "heard": "Can you turn it off?"
+   }
+  },
+  "Drink a lot of water.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dɹˈɪŋk ɐ lˈɑɾ əv wˈɔɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.34,
+    "grade": "strict",
+    "heard": "Drink a lot of water."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dɹˈɪŋk ɐ lˈɑɾ əv wˈɔɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.43,
+    "grade": "strict",
+    "heard": "Drink a lot of water."
+   }
+  },
+  "I will check it out in an hour.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌI wɪl ʧˈɛk ɪɾ ˈWt ɪn ɐn ˈWəɹ.",
+    "speed": 0.9,
+    "secs": 1.58,
+    "grade": "strict",
+    "heard": "I will check it out in an hour."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌI wɪl ʧˈɛk ɪɾ ˈWt ɪn ɐn ˈWəɹ.",
+    "speed": 0.9,
+    "secs": 1.6,
+    "grade": "strict",
+    "heard": "I will check it out in an hour."
+   }
+  }
+ },
+ "p14": {
+  "Are you okay?": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ˌɑɹ ju ˌOkˈA?",
+    "speed": 0.9,
+    "secs": 0.85,
+    "grade": "strict",
+    "heard": "Are you okay?",
+    "pitch": "rises +3.1 st (end raised by resynthesis; was -1.4)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "ˌɑɹ ju ˌOkˈA?",
+    "speed": 0.9,
+    "secs": 0.93,
+    "grade": "strict",
+    "heard": "Are you okay?",
+    "pitch": "rises +3.3 st (end raised by resynthesis; was -4.6)"
+   }
+  },
+  "Do you have any pain?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈu ju hæv ˈɛni pˈAn?",
+    "speed": 0.9,
+    "secs": 1.14,
+    "grade": "strict",
+    "heard": "Do you have any pain?",
+    "pitch": "rises +4.5 st (end raised by resynthesis; was +0.5)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "dˈu ju hæv ˈɛni pˈAn?",
+    "speed": 0.9,
+    "secs": 1.18,
+    "grade": "strict",
+    "heard": "Do you have any pain?",
+    "pitch": "rises +4.3 st (end raised by resynthesis; was -8.2)"
+   }
+  },
+  "Can you walk?": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "kˌæn ju wˈɔk?",
+    "speed": 0.9,
+    "secs": 0.73,
+    "grade": "strict",
+    "heard": "Can you walk?",
+    "pitch": "rises +3.5 st (end raised by resynthesis; was -3.2)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "kˌæn ju wˈɔk?",
+    "speed": 0.9,
+    "secs": 0.74,
+    "grade": "strict",
+    "heard": "Can you walk?",
+    "pitch": "rises +3.3 st (end raised by resynthesis; was -7.6)"
+   }
+  },
+  "Where does it hurt?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˌɛɹ dˈʌz ɪt hˈɜɹt?",
+    "speed": 0.9,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "Where does it hurt?",
+    "pitch": "falls -4.4 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "wˌɛɹ dˈʌz ɪt hˈɜɹt?",
+    "speed": 0.9,
+    "secs": 1.34,
+    "grade": "strict",
+    "heard": "Where does it hurt?",
+    "pitch": "falls -6.1 st (as synthesised)"
+   }
+  },
+  "What is your name?": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "wˌʌt ɪz jʊɹ nˈAm?",
+    "speed": 1.0,
+    "secs": 0.94,
+    "grade": "strict",
+    "heard": "What is your name?",
+    "pitch": "falls -1.6 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "wˌʌt ɪz jʊɹ nˈAm?",
+    "speed": 0.9,
+    "secs": 1.23,
+    "grade": "strict",
+    "heard": "What is your name?",
+    "pitch": "falls -2.4 st (as synthesised)"
+   }
+  },
+  "I feel much better.": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "ˌI fˈil mˈʌʧ bˈɛɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.37,
+    "grade": "strict",
+    "heard": "I feel much better.",
+    "pitch": "falls -1.8 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "ˌI fˈil mˈʌʧ bˈɛɾəɹ.",
+    "speed": 0.9,
+    "secs": 1.56,
+    "grade": "strict",
+    "heard": "I feel much better.",
+    "pitch": "falls -4.1 st (as synthesised)"
+   }
+  },
+  "Please sit down.": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "plˈiz sˈɪt dˌWn.",
+    "speed": 0.82,
+    "secs": 1.32,
+    "grade": "strict",
+    "heard": "Please sit down.",
+    "pitch": "falls -2.3 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "plˈiz sˈɪt dˌWn.",
+    "speed": 0.9,
+    "secs": 1.38,
+    "grade": "strict",
+    "heard": "Please sit down.",
+    "pitch": "falls -5.7 st (as synthesised)"
+   }
+  },
+  "Do you take any medicine?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈu ju tˈAk ˈɛni mˈɛdəsᵊn?",
+    "speed": 0.9,
+    "secs": 1.32,
+    "grade": "strict",
+    "heard": "Do you take any medicine?",
+    "pitch": "rises +5.3 st (end raised by resynthesis; was +1.2)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "dˈu ju tˈAk ˈɛni mˈɛdəsᵊn?",
+    "speed": 1.0,
+    "secs": 1.33,
+    "grade": "strict",
+    "heard": "Do you take any medicine?",
+    "pitch": "rises +4.8 st (end raised by resynthesis; was -4.8)"
+   }
+  },
+  "What time is it?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "wˌʌt tˈIm ɪz ɪt?",
+    "speed": 0.9,
+    "secs": 1.05,
+    "grade": "strict",
+    "heard": "What time is it?",
+    "pitch": "falls -2.9 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "wˌʌt tˈIm ɪz ɪt?",
+    "speed": 0.9,
+    "secs": 1.28,
+    "grade": "strict",
+    "heard": "What time is it?",
+    "pitch": "falls -2.3 st (as synthesised)"
+   }
+  },
+  "Are you ready?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɑɹ ju ɹˈɛdi?",
+    "speed": 0.9,
+    "secs": 0.71,
+    "grade": "strict",
+    "heard": "Are you ready?",
+    "pitch": "rises +3.5 st (end raised by resynthesis; was -1.3)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "ˌɑɹ ju ɹˈɛdi?",
+    "speed": 0.9,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Are you ready?",
+    "pitch": "rises +3.4 st (end raised by resynthesis; was -5.0)"
+   }
+  },
+  "Are you allergic to any medicine?": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɑɹ ju əlˈɜɹʤɪk tʊ ˈɛni mˈɛdəsᵊn?",
+    "speed": 0.9,
+    "secs": 1.79,
+    "grade": "strict",
+    "heard": "Are you allergic to any medicine?",
+    "pitch": "rises +4.6 st (end raised by resynthesis; was +1.1)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "ˌɑɹ ju əlˈɜɹʤɪk tʊ ˈɛni mˈɛdəsᵊn?",
+    "speed": 1.0,
+    "secs": 1.71,
+    "grade": "strict",
+    "heard": "Are you allergic to any medicine?",
+    "pitch": "rises +4.4 st (end raised by resynthesis; was -1.6)"
+   }
+  },
+  "When did the pain start?": {
+   "f": {
+    "voice": "af_heart",
+    "phonemes": "wˌɛn dˈɪd ðə pˈAn stˈɑɹt?",
+    "speed": 1.0,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "When did the pain start?",
+    "pitch": "falls -3.1 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_michael",
+    "phonemes": "wˌɛn dˈɪd ðə pˈAn stˈɑɹt?",
+    "speed": 0.9,
+    "secs": 1.67,
+    "grade": "strict",
+    "heard": "When did the pain start?",
+    "pitch": "falls -4.2 st (as synthesised)"
+   }
+  },
+  "Please take a deep breath.": {
+   "f": {
+    "voice": "af_sarah",
+    "phonemes": "plˈiz tˈAk ɐ dˈip bɹˈɛθ.",
+    "speed": 0.9,
+    "secs": 1.45,
+    "grade": "strict",
+    "heard": "Please take a deep breath.",
+    "pitch": "falls -5.7 st (as synthesised)"
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "plˈiz tˈAk ɐ dˈip bɹˈɛθ.",
+    "speed": 0.9,
+    "secs": 1.51,
+    "grade": "strict",
+    "heard": "Please take a deep breath.",
+    "pitch": "falls -7.5 st (as synthesised)"
+   }
+  }
+ }
+}

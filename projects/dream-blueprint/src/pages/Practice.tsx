@@ -60,6 +60,7 @@ import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
 import GrammarTeach, { GrammarBook } from "../components/GrammarTeach";
 import StoryLibrary from "../components/StoryLibrary";
+import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
 import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
@@ -1146,8 +1147,8 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords" | "grammar" | "story";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords", "grammar", "story"];
+  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords" | "grammar" | "story" | "sound";
+  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords", "grammar", "story", "sound"];
   // #library/story/listen opens the graded passages on that tab.
   const storyFromHash = (): StoryTab => {
     const t = location.hash.startsWith("#library/story/") ? location.hash.split("/")[2] : "";
@@ -1325,6 +1326,7 @@ function Extras({
           [
             ["words", "單字複習"],
             ["grammar", "文法講解"],
+            ["sound", "發音課"],
             ["listen", "句子跟讀"],
             ["translate", "中翻英"],
             ["story", "短文讀聽"],
@@ -1350,6 +1352,7 @@ function Extras({
               key === "passage" ||
               key === "grammar" ||
               key === "story" ||
+              key === "sound" ||
               key === "reading" ||
               key === "nlisten" ||
               key === "nread" ||
@@ -1500,6 +1503,7 @@ function Extras({
       )}
       {mode === "grammar" && <GrammarBook state={state} onActivity={onActivity} date={date} />}
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
+      {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}

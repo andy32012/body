@@ -1,0 +1,1203 @@
+[
+ {
+  "id": "p00",
+  "kind": "table",
+  "title": "音標表：每個符號配一個字",
+  "tag": "KK 音標",
+  "explain": [
+   "字典和課本用音標告訴你一個字怎麼念。台灣學的是 KK 音標，不用背，先知道每個符號大概是什麼聲音，查字典時看得懂就好。",
+   "點每個字聽聲音，跟著念一次。後面的課會一組一組教最容易念錯的音。"
+  ],
+  "items": [
+   {
+    "label": "[i]",
+    "text": "see",
+    "note": "長的「一」，嘴角往兩邊拉"
+   },
+   {
+    "label": "[ɪ]",
+    "text": "sit",
+    "note": "短、放鬆，介於「一」和「ㄝ」之間"
+   },
+   {
+    "label": "[e]",
+    "text": "day",
+    "note": "從「ㄝ」滑到「一」"
+   },
+   {
+    "label": "[ɛ]",
+    "text": "bed",
+    "note": "短的「ㄝ」"
+   },
+   {
+    "label": "[æ]",
+    "text": "cat",
+    "note": "嘴巴張大的「ㄝ」"
+   },
+   {
+    "label": "[ɑ]",
+    "text": "hot",
+    "note": "嘴巴張大說「啊」"
+   },
+   {
+    "label": "[ɔ]",
+    "text": "ball",
+    "note": "嘴唇圓圓的「ㄛ」"
+   },
+   {
+    "label": "[o]",
+    "text": "go",
+    "note": "從「ㄛ」滑到「ㄨ」"
+   },
+   {
+    "label": "[ʊ]",
+    "text": "book",
+    "note": "短、放鬆的「ㄨ」"
+   },
+   {
+    "label": "[u]",
+    "text": "food",
+    "note": "長的「ㄨ」，嘴唇往前嘟"
+   },
+   {
+    "label": "[ʌ]",
+    "text": "sun",
+    "note": "短的、放鬆的「ㄚ」"
+   },
+   {
+    "label": "[ə]",
+    "text": "about",
+    "note": "最輕最短的「ㄜ」（about 的第一個 a）"
+   },
+   {
+    "label": "[ɝ]",
+    "text": "nurse",
+    "note": "捲舌的「ㄜ」（重音）"
+   },
+   {
+    "label": "[ɚ]",
+    "text": "doctor",
+    "note": "捲舌的「ㄜ」（輕音，doctor 的 or）"
+   },
+   {
+    "label": "[aɪ]",
+    "text": "my",
+    "note": "像中文的「ㄞ」（愛）"
+   },
+   {
+    "label": "[aʊ]",
+    "text": "now",
+    "note": "像中文的「ㄠ」（奧）"
+   },
+   {
+    "label": "[ɔɪ]",
+    "text": "boy",
+    "note": "先「ㄛ」再滑到「一」"
+   },
+   {
+    "label": "[θ]",
+    "text": "think",
+    "note": "舌尖放在牙齒中間吹氣"
+   },
+   {
+    "label": "[ð]",
+    "text": "this",
+    "note": "舌尖放在牙齒中間，喉嚨震動"
+   },
+   {
+    "label": "[ʃ]",
+    "text": "she",
+    "note": "像叫人安靜的「噓」"
+   },
+   {
+    "label": "[ʒ]",
+    "text": "usually",
+    "note": "「噓」加上喉嚨震動（usually 中間的 s）"
+   },
+   {
+    "label": "[tʃ]",
+    "text": "chair",
+    "note": "像「ㄑ」，嘴唇往前"
+   },
+   {
+    "label": "[dʒ]",
+    "text": "job",
+    "note": "像「ㄐ」，嘴唇往前、喉嚨震動"
+   },
+   {
+    "label": "[ŋ]",
+    "text": "sing",
+    "note": "「ㄥ」的鼻音，舌根頂住"
+   },
+   {
+    "label": "[j]",
+    "text": "yes",
+    "note": "很短的「一」"
+   },
+   {
+    "label": "[r]",
+    "text": "red",
+    "note": "舌頭往後捲，不碰到任何地方"
+   },
+   {
+    "label": "[l]",
+    "text": "leg",
+    "note": "舌尖頂住上牙齒後面"
+   },
+   {
+    "label": "[v]",
+    "text": "very",
+    "note": "上排牙齒輕咬下嘴唇，喉嚨震動"
+   },
+   {
+    "label": "[z]",
+    "text": "zoo",
+    "note": "s 加上喉嚨震動"
+   }
+  ]
+ },
+ {
+  "id": "p01",
+  "kind": "pairs",
+  "title": "長短音：sheep 和 ship",
+  "tag": "[i] / [ɪ]",
+  "explain": [
+   "[i] 是長音：嘴角往兩邊拉，像微笑，聲音拉長。sheep、eat、sleep 都是這個音。",
+   "[ɪ] 是短音：嘴巴放鬆、稍微開一點，短短帶過，聽起來介於「一」和「ㄝ」之間。ship、it、slip 都是這個音。"
+  ],
+  "tip": "中文只有一個「一」，所以 ship 很容易念成 sheep。念 [ɪ] 的時候不要微笑，嘴巴放鬆就對了。",
+  "pairs": [
+   [
+    "sheep",
+    "ship"
+   ],
+   [
+    "eat",
+    "it"
+   ],
+   [
+    "sleep",
+    "slip"
+   ],
+   [
+    "heat",
+    "hit"
+   ],
+   [
+    "leave",
+    "live"
+   ],
+   [
+    "cheap",
+    "chip"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "I need to sleep a little bit.",
+    "zh": "我需要睡一下。"
+   },
+   {
+    "en": "I feel a little ill.",
+    "zh": "我覺得有點不舒服。"
+   },
+   {
+    "en": "He will leave, but I live here.",
+    "zh": "他會離開，但我住在這裡。"
+   }
+  ]
+ },
+ {
+  "id": "p02",
+  "kind": "pairs",
+  "title": "嘴巴開多大：bed 和 bad",
+  "tag": "[ɛ] / [æ]",
+  "explain": [
+   "[ɛ]：嘴巴半開，像中文的「ㄝ」，短短的。bed、pen、said 都是這個音。",
+   "[æ]：嘴巴張大、嘴角往兩邊拉，下巴往下掉，像要咬一大口蘋果，聲音比較長。bad、pan、sad 都是這個音。"
+  ],
+  "tip": "中文沒有 [æ]，常常念得跟 [ɛ] 一樣。念 [æ] 時下巴要比你習慣的再往下一點。",
+  "pairs": [
+   [
+    "bed",
+    "bad"
+   ],
+   [
+    "pen",
+    "pan"
+   ],
+   [
+    "said",
+    "sad"
+   ],
+   [
+    "guess",
+    "gas"
+   ],
+   [
+    "bet",
+    "bat"
+   ],
+   [
+    "dead",
+    "dad"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "The man said he was sad.",
+    "zh": "那個男人說他很難過。"
+   },
+   {
+    "en": "I had a headache in bed.",
+    "zh": "我躺在床上的時候頭痛。"
+   },
+   {
+    "en": "My pen is in the pan.",
+    "zh": "我的筆在鍋子裡。"
+   }
+  ]
+ },
+ {
+  "id": "p03",
+  "kind": "pairs",
+  "title": "luck 和 lock",
+  "tag": "[ʌ] / [ɑ]",
+  "explain": [
+   "[ʌ]：嘴巴開一點點、放鬆，短短的，介於「ㄚ」和「ㄜ」之間。luck、cup、color 和 stomach 的 o 都是這個音。",
+   "[ɑ]：嘴巴張大，像看醫生時說「啊」，聲音拉長。美式英文的 lock、hot、doctor、not 都是這個音，不是「ㄛ」。"
+  ],
+  "tip": "台灣常把 hot、doctor 的 o 念成「ㄛ」。美式發音是張大嘴的「啊」。",
+  "pairs": [
+   [
+    "luck",
+    "lock"
+   ],
+   [
+    "color",
+    "collar"
+   ],
+   [
+    "come",
+    "calm"
+   ],
+   [
+    "gut",
+    "got"
+   ],
+   [
+    "rubber",
+    "robber"
+   ],
+   [
+    "bucks",
+    "box"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "The doctor is not at lunch.",
+    "zh": "醫師不在吃午餐。"
+   },
+   {
+    "en": "Lock the door, and good luck.",
+    "zh": "把門鎖上，祝你好運。"
+   },
+   {
+    "en": "My stomach hurts a lot.",
+    "zh": "我的胃很痛。"
+   }
+  ]
+ },
+ {
+  "id": "p04",
+  "kind": "pairs",
+  "title": "pool 和 pull",
+  "tag": "[u] / [ʊ]",
+  "explain": [
+   "[u] 是長音：嘴唇圓圓往前嘟，聲音拉長。pool、food、blue 都是這個音。",
+   "[ʊ] 是短音：嘴唇放鬆、只有一點點圓，短短帶過，有點像「ㄜ」加一點「ㄨ」。pull、good、book、foot 都是這個音。"
+  ],
+  "tip": "中文只有一個「ㄨ」，所以 pull 常被念成 pool。念 [ʊ] 時嘴唇不要嘟出去。",
+  "pairs": [
+   [
+    "pool",
+    "pull"
+   ],
+   [
+    "fool",
+    "full"
+   ],
+   [
+    "Luke",
+    "look"
+   ]
+  ],
+  "items": [
+   {
+    "label": "[u]",
+    "text": "food",
+    "note": "長音"
+   },
+   {
+    "label": "[u]",
+    "text": "moon",
+    "note": "長音"
+   },
+   {
+    "label": "[u]",
+    "text": "blue",
+    "note": "長音"
+   },
+   {
+    "label": "[ʊ]",
+    "text": "good",
+    "note": "短音"
+   },
+   {
+    "label": "[ʊ]",
+    "text": "foot",
+    "note": "短音"
+   },
+   {
+    "label": "[ʊ]",
+    "text": "put",
+    "note": "短音"
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Look at the full moon.",
+    "zh": "看那個滿月。"
+   },
+   {
+    "en": "The food is good.",
+    "zh": "食物很好吃。"
+   },
+   {
+    "en": "Put your foot in the boot.",
+    "zh": "把腳放進靴子裡。"
+   }
+  ]
+ },
+ {
+  "id": "p05",
+  "kind": "pairs",
+  "title": "pain 和 pen",
+  "tag": "[e] / [ɛ]",
+  "explain": [
+   "[e] 是會滑動的音：從「ㄝ」滑到「一」，嘴巴會動，聲音比較長。pain、late、wait 都是這個音。",
+   "[ɛ]：嘴巴不動，短短的「ㄝ」。pen、let、wet 都是這個音。"
+  ],
+  "tip": "護理最常說的 pain（痛）不要念成 pen（筆）。念 pain 時要聽得到後面那個小小的「一」。",
+  "pairs": [
+   [
+    "pain",
+    "pen"
+   ],
+   [
+    "late",
+    "let"
+   ],
+   [
+    "wait",
+    "wet"
+   ],
+   [
+    "taste",
+    "test"
+   ],
+   [
+    "gate",
+    "get"
+   ],
+   [
+    "date",
+    "debt"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "Where is the pain?",
+    "zh": "哪裡痛？"
+   },
+   {
+    "en": "Wait, the floor is wet.",
+    "zh": "等一下，地板是濕的。"
+   },
+   {
+    "en": "Take the test later.",
+    "zh": "晚一點再做檢查。"
+   }
+  ]
+ },
+ {
+  "id": "p06",
+  "kind": "pairs",
+  "title": "咬舌音：think 和 sink",
+  "tag": "[θ] [ð] / [s] [t] [d] [z]",
+  "explain": [
+   "[θ] 和 [ð]：舌尖輕輕放在上下牙齒中間（照鏡子看得到舌尖），把氣吹出去。",
+   "[θ] 喉嚨不震動：think、three、mouth、breath。[ð] 喉嚨要震動：this、they、breathe。"
+  ],
+  "tip": "中文沒有咬舌音，常被念成 s、t 或 d：think 變 sink、three 變 tree、they 變 day。舌尖一定要伸到牙齒中間。",
+  "pairs": [
+   [
+    "think",
+    "sink"
+   ],
+   [
+    "thank",
+    "sank"
+   ],
+   [
+    "three",
+    "tree"
+   ],
+   [
+    "then",
+    "den"
+   ],
+   [
+    "breathe",
+    "breeze"
+   ],
+   [
+    "thing",
+    "sing"
+   ],
+   [
+    "thin",
+    "sin"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "Take a deep breath.",
+    "zh": "深呼吸。"
+   },
+   {
+    "en": "Breathe in through your mouth.",
+    "zh": "用嘴巴吸氣。"
+   },
+   {
+    "en": "Thank you for these three things.",
+    "zh": "謝謝你給我這三樣東西。"
+   }
+  ]
+ },
+ {
+  "id": "p07",
+  "kind": "pairs",
+  "title": "light 和 right、night 和 light",
+  "tag": "[l] / [r] / [n]",
+  "explain": [
+   "[l]：舌尖頂住上排牙齒後面的牙齦，氣從舌頭兩邊出去。",
+   "[r]：舌頭往後捲，不碰到任何地方，嘴唇稍微圓。",
+   "[n]：舌尖也頂住牙齦，但是氣從鼻子出來。捏住鼻子就發不出 [n]，可以用這個方法檢查。"
+  ],
+  "tip": "l 和 r、n 和 l 是最常被聽錯的音。念 right 時先把嘴唇嘟圓，舌頭不要碰上面。",
+  "pairs": [
+   [
+    "light",
+    "right"
+   ],
+   [
+    "long",
+    "wrong"
+   ],
+   [
+    "fly",
+    "fry"
+   ],
+   [
+    "collect",
+    "correct"
+   ],
+   [
+    "late",
+    "rate"
+   ],
+   [
+    "play",
+    "pray"
+   ],
+   [
+    "night",
+    "light"
+   ],
+   [
+    "snow",
+    "slow"
+   ],
+   [
+    "net",
+    "let"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "Turn on the light on the right.",
+    "zh": "把右邊的燈打開。"
+   },
+   {
+    "en": "Please read the label.",
+    "zh": "請看一下標籤。"
+   },
+   {
+    "en": "I need a little rest.",
+    "zh": "我需要休息一下。"
+   }
+  ]
+ },
+ {
+  "id": "p08",
+  "kind": "pairs",
+  "title": "very 不是 wery",
+  "tag": "[v] / [w] / [b] / [f]",
+  "explain": [
+   "[v]：上排牙齒輕輕咬住下嘴唇，喉嚨震動。它就是 [f] 加上聲音。",
+   "[w]：嘴唇圓圓嘟起來，牙齒不碰嘴唇。[b]：兩片嘴唇閉起來再彈開。"
+  ],
+  "tip": "中文沒有 [v]，very 常被念成 wery，或把 v 念成 b。牙齒要碰到下嘴唇才是 [v]。",
+  "pairs": [
+   [
+    "vest",
+    "west"
+   ],
+   [
+    "very",
+    "berry"
+   ],
+   [
+    "fan",
+    "van"
+   ],
+   [
+    "vote",
+    "boat"
+   ],
+   [
+    "vent",
+    "went"
+   ],
+   [
+    "verse",
+    "worse"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "I feel very weak.",
+    "zh": "我覺得很虛弱。"
+   },
+   {
+    "en": "Check the vital signs every four hours.",
+    "zh": "每四小時量一次生命徵象。"
+   },
+   {
+    "en": "We have five visitors.",
+    "zh": "我們有五位訪客。"
+   }
+  ]
+ },
+ {
+  "id": "p09",
+  "kind": "pairs",
+  "title": "字尾不要吞掉：back 和 bag",
+  "tag": "字尾子音",
+  "explain": [
+   "中文的字尾幾乎沒有子音，所以很容易把英文字尾吞掉：card 念成 car、white 念成 why。字尾的 p、t、k、b、d、g 要做出嘴型，輕輕帶出來。",
+   "字尾有聲（b、d、g、z、v）時，前面的母音會拉長：bag 的 a 比 back 的 a 長，rise 的 i 比 rice 的 i 長。"
+  ],
+  "tip": "聽不出 back 和 bag 的差別時，先聽母音的長短，再聽字尾。",
+  "pairs": [
+   [
+    "back",
+    "bag"
+   ],
+   [
+    "rice",
+    "rise"
+   ],
+   [
+    "hat",
+    "had"
+   ],
+   [
+    "write",
+    "ride"
+   ],
+   [
+    "wrote",
+    "road"
+   ],
+   [
+    "leaf",
+    "leave"
+   ],
+   [
+    "car",
+    "card"
+   ],
+   [
+    "why",
+    "white"
+   ],
+   [
+    "play",
+    "plate"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "I need a card, not a car.",
+    "zh": "我需要一張卡片，不是一輛車。"
+   },
+   {
+    "en": "Put the bag on your back.",
+    "zh": "把袋子背在背上。"
+   },
+   {
+    "en": "Please save a seat for me.",
+    "zh": "請幫我留一個位子。"
+   }
+  ]
+ },
+ {
+  "id": "p10",
+  "kind": "endings",
+  "title": "-ed 和 -s 的三種念法",
+  "tag": "[t] [d] [ɪd]、[s] [z] [ɪz]",
+  "explain": [
+   "-ed：前面是無聲的音（p、k、f、s、sh、ch）念 [t]；前面是有聲的音（母音、b、g、l、m、n、v、z）念 [d]；前面是 t 或 d 時多一個音節，念 [ɪd]。",
+   "-s 也一樣：無聲的後面念 [s]，有聲的後面念 [z]；s、z、sh、ch、x 後面多一個音節，念 [ɪz]。"
+  ],
+  "tip": "最常見的錯：把 walked 念成兩個音節（walk-id）。只有 t、d 後面才多一個音節。",
+  "items": [
+   {
+    "label": "[t]",
+    "text": "walked",
+    "note": "walk 的 k 無聲"
+   },
+   {
+    "label": "[t]",
+    "text": "washed",
+    "note": "sh 無聲"
+   },
+   {
+    "label": "[t]",
+    "text": "stopped",
+    "note": "p 無聲"
+   },
+   {
+    "label": "[t]",
+    "text": "helped",
+    "note": "p 無聲"
+   },
+   {
+    "label": "[d]",
+    "text": "played",
+    "note": "母音後面"
+   },
+   {
+    "label": "[d]",
+    "text": "called",
+    "note": "l 有聲"
+   },
+   {
+    "label": "[d]",
+    "text": "cleaned",
+    "note": "n 有聲"
+   },
+   {
+    "label": "[d]",
+    "text": "moved",
+    "note": "v 有聲"
+   },
+   {
+    "label": "[ɪd]",
+    "text": "wanted",
+    "note": "t 後面"
+   },
+   {
+    "label": "[ɪd]",
+    "text": "needed",
+    "note": "d 後面"
+   },
+   {
+    "label": "[ɪd]",
+    "text": "started",
+    "note": "t 後面"
+   },
+   {
+    "label": "[ɪd]",
+    "text": "visited",
+    "note": "t 後面"
+   },
+   {
+    "label": "[s]",
+    "text": "cups",
+    "note": "p 無聲"
+   },
+   {
+    "label": "[s]",
+    "text": "books",
+    "note": "k 無聲"
+   },
+   {
+    "label": "[s]",
+    "text": "cats",
+    "note": "t 無聲"
+   },
+   {
+    "label": "[z]",
+    "text": "beds",
+    "note": "d 有聲"
+   },
+   {
+    "label": "[z]",
+    "text": "bags",
+    "note": "g 有聲"
+   },
+   {
+    "label": "[z]",
+    "text": "pills",
+    "note": "l 有聲"
+   },
+   {
+    "label": "[ɪz]",
+    "text": "nurses",
+    "note": "s 後面"
+   },
+   {
+    "label": "[ɪz]",
+    "text": "watches",
+    "note": "ch 後面"
+   },
+   {
+    "label": "[ɪz]",
+    "text": "boxes",
+    "note": "x 後面"
+   }
+  ],
+  "sentences": [
+   {
+    "en": "She walked to the ward and checked the beds.",
+    "zh": "她走到病房，檢查了床位。"
+   },
+   {
+    "en": "He needed help, so I called the doctor.",
+    "zh": "他需要幫忙，所以我打給醫師。"
+   },
+   {
+    "en": "The nurses washed their hands.",
+    "zh": "護理師們洗了手。"
+   }
+  ]
+ },
+ {
+  "id": "p11",
+  "kind": "stress",
+  "title": "單字重音：HOSpital",
+  "tag": "重音",
+  "explain": [
+   "兩個音節以上的英文字，都有一個音節特別大聲、特別長、音調也比較高，其他音節變輕變短（常常變成 [ə]）。",
+   "重音放錯，母語人士常常聽不懂，比母音念不準還嚴重。查字典時，重音符號 ˋ 或 ˈ 後面那個音節就是重音。"
+  ],
+  "tip": "小訣竅：-tion 結尾的字，重音在它前面那個音節（inforMAtion、inJECtion）。",
+  "items": [
+   {
+    "label": "HOS·pi·tal",
+    "text": "hospital",
+    "note": "醫院"
+   },
+   {
+    "label": "MED·i·cine",
+    "text": "medicine",
+    "note": "藥"
+   },
+   {
+    "label": "PA·tient",
+    "text": "patient",
+    "note": "病人"
+   },
+   {
+    "label": "DOC·tor",
+    "text": "doctor",
+    "note": "醫師"
+   },
+   {
+    "label": "TEM·per·a·ture",
+    "text": "temperature",
+    "note": "體溫（口語常念成三個音節 TEM-pra-chur）"
+   },
+   {
+    "label": "to·DAY",
+    "text": "today",
+    "note": "今天"
+   },
+   {
+    "label": "be·CAUSE",
+    "text": "because",
+    "note": "因為"
+   },
+   {
+    "label": "al·LER·gic",
+    "text": "allergic",
+    "note": "過敏的"
+   },
+   {
+    "label": "in·JEC·tion",
+    "text": "injection",
+    "note": "注射"
+   },
+   {
+    "label": "im·POR·tant",
+    "text": "important",
+    "note": "重要的"
+   },
+   {
+    "label": "in·for·MA·tion",
+    "text": "information",
+    "note": "資訊"
+   },
+   {
+    "label": "un·der·STAND",
+    "text": "understand",
+    "note": "了解"
+   }
+  ],
+  "sentences": [
+   {
+    "en": "The patient is in the hospital today.",
+    "zh": "病人今天在醫院。"
+   },
+   {
+    "en": "I am allergic to this medicine.",
+    "zh": "我對這個藥過敏。"
+   },
+   {
+    "en": "It is important to understand the information.",
+    "zh": "了解這些資訊很重要。"
+   }
+  ]
+ },
+ {
+  "id": "p12",
+  "kind": "pairs",
+  "title": "句子的輕重：can 和 can't、15 和 50",
+  "tag": "句子重音",
+  "explain": [
+   "句子裡重要的字（名詞、動詞、形容詞、否定）念得大聲又清楚；小字（a、the、to、of、and、can、代名詞）念得又輕又快。",
+   "can 平常念得很輕，像 [kən]；can't 一定重讀 [kænt]，字尾的 t 常常聽不到。所以分辨 can 和 can't 要聽輕重，不是聽 t。",
+   "數字也靠重音：thirTEEN 重音在後面，THIRty 重音在前面。給藥劑量聽錯很危險，不確定就再問一次。"
+  ],
+  "tip": "自己說的時候，can't 要念重、念清楚；說十幾時把 -teen 拉長。",
+  "pairs": [
+   [
+    "I can swim.",
+    "I can't swim."
+   ],
+   [
+    "She can walk.",
+    "She can't walk."
+   ],
+   [
+    "thirteen",
+    "thirty"
+   ],
+   [
+    "fourteen",
+    "forty"
+   ],
+   [
+    "fifteen",
+    "fifty"
+   ],
+   [
+    "sixteen",
+    "sixty"
+   ]
+  ],
+  "sentences": [
+   {
+    "en": "I want to go home.",
+    "zh": "我想回家。"
+   },
+   {
+    "en": "A cup of tea, please.",
+    "zh": "請給我一杯茶。"
+   },
+   {
+    "en": "Take it twice a day.",
+    "zh": "一天吃兩次。"
+   }
+  ]
+ },
+ {
+  "id": "p13",
+  "kind": "listen",
+  "title": "連音：check it out",
+  "tag": "連音",
+  "explain": [
+   "前一個字的字尾是子音、後一個字的開頭是母音時，兩個字會連在一起念：check it out 聽起來像 che-ki-tout。",
+   "美式英文裡，夾在兩個母音中間的 t 會變成很輕的、像 d 的音：water、better、a lot of。"
+  ],
+  "tip": "聽不懂常常不是單字不會，而是連音之後認不出來。先聽，再跟著連起來念。",
+  "items": [
+   {
+    "label": "a-napple",
+    "text": "an apple",
+    "note": "一顆蘋果"
+   },
+   {
+    "label": "tur-ni-toff",
+    "text": "turn it off",
+    "note": "把它關掉"
+   },
+   {
+    "label": "che-ki-tout",
+    "text": "check it out",
+    "note": "看一下"
+   },
+   {
+    "label": "pi-ki-tup",
+    "text": "pick it up",
+    "note": "把它撿起來"
+   },
+   {
+    "label": "no-ta-tall",
+    "text": "not at all",
+    "note": "一點也不"
+   },
+   {
+    "label": "a-lo-tof",
+    "text": "a lot of water",
+    "note": "很多水（t 像輕輕的 d）"
+   },
+   {
+    "label": "si-tup",
+    "text": "sit up",
+    "note": "坐起來"
+   },
+   {
+    "label": "i-na-nhour",
+    "text": "in an hour",
+    "note": "一小時後"
+   },
+   {
+    "label": "wha-ti-zit",
+    "text": "What is it?",
+    "note": "那是什麼？"
+   }
+  ],
+  "quiz": [
+   {
+    "audio": "turn it off",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "turn it off",
+     "turn it up",
+     "turn off"
+    ],
+    "answer": 0,
+    "why": "中間的 it 很輕，但是有：tur-ni-toff。"
+   },
+   {
+    "audio": "pick it up",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "pick up",
+     "pick it up",
+     "pick them up"
+    ],
+    "answer": 1,
+    "why": "pick 的 k 和 it 連在一起：pi-ki-tup。"
+   },
+   {
+    "audio": "in an hour",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "in an hour",
+     "in our house",
+     "an hour"
+    ],
+    "answer": 0,
+    "why": "in、an、hour 三個字連成 i-na-nhour（hour 的 h 不發音）。"
+   },
+   {
+    "audio": "not at all",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "not all",
+     "not at all",
+     "not tall"
+    ],
+    "answer": 1,
+    "why": "兩個 t 都變輕，連成 no-ta-tall。"
+   },
+   {
+    "audio": "check it out",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "check out",
+     "check it out",
+     "check them out"
+    ],
+    "answer": 1,
+    "why": "check 的 k 和 it 連在一起：che-ki-tout。"
+   },
+   {
+    "audio": "sit up",
+    "q": "你聽到的是哪一個？",
+    "options": [
+     "sit up",
+     "set up",
+     "stand up"
+    ],
+    "answer": 0,
+    "why": "sit 的 t 和 up 連在一起：si-tup。"
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Can you turn it off?",
+    "zh": "可以把它關掉嗎？"
+   },
+   {
+    "en": "Drink a lot of water.",
+    "zh": "多喝水。"
+   },
+   {
+    "en": "I will check it out in an hour.",
+    "zh": "我一小時後去看一下。"
+   }
+  ]
+ },
+ {
+  "id": "p14",
+  "kind": "listen",
+  "title": "語調：問句上升還是下降",
+  "tag": "語調",
+  "explain": [
+   "用 yes／no 回答的問句，句尾音調上升 ↗：Are you okay?",
+   "用 what、where、when、why、how 開頭的問句，句尾音調下降 ↘：Where does it hurt? 這跟中文問句的習慣不一樣，最容易念錯。",
+   "一般的句子和請對方做事的句子，句尾也是下降 ↘：I feel much better.、Please sit down."
+  ],
+  "tip": "把 wh 問句念成上升，聽起來會像你不確定自己在問什麼。句尾往下，問題才清楚。",
+  "items": [
+   {
+    "label": "↗",
+    "text": "Are you okay?",
+    "note": "yes／no 問句，句尾上升"
+   },
+   {
+    "label": "↗",
+    "text": "Do you have any pain?",
+    "note": "yes／no 問句，句尾上升"
+   },
+   {
+    "label": "↗",
+    "text": "Can you walk?",
+    "note": "yes／no 問句，句尾上升"
+   },
+   {
+    "label": "↘",
+    "text": "Where does it hurt?",
+    "note": "wh 問句，句尾下降"
+   },
+   {
+    "label": "↘",
+    "text": "What is your name?",
+    "note": "wh 問句，句尾下降"
+   },
+   {
+    "label": "↘",
+    "text": "I feel much better.",
+    "note": "一般句子，句尾下降"
+   },
+   {
+    "label": "↘",
+    "text": "Please sit down.",
+    "note": "請對方做事，句尾下降"
+   }
+  ],
+  "quiz": [
+   {
+    "audio": "Are you okay?",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 0,
+    "why": "用 yes／no 回答的問句，句尾上升。"
+   },
+   {
+    "audio": "Where does it hurt?",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 1,
+    "why": "wh 開頭的問句，句尾下降。"
+   },
+   {
+    "audio": "Do you take any medicine?",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 0,
+    "why": "用 yes／no 回答的問句，句尾上升。"
+   },
+   {
+    "audio": "What time is it?",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 1,
+    "why": "wh 開頭的問句，句尾下降。"
+   },
+   {
+    "audio": "I feel much better.",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 1,
+    "why": "一般的句子，句尾下降。"
+   },
+   {
+    "audio": "Are you ready?",
+    "q": "這句的句尾是上升還是下降？",
+    "options": [
+     "上升 ↗",
+     "下降 ↘"
+    ],
+    "answer": 0,
+    "why": "用 yes／no 回答的問句，句尾上升。"
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Are you allergic to any medicine?",
+    "zh": "你對任何藥物過敏嗎？"
+   },
+   {
+    "en": "When did the pain start?",
+    "zh": "什麼時候開始痛的？"
+   },
+   {
+    "en": "Please take a deep breath.",
+    "zh": "請深呼吸。"
+   }
+  ]
+ }
+]

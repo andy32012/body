@@ -10,6 +10,13 @@ const photos = new Map(Object.entries(config.gallery).map(([file, hash]) => {
   return [url, url + "?photo=" + hash];
 }));
 const photoKeys = new Set(photos.values());
+// Pronunciation packs: kept the first time a lesson is opened (or all at once from the course page), across app updates.
+const soundName = prefix + "sounds";
+const sounds = new Map(Object.entries(config.sounds || {}).map(([file, hash]) => {
+  const url = absolute(file);
+  return [url, url + "?sound=" + hash];
+}));
+const soundKeys = new Set(sounds.values());
 const shell = absolute("index.html");
 const fallback = absolute(config.fallback);
 const pending = new Map();
@@ -45,12 +52,16 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     for (const name of await caches.keys()) {
-      if (name.startsWith(prefix) && name !== coreName && name !== galleryName) await caches.delete(name);
+      if (name.startsWith(prefix) && name !== coreName && name !== galleryName && name !== soundName) await caches.delete(name);
     }
     await self.clients.claim();
     const gallery = await caches.open(galleryName);
     for (const request of await gallery.keys()) {
       if (!photoKeys.has(request.url)) await gallery.delete(request);
+    }
+    const kept = await caches.open(soundName);
+    for (const request of await kept.keys()) {
+      if (!soundKeys.has(request.url)) await kept.delete(request);
     }
   })());
 });
@@ -65,6 +76,21 @@ self.addEventListener("fetch", event => {
       const gallery = await caches.open(galleryName);
       try { return await savePhoto(url.href, gallery); }
       catch { return Response.error(); }
+    })());
+    return;
+  }
+  if (sounds.has(url.href)) {
+    event.respondWith((async () => {
+      const key = sounds.get(url.href);
+      const kept = await caches.open(soundName);
+      const cached = await kept.match(key);
+      if (cached) return cached;
+      try {
+        const response = await fetch(key, { cache: "no-cache" });
+        // Only a whole, successful download is kept; a full device still gets to play it this once.
+        if (response.status === 200) await kept.put(key, response.clone()).catch(() => {});
+        return response;
+      } catch { return Response.error(); }
     })());
     return;
   }

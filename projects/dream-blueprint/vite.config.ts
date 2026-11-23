@@ -55,6 +55,8 @@ function offlineApp(): Plugin {
       const directory = path.resolve(output.dir);
       const files = await listBuildFiles(directory);
       const gallery: Record<string, string> = {};
+      // Pronunciation clips (one pack per lesson and voice) are kept as they are used, not downloaded with the app.
+      const sounds: Record<string, string> = {};
       const version = createHash("sha256");
       for (const file of files) {
         const bytes = await readFile(path.join(directory, file));
@@ -62,12 +64,14 @@ function offlineApp(): Plugin {
         if (/^cosmos\/.*\.(?:webp|avif|jpe?g|png)$/i.test(file)) {
           gallery[file] = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
         }
+        if (/^pron\/.*\.pack$/.test(file)) sounds[file] = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
       }
       const config = {
         entry: files.find(file => /^assets\/index-[\w-]+\.js$/.test(file)),
         version: version.digest("hex").slice(0, 16),
-        core: files.filter(file => !(file in gallery)),
+        core: files.filter(file => !(file in gallery) && !(file in sounds)),
         gallery,
+        sounds,
         fallback: "cosmos/n01.webp"
       };
       const worker = await readFile(path.join(root, "scripts/service-worker.js"), "utf8");
