@@ -16,3 +16,28 @@
 .vocab-results button { flex:none; }
 .vocab-panel input,.vocab-panel select { max-width:100%; color:inherit; background:transparent; border:1px solid currentColor; padding:.5rem; border-radius:.4rem; }
 .vocab-panel select option { color:CanvasText; background:Canvas; }
+
+/* 字根字首 */
+.wp { display: grid; gap: .8rem; width: 100%; min-width: 0; }
+.wp-kinds small { opacity: .7; margin-left: .25rem; font-variant-numeric: tabular-nums; }
+.wp-card { display: grid; justify-items: start; gap: .5rem; width: 100%; margin: 0; padding: .9rem 1rem; border: 1px solid #8976ab50; border-radius: .9rem; }
+.wp-card > small { opacity: .75; }
+.wp-meaning { font-size: 1.05rem; }
+.wp-examples { list-style: none; display: grid; gap: .1rem; width: 100%; margin: 0; padding: 0; }
+.wp-examples li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .9rem; padding: .4rem 0; border-bottom: 1px solid #8976ab35; }
+.wp-examples li:last-child { border-bottom: 0; }
+.wp-examples small { opacity: .75; }
+.wp-guess { display: grid; gap: .45rem; width: 100%; padding-top: .3rem; }
+.wp-guess p { margin: 0; }
+.wp-options { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wp-options button[data-state="right"] { border-color: #2fae7b; background: #2fae7b2e; opacity: 1; }
+.wp-options button[data-state="wrong"] { text-decoration: line-through; opacity: .5; }
+.wp-ok { margin: 0; }
+.vocab-area button.wp-next { background: #7953b530; font-weight: 650; }
+.vocab-area button:disabled { opacity: .5; cursor: default; }
+.wp-all section { margin-top: .6rem; }
+.wp-all h4 { margin: .4rem 0 .2rem; font-size: .95rem; }
+.wp-all ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: .1rem 1.2rem; }
+.wp-all li { display: grid; padding: .3rem 0; border-bottom: 1px solid #8976ab30; }
+.wp-all li small { opacity: .7; overflow-wrap: anywhere; }
+.wp-all li[data-learned="true"] b { color: #2fae7b; }

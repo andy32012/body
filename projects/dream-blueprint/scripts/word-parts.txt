@@ -1,0 +1,139 @@
+# 日常字根、字首、字尾。一行一個：
+#   類型 | 寫法 | 意思 | 例字=中文=拆解 ; 例字=中文=拆解 ; … | 猜猜看的字=中文
+# 拆解可以不寫。順序就是學的順序：最常見、最好認的在前面。
+# 改完跑：python3 scripts/word-parts.py   → src/data/word-parts.json
+
+字首 | un- | 不、相反 | unhappy=不快樂的=un 不＋happy 快樂的 ; unable=不能的=un 不＋able 能夠的 ; unlock=開鎖=un 相反＋lock 鎖上 | unkind=不親切的
+字首 | re- | 再一次、回來 | return=返回=re 回＋turn 轉 ; rewrite=重寫=re 再＋write 寫 ; review=複習=re 再＋view 看 | rebuild=重建
+字尾 | -er／-or | 做這件事的人或東西 | teacher=老師=teach 教＋er 人 ; visitor=訪客=visit 拜訪＋or 人 ; cooker=炊具=cook 煮＋er 東西 | painter=畫家
+字尾 | -ful | 充滿…的 | careful=小心的=care 小心＋ful 充滿 ; helpful=有幫助的=help 幫助＋ful ; painful=疼痛的=pain 痛＋ful | hopeful=抱著希望的
+字尾 | -less | 沒有…的 | careless=粗心的=care 小心＋less 沒有 ; homeless=無家可歸的=home 家＋less ; painless=不痛的=pain 痛＋less | sleepless=睡不著的
+字尾 | -ly | …地（形容詞變副詞） | quickly=快速地=quick 快的＋ly ; slowly=慢慢地=slow 慢的＋ly ; carefully=小心地=careful 小心的＋ly | quietly=安靜地
+字首 | dis- | 不、分開 | dislike=不喜歡=dis 不＋like 喜歡 ; disagree=不同意=dis 不＋agree 同意 ; disappear=消失=dis 不＋appear 出現 | dishonest=不誠實的
+字首 | in-／im-（不） | 不（b、m、p 前面用 im-） | impossible=不可能的=im 不＋possible 可能的 ; incorrect=不正確的=in 不＋correct 正確的 ; impolite=沒禮貌的=im 不＋polite 有禮貌的 | inexpensive=不貴的
+字尾 | -tion／-sion | 動作或結果（動詞變名詞） | action=行動=act 做＋ion ; information=資訊=inform 通知＋ation ; decision=決定=decide 決定＋sion | invitation=邀請
+字尾 | -able／-ible | 可以…的 | comfortable=舒服的=comfort 舒適＋able ; washable=可以洗的=wash 洗＋able ; possible=可能的 | drinkable=可以喝的
+字首 | pre- | 在…之前、預先 | preview=預習、預告=pre 先＋view 看 ; prepare=準備=pre 先＋pare 備好 ; predict=預測=pre 先＋dict 說 | preschool=幼兒園（上小學之前）
+字首 | mis- | 錯誤 | mistake=錯誤=mis 錯＋take 拿 ; misunderstand=誤會=mis 錯＋understand 了解 ; misspell=拼錯=mis 錯＋spell 拼 | misread=讀錯
+字尾 | -ness | 狀態（形容詞變名詞） | kindness=仁慈=kind 仁慈的＋ness ; illness=疾病=ill 生病的＋ness ; happiness=快樂=happy 快樂的＋ness | sadness=悲傷
+字尾 | -ment | 動作或結果（動詞變名詞） | movement=動作=move 動＋ment ; treatment=治療=treat 治療＋ment ; appointment=預約=appoint 約定＋ment | payment=付款
+字首 | over- | 過度、在上面 | overeat=吃太多=over 過度＋eat 吃 ; oversleep=睡過頭=over 過度＋sleep 睡 ; overweight=過重的=over 過度＋weight 體重 | overwork=工作過度
+字首 | under- | 在下面、不足 | underground=地下的=under 下＋ground 地面 ; underline=畫底線=under 下＋line 線 ; underweight=體重過輕的=under 不足＋weight 體重 | underwear=內衣褲
+字尾 | -y | 有…的（名詞變形容詞） | rainy=下雨的=rain 雨＋y ; sleepy=想睡的=sleep 睡＋y ; healthy=健康的=health 健康＋y | salty=鹹的
+字尾 | -ed／-ing | 感到…的／令人…的 | interested=感興趣的=人的感覺用 -ed ; interesting=有趣的=事情給人的感覺用 -ing ; tired=累的 ; tiring=累人的 | exciting=令人興奮的
+字尾 | -ist | 做…的人、專家 | artist=藝術家=art 藝術＋ist 人 ; dentist=牙醫=dent 牙＋ist 人 ; scientist=科學家=science 科學＋ist | pianist=鋼琴家
+字尾 | -ous | 有…性質的 | dangerous=危險的=danger 危險＋ous ; famous=有名的=fame 名聲＋ous ; nervous=緊張的=nerve 神經＋ous | poisonous=有毒的
+字尾 | -al | …的（名詞變形容詞） | national=國家的=nation 國家＋al ; medical=醫療的=medic 醫＋al ; personal=個人的=person 人＋al | musical=音樂的
+字尾 | -ive | 有…傾向的 | active=活躍的=act 做＋ive ; expensive=貴的=expense 花費＋ive ; positive=正面的、陽性的 | creative=有創意的
+字首 | in-／im-（進入） | 進入、在裡面 | inside=裡面=in 裡＋side 邊 ; income=收入=in 進＋come 來 ; import=進口=im 進＋port 運 | indoor=室內的
+字首 | ex- | 向外；以前的 | exit=出口=ex 外＋it 走 ; export=出口（貨物）=ex 外＋port 運 ; exhale=吐氣=ex 外＋hale 呼吸 | ex-boyfriend=前男友
+字首 | inter- | 在…之間、互相 | international=國際的=inter 之間＋national 國家的 ; internet=網際網路=inter 之間＋net 網 ; interview=面試、訪問=inter 互相＋view 看 | interact=互動
+字首 | sub- | 在下面 | subway=地下鐵=sub 下＋way 路 ; submarine=潛水艇=sub 下＋marine 海 ; subtitle=字幕=sub 下＋title 標題 | subzero=零下的
+字首 | trans- | 穿過、轉移 | transport=運輸=trans 轉＋port 運 ; translate=翻譯=trans 轉＋late 帶過去 ; transfer=轉移、轉學=trans 轉＋fer 帶 | transplant=移植
+字首 | co-／com-／con- | 一起 | cooperate=合作=co 一起＋operate 運作 ; connect=連接=con 一起＋nect 綁 ; company=公司、同伴=com 一起＋pan 麵包（一起吃麵包的人） | coworker=同事
+字首 | en-／em- | 使…、放進去 | enjoy=享受=en 使＋joy 快樂 ; enlarge=放大=en 使＋large 大 ; encourage=鼓勵=en 使＋courage 勇氣 | enable=使能夠
+字首 | de- | 往下、去掉 | decrease=減少=de 往下＋crease 長 ; depart=離開=de 離＋part 分開 ; delete=刪除 | defrost=解凍
+字首 | non- | 非、不 | nonstop=不停的、直達的=non 不＋stop 停 ; nonsense=胡說=non 沒有＋sense 道理 ; nonsmoker=不抽菸的人=non 不＋smoker 抽菸的人 | nonfat=脫脂的
+字首 | anti- | 反對、對抗 | antibiotic=抗生素=anti 抗＋bio 生物 ; antivirus=防毒的=anti 抗＋virus 病毒 ; antisocial=不合群的=anti 反＋social 社交的 | antiwar=反戰的
+字首 | auto- | 自己、自動 | automatic=自動的 ; autograph=親筆簽名=auto 自己＋graph 寫 ; automobile=汽車=auto 自己＋mobile 會動的 | autopilot=自動駕駛
+字首 | self- | 自己 | self-care=自我照顧=self 自己＋care 照顧 ; self-control=自制=self 自己＋control 控制 ; selfish=自私的=self 自己＋ish | self-study=自學
+字首 | out- | 向外、超過 | outside=外面=out 外＋side 邊 ; outdoor=戶外的=out 外＋door 門 ; outgoing=外向的=out 外＋going 走 | outline=大綱、輪廓
+字首 | mid- | 中間 | midnight=午夜=mid 中＋night 夜 ; midterm=期中（考）=mid 中＋term 學期 ; midday=正午=mid 中＋day 白天 | midweek=一週的中間
+字首 | fore- | 前面、預先 | forehead=額頭=fore 前＋head 頭 ; forecast=預報=fore 先＋cast 投 ; forearm=前臂=fore 前＋arm 手臂 | foresee=預見
+字首 | super- | 超級、在上面 | supermarket=超級市場=super 超級＋market 市場 ; superman=超人 ; superstar=超級巨星 | superhero=超級英雄
+字首 | uni- | 一、單一 | uniform=制服=uni 一＋form 樣子 ; unit=單位 ; unique=獨一無二的 | unicycle=單輪車
+字首 | bi- | 二 | bicycle=腳踏車=bi 二＋cycle 輪 ; bilingual=雙語的=bi 二＋lingual 語言的 ; biweekly=兩週一次的=bi 二＋weekly 每週的 | bimonthly=兩個月一次的
+字首 | tri- | 三 | triangle=三角形=tri 三＋angle 角 ; tricycle=三輪車=tri 三＋cycle 輪 ; triple=三倍的 | triathlon=鐵人三項
+字首 | multi- | 多 | multicultural=多元文化的=multi 多＋cultural 文化的 ; multimedia=多媒體=multi 多＋media 媒體 ; multiply=乘、增加 | multicolor=多種顏色的
+字首 | semi- | 半 | semicircle=半圓=semi 半＋circle 圓 ; semifinal=準決賽=semi 半＋final 決賽 ; semiconductor=半導體=semi 半＋conductor 導體 | semisweet=半甜的
+字首 | mini- | 小 | minibus=小型巴士=mini 小＋bus ; miniskirt=迷你裙=mini 小＋skirt 裙 ; minimum=最小量 | minivan=小型廂型車
+字首 | micro- | 微小 | microscope=顯微鏡=micro 微小＋scope 看 ; microwave=微波（爐）=micro 微＋wave 波 ; microphone=麥克風=micro 微小＋phone 聲音 | microchip=微晶片
+字首 | tele- | 遠 | telephone=電話=tele 遠＋phone 聲音 ; television=電視=tele 遠＋vision 看 ; telescope=望遠鏡=tele 遠＋scope 看 | telework=遠距工作
+字首 | post- | 在…之後 | postpone=延後=post 後＋pone 放 ; postwar=戰後的=post 後＋war 戰爭 ; postgraduate=研究生=post 後＋graduate 畢業 | postoperative=手術後的
+字首 | kilo- | 一千 | kilogram=公斤=kilo 千＋gram 公克 ; kilometer=公里=kilo 千＋meter 公尺 ; kilobyte=千位元組 | kilowatt=千瓦
+字首 | milli- | 千分之一 | milliliter=毫升=milli 千分之一＋liter 公升 ; millimeter=毫米=milli＋meter 公尺 ; milligram=毫克=milli＋gram 公克 | millisecond=毫秒
+字尾 | -ity／-ty | 性質、狀態（名詞） | ability=能力=able 能夠的＋ity ; safety=安全=safe 安全的＋ty ; activity=活動=active 活躍的＋ity | reality=現實
+字尾 | -ance／-ence | 狀態、性質（名詞） | importance=重要性=important 重要的→ance ; difference=不同=different 不同的→ence ; ambulance=救護車=ambul 走＋ance | appearance=外表、出現
+字尾 | -ship | 關係、身分 | friendship=友誼=friend 朋友＋ship ; relationship=關係=relation 關聯＋ship ; membership=會員身分=member 會員＋ship | leadership=領導力
+字尾 | -hood | 時期、狀態 | childhood=童年=child 小孩＋hood ; neighborhood=鄰近地區=neighbor 鄰居＋hood ; adulthood=成年期=adult 成人＋hood | motherhood=當母親（的身分）
+字尾 | -ish | 有點…的；…國的 | childish=幼稚的=child 小孩＋ish ; foolish=愚蠢的=fool 傻瓜＋ish ; British=英國的 | reddish=帶紅色的
+字尾 | -ic | …的 | basic=基本的=base 基礎＋ic ; allergic=過敏的=allergy 過敏＋ic ; electric=電的 | scientific=科學的
+字尾 | -en | 使變成…（變動詞） | shorten=縮短=short 短＋en ; widen=加寬=wide 寬＋en ; weaken=使變弱=weak 弱＋en | darken=使變暗
+字尾 | -ize | 使…化（變動詞） | realize=了解到、實現=real 真的＋ize ; organize=組織、整理 ; memorize=背起來=memory 記憶＋ize | modernize=使現代化
+字尾 | -ify | 使…（變動詞） | simplify=簡化=simple 簡單＋ify ; clarify=說清楚=clear 清楚＋ify ; identify=辨認 | purify=淨化
+字尾 | -th | 把形容詞變成名詞 | length=長度=long 長的→length ; strength=力量=strong 強的→strength ; width=寬度=wide 寬的→width | depth=深度
+字尾 | -ward | 往…方向 | forward=向前=for 前＋ward ; backward=向後=back 後＋ward ; toward=朝向=to＋ward | upward=向上
+字尾 | -ian／-an | …的人、…國人 | musician=音樂家=music 音樂＋ian ; American=美國人 ; physician=內科醫師 | librarian=圖書館員
+字尾 | -ese | …國的、…語 | Chinese=中國的、中文 ; Japanese=日本的、日文 ; Taiwanese=台灣的、台語 | Vietnamese=越南的、越南語
+字尾 | -ee | 被…的人 | employee=員工=employ 雇用＋ee 被雇用的人 ; trainee=受訓的人=train 訓練＋ee ; interviewee=被面試的人=interview 面試＋ee | payee=收款人
+字尾 | -ery／-ry | 場所、行業 | bakery=麵包店=bake 烤＋ery ; nursery=育嬰室、托兒所=nurse 照顧＋ery ; surgery=手術 | fishery=漁場
+字根 | port | 運、拿 | airport=機場=air 空中＋port 港 ; report=報告=re 回＋port 帶 ; support=支持=sup 下面＋port 撐 | portable=可以帶著走的
+字根 | act | 做 | actor=演員=act 演＋or 人 ; action=行動 ; react=反應=re 回＋act 做 | reaction=反應
+字根 | vis／vid | 看 | visit=拜訪 ; video=影片 ; visible=看得見的=vis 看＋ible 可以 | invisible=看不見的
+字根 | spect／pect | 看 | inspect=檢查=in 裡＋spect 看 ; respect=尊敬=re 再＋spect 看 ; expect=期待=ex 外＋(s)pect 看 | spectator=觀眾
+字根 | dict | 說 | dictionary=字典 ; predict=預測=pre 先＋dict 說 ; dictate=口述、聽寫 | contradict=反駁、矛盾
+字根 | scrib／script | 寫 | describe=描述=de 下＋scribe 寫 ; prescription=處方=pre 先＋script 寫 ; subscribe=訂閱=sub 下面＋scribe 寫（簽名） | manuscript=手稿
+字根 | aud | 聽 | audio=聲音的 ; audience=聽眾、觀眾 ; auditorium=禮堂 | audible=聽得見的
+字根 | phon | 聲音 | telephone=電話=tele 遠＋phone 聲音 ; microphone=麥克風 ; headphones=耳機=head 頭＋phones 聲音 | phonics=自然發音法
+字根 | graph／gram | 寫、畫 | photograph=照片=photo 光＋graph 畫 ; paragraph=段落 ; program=節目、程式 | telegram=電報
+字根 | photo | 光 | photograph=照片 ; photocopy=影印=photo 光＋copy 複製 ; photographer=攝影師 | photosensitive=對光敏感的
+字根 | bio | 生命 | biology=生物學=bio 生命＋logy 學 ; biography=傳記=bio 生命＋graphy 寫 ; antibiotic=抗生素 | biotechnology=生物科技
+字根 | geo | 土地、地球 | geography=地理=geo 地＋graphy 寫 ; geology=地質學=geo 地＋logy 學 ; geometry=幾何=geo 地＋metry 量 | geothermal=地熱的
+字根 | therm | 熱 | thermometer=溫度計=therm 熱＋meter 量 ; thermos=保溫瓶 ; thermal=熱的、保暖的 | thermostat=恆溫器
+字根 | meter／metr | 測量 | meter=公尺 ; thermometer=溫度計 ; centimeter=公分=centi 百分之一＋meter | speedometer=速度表
+字根 | cent | 一百 | cent=分（一百分之一元） ; century=世紀（一百年） ; percent=百分之…=per 每＋cent 一百 | centennial=一百週年
+字根 | man／manu | 手 | manual=手動的、手冊 ; manage=管理（原本是用手操控） ; manufacture=製造=manu 手＋fact 做 | manicure=修指甲
+字根 | ped | 腳 | pedal=踏板 ; pedestrian=行人 ; pedicure=足部保養 | centipede=蜈蚣（一百隻腳）
+字根 | mov／mot／mob | 動 | move=移動 ; motion=動作 ; mobile=行動的、可移動的 | remove=移除
+字根 | duc／duct | 引導 | educate=教育=e 出＋duc 引導 ; introduce=介紹=intro 向內＋duce 引 ; produce=生產=pro 向前＋duce 引 | reduce=減少
+字根 | mit／miss | 送 | admit=承認、准許進入=ad 向＋mit 送 ; permit=允許=per 通過＋mit 送 ; mission=任務 | transmit=傳送
+字根 | ject | 丟、投 | inject=注射=in 進＋ject 投 ; project=計畫、投影=pro 向前＋ject 投 ; reject=拒絕=re 回＋ject 丟 | eject=彈出
+字根 | tract | 拉 | attract=吸引=at 向＋tract 拉 ; tractor=拖拉機 ; subtract=減去=sub 下＋tract 拉 | extract=抽出、拔出
+字根 | struct | 建造 | structure=結構 ; construct=建造=con 一起＋struct 建 ; instruction=指示、說明 | destruction=破壞
+字根 | form | 形狀 | uniform=制服 ; inform=通知=in 進＋form 形（讓人心裡有個樣子） ; transform=改變=trans 轉＋form 形 | reform=改革
+字根 | press | 壓 | pressure=壓力 ; express=表達=ex 外＋press 壓 ; depress=使沮喪=de 往下＋press 壓 | compress=壓縮
+字根 | rupt | 破 | interrupt=打斷=inter 之間＋rupt 破 ; erupt=爆發=e 外＋rupt 破 ; bankrupt=破產的=bank 銀行＋rupt 破 | rupture=破裂
+字根 | viv／vit | 生命 | survive=存活=sur 超過＋vive 活 ; vitamin=維他命 ; vital=生命的、極重要的 | revive=甦醒、復活
+字根 | med | 治療 | medicine=藥、醫學 ; medical=醫療的 ; medication=藥物 | remedy=療法
+字根 | spir | 呼吸 | respiration=呼吸=re 再＋spir 呼吸 ; inspire=鼓舞（原本是吸氣）=in 進＋spire 呼吸 ; spirit=精神（原本是氣息） | respirator=呼吸器
+字根 | mem | 記憶 | memory=記憶 ; remember=記得=re 再＋member 記 ; memorize=背起來 | memorial=紀念碑、紀念的
+字根 | cred | 相信 | credit=信用 ; incredible=難以置信的=in 不＋cred 相信＋ible ; credit card=信用卡 | credible=可信的
+字根 | loc | 地方 | local=當地的 ; location=位置 ; locate=找出位置 | relocate=搬遷
+字根 | sign | 記號 | sign=標誌、簽名 ; signal=信號 ; signature=簽名 | significant=有意義的、顯著的
+字根 | fin | 結束、界限 | finish=完成 ; final=最後的 ; define=下定義=de＋fine 界限 | infinite=無限的
+字根 | equ | 相等 | equal=相等的 ; equation=方程式 ; equator=赤道（把地球分成相等的兩半） | equality=平等
+字根 | part | 部分 | partner=夥伴 ; department=部門、科=de＋part 分＋ment ; participate=參加=parti 部分＋cip 拿 | partial=部分的
+字根 | serv | 服務、保存 | serve=服務 ; service=服務 ; reserve=預訂、保留=re 回＋serve 留 | preserve=保存
+字根 | nat | 出生 | nature=自然 ; native=本地的、天生的 ; nation=國家 | prenatal=產前的
+字根 | nov | 新 | novel=小說、新奇的 ; innovation=創新=in 進＋nov 新 ; renovate=翻新=re 再＋nov 新 | novice=新手
+字根 | pos／pon | 放 | position=位置 ; deposit=存款=de 下＋posit 放 ; postpone=延後=post 後＋pone 放 | expose=暴露、使接觸
+字根 | fer | 帶、拿 | transfer=轉移=trans 轉＋fer 帶 ; offer=提供 ; refer=轉介、參考=re 回＋fer 帶 | prefer=比較喜歡
+字根 | cap／cept／ceive | 拿、抓 | accept=接受=ac 向＋cept 拿 ; receive=收到=re 回＋ceive 拿 ; capture=捕捉 | reception=接待（處）
+字根 | tain／ten | 握住 | contain=包含=con 一起＋tain 握 ; maintain=維持=main 手＋tain 握 ; obtain=得到 | retain=保留
+字根 | ven／vent | 來 | event=事件=e 出＋vent 來 ; invent=發明=in 進＋vent 來 ; prevent=預防=pre 先＋vent 來 | convention=大會
+字根 | ced／ceed／cess | 走 | proceed=繼續進行=pro 向前＋ceed 走 ; succeed=成功 ; process=過程 | exceed=超過
+字根 | gress／grad | 走、一步 | progress=進步=pro 向前＋gress 走 ; grade=年級、成績 ; graduate=畢業 | upgrade=升級
+字根 | sens／sent | 感覺 | sense=感覺 ; sensitive=敏感的 ; consent=同意=con 一起＋sent 感覺 | sensor=感應器
+字根 | voc／voic | 聲音、叫 | voice=聲音 ; vocabulary=字彙 ; vocal=聲音的 | advocate=提倡
+字根 | log／logue | 說、話 | dialogue=對話=dia 兩邊＋logue 說 ; logic=邏輯 ; apology=道歉 | monologue=獨白
+字根 | lingu／langu | 語言 | language=語言 ; bilingual=雙語的 ; linguistics=語言學 | multilingual=會多種語言的
+字根 | liter | 文字 | literature=文學 ; literally=照字面地 ; literate=識字的 | illiterate=不識字的
+字根 | soci | 同伴、社會 | social=社會的、社交的 ; society=社會 ; associate=聯想、同事 | sociable=愛交際的
+字根 | popul／publ | 人民 | popular=受歡迎的 ; population=人口 ; public=公共的 | unpopular=不受歡迎的
+字根 | cycl | 圓、輪 | cycle=循環 ; bicycle=腳踏車 ; recycle=回收=re 再＋cycle 循環 | cyclone=氣旋
+字根 | clud／clus／clos | 關 | include=包括=in 裡＋clude 關 ; close=關 ; conclude=下結論=con 一起＋clude 關 | exclude=排除
+字根 | pend／pens | 懸掛、付錢 | depend=依賴=de 下＋pend 掛 ; expensive=貴的 ; spend=花費 | independent=獨立的
+字根 | ple／plet／ply | 充滿 | complete=完成、完整的=com 完全＋plete 滿 ; plenty=很多 ; supply=供應 | incomplete=不完整的
+字根 | prim／prin | 第一 | primary=主要的、初級的 ; prince=王子 ; principal=校長、主要的 | primitive=原始的
+字根 | quest／quir | 問、尋求 | question=問題 ; request=請求=re 再＋quest 求 ; require=需要=re 再＋quire 求 | requirement=必要條件
+字根 | rect／reg | 直、規則 | correct=正確的 ; direct=直接的 ; regular=規律的 | irregular=不規則的
+字根 | sta／sist | 站立 | station=車站 ; stable=穩定的 ; assist=協助=as 向＋sist 站（站在旁邊） | statue=雕像
+字根 | tend／tens | 伸展 | attend=出席、照顧=at 向＋tend 伸 ; extend=延伸=ex 外＋tend 伸 ; tension=緊張、張力 | extension=延長、分機
+字根 | vers／vert | 轉 | reverse=倒轉=re 回＋verse 轉 ; convert=轉換=con 完全＋vert 轉 ; version=版本 | conversion=轉換
+字根 | lect／leg | 選、讀 | collect=收集=col 一起＋lect 選 ; select=選擇=se 分開＋lect 選 ; lecture=講課 | election=選舉
+字根 | ord／ordin | 順序 | order=順序、點餐 ; ordinary=普通的 ; coordinate=協調=co 一起＋ordin 順序 | disorder=混亂、（身體）失調
+字根 | vac | 空 | vacation=假期 ; vacuum=真空、吸塵器 ; vacant=空著的 | vacancy=空房、空缺
+字根 | dur | 持續 | during=在…期間 ; duration=持續時間 ; durable=耐用的 | endurance=耐力
+字根 | tech | 技術 | technique=技巧 ; technology=科技=techno 技術＋logy 學 ; technical=技術的 | technician=技術員
+字根 | var／vari | 變化 | various=各種的 ; variety=多樣 ; vary=變化 | variation=變化
+字根 | val | 價值、有力 | value=價值 ; valuable=貴重的 ; evaluate=評估=e 出＋valu 價值 | invalid=無效的

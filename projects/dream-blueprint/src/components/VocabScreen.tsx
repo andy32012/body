@@ -6,6 +6,8 @@ import type { PageProps } from '../lib/store'
 import { activePeriod, dayKey, newCard, weekKey } from '../lib/progress'
 import { formLines, getScreeningQueue, levelEntry, meaningLine, officialWords, wordKey } from '../lib/vocab'
 import wordParts from '../data/medical-parts.json'
+import WordParts from './WordParts'
+import { learnedParts, wordParts as everydayParts } from '../lib/wordParts'
 import './vocabulary.css'
 
 /** A table word shows each meaning with its part of speech, and a merged entry each of its forms. */
@@ -28,6 +30,7 @@ export default function VocabScreen({state, update}: PageProps) {
   const [reveal, setReveal] = useState(false)
   const [tab, setTab] = useState<'screen'|'learn'|'roots'|'lookup'>('screen')
   const [working, setWorking] = useState(false)
+  const [rootKind, setRootKind] = useState<'everyday'|'medical'>('everyday')
   const [searchTerm, setSearchTerm] = useState('')
   const targetLevel = today < '2027-07-01' ? 1 : today < '2029-08-01' ? 3 : 4
   const [lookupLevel,setLookupLevel] = useState(targetLevel)
@@ -67,8 +70,8 @@ export default function VocabScreen({state, update}: PageProps) {
   const practiceWord = waiting[0]
 
   if (quiet) return <p>今天只複習熟悉的內容。</p>
-  return <section className="vocab-area" aria-label="單字與醫護字根">
-    <div className="vocab-tabs">{([['screen','單字快篩'],['learn','待學單字'],['lookup','分級找字'],['roots','醫護字根']] as const)
+  return <section className="vocab-area" aria-label="單字與字根字首">
+    <div className="vocab-tabs">{([['screen','單字快篩'],['learn','待學單字'],['lookup','分級找字'],['roots','字根字首']] as const)
       .map(([id,label]) => <button type="button" key={id} aria-pressed={tab === id}
         onClick={() => {setTab(id);setReveal(false)}}>{label}</button>)}</div>
 
@@ -115,15 +118,21 @@ export default function VocabScreen({state, update}: PageProps) {
               }}>{classified.has(wordKey(word.en)) ? '已記錄' : '加入待學'}</button></li>)}</ul>}
       </div>}
       {tab === 'roots' && <div className="vocab-panel">
-        <p>本週兩個醫護字根、字首或字尾，已學 {finishedThisWeek} 個。</p>
-        {parts.map(part => <article key={part.id}>
-          <small>{part.type}</small><strong className="vocab-term" lang="en">{part.part}</strong>
-          <p>{part.meaning} · <span lang="en">{part.example}</span>（{part.translation}）</p>
-          <button type="button" onClick={() => update(prev => ({...prev,checks:{...prev.checks,
-            [weekPrefix+part.id]:true,['medical-learned.'+part.id]:true}}))}>記下這個{part.type}</button>
-        </article>)}
-        {!parts.length && <p>{finishedThisWeek >= 2 ? '本週的兩個已完成。' : '60 個醫護構詞都學過了。'}</p>}
-        <a href="https://medlineplus.gov/appendixa.html" target="_blank" rel="noreferrer">醫護構詞參考（MedlinePlus）</a>
+        <div className="vocab-tabs wp-kinds">
+          <button type="button" aria-pressed={rootKind === 'everyday'} onClick={() => setRootKind('everyday')}>日常 <small>{learnedParts(state.checks).length}／{everydayParts.length}</small></button>
+          <button type="button" aria-pressed={rootKind === 'medical'} onClick={() => setRootKind('medical')}>醫護 <small>{wordParts.filter(p => state.checks['medical-learned.' + p.id]).length}／{wordParts.length}</small></button>
+        </div>
+        {rootKind === 'everyday' ? <WordParts state={state} update={update} /> : <>
+          <p>本週兩個醫護字根、字首或字尾，已學 {finishedThisWeek} 個。</p>
+          {parts.map(part => <article key={part.id}>
+            <small>{part.type}</small><strong className="vocab-term" lang="en">{part.part}</strong>
+            <p>{part.meaning} · <span lang="en">{part.example}</span>（{part.translation}） <AskWord en={part.part} zh={part.type + '：' + part.meaning} /></p>
+            <button type="button" onClick={() => update(prev => ({...prev,checks:{...prev.checks,
+              [weekPrefix+part.id]:true,['medical-learned.'+part.id]:true}}))}>記下這個{part.type}</button>
+          </article>)}
+          {!parts.length && <p>{finishedThisWeek >= 2 ? '本週的兩個已完成。' : '60 個醫護構詞都學過了。'}</p>}
+          <a href="https://medlineplus.gov/appendixa.html" target="_blank" rel="noreferrer">醫護構詞參考（MedlinePlus）</a>
+        </>}
       </div>}
 
     <details><summary>詞表來源</summary>

@@ -1,0 +1,3478 @@
+[
+ {
+  "id": "wp001",
+  "type": "字首",
+  "part": "un-",
+  "meaning": "不、相反",
+  "examples": [
+   {
+    "en": "unhappy",
+    "zh": "不快樂的",
+    "how": "un 不＋happy 快樂的"
+   },
+   {
+    "en": "unable",
+    "zh": "不能的",
+    "how": "un 不＋able 能夠的"
+   },
+   {
+    "en": "unlock",
+    "zh": "開鎖",
+    "how": "un 相反＋lock 鎖上"
+   }
+  ],
+  "guess": {
+   "en": "unkind",
+   "zh": "不親切的"
+  }
+ },
+ {
+  "id": "wp002",
+  "type": "字首",
+  "part": "re-",
+  "meaning": "再一次、回來",
+  "examples": [
+   {
+    "en": "return",
+    "zh": "返回",
+    "how": "re 回＋turn 轉"
+   },
+   {
+    "en": "rewrite",
+    "zh": "重寫",
+    "how": "re 再＋write 寫"
+   },
+   {
+    "en": "review",
+    "zh": "複習",
+    "how": "re 再＋view 看"
+   }
+  ],
+  "guess": {
+   "en": "rebuild",
+   "zh": "重建"
+  }
+ },
+ {
+  "id": "wp003",
+  "type": "字尾",
+  "part": "-er／-or",
+  "meaning": "做這件事的人或東西",
+  "examples": [
+   {
+    "en": "teacher",
+    "zh": "老師",
+    "how": "teach 教＋er 人"
+   },
+   {
+    "en": "visitor",
+    "zh": "訪客",
+    "how": "visit 拜訪＋or 人"
+   },
+   {
+    "en": "cooker",
+    "zh": "炊具",
+    "how": "cook 煮＋er 東西"
+   }
+  ],
+  "guess": {
+   "en": "painter",
+   "zh": "畫家"
+  }
+ },
+ {
+  "id": "wp004",
+  "type": "字尾",
+  "part": "-ful",
+  "meaning": "充滿…的",
+  "examples": [
+   {
+    "en": "careful",
+    "zh": "小心的",
+    "how": "care 小心＋ful 充滿"
+   },
+   {
+    "en": "helpful",
+    "zh": "有幫助的",
+    "how": "help 幫助＋ful"
+   },
+   {
+    "en": "painful",
+    "zh": "疼痛的",
+    "how": "pain 痛＋ful"
+   }
+  ],
+  "guess": {
+   "en": "hopeful",
+   "zh": "抱著希望的"
+  }
+ },
+ {
+  "id": "wp005",
+  "type": "字尾",
+  "part": "-less",
+  "meaning": "沒有…的",
+  "examples": [
+   {
+    "en": "careless",
+    "zh": "粗心的",
+    "how": "care 小心＋less 沒有"
+   },
+   {
+    "en": "homeless",
+    "zh": "無家可歸的",
+    "how": "home 家＋less"
+   },
+   {
+    "en": "painless",
+    "zh": "不痛的",
+    "how": "pain 痛＋less"
+   }
+  ],
+  "guess": {
+   "en": "sleepless",
+   "zh": "睡不著的"
+  }
+ },
+ {
+  "id": "wp006",
+  "type": "字尾",
+  "part": "-ly",
+  "meaning": "…地（形容詞變副詞）",
+  "examples": [
+   {
+    "en": "quickly",
+    "zh": "快速地",
+    "how": "quick 快的＋ly"
+   },
+   {
+    "en": "slowly",
+    "zh": "慢慢地",
+    "how": "slow 慢的＋ly"
+   },
+   {
+    "en": "carefully",
+    "zh": "小心地",
+    "how": "careful 小心的＋ly"
+   }
+  ],
+  "guess": {
+   "en": "quietly",
+   "zh": "安靜地"
+  }
+ },
+ {
+  "id": "wp007",
+  "type": "字首",
+  "part": "dis-",
+  "meaning": "不、分開",
+  "examples": [
+   {
+    "en": "dislike",
+    "zh": "不喜歡",
+    "how": "dis 不＋like 喜歡"
+   },
+   {
+    "en": "disagree",
+    "zh": "不同意",
+    "how": "dis 不＋agree 同意"
+   },
+   {
+    "en": "disappear",
+    "zh": "消失",
+    "how": "dis 不＋appear 出現"
+   }
+  ],
+  "guess": {
+   "en": "dishonest",
+   "zh": "不誠實的"
+  }
+ },
+ {
+  "id": "wp008",
+  "type": "字首",
+  "part": "in-／im-（不）",
+  "meaning": "不（b、m、p 前面用 im-）",
+  "examples": [
+   {
+    "en": "impossible",
+    "zh": "不可能的",
+    "how": "im 不＋possible 可能的"
+   },
+   {
+    "en": "incorrect",
+    "zh": "不正確的",
+    "how": "in 不＋correct 正確的"
+   },
+   {
+    "en": "impolite",
+    "zh": "沒禮貌的",
+    "how": "im 不＋polite 有禮貌的"
+   }
+  ],
+  "guess": {
+   "en": "inexpensive",
+   "zh": "不貴的"
+  }
+ },
+ {
+  "id": "wp009",
+  "type": "字尾",
+  "part": "-tion／-sion",
+  "meaning": "動作或結果（動詞變名詞）",
+  "examples": [
+   {
+    "en": "action",
+    "zh": "行動",
+    "how": "act 做＋ion"
+   },
+   {
+    "en": "information",
+    "zh": "資訊",
+    "how": "inform 通知＋ation"
+   },
+   {
+    "en": "decision",
+    "zh": "決定",
+    "how": "decide 決定＋sion"
+   }
+  ],
+  "guess": {
+   "en": "invitation",
+   "zh": "邀請"
+  }
+ },
+ {
+  "id": "wp010",
+  "type": "字尾",
+  "part": "-able／-ible",
+  "meaning": "可以…的",
+  "examples": [
+   {
+    "en": "comfortable",
+    "zh": "舒服的",
+    "how": "comfort 舒適＋able"
+   },
+   {
+    "en": "washable",
+    "zh": "可以洗的",
+    "how": "wash 洗＋able"
+   },
+   {
+    "en": "possible",
+    "zh": "可能的"
+   }
+  ],
+  "guess": {
+   "en": "drinkable",
+   "zh": "可以喝的"
+  }
+ },
+ {
+  "id": "wp011",
+  "type": "字首",
+  "part": "pre-",
+  "meaning": "在…之前、預先",
+  "examples": [
+   {
+    "en": "preview",
+    "zh": "預習、預告",
+    "how": "pre 先＋view 看"
+   },
+   {
+    "en": "prepare",
+    "zh": "準備",
+    "how": "pre 先＋pare 備好"
+   },
+   {
+    "en": "predict",
+    "zh": "預測",
+    "how": "pre 先＋dict 說"
+   }
+  ],
+  "guess": {
+   "en": "preschool",
+   "zh": "幼兒園（上小學之前）"
+  }
+ },
+ {
+  "id": "wp012",
+  "type": "字首",
+  "part": "mis-",
+  "meaning": "錯誤",
+  "examples": [
+   {
+    "en": "mistake",
+    "zh": "錯誤",
+    "how": "mis 錯＋take 拿"
+   },
+   {
+    "en": "misunderstand",
+    "zh": "誤會",
+    "how": "mis 錯＋understand 了解"
+   },
+   {
+    "en": "misspell",
+    "zh": "拼錯",
+    "how": "mis 錯＋spell 拼"
+   }
+  ],
+  "guess": {
+   "en": "misread",
+   "zh": "讀錯"
+  }
+ },
+ {
+  "id": "wp013",
+  "type": "字尾",
+  "part": "-ness",
+  "meaning": "狀態（形容詞變名詞）",
+  "examples": [
+   {
+    "en": "kindness",
+    "zh": "仁慈",
+    "how": "kind 仁慈的＋ness"
+   },
+   {
+    "en": "illness",
+    "zh": "疾病",
+    "how": "ill 生病的＋ness"
+   },
+   {
+    "en": "happiness",
+    "zh": "快樂",
+    "how": "happy 快樂的＋ness"
+   }
+  ],
+  "guess": {
+   "en": "sadness",
+   "zh": "悲傷"
+  }
+ },
+ {
+  "id": "wp014",
+  "type": "字尾",
+  "part": "-ment",
+  "meaning": "動作或結果（動詞變名詞）",
+  "examples": [
+   {
+    "en": "movement",
+    "zh": "動作",
+    "how": "move 動＋ment"
+   },
+   {
+    "en": "treatment",
+    "zh": "治療",
+    "how": "treat 治療＋ment"
+   },
+   {
+    "en": "appointment",
+    "zh": "預約",
+    "how": "appoint 約定＋ment"
+   }
+  ],
+  "guess": {
+   "en": "payment",
+   "zh": "付款"
+  }
+ },
+ {
+  "id": "wp015",
+  "type": "字首",
+  "part": "over-",
+  "meaning": "過度、在上面",
+  "examples": [
+   {
+    "en": "overeat",
+    "zh": "吃太多",
+    "how": "over 過度＋eat 吃"
+   },
+   {
+    "en": "oversleep",
+    "zh": "睡過頭",
+    "how": "over 過度＋sleep 睡"
+   },
+   {
+    "en": "overweight",
+    "zh": "過重的",
+    "how": "over 過度＋weight 體重"
+   }
+  ],
+  "guess": {
+   "en": "overwork",
+   "zh": "工作過度"
+  }
+ },
+ {
+  "id": "wp016",
+  "type": "字首",
+  "part": "under-",
+  "meaning": "在下面、不足",
+  "examples": [
+   {
+    "en": "underground",
+    "zh": "地下的",
+    "how": "under 下＋ground 地面"
+   },
+   {
+    "en": "underline",
+    "zh": "畫底線",
+    "how": "under 下＋line 線"
+   },
+   {
+    "en": "underweight",
+    "zh": "體重過輕的",
+    "how": "under 不足＋weight 體重"
+   }
+  ],
+  "guess": {
+   "en": "underwear",
+   "zh": "內衣褲"
+  }
+ },
+ {
+  "id": "wp017",
+  "type": "字尾",
+  "part": "-y",
+  "meaning": "有…的（名詞變形容詞）",
+  "examples": [
+   {
+    "en": "rainy",
+    "zh": "下雨的",
+    "how": "rain 雨＋y"
+   },
+   {
+    "en": "sleepy",
+    "zh": "想睡的",
+    "how": "sleep 睡＋y"
+   },
+   {
+    "en": "healthy",
+    "zh": "健康的",
+    "how": "health 健康＋y"
+   }
+  ],
+  "guess": {
+   "en": "salty",
+   "zh": "鹹的"
+  }
+ },
+ {
+  "id": "wp018",
+  "type": "字尾",
+  "part": "-ed／-ing",
+  "meaning": "感到…的／令人…的",
+  "examples": [
+   {
+    "en": "interested",
+    "zh": "感興趣的",
+    "how": "人的感覺用 -ed"
+   },
+   {
+    "en": "interesting",
+    "zh": "有趣的",
+    "how": "事情給人的感覺用 -ing"
+   },
+   {
+    "en": "tired",
+    "zh": "累的"
+   },
+   {
+    "en": "tiring",
+    "zh": "累人的"
+   }
+  ],
+  "guess": {
+   "en": "exciting",
+   "zh": "令人興奮的"
+  }
+ },
+ {
+  "id": "wp019",
+  "type": "字尾",
+  "part": "-ist",
+  "meaning": "做…的人、專家",
+  "examples": [
+   {
+    "en": "artist",
+    "zh": "藝術家",
+    "how": "art 藝術＋ist 人"
+   },
+   {
+    "en": "dentist",
+    "zh": "牙醫",
+    "how": "dent 牙＋ist 人"
+   },
+   {
+    "en": "scientist",
+    "zh": "科學家",
+    "how": "science 科學＋ist"
+   }
+  ],
+  "guess": {
+   "en": "pianist",
+   "zh": "鋼琴家"
+  }
+ },
+ {
+  "id": "wp020",
+  "type": "字尾",
+  "part": "-ous",
+  "meaning": "有…性質的",
+  "examples": [
+   {
+    "en": "dangerous",
+    "zh": "危險的",
+    "how": "danger 危險＋ous"
+   },
+   {
+    "en": "famous",
+    "zh": "有名的",
+    "how": "fame 名聲＋ous"
+   },
+   {
+    "en": "nervous",
+    "zh": "緊張的",
+    "how": "nerve 神經＋ous"
+   }
+  ],
+  "guess": {
+   "en": "poisonous",
+   "zh": "有毒的"
+  }
+ },
+ {
+  "id": "wp021",
+  "type": "字尾",
+  "part": "-al",
+  "meaning": "…的（名詞變形容詞）",
+  "examples": [
+   {
+    "en": "national",
+    "zh": "國家的",
+    "how": "nation 國家＋al"
+   },
+   {
+    "en": "medical",
+    "zh": "醫療的",
+    "how": "medic 醫＋al"
+   },
+   {
+    "en": "personal",
+    "zh": "個人的",
+    "how": "person 人＋al"
+   }
+  ],
+  "guess": {
+   "en": "musical",
+   "zh": "音樂的"
+  }
+ },
+ {
+  "id": "wp022",
+  "type": "字尾",
+  "part": "-ive",
+  "meaning": "有…傾向的",
+  "examples": [
+   {
+    "en": "active",
+    "zh": "活躍的",
+    "how": "act 做＋ive"
+   },
+   {
+    "en": "expensive",
+    "zh": "貴的",
+    "how": "expense 花費＋ive"
+   },
+   {
+    "en": "positive",
+    "zh": "正面的、陽性的"
+   }
+  ],
+  "guess": {
+   "en": "creative",
+   "zh": "有創意的"
+  }
+ },
+ {
+  "id": "wp023",
+  "type": "字首",
+  "part": "in-／im-（進入）",
+  "meaning": "進入、在裡面",
+  "examples": [
+   {
+    "en": "inside",
+    "zh": "裡面",
+    "how": "in 裡＋side 邊"
+   },
+   {
+    "en": "income",
+    "zh": "收入",
+    "how": "in 進＋come 來"
+   },
+   {
+    "en": "import",
+    "zh": "進口",
+    "how": "im 進＋port 運"
+   }
+  ],
+  "guess": {
+   "en": "indoor",
+   "zh": "室內的"
+  }
+ },
+ {
+  "id": "wp024",
+  "type": "字首",
+  "part": "ex-",
+  "meaning": "向外；以前的",
+  "examples": [
+   {
+    "en": "exit",
+    "zh": "出口",
+    "how": "ex 外＋it 走"
+   },
+   {
+    "en": "export",
+    "zh": "出口（貨物）",
+    "how": "ex 外＋port 運"
+   },
+   {
+    "en": "exhale",
+    "zh": "吐氣",
+    "how": "ex 外＋hale 呼吸"
+   }
+  ],
+  "guess": {
+   "en": "ex-boyfriend",
+   "zh": "前男友"
+  }
+ },
+ {
+  "id": "wp025",
+  "type": "字首",
+  "part": "inter-",
+  "meaning": "在…之間、互相",
+  "examples": [
+   {
+    "en": "international",
+    "zh": "國際的",
+    "how": "inter 之間＋national 國家的"
+   },
+   {
+    "en": "internet",
+    "zh": "網際網路",
+    "how": "inter 之間＋net 網"
+   },
+   {
+    "en": "interview",
+    "zh": "面試、訪問",
+    "how": "inter 互相＋view 看"
+   }
+  ],
+  "guess": {
+   "en": "interact",
+   "zh": "互動"
+  }
+ },
+ {
+  "id": "wp026",
+  "type": "字首",
+  "part": "sub-",
+  "meaning": "在下面",
+  "examples": [
+   {
+    "en": "subway",
+    "zh": "地下鐵",
+    "how": "sub 下＋way 路"
+   },
+   {
+    "en": "submarine",
+    "zh": "潛水艇",
+    "how": "sub 下＋marine 海"
+   },
+   {
+    "en": "subtitle",
+    "zh": "字幕",
+    "how": "sub 下＋title 標題"
+   }
+  ],
+  "guess": {
+   "en": "subzero",
+   "zh": "零下的"
+  }
+ },
+ {
+  "id": "wp027",
+  "type": "字首",
+  "part": "trans-",
+  "meaning": "穿過、轉移",
+  "examples": [
+   {
+    "en": "transport",
+    "zh": "運輸",
+    "how": "trans 轉＋port 運"
+   },
+   {
+    "en": "translate",
+    "zh": "翻譯",
+    "how": "trans 轉＋late 帶過去"
+   },
+   {
+    "en": "transfer",
+    "zh": "轉移、轉學",
+    "how": "trans 轉＋fer 帶"
+   }
+  ],
+  "guess": {
+   "en": "transplant",
+   "zh": "移植"
+  }
+ },
+ {
+  "id": "wp028",
+  "type": "字首",
+  "part": "co-／com-／con-",
+  "meaning": "一起",
+  "examples": [
+   {
+    "en": "cooperate",
+    "zh": "合作",
+    "how": "co 一起＋operate 運作"
+   },
+   {
+    "en": "connect",
+    "zh": "連接",
+    "how": "con 一起＋nect 綁"
+   },
+   {
+    "en": "company",
+    "zh": "公司、同伴",
+    "how": "com 一起＋pan 麵包（一起吃麵包的人）"
+   }
+  ],
+  "guess": {
+   "en": "coworker",
+   "zh": "同事"
+  }
+ },
+ {
+  "id": "wp029",
+  "type": "字首",
+  "part": "en-／em-",
+  "meaning": "使…、放進去",
+  "examples": [
+   {
+    "en": "enjoy",
+    "zh": "享受",
+    "how": "en 使＋joy 快樂"
+   },
+   {
+    "en": "enlarge",
+    "zh": "放大",
+    "how": "en 使＋large 大"
+   },
+   {
+    "en": "encourage",
+    "zh": "鼓勵",
+    "how": "en 使＋courage 勇氣"
+   }
+  ],
+  "guess": {
+   "en": "enable",
+   "zh": "使能夠"
+  }
+ },
+ {
+  "id": "wp030",
+  "type": "字首",
+  "part": "de-",
+  "meaning": "往下、去掉",
+  "examples": [
+   {
+    "en": "decrease",
+    "zh": "減少",
+    "how": "de 往下＋crease 長"
+   },
+   {
+    "en": "depart",
+    "zh": "離開",
+    "how": "de 離＋part 分開"
+   },
+   {
+    "en": "delete",
+    "zh": "刪除"
+   }
+  ],
+  "guess": {
+   "en": "defrost",
+   "zh": "解凍"
+  }
+ },
+ {
+  "id": "wp031",
+  "type": "字首",
+  "part": "non-",
+  "meaning": "非、不",
+  "examples": [
+   {
+    "en": "nonstop",
+    "zh": "不停的、直達的",
+    "how": "non 不＋stop 停"
+   },
+   {
+    "en": "nonsense",
+    "zh": "胡說",
+    "how": "non 沒有＋sense 道理"
+   },
+   {
+    "en": "nonsmoker",
+    "zh": "不抽菸的人",
+    "how": "non 不＋smoker 抽菸的人"
+   }
+  ],
+  "guess": {
+   "en": "nonfat",
+   "zh": "脫脂的"
+  }
+ },
+ {
+  "id": "wp032",
+  "type": "字首",
+  "part": "anti-",
+  "meaning": "反對、對抗",
+  "examples": [
+   {
+    "en": "antibiotic",
+    "zh": "抗生素",
+    "how": "anti 抗＋bio 生物"
+   },
+   {
+    "en": "antivirus",
+    "zh": "防毒的",
+    "how": "anti 抗＋virus 病毒"
+   },
+   {
+    "en": "antisocial",
+    "zh": "不合群的",
+    "how": "anti 反＋social 社交的"
+   }
+  ],
+  "guess": {
+   "en": "antiwar",
+   "zh": "反戰的"
+  }
+ },
+ {
+  "id": "wp033",
+  "type": "字首",
+  "part": "auto-",
+  "meaning": "自己、自動",
+  "examples": [
+   {
+    "en": "automatic",
+    "zh": "自動的"
+   },
+   {
+    "en": "autograph",
+    "zh": "親筆簽名",
+    "how": "auto 自己＋graph 寫"
+   },
+   {
+    "en": "automobile",
+    "zh": "汽車",
+    "how": "auto 自己＋mobile 會動的"
+   }
+  ],
+  "guess": {
+   "en": "autopilot",
+   "zh": "自動駕駛"
+  }
+ },
+ {
+  "id": "wp034",
+  "type": "字首",
+  "part": "self-",
+  "meaning": "自己",
+  "examples": [
+   {
+    "en": "self-care",
+    "zh": "自我照顧",
+    "how": "self 自己＋care 照顧"
+   },
+   {
+    "en": "self-control",
+    "zh": "自制",
+    "how": "self 自己＋control 控制"
+   },
+   {
+    "en": "selfish",
+    "zh": "自私的",
+    "how": "self 自己＋ish"
+   }
+  ],
+  "guess": {
+   "en": "self-study",
+   "zh": "自學"
+  }
+ },
+ {
+  "id": "wp035",
+  "type": "字首",
+  "part": "out-",
+  "meaning": "向外、超過",
+  "examples": [
+   {
+    "en": "outside",
+    "zh": "外面",
+    "how": "out 外＋side 邊"
+   },
+   {
+    "en": "outdoor",
+    "zh": "戶外的",
+    "how": "out 外＋door 門"
+   },
+   {
+    "en": "outgoing",
+    "zh": "外向的",
+    "how": "out 外＋going 走"
+   }
+  ],
+  "guess": {
+   "en": "outline",
+   "zh": "大綱、輪廓"
+  }
+ },
+ {
+  "id": "wp036",
+  "type": "字首",
+  "part": "mid-",
+  "meaning": "中間",
+  "examples": [
+   {
+    "en": "midnight",
+    "zh": "午夜",
+    "how": "mid 中＋night 夜"
+   },
+   {
+    "en": "midterm",
+    "zh": "期中（考）",
+    "how": "mid 中＋term 學期"
+   },
+   {
+    "en": "midday",
+    "zh": "正午",
+    "how": "mid 中＋day 白天"
+   }
+  ],
+  "guess": {
+   "en": "midweek",
+   "zh": "一週的中間"
+  }
+ },
+ {
+  "id": "wp037",
+  "type": "字首",
+  "part": "fore-",
+  "meaning": "前面、預先",
+  "examples": [
+   {
+    "en": "forehead",
+    "zh": "額頭",
+    "how": "fore 前＋head 頭"
+   },
+   {
+    "en": "forecast",
+    "zh": "預報",
+    "how": "fore 先＋cast 投"
+   },
+   {
+    "en": "forearm",
+    "zh": "前臂",
+    "how": "fore 前＋arm 手臂"
+   }
+  ],
+  "guess": {
+   "en": "foresee",
+   "zh": "預見"
+  }
+ },
+ {
+  "id": "wp038",
+  "type": "字首",
+  "part": "super-",
+  "meaning": "超級、在上面",
+  "examples": [
+   {
+    "en": "supermarket",
+    "zh": "超級市場",
+    "how": "super 超級＋market 市場"
+   },
+   {
+    "en": "superman",
+    "zh": "超人"
+   },
+   {
+    "en": "superstar",
+    "zh": "超級巨星"
+   }
+  ],
+  "guess": {
+   "en": "superhero",
+   "zh": "超級英雄"
+  }
+ },
+ {
+  "id": "wp039",
+  "type": "字首",
+  "part": "uni-",
+  "meaning": "一、單一",
+  "examples": [
+   {
+    "en": "uniform",
+    "zh": "制服",
+    "how": "uni 一＋form 樣子"
+   },
+   {
+    "en": "unit",
+    "zh": "單位"
+   },
+   {
+    "en": "unique",
+    "zh": "獨一無二的"
+   }
+  ],
+  "guess": {
+   "en": "unicycle",
+   "zh": "單輪車"
+  }
+ },
+ {
+  "id": "wp040",
+  "type": "字首",
+  "part": "bi-",
+  "meaning": "二",
+  "examples": [
+   {
+    "en": "bicycle",
+    "zh": "腳踏車",
+    "how": "bi 二＋cycle 輪"
+   },
+   {
+    "en": "bilingual",
+    "zh": "雙語的",
+    "how": "bi 二＋lingual 語言的"
+   },
+   {
+    "en": "biweekly",
+    "zh": "兩週一次的",
+    "how": "bi 二＋weekly 每週的"
+   }
+  ],
+  "guess": {
+   "en": "bimonthly",
+   "zh": "兩個月一次的"
+  }
+ },
+ {
+  "id": "wp041",
+  "type": "字首",
+  "part": "tri-",
+  "meaning": "三",
+  "examples": [
+   {
+    "en": "triangle",
+    "zh": "三角形",
+    "how": "tri 三＋angle 角"
+   },
+   {
+    "en": "tricycle",
+    "zh": "三輪車",
+    "how": "tri 三＋cycle 輪"
+   },
+   {
+    "en": "triple",
+    "zh": "三倍的"
+   }
+  ],
+  "guess": {
+   "en": "triathlon",
+   "zh": "鐵人三項"
+  }
+ },
+ {
+  "id": "wp042",
+  "type": "字首",
+  "part": "multi-",
+  "meaning": "多",
+  "examples": [
+   {
+    "en": "multicultural",
+    "zh": "多元文化的",
+    "how": "multi 多＋cultural 文化的"
+   },
+   {
+    "en": "multimedia",
+    "zh": "多媒體",
+    "how": "multi 多＋media 媒體"
+   },
+   {
+    "en": "multiply",
+    "zh": "乘、增加"
+   }
+  ],
+  "guess": {
+   "en": "multicolor",
+   "zh": "多種顏色的"
+  }
+ },
+ {
+  "id": "wp043",
+  "type": "字首",
+  "part": "semi-",
+  "meaning": "半",
+  "examples": [
+   {
+    "en": "semicircle",
+    "zh": "半圓",
+    "how": "semi 半＋circle 圓"
+   },
+   {
+    "en": "semifinal",
+    "zh": "準決賽",
+    "how": "semi 半＋final 決賽"
+   },
+   {
+    "en": "semiconductor",
+    "zh": "半導體",
+    "how": "semi 半＋conductor 導體"
+   }
+  ],
+  "guess": {
+   "en": "semisweet",
+   "zh": "半甜的"
+  }
+ },
+ {
+  "id": "wp044",
+  "type": "字首",
+  "part": "mini-",
+  "meaning": "小",
+  "examples": [
+   {
+    "en": "minibus",
+    "zh": "小型巴士",
+    "how": "mini 小＋bus"
+   },
+   {
+    "en": "miniskirt",
+    "zh": "迷你裙",
+    "how": "mini 小＋skirt 裙"
+   },
+   {
+    "en": "minimum",
+    "zh": "最小量"
+   }
+  ],
+  "guess": {
+   "en": "minivan",
+   "zh": "小型廂型車"
+  }
+ },
+ {
+  "id": "wp045",
+  "type": "字首",
+  "part": "micro-",
+  "meaning": "微小",
+  "examples": [
+   {
+    "en": "microscope",
+    "zh": "顯微鏡",
+    "how": "micro 微小＋scope 看"
+   },
+   {
+    "en": "microwave",
+    "zh": "微波（爐）",
+    "how": "micro 微＋wave 波"
+   },
+   {
+    "en": "microphone",
+    "zh": "麥克風",
+    "how": "micro 微小＋phone 聲音"
+   }
+  ],
+  "guess": {
+   "en": "microchip",
+   "zh": "微晶片"
+  }
+ },
+ {
+  "id": "wp046",
+  "type": "字首",
+  "part": "tele-",
+  "meaning": "遠",
+  "examples": [
+   {
+    "en": "telephone",
+    "zh": "電話",
+    "how": "tele 遠＋phone 聲音"
+   },
+   {
+    "en": "television",
+    "zh": "電視",
+    "how": "tele 遠＋vision 看"
+   },
+   {
+    "en": "telescope",
+    "zh": "望遠鏡",
+    "how": "tele 遠＋scope 看"
+   }
+  ],
+  "guess": {
+   "en": "telework",
+   "zh": "遠距工作"
+  }
+ },
+ {
+  "id": "wp047",
+  "type": "字首",
+  "part": "post-",
+  "meaning": "在…之後",
+  "examples": [
+   {
+    "en": "postpone",
+    "zh": "延後",
+    "how": "post 後＋pone 放"
+   },
+   {
+    "en": "postwar",
+    "zh": "戰後的",
+    "how": "post 後＋war 戰爭"
+   },
+   {
+    "en": "postgraduate",
+    "zh": "研究生",
+    "how": "post 後＋graduate 畢業"
+   }
+  ],
+  "guess": {
+   "en": "postoperative",
+   "zh": "手術後的"
+  }
+ },
+ {
+  "id": "wp048",
+  "type": "字首",
+  "part": "kilo-",
+  "meaning": "一千",
+  "examples": [
+   {
+    "en": "kilogram",
+    "zh": "公斤",
+    "how": "kilo 千＋gram 公克"
+   },
+   {
+    "en": "kilometer",
+    "zh": "公里",
+    "how": "kilo 千＋meter 公尺"
+   },
+   {
+    "en": "kilobyte",
+    "zh": "千位元組"
+   }
+  ],
+  "guess": {
+   "en": "kilowatt",
+   "zh": "千瓦"
+  }
+ },
+ {
+  "id": "wp049",
+  "type": "字首",
+  "part": "milli-",
+  "meaning": "千分之一",
+  "examples": [
+   {
+    "en": "milliliter",
+    "zh": "毫升",
+    "how": "milli 千分之一＋liter 公升"
+   },
+   {
+    "en": "millimeter",
+    "zh": "毫米",
+    "how": "milli＋meter 公尺"
+   },
+   {
+    "en": "milligram",
+    "zh": "毫克",
+    "how": "milli＋gram 公克"
+   }
+  ],
+  "guess": {
+   "en": "millisecond",
+   "zh": "毫秒"
+  }
+ },
+ {
+  "id": "wp050",
+  "type": "字尾",
+  "part": "-ity／-ty",
+  "meaning": "性質、狀態（名詞）",
+  "examples": [
+   {
+    "en": "ability",
+    "zh": "能力",
+    "how": "able 能夠的＋ity"
+   },
+   {
+    "en": "safety",
+    "zh": "安全",
+    "how": "safe 安全的＋ty"
+   },
+   {
+    "en": "activity",
+    "zh": "活動",
+    "how": "active 活躍的＋ity"
+   }
+  ],
+  "guess": {
+   "en": "reality",
+   "zh": "現實"
+  }
+ },
+ {
+  "id": "wp051",
+  "type": "字尾",
+  "part": "-ance／-ence",
+  "meaning": "狀態、性質（名詞）",
+  "examples": [
+   {
+    "en": "importance",
+    "zh": "重要性",
+    "how": "important 重要的→ance"
+   },
+   {
+    "en": "difference",
+    "zh": "不同",
+    "how": "different 不同的→ence"
+   },
+   {
+    "en": "ambulance",
+    "zh": "救護車",
+    "how": "ambul 走＋ance"
+   }
+  ],
+  "guess": {
+   "en": "appearance",
+   "zh": "外表、出現"
+  }
+ },
+ {
+  "id": "wp052",
+  "type": "字尾",
+  "part": "-ship",
+  "meaning": "關係、身分",
+  "examples": [
+   {
+    "en": "friendship",
+    "zh": "友誼",
+    "how": "friend 朋友＋ship"
+   },
+   {
+    "en": "relationship",
+    "zh": "關係",
+    "how": "relation 關聯＋ship"
+   },
+   {
+    "en": "membership",
+    "zh": "會員身分",
+    "how": "member 會員＋ship"
+   }
+  ],
+  "guess": {
+   "en": "leadership",
+   "zh": "領導力"
+  }
+ },
+ {
+  "id": "wp053",
+  "type": "字尾",
+  "part": "-hood",
+  "meaning": "時期、狀態",
+  "examples": [
+   {
+    "en": "childhood",
+    "zh": "童年",
+    "how": "child 小孩＋hood"
+   },
+   {
+    "en": "neighborhood",
+    "zh": "鄰近地區",
+    "how": "neighbor 鄰居＋hood"
+   },
+   {
+    "en": "adulthood",
+    "zh": "成年期",
+    "how": "adult 成人＋hood"
+   }
+  ],
+  "guess": {
+   "en": "motherhood",
+   "zh": "當母親（的身分）"
+  }
+ },
+ {
+  "id": "wp054",
+  "type": "字尾",
+  "part": "-ish",
+  "meaning": "有點…的；…國的",
+  "examples": [
+   {
+    "en": "childish",
+    "zh": "幼稚的",
+    "how": "child 小孩＋ish"
+   },
+   {
+    "en": "foolish",
+    "zh": "愚蠢的",
+    "how": "fool 傻瓜＋ish"
+   },
+   {
+    "en": "British",
+    "zh": "英國的"
+   }
+  ],
+  "guess": {
+   "en": "reddish",
+   "zh": "帶紅色的"
+  }
+ },
+ {
+  "id": "wp055",
+  "type": "字尾",
+  "part": "-ic",
+  "meaning": "…的",
+  "examples": [
+   {
+    "en": "basic",
+    "zh": "基本的",
+    "how": "base 基礎＋ic"
+   },
+   {
+    "en": "allergic",
+    "zh": "過敏的",
+    "how": "allergy 過敏＋ic"
+   },
+   {
+    "en": "electric",
+    "zh": "電的"
+   }
+  ],
+  "guess": {
+   "en": "scientific",
+   "zh": "科學的"
+  }
+ },
+ {
+  "id": "wp056",
+  "type": "字尾",
+  "part": "-en",
+  "meaning": "使變成…（變動詞）",
+  "examples": [
+   {
+    "en": "shorten",
+    "zh": "縮短",
+    "how": "short 短＋en"
+   },
+   {
+    "en": "widen",
+    "zh": "加寬",
+    "how": "wide 寬＋en"
+   },
+   {
+    "en": "weaken",
+    "zh": "使變弱",
+    "how": "weak 弱＋en"
+   }
+  ],
+  "guess": {
+   "en": "darken",
+   "zh": "使變暗"
+  }
+ },
+ {
+  "id": "wp057",
+  "type": "字尾",
+  "part": "-ize",
+  "meaning": "使…化（變動詞）",
+  "examples": [
+   {
+    "en": "realize",
+    "zh": "了解到、實現",
+    "how": "real 真的＋ize"
+   },
+   {
+    "en": "organize",
+    "zh": "組織、整理"
+   },
+   {
+    "en": "memorize",
+    "zh": "背起來",
+    "how": "memory 記憶＋ize"
+   }
+  ],
+  "guess": {
+   "en": "modernize",
+   "zh": "使現代化"
+  }
+ },
+ {
+  "id": "wp058",
+  "type": "字尾",
+  "part": "-ify",
+  "meaning": "使…（變動詞）",
+  "examples": [
+   {
+    "en": "simplify",
+    "zh": "簡化",
+    "how": "simple 簡單＋ify"
+   },
+   {
+    "en": "clarify",
+    "zh": "說清楚",
+    "how": "clear 清楚＋ify"
+   },
+   {
+    "en": "identify",
+    "zh": "辨認"
+   }
+  ],
+  "guess": {
+   "en": "purify",
+   "zh": "淨化"
+  }
+ },
+ {
+  "id": "wp059",
+  "type": "字尾",
+  "part": "-th",
+  "meaning": "把形容詞變成名詞",
+  "examples": [
+   {
+    "en": "length",
+    "zh": "長度",
+    "how": "long 長的→length"
+   },
+   {
+    "en": "strength",
+    "zh": "力量",
+    "how": "strong 強的→strength"
+   },
+   {
+    "en": "width",
+    "zh": "寬度",
+    "how": "wide 寬的→width"
+   }
+  ],
+  "guess": {
+   "en": "depth",
+   "zh": "深度"
+  }
+ },
+ {
+  "id": "wp060",
+  "type": "字尾",
+  "part": "-ward",
+  "meaning": "往…方向",
+  "examples": [
+   {
+    "en": "forward",
+    "zh": "向前",
+    "how": "for 前＋ward"
+   },
+   {
+    "en": "backward",
+    "zh": "向後",
+    "how": "back 後＋ward"
+   },
+   {
+    "en": "toward",
+    "zh": "朝向",
+    "how": "to＋ward"
+   }
+  ],
+  "guess": {
+   "en": "upward",
+   "zh": "向上"
+  }
+ },
+ {
+  "id": "wp061",
+  "type": "字尾",
+  "part": "-ian／-an",
+  "meaning": "…的人、…國人",
+  "examples": [
+   {
+    "en": "musician",
+    "zh": "音樂家",
+    "how": "music 音樂＋ian"
+   },
+   {
+    "en": "American",
+    "zh": "美國人"
+   },
+   {
+    "en": "physician",
+    "zh": "內科醫師"
+   }
+  ],
+  "guess": {
+   "en": "librarian",
+   "zh": "圖書館員"
+  }
+ },
+ {
+  "id": "wp062",
+  "type": "字尾",
+  "part": "-ese",
+  "meaning": "…國的、…語",
+  "examples": [
+   {
+    "en": "Chinese",
+    "zh": "中國的、中文"
+   },
+   {
+    "en": "Japanese",
+    "zh": "日本的、日文"
+   },
+   {
+    "en": "Taiwanese",
+    "zh": "台灣的、台語"
+   }
+  ],
+  "guess": {
+   "en": "Vietnamese",
+   "zh": "越南的、越南語"
+  }
+ },
+ {
+  "id": "wp063",
+  "type": "字尾",
+  "part": "-ee",
+  "meaning": "被…的人",
+  "examples": [
+   {
+    "en": "employee",
+    "zh": "員工",
+    "how": "employ 雇用＋ee 被雇用的人"
+   },
+   {
+    "en": "trainee",
+    "zh": "受訓的人",
+    "how": "train 訓練＋ee"
+   },
+   {
+    "en": "interviewee",
+    "zh": "被面試的人",
+    "how": "interview 面試＋ee"
+   }
+  ],
+  "guess": {
+   "en": "payee",
+   "zh": "收款人"
+  }
+ },
+ {
+  "id": "wp064",
+  "type": "字尾",
+  "part": "-ery／-ry",
+  "meaning": "場所、行業",
+  "examples": [
+   {
+    "en": "bakery",
+    "zh": "麵包店",
+    "how": "bake 烤＋ery"
+   },
+   {
+    "en": "nursery",
+    "zh": "育嬰室、托兒所",
+    "how": "nurse 照顧＋ery"
+   },
+   {
+    "en": "surgery",
+    "zh": "手術"
+   }
+  ],
+  "guess": {
+   "en": "fishery",
+   "zh": "漁場"
+  }
+ },
+ {
+  "id": "wp065",
+  "type": "字根",
+  "part": "port",
+  "meaning": "運、拿",
+  "examples": [
+   {
+    "en": "airport",
+    "zh": "機場",
+    "how": "air 空中＋port 港"
+   },
+   {
+    "en": "report",
+    "zh": "報告",
+    "how": "re 回＋port 帶"
+   },
+   {
+    "en": "support",
+    "zh": "支持",
+    "how": "sup 下面＋port 撐"
+   }
+  ],
+  "guess": {
+   "en": "portable",
+   "zh": "可以帶著走的"
+  }
+ },
+ {
+  "id": "wp066",
+  "type": "字根",
+  "part": "act",
+  "meaning": "做",
+  "examples": [
+   {
+    "en": "actor",
+    "zh": "演員",
+    "how": "act 演＋or 人"
+   },
+   {
+    "en": "action",
+    "zh": "行動"
+   },
+   {
+    "en": "react",
+    "zh": "反應",
+    "how": "re 回＋act 做"
+   }
+  ],
+  "guess": {
+   "en": "reaction",
+   "zh": "反應"
+  }
+ },
+ {
+  "id": "wp067",
+  "type": "字根",
+  "part": "vis／vid",
+  "meaning": "看",
+  "examples": [
+   {
+    "en": "visit",
+    "zh": "拜訪"
+   },
+   {
+    "en": "video",
+    "zh": "影片"
+   },
+   {
+    "en": "visible",
+    "zh": "看得見的",
+    "how": "vis 看＋ible 可以"
+   }
+  ],
+  "guess": {
+   "en": "invisible",
+   "zh": "看不見的"
+  }
+ },
+ {
+  "id": "wp068",
+  "type": "字根",
+  "part": "spect／pect",
+  "meaning": "看",
+  "examples": [
+   {
+    "en": "inspect",
+    "zh": "檢查",
+    "how": "in 裡＋spect 看"
+   },
+   {
+    "en": "respect",
+    "zh": "尊敬",
+    "how": "re 再＋spect 看"
+   },
+   {
+    "en": "expect",
+    "zh": "期待",
+    "how": "ex 外＋(s)pect 看"
+   }
+  ],
+  "guess": {
+   "en": "spectator",
+   "zh": "觀眾"
+  }
+ },
+ {
+  "id": "wp069",
+  "type": "字根",
+  "part": "dict",
+  "meaning": "說",
+  "examples": [
+   {
+    "en": "dictionary",
+    "zh": "字典"
+   },
+   {
+    "en": "predict",
+    "zh": "預測",
+    "how": "pre 先＋dict 說"
+   },
+   {
+    "en": "dictate",
+    "zh": "口述、聽寫"
+   }
+  ],
+  "guess": {
+   "en": "contradict",
+   "zh": "反駁、矛盾"
+  }
+ },
+ {
+  "id": "wp070",
+  "type": "字根",
+  "part": "scrib／script",
+  "meaning": "寫",
+  "examples": [
+   {
+    "en": "describe",
+    "zh": "描述",
+    "how": "de 下＋scribe 寫"
+   },
+   {
+    "en": "prescription",
+    "zh": "處方",
+    "how": "pre 先＋script 寫"
+   },
+   {
+    "en": "subscribe",
+    "zh": "訂閱",
+    "how": "sub 下面＋scribe 寫（簽名）"
+   }
+  ],
+  "guess": {
+   "en": "manuscript",
+   "zh": "手稿"
+  }
+ },
+ {
+  "id": "wp071",
+  "type": "字根",
+  "part": "aud",
+  "meaning": "聽",
+  "examples": [
+   {
+    "en": "audio",
+    "zh": "聲音的"
+   },
+   {
+    "en": "audience",
+    "zh": "聽眾、觀眾"
+   },
+   {
+    "en": "auditorium",
+    "zh": "禮堂"
+   }
+  ],
+  "guess": {
+   "en": "audible",
+   "zh": "聽得見的"
+  }
+ },
+ {
+  "id": "wp072",
+  "type": "字根",
+  "part": "phon",
+  "meaning": "聲音",
+  "examples": [
+   {
+    "en": "telephone",
+    "zh": "電話",
+    "how": "tele 遠＋phone 聲音"
+   },
+   {
+    "en": "microphone",
+    "zh": "麥克風"
+   },
+   {
+    "en": "headphones",
+    "zh": "耳機",
+    "how": "head 頭＋phones 聲音"
+   }
+  ],
+  "guess": {
+   "en": "phonics",
+   "zh": "自然發音法"
+  }
+ },
+ {
+  "id": "wp073",
+  "type": "字根",
+  "part": "graph／gram",
+  "meaning": "寫、畫",
+  "examples": [
+   {
+    "en": "photograph",
+    "zh": "照片",
+    "how": "photo 光＋graph 畫"
+   },
+   {
+    "en": "paragraph",
+    "zh": "段落"
+   },
+   {
+    "en": "program",
+    "zh": "節目、程式"
+   }
+  ],
+  "guess": {
+   "en": "telegram",
+   "zh": "電報"
+  }
+ },
+ {
+  "id": "wp074",
+  "type": "字根",
+  "part": "photo",
+  "meaning": "光",
+  "examples": [
+   {
+    "en": "photograph",
+    "zh": "照片"
+   },
+   {
+    "en": "photocopy",
+    "zh": "影印",
+    "how": "photo 光＋copy 複製"
+   },
+   {
+    "en": "photographer",
+    "zh": "攝影師"
+   }
+  ],
+  "guess": {
+   "en": "photosensitive",
+   "zh": "對光敏感的"
+  }
+ },
+ {
+  "id": "wp075",
+  "type": "字根",
+  "part": "bio",
+  "meaning": "生命",
+  "examples": [
+   {
+    "en": "biology",
+    "zh": "生物學",
+    "how": "bio 生命＋logy 學"
+   },
+   {
+    "en": "biography",
+    "zh": "傳記",
+    "how": "bio 生命＋graphy 寫"
+   },
+   {
+    "en": "antibiotic",
+    "zh": "抗生素"
+   }
+  ],
+  "guess": {
+   "en": "biotechnology",
+   "zh": "生物科技"
+  }
+ },
+ {
+  "id": "wp076",
+  "type": "字根",
+  "part": "geo",
+  "meaning": "土地、地球",
+  "examples": [
+   {
+    "en": "geography",
+    "zh": "地理",
+    "how": "geo 地＋graphy 寫"
+   },
+   {
+    "en": "geology",
+    "zh": "地質學",
+    "how": "geo 地＋logy 學"
+   },
+   {
+    "en": "geometry",
+    "zh": "幾何",
+    "how": "geo 地＋metry 量"
+   }
+  ],
+  "guess": {
+   "en": "geothermal",
+   "zh": "地熱的"
+  }
+ },
+ {
+  "id": "wp077",
+  "type": "字根",
+  "part": "therm",
+  "meaning": "熱",
+  "examples": [
+   {
+    "en": "thermometer",
+    "zh": "溫度計",
+    "how": "therm 熱＋meter 量"
+   },
+   {
+    "en": "thermos",
+    "zh": "保溫瓶"
+   },
+   {
+    "en": "thermal",
+    "zh": "熱的、保暖的"
+   }
+  ],
+  "guess": {
+   "en": "thermostat",
+   "zh": "恆溫器"
+  }
+ },
+ {
+  "id": "wp078",
+  "type": "字根",
+  "part": "meter／metr",
+  "meaning": "測量",
+  "examples": [
+   {
+    "en": "meter",
+    "zh": "公尺"
+   },
+   {
+    "en": "thermometer",
+    "zh": "溫度計"
+   },
+   {
+    "en": "centimeter",
+    "zh": "公分",
+    "how": "centi 百分之一＋meter"
+   }
+  ],
+  "guess": {
+   "en": "speedometer",
+   "zh": "速度表"
+  }
+ },
+ {
+  "id": "wp079",
+  "type": "字根",
+  "part": "cent",
+  "meaning": "一百",
+  "examples": [
+   {
+    "en": "cent",
+    "zh": "分（一百分之一元）"
+   },
+   {
+    "en": "century",
+    "zh": "世紀（一百年）"
+   },
+   {
+    "en": "percent",
+    "zh": "百分之…",
+    "how": "per 每＋cent 一百"
+   }
+  ],
+  "guess": {
+   "en": "centennial",
+   "zh": "一百週年"
+  }
+ },
+ {
+  "id": "wp080",
+  "type": "字根",
+  "part": "man／manu",
+  "meaning": "手",
+  "examples": [
+   {
+    "en": "manual",
+    "zh": "手動的、手冊"
+   },
+   {
+    "en": "manage",
+    "zh": "管理（原本是用手操控）"
+   },
+   {
+    "en": "manufacture",
+    "zh": "製造",
+    "how": "manu 手＋fact 做"
+   }
+  ],
+  "guess": {
+   "en": "manicure",
+   "zh": "修指甲"
+  }
+ },
+ {
+  "id": "wp081",
+  "type": "字根",
+  "part": "ped",
+  "meaning": "腳",
+  "examples": [
+   {
+    "en": "pedal",
+    "zh": "踏板"
+   },
+   {
+    "en": "pedestrian",
+    "zh": "行人"
+   },
+   {
+    "en": "pedicure",
+    "zh": "足部保養"
+   }
+  ],
+  "guess": {
+   "en": "centipede",
+   "zh": "蜈蚣（一百隻腳）"
+  }
+ },
+ {
+  "id": "wp082",
+  "type": "字根",
+  "part": "mov／mot／mob",
+  "meaning": "動",
+  "examples": [
+   {
+    "en": "move",
+    "zh": "移動"
+   },
+   {
+    "en": "motion",
+    "zh": "動作"
+   },
+   {
+    "en": "mobile",
+    "zh": "行動的、可移動的"
+   }
+  ],
+  "guess": {
+   "en": "remove",
+   "zh": "移除"
+  }
+ },
+ {
+  "id": "wp083",
+  "type": "字根",
+  "part": "duc／duct",
+  "meaning": "引導",
+  "examples": [
+   {
+    "en": "educate",
+    "zh": "教育",
+    "how": "e 出＋duc 引導"
+   },
+   {
+    "en": "introduce",
+    "zh": "介紹",
+    "how": "intro 向內＋duce 引"
+   },
+   {
+    "en": "produce",
+    "zh": "生產",
+    "how": "pro 向前＋duce 引"
+   }
+  ],
+  "guess": {
+   "en": "reduce",
+   "zh": "減少"
+  }
+ },
+ {
+  "id": "wp084",
+  "type": "字根",
+  "part": "mit／miss",
+  "meaning": "送",
+  "examples": [
+   {
+    "en": "admit",
+    "zh": "承認、准許進入",
+    "how": "ad 向＋mit 送"
+   },
+   {
+    "en": "permit",
+    "zh": "允許",
+    "how": "per 通過＋mit 送"
+   },
+   {
+    "en": "mission",
+    "zh": "任務"
+   }
+  ],
+  "guess": {
+   "en": "transmit",
+   "zh": "傳送"
+  }
+ },
+ {
+  "id": "wp085",
+  "type": "字根",
+  "part": "ject",
+  "meaning": "丟、投",
+  "examples": [
+   {
+    "en": "inject",
+    "zh": "注射",
+    "how": "in 進＋ject 投"
+   },
+   {
+    "en": "project",
+    "zh": "計畫、投影",
+    "how": "pro 向前＋ject 投"
+   },
+   {
+    "en": "reject",
+    "zh": "拒絕",
+    "how": "re 回＋ject 丟"
+   }
+  ],
+  "guess": {
+   "en": "eject",
+   "zh": "彈出"
+  }
+ },
+ {
+  "id": "wp086",
+  "type": "字根",
+  "part": "tract",
+  "meaning": "拉",
+  "examples": [
+   {
+    "en": "attract",
+    "zh": "吸引",
+    "how": "at 向＋tract 拉"
+   },
+   {
+    "en": "tractor",
+    "zh": "拖拉機"
+   },
+   {
+    "en": "subtract",
+    "zh": "減去",
+    "how": "sub 下＋tract 拉"
+   }
+  ],
+  "guess": {
+   "en": "extract",
+   "zh": "抽出、拔出"
+  }
+ },
+ {
+  "id": "wp087",
+  "type": "字根",
+  "part": "struct",
+  "meaning": "建造",
+  "examples": [
+   {
+    "en": "structure",
+    "zh": "結構"
+   },
+   {
+    "en": "construct",
+    "zh": "建造",
+    "how": "con 一起＋struct 建"
+   },
+   {
+    "en": "instruction",
+    "zh": "指示、說明"
+   }
+  ],
+  "guess": {
+   "en": "destruction",
+   "zh": "破壞"
+  }
+ },
+ {
+  "id": "wp088",
+  "type": "字根",
+  "part": "form",
+  "meaning": "形狀",
+  "examples": [
+   {
+    "en": "uniform",
+    "zh": "制服"
+   },
+   {
+    "en": "inform",
+    "zh": "通知",
+    "how": "in 進＋form 形（讓人心裡有個樣子）"
+   },
+   {
+    "en": "transform",
+    "zh": "改變",
+    "how": "trans 轉＋form 形"
+   }
+  ],
+  "guess": {
+   "en": "reform",
+   "zh": "改革"
+  }
+ },
+ {
+  "id": "wp089",
+  "type": "字根",
+  "part": "press",
+  "meaning": "壓",
+  "examples": [
+   {
+    "en": "pressure",
+    "zh": "壓力"
+   },
+   {
+    "en": "express",
+    "zh": "表達",
+    "how": "ex 外＋press 壓"
+   },
+   {
+    "en": "depress",
+    "zh": "使沮喪",
+    "how": "de 往下＋press 壓"
+   }
+  ],
+  "guess": {
+   "en": "compress",
+   "zh": "壓縮"
+  }
+ },
+ {
+  "id": "wp090",
+  "type": "字根",
+  "part": "rupt",
+  "meaning": "破",
+  "examples": [
+   {
+    "en": "interrupt",
+    "zh": "打斷",
+    "how": "inter 之間＋rupt 破"
+   },
+   {
+    "en": "erupt",
+    "zh": "爆發",
+    "how": "e 外＋rupt 破"
+   },
+   {
+    "en": "bankrupt",
+    "zh": "破產的",
+    "how": "bank 銀行＋rupt 破"
+   }
+  ],
+  "guess": {
+   "en": "rupture",
+   "zh": "破裂"
+  }
+ },
+ {
+  "id": "wp091",
+  "type": "字根",
+  "part": "viv／vit",
+  "meaning": "生命",
+  "examples": [
+   {
+    "en": "survive",
+    "zh": "存活",
+    "how": "sur 超過＋vive 活"
+   },
+   {
+    "en": "vitamin",
+    "zh": "維他命"
+   },
+   {
+    "en": "vital",
+    "zh": "生命的、極重要的"
+   }
+  ],
+  "guess": {
+   "en": "revive",
+   "zh": "甦醒、復活"
+  }
+ },
+ {
+  "id": "wp092",
+  "type": "字根",
+  "part": "med",
+  "meaning": "治療",
+  "examples": [
+   {
+    "en": "medicine",
+    "zh": "藥、醫學"
+   },
+   {
+    "en": "medical",
+    "zh": "醫療的"
+   },
+   {
+    "en": "medication",
+    "zh": "藥物"
+   }
+  ],
+  "guess": {
+   "en": "remedy",
+   "zh": "療法"
+  }
+ },
+ {
+  "id": "wp093",
+  "type": "字根",
+  "part": "spir",
+  "meaning": "呼吸",
+  "examples": [
+   {
+    "en": "respiration",
+    "zh": "呼吸",
+    "how": "re 再＋spir 呼吸"
+   },
+   {
+    "en": "inspire",
+    "zh": "鼓舞（原本是吸氣）",
+    "how": "in 進＋spire 呼吸"
+   },
+   {
+    "en": "spirit",
+    "zh": "精神（原本是氣息）"
+   }
+  ],
+  "guess": {
+   "en": "respirator",
+   "zh": "呼吸器"
+  }
+ },
+ {
+  "id": "wp094",
+  "type": "字根",
+  "part": "mem",
+  "meaning": "記憶",
+  "examples": [
+   {
+    "en": "memory",
+    "zh": "記憶"
+   },
+   {
+    "en": "remember",
+    "zh": "記得",
+    "how": "re 再＋member 記"
+   },
+   {
+    "en": "memorize",
+    "zh": "背起來"
+   }
+  ],
+  "guess": {
+   "en": "memorial",
+   "zh": "紀念碑、紀念的"
+  }
+ },
+ {
+  "id": "wp095",
+  "type": "字根",
+  "part": "cred",
+  "meaning": "相信",
+  "examples": [
+   {
+    "en": "credit",
+    "zh": "信用"
+   },
+   {
+    "en": "incredible",
+    "zh": "難以置信的",
+    "how": "in 不＋cred 相信＋ible"
+   },
+   {
+    "en": "credit card",
+    "zh": "信用卡"
+   }
+  ],
+  "guess": {
+   "en": "credible",
+   "zh": "可信的"
+  }
+ },
+ {
+  "id": "wp096",
+  "type": "字根",
+  "part": "loc",
+  "meaning": "地方",
+  "examples": [
+   {
+    "en": "local",
+    "zh": "當地的"
+   },
+   {
+    "en": "location",
+    "zh": "位置"
+   },
+   {
+    "en": "locate",
+    "zh": "找出位置"
+   }
+  ],
+  "guess": {
+   "en": "relocate",
+   "zh": "搬遷"
+  }
+ },
+ {
+  "id": "wp097",
+  "type": "字根",
+  "part": "sign",
+  "meaning": "記號",
+  "examples": [
+   {
+    "en": "sign",
+    "zh": "標誌、簽名"
+   },
+   {
+    "en": "signal",
+    "zh": "信號"
+   },
+   {
+    "en": "signature",
+    "zh": "簽名"
+   }
+  ],
+  "guess": {
+   "en": "significant",
+   "zh": "有意義的、顯著的"
+  }
+ },
+ {
+  "id": "wp098",
+  "type": "字根",
+  "part": "fin",
+  "meaning": "結束、界限",
+  "examples": [
+   {
+    "en": "finish",
+    "zh": "完成"
+   },
+   {
+    "en": "final",
+    "zh": "最後的"
+   },
+   {
+    "en": "define",
+    "zh": "下定義",
+    "how": "de＋fine 界限"
+   }
+  ],
+  "guess": {
+   "en": "infinite",
+   "zh": "無限的"
+  }
+ },
+ {
+  "id": "wp099",
+  "type": "字根",
+  "part": "equ",
+  "meaning": "相等",
+  "examples": [
+   {
+    "en": "equal",
+    "zh": "相等的"
+   },
+   {
+    "en": "equation",
+    "zh": "方程式"
+   },
+   {
+    "en": "equator",
+    "zh": "赤道（把地球分成相等的兩半）"
+   }
+  ],
+  "guess": {
+   "en": "equality",
+   "zh": "平等"
+  }
+ },
+ {
+  "id": "wp100",
+  "type": "字根",
+  "part": "part",
+  "meaning": "部分",
+  "examples": [
+   {
+    "en": "partner",
+    "zh": "夥伴"
+   },
+   {
+    "en": "department",
+    "zh": "部門、科",
+    "how": "de＋part 分＋ment"
+   },
+   {
+    "en": "participate",
+    "zh": "參加",
+    "how": "parti 部分＋cip 拿"
+   }
+  ],
+  "guess": {
+   "en": "partial",
+   "zh": "部分的"
+  }
+ },
+ {
+  "id": "wp101",
+  "type": "字根",
+  "part": "serv",
+  "meaning": "服務、保存",
+  "examples": [
+   {
+    "en": "serve",
+    "zh": "服務"
+   },
+   {
+    "en": "service",
+    "zh": "服務"
+   },
+   {
+    "en": "reserve",
+    "zh": "預訂、保留",
+    "how": "re 回＋serve 留"
+   }
+  ],
+  "guess": {
+   "en": "preserve",
+   "zh": "保存"
+  }
+ },
+ {
+  "id": "wp102",
+  "type": "字根",
+  "part": "nat",
+  "meaning": "出生",
+  "examples": [
+   {
+    "en": "nature",
+    "zh": "自然"
+   },
+   {
+    "en": "native",
+    "zh": "本地的、天生的"
+   },
+   {
+    "en": "nation",
+    "zh": "國家"
+   }
+  ],
+  "guess": {
+   "en": "prenatal",
+   "zh": "產前的"
+  }
+ },
+ {
+  "id": "wp103",
+  "type": "字根",
+  "part": "nov",
+  "meaning": "新",
+  "examples": [
+   {
+    "en": "novel",
+    "zh": "小說、新奇的"
+   },
+   {
+    "en": "innovation",
+    "zh": "創新",
+    "how": "in 進＋nov 新"
+   },
+   {
+    "en": "renovate",
+    "zh": "翻新",
+    "how": "re 再＋nov 新"
+   }
+  ],
+  "guess": {
+   "en": "novice",
+   "zh": "新手"
+  }
+ },
+ {
+  "id": "wp104",
+  "type": "字根",
+  "part": "pos／pon",
+  "meaning": "放",
+  "examples": [
+   {
+    "en": "position",
+    "zh": "位置"
+   },
+   {
+    "en": "deposit",
+    "zh": "存款",
+    "how": "de 下＋posit 放"
+   },
+   {
+    "en": "postpone",
+    "zh": "延後",
+    "how": "post 後＋pone 放"
+   }
+  ],
+  "guess": {
+   "en": "expose",
+   "zh": "暴露、使接觸"
+  }
+ },
+ {
+  "id": "wp105",
+  "type": "字根",
+  "part": "fer",
+  "meaning": "帶、拿",
+  "examples": [
+   {
+    "en": "transfer",
+    "zh": "轉移",
+    "how": "trans 轉＋fer 帶"
+   },
+   {
+    "en": "offer",
+    "zh": "提供"
+   },
+   {
+    "en": "refer",
+    "zh": "轉介、參考",
+    "how": "re 回＋fer 帶"
+   }
+  ],
+  "guess": {
+   "en": "prefer",
+   "zh": "比較喜歡"
+  }
+ },
+ {
+  "id": "wp106",
+  "type": "字根",
+  "part": "cap／cept／ceive",
+  "meaning": "拿、抓",
+  "examples": [
+   {
+    "en": "accept",
+    "zh": "接受",
+    "how": "ac 向＋cept 拿"
+   },
+   {
+    "en": "receive",
+    "zh": "收到",
+    "how": "re 回＋ceive 拿"
+   },
+   {
+    "en": "capture",
+    "zh": "捕捉"
+   }
+  ],
+  "guess": {
+   "en": "reception",
+   "zh": "接待（處）"
+  }
+ },
+ {
+  "id": "wp107",
+  "type": "字根",
+  "part": "tain／ten",
+  "meaning": "握住",
+  "examples": [
+   {
+    "en": "contain",
+    "zh": "包含",
+    "how": "con 一起＋tain 握"
+   },
+   {
+    "en": "maintain",
+    "zh": "維持",
+    "how": "main 手＋tain 握"
+   },
+   {
+    "en": "obtain",
+    "zh": "得到"
+   }
+  ],
+  "guess": {
+   "en": "retain",
+   "zh": "保留"
+  }
+ },
+ {
+  "id": "wp108",
+  "type": "字根",
+  "part": "ven／vent",
+  "meaning": "來",
+  "examples": [
+   {
+    "en": "event",
+    "zh": "事件",
+    "how": "e 出＋vent 來"
+   },
+   {
+    "en": "invent",
+    "zh": "發明",
+    "how": "in 進＋vent 來"
+   },
+   {
+    "en": "prevent",
+    "zh": "預防",
+    "how": "pre 先＋vent 來"
+   }
+  ],
+  "guess": {
+   "en": "convention",
+   "zh": "大會"
+  }
+ },
+ {
+  "id": "wp109",
+  "type": "字根",
+  "part": "ced／ceed／cess",
+  "meaning": "走",
+  "examples": [
+   {
+    "en": "proceed",
+    "zh": "繼續進行",
+    "how": "pro 向前＋ceed 走"
+   },
+   {
+    "en": "succeed",
+    "zh": "成功"
+   },
+   {
+    "en": "process",
+    "zh": "過程"
+   }
+  ],
+  "guess": {
+   "en": "exceed",
+   "zh": "超過"
+  }
+ },
+ {
+  "id": "wp110",
+  "type": "字根",
+  "part": "gress／grad",
+  "meaning": "走、一步",
+  "examples": [
+   {
+    "en": "progress",
+    "zh": "進步",
+    "how": "pro 向前＋gress 走"
+   },
+   {
+    "en": "grade",
+    "zh": "年級、成績"
+   },
+   {
+    "en": "graduate",
+    "zh": "畢業"
+   }
+  ],
+  "guess": {
+   "en": "upgrade",
+   "zh": "升級"
+  }
+ },
+ {
+  "id": "wp111",
+  "type": "字根",
+  "part": "sens／sent",
+  "meaning": "感覺",
+  "examples": [
+   {
+    "en": "sense",
+    "zh": "感覺"
+   },
+   {
+    "en": "sensitive",
+    "zh": "敏感的"
+   },
+   {
+    "en": "consent",
+    "zh": "同意",
+    "how": "con 一起＋sent 感覺"
+   }
+  ],
+  "guess": {
+   "en": "sensor",
+   "zh": "感應器"
+  }
+ },
+ {
+  "id": "wp112",
+  "type": "字根",
+  "part": "voc／voic",
+  "meaning": "聲音、叫",
+  "examples": [
+   {
+    "en": "voice",
+    "zh": "聲音"
+   },
+   {
+    "en": "vocabulary",
+    "zh": "字彙"
+   },
+   {
+    "en": "vocal",
+    "zh": "聲音的"
+   }
+  ],
+  "guess": {
+   "en": "advocate",
+   "zh": "提倡"
+  }
+ },
+ {
+  "id": "wp113",
+  "type": "字根",
+  "part": "log／logue",
+  "meaning": "說、話",
+  "examples": [
+   {
+    "en": "dialogue",
+    "zh": "對話",
+    "how": "dia 兩邊＋logue 說"
+   },
+   {
+    "en": "logic",
+    "zh": "邏輯"
+   },
+   {
+    "en": "apology",
+    "zh": "道歉"
+   }
+  ],
+  "guess": {
+   "en": "monologue",
+   "zh": "獨白"
+  }
+ },
+ {
+  "id": "wp114",
+  "type": "字根",
+  "part": "lingu／langu",
+  "meaning": "語言",
+  "examples": [
+   {
+    "en": "language",
+    "zh": "語言"
+   },
+   {
+    "en": "bilingual",
+    "zh": "雙語的"
+   },
+   {
+    "en": "linguistics",
+    "zh": "語言學"
+   }
+  ],
+  "guess": {
+   "en": "multilingual",
+   "zh": "會多種語言的"
+  }
+ },
+ {
+  "id": "wp115",
+  "type": "字根",
+  "part": "liter",
+  "meaning": "文字",
+  "examples": [
+   {
+    "en": "literature",
+    "zh": "文學"
+   },
+   {
+    "en": "literally",
+    "zh": "照字面地"
+   },
+   {
+    "en": "literate",
+    "zh": "識字的"
+   }
+  ],
+  "guess": {
+   "en": "illiterate",
+   "zh": "不識字的"
+  }
+ },
+ {
+  "id": "wp116",
+  "type": "字根",
+  "part": "soci",
+  "meaning": "同伴、社會",
+  "examples": [
+   {
+    "en": "social",
+    "zh": "社會的、社交的"
+   },
+   {
+    "en": "society",
+    "zh": "社會"
+   },
+   {
+    "en": "associate",
+    "zh": "聯想、同事"
+   }
+  ],
+  "guess": {
+   "en": "sociable",
+   "zh": "愛交際的"
+  }
+ },
+ {
+  "id": "wp117",
+  "type": "字根",
+  "part": "popul／publ",
+  "meaning": "人民",
+  "examples": [
+   {
+    "en": "popular",
+    "zh": "受歡迎的"
+   },
+   {
+    "en": "population",
+    "zh": "人口"
+   },
+   {
+    "en": "public",
+    "zh": "公共的"
+   }
+  ],
+  "guess": {
+   "en": "unpopular",
+   "zh": "不受歡迎的"
+  }
+ },
+ {
+  "id": "wp118",
+  "type": "字根",
+  "part": "cycl",
+  "meaning": "圓、輪",
+  "examples": [
+   {
+    "en": "cycle",
+    "zh": "循環"
+   },
+   {
+    "en": "bicycle",
+    "zh": "腳踏車"
+   },
+   {
+    "en": "recycle",
+    "zh": "回收",
+    "how": "re 再＋cycle 循環"
+   }
+  ],
+  "guess": {
+   "en": "cyclone",
+   "zh": "氣旋"
+  }
+ },
+ {
+  "id": "wp119",
+  "type": "字根",
+  "part": "clud／clus／clos",
+  "meaning": "關",
+  "examples": [
+   {
+    "en": "include",
+    "zh": "包括",
+    "how": "in 裡＋clude 關"
+   },
+   {
+    "en": "close",
+    "zh": "關"
+   },
+   {
+    "en": "conclude",
+    "zh": "下結論",
+    "how": "con 一起＋clude 關"
+   }
+  ],
+  "guess": {
+   "en": "exclude",
+   "zh": "排除"
+  }
+ },
+ {
+  "id": "wp120",
+  "type": "字根",
+  "part": "pend／pens",
+  "meaning": "懸掛、付錢",
+  "examples": [
+   {
+    "en": "depend",
+    "zh": "依賴",
+    "how": "de 下＋pend 掛"
+   },
+   {
+    "en": "expensive",
+    "zh": "貴的"
+   },
+   {
+    "en": "spend",
+    "zh": "花費"
+   }
+  ],
+  "guess": {
+   "en": "independent",
+   "zh": "獨立的"
+  }
+ },
+ {
+  "id": "wp121",
+  "type": "字根",
+  "part": "ple／plet／ply",
+  "meaning": "充滿",
+  "examples": [
+   {
+    "en": "complete",
+    "zh": "完成、完整的",
+    "how": "com 完全＋plete 滿"
+   },
+   {
+    "en": "plenty",
+    "zh": "很多"
+   },
+   {
+    "en": "supply",
+    "zh": "供應"
+   }
+  ],
+  "guess": {
+   "en": "incomplete",
+   "zh": "不完整的"
+  }
+ },
+ {
+  "id": "wp122",
+  "type": "字根",
+  "part": "prim／prin",
+  "meaning": "第一",
+  "examples": [
+   {
+    "en": "primary",
+    "zh": "主要的、初級的"
+   },
+   {
+    "en": "prince",
+    "zh": "王子"
+   },
+   {
+    "en": "principal",
+    "zh": "校長、主要的"
+   }
+  ],
+  "guess": {
+   "en": "primitive",
+   "zh": "原始的"
+  }
+ },
+ {
+  "id": "wp123",
+  "type": "字根",
+  "part": "quest／quir",
+  "meaning": "問、尋求",
+  "examples": [
+   {
+    "en": "question",
+    "zh": "問題"
+   },
+   {
+    "en": "request",
+    "zh": "請求",
+    "how": "re 再＋quest 求"
+   },
+   {
+    "en": "require",
+    "zh": "需要",
+    "how": "re 再＋quire 求"
+   }
+  ],
+  "guess": {
+   "en": "requirement",
+   "zh": "必要條件"
+  }
+ },
+ {
+  "id": "wp124",
+  "type": "字根",
+  "part": "rect／reg",
+  "meaning": "直、規則",
+  "examples": [
+   {
+    "en": "correct",
+    "zh": "正確的"
+   },
+   {
+    "en": "direct",
+    "zh": "直接的"
+   },
+   {
+    "en": "regular",
+    "zh": "規律的"
+   }
+  ],
+  "guess": {
+   "en": "irregular",
+   "zh": "不規則的"
+  }
+ },
+ {
+  "id": "wp125",
+  "type": "字根",
+  "part": "sta／sist",
+  "meaning": "站立",
+  "examples": [
+   {
+    "en": "station",
+    "zh": "車站"
+   },
+   {
+    "en": "stable",
+    "zh": "穩定的"
+   },
+   {
+    "en": "assist",
+    "zh": "協助",
+    "how": "as 向＋sist 站（站在旁邊）"
+   }
+  ],
+  "guess": {
+   "en": "statue",
+   "zh": "雕像"
+  }
+ },
+ {
+  "id": "wp126",
+  "type": "字根",
+  "part": "tend／tens",
+  "meaning": "伸展",
+  "examples": [
+   {
+    "en": "attend",
+    "zh": "出席、照顧",
+    "how": "at 向＋tend 伸"
+   },
+   {
+    "en": "extend",
+    "zh": "延伸",
+    "how": "ex 外＋tend 伸"
+   },
+   {
+    "en": "tension",
+    "zh": "緊張、張力"
+   }
+  ],
+  "guess": {
+   "en": "extension",
+   "zh": "延長、分機"
+  }
+ },
+ {
+  "id": "wp127",
+  "type": "字根",
+  "part": "vers／vert",
+  "meaning": "轉",
+  "examples": [
+   {
+    "en": "reverse",
+    "zh": "倒轉",
+    "how": "re 回＋verse 轉"
+   },
+   {
+    "en": "convert",
+    "zh": "轉換",
+    "how": "con 完全＋vert 轉"
+   },
+   {
+    "en": "version",
+    "zh": "版本"
+   }
+  ],
+  "guess": {
+   "en": "conversion",
+   "zh": "轉換"
+  }
+ },
+ {
+  "id": "wp128",
+  "type": "字根",
+  "part": "lect／leg",
+  "meaning": "選、讀",
+  "examples": [
+   {
+    "en": "collect",
+    "zh": "收集",
+    "how": "col 一起＋lect 選"
+   },
+   {
+    "en": "select",
+    "zh": "選擇",
+    "how": "se 分開＋lect 選"
+   },
+   {
+    "en": "lecture",
+    "zh": "講課"
+   }
+  ],
+  "guess": {
+   "en": "election",
+   "zh": "選舉"
+  }
+ },
+ {
+  "id": "wp129",
+  "type": "字根",
+  "part": "ord／ordin",
+  "meaning": "順序",
+  "examples": [
+   {
+    "en": "order",
+    "zh": "順序、點餐"
+   },
+   {
+    "en": "ordinary",
+    "zh": "普通的"
+   },
+   {
+    "en": "coordinate",
+    "zh": "協調",
+    "how": "co 一起＋ordin 順序"
+   }
+  ],
+  "guess": {
+   "en": "disorder",
+   "zh": "混亂、（身體）失調"
+  }
+ },
+ {
+  "id": "wp130",
+  "type": "字根",
+  "part": "vac",
+  "meaning": "空",
+  "examples": [
+   {
+    "en": "vacation",
+    "zh": "假期"
+   },
+   {
+    "en": "vacuum",
+    "zh": "真空、吸塵器"
+   },
+   {
+    "en": "vacant",
+    "zh": "空著的"
+   }
+  ],
+  "guess": {
+   "en": "vacancy",
+   "zh": "空房、空缺"
+  }
+ },
+ {
+  "id": "wp131",
+  "type": "字根",
+  "part": "dur",
+  "meaning": "持續",
+  "examples": [
+   {
+    "en": "during",
+    "zh": "在…期間"
+   },
+   {
+    "en": "duration",
+    "zh": "持續時間"
+   },
+   {
+    "en": "durable",
+    "zh": "耐用的"
+   }
+  ],
+  "guess": {
+   "en": "endurance",
+   "zh": "耐力"
+  }
+ },
+ {
+  "id": "wp132",
+  "type": "字根",
+  "part": "tech",
+  "meaning": "技術",
+  "examples": [
+   {
+    "en": "technique",
+    "zh": "技巧"
+   },
+   {
+    "en": "technology",
+    "zh": "科技",
+    "how": "techno 技術＋logy 學"
+   },
+   {
+    "en": "technical",
+    "zh": "技術的"
+   }
+  ],
+  "guess": {
+   "en": "technician",
+   "zh": "技術員"
+  }
+ },
+ {
+  "id": "wp133",
+  "type": "字根",
+  "part": "var／vari",
+  "meaning": "變化",
+  "examples": [
+   {
+    "en": "various",
+    "zh": "各種的"
+   },
+   {
+    "en": "variety",
+    "zh": "多樣"
+   },
+   {
+    "en": "vary",
+    "zh": "變化"
+   }
+  ],
+  "guess": {
+   "en": "variation",
+   "zh": "變化"
+  }
+ },
+ {
+  "id": "wp134",
+  "type": "字根",
+  "part": "val",
+  "meaning": "價值、有力",
+  "examples": [
+   {
+    "en": "value",
+    "zh": "價值"
+   },
+   {
+    "en": "valuable",
+    "zh": "貴重的"
+   },
+   {
+    "en": "evaluate",
+    "zh": "評估",
+    "how": "e 出＋valu 價值"
+   }
+  ],
+  "guess": {
+   "en": "invalid",
+   "zh": "無效的"
+  }
+ }
+]
