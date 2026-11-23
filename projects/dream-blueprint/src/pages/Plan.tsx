@@ -31,13 +31,14 @@ function monthTitle(month: string) {
   return Number(month.slice(0, 4)) + " 年 " + Number(month.slice(5)) + " 月";
 }
 type Goal = { id: string; source: string; track: Track; text: string };
+// A month can leave a track empty (the dream track during the licensing exam, say): no goal then.
 const baseGoals: Goal[] = plan.months.flatMap((m) =>
-  tracks.map((track) => ({
+  tracks.flatMap((track) => m[track] ? [{
     id: "plan." + m.month + "." + track,
     source: m.month,
     track,
     text: m[track],
-  })),
+  }] : []),
 );
 
 export type PlanTab = "calendar" | "levels" | "timeline" | "map" | "exam" | "rivals";

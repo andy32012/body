@@ -22,6 +22,8 @@ export interface Step {
   wordsBy?: string
   /** Rough date in the five-year plan, and Cambridge's guided-learning hours from zero (self-study usually needs more). */
   target: string; hours: string
+  /** When the plan books this certificate, if not right after the step's last unit (shown where the units end). */
+  bookWhen?: string
   exams: ExamId[]
   /** IELTS Academic overall band that counts as this level. */
   ielts?: number
@@ -61,6 +63,7 @@ export const steps: readonly Step[] = [
   { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 7 月、第 4 級約 2027 年 12 月看完，趕在實習之前', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
     practice: '每日課單元 17–30、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
   { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2029 年 10 月看完', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
+    bookWhen: '先不考：等 7000 單第 5–6 級看完（約 2029 年 10 月，國考後）再報名',
     practice: '每日課單元 31–42，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
   { from: 'B2', to: 'C1', units: unitsOf(['C1']), words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
     practice: '每日課教材還在寫；先用雅思閱讀、寫作 Task 1／2、口說 Part 2 和 Emma 練，最後一年找真人老師練口說' },
@@ -156,10 +159,12 @@ export function levelOpen(notes: Record<string, string>, to: LevelId) {
 export function stepOfUnit(unit: number): Step {
   return steps.find(s => s.units && unit >= s.units[0] && unit <= s.units[1]) ?? steps.find(s => !s.units)!
 }
-/** The certificate a unit is waiting for: the step before it must be passed or booked. Null when the unit is open. */
+/** The certificate a unit is waiting for: the step before it must be passed or booked. Null when the unit is open, and past
+ *  the last written unit, where there is nothing to open: the plan books B2 once its words are done, not when the units are. */
 export function unitGate(notes: Record<string, string>, unit: number): Step | null {
-  const i = steps.indexOf(stepOfUnit(unit))
-  if (i <= 0) return null
+  const step = stepOfUnit(unit)
+  const i = steps.indexOf(step)
+  if (i <= 0 || !step.units) return null
   const before = steps[i - 1]
   return levelOpen(notes, before.to) ? null : before
 }

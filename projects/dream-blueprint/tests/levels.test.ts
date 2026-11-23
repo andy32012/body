@@ -62,15 +62,19 @@ test('其他證照、雅思和跳級：證照上寫到哪一級就算哪一級',
   assert.equal(visaScreen(saveAttempt({}, 'C1', { id: 'k', exam: 'ielts', date: '2031-10-01', band: { overall: 7, speaking: 6.5 } })), null, '口說要 7')
 })
 
-test('日曆：一段上完標出要報名哪張證照；還沒報名就停在下一段第一天', () => {
+test('日曆：一段上完標出要報名哪張證照；已經上到下一段第一天還沒報名才停住', () => {
   const base = { today: '2027-04-12', from: '2027-04-12', to: '2027-04-30', cursor: 15 * 6 + 3, sessions: [], ranges: [], weekdays: [1, 2, 3, 4, 5, 6], restDays: [0] }
   const open = projectCalendar(base)
   const end = open.find(d => d.gate)!
   assert.deepEqual([end.unit, end.lessonDay, end.gate], [16, 6, 'A2'])
   assert.match(end.label, /報名全民英檢初級/)
   assert.equal(open.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 17)
-  const locked = projectCalendar({ ...base, lockedUnit: 17 })
-  const after = locked.filter(d => d.day > end.day && d.kind !== 'rest')
+  // 關卡還在後面：和計畫一樣，當作上完就報名，不會先把後面都排成複習。
+  const ahead = projectCalendar({ ...base, lockedUnit: 17 })
+  assert.equal(ahead.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 17)
+  // 已經上到單元 17 還沒報名：停在升級關卡，直到報名。
+  const atGate = projectCalendar({ ...base, cursor: 16 * 6, lockedUnit: 17 })
+  const after = atGate.filter(d => d.kind !== 'rest')
   assert.ok(after.length && after.every(d => d.kind === 'review' && /升級關卡/.test(d.label)))
 })
 

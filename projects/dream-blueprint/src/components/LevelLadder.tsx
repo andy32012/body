@@ -18,7 +18,7 @@ function statusLine(s: CertStatus, step: Step) {
   if (s.state === 'waiting' && s.next) return '等成績：' + exams[s.next.exam].name + ' ' + md(s.next.date) + (s.lr ? '（聽讀已過）' : s.sw ? '（說寫已過）' : '') + ' · 下一段先讀'
   if (s.state === 'partial') return (s.lr ? '聽讀過了，還差說寫' : '說寫過了，還差聽讀') + ' · 報名下一場才能接著上'
   if (s.state === 'failed') return '這次沒過 · 補最弱的那一項，報名下一場才能接著上'
-  return '還沒報名' + exam
+  return '還沒報名' + exam + (step.bookWhen ? ' · ' + step.bookWhen : '')
 }
 /** What a filled-in result says, part by part. */
 function resultLine(a: CertAttempt) {

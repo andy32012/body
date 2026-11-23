@@ -49,7 +49,7 @@ export function handoffText(state: AppState, today: string) {
     '',
     '## 目前進度（' + today + '，' + (periodNames[activePeriod(today, state.settings.periods)] ?? '') + '）',
     '- 課表共 ' + units.length + ' 個文法單元（42 個主線＋B1→B2 橋接），每單元 6 天：第 1–5 天各一句中翻英，第 6 天三句小關卡。',
-    finished ? '- ' + units.length + ' 個單元都做完了，接下來以複習和雅思閱讀、寫作、口說為主（B2→C1 每日課還在寫）。'
+    finished ? '- ' + units.length + ' 個單元都做完了。照計畫：全民英檢中高級（或雅思學術組 5.5）等 7000 單第 5–6 級看完再考，之後用雅思閱讀、寫作、口說往 C1 練（B2→C1 每日課還在寫）。'
       : '- 現在：單元 ' + unitId + '（' + unit?.title + '）第 ' + day + ' 天。',
     levelLine(state),
     unit ? '- 這個單元的規則：' + unit.rule : null,

@@ -425,6 +425,8 @@ function lesson(state: AppState, energy: Energy, date: string, at?: { unit: numb
     vacation,
     freshReview: review && !previous,
     gate,
+    /** Every written unit is done: the days go to review, words and the four skills (see the month plan). */
+    done: !at && cursor.unit > units.length,
   };
 }
 

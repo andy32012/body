@@ -1,29 +1,23 @@
 import schedule from '../data/curriculumSchedule.json' with { type: 'json' }
+import topicData from '../data/topics.json' with { type: 'json' }
 import { activePeriod, addDays, daysBetween, type Energy, type Period, type PeriodRange } from './progress.ts'
 import { busyMinutes, calendarGaps, holidayBreak, longExam, quietLabel } from './dailyPlan.ts'
 import { exams, stepEndingAt, stepOfUnit, steps } from './cefr.ts'
 
-const initial = new Map(schedule.initialDays.map(entry => [entry.day, entry]))
+/** The plan has one source. `planDays()` walks the course from `schedule.start` (the first lesson) with the same rules as the live calendar:
+ *  one main lesson a day on the default days (life topics take turns with grammar), the default exam, vacation, internship
+ *  and licensing-exam periods, and every certificate booked as soon as its level's units are done. The month plan
+ *  (plan.json), the year plan and the calendar's 原課表安排 all follow this walk; tests/plan.test.ts checks them. */
+
 const weekday = (date: string) => new Date(date + 'T12:00:00Z').getUTCDay()
-const initialBounds = { from: '2026-11-13', to: '2027-02-20' }
+/** The user's own default periods cover the first winter; from this day on, tentative months in the schedule fill the gaps. */
+const forecastFrom = '2027-02-21'
+/** The last day the plan page can show. */
+export const planEnd = '2034-12-31'
 const limit = schedule.preparedThroughUnit * schedule.daysPerUnit
 const label = (unit: number, day: number) => `單元 ${unit} 第 ${day} 天`
-
-export function originalPlan(day: string): string {
-  const planned = initial.get(day)
-  if (planned) return label(planned.unit, planned.lessonDay)
-  if (holidayBreak(day)) return '過年休息，想練的話複習 15 分鐘（選做）'
-  if (day >= initialBounds.from && day <= initialBounds.to) {
-    if ((day <= '2026-11-19') || (day >= '2027-01-03' && day <= '2027-01-16')) {
-      return '考週，複習 15 分鐘或休息（選做）'
-    }
-    return '休息，想練的話複習 15 分鐘（選做）'
-  }
-  const month = day.slice(0,7)
-  const segment = [...schedule.monthly, ...schedule.longRange].find(s => s.from <= month && month <= s.to)
-  if (!segment) return '開學時重排'
-  return [segment.units.length ? '單元 ' + segment.units.join('、') : '', segment.goal].filter(Boolean).join(' · ')
-}
+/** After the last written unit: the lessons are done, the plan goes on with words, the four skills and certificates. */
+export const courseDoneLabel = schedule.preparedThroughUnit + ' 個單元都上完了 · 照月計畫背單字、練讀聽說寫和準備證照'
 
 interface Session { day: string; energy: Energy; advanced?: boolean; sentenceId?: string }
 type Part = 'A' | 'B' | 'C'
@@ -43,7 +37,8 @@ interface CalendarInput {
   retry?: boolean
   /** Life topics take turns with grammar lessons (one main lesson a day; C at least 3 days after B). */
   topics?: readonly TopicPlan[]
-  /** A unit that waits for a certificate (the level before it is neither passed nor booked): lessons stop there. */
+  /** A unit that waits for a certificate (the level before it is neither passed nor booked). The lessons stop there only
+   *  once the learner has reached it; a gate still ahead is assumed booked on time, as in the plan. */
   lockedUnit?: number | null
 }
 export interface ProjectedDay {
@@ -56,9 +51,10 @@ export interface ProjectedDay {
   original: string
   /** A life-topic session instead of a grammar lesson: the topic number and part. */
   topic?: { n: number; part: Part }
-  /** This lesson finishes a level's units: time to book its certificate. */
+  /** This lesson finishes a level's units: time to book its certificate (or, for B2, to plan when). */
   gate?: string
 }
+export type PlannedDay = Omit<ProjectedDay, 'original'>
 
 // Count eligible days only. A period of rest has no weight in the next term's forecast.
 function recentPace(input: CalendarInput, weekdays: readonly number[]) {
@@ -78,12 +74,15 @@ function recentPace(input: CalendarInput, weekdays: readonly number[]) {
   return eligible ? Math.min(1, Math.max(1, completed) / eligible) : 1
 }
 
-export function projectCalendar(input: CalendarInput): ProjectedDay[] {
-  const weekdays = input.weekdays ?? schedule.terms.semester.weekdays
-  const restDays = input.restDays ?? [0,5]
+/** The day-by-day walk shared by the plan and the live calendar. Days before `today` are left for the caller to label. */
+function walk(input: CalendarInput): PlannedDay[] {
+  const weekdays = input.weekdays ?? schedule.regularDays
+  const restDays = input.restDays ?? schedule.restDays
   const pace = recentPace(input,weekdays)
   const advanced = new Set(input.sessions.filter(s => s.advanced ?? s.energy !== 'low').map(s => s.day))
   let cursor = Math.max(0, Math.min(limit, Math.trunc(input.cursor)))
+  // Waiting at the gate now (or a failed result after the unit began): review until the certificate is booked.
+  const stuck = !!input.lockedUnit && Math.floor(cursor / schedule.daysPerUnit) + 1 >= input.lockedUnit
   let credit = 1 - pace
   const topics = (input.topics ?? []).map(t => ({ ...t, done: { ...t.done } }))
   const lastMain = input.sessions.filter(s => s.day < input.today && s.energy !== 'low').at(-1)
@@ -102,17 +101,16 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
     }
     return null
   }
-  const result: ProjectedDay[] = []
+  const result: PlannedDay[] = []
   const start = input.from < input.today ? input.from : input.today
   for (let day = start; day <= input.to; day = addDays(day,1)) {
     const explicitPeriod = input.ranges.some(r => r.start <= day && (!r.end || r.end >= day))
-    const forecast = !explicitPeriod && day > initialBounds.to
+    const forecast = !explicitPeriod && day >= forecastFrom
       ? schedule.periods.find(r => r.tentative && r.start <= day && r.end >= day) : undefined
     const period = forecast ? forecast.type as Period : activePeriod(day, input.ranges)
-    const original = originalPlan(day)
-    const item: ProjectedDay = { day, original, period, kind:'rest', unit:null, lessonDay:null, label:'休息日' }
+    const item: PlannedDay = { day, period, kind:'rest', unit:null, lessonDay:null, label:'休息日' }
     if (day < input.today) {
-      item.label = '原訂 · ' + original
+      // Labelled by the caller from the plan.
     } else if (period === 'exam' || period === 'internship') {
       item.kind = 'review'
       const maintenance = schedule.periods.find(p =>
@@ -142,10 +140,10 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
             item.kind = 'lesson'
             item.topic = { n: topic.t.n, part: topic.part }
             item.label = '生活主題 ' + topic.t.n + '：' + topic.t.title + ' · 第 ' + ('ABC'.indexOf(topic.part) + 1) + ' 次（' + partLabel[topic.part] + '）'
-          } else if (cursor < limit && input.lockedUnit && Math.floor(cursor / schedule.daysPerUnit) + 1 >= input.lockedUnit) {
+          } else if (cursor < limit && stuck) {
             // Also mid-unit: a result that fails after the unit has begun turns the lessons into review (DBP-010).
             // The next level's lessons open once the certificate before it is booked.
-            const before = steps[steps.indexOf(stepOfUnit(input.lockedUnit)) - 1]
+            const before = steps[steps.indexOf(stepOfUnit(input.lockedUnit!)) - 1]
             item.kind = 'review'
             item.label = '升級關卡：報名' + exams[before.exams[0]].name + '，填上考試日期就接著上單元 ' + (Math.floor(cursor / schedule.daysPerUnit) + 1)
           } else if (cursor < limit) {
@@ -158,12 +156,13 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
             const ending = item.lessonDay === schedule.daysPerUnit ? stepEndingAt(item.unit) : null
             if (ending) {
               item.gate = ending.to
-              item.label += ' · ' + ending.from + '→' + ending.to + ' 上完，報名' + exams[ending.exams[0]].name
+              const exam = exams[ending.exams[0]].name
+              item.label += ' · ' + ending.from + '→' + ending.to + ' 上完，' + (ending.bookWhen ? exam + ending.bookWhen : '報名' + exam)
             }
             cursor++
           } else {
             item.kind = 'future'
-            item.label = 'B2→C1 每日課還在寫 · 先練雅思閱讀、寫作和口說'
+            item.label = courseDoneLabel
           }
         } else {
           item.kind = 'review'
@@ -180,4 +179,30 @@ export function projectCalendar(input: CalendarInput): ProjectedDay[] {
     if (day >= input.from) result.push(item)
   }
   return result
+}
+
+const planRanges: PeriodRange[] = schedule.periods.map(p => ({ type: p.type as Period, start: p.start, end: p.end }))
+let plan: { days: PlannedDay[]; byDay: Map<string, PlannedDay> } | null = null
+/** The whole plan, day by day: every lesson done on its day, life topics in turn, every certificate booked on time. */
+export function planDays(): readonly PlannedDay[] {
+  if (!plan) {
+    const days = walk({
+      today: schedule.start, from: schedule.start, to: planEnd, cursor: 0, sessions: [], ranges: planRanges,
+      topics: topicData.map(t => ({ n: t.n, title: t.title, after: t.after, done: {} })), lockedUnit: null,
+    })
+    plan = { days, byDay: new Map(days.map(d => [d.day, d])) }
+  }
+  return plan.days
+}
+/** What the plan has on a day (the calendar's 原課表安排); empty outside the plan. */
+export function originalPlan(day: string): string {
+  planDays()
+  return plan!.byDay.get(day)?.label ?? ''
+}
+
+export function projectCalendar(input: CalendarInput): ProjectedDay[] {
+  return walk(input).map(d => {
+    const original = originalPlan(d.day)
+    return { ...d, original, label: d.day < input.today ? (original ? '原訂 · ' + original : '') : d.label }
+  })
 }

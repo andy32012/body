@@ -10,10 +10,13 @@ import { activeLesson, coreSaved, mainLessonDone, pendingLessons, resumePhase, s
 import { getLessonPreview } from '../pages/Practice'
 import { nextFocus } from '../lib/nextFocus'
 import { dueTopic, partNumber, partPlan, skipKey, topicDoneToday, topicGoal } from '../lib/topics'
+import schedule from '../data/curriculumSchedule.json'
 import ScenePhoto from './ScenePhoto'
 import TodayPlan from './TodayPlan'
 import './dock.css'
 import './today-lesson.css'
+
+const courseUnits = schedule.preparedThroughUnit
 
 /** Today's energy: a default from the day's plan (one source for every minute shown), changeable for today only. */
 export function useEnergyChoice(state: AppState, today: string) {
@@ -70,16 +73,18 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   // The next level's lessons wait for the certificate of the level before them.
   const gate = !quiet && !topic && energy !== 'low' ? lesson.gate : null
   const gateExam = gate ? exams[gate.exams[0]] : null
+  const where = lesson.done ? '每日課都上完了' : '課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
   const label = gate ? '升級關卡 · ' + gate.from + '→' + gate.to + ' 上完了'
     : topic ? '生活主題 ' + topic.topic.n + ' · ' + topic.topic.title + ' · 第 ' + partNumber(topic.part) + ' 次（共 3 次）'
     : topicDone && !finished && !quiet && energy !== 'low' ? '加練 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-    : quiet ? (kind === 'exam' ? '考週' : kind === 'sprint' ? '國考衝刺' : '實習') + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
-    : lesson.review ? (energy === 'low' ? (optional ? (kind === 'rest' ? '今天休息' : '今天沒排課') + ' · ' + low + '是選做' : '今天 ' + low) + ' · 課表停在 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
+    : quiet ? (kind === 'exam' ? '考週' : kind === 'sprint' ? '國考衝刺' : '實習') + ' · ' + where
+    : lesson.review ? (energy === 'low' ? (optional ? (kind === 'rest' ? '今天休息' : '今天沒排課') + ' · ' + low + '是選做' : '今天 ' + low) + ' · ' + where
+      : lesson.done ? '每日課 ' + courseUnits + ' 個單元都上完了' : '複習日 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天')
     : lesson.checkpoint ? '單元 ' + lesson.unit + ' 小關卡' : '今天這一堂 · 單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天'
   const short = optional ? '想動一下的話，花 ' + low + '複習：回想一句熟悉的英文、翻幾張複習卡（選做）' : '今天只要 ' + low + '：回想一句熟悉的英文，再翻幾張複習卡'
   const goal = gate && gateExam ? '去報名' + gateExam.name + '：填上考試日期就能先上下一段，考過才正式升到 ' + gate.to
     : topic ? topicGoal(topic) : quiet ? (energy === 'normal' ? choice.labels.normal + '護理英文：複習、聽或讀一段，再練單字、口說或護理題' : short)
-    : lesson.review ? (energy === 'low' ? short : '今天複習舊句，課表明天繼續')
+    : lesson.review ? (energy === 'low' ? short : lesson.done ? '複習舊句，其他時間背 7000 單、練讀聽說寫和準備證照（照月計畫）' : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
   const progress = courseProgress(state.curriculum.unit)
   const level = officialLevel(state.notes)
@@ -157,7 +162,7 @@ export function LessonBanner({ state, today, start }: Pick<PageProps, 'state'> &
   </section>
   return <section className="lesson-banner">
     <div><small>{finished ? '今天這一堂完成了 ✓' : choice.quiet ? '考週／實習：課表停在原位' : choice.optional && choice.energy === 'low' ? (choice.kind === 'rest' ? '今天休息' : '今天沒排課') + ' · ' + choice.labels.low + '是選做' : '今天這一堂'}</small>
-      <strong>{choice.quiet ? '單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : lesson.cando || lesson.title}</strong></div>
+      <strong>{lesson.done ? '每日課都上完了，今天複習' : choice.quiet ? '單元 ' + lesson.unit + ' 第 ' + lesson.day + ' 天' : lesson.cando || lesson.title}</strong></div>
     <button type="button" onClick={() => start(choice.energy)}><Play size={14} fill="currentColor" />{finished ? '再上一次' : choice.energy === 'low' ? choice.labels.low + '複習' : '開始'}</button>
   </section>
 }
