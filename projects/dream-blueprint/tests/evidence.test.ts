@@ -22,6 +22,16 @@ test('變化句、表達題、小關卡的判定', () => {
   assert.equal(judgeVariation('good', "I'm not a doctor, I'm a nurse", 'I am not a doctor. I am a nurse.'), 'independent')
   assert.equal(judgeVariation('good', 'No doctor, nurse.', 'I am not a doctor. I am a nurse.'), 'pending')
   assert.equal(judgeVariation('good', '', 'I am not a doctor. I am a nurse.'), null)
+  // 換個說法也能請 Claude 老師批改：第一次就對 → 獨立完成；被指出問題後改好、或老師給了答案 → 有提示完成
+  const ref = 'I am not a doctor. I am a nurse.'
+  assert.equal(judgeVariation('good', 'I am not a doctor, I am a nurse.', ref, { firstVerdict: 'good', checkedText: 'I am not a doctor, I am a nurse.' }), 'independent')
+  assert.equal(judgeVariation('good', "I'm no doctor; I'm a nurse.", ref, { firstVerdict: 'good', checkedText: "I'm no doctor; I'm a nurse." }), 'independent', '跟參考句不同但老師第一次就說對')
+  assert.equal(judgeVariation('good', ref, ref, { firstVerdict: 'small', checkedText: 'I am not doctor I am a nurse.' }), 'assisted', '老師指出少了 a，改好才對')
+  assert.equal(judgeVariation('good', ref, ref, { firstVerdict: 'changed', checkedText: 'I am a doctor.' }), 'assisted')
+  assert.equal(judgeVariation('good', ref, ref, { revealed: true }), 'assisted', '老師直接給了答案')
+  assert.equal(judgeVariation('good', 'I am no doctor nurse.', ref, { firstVerdict: 'good', checkedText: "I'm no doctor; I'm a nurse." }), 'pending', '老師確認之後又改掉的那一版沒人看過')
+  assert.equal(judgeVariation('small', ref, ref, { firstVerdict: 'good', checkedText: ref }), 'assisted')
+  assert.equal(judgeVariation('again', ref, ref, { firstVerdict: 'good', checkedText: ref }), null)
   assert.equal(judgeExpress({ firstVerdict: 'good', help: ['zh'], answered: true }), 'independent')
   assert.equal(judgeExpress({ firstVerdict: 'good', help: ['frame'], answered: true }), 'assisted')
   assert.equal(judgeExpress({ help: [], answered: true }), 'pending')

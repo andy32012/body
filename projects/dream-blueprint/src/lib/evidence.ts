@@ -150,11 +150,12 @@ export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; reveale
 }
 /** Whether a written answer may count toward 「穩了」: answered alone and checked (exact match or Claude's first verdict). */
 export const verifiedAlone = (a: Parameters<typeof judgeWritten>[0]) => judgeWritten(a) === 'independent'
-/** The variation is written first and only then compared with the answer. */
-export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string | readonly string[]): Level | null {
-  if (mark === 'again' || !answered(answer)) return null
-  if (mark === 'small') return 'assisted'
-  return matchesReference(answer, typeof en === 'string' ? [en] : en) ? 'independent' : 'pending'
+/** The variation is written first and only then compared with the answer. When Claude checked it, the same standard as
+ *  every written answer applies: right on the first check → done alone; fixed after feedback, or given the answer → done with help. */
+export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string | readonly string[],
+  check: { firstVerdict?: Verdict; checkedText?: string; revealed?: boolean } = {}): Level | null {
+  return judgeWritten({ rating: mark === 'good' ? 'correct' : mark === 'small' ? 'minor' : 'again', revealed: !!check.revealed, answer,
+    references: typeof en === 'string' ? [en] : en, firstVerdict: check.firstVerdict, checkedText: check.checkedText })
 }
 /** The open task: a frame, the model answer or asking Claude (「我卡住了」) counts as help; the first feedback decides "alone". */
 export function judgeExpress(r: { firstVerdict?: Verdict; help: readonly string[]; answered: boolean }): Level | null {

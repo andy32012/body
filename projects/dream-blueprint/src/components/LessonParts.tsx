@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, Pause, Play, Volume2 } from 'lucide-react'
 import CorrectBox from './CorrectBox'
+import TutorChat from './TutorChat'
+import { sameEnglish } from '../lib/evidence'
 import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
@@ -160,21 +162,43 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
   </section>
 }
 
-/** One more sentence with the same pattern, written from Chinese, answer revealed after trying. */
-export function LessonVariation({ item, onDone }: { item: { zh: string; en: string; alt?: string[] }; onDone: (mark: 'good' | 'small' | 'again', answer: string) => void }) {
+/** What Claude said about a variation: the verdict on the first try with the exact text it judged, and whether it gave the answer away. */
+export interface VariationCheck { firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean }
+/** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
+ *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
+export function LessonVariation({ item, tutorId, pattern, rule, onDone }: { item: { zh: string; en: string; alt?: string[] }
+  /** The id of today's sentence, so the teacher knows the unit and its rule. */
+  tutorId?: string; pattern?: string; rule?: string
+  onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => void }) {
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
+  const [check, setCheck] = useState<VariationCheck>({})
   const mountedAt = useRef(Date.now())
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
-  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer) }
+  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer, check) }
+  const reveal = () => { shownAt.current = Date.now(); setShown(true) }
+  const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
+  const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)
+  useTaskContext({
+    label: '換個說法：' + item.zh,
+    detail: ['題目（中翻英，跟今天的句子同一個句型）：' + item.zh, pattern ? '句型：' + pattern : '', '參考答案（他還沒看答案前不要說出來）：' + sentence.reference.join(' / ')].filter(Boolean).join('\n'),
+    draft: answer,
+  })
   return <section className="ls-vary">
     <div className="pr-label">換個說法 · 同一個句型</div>
     <h2 className="pr-question">{item.zh}</h2>
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再看答案" />
+      <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請老師批改或看答案" />
     </label>
-    {!shown ? <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (ready()) { shownAt.current = Date.now(); setShown(true) } }}>看答案</button></div> : <>
+    <TutorChat sentence={sentence} answer={answer}
+      onReveal={() => setCheck(c => ({ ...c, revealed: true }))}
+      onVerdict={(v, attempt, text) => {
+        if (attempt === 1) setCheck(c => c.firstVerdict ? c : { ...c, firstVerdict: v, checkedText: text })
+        // The teacher says it is right: the reference and the marks open without another tap.
+        if (v === 'good') setShown(true)
+      }} />
+    {!shown ? <div className="pr-actions"><button type="button" className={tutorKey() ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
       <fieldset className="pr-marks"><legend>我寫得…</legend>
         <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
@@ -182,6 +206,12 @@ export function LessonVariation({ item, onDone }: { item: { zh: string; en: stri
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
       </fieldset>
       {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
+      {answer.trim() && check.firstVerdict && <p className="ls-help">
+        {check.revealed ? '老師已經把答案告訴你了：按「對了」會記成有提示完成。'
+          : check.firstVerdict !== 'good' ? '老師指出過要改的地方：改好後按「對了」，這次記成有提示完成。'
+          : edited ? '你在老師確認之後又改了答案：按「對了」會拿你現在寫的跟參考句比。'
+          : '老師確認意思和文法都對：按「對了」會記成當次獨立完成。'}
+      </p>}
     </>}
   </section>
 }

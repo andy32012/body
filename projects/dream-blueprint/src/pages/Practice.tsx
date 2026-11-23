@@ -830,10 +830,13 @@ function PracticeSession({
         {live && lessonData && phase === "vary" && (
           <LessonVariation
             item={variationFor(lessonData, current.day)}
-            onDone={(m, answer) => {
+            tutorId={item.id}
+            pattern={current.title}
+            rule={current.rule}
+            onDone={(m, answer, check) => {
               if (!settled()) return;
               const v = variationFor(lessonData, current.day);
-              evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])]), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
+              evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
               if (m !== "good")
                 update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
               finish(false, "express");
