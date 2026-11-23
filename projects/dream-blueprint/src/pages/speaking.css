@@ -96,3 +96,6 @@
 .sp-settings .pair strong { color: var(--text); }
 .sp-settings .set-actions button { font: inherit; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--text); cursor: pointer; }
 .sp-settings .set-actions button:disabled { opacity: .5; }
+.sp-settings label.sp-check { grid-template-columns: auto 1fr; align-items: start; gap: 10px; color: var(--text); cursor: pointer; }
+.sp-settings .sp-check input { width: 18px; height: 18px; padding: 0; margin-top: 2px; accent-color: #2fd6c8; }
+.sp-settings .sp-check small { display: block; margin-top: 2px; }

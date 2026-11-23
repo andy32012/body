@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Mic, Square, Settings2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { openaiKey, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
+import { echoGuard, openaiKey, setEchoGuard, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
+import { EMMA, emmaInstructions, emmaOpening, quietNudge } from '../lib/emmaPrompt'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
@@ -19,21 +20,7 @@ import { nurseInstructions, nurseSpeakKey, type NurseListening } from '../lib/nu
 import { PairPaste } from '../components/PairDevice'
 import './speaking.css'
 
-const NAME = 'Emma'
-
-function instructions(memory: string[], lesson = '', level = emmaLevel(1)) {
-  return [
-    `You are ${NAME}, a cute, cheerful 20-year-old American girl. You are a nursing student at Harvard, and you are a close friend of 玄燁 (call him by name or "hey you"). You two chat like good friends.`,
-    'He is a nursing student in Taiwan. ' + level.about + ' He wants to get better for IELTS and to work as a nurse in the US someday.',
-    'This is casual everyday chat: your day, his day, classes, food, movies, weekend plans, nursing school life, little jokes. Be warm, playful and curious, use natural American expressions, laugh a little, react with feeling.',
-    level.speak,
-    'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
-    'If he gets stuck or uses Chinese, help with one short Traditional-Mandarin hint, then encourage him back into English.',
-    'Start by greeting him like a friend you are happy to see.',
-    lesson,
-    memory.length ? 'Things you remember about him from before: ' + memory.join('; ') : '',
-  ].filter(Boolean).join('\n')
-}
+const NAME = EMMA
 
 type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
 const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
@@ -86,6 +73,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const [key, setKey] = useState(openaiKey())
   const [settings, setSettings] = useState(!openaiKey())
   const [voice, setVoice] = useState(voiceName())
+  const [guard, setGuard] = useState(echoGuard)
   const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>('idle')
   const [error, setError] = useState('')
   const [lines, setLines] = useState<Line[]>([])
@@ -123,9 +111,15 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
     setError(''); setLines([]); setNotes(''); setFixes([]); setYouMs(0); setYouFrom(undefined)
+    const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : ''
     try {
       session.current = await startVoice({
-        instructions: instructions(memory.notes, card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : '', emmaLevel(state.curriculum.unit)),
+        instructions: emmaInstructions(memory.notes, extra, emmaLevel(state.curriculum.unit), { longTurn: !!card }),
+        opening: emmaOpening(!!extra),
+        // In IELTS Part 2 he talks alone for a minute or two and may stop to think: nobody hurries him there.
+        quiet: card ? undefined : { afterMs: 10000, times: 2, say: quietNudge },
+        // Not in Part 2 either: a "Mm-hm" from her would cut a hole in his long answer.
+        guard: echoGuard() && !card,
         onLine: setLines,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
@@ -259,6 +253,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         <label>聲音<select value={voice} onChange={e => { setVoice(e.target.value); setVoiceName(e.target.value) }}>
           {voices.map(v => <option key={v} value={v}>{v}</option>)}
         </select></label>
+        <label className="sp-check"><input type="checkbox" checked={guard} onChange={e => { setGuard(e.target.checked); setEchoGuard(e.target.checked) }} />
+          <span>防回音：{NAME} 說話的時候先不收你的聲音<small>用喇叭時開著，她才不會聽到自己的聲音就停下來。戴耳機、想在她說話時插話，再關掉。</small></span></label>
         <button type="button" onClick={() => { setOpenaiKey(key); if (key.trim()) setSettings(false) }}>儲存</button>
         <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
         <PairPaste need="voice" />
