@@ -53,3 +53,5 @@ export const askEvent = 'dream-blueprint:ask-claude'
 export function askClaude(text: string) {
   window.dispatchEvent(new CustomEvent(askEvent, { detail: text }))
 }
+/** Open the floating Claude chat on the task on screen, without sending anything (「問問 Claude」). */
+export const openClaude = () => askClaude('')

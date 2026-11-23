@@ -395,3 +395,7 @@
 .pr-marks button:disabled { opacity: .42; cursor: not-allowed; }
 .pr-blank-note { flex-basis: 100%; margin: .55rem 0 0; font-size: 13px; line-height: 1.5; color: var(--practice-secondary, inherit); }
 .passage-lemma { font-size: .82em; opacity: .7; }
+.practice-page .passage-ask { display: inline-flex; align-items: center; gap: 6px; }
+.passage-next { align-items: center; }
+.passage-next small { color: var(--practice-secondary); font-size: .88rem; }
+.passage-note .pr-link { display: inline; min-height: 0; padding: 0; }

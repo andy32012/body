@@ -47,7 +47,7 @@ function parse(text: string): Result | null {
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, mode = 'translate', restore, previous, selfFix = false }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, mode = 'translate', restore, previous, selfFix = false }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
   onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result) => void; mode?: 'translate' | 'open'
   /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
@@ -57,6 +57,8 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   /** Show one issue at a time (where, and why) before the full correction. */
   selfFix?: boolean
   onReveal?: () => void
+  /** Claude could not be reached (no network, a refused key…), so the caller can offer another way on. */
+  onError?: () => void
 }) {
   const [saved, setSaved] = useState<number[]>([])
   const [turns, setTurns] = useState<TutorTurn[]>(() => restore ? [{ role: 'user', content: '我的翻譯：' + restore.answer }, { role: 'assistant', content: JSON.stringify(restore.result) }] : [])
@@ -79,7 +81,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
         setTurns([...next, { role: 'assistant', content: reply }])
         if (!parsed) setError('老師回得格式怪怪的，下面是原文：\n' + reply)
       } else setTurns([...next, { role: 'assistant', content: reply }])
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)) }
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); onError?.() }
     finally { setBusy(false) }
   }
 
