@@ -43,6 +43,24 @@
 .application .nav-link.current::before { content:""; position:absolute; left:0; top:9px; bottom:9px; width:3px; border-radius:3px; background:var(--lav); }
 .application .nav-link.current svg { color:var(--lav); }
 .application .nav-link i { display:none; }
+/* The sections of the practice library (單字、文法、發音、護理英文) sit under 英文練習: smaller, set in, close together. */
+.application .sidebar nav > .nav-link { flex:none; }
+.application .nav-link.nav-sub { padding:7px 12px 7px 34px; gap:9px; font-size:13px; font-weight:520; margin-top:-5px; }
+.application .nav-link.nav-sub.current::before { left:20px; top:8px; bottom:8px; }
+.application .side-bottom { padding-top:12px; }
+/* A short window: the destination card gives its room to the menu, and the menu closes up. */
+@media (max-height:820px) and (min-width:761px) {
+  .application .sidebar .destination { display:none; }
+  .application .sidebar { padding-top:24px; }
+  .application .sidebar-rule { margin-block:16px 14px; }
+}
+@media (max-height:720px) and (min-width:761px) {
+  .application .sidebar { padding-top:18px; }
+  .application .sidebar-rule { margin-block:12px 10px; }
+  .application .sidebar nav { gap:3px; }
+  .application .sidebar nav .nav-link { padding-block:8px; }
+  .application .sidebar nav .nav-link.nav-sub { padding-block:5px; margin-top:0; }
+}
 .application .destination { background:linear-gradient(135deg,var(--glow),transparent); border-color:var(--glass-line); }
 
 /* —— header —— */

@@ -29,7 +29,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 .brand-orbit b,.brand-orbit:after {content:'';position:absolute;border-radius:50%;width:4px;height:4px;background:#d2b6ff;bottom:4px;left:26px}
 .brand-orbit b {left:auto;right:1px;top:5px;width:3px;height:3px}
 .sidebar-rule {margin:27px 5px 25px;height:1px;background:var(--line)}
-.sidebar nav {display:flex;flex-direction:column;gap:8px}
+.sidebar nav {display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;scrollbar-width:thin;margin-inline:-4px;padding-inline:4px}
 .nav-link {display:flex;align-items:center;gap:13px;background:transparent;border:1px solid transparent;width:100%;color:var(--nav);font-size:14px;font-weight:560;padding:12px 15px;border-radius:9px;text-align:left;letter-spacing:.035em;transition:background .15s,color .15s}
 .nav-link svg {stroke-width:1.65}
 .nav-link:hover {background:color-mix(in srgb,var(--lav) 8%,transparent);color:var(--text)}

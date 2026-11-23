@@ -4,7 +4,7 @@ import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Settings2, Star, Sun,
-  Telescope, Mic, House,
+  Telescope, Mic, House, BookA, SpellCheck, AudioLines, Stethoscope,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
@@ -32,6 +32,7 @@ import { localModified, restoreBackup, setLocalModified } from './lib/store'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
+import { librarySections, modeFromHash, sectionHash, sectionInfo, sectionOf, type LibrarySection } from './lib/library'
 
 type View = Page | 'library' | 'cosmos' | 'speaking'
 type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:string}
@@ -42,6 +43,8 @@ const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'history', title:'航行紀錄', mobile:'紀錄', icon:ChartNoAxesColumnIncreasing},
   {id:'plan', title:'夢想星圖', mobile:'計畫', icon:MapIcon},
 ]
+/** The sections of the practice library that have their own entry in the main menu, under 英文練習. */
+const sectionIcons: Record<Exclude<LibrarySection,'practice'>, LucideIcon> = {words:BookA, grammar:SpellCheck, sound:AudioLines, nursing:Stethoscope}
 const extraTitles: Partial<Record<View, string>> = {rivals:'星際排行榜', settings:'設定', cosmos:'宇宙圖鑑', practice:'英文練習'}
 const phases = {semester:'一般學期', exam:'考週模式', internship:'實習模式', vacation:'寒暑假模式'}
 function readRoute():Route {
@@ -49,7 +52,7 @@ function readRoute():Route {
   // The leaderboard now lives inside the plan page.
   if (key === 'rivals') return {view:'plan', tab:'rivals', energy:'low'}
   const view = [...links.map(l => l.id),'practice','settings','cosmos','rivals'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='exam'?'exam':value==='timeline'?'timeline':value==='rivals'?'rivals':value==='levels'?'levels':'calendar'}
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice'||view==='library' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='exam'?'exam':value==='timeline'?'timeline':value==='rivals'?'rivals':value==='levels'?'levels':'calendar'}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
@@ -166,7 +169,10 @@ function App() {
     return ()=>{window.removeEventListener('hashchange',handle);window.removeEventListener('focus',clock);clearInterval(timer)}
   },[])
   useEffect(()=>{document.documentElement.dataset.theme=state.settings.theme},[state.settings.theme])
-  const pageName=links.find(l=>l.id===active)?.title||extraTitles[active]||'設定'
+  // The practice library has sections (words, grammar, pronunciation, nursing English); the open one names the page.
+  const periodQuiet=['exam','internship'].includes(activePeriod(today,state.settings.periods))
+  const section:LibrarySection|null=page==='library'?sectionOf(modeFromHash(route.mode),periodQuiet):null
+  const pageName=section?sectionInfo(section).title:links.find(l=>l.id===active)?.title||extraTitles[active]||'設定'
   useEffect(()=>{document.title=pageName+' · 夢想藍圖'},[pageName])
   const props:PageProps={state,update,navigate}
   const memoryNotes=readMemory(state.notes)
@@ -221,12 +227,16 @@ function App() {
   const sorted=state.settings.periods.filter(r=>r.type===phase&&r.start<=today&&(!r.end||r.end>=today)).sort((a,b)=>b.start.localeCompare(a.start))
   const until=sorted[0]?.end
   const status=phase==='exam'&&today>='2029-02-01'&&today<='2029-07-31'?'國考衝刺':phases[phase]
-  const titleNav=(l:typeof links[number],mobile=false)=><button type="button" key={l.id} className={(active===l.id?'nav-link current':'nav-link')} aria-current={active===l.id?'page':undefined} onClick={()=>setView(l.id)}><l.icon size={mobile?20:19}/><span>{mobile?l.mobile:l.title}</span>{!mobile&&active===l.id&&<i/>}</button>
+  // In the sidebar 英文練習 is current only for its own section; on a phone 練習 stands for the whole library.
+  const isCurrent=(l:typeof links[number],mobile:boolean)=>active===l.id&&(mobile||l.id!=='library'||!section||section==='practice')
+  const titleNav=(l:typeof links[number],mobile=false)=><button type="button" key={l.id} className={(isCurrent(l,mobile)?'nav-link current':'nav-link')} aria-current={isCurrent(l,mobile)?'page':undefined} onClick={()=>setView(l.id)}><l.icon size={mobile?20:19}/><span>{mobile?l.mobile:l.title}</span>{!mobile&&isCurrent(l,mobile)&&<i/>}</button>
+  const sectionNav=librarySections.filter(s=>s.id!=='practice').map(s=>{const Icon=sectionIcons[s.id as keyof typeof sectionIcons]
+    return <button type="button" key={s.id} className={'nav-link nav-sub'+(section===s.id?' current':'')} aria-current={section===s.id?'page':undefined} onClick={()=>{location.hash=sectionHash(s.id,periodQuiet)}}><Icon size={16}/><span>{s.menu}</span>{section===s.id&&<i/>}</button>})
   return <MemoryContext.Provider value={memory}><SceneFeatureContext.Provider value={sky?.feature}><div className="application" data-theme={state.settings.theme} data-view={page}>
     <UniverseBackground photo={sky?.background}/>
     <a className="skip-link" href="#content" onClick={e=>{e.preventDefault();document.getElementById('content')?.focus()}}>跳到主要內容</a>
     <aside className="sidebar"><Brand/><div className="sidebar-rule"/>
-      <nav aria-label="主要導覽">{available.map(l=>titleNav(l))}</nav>
+      <nav aria-label="主要導覽">{available.map(l=>l.id==='library'?[titleNav(l),...sectionNav]:titleNav(l))}</nav>
       <div className="side-bottom"><button className="destination" onClick={()=>setView('plan','map')}><span className="destination-symbol"><Orbit size={27}/></span><small>我的目的地</small><strong>美國註冊護理師 <ArrowUpRight size={13}/></strong><span>期望抵達 2033–2034</span></button>
       <button className={'nav-link settings-link'+(page==='settings'?' current':'')} onClick={()=>setView('settings')}><Settings2 size={18}/>設定</button>
       <div className="profile"><span>玄</span><div><b>玄燁</b><small>{state.school.schoolName} · {state.school.program}</small></div></div></div>
@@ -239,7 +249,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page"><PracticeCover title="英文練習"/><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/><PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-section={section}><PracticeCover title={pageName}/>{section==='practice'&&<><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/></>}<PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined}/>:<Settings {...props}/>}
     </main></div>
     {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}

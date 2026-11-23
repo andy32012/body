@@ -62,6 +62,7 @@ import GrammarTeach, { GrammarBook } from "../components/GrammarTeach";
 import StoryLibrary from "../components/StoryLibrary";
 import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
+import { librarySections, modeFromHash, modeLabel, sectionHash, sectionInfo, sectionModes, sectionOf, type LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
 import { useTaskContext } from "../lib/taskContext";
@@ -1147,8 +1148,7 @@ function Extras({
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = "words" | "listen" | "quiz" | "case" | "screen" | "translate" | "passage" | "reading" | "writing" | "unit" | "nlisten" | "nread" | "nwords" | "grammar" | "story" | "sound";
-  const modes: Mode[] = ["words", "listen", "quiz", "case", "screen", "translate", "passage", "reading", "writing", "unit", "nlisten", "nread", "nwords", "grammar", "story", "sound"];
+  type Mode = LibraryMode;
   // #library/story/listen opens the graded passages on that tab.
   const storyFromHash = (): StoryTab => {
     const t = location.hash.startsWith("#library/story/") ? location.hash.split("/")[2] : "";
@@ -1158,14 +1158,16 @@ function Extras({
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
-  const fromHash = (): Mode => {
-    const m = location.hash.split("/")[1] as Mode;
-    return modes.includes(m) ? m : "words";
-  };
+  const fromHash = (): Mode => modeFromHash(location.hash);
   const [mode, setMode] = useState<Mode>(fromHash);
+  // A button of the open section: the address follows, so a reload or a shared link opens the same practice.
+  const choose = (m: Mode) => {
+    setMode(m);
+    history.replaceState(null, "", "#library/" + m);
+  };
   useEffect(() => {
     const onHash = () => {
-      if (location.hash.startsWith("#library/")) {
+      if (location.hash === "#library" || location.hash.startsWith("#library/")) {
         setMode(fromHash());
         if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
         if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
@@ -1318,57 +1320,33 @@ function Extras({
     setOffset(offset + 1);
     setSee(false);
   }
+  // Only the open section's kinds of practice are offered here; the other sections are in the main menu.
+  const section = sectionOf(mode, periodQuiet);
+  const quietModes: Mode[] = ["listen", "words", "translate", "passage", "grammar", "story", "sound", "reading", "nlisten", "nread", "nwords"];
+  const shownModes = sectionModes(section, periodQuiet)
+    .filter((key) => key !== "unit" || mode === "unit" || hasPack(state.curriculum.unit) || state.curriculum.unit > packUnits[0])
+    .filter((key) => !quiet || quietModes.includes(key) || ((key === "quiz" || key === "case") && periodQuiet));
   return (
     <section className="pr-pane pr-extras">
-      <h2>自選加練</h2>
-      <div className="pr-options">
-        {(
-          [
-            ["words", "單字複習"],
-            ["grammar", "文法講解"],
-            ["sound", "發音課"],
-            ["listen", "句子跟讀"],
-            ["translate", "中翻英"],
-            ["story", "短文讀聽"],
-            ["reading", "閱讀理解"],
-            ["writing", "寫作階梯"],
-            ["unit", "單元讀聽說寫"],
-            ["passage", "7000 單短文"],
-            ["quiz", periodQuiet ? "護理英文題" : "選擇題"],
-            ["case", "臨床情境"],
-            ["nlisten", "護理聽力"],
-            ["nread", "護理閱讀"],
-            ["nwords", "護理單字"],
-            ["screen", "單字快篩"],
-          ] as const
-        )
-          .filter(([key]) => key !== "unit" || mode === "unit" || hasPack(state.curriculum.unit) || state.curriculum.unit > packUnits[0])
-          .filter(
-            ([key]) =>
-              !quiet ||
-              key === "listen" ||
-              key === "words" ||
-              key === "translate" ||
-              key === "passage" ||
-              key === "grammar" ||
-              key === "story" ||
-              key === "sound" ||
-              key === "reading" ||
-              key === "nlisten" ||
-              key === "nread" ||
-              key === "nwords" ||
-              ((key === "quiz" || key === "case") && periodQuiet),
-          )
-          .map(([key, label]) => (
-            <button
-              key={key}
-              aria-pressed={key === mode}
-              onClick={() => setMode(key)}
-            >
-              {label}
+      {/* On a phone there is no sidebar: the sections of the library are a row of chips here. */}
+      <nav className="pr-sections" aria-label="練習分類">
+        {librarySections.map((s) => (
+          <button key={s.id} type="button" aria-current={s.id === section ? "page" : undefined}
+            aria-label={s.menu} onClick={() => { location.hash = sectionHash(s.id, periodQuiet); }}>
+            {s.chip}
+          </button>
+        ))}
+      </nav>
+      <h2>{sectionInfo(section).heading}</h2>
+      {shownModes.length > 1 && (
+        <div className="pr-options">
+          {shownModes.map((key) => (
+            <button key={key} aria-pressed={key === mode} onClick={() => choose(key)}>
+              {modeLabel(key, periodQuiet)}
             </button>
           ))}
-      </div>
+        </div>
+      )}
       {mode === "words" && (() => {
         const count = skillSummary(state.notes, learning.map((w) => wordKey(w.en)));
         return (
@@ -1418,7 +1396,7 @@ function Extras({
             <p>{offset ? "這次的複習卡完成了。" : "今天沒有到期的單字卡。"}</p>
             {load.sentences > 0 && (
               <p>還有 {load.sentences} 句句子卡要複習。{" "}
-                <button onClick={() => setMode("translate")}>去中翻英</button>
+                <button onClick={() => { location.hash = "library/translate"; }}>去中翻英</button>
               </p>
             )}
           </div>
