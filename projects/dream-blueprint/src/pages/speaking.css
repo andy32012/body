@@ -99,3 +99,6 @@
 .sp-settings label.sp-check { grid-template-columns: auto 1fr; align-items: start; gap: 10px; color: var(--text); cursor: pointer; }
 .sp-settings .sp-check input { width: 18px; height: 18px; padding: 0; margin-top: 2px; accent-color: #2fd6c8; }
 .sp-settings .sp-check small { display: block; margin-top: 2px; }
+/* With the settings open on a small screen the wave has no room left: its hint would sit on top of the settings. */
+.sp-settings + .sp-wavebox .sp-hint, .sp-settings + .sp-wavebox .sp-tag { display: none; }
+.sp-settings + .sp-wavebox { min-height: 28px; }
