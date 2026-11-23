@@ -16,6 +16,8 @@ function say(text: string, rate = 0.85, onPlay?: () => void) {
       let done = false
       const go = () => { if (!done) { done = true; onPlay() } }
       u.onstart = go
+      // Some engines never report the start of a short word; one that reached its end was played.
+      u.onend = go
       setTimeout(() => { try { if (speechSynthesis.speaking) go() } catch { /* no engine */ } }, 1200)
     }
     speechSynthesis.speak(u)

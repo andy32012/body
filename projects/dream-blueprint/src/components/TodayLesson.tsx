@@ -6,7 +6,7 @@ import { dayBudget } from '../lib/dailyPlan'
 import { courseProgress, exams, officialLevel } from '../lib/cefr'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
-import { activeLesson, coreSaved, lessonFinished, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
+import { activeLesson, coreSaved, mainLessonDone, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../pages/Practice'
 import { nextFocus } from '../lib/nextFocus'
 import { dueTopic, partNumber, partPlan, skipKey, topicDoneToday, topicGoal } from '../lib/topics'
@@ -60,7 +60,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
     : state.curriculum.unit === active.rec.unit && state.curriculum.day === active.rec.day ? 'core' : null
   const at = resume === 'same' && active ? { unit: active.rec.unit, day: active.rec.day } : undefined
   const lesson = getLessonPreview(state, energy, today, at)
-  const finished = lessonFinished(state.notes, today)
+  const finished = mainLessonDone(state, today)
   // Other earlier lessons still missing 表達 (the active pointer only remembers the latest one).
   const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => p.date !== today && p.date !== (resume === 'later' ? active?.date : '')) : []
   const nextStep = !topic && active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
@@ -142,7 +142,7 @@ export function TodayThings({ state, navigate, today, nextStep }: Pick<PageProps
 export function LessonBanner({ state, today, start }: Pick<PageProps, 'state'> & { today: string; start: (e: Energy) => void }) {
   const choice = useEnergyChoice(state, today)
   const lesson = getLessonPreview(state, choice.energy, today)
-  const finished = lessonFinished(state.notes, today)
+  const finished = mainLessonDone(state, today)
   const topic = !choice.quiet && choice.energy !== 'low' ? dueTopic(state, today) : null
   if (topic) return <section className="lesson-banner">
     <div><small>今天這一堂 · 生活主題 {topic.topic.n} · 第 {partNumber(topic.part)} 次</small>

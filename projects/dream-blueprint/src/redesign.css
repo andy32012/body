@@ -114,4 +114,5 @@
 .content-notice { display: grid; gap: .35rem; padding: 1rem 1.1rem; }
 .content-notice p { margin: 0; font-size: 14px; line-height: 1.6; }
 .content-notice button { justify-self: start; }
+.first-guide ol { margin: .1rem 0; padding-inline-start: 1.25rem; display: grid; gap: .3rem; font-size: 14px; line-height: 1.6; }
 .content-notice button { border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: inherit; border-radius: 999px; padding: .35rem 1rem; font: inherit; font-size: 14px; }

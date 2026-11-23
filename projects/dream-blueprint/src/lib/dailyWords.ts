@@ -11,8 +11,11 @@ export function dailyWordPhoto(key: string) {
   return wordPhotos[index % wordPhotos.length]
 }
 
-export const DAILY_CHOICES = [5, 8, 10, 15, 20] as const
-export const DEFAULT_DAILY = 8
+export const DAILY_CHOICES = [5, 8, 10, 15, 20, 25, 30] as const
+/** 20 a day: at this pace levels 1–2 are seen before the first certificate (全民英檢初級, mid-2027) and levels 3–4 before
+ *  the internship starts (2028-02) and 全民英檢中級. At 8 a day level 4 was not reached until 2029, after the exam it is for.
+ *  Sorting a word takes seconds; only the unknown ones become cards, and the review cap and the new-word brake keep the load in hand. */
+export const DEFAULT_DAILY = 20
 export const countKey = 'daily-word.count'
 export const doneKey = (day: string) => 'daily-word.done.' + day
 export const seenKey = (day: string) => 'daily-word.seen.' + day

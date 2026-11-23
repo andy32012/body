@@ -40,10 +40,11 @@ test('今日單字從最低級開始，分過類的字不再出現；考週預�
   assert.equal(first.length,6012)
   const next = dailyQueue([first[0].en],[first[1].en])
   assert.equal(next[0].en,first[2].en)
-  assert.equal(dailyTarget({},false,'2026-11-24'),8)
+  assert.equal(dailyTarget({},false,'2026-11-24'),20)
+  assert.equal(dailyTarget({'daily-word.count':'30'},false,'2026-11-24'),30)
   assert.equal(dailyTarget({'daily-word.count':'15'},false,'2026-11-24'),15)
   assert.equal(dailyTarget({'daily-word.count':'15'},true,'2026-11-14'),1)
-  assert.equal(dailyTarget({'daily-word.more.2026-11-14':'1'},true,'2026-11-14'),8)
+  assert.equal(dailyTarget({'daily-word.more.2026-11-14':'1'},true,'2026-11-14'),20)
 })
 
 test('今日單字每 56 個字看完整組實拍照，回頭看同一個字會配回同一張', () => {

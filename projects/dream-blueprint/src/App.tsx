@@ -98,6 +98,20 @@ function ContentNotice({state,update}:Pick<PageProps,'state'|'update'>) {
     <button type="button" onClick={()=>update(prev=>({...prev,notes:{...prev.notes,...Object.fromEntries(pending.map(u=>['content.seen.'+u.id,'1']))}}))}>知道了</button>
   </section>
 }
+/** Shown until the first practice day (or until dismissed): the three things a new learner needs to know. */
+function FirstGuide({state,update}:Pick<PageProps,'state'|'update'>) {
+  if (state.sessions.length>0 || state.notes['guide.seen']) return null
+  return <section className="orbit-card content-notice first-guide" role="note" aria-label="第一次使用">
+    <strong>第一次用？照這三步就好</strong>
+    <ol>
+      <li>按下面的「開始這一堂」上今天的課：聽一段對話 → 看文法講解、做幾題小練習 → 寫一句英文 → 跟著念 → 用自己的話寫幾句。大約 25 分鐘。</li>
+      <li>上完回到這一頁，照「今天的 1.5 小時」清單由上往下做：做完的會自己打勾，不用的也可以自己勾掉。</li>
+      <li>時間不夠就選「15 分鐘」只做複習。明天用同一個網址再打開，進度會接著走。</li>
+    </ol>
+    <p>想讓 Claude 批改句子、跟 Emma 練口說，到右上角的設定 →「連接 Claude」貼上金鑰；沒有金鑰也能用，寫完自己對照參考句。</p>
+    <button type="button" onClick={()=>update(prev=>({...prev,notes:{...prev.notes,'guide.seen':'1'}}))}>知道了</button>
+  </section>
+}
 function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:()=>void}) {
   const {state,update,navigate,today,start,openWord}=props
   const goal=nextAction(state), days=new Set(state.sessions.map(s=>s.day)).size
@@ -107,6 +121,7 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
   const weekCount=Array.from({length:7},(_,i)=>addDays(weekStart,i)).filter(d=>practised.has(d)).length
   return <div className="home-stack">
     <ContentNotice state={state} update={update}/>
+    <FirstGuide state={state} update={update}/>
     <TodayLesson state={state} update={update} today={today} start={start} openWord={openWord} days={days} weekCount={weekCount}/>
     <TodayThings state={state} navigate={navigate} today={today} nextStep={goal.title}/>
     <div className="overview-row">

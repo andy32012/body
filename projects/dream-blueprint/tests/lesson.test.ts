@@ -257,3 +257,22 @@ test('配對 QR：要對的配對碼、10 分鐘內才打得開', async () => {
   assert.deepEqual(await open(p, code, t + 11 * 60_000), { ok: false, reason: 'expired' })
   assert.deepEqual(await open('garbage!!', code, t), { ok: false, reason: 'broken' })
 })
+
+test('單元小關卡那天算上完今天的課：清單打勾，生活主題不會排在同一天', async () => {
+  const { mainLessonDone, courseMovedOn, updateLesson } = await import('../src/lib/lesson.ts')
+  const { dueTopic } = await import('../src/lib/topics.ts')
+  const day = '2026-11-28'
+  const checkpoint = { id: 'x', day, energy: 'normal', advanced: true, sentenceId: 'u1-c3' }
+  const before = { notes: {}, curriculum: { unit: 2 }, sessions: [] as typeof checkpoint[] }
+  assert.equal(dueTopic(before, day)?.topic.id, 't1', '上完單元 1，隔天起輪到生活主題 1')
+  const after = { ...before, sessions: [checkpoint] }
+  assert.equal(courseMovedOn(after.sessions, day), true)
+  assert.equal(mainLessonDone(after, day), true, '小關卡沒有課堂紀錄，也算今天的課上完了')
+  assert.equal(dueTopic(after, day), null, '同一天只排一堂')
+  assert.equal(dueTopic(after, '2026-11-30')?.topic.id, 't1', '下一個上課日才輪到生活主題')
+  // A guided lesson whose last step is still open is not done yet.
+  const open = { notes: updateLesson({}, day, 1, 2, {}, 'pattern'), sessions: [{ id: 'y', day, energy: 'normal', advanced: true, sentenceId: 'u1-d2' }] }
+  assert.equal(mainLessonDone(open, day), false)
+  assert.equal(mainLessonDone({ ...open, notes: updateLesson(open.notes, day, 1, 2, {}, 'done') }, day), true)
+  assert.equal(mainLessonDone({ notes: {}, sessions: [{ id: 'library-' + day, day, energy: 'low', advanced: false, sentenceId: '' }] }, day), false, '只在練習頁加練不算')
+})

@@ -99,6 +99,14 @@ export function markLessonStep(notes: Record<string, string>, day: string, unit:
   return updateLesson(notes, day, unit, lessonDay, extra, step)
 }
 export const lessonFinished = (notes: Record<string, string>, day: string) => !!readLessonRecord(notes, day)?.steps.includes('done')
+type DaySession = { day: string; energy: string; advanced?: boolean; sentenceId?: string }
+/** A grammar session that moved the course on today. The unit checkpoint (day 6) is one, and it keeps no lesson record. */
+export const courseMovedOn = (sessions: readonly DaySession[], day: string) =>
+  sessions.some(s => s.day === day && (s.advanced ?? s.energy !== 'low') && !s.sentenceId?.startsWith('topic:'))
+/** Today's main grammar lesson is done: a guided lesson that reached its end, or a checkpoint. A guided lesson whose
+ *  last step (表達) is still open is not done yet, even though its sentences are saved. */
+export const mainLessonDone = (state: { notes: Record<string, string>; sessions: readonly DaySession[] }, day: string) =>
+  lessonFinished(state.notes, day) || (!readLessonRecord(state.notes, day) && courseMovedOn(state.sessions, day))
 export function activeLesson(notes: Record<string, string>): { date: string; rec: LessonRecord } | null {
   const date = notes[activeKey]
   if (!date) return null

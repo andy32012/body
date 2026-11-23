@@ -4,7 +4,7 @@ import { reviewEnergy, reviewLoad, sentenceReviewKey, type Energy } from '../lib
 import { answeredOn, quizSectionKey, sectionOf, type QuizItem } from '../lib/quiz'
 import { casesFinishedOn } from '../lib/scenarios'
 import quizData from '../data/quiz.json'
-import { activeLesson, lessonFinished } from '../lib/lesson'
+import { activeLesson, lessonFinished, mainLessonDone } from '../lib/lesson'
 import { dueTopic, partNumber, partPlan, topicDoneToday } from '../lib/topics'
 import type { Focus } from '../lib/nextFocus'
 import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
@@ -12,6 +12,7 @@ import { dailyTarget, doneKey } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
 import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
+import { readSkills } from '../lib/wordSkills'
 import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
 import './today-plan.css'
 
@@ -43,6 +44,9 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const casesToday = casesFinishedOn(state.notes, today)
   const topic = mode === 'regular' && energy !== 'low' ? dueTopic(state, today) : null
   const topicDone = topicDoneToday(state.notes, today)
+  // A guided lesson that reached its end, or the unit checkpoint (which keeps no lesson record).
+  const lessonDone = mainLessonDone(state, today)
+  const checkpointDone = lessonDone && !lessonFinished(state.notes, today)
   const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog)
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
   // A reading record saved today, or graded passages read today (logged as a reading day).
@@ -72,26 +76,32 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const cert = nextStep ? certStatus(state.notes, nextStep.to) : null
   const exam = nextStep ? exams[nextStep.exams[0]] : null
 
+  // 「先補強」 is done once its practice happened today: five words heard and matched, or two more sentences written in the library.
+  const heardToday = focus?.kind === 'listen' ? state.learningWords.filter(w => readSkills(state.notes, w).listen === today).length : 0
+  const extraSentences = state.sessions.find(x => x.id === 'library-' + today)?.translations?.length ?? 0
+  const focusDone = focus?.kind === 'listen' ? heardToday >= 5 : focus?.kind === 'contrast' || focus?.kind === 'produce' ? extraSentences >= 2 : false
   const queued = shown.queued ? '另有 ' + shown.queued + ' 句句子卡排在之後的日子' : ''
   const reviewDetail = left
     ? [shown.words ? '單字卡 ' + shown.words + ' 張' : '', shown.sentences ? '句子卡 ' + shown.sentences + ' 句（中翻英）' : ''].filter(Boolean).join('、') + '，先不看答案回想'
       + (shown.backlog ? '；單字卡另外 ' + shown.backlog + ' 張排到明天' : '') + (queued ? '（' + queued + '）' : '')
     : reviewedToday ? '今天的複習做完了' + (queued ? '（' + queued + '，想多做可以再開中翻英）' : '')
-    : '今天沒有到期的卡，可以快篩幾個新字'
+    : state.cards.length ? '今天沒有到期的卡，這一步不用做；想多做可以快篩幾個新字'
+    : '第一天還沒有複習卡，這一步先跳過。今天學的字和句子，明天起會出現在這裡'
   // Word cards on 單字複習, sentence cards on 中翻英: two buttons when both are waiting.
   const reviewGo: Pick<Task, 'go' | 'goLabel' | 'go2' | 'go2Label'> = shown.words
     ? { go: to('library/words'), goLabel: '單字卡', ...(shown.sentences ? { go2: to('library/translate'), go2Label: '句子卡' } : {}) }
-    : shown.sentences ? { go: to('library/translate'), goLabel: '句子卡' } : { go: to('library/words') }
-  const review: Task = { id: 'review', min: 0, title: '複習卡', detail: reviewDetail, auto: reviewedToday && left === 0, ...reviewGo }
+    : shown.sentences ? { go: to('library/translate'), goLabel: '句子卡' } : reviewedToday ? { go: to('library/words') } : { go: to('library/screen'), goLabel: '快篩' }
+  const review: Task = { id: 'review', min: 0, title: '複習卡', detail: reviewDetail, auto: left === 0, ...reviewGo }
   const lesson: Task = topic ? { id: 'lesson', min: 0, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
       auto: false, go: () => onStart(energy), goLabel: topic.step > 0 ? '繼續' : '開始' }
-    : topicDone && !lessonFinished(state.notes, today) ? { id: 'lesson', min: 0, title: '今天的生活主題', detail: '完成了。文法課下次上；想多練也可以現在上。',
+    : topicDone && !lessonDone ? { id: 'lesson', min: 0, title: '今天的生活主題', detail: '完成了。文法課下次上；想多練也可以現在上。',
       auto: true, go: () => onStart(energy), goLabel: '加練' }
+    : checkpointDone ? { id: 'lesson', min: 0, title: '今天這一堂', detail: '單元小關卡做完了，明天接下一個單元或生活主題', auto: true, go: () => onStart(energy), goLabel: '再複習' }
     : { id: 'lesson', min: 0, title: '今天這一堂', detail: '回想 → 聽懂 → 句型 → 用自己的話說 → 訂正',
-      auto: lessonFinished(state.notes, today), go: () => onStart(energy), goLabel: lessonFinished(state.notes, today) ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
+      auto: lessonDone, go: () => onStart(energy), goLabel: lessonDone ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
   const catalog: Record<Exclude<BlockId, 'review' | 'lesson'>, Omit<Task, 'min'>> = {
-    focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: false, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
-    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 15–20）' : '') : '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
+    focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: focusDone, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
+    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
       auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
     input: testDay ? { id: 'input', title: '聽或讀：單元回測', detail: '單元 ' + pack + ' 最後一天：一篇沒看過的閱讀＋一段沒聽過的聽力，各只有一次機會', auto: !!(held.reading && held.listening),
         go: to('library/unit/test'), goLabel: '回測' }

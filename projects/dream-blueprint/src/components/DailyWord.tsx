@@ -9,7 +9,7 @@ import { markSkill } from '../lib/wordSkills'
 import { paintSky, seedOf } from '../lib/starfield'
 import { useModal } from '../lib/modal'
 import { formLines, meaningLine, wordKey } from '../lib/vocab'
-import { DAILY_CHOICES, changeSorted, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
+import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -130,7 +130,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
         {quiet && queue.length > 0 && state.notes[moreKey(today)] !== '1' &&
           <button type="button" className="daily-word-reveal" onClick={() => setNote(moreKey(today), '1')}>考週只排 1 個。還想再看幾個</button>}
         <label className="daily-word-count">每天看幾個
-          <select id="daily-word-count" value={Number(state.notes[countKey]) || 8}
+          <select id="daily-word-count" value={Number(state.notes[countKey]) || DEFAULT_DAILY}
             onChange={event => setNote(countKey, event.target.value)}>
             {DAILY_CHOICES.map(n => <option key={n} value={n}>{n} 個</option>)}
           </select>

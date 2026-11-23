@@ -100,7 +100,7 @@ export default function LevelLadder({ state, update }: Pick<PageProps, 'state' |
       <h2>英文程度階梯</h2>
       <p className="ll-now">證照上的程度 <b>{level}</b> · 每日課正在上 <b>{course.step.from}→{course.step.to}</b>
         {course.total ? '（單元 ' + Math.min(course.done + 1, course.total) + ' / ' + course.total + '）' : '（這一段的每日課還在寫）'}</p>
-      <p>每天：週一到週六 1.5 小時，寒假 3–4 小時；實習時 20–30 分鐘護理英文，國考衝刺 15 分鐘。每一級最後考一張證照，考過才算升級。報名後填上考試日期，就能先讀下一段，等成績也不用停；沒過就補最弱的那一項，報名下一場再繼續。7000 單的日期是照每天打開今日單字（週日也開）、看 8 個新字、先做複習算的；週日沒開會晚 1–4 個月，第 3 級會拖進實習期間。</p>
+      <p>每天：週一到週六 1.5 小時，寒假 3–4 小時；實習時 20–30 分鐘護理英文，國考衝刺 15 分鐘。每一級最後考一張證照，考過才算升級。報名後填上考試日期，就能先讀下一段，等成績也不用停；沒過就補最弱的那一項，報名下一場再繼續。7000 單的日期是照每天打開今日單字（週日也開）、看 20 個新字、先做複習算的；週日沒開會晚 1–7 個月，第 4 級會拖進實習期間。每天看幾個可以在「設定 → 我的學習節奏」改。</p>
       {visa ? <p className="ll-visa">✓ 美國 RN 的 VisaScreen 英文達標（雅思 {md(visa.date)}）。雅思成績一般兩年有效，大約 {md(visa.until)} 前要送件。</p>
         : <p className="ll-goal">美國 RN 的 VisaScreen 要雅思學術組總分 6.5、口說 7：整體 B2 以上、口說到 C1。</p>}
     </section>

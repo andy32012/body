@@ -67,22 +67,23 @@ const recordDays = (notes: Record<string, string>, prefix: string) => Object.ent
   try { const r = JSON.parse(v) as { day?: unknown; best?: { day?: unknown } }; return [r.day, r.best?.day].filter((d): d is string => typeof d === 'string') } catch { return [] }
 })
 /** Days each skill was practised: the log, plus saved reading and writing records and sentence shadowing in the library. */
-export function skillDays(notes: Record<string, string>, sessions: readonly { day: string; spokenIds?: string[] }[] = []): Record<Skill, Set<string>> {
+export function skillDays(notes: Record<string, string>, sessions: readonly { id?: string; day: string; spokenIds?: string[] }[] = []): Record<Skill, Set<string>> {
   const log = readLog(notes)
   return {
-    listen: new Set([...(log.listen ?? []), ...sessions.filter(s => s.spokenIds?.length).map(s => s.day)]),
+    // Only shadowing done in the practice library counts: the one sentence shadowed inside a lesson belongs to the lesson.
+    listen: new Set([...(log.listen ?? []), ...sessions.filter(s => s.spokenIds?.length && s.id?.startsWith('library-')).map(s => s.day)]),
     read: new Set([...(log.read ?? []), ...recordDays(notes, 'read.')]),
     speak: new Set(log.speak ?? []),
     write: new Set([...(log.write ?? []), ...recordDays(notes, 'write.')]),
   }
 }
 /** How many days this week (Monday to today) each skill was practised. */
-export function weekCounts(notes: Record<string, string>, sessions: readonly { day: string; spokenIds?: string[] }[], today: string): Record<Skill, number> {
+export function weekCounts(notes: Record<string, string>, sessions: readonly { id?: string; day: string; spokenIds?: string[] }[], today: string): Record<Skill, number> {
   const from = weekKey(today), days = skillDays(notes, sessions)
   const inWeek = (s: Set<string>) => [...s].filter(d => d >= from && d <= today).length
   return { listen: inWeek(days.listen), read: inWeek(days.read), speak: inWeek(days.speak), write: inWeek(days.write) }
 }
-export const practisedOn = (notes: Record<string, string>, sessions: readonly { day: string; spokenIds?: string[] }[], skill: Skill, day: string) =>
+export const practisedOn = (notes: Record<string, string>, sessions: readonly { id?: string; day: string; spokenIds?: string[] }[], skill: Skill, day: string) =>
   skillDays(notes, sessions)[skill].has(day)
 
 /** What Emma is told for a pack speaking task. */

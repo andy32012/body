@@ -34,8 +34,8 @@ test('今天的複習：單字卡到上限、句子卡一天 5 句，其餘排�
 
 test('新字煞車：只有今天複習不完的單字卡會擋新字，排隊的句子卡不會', () => {
   const backlog = (cards: ReviewCard[]) => reviewLoad(state(cards), day, 'normal').backlog
-  assert.equal(dailyTarget({}, false, day, backlog([...words(90), ...sentences(300)])), 8, '句子卡排再多都不擋新字')
-  assert.equal(dailyTarget({}, false, day, backlog(words(100))), 8, '今天清得完的卡不擋新字')
+  assert.equal(dailyTarget({}, false, day, backlog([...words(90), ...sentences(300)])), 20, '句子卡排再多都不擋新字')
+  assert.equal(dailyTarget({}, false, day, backlog(words(100))), 20, '今天清得完的卡不擋新字')
   assert.equal(dailyTarget({}, false, day, backlog(words(160))), 6, '積 60 張：新字減少')
   assert.equal(dailyTarget({}, false, day, backlog(words(180))), 0, '積 80 張：先暫停')
 })
@@ -74,5 +74,9 @@ test('存檔：240 天和 365 天格的卡片能存也能讀回來', () => {
 test('等級階梯：每一段的 7000 單都寫了照計畫算得到的日期', async () => {
   const { steps } = await import('../src/lib/cefr.ts')
   for (const s of steps) if (s.words) assert.ok(s.wordsBy, s.from + '→' + s.to + ' 要寫 7000 單預計日期')
-  assert.match(steps.find(s => s.to === 'B1')!.wordsBy!, /第 4 級排在實習和國考之後/)
+  // At 20 new words a day (the default), level 4 is seen before the internship starts in 2028-02.
+  assert.match(steps.find(s => s.to === 'B1')!.wordsBy!, /第 4 級約 2027 年 12 月看完，趕在實習之前/)
+  const { DEFAULT_DAILY, DAILY_CHOICES } = await import('../src/lib/dailyWords.ts')
+  assert.equal(DEFAULT_DAILY, 20)
+  assert.ok((DAILY_CHOICES as readonly number[]).includes(DEFAULT_DAILY))
 })

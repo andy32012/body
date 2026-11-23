@@ -107,8 +107,11 @@ test('四技能平衡：這週每種技能做了幾天（週一開始）', () =>
   notes = logSkill(notes, 'speak', '2026-11-19')
   notes = logSkill(notes, 'speak', '2026-11-19')
   notes = logSkill(notes, 'listen', '2026-11-15')
-  const sessions = [{ day: '2026-11-20', spokenIds: ['s1'] }, { day: '2026-11-21', spokenIds: [] }]
+  // Shadowing in the practice library is a listening day; the one sentence shadowed inside a lesson is not.
+  const sessions = [{ id: 'library-2026-11-20', day: '2026-11-20', spokenIds: ['s1'] }, { id: 'library-2026-11-21', day: '2026-11-21', spokenIds: [] },
+    { id: 'abc', day: '2026-11-19', spokenIds: ['u1-d1'] }]
   assert.deepEqual(weekCounts(notes, sessions, today), { listen: 1, read: 1, speak: 1, write: 1 })
+  assert.equal(skillDays(notes, sessions).listen.has('2026-11-19'), false, '課堂裡跟讀一句不算當天的聽力練習')
   assert.equal(skillDays(notes, sessions).speak.size, 1, '同一天記兩次只算一天')
   assert.equal(skillDays(notes, sessions).listen.has('2026-11-15'), true, '上週的也留著，只是不算這週')
 })

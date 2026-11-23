@@ -7,7 +7,10 @@
 import { dayBudget } from '../src/lib/dailyPlan.ts'
 import { createInitialState } from '../src/lib/store.ts'
 import { addDays, newCard, reviewBudget, reviewCard, reviewEnergy, reviewLoad, sentenceReviewKey, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
-import { dailyTarget } from '../src/lib/dailyWords.ts'
+import { countKey, dailyTarget } from '../src/lib/dailyWords.ts'
+
+// WORDS=20 npm run words:pace shows the pace for another daily count (one of DAILY_CHOICES); without it, the default.
+const perDay = Number(process.env.WORDS) || 0
 
 const settings = createInitialState('2026-11-23').settings
 const isDue = (c: ReviewCard, day: string) => c.due <= day && c.lastDay < day
@@ -19,7 +22,7 @@ function run(label: string, sundays: boolean, seed = 7) {
   const rand = () => { r = (r * 1664525 + 1013904223) >>> 0; return r / 2 ** 32 }
   const cards: ReviewCard[] = []
   let events: ReviewEvent[] = []
-  let notes: Record<string, string> = {}
+  let notes: Record<string, string> = perDay ? { [countKey]: String(perDay) } : {}
   let day = '2026-11-23', seen = 0, unit = 1, uday = 1, sid = 0, minutes = 0, studyDays = 0, peak = 0
   const lessonOf = new Map<string, { unit: number; d: number }>()
   const done: string[] = []

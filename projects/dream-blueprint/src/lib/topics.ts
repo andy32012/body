@@ -2,7 +2,7 @@ import data from '../data/topics.json'
 import { addDays, applyAnswer, daysBetween, newCard, type Energy, type Period } from './progress'
 import type { AppState } from './store'
 import { judgeCheckpoint, judgeExpress, levelNames, type Level, type Verdict } from './evidence'
-import { readLessonRecord } from './lesson'
+import { courseMovedOn, readLessonRecord } from './lesson'
 import { isKnownWord, levelEntry, wordKey } from './vocab'
 
 /** Life topics: each one is three short sessions on different days.
@@ -110,7 +110,7 @@ export function partReady(rec: TopicRecord, part: TopicPart, today: string) {
 }
 
 export interface DueTopic { topic: Topic; part: TopicPart; step: number }
-type TopicState = { notes: Record<string, string>; curriculum: { unit: number }; sessions: readonly { day: string; energy: string; sentenceId: string }[] }
+type TopicState = { notes: Record<string, string>; curriculum: { unit: number }; sessions: readonly { day: string; energy: string; sentenceId: string; advanced?: boolean }[] }
 
 /** Whether today's main lesson is a life-topic session, and which one.
  *  One main lesson a day; topics unlock in order as grammar units are finished, and take turns with grammar lessons:
@@ -120,6 +120,8 @@ export function dueTopic(state: TopicState, today: string): DueTopic | null {
   if (state.notes[skipKey(today)]) return null
   // A grammar lesson already started today keeps today's slot.
   if (readLessonRecord(state.notes, today)) return null
+  // So does a unit checkpoint done today: it keeps no lesson record, but one main lesson a day is the rule.
+  if (courseMovedOn(state.sessions, today)) return null
   const records = topics.map(t => [t, readTopic(state.notes, t.id)] as const)
   if (records.some(([, r]) => Object.values(r.done).includes(today))) return null
   // A part that was started and left open continues first.

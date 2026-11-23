@@ -16,7 +16,7 @@ export interface Step {
   units: [number, number] | null
   /** 7000 單 levels that belong here. */
   words: [number, number] | null
-  /** When those levels are seen at the planned pace: 8 new words a day, review first, the app opened every day
+  /** When those levels are seen at the planned pace: 20 new words a day (DEFAULT_DAILY), review first, the app opened every day
    *  (Sunday's short plan too), new words paused in the internship and licensing exam (2028-02 to 2029-07).
    *  Worked out day by day with the app's own review rules: `npm run words:pace` (scripts/words-pace.ts). */
   wordsBy?: string
@@ -56,11 +56,11 @@ function unitsOf(stages: readonly string[]): [number, number] | null {
   return ids.length ? [Math.min(...ids), Math.max(...ids)] : null
 }
 export const steps: readonly Step[] = [
-  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 8 月看完', target: '2027 年中', hours: '約 200 小時', exams: ['gept-a2', 'other'],
+  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 3 月看完', target: '2027 年中', hours: '約 200 小時', exams: ['gept-a2', 'other'],
     practice: '每日課單元 1–16、7000 單第 1–2 級、閱讀 A1–A2、寫作①句子、生活主題' },
-  { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 12 月看完；第 4 級排在實習和國考之後，約 2029 年 8 月', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
+  { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 7 月、第 4 級約 2027 年 12 月看完，趕在實習之前', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
     practice: '每日課單元 17–30、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
-  { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2030 年 4 月看完', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
+  { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2029 年 10 月看完', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
     practice: '每日課單元 31–42，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
   { from: 'B2', to: 'C1', units: unitsOf(['C1']), words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
     practice: '每日課教材還在寫；先用雅思閱讀、寫作 Task 1／2、口說 Part 2 和 Emma 練，最後一年找真人老師練口說' },

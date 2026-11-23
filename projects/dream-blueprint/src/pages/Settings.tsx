@@ -76,6 +76,7 @@ function Panel({ title, hint, icon: Icon, children }: { title: string; hint?: st
 
 import { exportBackup, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
 import { dayKey, addDays, activePeriod } from '../lib/progress'
+import { DAILY_CHOICES, DEFAULT_DAILY, countKey } from '../lib/dailyWords'
 
 type SettingsData = AppState['settings']
 type PeriodType = SettingsData['periods'][number]['type']
@@ -192,6 +193,7 @@ export default function Settings(props: PageProps) {
         <div className="set-dates"><label>開始日期<input type="date" value={start} onChange={e=>setStart(e.target.value)} /></label><label>結束日期<input type="date" min={start} value={end} onChange={e=>setEnd(e.target.value)} /></label></div>
         <button type="button" onClick={savePeriod}>加入時期</button>{status('period')}
       </div>
+      <label>今日單字每天看幾個<select value={Number(state.notes[countKey]) || DEFAULT_DAILY} onChange={e=>update(prev=>({...prev,notes:{...prev.notes,[countKey]:e.target.value}}))}>{DAILY_CHOICES.map(n=><option key={n} value={n}>{n} 個{n===DEFAULT_DAILY?'（建議）':''}</option>)}</select></label>
       <label>英文朗讀速度<select value={s.speechRate} onChange={e=>set('speechRate',Number(e.target.value))}>{[...new Set([0.65,0.8,0.9,1,1.15,s.speechRate])].sort((a,b)=>a-b).map(n=><option key={n} value={n}>{n} 倍速</option>)}</select></label>
     </Panel>
     <Panel icon={Telescope} title="我的出發點" hint="記下出發的原因與實習安排">
