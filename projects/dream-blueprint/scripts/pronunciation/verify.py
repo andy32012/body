@@ -5,7 +5,7 @@ usage: verify.py <public/pron directory> [lesson id ...]"""
 import json, os, struct, subprocess, sys
 import numpy as np
 from course import parse, clips, slug, lesson_texts
-from lib import check_once, ORDER
+from lib import check_once, ORDER, padded, transcribe, norm
 from pitchwork import final_move
 
 src = sys.argv[1]
@@ -15,7 +15,7 @@ all_clips = clips(parse())
 def decode(mp3):
     p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'mp3', '-i', '-', '-f', 'f32le', '-ac', '1', '-ar', '24000', '-'], input=mp3, capture_output=True, check=True).stdout
     return np.frombuffer(p, dtype=np.float32), 24000
-bad, total, secs = [], 0, 0.0
+bad, total, secs, pieces = [], 0, 0.0, 0
 for l in lessons:
     want = {}
     if l['kind'] == 'listen' and any(i['label'] in ('↗', '↘') for i in l['items']):
@@ -31,6 +31,13 @@ for l in lessons:
             off, length = index[slug(t)]
             x, sr = decode(raw[4 + size + off:4 + size + off + length])
             total += 1; secs += len(x) / sr
+            if '~' in t:
+                # a long word's slow version must come back as the word; its syllables are too short to grade (see syllables.py)
+                if t.endswith('~slow'):
+                    heard = [transcribe(padded(a, sr)) for a in (x, np.concatenate([np.zeros(288, dtype=np.float32), x]))]
+                    if not all(norm(h) == norm(t.split('~')[0]) for h in heard): bad.append(f"{l['id']}-{g} {t!r}: heard {heard}")
+                else: pieces += 1
+                continue
             r = min((check_once(all_clips[slug(t)], a, sr) for a in (x, np.concatenate([np.zeros(288, dtype=np.float32), x]))), key=lambda r: ORDER[r['grade']])
             note = ''
             if t in want:
@@ -40,5 +47,5 @@ for l in lessons:
                 if not right: r['grade'] = 'bad'
             if r['grade'] != 'strict': bad.append(f"{l['id']}-{g} {t!r}: {r['grade']} {r.get('rivals') or r.get('heard')}{note}")
     print(l['id'], 'checked;', total, 'clips so far,', len(bad), 'not clear', flush=True)
-print(f'{total} clips, {secs / 60:.1f} minutes of sound, {len(bad)} not clear')
+print(f'{total} clips, {secs / 60:.1f} minutes of sound, {len(bad)} not clear ({pieces} of the clips are syllables of long words: present, not graded)')
 for b in bad: print(' -', b)

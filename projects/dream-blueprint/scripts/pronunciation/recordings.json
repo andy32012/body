@@ -9640,5 +9640,2551 @@
     "pitch": "falls -7.5 st (as synthesised)"
    }
   }
+ },
+ "p15": {
+  "beautiful": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "bjˈuɾəfəl.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "Beautiful.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Beautiful.",
+      "Beautiful."
+     ],
+     "slow_secs": 1.49,
+     "piece_secs": [
+      0.45,
+      0.24,
+      0.68
+     ],
+     "slow_sounds": "m b j u t ə f ə l",
+     "piece_sounds": [
+      "b b j u t",
+      "w ʌ",
+      "s ɔ m"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      false
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "bjˈuɾəfəl.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "Beautiful.",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "beautiful",
+      "Beautiful."
+     ],
+     "slow_secs": 1.38,
+     "piece_secs": [
+      0.43,
+      0.18,
+      0.66
+     ],
+     "slow_sounds": "b b j u t ə f ə l",
+     "piece_sounds": [
+      "b b j u t",
+      "f ɪ f t",
+      "f ʊ l"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "tomorrow": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "təmˈɑɹO.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "ahead": 8.75,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "tomato",
+      8.75
+     ]
+    ],
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Tomorrow.",
+      "Tomorrow."
+     ],
+     "slow_secs": 1.13,
+     "piece_secs": [
+      0.16,
+      0.39,
+      0.46
+     ],
+     "slow_sounds": "t ə m ɑ ɹ ɹ ow",
+     "piece_sounds": [
+      "t t ɪ p",
+      "m ɑ ɹ",
+      "ɹ aw"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      false
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "təmˈɑɹO.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "ahead": 8.48,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "tomato",
+      8.48
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "...tomorrow.",
+      "...tomorrow."
+     ],
+     "slow_secs": 1.62,
+     "piece_secs": [
+      0.33,
+      0.46,
+      0.72
+     ],
+     "slow_sounds": "s t ə m ɑ ɹ ɹ ow",
+     "piece_sounds": [
+      "h z t ɪ p",
+      "m ɑ ɹ",
+      "h ɹ̩ ɹ ow"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "yesterday": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "jˈɛstəɹdˌA.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "heard": "Yesterday.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.72,
+     "stretch": 1.5,
+     "heard": [
+      "...yesterday.",
+      "Yesterday"
+     ],
+     "slow_secs": 1.85,
+     "piece_secs": [
+      0.7,
+      0.38,
+      0.65
+     ],
+     "slow_sounds": "j æ s t ɹ̩ d ej",
+     "piece_sounds": [
+      "j ɛ s",
+      "s s t ɹ̩ t",
+      "d ej d"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "jˈɛstəɹdˌA.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "heard": "yesterday",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "YESTERDAY",
+      "YESTERDAY"
+     ],
+     "slow_secs": 1.89,
+     "piece_secs": [
+      0.65,
+      0.32,
+      0.8
+     ],
+     "slow_sounds": "j ɛ s t ɹ̩ d d ej",
+     "piece_sounds": [
+      "j j ɛ s",
+      "θ ɹ̩ d ɹ̩",
+      "d ej d ej"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "remember": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹəmˈɛmbəɹ.",
+    "speed": 0.85,
+    "secs": 0.73,
+    "grade": "strict",
+    "heard": "Remember.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Remember!",
+      "Remember"
+     ],
+     "slow_secs": 1.4,
+     "piece_secs": [
+      0.34,
+      0.32,
+      0.62
+     ],
+     "slow_sounds": "d ɹ ɪ m ð ɛ m b ɑ",
+     "piece_sounds": [
+      "ɹ z ɹ ɪ p",
+      "w ɛ m",
+      "m b ɑ ɹ i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹəmˈɛmbəɹ.",
+    "speed": 0.97,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "Remember...",
+    "syllables": {
+     "voice": "am_fenrir",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Remember",
+      "Remember"
+     ],
+     "slow_secs": 1.46,
+     "piece_secs": [
+      0.23,
+      0.44,
+      0.67
+     ],
+     "slow_sounds": "ɹ ɪ m m ɛ m b ɹ̩ s",
+     "piece_sounds": [
+      "ɹ ɹ ɪ p",
+      "m ɛ m",
+      "b ɹ̩ s ʃ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "different": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈɪfəɹənt.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 6.27,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "difference",
+      6.67
+     ]
+    ],
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Different",
+      "Different"
+     ],
+     "slow_secs": 1.41,
+     "piece_secs": [
+      0.41,
+      0.33,
+      0.55
+     ],
+     "slow_sounds": "d ɪ f f ɹ̩ ɹ ə n t s",
+     "piece_sounds": [
+      "d æ n d d ɪ f t",
+      "f ɹ̩ f ɹ t",
+      "ɹ ɛ n t"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈɪfəɹənt.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "ahead": 4.85,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "difference",
+      4.92
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Different",
+      "Different."
+     ],
+     "slow_secs": 1.54,
+     "piece_secs": [
+      0.44,
+      0.3,
+      0.67
+     ],
+     "slow_sounds": "d ɪ d ɪ f ɔ ɹ ə n t ə",
+     "piece_sounds": [
+      "d n d ɪ d ɪ f",
+      "f ɹ̩ ɹ̩ ɛ ɹ ɪ t",
+      "f ɹ ɛ n t t"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "dangerous": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˈAnʤəɹəs.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Dangerous.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Dangerous.",
+      "Dangerous."
+     ],
+     "slow_secs": 1.58,
+     "piece_secs": [
+      0.61,
+      0.33,
+      0.52
+     ],
+     "slow_sounds": "d n d͡ʒ ɹ̩ ə s",
+     "piece_sounds": [
+      "d ej m d ej n",
+      "d͡ʒ ʒ ʊ ɹ",
+      "b ʌ s"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˈAnʤəɹəs.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "heard": "Dangerous.",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "DANGEROUS.",
+      "DANGEROUS."
+     ],
+     "slow_secs": 1.74,
+     "piece_secs": [
+      0.68,
+      0.36,
+      0.58
+     ],
+     "slow_sounds": "ð ə d n d͡ʒ ɹ̩ ʌ ʌ s",
+     "piece_sounds": [
+      "ð ə d ej n",
+      "d͡ʒ ɔ ɹ ə",
+      "ʌ ʌ s"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "comfortable": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈʌmfəɹɾəbᵊl.",
+    "speed": 0.85,
+    "secs": 0.94,
+    "grade": "strict",
+    "heard": "Comfortable.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Comfortable.",
+      "Comfortable."
+     ],
+     "slow_secs": 1.55,
+     "piece_secs": [
+      0.49,
+      0.19,
+      0.19,
+      0.57
+     ],
+     "slow_sounds": "k ʌ m f ɹ̩ t ə b ə l",
+     "piece_sounds": [
+      "k ʌ m",
+      "s s ɪ",
+      "h t ʌ p",
+      "b ɑ"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true,
+      false
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈʌmfəɹɾəbᵊl.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "Comfortable",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Comfortable",
+      "Comfortable"
+     ],
+     "slow_secs": 1.8,
+     "piece_secs": [
+      0.53,
+      0.2,
+      0.2,
+      0.75
+     ],
+     "slow_sounds": "ɪ k ʌ m f ɹ̩ t t ə b ə l",
+     "piece_sounds": [
+      "ð ɛ k ʌ m",
+      "f ɹ̩ f",
+      "b t ʌ p",
+      "b ow ʌ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "vegetable": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "vˈɛʤtəbəl.",
+    "speed": 0.85,
+    "secs": 0.83,
+    "grade": "strict",
+    "heard": "Vegetable.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.72,
+     "stretch": 1.5,
+     "heard": [
+      "Vegetable",
+      "Vegetable"
+     ],
+     "slow_secs": 1.69,
+     "piece_secs": [
+      0.75,
+      0.22,
+      0.6
+     ],
+     "slow_sounds": "v v æ t t ə b ə l l",
+     "piece_sounds": [
+      "ð æ ɛ",
+      "s t ɪ p",
+      "ð ə b ow ɔ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "vˈɛʤtəbəl.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "Vegetable",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Vegetable",
+      "Vegetable"
+     ],
+     "slow_secs": 1.73,
+     "piece_secs": [
+      0.66,
+      0.22,
+      0.72
+     ],
+     "slow_sounds": "i v æ d t ə b ə l",
+     "piece_sounds": [
+      "i i v æ z",
+      "s s t ɪ p",
+      "b ʌ l"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "restaurant": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹˈɛstəɹənt.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "restaurant",
+    "syllables": {
+     "voice": "af_kore",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "restaurant",
+      "restaurant"
+     ],
+     "slow_secs": 1.6,
+     "piece_secs": [
+      0.55,
+      0.19,
+      0.74
+     ],
+     "slow_sounds": "ɹ ɛ s t ɹ̩ ej ɪ n t",
+     "piece_sounds": [
+      "ɹ ɛ s t",
+      "ʃ ɹ̩ t͡ʃ ɹ̩",
+      "p ɹ̩ ɹ ɪ n t"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹˈɛstəɹənt.",
+    "speed": 0.97,
+    "secs": 0.81,
+    "grade": "strict",
+    "heard": "restaurant",
+    "syllables": {
+     "voice": "am_fenrir",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "restaurant",
+      "restaurant",
+      "restaurant",
+      "restaurant"
+     ],
+     "slow_secs": 1.56,
+     "piece_secs": [
+      0.54,
+      0.19,
+      0.71
+     ],
+     "slow_sounds": "ɹ æ s s t ɹ̩ ɹ ɪ n t",
+     "piece_sounds": [
+      "ɹ ɛ s t",
+      "ʃ ɹ̩ ɹ̩",
+      "p ɹ ɪ n t"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true
+     ]
+    }
+   }
+  },
+  "umbrella": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌʌmbɹˈɛlə.",
+    "speed": 0.85,
+    "secs": 0.75,
+    "grade": "strict",
+    "heard": "Umbrella",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Umbrella",
+      "Umbrella"
+     ],
+     "slow_secs": 1.44,
+     "piece_secs": [
+      0.36,
+      0.47,
+      0.5
+     ],
+     "slow_sounds": "ʌ ʌ m b ɹ i l",
+     "piece_sounds": [
+      "aj ʌ m",
+      "æ b ɹ̩ æ aw l",
+      "w ej l l ej"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      false
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌʌmbɹˈɛlə.",
+    "speed": 0.97,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "Umbrella",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Umbrella",
+      "Umbrella"
+     ],
+     "slow_secs": 1.72,
+     "piece_secs": [
+      0.47,
+      0.44,
+      0.68
+     ],
+     "slow_sounds": "ʌ ʌ m b ɹ̩ ɹ ɛ l ə s",
+     "piece_sounds": [
+      "s ʌ m",
+      "b ɹ̩ ɹ̩ ɛ t",
+      "l l ʌ s"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "computer": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kəmpjˈuɾəɹ.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "ahead": 2.85,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "compute",
+      2.85
+     ],
+     [
+      "commuter",
+      5.96
+     ]
+    ],
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "COMPUTER",
+      "Computer."
+     ],
+     "slow_secs": 1.55,
+     "piece_secs": [
+      0.45,
+      0.41,
+      0.56
+     ],
+     "slow_sounds": "k ʌ m p j t͡ʃ u t͡ʃ ɹ̩",
+     "piece_sounds": [
+      "k ʌ m",
+      "k k j u t",
+      "ʃ ɔ ɹ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kəmpjˈuɾəɹ.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "ahead": 2.96,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "compute",
+      2.96
+     ],
+     [
+      "commuter",
+      4.01
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "COMPUTER",
+      "COMPUTER"
+     ],
+     "slow_secs": 1.48,
+     "piece_secs": [
+      0.35,
+      0.3,
+      0.7
+     ],
+     "slow_sounds": "k ʌ m p j u ɹ̩ t",
+     "piece_sounds": [
+      "k ʌ m",
+      "p j u",
+      "ɡ ʊ d ɹ̩ æ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "afternoon": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌæftəɹnˈun.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "heard": "Afternoon",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Afternoon",
+      "Afternoon"
+     ],
+     "slow_secs": 1.45,
+     "piece_secs": [
+      0.39,
+      0.19,
+      0.75
+     ],
+     "slow_sounds": "æ f t ɹ̩ n u n",
+     "piece_sounds": [
+      "æ ʌ f",
+      "d ɹ̩ k ɹ̩ k",
+      "n u n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌæftəɹnˈun.",
+    "speed": 0.85,
+    "secs": 1.09,
+    "grade": "strict",
+    "heard": "Afternoon",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Afternoon",
+      "Afternoon"
+     ],
+     "slow_secs": 1.63,
+     "piece_secs": [
+      0.44,
+      0.2,
+      0.88
+     ],
+     "slow_sounds": "æ æ f t ɹ̩ n u n",
+     "piece_sounds": [
+      "æ æ f",
+      "θ t ɹ̩ t",
+      "n u n z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "expensive": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɪkspˈɛnsɪv.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "ahead": 9.06,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "extensive",
+      9.18
+     ]
+    ],
+    "syllables": {
+     "voice": "af_kore",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Expensive",
+      "Expensive"
+     ],
+     "slow_secs": 1.59,
+     "piece_secs": [
+      0.15,
+      0.56,
+      0.75
+     ],
+     "slow_sounds": "ɪ ɪ k s p ɛ n s ɪ v",
+     "piece_sounds": [
+      "h i",
+      "s k s m ɛ n d",
+      "s ɪ v"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɪkspˈɛnsɪv.",
+    "speed": 0.85,
+    "secs": 1.07,
+    "grade": "strict",
+    "ahead": 9.04,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "extensive",
+      9.25
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Expensive",
+      "Expensive"
+     ],
+     "slow_secs": 1.98,
+     "piece_secs": [
+      0.37,
+      0.62,
+      0.88
+     ],
+     "slow_sounds": "ɪ k s p p ɛ n s ɪ v",
+     "piece_sounds": [
+      "ej ɛ s z",
+      "s p l ɛ n d",
+      "s ɪ v"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "necessary": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "nˈɛsəsˌɛɹi.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "necessary.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "necessary.",
+      "Necessary."
+     ],
+     "slow_secs": 1.74,
+     "piece_secs": [
+      0.47,
+      0.31,
+      0.38,
+      0.46
+     ],
+     "slow_sounds": "n n ɛ s ə s ɛ ɹ i",
+     "piece_sounds": [
+      "n n ʌ ɑ",
+      "s ɪ z",
+      "s ɛ ɹ",
+      "k ɹ̩ ɹ i"
+     ],
+     "vowel_heard": [
+      false,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "nˈɛsəsˌɛɹi.",
+    "speed": 0.85,
+    "secs": 1.05,
+    "grade": "strict",
+    "heard": "Necessary",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Necessary.",
+      "Necessary."
+     ],
+     "slow_secs": 1.89,
+     "piece_secs": [
+      0.48,
+      0.29,
+      0.4,
+      0.6
+     ],
+     "slow_sounds": "n ɛ s ə s ɛ ɹ i",
+     "piece_sounds": [
+      "n n ɛ f θ",
+      "s ɪ",
+      "s ɛ ɹ",
+      "k ɹ̩ ɹ i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "education": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɛʤəkˈAʃən.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "heard": "Education",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Education",
+      "Education"
+     ],
+     "slow_secs": 1.79,
+     "piece_secs": [
+      0.29,
+      0.27,
+      0.43,
+      0.68
+     ],
+     "slow_sounds": "æ ɛ d͡ʒ ə k ej ʃ ə n",
+     "piece_sounds": [
+      "æ ʌ t",
+      "d z i k",
+      "k ej k ej",
+      "s ʌ n"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌɛʤəkˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.13,
+    "grade": "strict",
+    "heard": "Education",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Education",
+      "Education"
+     ],
+     "slow_secs": 1.68,
+     "piece_secs": [
+      0.19,
+      0.23,
+      0.39,
+      0.75
+     ],
+     "slow_sounds": "ɛ ɛ d͡ʒ ə k ej ʃ ə n",
+     "piece_sounds": [
+      "æ æ t",
+      "d z ɪ k",
+      "k ej k k ej f",
+      "s ɪ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "university": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "jˌunəvˈɜɹsəɾi.",
+    "speed": 0.85,
+    "secs": 0.94,
+    "grade": "strict",
+    "heard": "University.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "University",
+      "University"
+     ],
+     "slow_secs": 1.76,
+     "piece_secs": [
+      0.24,
+      0.19,
+      0.32,
+      0.31,
+      0.57
+     ],
+     "slow_sounds": "j u n ə v ɹ̩ s s ə d t i",
+     "piece_sounds": [
+      "j j u",
+      "w ɪ n ʌ",
+      "v ɹ̩ s v ɹ̩",
+      "s s ɛ",
+      "t t i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "jˌunəvˈɜɹsəɾi.",
+    "speed": 0.85,
+    "secs": 1.13,
+    "grade": "strict",
+    "heard": "University",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "University",
+      "university"
+     ],
+     "slow_secs": 2.14,
+     "piece_secs": [
+      0.32,
+      0.26,
+      0.45,
+      0.31,
+      0.67
+     ],
+     "slow_sounds": "j u n ə v ɹ̩ s ə t i",
+     "piece_sounds": [
+      "j u",
+      "k u n ʌ f",
+      "b ɹ̩ θ v ɹ̩ θ",
+      "s s ɪ",
+      "t i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "Remember your umbrella tomorrow.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɹəmˈɛmbəɹ jʊɹ ˌʌmbɹˈɛlə təmˈɑɹO.",
+    "speed": 0.9,
+    "secs": 1.79,
+    "grade": "strict",
+    "heard": "Remember your umbrella tomorrow."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɹəmˈɛmbəɹ jʊɹ ˌʌmbɹˈɛlə təmˈɑɹO.",
+    "speed": 0.9,
+    "secs": 1.92,
+    "grade": "strict",
+    "heard": "Remember your umbrella tomorrow."
+   }
+  },
+  "The restaurant is beautiful but expensive.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə ɹˈɛstəɹənt ɪz bjˈuɾəfəl bˌʌt ɪkspˈɛnsɪv.",
+    "speed": 0.9,
+    "secs": 2.58,
+    "grade": "strict",
+    "heard": "The restaurant is beautiful, but expensive."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə ɹˈɛstəɹənt ɪz bjˈuɾəfəl bˌʌt ɪkspˈɛnsɪv.",
+    "speed": 0.9,
+    "secs": 2.45,
+    "grade": "strict",
+    "heard": "The restaurant is beautiful but expensive."
+   }
+  },
+  "It is necessary to eat vegetables.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɪt ɪz nˈɛsəsˌɛɹi tʊ ˈit vˈɛʤtəbəlz.",
+    "speed": 0.9,
+    "secs": 2.01,
+    "grade": "strict",
+    "heard": "It is necessary to eat vegetables."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌɪt ɪz nˈɛsəsˌɛɹi tʊ ˈit vˈɛʤtəbəlz.",
+    "speed": 0.9,
+    "secs": 2.07,
+    "grade": "strict",
+    "heard": "It is necessary to eat vegetables."
+   }
+  }
+ },
+ "p16": {
+  "emergency": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "əmˈɜɹʤənsi.",
+    "speed": 0.85,
+    "secs": 0.94,
+    "grade": "strict",
+    "heard": "Emergency.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Emergency",
+      "emergency"
+     ],
+     "slow_secs": 1.67,
+     "piece_secs": [
+      0.19,
+      0.41,
+      0.35,
+      0.6
+     ],
+     "slow_sounds": "ə m ɹ̩ d͡ʒ ə n s i",
+     "piece_sounds": [
+      "h ʌ",
+      "m m ɹ̩ ɹ̩",
+      "d͡ʒ d͡ʒ ɛ n t",
+      "s i"
+     ],
+     "vowel_heard": [
+      false,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "əmˈɜɹʤənsi.",
+    "speed": 0.85,
+    "secs": 1.09,
+    "grade": "strict",
+    "heard": "Emergency.",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "emergency",
+      "emergency"
+     ],
+     "slow_secs": 2.04,
+     "piece_secs": [
+      0.17,
+      0.55,
+      0.43,
+      0.77
+     ],
+     "slow_sounds": "ɪ m ɹ̩ d͡ʒ ə n s i",
+     "piece_sounds": [
+      "b ɛ p",
+      "m m ɹ̩",
+      "d͡ʒ ɪ n z",
+      "s i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "thermometer": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "θəɹmˈɑməɾəɹ.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "heard": "Thermometer",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Thermometer",
+      "Thermometer"
+     ],
+     "slow_secs": 1.66,
+     "piece_secs": [
+      0.38,
+      0.25,
+      0.31,
+      0.61
+     ],
+     "slow_sounds": "ð θ ɹ̩ m ɑ m ə t ɹ̩ ɹ̩",
+     "piece_sounds": [
+      "ð θ ɹ̩ ɹ",
+      "aj m ɑ m",
+      "h ʌ m ɪ t",
+      "t ɹ̩ t ɹ̩"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "θəɹmˈɑməɾəɹ.",
+    "speed": 0.97,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Thermometer",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "thermometer",
+      "thermometer"
+     ],
+     "slow_secs": 1.92,
+     "piece_secs": [
+      0.41,
+      0.42,
+      0.26,
+      0.71
+     ],
+     "slow_sounds": "θ ɹ̩ ɹ̩ m m ɑ m ə t ɹ̩ d",
+     "piece_sounds": [
+      "ð ə θ ɹ̩ d ɹ",
+      "s m ɑ m",
+      "m m ʌ",
+      "n ɹ̩ t͡ʃ s ɹ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "antibiotic": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌæntibˌIˈɑɾɪk.",
+    "speed": 0.85,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "Antibiotic.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Antibiotic",
+      "Antibiotic"
+     ],
+     "slow_secs": 1.87,
+     "piece_secs": [
+      0.39,
+      0.23,
+      0.26,
+      0.26,
+      0.61
+     ],
+     "slow_sounds": "æ n t i b aj ɑ t t ɪ k",
+     "piece_sounds": [
+      "æ n",
+      "s t i",
+      "b aj t aj t",
+      "ð ɑ t",
+      "s ɪ k"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌæntibˌIˈɑɾɪk.",
+    "speed": 0.85,
+    "secs": 1.3,
+    "grade": "strict",
+    "heard": "Antibiotic",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Antibiotic",
+      "Antibiotic"
+     ],
+     "slow_secs": 2.4,
+     "piece_secs": [
+      0.52,
+      0.29,
+      0.37,
+      0.38,
+      0.71
+     ],
+     "slow_sounds": "æ n t i b aj ɑ t ɪ k",
+     "piece_sounds": [
+      "æ æ n",
+      "t t i p",
+      "b aj",
+      "d ej ɑ ɹ t",
+      "t ej k ɪ k"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "medication": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "mˌɛdəkˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.05,
+    "grade": "strict",
+    "ahead": 5.73,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "meditation",
+      5.88
+     ],
+     [
+      "dedication",
+      9.65
+     ]
+    ],
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "medication",
+      "medication"
+     ],
+     "slow_secs": 1.81,
+     "piece_secs": [
+      0.38,
+      0.22,
+      0.43,
+      0.65
+     ],
+     "slow_sounds": "m ɛ d ə k ej ʃ ə n",
+     "piece_sounds": [
+      "m m ɛ t",
+      "θ ɪ k",
+      "t ej t t t",
+      "s s ʌ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "mˌɛdəkˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.15,
+    "grade": "strict",
+    "ahead": 5.11,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "meditation",
+      5.29
+     ],
+     [
+      "dedication",
+      9.97
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "medication",
+      "medication"
+     ],
+     "slow_secs": 2.01,
+     "piece_secs": [
+      0.32,
+      0.32,
+      0.47,
+      0.77
+     ],
+     "slow_sounds": "m ɛ d ə k ej ʃ ə n",
+     "piece_sounds": [
+      "w i m ɛ t",
+      "h ɛ t ej ə",
+      "k ej k t ej",
+      "s ɪ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "prescription": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "pɹiskɹˈɪpʃən.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Prescription",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Prescription",
+      "Prescription"
+     ],
+     "slow_secs": 1.69,
+     "piece_secs": [
+      0.38,
+      0.5,
+      0.68
+     ],
+     "slow_sounds": "p ɹ ə s k ɹ ɛ p ʃ ə n",
+     "piece_sounds": [
+      "p ɹ ɪ z",
+      "s k ɹ ɪ p t",
+      "ʃ ʃ ʌ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "pɹiskɹˈɪpʃən.",
+    "speed": 0.85,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "Prescription",
+    "syllables": {
+     "voice": "am_fenrir",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Prescription",
+      "Prescription"
+     ],
+     "slow_secs": 1.74,
+     "piece_secs": [
+      0.3,
+      0.51,
+      0.81
+     ],
+     "slow_sounds": "p ɹ i s k ɹ ɪ p ʃ ə n",
+     "piece_sounds": [
+      "p ɹ i θ",
+      "s s k ɹ ɪ p",
+      "ʃ ʃ ɛ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "operation": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˌɑpəɹˈAʃən.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Operation",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Operation",
+      "Operation"
+     ],
+     "slow_secs": 1.41,
+     "piece_secs": [
+      0.18,
+      0.09,
+      0.39,
+      0.63
+     ],
+     "slow_sounds": "ɑ p ɹ̩ ej ʃ ə n",
+     "piece_sounds": [
+      "ʌ ʌ p",
+      "θ ʊ",
+      "f ɹ̩ i ɹ ej",
+      "ʃ ɛ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˌɑpəɹˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "Operation",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Operation",
+      "Operation"
+     ],
+     "slow_secs": 1.86,
+     "piece_secs": [
+      0.35,
+      0.22,
+      0.41,
+      0.77
+     ],
+     "slow_sounds": "ɑ p ɹ̩ ej ʃ ə n",
+     "piece_sounds": [
+      "b ɑ p",
+      "θ ɹ̩ θ ɹ̩ d",
+      "w ɹ̩ ɹ ej t",
+      "ʃ ʃ ɪ n"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "examination": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɪɡzˌæmənˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.13,
+    "grade": "strict",
+    "heard": "Examination.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.72,
+     "stretch": 1.5,
+     "heard": [
+      "examination.",
+      "examination"
+     ],
+     "slow_secs": 2.19,
+     "piece_secs": [
+      0.36,
+      0.37,
+      0.22,
+      0.44,
+      0.69
+     ],
+     "slow_sounds": "ɪ ɡ z æ m ə n ej ʃ ə n",
+     "piece_sounds": [
+      "d ɛ ɡ z",
+      "s æ m",
+      "k ə m æ t",
+      "d n ej v",
+      "ʃ ʃ ʌ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɪɡzˌæmənˈAʃən.",
+    "speed": 0.85,
+    "secs": 1.26,
+    "grade": "strict",
+    "heard": "Examination",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "examination",
+      "examination"
+     ],
+     "slow_secs": 2.23,
+     "piece_secs": [
+      0.29,
+      0.47,
+      0.19,
+      0.43,
+      0.72
+     ],
+     "slow_sounds": "ɪ ɡ z æ m ə n ej ʃ ə n",
+     "piece_sounds": [
+      "d ɪ ɡ",
+      "s z æ p",
+      "m ʌ t",
+      "n ej n ej θ",
+      "ʃ ʃ ɛ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "appointment": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "əpˈYntmənt.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Appointment",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Appointment",
+      "Appointment"
+     ],
+     "slow_secs": 1.6,
+     "piece_secs": [
+      0.29,
+      0.52,
+      0.67
+     ],
+     "slow_sounds": "ə p p oj n t m ə n t",
+     "piece_sounds": [
+      "ʌ ʌ p",
+      "p p oj n t",
+      "m ɛ n z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "əpˈYntmənt.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Appointment",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Appointment",
+      "Appointment"
+     ],
+     "slow_secs": 1.7,
+     "piece_secs": [
+      0.3,
+      0.55,
+      0.74
+     ],
+     "slow_sounds": "ə p oj n t m ə n t s",
+     "piece_sounds": [
+      "ʌ ʌ p",
+      "p n p oj n t",
+      "m ɛ n z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "ambulance": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˈæmbjələns.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Ambulance",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Ambulance",
+      "Ambulance"
+     ],
+     "slow_secs": 1.62,
+     "piece_secs": [
+      0.39,
+      0.32,
+      0.79
+     ],
+     "slow_sounds": "æ m b j ə l ə n s",
+     "piece_sounds": [
+      "æ æ m",
+      "m m v i ɛ t",
+      "b l ɛ n z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˈæmbjələns.",
+    "speed": 0.85,
+    "secs": 0.96,
+    "grade": "strict",
+    "heard": "Ambulance",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Ambulance",
+      "Ambulance"
+     ],
+     "slow_secs": 1.83,
+     "piece_secs": [
+      0.53,
+      0.3,
+      0.88
+     ],
+     "slow_sounds": "aj æ m b i ə l ɪ n s",
+     "piece_sounds": [
+      "aj m",
+      "v i ɛ l t",
+      "b l ɪ n z"
+     ],
+     "vowel_heard": [
+      false,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "stethoscope": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "stˈɛθəskˌOp.",
+    "speed": 0.85,
+    "secs": 1.02,
+    "grade": "strict",
+    "heard": "stethoscope",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "stethoscope",
+      "stethoscope"
+     ],
+     "slow_secs": 1.47,
+     "piece_secs": [
+      0.43,
+      0.15,
+      0.78
+     ],
+     "slow_sounds": "s s t æ θ ə s k ow p",
+     "piece_sounds": [
+      "h ɪ z t d ɛ θ",
+      "θ ɪ",
+      "s s k ow p"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "stˈɛθəskˌOp.",
+    "speed": 0.97,
+    "secs": 0.9,
+    "grade": "strict",
+    "heard": "stethoscope",
+    "syllables": {
+     "voice": "am_fenrir",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "stethoscope",
+      "Stethoscope"
+     ],
+     "slow_secs": 1.75,
+     "piece_secs": [
+      0.47,
+      0.23,
+      0.94
+     ],
+     "slow_sounds": "s t æ θ ə s k ow p",
+     "piece_sounds": [
+      "d t ɛ θ",
+      "f ɪ t",
+      "s s k ow b"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "diabetes": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "dˌIəbˈiɾiz.",
+    "speed": 0.85,
+    "secs": 0.92,
+    "grade": "strict",
+    "heard": "Diabetes.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "diabetes",
+      "Diabetes"
+     ],
+     "slow_secs": 1.84,
+     "piece_secs": [
+      0.42,
+      0.14,
+      0.33,
+      0.83
+     ],
+     "slow_sounds": "d aj b i t i z",
+     "piece_sounds": [
+      "d aj aj",
+      "h ɪ p",
+      "b i t",
+      "t t ɪ ɹ z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "dˌIəbˈiɾiz.",
+    "speed": 0.85,
+    "secs": 1.11,
+    "grade": "strict",
+    "heard": "Diabetes",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "DIABETES",
+      "DIABETES"
+     ],
+     "slow_secs": 2.04,
+     "piece_secs": [
+      0.47,
+      0.16,
+      0.38,
+      0.91
+     ],
+     "slow_sounds": "d aj b i t i z",
+     "piece_sounds": [
+      "d aj aj aj",
+      "h ɪ p",
+      "b i t",
+      "t t i z"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "pneumonia": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "numˈOnjə.",
+    "speed": 0.97,
+    "secs": 0.7,
+    "grade": "strict",
+    "heard": "Pneumonia",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Pneumonia",
+      "Pneumonia"
+     ],
+     "slow_secs": 1.26,
+     "piece_secs": [
+      0.27,
+      0.44,
+      0.43
+     ],
+     "slow_sounds": "d z n u m ow n j ə",
+     "piece_sounds": [
+      "w z n u",
+      "m ow m ow n",
+      "j æ"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      false
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "numˈOnjə.",
+    "speed": 0.85,
+    "secs": 1.02,
+    "grade": "strict",
+    "heard": "Pneumonia",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Pneumonia",
+      "Pneumonia"
+     ],
+     "slow_secs": 1.55,
+     "piece_secs": [
+      0.27,
+      0.5,
+      0.65
+     ],
+     "slow_sounds": "n u m ow n i j ɛ s",
+     "piece_sounds": [
+      "n u",
+      "m ow m ow n",
+      "j j ɛ s"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "allergy": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˈæləɹʤi.",
+    "speed": 0.85,
+    "secs": 0.77,
+    "grade": "strict",
+    "heard": "Allergy",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "Allergy",
+      "Allergy"
+     ],
+     "slow_secs": 1.35,
+     "piece_secs": [
+      0.37,
+      0.31,
+      0.55
+     ],
+     "slow_sounds": "æ l ɹ̩ d͡ʒ i i",
+     "piece_sounds": [
+      "ð aw p",
+      "w l ɹ̩ d",
+      "ʃ i"
+     ],
+     "vowel_heard": [
+      false,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˈæləɹʤi.",
+    "speed": 0.85,
+    "secs": 0.9,
+    "grade": "strict",
+    "heard": "Allergy",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Allergy",
+      "Allergy"
+     ],
+     "slow_secs": 1.38,
+     "piece_secs": [
+      0.25,
+      0.32,
+      0.69
+     ],
+     "slow_sounds": "æ l ɹ̩ ə d͡ʒ i",
+     "piece_sounds": [
+      "æ æ",
+      "ʌ l ɹ̩ d",
+      "d i"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "infection": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ɪnfˈɛkʃən.",
+    "speed": 0.85,
+    "secs": 0.85,
+    "grade": "strict",
+    "ahead": 5.94,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "injection",
+      6.09
+     ],
+     [
+      "infectious",
+      7.52
+     ]
+    ],
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Infection",
+      "Infection"
+     ],
+     "slow_secs": 1.38,
+     "piece_secs": [
+      0.33,
+      0.32,
+      0.62
+     ],
+     "slow_sounds": "ɪ n f ɛ k ʃ ə n",
+     "piece_sounds": [
+      "aj ɪ n",
+      "θ ʌ k",
+      "k ʌ n"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ɪnfˈɛkʃən.",
+    "speed": 0.85,
+    "secs": 1.0,
+    "grade": "strict",
+    "ahead": 6.12,
+    "partner": 9.0,
+    "rivals": [
+     [
+      "injection",
+      6.28
+     ],
+     [
+      "infectious",
+      6.55
+     ]
+    ],
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "infection",
+      "infection"
+     ],
+     "slow_secs": 1.79,
+     "piece_secs": [
+      0.42,
+      0.46,
+      0.78
+     ],
+     "slow_sounds": "ə ɪ n f ɛ k ʃ ə n",
+     "piece_sounds": [
+      "ow l ə n v",
+      "f f æ k t",
+      "k ʃ ɪ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "surgery": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "sˈɜɹʤəɹi.",
+    "speed": 0.85,
+    "secs": 0.81,
+    "grade": "strict",
+    "heard": "Surgery.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Surgery",
+      "Surgery"
+     ],
+     "slow_secs": 1.2,
+     "piece_secs": [
+      0.44,
+      0.17,
+      0.47
+     ],
+     "slow_sounds": "s s ɹ̩ ɹ d͡ʒ ɹ̩ i",
+     "piece_sounds": [
+      "s s ɹ̩ t",
+      "d n d͡ʒ ɹ̩",
+      "θ ɹ i"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "sˈɜɹʤəɹi.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Surgery.",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Surgery.",
+      "Surgery"
+     ],
+     "slow_secs": 1.4,
+     "piece_secs": [
+      0.46,
+      0.09,
+      0.74
+     ],
+     "slow_sounds": "s s ɹ d͡ʒ ɹ̩ i",
+     "piece_sounds": [
+      "s ɹ̩ s t",
+      "ð",
+      "d ɹ i"
+     ],
+     "vowel_heard": [
+      true,
+      false,
+      true
+     ]
+    }
+   }
+  },
+  "oxygen": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ˈɑksəʤᵊn.",
+    "speed": 0.85,
+    "secs": 0.87,
+    "grade": "strict",
+    "heard": "Oxygen.",
+    "syllables": {
+     "voice": "af_bella",
+     "speed": 0.88,
+     "stretch": 1.5,
+     "heard": [
+      "Oxygen",
+      "Oxygen."
+     ],
+     "slow_secs": 1.36,
+     "piece_secs": [
+      0.43,
+      0.23,
+      0.59
+     ],
+     "slow_sounds": "ɑ k s ə ə d͡ʒ ə n",
+     "piece_sounds": [
+      "aj k",
+      "k s ɪ",
+      "d͡ʒ ɛ n"
+     ],
+     "vowel_heard": [
+      false,
+      true,
+      true
+     ]
+    }
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ˈɑksəʤᵊn.",
+    "speed": 0.85,
+    "secs": 0.98,
+    "grade": "strict",
+    "heard": "oxygen",
+    "syllables": {
+     "voice": "am_adam",
+     "speed": 0.8,
+     "stretch": 1.5,
+     "heard": [
+      "oxygen",
+      "Oxygen"
+     ],
+     "slow_secs": 1.7,
+     "piece_secs": [
+      0.53,
+      0.31,
+      0.75
+     ],
+     "slow_sounds": "ɑ k s ə ə d͡ʒ ə n",
+     "piece_sounds": [
+      "ow ɑ ɑ k",
+      "k k ɪ t",
+      "d͡ʒ ɪ n"
+     ],
+     "vowel_heard": [
+      true,
+      true,
+      true
+     ]
+    }
+   }
+  },
+  "Call an ambulance. It is an emergency.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "kˈɔl ɐn ˈæmbjələns. ˌɪt ɪz ɐn əmˈɜɹʤənsi.",
+    "speed": 0.9,
+    "secs": 2.6,
+    "grade": "strict",
+    "heard": "Call an ambulance. It is an emergency."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "kˈɔl ɐn ˈæmbjələns. ˌɪt ɪz ɐn əmˈɜɹʤənsi.",
+    "speed": 0.9,
+    "secs": 2.52,
+    "grade": "strict",
+    "heard": "Call an ambulance. It is an emergency."
+   }
+  },
+  "The doctor wrote a prescription for an antibiotic.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "ðə dˈɑktəɹ ɹˈOt ɐ pɹiskɹˈɪpʃən fɔɹ ɐn ˌæntibˌIˈɑɾɪk.",
+    "speed": 0.9,
+    "secs": 3.03,
+    "grade": "strict",
+    "heard": "The doctor wrote a prescription for an antibiotic."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "ðə dˈɑktəɹ ɹˈOt ɐ pɹiskɹˈɪpʃən fɔɹ ɐn ˌæntibˌIˈɑɾɪk.",
+    "speed": 0.9,
+    "secs": 2.75,
+    "grade": "strict",
+    "heard": "The doctor wrote a prescription for an antibiotic."
+   }
+  },
+  "Take your temperature with the thermometer.": {
+   "f": {
+    "voice": "af_bella",
+    "phonemes": "tˈAk jʊɹ tˈɛmpəɹəʧəɹ wɪð ðə θəɹmˈɑməɾəɹ.",
+    "speed": 0.9,
+    "secs": 2.2,
+    "grade": "strict",
+    "heard": "Take your temperature with the thermometer."
+   },
+   "m": {
+    "voice": "am_adam",
+    "phonemes": "tˈAk jʊɹ tˈɛmpəɹəʧəɹ wɪð ðə θəɹmˈɑməɾəɹ.",
+    "speed": 0.9,
+    "secs": 2.09,
+    "grade": "strict",
+    "heard": "Take your temperature with the thermometer."
+   }
+  }
  }
 }

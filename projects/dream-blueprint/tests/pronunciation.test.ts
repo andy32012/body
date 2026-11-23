@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { clipSlug, hasQuiz, lessonTexts, nextPron, packFile, pronLessons, pronPassed, pronProgress, pronVoices, quizFor, readPron, readVoice, savePron, stressParts,
+import { chunkClips, clipSlug, hasQuiz, lessonTexts, nextPron, packFile, pronLessons, pronPassed, pronProgress, pronVoices, quizFor, readPron, readVoice, savePron, stressParts,
   voiceKey } from '../src/lib/pronunciation.ts'
 import { unpack } from '../src/lib/pronAudio.ts'
 
@@ -49,6 +49,34 @@ test('字尾和重音兩堂：標的念法在三種裡面；重音標示剛好�
   assert.deepEqual(stressParts('in·for·MA·tion'), { parts: ['in', 'for', 'ma', 'tion'], stressed: 2 })
 })
 
+test('長單字拆開念：每個字切成的小段拼得回原字，剛好一段重音，每段有 KK 音標和自己的錄音', () => {
+  const lessons = pronLessons.filter(l => l.kind === 'chunks')
+  assert.equal(lessons.length, 2, '生活、護理各一堂')
+  const words = new Set<string>()
+  for (const l of lessons) {
+    assert.ok(l.items!.length >= 12, l.id)
+    for (const item of l.items!) {
+      const { parts, stressed } = stressParts(item.label)
+      assert.ok(parts.length >= 3, item.text + ' 至少三段才算長單字')
+      assert.equal(parts.join(''), item.text.toLowerCase(), item.label)
+      assert.equal(item.label.split('·').filter(p => p === p.toUpperCase()).length, 1, item.label + ' 只有一個重音')
+      assert.ok(stressed >= 0)
+      assert.equal(item.kk?.length, parts.length, item.text + ' 每一段都有音標')
+      for (const k of item.kk!) assert.ok(k.length > 0 && !/[ˈˌAIOWYɹʧʤ]/.test(k), item.text + ' 的音標是 KK：' + k)
+      const clips = chunkClips(item)
+      assert.equal(clips.pieces.length, parts.length)
+      assert.equal(clips.grown.length, parts.length - 2, '兩段、三段……到少一段；全部合起來就是慢速的整個字')
+      const texts = new Set(lessonTexts(l).map(clipSlug))
+      for (const t of [item.text, clips.slow, ...clips.pieces, ...clips.grown]) assert.ok(texts.has(clipSlug(t)), t)
+      assert.ok(!words.has(item.text), item.text + ' 不重複'); words.add(item.text)
+    }
+  }
+  assert.deepEqual(chunkClips({ label: 'BEAU·ti·ful', text: 'beautiful', note: '', kk: ['bju', 'tə', 'fəl'] }),
+    { slow: 'beautiful~slow', pieces: ['beautiful~1', 'beautiful~2', 'beautiful~3'], grown: ['beautiful~1-2'] })
+  assert.equal(clipSlug('beautiful~1-2'), 'beautiful-1-2')
+  assert.deepEqual(chunkClips({ label: 'a', text: 'a', note: '' }), { slow: 'a~slow', pieces: [], grown: [] })
+})
+
 test('聽辨測驗：同一個種子出同一份題目；答案對得上要播的那個字', () => {
   for (const l of pronLessons) {
     const quiz = quizFor(l, 7)
@@ -61,7 +89,7 @@ test('聽辨測驗：同一個種子出同一份題目；答案對得上要播�
       assert.ok(q.answer >= 0 && q.answer < q.options.length && new Set(q.options).size === q.options.length, l.id + ' ' + q.audio)
       if (l.kind === 'pairs') { assert.equal(q.options[q.answer], q.audio); assert.equal(q.options.length, 2) }
       if (l.kind === 'endings') assert.equal(q.options[q.answer], l.items!.find(i => i.text === q.audio)!.label)
-      if (l.kind === 'stress') assert.equal(q.answer, stressParts(l.items!.find(i => i.text === q.audio)!.label).stressed)
+      if (l.kind === 'stress' || l.kind === 'chunks') assert.equal(q.answer, stressParts(l.items!.find(i => i.text === q.audio)!.label).stressed)
       if (l.kind !== 'pairs') assert.ok(q.why.length > 5, l.id + ' 有解說')
     }
     if (l.kind === 'pairs') {
@@ -126,5 +154,5 @@ test('發音包：每一堂女聲、男聲各一包，課裡每個字和句子�
     }
   }
   assert.equal(readdirSync(new URL('pron/', root)).length, pronLessons.length * pronVoices.length, 'pron 資料夾沒有多餘的檔案')
-  assert.ok(bytes < 7_000_000, '全部發音包不超過 7 MB：' + bytes)
+  assert.ok(bytes < 12_000_000, '全部發音包不超過 12 MB：' + bytes)
 })

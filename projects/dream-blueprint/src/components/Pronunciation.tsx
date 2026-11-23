@@ -3,14 +3,16 @@ import { Check, ChevronLeft, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { useTaskContext } from '../lib/taskContext'
 import { logSkill } from '../lib/bridge'
-import { hasQuiz, nextPron, PASS, pronLessons, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
-  type PronLesson, type PronQuestion, type PronVoice, type VoiceChoice } from '../lib/pronunciation'
+import { chunkClips, hasQuiz, nextPron, PASS, pronLessons, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
+  type PronItem, type PronLesson, type PronQuestion, type PronVoice, type VoiceChoice } from '../lib/pronunciation'
 import { saveAllPacks, usePronPlayer, type Take } from '../lib/pronAudio'
 import './pron.css'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }
 type Player = ReturnType<typeof usePronPlayer>
 const SAVED = 'dream-blueprint.pron-saved'
+/** Size of all the sound packs together (pack.py prints it). */
+const PACKS_MB = 10.5
 const number = (l: PronLesson) => pronLessons.indexOf(l) + 1
 const short = (day: string) => day.slice(5).replace('-', '/')
 const voicesOf = (choice: VoiceChoice): PronVoice[] => choice === 'both' ? ['f', 'm'] : [choice]
@@ -79,7 +81,7 @@ function SaveAll() {
   return <p className="pn-save">
     {saved ? '全部的發音都存在這台裝置了，沒有網路也能聽。'
       : progress !== null ? '正在存：' + progress + ' / ' + total
-      : <>上過的課會自動留在這台裝置。想先全部存好（約 5.5 MB）：<button type="button" className="pr-link" onClick={save}>全部存起來</button></>}
+      : <>上過的課會自動留在這台裝置。想先全部存好（約 {PACKS_MB} MB）：<button type="button" className="pr-link" onClick={save}>全部存起來</button></>}
     {error && <span role="alert"> {error}</span>}
   </p>
 }
@@ -134,7 +136,7 @@ function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { l
 
     <section className="pn-sec" aria-label="聽聽看">
       <h4><i aria-hidden="true">2</i>聽聽看，跟著念</h4>
-      <small className="pn-hint">點一個字聽一次，跟著念出聲。{lesson.pairs ? '「比一比」會把兩個連著念，聽它們差在哪。' : ''}</small>
+      <small className="pn-hint">{lesson.kind === 'chunks' ? '點一小段聽那一段；點整個字聽正常速度。每個都跟著念出聲。' : '點一個字聽一次，跟著念出聲。'}{lesson.pairs ? '「比一比」會把兩個連著念，聽它們差在哪。' : ''}</small>
       {lesson.pairs && <ul className="pn-pairs">
         {lesson.pairs.map(([a, b]) => <li key={a + b} data-long={a.includes(' ') || undefined}>
           <Word text={a} on={speaking(a)} onSay={() => say([a])} />
@@ -142,7 +144,10 @@ function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { l
           <button type="button" className="pn-both" aria-label={'比一比：' + a + '、' + b} onClick={() => say([a, b])}>比一比</button>
         </li>)}
       </ul>}
-      {lesson.items && <ul className="pn-items" data-kind={lesson.kind}>
+      {lesson.kind === 'chunks' && lesson.items && <ul className="pn-chunk-list">
+        {lesson.items.map(item => <Chunks key={item.text} item={item} player={player} choice={choice} rate={rate} />)}
+      </ul>}
+      {lesson.kind !== 'chunks' && lesson.items && <ul className="pn-items" data-kind={lesson.kind}>
         {lesson.items.map(item => <li key={item.label + item.text}>
           <span className="pn-label" lang="en">{lesson.kind === 'stress' ? <Stress label={item.label} /> : item.label}</span>
           <Word text={item.text} on={speaking(item.text)} onSay={() => say([item.text])} />
@@ -172,6 +177,37 @@ function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { l
 function Word({ text, on, onSay }: { text: string; on: boolean; onSay: () => void }) {
   return <button type="button" className="pn-word" lang="en" data-on={on} aria-label={'聽：' + text} onClick={onSay}><Volume2 size={14} aria-hidden="true" /><span>{text}</span></button>
 }
+/** A long word cut into syllables. Every piece can be heard on its own; two buttons walk through the word:
+ *  piece by piece and then together, or growing by one piece at a time. All of it comes from one slow recording. */
+function Chunks({ item, player, choice, rate }: { item: PronItem; player: Player; choice: VoiceChoice; rate: number }) {
+  const { parts, stressed } = stressParts(item.label)
+  const clips = chunkClips(item)
+  const chosen = voicesOf(choice)
+  // The pieces only exist as recordings: without a downloaded voice the device can still read the whole word, nothing else.
+  const voice = chosen.find(v => player.ready.includes(v)) ?? player.ready[0]
+  const whole = takes([item.text], choice)
+  const one = (text: string): Take[] => voice ? [{ text, voice }] : []
+  const now = player.now?.text
+  const lit = (i: number) => now === clips.pieces[i] || now === clips.slow || now === item.text || clips.grown.some((g, j) => now === g && i <= j + 1)
+  return <li className="pn-chunk-card">
+    <div className="pn-chunk-top">
+      <Word text={item.text} on={now === item.text} onSay={() => player.play(whole, rate)} />
+      <small>{item.note}</small>
+    </div>
+    <div className="pn-chunks" role="group" aria-label={item.text + ' 的每一段'}>
+      {parts.map((p, i) => <button key={i} type="button" className="pn-chunk" lang="en" disabled={!voice} data-stress={i === stressed} data-on={lit(i)}
+        aria-label={'聽第 ' + (i + 1) + ' 段：' + p + (i === stressed ? '（重音）' : '')} onClick={() => player.play(one(clips.pieces[i]), rate)}>
+        <b>{i === stressed ? p.toUpperCase() : p}</b><small>[{item.kk?.[i]}]</small>
+      </button>)}
+    </div>
+    {voice ? <div className="pn-chunk-actions">
+      <button type="button" onClick={() => player.play([...clips.pieces.flatMap(one), ...one(clips.slow), ...whole], rate)}>一段一段念，再合起來</button>
+      <button type="button" onClick={() => player.play([...one(clips.pieces[0]), ...clips.grown.flatMap(one), ...one(clips.slow), ...whole], rate)}>慢慢加長</button>
+      <button type="button" onClick={() => player.play(one(clips.slow), rate)}>慢速</button>
+    </div> : !player.loading && <small className="pn-hint">小段的聲音要連上網路下載；現在只能聽整個字。</small>}
+  </li>
+}
+
 /** "HOS·pi·tal": the stressed syllable stands out. */
 function Stress({ label }: { label: string }) {
   const { parts, stressed } = stressParts(label)

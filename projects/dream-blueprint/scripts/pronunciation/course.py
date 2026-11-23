@@ -1,4 +1,8 @@
 """Parses course.txt into the lesson list and the list of clips to record.
+An `X` line is a long word cut into syllables: `X BEAU·ti·ful | beautiful | 漂亮的 | bjˈu|tə|fəl` — the spelling in pieces
+(the stressed one in capitals), the word, its meaning, and the careful pronunciation in the synthesiser's symbols, cut at the
+same places. Besides the word itself such an item has derived clips, cut from one slow recording (syllables.py):
+`beautiful~slow`, each piece `beautiful~1` …, and the word growing piece by piece `beautiful~1-2` ….
 A `P<n>` line is a pool of candidate minimal pairs for a lesson, in order of preference; the lesson keeps n of them: the first n
 whose recordings came out clearly distinct in both voices (chosen.json, written by choose.py)."""
 import json, re, sys, os
@@ -13,6 +17,19 @@ MP3 = ['-ac', '1', '-ar', '24000', '-c:a', 'libmp3lame', '-b:a', '96k', '-write_
 def slug(text):
     return re.sub(r'[^a-z0-9]+', '-', text.lower().replace("'", '').replace('’', '')).strip('-')
 
+# The synthesiser's symbols as the KK symbols the course teaches (lesson p00).
+KK = [('əɹ', 'ɚ'), ('ɜɹ', 'ɝ'), ('A', 'e'), ('I', 'aɪ'), ('O', 'o'), ('W', 'aʊ'), ('Y', 'ɔɪ'), ('ʧ', 'tʃ'), ('ʤ', 'dʒ'), ('ɡ', 'g'), ('ɹ', 'r'), ('ᵊ', 'ə'), ('ɐ', 'ə'), ('ɾ', 't')]
+def kk(piece):
+    """One syllable in KK. An unstressed [i] is written [ɪ], as Taiwanese dictionaries do (emergency [ɪˋmɝdʒənsɪ])."""
+    stressed = 'ˈ' in piece or 'ˌ' in piece
+    out = piece.replace('ˈ', '').replace('ˌ', '')
+    for a, b in KK: out = out.replace(a, b)
+    return out if stressed else out.replace('i', 'ɪ')
+def derived(item):
+    """The extra clips of a syllable item: slow, every piece, and the growing word (two pieces … all but the last)."""
+    n, t = len(item['kk']), item['text']
+    return [t + '~slow'] + [f'{t}~{i}' for i in range(1, n + 1)] + [f'{t}~1-{j}' for j in range(2, n)]
+
 def parse(path=os.path.join(HERE, 'course.txt')):
     chosen = json.load(open(CHOSEN))['pairs'] if os.path.exists(CHOSEN) else {}
     lessons = []
@@ -25,7 +42,7 @@ def parse(path=os.path.join(HERE, 'course.txt')):
         rest = rest.strip()
         if tag == '#L':
             id_, kind, title, label = [p.strip() for p in rest.split('|')]
-            cur = {'id': id_, 'kind': kind, 'title': title, 'tag': label, 'explain': [], 'tip': '', 'pools': [], 'pairs': [], 'items': [], 'quiz': [], 'sentences': []}
+            cur = {'id': id_, 'kind': kind, 'title': title, 'tag': label, 'explain': [], 'tip': '', 'pools': [], 'pairs': [], 'items': [], 'quiz': [], 'sentences': [], 'syll': {}}
             lessons.append(cur)
         elif tag == 'H':
             cur['explain'].append(rest)
@@ -37,6 +54,14 @@ def parse(path=os.path.join(HERE, 'course.txt')):
         elif tag == 'W':
             label, text, note = [p.strip() for p in rest.split('|')]
             cur['items'].append({'label': label, 'text': text, 'note': note})
+        elif tag == 'X':
+            label, text, note, said = [p.strip() for p in rest.split(' | ')]
+            pieces = said.split('|')
+            assert len(pieces) == len(label.split('·')), text + ': the spelling and the sounds are cut into a different number of pieces'
+            assert ''.join(label.split('·')).lower() == text.lower(), text + ': the pieces do not spell the word'
+            assert sum('ˈ' in p for p in pieces) == 1 and 'ˈ' in pieces[[p == p.upper() for p in label.split('·')].index(True)], text + ': the stress mark is not in the capital piece'
+            cur['items'].append({'label': label, 'text': text, 'note': note, 'kk': [kk(p) for p in pieces]})
+            cur['syll'][text] = pieces
         elif tag == 'Q':
             audio, q, options, answer, why = [p.strip() for p in rest.split('|')]
             cur['quiz'].append({'audio': audio, 'q': q, 'options': [o.strip() for o in options.split(';')], 'answer': int(answer), 'why': why})
@@ -53,13 +78,13 @@ def for_app(lessons):
     """The lesson list as the app reads it: no pools, no empty fields."""
     out = []
     for l in lessons:
-        l = {k: v for k, v in l.items() if k != 'pools' and v}
+        l = {k: v for k, v in l.items() if k not in ('pools', 'syll') and v}
         out.append(l)
     return out
 
 def lesson_texts(l):
     seen, out = set(), []
-    for t in [w for p in l['pairs'] for w in p] + [i['text'] for i in l['items']] + [q['audio'] for q in l['quiz']] + [s['en'] for s in l['sentences']]:
+    for t in [w for p in l['pairs'] for w in p] + [i['text'] for i in l['items']] + [d for i in l['items'] if 'kk' in i for d in derived(i)] + [q['audio'] for q in l['quiz']] + [s['en'] for s in l['sentences']]:
         if slug(t) not in seen: seen.add(slug(t)); out.append(t)
     return out
 

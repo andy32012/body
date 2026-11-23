@@ -7,6 +7,8 @@ from course import parse, slug, lesson_texts, HERE, CHOSEN, MP3
 dest = sys.argv[1]
 os.makedirs(dest, exist_ok=True)
 voices = json.load(open(CHOSEN))['voices']
+# the pieces of a long word ("beautiful~2") are in the voice syllables.py cut them from
+cuts = {g: json.load(open(os.path.join(HERE, 'out', f'syllables-{g}.json'))) if os.path.exists(os.path.join(HERE, 'out', f'syllables-{g}.json')) else {} for g in 'fm'}
 def mp3(wav):
     return subprocess.run(['ffmpeg', '-v', 'error', '-i', wav] + MP3, capture_output=True, check=True).stdout
 total, wanted = 0, set()
@@ -15,7 +17,8 @@ for l in parse():
         index, data = {}, b''
         for t in lesson_texts(l):
             s = slug(t)
-            clip = mp3(os.path.join(HERE, 'out', g, voices[g][s], s + '.wav'))
+            voice = cuts[g][slug(t.split('~')[0])]['voice'] if '~' in t else voices[g][s]
+            clip = mp3(os.path.join(HERE, 'out', g, voice, s + '.wav'))
             index[s] = [len(data), len(clip)]
             data += clip
         head = json.dumps(index, separators=(',', ':')).encode()

@@ -225,3 +225,53 @@ Q Are you ready? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降
 S Are you allergic to any medicine? = 你對任何藥物過敏嗎？
 S When did the pain start? = 什麼時候開始痛的？
 S Please take a deep breath. = 請深呼吸。
+
+#L p15 | chunks | 長單字拆開念：生活常用字 | 拆音節
+H 長的單字不要一口氣硬念。先照母音把它切成幾小段（音節），一段一段念，再慢慢合起來，最後用正常速度念一次。
+H 每個字下面是切好的小段和它的 KK 音標。點一小段聽那一段的聲音；「一段一段念」會照順序念完再合起來；「慢慢加長」是念第一段、前兩段、前三段……像堆積木一樣加上去。
+H 大寫的那一段是重音：念得最大聲、最長。其他段要輕、要短，母音常常變成 [ə]。合起來的時候不要每一段都一樣重。
+T 小段的聲音是從「慢速的整個字」裡切出來的，所以很短，聽起來像字的一部分，這是正常的。先聽出每一段的母音，再跟著「慢速」念整個字。
+X BEAU·ti·ful | beautiful | 漂亮的 | bjˈu|tə|fəl
+X to·MOR·row | tomorrow | 明天 | tə|mˈɑ|ɹO
+X YES·ter·day | yesterday | 昨天 | jˈɛs|təɹ|dˌA
+X re·MEM·ber | remember | 記得 | ɹɪ|mˈɛm|bəɹ
+X DIF·fer·ent | different | 不同的（口語常念成兩段 DIF-rent） | dˈɪ|fəɹ|ənt
+X DAN·ger·ous | dangerous | 危險的 | dˈAn|ʤəɹ|əs
+X COM·for·ta·ble | comfortable | 舒服的（口語常念成三段 COMF-ter-ble） | kˈʌm|fəɹ|tə|bᵊl
+X VEGE·ta·ble | vegetable | 蔬菜（中間的 e 不念） | vˈɛʤ|tə|bəl
+X RES·tau·rant | restaurant | 餐廳 | ɹˈɛs|tə|ɹənt
+X um·BREL·la | umbrella | 雨傘 | ˌʌm|bɹˈɛ|lə
+X com·PU·ter | computer | 電腦 | kəm|pjˈu|təɹ
+X af·ter·NOON | afternoon | 下午 | ˌæf|təɹ|nˈun
+X ex·PEN·sive | expensive | 貴的 | ɪk|spˈɛn|sɪv
+X NEC·es·sar·y | necessary | 必要的 | nˈɛ|sə|sˌɛ|ɹi
+X ed·u·CA·tion | education | 教育 | ˌɛ|ʤə|kˈA|ʃən
+X u·ni·VER·si·ty | university | 大學 | jˌu|nə|vˈɜɹ|sə|ti
+S Remember your umbrella tomorrow. = 明天記得帶雨傘。
+S The restaurant is beautiful but expensive. = 那家餐廳很漂亮，但是很貴。
+S It is necessary to eat vegetables. = 吃蔬菜是必要的。
+
+#L p16 | chunks | 長單字拆開念：護理常用字 | 拆音節
+H 護理英文的字常常很長，但是切開來每一段都不難。先一段一段念，再慢慢合起來。
+H -tion 結尾的字（medication、operation、infection）重音都在 -tion 前面那一段，-tion 自己念得很輕，像 [ʃən]。
+H 大寫的那一段是重音。重音放對比每個音都念準還重要：e·MER·gen·cy 念成 E·mer·gen·cy，對方很可能聽不懂。
+T pneumonia 開頭的 p 不發音，從 [n] 開始念。stethoscope 的 th 是咬舌音 [θ]，不是 [s]。
+X e·MER·gen·cy | emergency | 緊急狀況、急診 | ɪ|mˈɜɹ|ʤən|si
+X ther·MOM·e·ter | thermometer | 體溫計 | θəɹ|mˈɑ|mə|təɹ
+X an·ti·bi·OT·ic | antibiotic | 抗生素 | ˌæn|ti|bˌI|ˈɑ|tɪk
+X med·i·CA·tion | medication | 藥物 | mˌɛ|də|kˈA|ʃən
+X pre·SCRIP·tion | prescription | 處方 | pɹi|skɹˈɪp|ʃən
+X op·er·A·tion | operation | 手術 | ˌɑ|pə|ɹˈA|ʃən
+X ex·am·i·NA·tion | examination | 檢查 | ɪɡ|zˌæ|mə|nˈA|ʃən
+X ap·POINT·ment | appointment | 預約、約診 | ə|pˈYnt|mənt
+X AM·bu·lance | ambulance | 救護車 | ˈæm|bjə|ləns
+X STETH·o·scope | stethoscope | 聽診器 | stˈɛ|θə|skˌOp
+X di·a·BE·tes | diabetes | 糖尿病 | dˌI|ə|bˈi|tiz
+X pneu·MO·nia | pneumonia | 肺炎（p 不發音） | nu|mˈOn|jə
+X AL·ler·gy | allergy | 過敏 | ˈæ|ləɹ|ʤi
+X in·FEC·tion | infection | 感染 | ɪn|fˈɛk|ʃən
+X SUR·ger·y | surgery | 外科手術 | sˈɜɹ|ʤə|ɹi
+X OX·y·gen | oxygen | 氧氣 | ˈɑk|sə|ʤən
+S Call an ambulance. It is an emergency. = 叫救護車，這是緊急狀況。
+S The doctor wrote a prescription for an antibiotic. = 醫師開了抗生素的處方。
+S Take your temperature with the thermometer. = 用體溫計量體溫。

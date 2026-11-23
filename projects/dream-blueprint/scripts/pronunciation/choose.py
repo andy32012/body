@@ -56,6 +56,7 @@ json.dump({'pairs': pairs}, open(CHOSEN, 'w'), ensure_ascii=False, indent=1)
 record = {}
 for l in parse():
     for t in lesson_texts(l):
+        if '~' in t: continue          # the pieces of a long word are cut by syllables.py and follow the word (below)
         s = slug(t)
         for g in 'fm':
             have = takes[g].get(s, {})
@@ -68,6 +69,18 @@ for l in parse():
             if r['grade'] != 'strict': problems.append(f"{l['id']}: {t!r} ({g}, {voices[g][s]}) is {r['grade']}: {r.get('rivals') or r.get('heard')}")
             record.setdefault(l['id'], {}).setdefault(t, {})[g] = {'voice': voices[g][s], **{k: r[k] for k in ('phonemes', 'speed', 'secs', 'grade', 'ahead', 'partner', 'rivals', 'heard', 'pitch') if k in r}}
 json.dump({'pairs': pairs, 'voices': voices}, open(CHOSEN, 'w'), ensure_ascii=False, indent=1)
+# the long words cut into syllables: what syllables.py made of each (it reads the voices just written, so on a first run
+# this part is empty; run syllables.py and then choose.py again)
+cuts = {g: json.load(open(p)) if os.path.exists(p := os.path.join(HERE, 'out', f'syllables-{g}.json')) else {} for g in 'fm'}
+for l in parse():
+    for word, pieces in l['syll'].items():
+        for g in 'fm':
+            c = cuts[g].get(slug(word))
+            if not c or c['pieces'] != pieces: problems.append(f"{l['id']}: {word!r} is not cut into syllables yet ({g})"); continue
+            if not c['ok']: problems.append(f"{l['id']}: the slow {word!r} ({g}) came back as {c['heard']}")
+            # not a fault, but worth knowing: the slow word did not come back right in the word's own voice
+            if c['voice'] != voices[g].get(slug(word)): print(f"note: {word!r} ({g}): the pieces are in {c['voice']}, the whole word in {voices[g].get(slug(word))}")
+            record.setdefault(l['id'], {}).setdefault(word, {}).setdefault(g, {})['syllables'] = {k: c[k] for k in ('voice', 'speed', 'stretch', 'heard', 'slow_secs', 'piece_secs', 'slow_sounds', 'piece_sounds', 'vowel_heard')}
 json.dump(record, open(os.path.join(HERE, 'recordings.json'), 'w'), ensure_ascii=False, indent=1)
 for l in parse():
     if l['pools']: print(l['id'], ' '.join('/'.join(p) for p in l['pairs']))

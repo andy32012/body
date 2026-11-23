@@ -2,8 +2,9 @@ import data from '../data/pronunciation.json'
 
 /** The pronunciation course: short lessons on the sounds, stress, linking and intonation a Mandarin speaker most often gets wrong.
  *  Every word and sentence has a recorded clip in a woman's and a man's voice (public/pron), packed one file per lesson and voice. */
-export type PronKind = 'table' | 'pairs' | 'endings' | 'stress' | 'listen'
-export interface PronItem { label: string; text: string; note: string }
+export type PronKind = 'table' | 'pairs' | 'endings' | 'stress' | 'listen' | 'chunks'
+/** In a 'chunks' lesson an item is a long word cut into syllables: label "BEAU·ti·ful", kk the KK symbols of each piece. */
+export interface PronItem { label: string; text: string; note: string; kk?: string[] }
 export interface PronQuiz { audio: string; q: string; options: string[]; answer: number; why: string }
 export interface PronLesson {
   id: string; kind: PronKind; title: string; tag: string; explain: string[]; tip?: string
@@ -25,9 +26,20 @@ export const readVoice = (notes: Record<string, string>): VoiceChoice => {
 
 /** File name of a clip inside a pack: the same rule the recording script uses. */
 export const clipSlug = (text: string) => text.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+/** The extra clips of a long word (a 'chunks' item), all cut from one slow recording: the slow word, each syllable, and the
+ *  word growing syllable by syllable (the first two, the first three … up to all but the last; all of them is the slow word). */
+export function chunkClips(item: PronItem) {
+  const n = item.kk?.length ?? 0
+  return {
+    slow: item.text + '~slow',
+    pieces: Array.from({ length: n }, (_, i) => item.text + '~' + (i + 1)),
+    grown: Array.from({ length: Math.max(0, n - 2) }, (_, i) => item.text + '~1-' + (i + 2)),
+  }
+}
+const chunkTexts = (item: PronItem) => { const c = chunkClips(item); return [c.slow, ...c.pieces, ...c.grown] }
 /** Every text of a lesson that has a clip. */
 export function lessonTexts(lesson: PronLesson): string[] {
-  const all = [...(lesson.pairs ?? []).flat(), ...(lesson.items ?? []).map(i => i.text), ...(lesson.quiz ?? []).map(q => q.audio), ...(lesson.sentences ?? []).map(s => s.en)]
+  const all = [...(lesson.pairs ?? []).flat(), ...(lesson.items ?? []).map(i => i.text), ...(lesson.items ?? []).filter(i => i.kk).flatMap(chunkTexts), ...(lesson.quiz ?? []).map(q => q.audio), ...(lesson.sentences ?? []).map(s => s.en)]
   const seen = new Set<string>()
   return all.filter(t => { const s = clipSlug(t); if (seen.has(s)) return false; seen.add(s); return true })
 }
@@ -53,7 +65,7 @@ export function stressParts(label: string): { parts: string[]; stressed: number 
 }
 const QUIZ_LENGTH = 8
 /** Questions for one attempt. Minimal pairs: which of the two did you hear. Endings: which of the three sounds.
- *  Stress: which syllable. Linking and intonation: the questions written for the lesson. */
+ *  Stress and long words: which syllable is stressed. Linking and intonation: the questions written for the lesson. */
 export function quizFor(lesson: PronLesson, seed: number): PronQuestion[] {
   const next = rng(seed)
   if (lesson.kind === 'pairs' && lesson.pairs) {
@@ -69,7 +81,7 @@ export function quizFor(lesson: PronLesson, seed: number): PronQuestion[] {
       .map(i => ({ audio: i.text, show: i.text, prompt: '這個字的字尾念哪一種？', options: labels, answer: labels.indexOf(i.label), why: i.note + '，所以念 ' + i.label + '。' }))
     return shuffled([...family(edLabels), ...family(sLabels)], next)
   }
-  if (lesson.kind === 'stress' && lesson.items) {
+  if ((lesson.kind === 'stress' || lesson.kind === 'chunks') && lesson.items) {
     return shuffled(lesson.items, next).slice(0, QUIZ_LENGTH).map(i => {
       const { parts, stressed } = stressParts(i.label)
       return { audio: i.text, show: i.text, prompt: '重音在哪一個音節？', options: parts, answer: stressed, why: '重音在 ' + parts[stressed] + '：' + i.label + '（' + i.note + '）' }

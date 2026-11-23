@@ -1199,5 +1199,395 @@
     "zh": "請深呼吸。"
    }
   ]
+ },
+ {
+  "id": "p15",
+  "kind": "chunks",
+  "title": "長單字拆開念：生活常用字",
+  "tag": "拆音節",
+  "explain": [
+   "長的單字不要一口氣硬念。先照母音把它切成幾小段（音節），一段一段念，再慢慢合起來，最後用正常速度念一次。",
+   "每個字下面是切好的小段和它的 KK 音標。點一小段聽那一段的聲音；「一段一段念」會照順序念完再合起來；「慢慢加長」是念第一段、前兩段、前三段……像堆積木一樣加上去。",
+   "大寫的那一段是重音：念得最大聲、最長。其他段要輕、要短，母音常常變成 [ə]。合起來的時候不要每一段都一樣重。"
+  ],
+  "tip": "小段的聲音是從「慢速的整個字」裡切出來的，所以很短，聽起來像字的一部分，這是正常的。先聽出每一段的母音，再跟著「慢速」念整個字。",
+  "items": [
+   {
+    "label": "BEAU·ti·ful",
+    "text": "beautiful",
+    "note": "漂亮的",
+    "kk": [
+     "bju",
+     "tə",
+     "fəl"
+    ]
+   },
+   {
+    "label": "to·MOR·row",
+    "text": "tomorrow",
+    "note": "明天",
+    "kk": [
+     "tə",
+     "mɑ",
+     "ro"
+    ]
+   },
+   {
+    "label": "YES·ter·day",
+    "text": "yesterday",
+    "note": "昨天",
+    "kk": [
+     "jɛs",
+     "tɚ",
+     "de"
+    ]
+   },
+   {
+    "label": "re·MEM·ber",
+    "text": "remember",
+    "note": "記得",
+    "kk": [
+     "rɪ",
+     "mɛm",
+     "bɚ"
+    ]
+   },
+   {
+    "label": "DIF·fer·ent",
+    "text": "different",
+    "note": "不同的（口語常念成兩段 DIF-rent）",
+    "kk": [
+     "dɪ",
+     "fɚ",
+     "ənt"
+    ]
+   },
+   {
+    "label": "DAN·ger·ous",
+    "text": "dangerous",
+    "note": "危險的",
+    "kk": [
+     "den",
+     "dʒɚ",
+     "əs"
+    ]
+   },
+   {
+    "label": "COM·for·ta·ble",
+    "text": "comfortable",
+    "note": "舒服的（口語常念成三段 COMF-ter-ble）",
+    "kk": [
+     "kʌm",
+     "fɚ",
+     "tə",
+     "bəl"
+    ]
+   },
+   {
+    "label": "VEGE·ta·ble",
+    "text": "vegetable",
+    "note": "蔬菜（中間的 e 不念）",
+    "kk": [
+     "vɛdʒ",
+     "tə",
+     "bəl"
+    ]
+   },
+   {
+    "label": "RES·tau·rant",
+    "text": "restaurant",
+    "note": "餐廳",
+    "kk": [
+     "rɛs",
+     "tə",
+     "rənt"
+    ]
+   },
+   {
+    "label": "um·BREL·la",
+    "text": "umbrella",
+    "note": "雨傘",
+    "kk": [
+     "ʌm",
+     "brɛ",
+     "lə"
+    ]
+   },
+   {
+    "label": "com·PU·ter",
+    "text": "computer",
+    "note": "電腦",
+    "kk": [
+     "kəm",
+     "pju",
+     "tɚ"
+    ]
+   },
+   {
+    "label": "af·ter·NOON",
+    "text": "afternoon",
+    "note": "下午",
+    "kk": [
+     "æf",
+     "tɚ",
+     "nun"
+    ]
+   },
+   {
+    "label": "ex·PEN·sive",
+    "text": "expensive",
+    "note": "貴的",
+    "kk": [
+     "ɪk",
+     "spɛn",
+     "sɪv"
+    ]
+   },
+   {
+    "label": "NEC·es·sar·y",
+    "text": "necessary",
+    "note": "必要的",
+    "kk": [
+     "nɛ",
+     "sə",
+     "sɛ",
+     "rɪ"
+    ]
+   },
+   {
+    "label": "ed·u·CA·tion",
+    "text": "education",
+    "note": "教育",
+    "kk": [
+     "ɛ",
+     "dʒə",
+     "ke",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "u·ni·VER·si·ty",
+    "text": "university",
+    "note": "大學",
+    "kk": [
+     "ju",
+     "nə",
+     "vɝ",
+     "sə",
+     "tɪ"
+    ]
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Remember your umbrella tomorrow.",
+    "zh": "明天記得帶雨傘。"
+   },
+   {
+    "en": "The restaurant is beautiful but expensive.",
+    "zh": "那家餐廳很漂亮，但是很貴。"
+   },
+   {
+    "en": "It is necessary to eat vegetables.",
+    "zh": "吃蔬菜是必要的。"
+   }
+  ]
+ },
+ {
+  "id": "p16",
+  "kind": "chunks",
+  "title": "長單字拆開念：護理常用字",
+  "tag": "拆音節",
+  "explain": [
+   "護理英文的字常常很長，但是切開來每一段都不難。先一段一段念，再慢慢合起來。",
+   "-tion 結尾的字（medication、operation、infection）重音都在 -tion 前面那一段，-tion 自己念得很輕，像 [ʃən]。",
+   "大寫的那一段是重音。重音放對比每個音都念準還重要：e·MER·gen·cy 念成 E·mer·gen·cy，對方很可能聽不懂。"
+  ],
+  "tip": "pneumonia 開頭的 p 不發音，從 [n] 開始念。stethoscope 的 th 是咬舌音 [θ]，不是 [s]。",
+  "items": [
+   {
+    "label": "e·MER·gen·cy",
+    "text": "emergency",
+    "note": "緊急狀況、急診",
+    "kk": [
+     "ɪ",
+     "mɝ",
+     "dʒən",
+     "sɪ"
+    ]
+   },
+   {
+    "label": "ther·MOM·e·ter",
+    "text": "thermometer",
+    "note": "體溫計",
+    "kk": [
+     "θɚ",
+     "mɑ",
+     "mə",
+     "tɚ"
+    ]
+   },
+   {
+    "label": "an·ti·bi·OT·ic",
+    "text": "antibiotic",
+    "note": "抗生素",
+    "kk": [
+     "æn",
+     "tɪ",
+     "baɪ",
+     "ɑ",
+     "tɪk"
+    ]
+   },
+   {
+    "label": "med·i·CA·tion",
+    "text": "medication",
+    "note": "藥物",
+    "kk": [
+     "mɛ",
+     "də",
+     "ke",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "pre·SCRIP·tion",
+    "text": "prescription",
+    "note": "處方",
+    "kk": [
+     "prɪ",
+     "skrɪp",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "op·er·A·tion",
+    "text": "operation",
+    "note": "手術",
+    "kk": [
+     "ɑ",
+     "pə",
+     "re",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "ex·am·i·NA·tion",
+    "text": "examination",
+    "note": "檢查",
+    "kk": [
+     "ɪg",
+     "zæ",
+     "mə",
+     "ne",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "ap·POINT·ment",
+    "text": "appointment",
+    "note": "預約、約診",
+    "kk": [
+     "ə",
+     "pɔɪnt",
+     "mənt"
+    ]
+   },
+   {
+    "label": "AM·bu·lance",
+    "text": "ambulance",
+    "note": "救護車",
+    "kk": [
+     "æm",
+     "bjə",
+     "ləns"
+    ]
+   },
+   {
+    "label": "STETH·o·scope",
+    "text": "stethoscope",
+    "note": "聽診器",
+    "kk": [
+     "stɛ",
+     "θə",
+     "skop"
+    ]
+   },
+   {
+    "label": "di·a·BE·tes",
+    "text": "diabetes",
+    "note": "糖尿病",
+    "kk": [
+     "daɪ",
+     "ə",
+     "bi",
+     "tɪz"
+    ]
+   },
+   {
+    "label": "pneu·MO·nia",
+    "text": "pneumonia",
+    "note": "肺炎（p 不發音）",
+    "kk": [
+     "nu",
+     "mon",
+     "jə"
+    ]
+   },
+   {
+    "label": "AL·ler·gy",
+    "text": "allergy",
+    "note": "過敏",
+    "kk": [
+     "æ",
+     "lɚ",
+     "dʒɪ"
+    ]
+   },
+   {
+    "label": "in·FEC·tion",
+    "text": "infection",
+    "note": "感染",
+    "kk": [
+     "ɪn",
+     "fɛk",
+     "ʃən"
+    ]
+   },
+   {
+    "label": "SUR·ger·y",
+    "text": "surgery",
+    "note": "外科手術",
+    "kk": [
+     "sɝ",
+     "dʒə",
+     "rɪ"
+    ]
+   },
+   {
+    "label": "OX·y·gen",
+    "text": "oxygen",
+    "note": "氧氣",
+    "kk": [
+     "ɑk",
+     "sə",
+     "dʒən"
+    ]
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Call an ambulance. It is an emergency.",
+    "zh": "叫救護車，這是緊急狀況。"
+   },
+   {
+    "en": "The doctor wrote a prescription for an antibiotic.",
+    "zh": "醫師開了抗生素的處方。"
+   },
+   {
+    "en": "Take your temperature with the thermometer.",
+    "zh": "用體溫計量體溫。"
+   }
+  ]
  }
 ]
