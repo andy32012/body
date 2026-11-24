@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import {
+import { levelTarget, readLevelsOpen,
   nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
   type ReadLevel, type ReadPassage,
 } from '../lib/reading'
+import { LockLine } from './Locked'
 import { useTaskContext } from '../lib/taskContext'
 import { AskWord } from './AIChat'
 import './reading.css'
@@ -78,12 +79,18 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
 
   if (failed) return <p>閱讀教材載入失敗，重新整理再試一次。</p>
   if (!all) return <p>載入中……</p>
+  // A level opens once the level before it has its target of passed passages (A1 12 of 15 before A2, and so on).
+  const opened = readLevelsOpen(all, state.notes)
+  const shownLevels = readLevels.filter(l => !set || all.some(p => p.level === l.id))
   const levelButtons = only ? null : <div className="pr-options rd-levels" role="group" aria-label="閱讀程度">
-    {readLevels.filter(l => !set || all.some(p => p.level === l.id)).map(l => {
+    {shownLevels.map((l, i) => {
       const here = all.filter(p => p.level === l.id)
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length
-      return <button key={l.id} type="button" aria-pressed={l.id === lvl} onClick={() => chooseLevel(l.id)}>
-        {l.name}<small>過關 {ok} / {here.length}{l.id === suggested ? ' · 建議' : ''}</small></button>
+      const before = shownLevels[i - 1], beforeHere = before ? all.filter(p => p.level === before.id) : []
+      const beforeOk = beforeHere.filter(p => passed(readRecord(state.notes, p.id))).length
+      return <button key={l.id} type="button" aria-pressed={l.id === lvl} disabled={!opened[l.id]} data-locked={!opened[l.id]} onClick={() => chooseLevel(l.id)}>
+        {l.name}{opened[l.id] ? <small>過關 {ok} / {here.length}{l.id === suggested ? ' · 建議' : ''}</small>
+          : <LockLine text={(before ? before.name.split(' ')[0] : '前一級') + ' 過關 ' + levelTarget(beforeHere.length) + ' 篇才打開（現在 ' + beforeOk + '）'} />}</button>
     })}
   </div>
   if (!passage) {
@@ -94,7 +101,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
         <strong>{currentId === undefined ? '準備文章中……' : only ? '這個單元的文章都看過或略過了' : readLevels.find(l => l.id === lvl)!.name + '這一輪的文章都看過或略過了'}</strong>
         {currentId !== undefined && <div className="pr-actions">
           <button type="button" className="pr-main" onClick={() => chooseLevel(lvl)}>{only ? '從第一篇再來' : '這一級從頭再來'}</button>
-          {nextLevel && !only && <button type="button" className="pr-link" onClick={() => chooseLevel(nextLevel.id)}>換到 {nextLevel.name}</button>}
+          {nextLevel && !only && opened[nextLevel.id] && <button type="button" className="pr-link" onClick={() => chooseLevel(nextLevel.id)}>換到 {nextLevel.name}</button>}
         </div>}
       </div>
     </div>

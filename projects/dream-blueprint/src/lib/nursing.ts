@@ -1,6 +1,7 @@
 /** Nursing English for the internship and licensing-exam months (and any day he wants it): listening dialogues with
  *  a transcript, reading passages in the reading format, and a nursing word list drilled like the 7000 words. */
 import type { Accent, ListenRecord, PackLine, PackQuestion } from './bridge'
+import { levelTarget, openSteps } from './unlock'
 
 export type NurseLevel = 'A2' | 'B1' | 'B2'
 /** `you` is the role he practises when he acts the scene out with Emma; Emma plays `emma`. */
@@ -30,6 +31,17 @@ export function readNurseListen(notes: Record<string, string>, id: string): List
 /** Understood by ear: every answer right after a complete play, without the text. */
 export const heardWell = (r: ListenRecord | null) => !!r && r.heard && r.correct === r.total
 
+/** Listened to without the text and at least 70% right: what counts toward finishing a level. */
+export const listenPassed = (r: ListenRecord | null) => !!r && r.heard && r.correct / Math.max(1, r.total) >= 0.7
+export const nurseLevels = ['A2', 'B1', 'B2'] as const
+/** Which levels of nursing listening are open: B1 once A2 has its target of passed dialogues (levelTarget), B2 after B1. */
+export function nurseLevelsOpen(list: readonly { id: string; level: string }[], notes: Record<string, string>): Record<string, boolean> {
+  const open = openSteps(nurseLevels.map(lv => {
+    const here = list.filter(l => l.level === lv)
+    return here.filter(l => listenPassed(readNurseListen(notes, l.id))).length >= levelTarget(here.length)
+  }))
+  return Object.fromEntries(nurseLevels.map((lv, i) => [lv, open[i]]))
+}
 /** Never heard first (in order), then ones not yet understood by ear (oldest first), then the rest (oldest first). */
 export function nextNurseListening(list: readonly NurseListening[], notes: Record<string, string>, skip: readonly string[] = []) {
   const pool = list.filter(l => !skip.includes(l.id))

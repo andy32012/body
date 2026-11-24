@@ -1,4 +1,6 @@
 import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
+import { openSteps, reached } from './unlock'
+import { unitPackOpen } from './bridge'
 
 /** 寫作階梯：句子 → 一段 → 多段 → IELTS Task 1 → Task 2. Claude grades each stage by a published table (see rubricFor). */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
@@ -186,3 +188,16 @@ export function parseGrade(text: string, rubric: Rubric, parts: readonly string[
       revised: typeof j.revised === 'string' ? j.revised : undefined }
   } catch { return null }
 }
+
+/** Tasks done in a stage before the next one opens: two (all, if a stage has fewer) — the bar that moves the suggestion on. */
+export const stageTarget = (stage: WriteStage) => Math.min(2, stage.tasks.length)
+/** Which stages are open: each ladder stage once the one before it has its two tasks done; the bridge stage once the
+ *  course reaches the bridge units. */
+export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, string>, unit: number): Record<string, boolean> {
+  const ladder = stages.filter(s => !s.pack)
+  const open = openSteps(ladder.map(s => s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length >= stageTarget(s)))
+  return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i]]), ...stages.filter(s => s.pack).map((s): [string, boolean] => [s.id, unitPackOpen(unit)])])
+}
+/** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
+export const writeTaskOpen = (task: Pick<WriteTask, 'unit'>, unit: number) => task.unit === undefined || reached(task.unit, unit)
+

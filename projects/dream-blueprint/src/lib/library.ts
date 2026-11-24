@@ -1,4 +1,5 @@
-import { hasPack, packUnits } from './bridge'
+import { unitPackOpen } from './bridge'
+export { unitPackOpen } from './bridge'
 
 /** The practice library. Every kind of practice has a page of its own, #library/<mode>, and nothing puts two kinds on one
  *  page. The main menu lists them under 英文練習 (the sidebar on a computer or tablet); on a phone the 英文練習 page itself
@@ -49,8 +50,6 @@ const groups: { id: LibraryGroup; title: string; ids: MenuId[] }[] = [
   { id: 'nursing', title: '護理英文', ids: ['nlisten', 'nread', 'nwords', 'case'] },
 ]
 export const menuHash = (id: MenuId) => id === 'speaking' ? 'speaking' : 'library/' + id
-/** The unit packs (單元讀聽說寫) start at the first bridge unit. */
-export const unitPackOpen = (unit: number) => hasPack(unit) || unit > packUnits[0]
 
 /** What the menu lists now. Exams and internship add no new material: writing, the unit packs and the word screen rest, and
  *  the questions are the nursing ones only, listed with nursing English as 護理英文題. */

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { reached } from '../lib/unlock'
 import { Volume2 } from 'lucide-react'
 import curriculum from '../data/curriculum.json'
 import type { PageProps } from '../lib/store'
@@ -141,7 +142,8 @@ export default function GrammarTeach({ unit, day, title, rule, notes, onSave, da
   </section>
 }
 
-/** In the practice library: any unit's teaching and all of its drills, to read ahead or to go back to. */
+/** In the practice library: the teaching and all the drills of any unit the course has reached, to go back to.
+ *  Units ahead of the course stay locked until the lessons get there. */
 export function GrammarBook({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
   const [unit, setUnit] = useState(() => Math.min(grammarUnits.length, Math.max(1, state.curriculum.unit)))
   const [round, setRound] = useState(0)
@@ -155,7 +157,7 @@ export function GrammarBook({ state, onActivity, date }: Pick<PageProps, 'state'
     <label className="gm-pick">單元
       <select value={unit} onChange={e => { setUnit(Number(e.target.value)); setRound(0) }}>
         {stages.map(s => <optgroup key={s} label={stageNames[s] ?? s}>
-          {curriculum.overview.filter(o => o.stage === s).map(o => <option key={o.unit} value={o.unit}>{o.unit}．{o.title}{o.unit === state.curriculum.unit ? '（現在這一課）' : ''}</option>)}
+          {curriculum.overview.filter(o => o.stage === s).map(o => <option key={o.unit} value={o.unit} disabled={!reached(o.unit, state.curriculum.unit)}>{reached(o.unit, state.curriculum.unit) ? '' : '🔒 '}{o.unit}．{o.title}{o.unit === state.curriculum.unit ? '（現在這一課）' : reached(o.unit, state.curriculum.unit) ? '' : '（上到才打開）'}</option>)}
         </optgroup>)}
       </select>
     </label>

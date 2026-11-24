@@ -4,6 +4,7 @@
 import { compareWithReference, normalizeEnglish } from './evidence'
 import { doneKey, type Passage } from './passages'
 import { levelEntry, meaningLine } from './vocab'
+import { levelDone, openSteps } from './unlock'
 
 export type StoryTab = 'read' | 'listen' | 'dictate'
 export const storyTabs: [StoryTab, string][] = [['read', '閱讀'], ['listen', '聽力'], ['dictate', '聽寫']]
@@ -61,6 +62,10 @@ export function storyProgress(all: readonly Passage[], level: number, notes: Rec
   const pool = all.filter(p => p.level === level && p.en)
   return { done: pool.filter(p => readStory(notes, p.id)[field[tab]]).length, total: pool.length }
 }
+
+/** The six levels on one tab (讀 / 聽 / 聽寫): a level opens once the one before it is done to its target (80%) on the same tab. */
+export const storyLevelsOpen = (all: readonly Passage[], notes: Record<string, string>, tab: StoryTab) =>
+  openSteps([1, 2, 3, 4, 5, 6].map(n => { const p = storyProgress(all, n, notes, tab); return levelDone(p.done, p.total) }))
 
 const irregular: Record<string, string> = {
   am: 'be', is: 'be', are: 'be', was: 'be', were: 'be', been: 'be', has: 'have', had: 'have', does: 'do', did: 'do', done: 'do',

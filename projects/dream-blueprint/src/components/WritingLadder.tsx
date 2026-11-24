@@ -4,7 +4,9 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { packUnits } from '../lib/bridge'
+import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
 import { MiniChart } from './LessonParts'
 import StuckButton from './StuckButton'
@@ -51,13 +53,17 @@ function Graded({ fb }: { fb: WriteFeedback }) {
 /** 寫作階梯: Claude grades each piece by the published table for its stage (全民英檢 or IELTS); IELTS tasks get a timer and a word target. */
 export default function WritingLadder({ state, onActivity, date, initialTask }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }) {
   const suggested = suggestedStage(stages, state.notes)
-  // A task opened from a unit's pack (library/writing/<id>) starts on that task.
-  const opened = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask)) : undefined
-  const [stageId, setStageId] = useState(() => opened?.id ?? suggested)
-  const stage = stages.find(s => s.id === stageId)!
-  const firstOpen = stage.tasks.find(t => !taskDone(readWrite(state.notes, t.id), !!stage.ielts)) ?? stage.tasks[0]
-  const [taskId, setTaskId] = useState(() => opened && initialTask ? initialTask : firstOpen.id)
-  const task = stage.tasks.find(t => t.id === taskId) ?? firstOpen
+  const unit = state.curriculum.unit
+  // A stage opens once the one before it has two tasks done; the bridge stage and its tasks open with their units.
+  const openStage = stagesOpen(stages, state.notes, unit)
+  const firstOpenTask = (s: WriteStage) => s.tasks.find(t => writeTaskOpen(t, unit) && !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks.find(t => writeTaskOpen(t, unit)) ?? s.tasks[0]
+  // A task opened from a unit's pack (library/writing/<id>) starts on that task, if it is open.
+  const fromPack = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask && writeTaskOpen(t, unit))) : undefined
+  const [stageId, setStageId] = useState(() => fromPack && openStage[fromPack.id] ? fromPack.id : suggested)
+  const stage = stages.find(s => s.id === stageId && openStage[s.id]) ?? stages.find(s => s.id === suggested)!
+  const firstOpen = firstOpenTask(stage)
+  const [taskId, setTaskId] = useState(() => fromPack && initialTask && fromPack.id === stage.id ? initialTask : firstOpen.id)
+  const task = stage.tasks.find(t => t.id === taskId && writeTaskOpen(t, unit)) ?? firstOpen
   const draftKey = 'write.' + task.id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [busy, setBusy] = useState(false)
@@ -121,12 +127,19 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
 
   return <div className="pr-stack wl">
     <div className="pr-options wl-stages" role="group" aria-label="寫作階梯">
-      {stages.map(s => <button key={s.id} type="button" aria-pressed={s.id === stage.id} onClick={() => { setStageId(s.id); setTaskId((s.tasks.find(t => !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks[0]).id) }}>
-        {s.name}<small>{stageDone[s.id]} / {s.tasks.length}{s.id === suggested ? ' · 建議' : ''}</small></button>)}
+      {stages.map((s, i) => {
+        const before = !s.pack ? stages.slice(0, i).filter(x => !x.pack).at(-1) : undefined
+        return <button key={s.id} type="button" aria-pressed={s.id === stage.id} disabled={!openStage[s.id]} data-locked={!openStage[s.id]} onClick={() => { setStageId(s.id); setTaskId(firstOpenTask(s).id) }}>
+          {s.name}{openStage[s.id] ? <small>{stageDone[s.id]} / {s.tasks.length}{s.id === suggested ? ' · 建議' : ''}</small>
+            : <LockLine text={s.pack ? '上到單元 ' + packUnits[0] + ' 才打開' : before ? '「' + before.name.replace(/^\S+\s*/, '') + '」做完 ' + stageTarget(before) + ' 題才打開（現在 ' + stageDone[before.id] + '）' : '還沒打開'} />}</button>
+      })}
     </div>
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
-    {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => <button key={t.id} type="button" aria-pressed={t.id === task.id} onClick={() => setTaskId(t.id)}>
-      {stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>)}</div>}
+    {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => {
+      const open = writeTaskOpen(t, unit)
+      return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} data-locked={!open} title={open ? undefined : '上到單元 ' + t.unit + ' 才打開'} onClick={() => setTaskId(t.id)}>
+        {!open && '🔒 '}{stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
+    })}</div>}
     <section className="wl-task">
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>

@@ -21,6 +21,8 @@ export interface Pack {
 /** Units that come with a pack, in order. */
 export const packUnits: number[] = curriculum.overview.filter(o => o.stage === 'BR').map(o => o.unit)
 export const hasPack = (unit: number) => packUnits.includes(unit)
+/** The unit packs (單元讀聽說寫) start at the first bridge unit. */
+export const unitPackOpen = (unit: number) => hasPack(unit) || unit > packUnits[0]
 /** The pack to show for where the course stands: this unit's, else the next one ahead, else the last one. */
 export const packFor = (unit: number) => hasPack(unit) ? unit : packUnits.find(u => u > unit) ?? packUnits[packUnits.length - 1]
 export const unitTitle = (unit: number) => curriculum.units.find(u => u.id === unit)?.title ?? ''

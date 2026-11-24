@@ -6,6 +6,7 @@ import {
   accentNames, hasPack, heldOpen, listenKey, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
   type HeldPart, type ListenRecord, type Pack, type PackListening,
 } from '../lib/bridge'
+import { reached } from '../lib/unlock'
 import { passed, readRecord, type ReadPassage } from '../lib/reading'
 import { readWrite, selfChecked, taskDone, type WriteStage, type WriteTask } from '../lib/writing'
 import { accentVoices, Transcript, useDialogueVoice, useVoiceList } from './LessonParts'
@@ -209,7 +210,10 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     return () => { alive = false }
   }, [])
   const [tab, setTab] = useState<Tab>(() => fromHash().tab ?? 'chunks')
-  const [unit, setUnit] = useState(() => fromHash().unit ?? packFor(state.curriculum.unit))
+  const [picked, setUnit] = useState(() => fromHash().unit ?? packFor(state.curriculum.unit))
+  // A pack opens with its unit: units ahead of the course stay locked, and a link to one opens the latest reached pack.
+  const reachedPacks = packUnits.filter(u => reached(u, state.curriculum.unit))
+  const unit = reached(picked, state.curriculum.unit) ? picked : reachedPacks.at(-1) ?? null
   useEffect(() => {
     const on = () => {
       if (!location.hash.startsWith('#library/unit')) return
@@ -221,6 +225,7 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     return () => window.removeEventListener('hashchange', on)
   }, [])
   if (failed) return <p>單元教材載入失敗，重新整理再試一次。</p>
+  if (unit === null) return <p className="ls-help">單元讀聽說寫從單元 {packUnits[0]} 開始，課程上到那裡才會打開。</p>
   const pack = packs?.find(p => p.unit === unit)
   if (!pack) return <p>載入中……</p>
   const cur = state.curriculum
@@ -240,12 +245,12 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     <header className="up-head">
       <label className="up-pick">單元
         <select value={unit} onChange={e => setUnit(Number(e.target.value))}>
-          {packUnits.map(u => <option key={u} value={u}>{u} · {unitTitle(u).split(/[：（]/)[0]}</option>)}
+          {packUnits.map(u => <option key={u} value={u} disabled={!reached(u, cur.unit)}>{reached(u, cur.unit) ? '' : '🔒 '}{u} · {unitTitle(u).split(/[：（]/)[0]}{reached(u, cur.unit) ? '' : '（上到才打開）'}</option>)}
         </select>
       </label>
       <p className="up-focus"><b>{pack.code}</b>{pack.focus}</p>
       <p className="qz-meta">
-        <span>{cur.unit === unit ? '這週的單元（第 ' + cur.day + ' 天）' : cur.unit < unit ? '你現在在單元 ' + cur.unit + '，這包可以先預習' : '上過的單元，可以回來複習'}</span>
+        <span>{cur.unit === unit ? '這週的單元（第 ' + cur.day + ' 天）' : '上過的單元，可以回來複習'}</span>
         <span>一個單元一週：詞塊和閱讀 → 聽力 → 寫作 → 口說 → 第 6 天回測</span>
       </p>
     </header>
@@ -257,7 +262,7 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     {tab === 'listen' && pack.listen.map((l, i) => <PackListen key={unit + '-' + i} l={l} rate={rate} last={readListen(notes, unit, i)}
       onSave={r => onActivity(prev => ({ ...prev, notes: logSkill({ ...prev.notes, [listenKey(unit, i)]: JSON.stringify({ ...r, day: date }) }, 'listen', date) }))} />)}
     {tab === 'write' && <section className="up-section">
-      <p className="ls-help">兩題段落寫作，題目會要你用這一課的文法。連上 Claude 就照四個評分項目批改；沒連的話自己對照檢查（記成自評，不算過關）。</p>
+      <p className="ls-help">兩題段落寫作，題目會要你用這一課的文法。連上 Claude 就照全民英檢中級英文作文的官方評分表批改；沒連的話自己對照檢查（記成自評，不算過關）。</p>
       {tasks.map(t => {
         const r = readWrite(notes, t.id)
         return <article key={t.id} className="up-item">

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Camera, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
-import { speakRubric,
+import { geptLevelsOpen, geptPass, speakRubric,
   answerSeconds, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
   type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord,
 } from '../lib/gept'
@@ -15,6 +15,7 @@ import { logSkill } from '../lib/bridge'
 import { dayKey } from '../lib/progress'
 import ReadAloudCheck from './ReadAloudCheck'
 import { RubricTable } from './RubricTable'
+import { LockLine } from './Locked'
 import { levelText, rubrics, type RubricId } from '../lib/rubrics'
 import GeptScene from './GeptScene'
 import './gept.css'
@@ -26,8 +27,11 @@ type Save = (patch: GeptRecord, feedback?: GeptFeedback) => void
 
 /** 全民英檢口說練習: the parts of the test one by one, with honest checks (see lib/gept.ts). */
 export default function GeptSpeaking({ state, update }: PageProps) {
-  // The A1→A2 units prepare for 初級; from the A2→B1 units on, 中級.
-  const [level, setLevel] = useState<GeptLevel>(() => state.curriculum.unit > 28 ? 'intermediate' : 'elementary')
+  // 中級 opens once a 初級 round's 回答問題 reached 4 級分 (the official pass level); until then it stays locked.
+  const levelOpen = geptLevelsOpen(state.notes, elementary.map(s => s.id))
+  // The A1→A2 units prepare for 初級; from the A2→B1 units on, 中級 — if it is open.
+  const [chosen, setLevel] = useState<GeptLevel>(() => state.curriculum.unit > 28 && levelOpen.intermediate ? 'intermediate' : 'elementary')
+  const level: GeptLevel = levelOpen[chosen] ? chosen : 'elementary'
   const setsOf = (l: GeptLevel): { id: string }[] => l === 'elementary' ? elementary : intermediate
   // The first set not practised yet, chosen once: finishing a part must not switch the page to the next set.
   const firstOpen = (l: GeptLevel) => (setsOf(l).find(s => !readGept(state.notes, l, s.id).d) ?? setsOf(l)[0]).id
@@ -51,15 +55,15 @@ export default function GeptSpeaking({ state, update }: PageProps) {
     return next
   })
 
-  const el = level === 'elementary' ? elementary.find(s => s.id === setId)! : null
-  const mid = level === 'intermediate' ? intermediate.find(s => s.id === setId)! : null
+  const el = level === 'elementary' ? elementary.find(s => s.id === setId) ?? elementary[0] : null
+  const mid = level === 'intermediate' ? intermediate.find(s => s.id === setId) ?? intermediate[0] : null
   return <div className="gp-page">
     <section className="gp-head">
       <a className="gp-back" href="#speaking">← 回到 Emma</a>
       <h1>全民英檢口說練習</h1>
       <div className="gp-tabs" role="tablist" aria-label="級數">
-        {(['elementary', 'intermediate'] as GeptLevel[]).map(l => <button key={l} type="button" role="tab" aria-selected={level === l}
-          onClick={() => { setLevel(l); setSetId(firstOpen(l)); setOpen([]) }}>{geptLevels[l].name}<small>{geptLevels[l].cefr}</small></button>)}
+        {(['elementary', 'intermediate'] as GeptLevel[]).map(l => <button key={l} type="button" role="tab" aria-selected={level === l} disabled={!levelOpen[l]} data-locked={!levelOpen[l]}
+          onClick={() => { setLevel(l); setSetId(firstOpen(l)); setOpen([]) }}>{geptLevels[l].name}{levelOpen[l] ? <small>{geptLevels[l].cefr}</small> : <LockLine text={'初級回答問題拿到 ' + geptPass + ' 級分才打開'} />}</button>)}
       </div>
       <div className="gp-sets" role="group" aria-label="題組">
         {sets.map((s, i) => {

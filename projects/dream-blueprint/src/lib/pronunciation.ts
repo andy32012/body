@@ -1,4 +1,5 @@
 import data from '../data/pronunciation.json'
+import { openSteps } from './unlock'
 
 /** The pronunciation course: short lessons on the sounds, stress, linking and intonation a Mandarin speaker most often gets wrong.
  *  Every word and sentence has a recorded clip in a woman's and a man's voice (public/pron), packed one file per lesson and voice. */
@@ -112,3 +113,5 @@ export function pronPassed(lesson: PronLesson, rec: PronRecord) {
 }
 export const nextPron = (notes: Record<string, string>) => pronLessons.find(l => !pronPassed(l, readPron(notes, l.id))) ?? null
 export const pronProgress = (notes: Record<string, string>) => ({ done: pronLessons.filter(l => pronPassed(l, readPron(notes, l.id))).length, total: pronLessons.length })
+/** The course goes in order: a lesson opens once every lesson before it is passed. */
+export const pronOpen = (notes: Record<string, string>) => openSteps(pronLessons.map(l => pronPassed(l, readPron(notes, l.id))))

@@ -1,3 +1,6 @@
+import { levelTarget, openSteps } from './unlock'
+export { levelTarget } from './unlock'
+
 /** Graded reading from A1 up to IELTS-style passages. Each wrong answer asks why, so word, sentence,
  *  locating and question-type problems can be told apart. */
 export type ReadLevel = 'A1' | 'A2' | 'B1' | 'B2'
@@ -45,9 +48,8 @@ export function saveRead(notes: Record<string, string>, id: string, rec: Omit<Re
 /** A passage is passed at 70% or better without opening the Chinese, on an attempt that counts. */
 export const passed = (r: ReadRecord | null) => !!r && clean(r.best ?? r)
 
-/** How many passed passages finish a level. A level with more than five passages is read almost in full (80%) before
- *  moving up — reading a lot at an easy level is the point of having that many; small levels keep the old rule of three. */
-export const levelTarget = (count: number) => count <= 5 ? Math.min(3, count) : Math.ceil(count * 0.8)
+/** How many passed passages finish a level (levelTarget): a level with more than five passages is read almost in full
+ *  (80%) before moving up — reading a lot at an easy level is the point of having that many; small levels need three. */
 /** The level to work on: the lowest one that has not reached its target of passed passages. */
 export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadLevel {
   for (const l of readLevels) {
@@ -55,6 +57,15 @@ export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string
     if (here.filter(p => passed(readRecord(notes, p.id))).length < levelTarget(here.length)) return l.id
   }
   return 'B2'
+}
+/** Which levels are open: A2 once A1 has its target of passed passages, B1 after A2, and so on. A level with no
+ *  passages in this set (the nursing passages have no A1) holds nothing back. */
+export function readLevelsOpen(all: readonly ReadPassage[], notes: Record<string, string>): Record<ReadLevel, boolean> {
+  const open = openSteps(readLevels.map(l => {
+    const here = all.filter(p => p.level === l.id)
+    return here.filter(p => passed(readRecord(notes, p.id))).length >= levelTarget(here.length)
+  }))
+  return Object.fromEntries(readLevels.map((l, i) => [l.id, open[i]])) as Record<ReadLevel, boolean>
 }
 /** Unread passages first, then ones not yet passed (oldest first), then the rest. */
 export function nextReading(all: readonly ReadPassage[], level: ReadLevel, notes: Record<string, string>, skip: readonly string[] = []) {

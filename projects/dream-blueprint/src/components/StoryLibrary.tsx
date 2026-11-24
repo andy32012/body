@@ -7,8 +7,9 @@ import { logSkill } from '../lib/bridge'
 import { newCard } from '../lib/progress'
 import { levelEntry, wordKey } from '../lib/vocab'
 import { useDialogueVoice } from './LessonParts'
-import { dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
+import { storyLevelsOpen, dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
   storyTabs, type Lookup, type StoryTab } from '../lib/story'
+import { openAt } from '../lib/unlock'
 import './story.css'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTab?: StoryTab }
@@ -18,6 +19,8 @@ const tabNotes: Record<StoryTab, string> = {
   dictate: '一次聽一句，把聽到的寫下來，再對答案。',
 }
 const tabDone: Record<StoryTab, string> = { read: '讀過', listen: '聽過', dictate: '聽寫過' }
+/** Each tab's own name in a lock line: 第 1 級閱讀完成八成才打開. */
+const tabName: Record<StoryTab, string> = { read: '閱讀', listen: '聽力', dictate: '聽寫' }
 
 /** The sentences of a passage. Each word can be tapped for its meaning; each sentence can be played. */
 /** `detail` (the meaning of the tapped word) is shown right under the sentence the word is in, so it never covers the text. */
@@ -39,7 +42,7 @@ export default function StoryLibrary({ state, onActivity, date, initialTab = 're
   const [tab, setTab] = useState<StoryTab>(initialTab)
   const [skipped, setSkipped] = useState<string[]>([])
   const [currentId, setCurrentId] = useState<string>()
-  const level = Math.min(6, Math.max(1, Number(state.notes[storyLevelKey]) || 1))
+  const stored = Math.min(6, Math.max(1, Number(state.notes[storyLevelKey]) || 1))
   useEffect(() => {
     let alive = true
     import('../data/passages.json')
@@ -48,6 +51,9 @@ export default function StoryLibrary({ state, onActivity, date, initialTab = 're
     return () => { alive = false }
   }, [])
   useEffect(() => { setTab(initialTab) }, [initialTab])
+  // Each tab climbs on its own: a level opens once the one before it is done to 80% on that tab (讀、聽、聽寫).
+  const levelOpen = useMemo(() => all ? storyLevelsOpen(all, state.notes, tab) : [true, false, false, false, false, false], [all, state.notes, tab])
+  const level = openAt(levelOpen, stored - 1) + 1
   // The passage stays the same while it is being worked on; only a new level, tab or 下一段 picks another.
   useEffect(() => {
     if (all) setCurrentId(nextStory(all, level, state.checks, state.notes, tab, skipped)?.id)
@@ -74,7 +80,7 @@ export default function StoryLibrary({ state, onActivity, date, initialTab = 're
     </div>
     <div className="passage-head">
       <label>級別 <select value={level} onChange={e => chooseLevel(Number(e.target.value))}>
-        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>第 {n} 級{n === 1 ? '（最簡單）' : ''}</option>)}
+        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n} disabled={!levelOpen[n - 1]}>{levelOpen[n - 1] ? '' : '🔒 '}第 {n} 級{n === 1 ? '（最簡單）' : levelOpen[n - 1] ? '' : '（第 ' + (n - 1) + ' 級' + tabName[tab] + '完成八成才打開）'}</option>)}
       </select></label>
       <span className="passage-count">{tabDone[tab]} <b>{progress.done}</b> / {progress.total} 段</span>
     </div>

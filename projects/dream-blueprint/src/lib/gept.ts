@@ -39,6 +39,11 @@ export interface GeptRecord { d?: string; q?: number; p?: number; r?: number }
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
   try { return JSON.parse(notes[geptKey(level, id)] || '{}') as GeptRecord } catch { return {} }
 }
+/** 中級 opens once a 初級 round's 回答問題 reached 4 級分 on Claude's reference score — the official pass level. */
+export const geptPass = 4
+export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: readonly string[]): Record<GeptLevel, boolean> {
+  return { elementary: true, intermediate: elementaryIds.some(id => (readGept(notes, 'elementary', id).q ?? 0) >= geptPass) }
+}
 export function saveGept(notes: Record<string, string>, level: GeptLevel, id: string, patch: GeptRecord) {
   return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...readGept(notes, level, id), ...patch }) }
 }

@@ -4,9 +4,10 @@ import { Check, ChevronLeft, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { useTaskContext } from '../lib/taskContext'
 import { logSkill } from '../lib/bridge'
-import { chunkClips, hasQuiz, nextPron, PASS, pronLessons, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
+import { chunkClips, hasQuiz, nextPron, PASS, pronLessons, pronOpen, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
   type PronItem, type PronLesson, type PronQuestion, type PronVoice, type VoiceChoice } from '../lib/pronunciation'
 import { saveAllPacks, usePronPlayer, type Take } from '../lib/pronAudio'
+import { LockLine } from './Locked'
 import './pron.css'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }
@@ -26,6 +27,8 @@ export default function Pronunciation({ state, onActivity, date }: Props) {
   const lesson = pronLessons.find(l => l.id === openId)
   const top = useRef<HTMLDivElement>(null)
   function open(id: string | null) {
+    // A lesson that is still locked (the one before it isn't passed) doesn't open.
+    if (id && !pronOpen(state.notes)[pronLessons.findIndex(l => l.id === id)]) return
     setOpenId(id)
     requestAnimationFrame(() => top.current?.scrollIntoView({ block: 'start' }))
   }
@@ -39,8 +42,10 @@ export default function Pronunciation({ state, onActivity, date }: Props) {
 function Index({ state, onOpen }: { state: Props['state']; onOpen: (id: string) => void }) {
   const progress = pronProgress(state.notes)
   const next = nextPron(state.notes)
+  // The course goes in order: a lesson opens once the one before it is passed.
+  const open = pronOpen(state.notes)
   return <>
-    <p className="st-note">每堂 5–8 分鐘：先看這個音怎麼念，點字聽女聲和男聲，做一個聽辨小測驗，再跟著念三句。照順序上，也可以挑想練的。</p>
+    <p className="st-note">每堂 5–8 分鐘：先看這個音怎麼念，點字聽女聲和男聲，做一個聽辨小測驗，再跟著念三句。照順序上：前一堂過關，下一堂才會打開；上過的課隨時可以回來練。</p>
     <div className="passage-head">
       <span className="passage-count">過關 <b>{progress.done}</b> / {progress.total} 堂</span>
     </div>
@@ -48,13 +53,14 @@ function Index({ state, onOpen }: { state: Props['state']; onOpen: (id: string) 
       ? <button type="button" className="pr-main pn-next" onClick={() => onOpen(next.id)}>{progress.done || readPron(state.notes, next.id).q ? '接著上' : '開始'}：第 {number(next)} 堂 {next.title}</button>
       : <p className="pn-allclear" role="status">{progress.total} 堂都過關了。哪個音又念不準，就回來點那一堂再練。</p>}
     <ol className="pn-list">
-      {pronLessons.map(l => {
+      {pronLessons.map((l, i) => {
         const rec = readPron(state.notes, l.id)
         const passed = pronPassed(l, rec)
         return <li key={l.id}>
-          <button type="button" onClick={() => onOpen(l.id)} data-passed={passed}>
+          <button type="button" onClick={() => onOpen(l.id)} data-passed={passed} disabled={!open[i]} data-locked={!open[i]}>
             <i aria-hidden="true">{passed ? <Check size={14} strokeWidth={3} /> : number(l)}</i>
-            <span><b>{l.title}</b><small>{l.tag}{rec.q ? ' · 測驗 ' + rec.q[0] + ' / ' + rec.q[1] + (passed ? '' : '，再練一次') : ''}{passed ? ' · 過關' : ''}</small></span>
+            <span><b>{l.title}</b>{open[i] ? <small>{l.tag}{rec.q ? ' · 測驗 ' + rec.q[0] + ' / ' + rec.q[1] + (passed ? '' : '，再練一次') : ''}{passed ? ' · 過關' : ''}</small>
+              : <LockLine text={'第 ' + i + ' 堂過關才打開'} />}</span>
           </button>
         </li>
       })}
@@ -171,7 +177,7 @@ function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { l
       <Shadow lesson={lesson} speaking={speaking} onSay={t => say([t])} saidOn={rec.s} today={date} onDone={() => finish({ s: date }, true)} />
     </section>}
 
-    {(passed || lesson.kind === 'table') && following && <button type="button" className="pr-main pn-next" onClick={() => onOpen(following.id)}>下一堂：{following.title}</button>}
+    {passed && following && <button type="button" className="pr-main pn-next" onClick={() => onOpen(following.id)}>下一堂：{following.title}</button>}
   </>
 }
 

@@ -7,7 +7,8 @@ import { tutorKey } from '../lib/tutor'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
 import ContextMeaning from './ContextMeaning'
-import { doneKey, levelKey, levelProgress, nextPassage, redoDue, redoKey, type Passage } from '../lib/passages'
+import { passageLevelsOpen, doneKey, levelKey, levelProgress, nextPassage, redoDue, redoKey, type Passage } from '../lib/passages'
+import { openAt } from '../lib/unlock'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
 
@@ -37,7 +38,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
   const [run, setRun] = useState(0)
   const [last, setLast] = useState<Feedback>()
   const [previous, setPrevious] = useState<Feedback>()
-  const level = Math.min(6, Math.max(1, Number(state.notes[levelKey]) || 1))
+  const stored = Math.min(6, Math.max(1, Number(state.notes[levelKey]) || 1))
 
   useEffect(() => {
     let alive = true
@@ -47,6 +48,9 @@ export default function PassageLibrary({ state, onActivity }: Props) {
     return () => { alive = false }
   }, [])
 
+  // A level opens once the one before it is done to 80%; a saved level that is locked falls back to the highest open one.
+  const levelOpen = useMemo(() => all ? passageLevelsOpen(all, state.checks) : [true, false, false, false, false, false], [all, state.checks])
+  const level = openAt(levelOpen, stored - 1) + 1
   const passage = useMemo(() => all && nextPassage(all, level, state.checks, state.notes, skipped, letter),
     [all, level, state.checks, state.notes, skipped, letter])
   const progress = useMemo(() => all ? levelProgress(all, level, state.checks) : { done: 0, total: 0 },
@@ -86,7 +90,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
   return <div className="pr-stack passage-library">
     <div className="passage-head">
       <label>級別 <select id="passage-level" value={level} onChange={event => choose(Number(event.target.value))}>
-        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>第 {n} 級</option>)}
+        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n} disabled={!levelOpen[n - 1]}>{levelOpen[n - 1] ? '' : '🔒 '}第 {n} 級{levelOpen[n - 1] ? '' : '（第 ' + (n - 1) + ' 級完成八成才打開）'}</option>)}
       </select></label>
       <label>字母 <select id="passage-letter" value={letter} onChange={event => { setLetter(event.target.value); setSkipped([]); reset() }}>
         <option value="">照順序</option>
@@ -94,7 +98,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       </select></label>
       <span className="passage-count">已完成 <b>{progress.done}</b> / {progress.total}</span>
     </div>
-    {!passage ? <p>{letter ? '這個字母的短文都做完了，換一個字母或回到照順序。' : '第 ' + level + ' 級的短文都做完了。可以換下一級。'}</p> : <>
+    {!passage ? <p>{letter ? '這個字母的短文都做完了，換一個字母或回到照順序。' : '第 ' + level + ' 級的短文都做完了' + (levelOpen[level] ? '，可以換下一級。' : '。')}</p> : <>
       <div className="pr-label">7000 單短文 · 第 {passage.level} 級 · {passage.letter} {String(passage.n).padStart(2, '0')}</div>
       {redoDue(state.notes, passage.id) && <p className="passage-again">這段之前按了「不會」，隔一天再試一次。寫不出來的地方先空著，批改後把錯的加入複習。</p>}
       <p className="passage-text">{passage.zh}</p>

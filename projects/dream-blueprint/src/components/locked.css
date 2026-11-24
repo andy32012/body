@@ -1,0 +1,7 @@
+/* Levels, stages and lessons that open one after another: a locked one is greyed out and says what opens it. */
+.lock-line { display: inline-flex; align-items: center; justify-content: center; gap: 4px; line-height: 1.35; opacity: .9; }
+.lock-line svg { flex: none; }
+button[data-locked="true"] { opacity: .55; cursor: not-allowed; }
+button[data-locked="true"]:hover { transform: none; }
+/* In a left-aligned list (發音課) the line sits on the left like the other small text. */
+.pn-list .lock-line { justify-content: flex-start; align-self: flex-start; text-align: left; }

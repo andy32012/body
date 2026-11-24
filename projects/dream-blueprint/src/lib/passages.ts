@@ -1,4 +1,5 @@
 import { addDays, dayKey } from './progress'
+import { levelDone, openSteps } from './unlock'
 
 export interface Passage {
   id: string
@@ -33,3 +34,6 @@ export const levelProgress = (all: readonly Passage[], level: number, checks: Re
   const pool = all.filter(p => p.level === level)
   return { done: pool.filter(p => checks[doneKey(p.id)]).length, total: pool.length }
 }
+/** The six levels: a level opens once the one before it is done to its target (80% of its passages). */
+export const passageLevelsOpen = (all: readonly Passage[], checks: Record<string, boolean>) =>
+  openSteps([1, 2, 3, 4, 5, 6].map(n => { const p = levelProgress(all, n, checks); return levelDone(p.done, p.total) }))
