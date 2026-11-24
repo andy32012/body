@@ -20,9 +20,6 @@ jobs:
         shell: bash
         working-directory: projects/dream-blueprint
     env:
-      WRITING_QA_PLAYWRIGHT_DIR: ${{ runner.temp }}/writing-playwright
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/writing-playwright-browsers
-      WRITING_QA_OUT: ${{ runner.temp }}/writing-mobile-qa-results
       WRITING_QA_URL: http://127.0.0.1:4173/#library/writing
     steps:
       - name: Check out the QA branch
@@ -33,6 +30,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Prepare QA temporary folders
+        run: |
+          printf '%s\n' "WRITING_QA_PLAYWRIGHT_DIR=$RUNNER_TEMP/writing-playwright" "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/writing-playwright-browsers" "WRITING_QA_OUT=$RUNNER_TEMP/writing-mobile-qa-results" >> "$GITHUB_ENV"
       - name: Install project dependencies
         run: npm ci
       - name: Run the full test suite
