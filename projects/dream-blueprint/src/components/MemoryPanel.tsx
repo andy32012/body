@@ -1,18 +1,33 @@
 import { useEffect, useState } from 'react'
+import QRCode from 'qrcode'
+import { QrCode } from 'lucide-react'
 import { applyMemory, useMemory } from '../lib/memory'
-import { exportBackup, getSnapshot, localModified, restoreBackup } from '../lib/store'
 import {
-  appsScriptCode, clearConflict, cloudBase, cloudCas, cloudConflict, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
-  importSyncCode, loadDriveState, noteSynced, saveDriveState, setCloudBase, setDriveLogs, syncCode, syncDecision, markConflict, type DriveMemory,
+  appsScriptCode, cloudCas, cloudConflict, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
+  importSyncCode, setDriveLogs, syncCode, syncLink, type DriveMemory,
 } from '../lib/drive'
+import { keepThisCopy, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
+import './pair.css'
 
-function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
-  const a = document.createElement('a')
-  a.href = url; a.download = name; a.click()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
+/** On a connected device: a QR code that connects a phone or iPad in one scan. */
+function SyncQr() {
+  const [qr, setQr] = useState('')
+  async function show() {
+    try { setQr(await QRCode.toDataURL(syncLink(), { margin: 1, width: 280, errorCorrectionLevel: 'L' })) } catch { setQr('') }
+  }
+  return <div className="pair">
+    <strong><QrCode size={15} aria-hidden="true" /> 手機、iPad 掃一下就連上</strong>
+    {!qr ? <>
+      <p>按下面的按鈕，用手機或 iPad 的相機對著 QR code 掃，點跳出來的連結就會自動連上，學習進度也會一起載入。</p>
+      <div className="set-actions"><button type="button" onClick={show}>顯示連接用 QR code</button></div>
+    </> : <>
+      <img className="pair-qr" src={qr} alt="連接雲端硬碟用的 QR code，用手機或 iPad 的相機掃描" width={280} height={280} />
+      <p>用手機或 iPad 的相機對著它，點跳出來的連結。</p>
+      <small>這個 QR code 跟同步碼一樣，掃到的人就能看、也能改你的進度，不要給別人掃。</small>
+      <div className="set-actions"><button type="button" onClick={() => setQr('')}>關掉</button></div>
+    </>}
+  </div>
 }
-const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 export default function MemoryPanel() {
   const { notes, update, remove, clear } = useMemory()
@@ -31,21 +46,22 @@ export default function MemoryPanel() {
 
   async function connect(fn: () => Promise<DriveMemory | null>) {
     setStatus('連接中……')
+    let list: DriveMemory | null
     try {
-      const list = await fn()
-      if (list) update(applyMemory([], list.notes, []).filter(n => !notes.includes(n) && !list.deleted.includes(n)), [])
+      list = await fn()
       setDrive(driveConfig())
-      const remote = await loadDriveState().catch(() => null)
-      const decision = syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), localModified())
-      if (decision === 'pull' && remote?.state) {
-        restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt)
-        noteSynced('已從雲端硬碟載入最新的學習進度')
-        setStatus('連上了！已經換成雲端硬碟裡最新的學習進度。')
-      } else if (decision === 'conflict' && remote) {
-        markConflict(remote.savedAt)
-        setStatus('連上了。雲端硬碟裡已經有一份進度，這台裝置也有自己的進度：請在下面選要留哪一份。')
-      } else setStatus('連上了！之後記住的事和學習進度都會存進雲端硬碟。')
-    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
+    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)); return }
+    try {
+      // Progress first: merging the cloud's memory notes is a change too, and would look like this device's own progress.
+      const r = await settleProgress()
+      setStatus(r.kind === 'pulled' ? '連上了！已經換成雲端硬碟裡最新的學習進度。'
+        : r.kind === 'conflict' ? '連上了。雲端硬碟裡已經有一份進度，這台裝置也有自己的進度：請在下面選要留哪一份。'
+          : '連上了！之後記住的事和學習進度都會存進雲端硬碟。')
+    } catch (e) { setStatus('連上了，但學習進度這次沒同步到（' + (e instanceof Error ? e.message : String(e)) + '），下次打開會再試。') }
+    finally {
+      const add = list ? applyMemory([], list.notes, []).filter(n => !notes.includes(n) && !list!.deleted.includes(n)) : []
+      if (add.length) update(add, [])
+    }
   }
   async function copyCode() {
     try { await navigator.clipboard.writeText(syncCode()); setStatus('同步碼已複製，貼到手機的這一格就能連上同一份記憶。') }
@@ -55,29 +71,10 @@ export default function MemoryPanel() {
     try { await navigator.clipboard.writeText(appsScriptCode); setStatus('雲端小程式已複製。') }
     catch { setStatus('複製失敗，請手動選取下面的程式碼。') }
   }
-  /** Take the cloud copy; this device's progress is downloaded first so nothing is lost. */
-  async function useCloud() {
+  /** Pick one copy when both changed (the other one is downloaded as a backup first). */
+  async function choose(pick: () => Promise<string>) {
     setBusy(true)
-    try {
-      const remote = await loadDriveState()
-      if (!remote?.state) { setStatus('雲端硬碟裡沒有進度可以載入。'); return }
-      download('夢想藍圖-這台裝置的進度-' + Date.now() + '.json', exportBackup(getSnapshot().state))
-      restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt); clearConflict()
-      noteSynced('已換成雲端硬碟的進度（這台原本的進度已下載成備份檔）')
-      setStatus('已換成雲端硬碟的進度。這台原本的進度下載成備份檔了，需要時可以到「備份」匯入。')
-    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
-  }
-  /** Keep this device's copy; the cloud copy is downloaded first, then overwritten on purpose. */
-  async function useLocal() {
-    setBusy(true)
-    try {
-      const remote = await loadDriveState()
-      if (remote?.state) download('夢想藍圖-雲端原本的進度-' + Date.now() + '.json', remote.state)
-      clearConflict()
-      const at = localModified() || Date.now()
-      await saveDriveState(JSON.stringify(getSnapshot().state), at, remote?.savedAt ?? 0, true)
-      setStatus('已用這台裝置的進度蓋掉雲端那份。雲端原本的進度下載成備份檔了。')
-    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+    try { setStatus(await pick()) } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
   }
 
   return <>
@@ -93,14 +90,16 @@ export default function MemoryPanel() {
       {conflict && <div className="set-warn" role="alert">
         <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。為了不互相蓋掉，兩份都先留著，請選一份：</p>
         <div className="set-actions">
-          <button type="button" disabled={busy} onClick={useCloud}>用雲端那份（這台的先下載成備份）</button>
-          <button type="button" disabled={busy} onClick={useLocal}>用這台這份（雲端的先下載成備份）</button>
+          <button type="button" disabled={busy} onClick={() => choose(takeCloudCopy)}>用雲端那份（這台的先下載成備份）</button>
+          <button type="button" disabled={busy} onClick={() => choose(keepThisCopy)}>用這台這份（雲端的先下載成備份）</button>
         </div>
       </div>}
       {(() => { const c = cloudStatus(); return c ? <p className={c.ok ? 'set-ok' : 'set-warn'}>{c.message}（{stamp(c.at)}）</p> : <p>學習進度還沒同步過。</p> })()}
       {drive.sheet && <p><a href={drive.sheet} target="_blank" rel="noreferrer">打開雲端硬碟裡的試算表</a></p>}
       <label className="set-check"><input type="checkbox" checked={logs} onChange={e => { setDriveLogs(e.target.checked); setLogs(e.target.checked) }} />
         這台裝置也把對話逐字稿（問問 Claude、英文口說）存進試算表的「對話紀錄」（預設關）</label>
+      <SyncQr />
+      <p>掃了沒反應，或是用加到主畫面的 App 開的？就改用同步碼：按下面的按鈕複製，用 LINE 傳給自己，貼到那台的「貼上同步碼」。</p>
       <div className="set-actions">
         <button type="button" onClick={copyCode}>複製同步碼（給手機用）</button>
         <button type="button" onClick={() => { disconnectDrive(); setDrive(null); setStatus('這台裝置已中斷雲端硬碟。') }}>這台裝置中斷連線</button>

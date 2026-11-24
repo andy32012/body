@@ -22,12 +22,13 @@ import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
 import { AIAssistant } from './components/AIChat'
 import { PairReceive } from './components/PairDevice'
+import SyncReceive from './components/SyncReceive'
 import { clearPairing, pairEvent, pairPrefix, takePairing } from './lib/pairing'
 import { handoffText } from './lib/handoff'
 import Speaking from './pages/Speaking'
 import Baseline from './components/Baseline'
 import { MemoryContext, applyMemory, readMemory, writeMemory, replaceMemory, mergeMemory, readDeleted, memoryDeletedKey, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision } from './lib/drive'
+import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent } from './lib/drive'
 import { localModified, restoreBackup, setLocalModified } from './lib/store'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
@@ -143,6 +144,10 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
 function App() {
   const {state,update,storageError}=useAppStore()
   const [pairing,setPairing]=useState(takePairing)
+  const [syncing,setSyncing]=useState(takeSyncLink)
+  // Opened from a scan-to-connect link: the dialog connects and settles the progress itself. Its effect runs before
+  // App's own (children first) and writes the connection at once, so App's on-open sync must stay out of the way.
+  const openedBySync=useRef(syncing!==null)
   const [route, changeRoute]=useState(readRoute)
   const [today,changeDay]=useState(dayKey)
   const [wordOpen,setWordOpen]=useState(false)
@@ -155,13 +160,15 @@ function App() {
   useEffect(()=>{
     // A QR link opened while the app is already open in this tab arrives as a hash change, not a new load.
     const pair=()=>{if(location.hash.startsWith(pairPrefix)){const p=takePairing();if(p)setPairing(p)}}
+    const sync=()=>{if(location.hash.startsWith(syncPrefix)){const c=takeSyncLink();if(c)setSyncing(c)}}
     const fromSettings=(e:Event)=>setPairing(String((e as CustomEvent).detail))
     window.addEventListener('hashchange',pair)
+    window.addEventListener('hashchange',sync)
     window.addEventListener(pairEvent,fromSettings)
-    return ()=>{window.removeEventListener('hashchange',pair);window.removeEventListener(pairEvent,fromSettings)}
+    return ()=>{window.removeEventListener('hashchange',pair);window.removeEventListener('hashchange',sync);window.removeEventListener(pairEvent,fromSettings)}
   },[])
   useEffect(()=>{
-    const handle=()=>{if(location.hash.startsWith(pairPrefix))return;changeRoute(readRoute());window.scrollTo(0,0)}
+    const handle=()=>{if(location.hash.startsWith(pairPrefix)||location.hash.startsWith(syncPrefix))return;changeRoute(readRoute());window.scrollTo(0,0)}
     const clock=()=>changeDay(dayKey())
     window.addEventListener('hashchange',handle)
     window.addEventListener('focus',clock)
@@ -182,8 +189,10 @@ function App() {
     clear:()=>update(s=>({...s,notes:replaceMemory(s.notes,[])}))}
   const stateJson=JSON.stringify(state)
   const cloudReady=useRef(false)
+  // A device that connects while the app is open starts saving once it has settled which progress to use.
+  useEffect(()=>{const on=()=>{cloudReady.current=true};window.addEventListener(driveReadyEvent,on);return ()=>window.removeEventListener(driveReadyEvent,on)},[])
   useEffect(()=>{
-    if(!driveConnected())return
+    if(!driveConnected()||openedBySync.current)return
     // Compare with the snapshot this device last synced, not just clocks: if both sides changed, keep both and ask.
     loadDriveState().then(remote=>{
       const decision=syncDecision(remote?.state?remote.savedAt:null,cloudBase(),localModified())
@@ -207,6 +216,8 @@ function App() {
   const driveReady=useRef(!driveConnected())
   useEffect(()=>{
     if(!driveConnected())return
+    // The scan dialog brings the cloud's memory itself; saving can start right away.
+    if(openedBySync.current){driveReady.current=true;return}
     loadDriveMemory().then(remote=>{
       if(remote)update(s=>{
         const merged=mergeMemory(readMemory(s.notes),readDeleted(s.notes),remote.notes,remote.deleted)
@@ -251,9 +262,10 @@ function App() {
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-section={section}><PracticeCover title={pageName}/>{section==='practice'&&<><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/></>}<PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined}/>:<Settings {...props}/>}
     </main></div>
-    {page==='today'&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
+    {page==='today'&&!syncing&&!pairing&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
     {pairing&&<PairReceive payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}
+    {syncing&&<SyncReceive code={syncing} onDone={()=>{clearSyncLink();setSyncing(null)}}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }

@@ -143,12 +143,44 @@ export function syncCode() {
   const d = read()
   return d ? btoa(JSON.stringify({ u: d.url, t: d.token })) : ''
 }
-export async function importSyncCode(code: string) {
-  let v: { u?: string; t?: string }
+/** The web app URL and token inside a sync code. Pure, for testing. */
+export function decodeSyncCode(code: string): { u: string; t: string } {
+  let v: { u?: unknown; t?: unknown }
   try { v = JSON.parse(atob(code.trim())) } catch { throw new Error('同步碼看不懂，整段重新複製一次。') }
-  if (!v.u || !v.t) throw new Error('同步碼不完整。')
+  if (typeof v?.u !== 'string' || typeof v?.t !== 'string' || !v.u || !v.t) throw new Error('同步碼不完整。')
+  return { u: v.u, t: v.t }
+}
+export async function importSyncCode(code: string) {
+  const v = decodeSyncCode(code)
   return connectDrive(v.u, v.t)
 }
+/** Whether this device is already connected with exactly this sync code (then connecting again would only reset it). */
+export function sameDrive(code: string) {
+  const d = read()
+  if (!d) return false
+  try { const v = decodeSyncCode(code); return v.u.trim() === d.url && v.t === d.token } catch { return false }
+}
+
+/** One scan connects another device: a link carrying the sync code after #, which is never sent to the server. */
+export const syncPrefix = '#sync='
+export function syncLink(code = syncCode()) {
+  // ?sync=1 makes Safari load the page fresh even when the site is already open in a tab
+  // (a link that only differs after # would just jump inside the old page).
+  return location.origin + location.pathname + '?sync=1' + syncPrefix + encodeURIComponent(code)
+}
+/** Read a sync link from the address bar and remove it right away, so the code doesn't stay in history. */
+let takenSync: string | null = null
+export function takeSyncLink(): string | null {
+  if (location.hash.startsWith(syncPrefix)) {
+    try { takenSync = decodeURIComponent(location.hash.slice(syncPrefix.length)).trim() || null } catch { takenSync = null }
+    history.replaceState(null, '', location.pathname + '#today')
+  }
+  // The same link read twice on one load (React may run the first render twice) gives the same answer.
+  return takenSync
+}
+export const clearSyncLink = () => { takenSync = null }
+/** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
+export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
 export const appsScriptCode = `// 夢想藍圖・雲端記憶 v2（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
