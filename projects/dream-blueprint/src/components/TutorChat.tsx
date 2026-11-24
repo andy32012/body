@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
 import { askTutor, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { sameEnglish } from '../lib/evidence'
+import { learnedFor } from '../lib/learned'
+import { useAppStore } from '../lib/store'
 import './tutor.css'
 
 const verdictNames = { good: '對了', small: '小錯', again: '再試一次', changed: '意思不一樣' }
@@ -18,6 +20,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
   const [error, setError] = useState('')
   const [question, setQuestion] = useState('')
   const abort = useRef<AbortController | null>(null)
+  const state = useAppStore()
   if (!tutorKey()) return null
 
   async function send(content: string) {
@@ -26,7 +29,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
     setTurns(next); setBusy(true); setError('')
     abort.current = new AbortController()
     try {
-      const reply = await askTutor(tutorSystem(sentence, []), next, abort.current.signal)
+      const reply = await askTutor(tutorSystem(sentence, learnedFor(state, sentence)), next, abort.current.signal)
       setTurns([...next, { role: 'assistant', content: reply }])
       const tries = next.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
       const v = verdictOf(reply)
