@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import { orderForSkill, spellingMatches, type Skill } from '../lib/wordSkills'
+import EmmaWordLink from './EmmaWordLink'
 
 /** `en` may list accepted spellings ("airplane/plane"); `key` is the word-table entry the skill is recorded on. */
 type Word = { en: string; zh: string; key?: string; ex?: string; exZh?: string }
@@ -27,9 +28,11 @@ function say(text: string, rate = 0.85, onPlay?: () => void) {
 
 /** 看懂 / 聽懂 / 說出 / 寫出 drills over the words being learned. Words missing the skill come first.
  *  A word list with example sentences (the nursing words) shows the example once the word is answered. */
-export default function WordSkills({ skill, words, distractors, notes, keyOf, rate, onPass }: {
+export default function WordSkills({ skill, words, distractors, notes, keyOf, rate, onPass, where = '單字複習' }: {
   skill: Skill; words: Word[]; distractors: Word[]; notes: Record<string, string>
   keyOf: (w: Word) => string; rate: number; onPass: (w: Word) => void
+  /** Which list this is, for Emma when he opens a chat about the word. */
+  where?: string
 }) {
   const [order] = useState(() => orderForSkill(words, keyOf, notes, skill).slice(0, 10))
   const [i, setI] = useState(0)
@@ -108,5 +111,8 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
       </>}
     </>}
     {answered && word.ex && <p className="ws-ex"><span lang="en">{word.ex}</span><br />{word.exZh}</p>}
+    {/* After answering, so the chat never gives the answer away. */}
+    {answered && <div className="ws-tools"><EmmaWordLink en={word.en} zh={word.zh} where={where} part={skill} seen
+      others={order.slice(i + 1, i + 6).map(w => w.en)} /></div>}
   </div>
 }

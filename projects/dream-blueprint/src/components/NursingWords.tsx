@@ -39,7 +39,7 @@ export default function NursingWords({ state, onActivity, date }: Pick<PageProps
       {today > 0 && <span>今天過關 {today} 個</span>}
     </p>
     <WordSkills key={skill + area} skill={skill} words={list} distractors={list.length >= 6 ? list : all} notes={state.notes}
-      keyOf={w => wordKey(w.en)} rate={state.settings.speechRate}
+      keyOf={w => wordKey(w.en)} rate={state.settings.speechRate} where="護理單字"
       onPass={w => onActivity(prev => ({ ...prev, notes: countNurseWord(markSkill(prev.notes, wordKey(w.en), skill, date), date) }))} />
   </div>
 }

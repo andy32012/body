@@ -1,6 +1,6 @@
 import { PracticeCover } from "../components/PracticeCover";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
+import { ChevronLeft, Headphones, Check, PenLine, Volume2 } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
 import ClinicalCase from "../components/ClinicalCase";
@@ -48,6 +48,8 @@ import {
 import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
 import UseWord from "../components/UseWord";
+import EmmaWordLink from "../components/EmmaWordLink";
+import { speakEnglish } from "../lib/tts";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
@@ -1058,10 +1060,14 @@ function Extras({
             <p>
               複習卡 {offset + 1} / {deck.length}
             </p>
-            <h3 lang="en">{word.en}</h3>
+            <h3 className="ws-term" lang="en">{word.en}{" "}
+              <button type="button" className="ws-mini" aria-label={"聽發音：" + word.en} onClick={() => void speakEnglish(word.en, state.settings.speechRate)}><Volume2 size={16} /></button>
+            </h3>
             {see && <p>{word.zh}</p>}
-            <div><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" />{see && <> <UseWord key={word.en} en={word.en} zh={word.zh}
-              onGood={() => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), "write", date) }))} /></>}</div>
+            <div className="ws-tools"><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" />
+              <EmmaWordLink en={word.en} zh={word.zh} where="單字複習" part="read" seen={see} others={deck.slice(offset + 1, offset + 6).map((w) => w.en)} />
+              {see && <UseWord key={word.en} en={word.en} zh={word.zh}
+              onGood={() => onActivity((prev) => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), "write", date) }))} />}</div>
             <div className="pr-actions">
               <button onClick={() => scoreWord(true)}>記得</button>
               <button onClick={() => setSee(true)}>看中文意思</button>

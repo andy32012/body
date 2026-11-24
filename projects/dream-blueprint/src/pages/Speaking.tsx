@@ -22,6 +22,7 @@ import { emmaLevel } from '../lib/cefr'
 import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
 import { nurseInstructions, nurseSpeakKey, type NurseListening } from '../lib/nursing'
 import { PairPaste } from '../components/PairDevice'
+import { partNames, readWordChat, wordChatBack, wordChatInstructions } from '../lib/wordChat'
 import './speaking.css'
 
 const NAME = EMMA
@@ -30,7 +31,7 @@ const NAME = EMMA
 type Fix = SpeakFix & { status: 'added' | 'already' | 'removed' }
 const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
 
-export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode, nurseMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string; nurseMode?: string }) {
+export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode, nurseMode, wordMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string; nurseMode?: string; wordMode?: string }) {
   const memory = useMemory()
   const [today] = useState(dayKey)
   const [lesson] = useState(() => lessonMode ? emmaLesson(state, today) : null)
@@ -58,6 +59,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     import('../data/nursing-listening.json').then(f => { const l = (f.default as NurseListening[]).find(x => x.id === nurseMode); if (alive && l) setNurse(l) }).catch(() => {})
     return () => { alive = false }
   }, [nurseMode])
+  // From a word card: chat about that word; Emma knows the list, the drill and the other words of the round.
+  const [wordChat] = useState(() => readWordChat(wordMode))
   const [task, setTask] = useState<string>()
   const [cardSkip, setCardSkip] = useState<string[]>([])
   const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
@@ -126,7 +129,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
     setError(''); setLines([]); setFeedback(null); setFixes([]); setYouMs(0); setYouFrom(undefined)
-    const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : ''
+    const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : wordChat ? wordChatInstructions(wordChat) : ''
     try {
       session.current = await startVoice({
         // Everything but the IELTS test knows what his course has taught and corrects him by his rule.
@@ -269,7 +272,14 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         {status === 'live' && liveAt && <p className="sp-timer">{youFrom ? '從你開口算起 ' + clock(tick - youFrom) + ' · 實際出聲 ' + clock(youMs) : '等你開口才開始計時'} · 通話 {clock(tick - liveAt)}（Part 2 目標從開口算 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
-      {!card && !lesson && !topic && !packRef && !nurseMode && <div className="sp-links">
+      {wordChat && <div className="sp-lesson">
+        <small>{wordChat.where} · {partNames[wordChat.part]} · 聊這個字</small>
+        <strong lang="en">{wordChat.en.split('/').join(' / ')}</strong>
+        {wordChat.zh && (wordChat.seen ? <span>{wordChat.zh}</span> : <details><summary>看中文意思</summary><span>{wordChat.zh}</span></details>)}
+        <span>Emma 知道你在複習這個字，會找你用它說幾句；想問意思、用法，或這一輪的其他字{wordChat.others.length ? '（' + wordChat.others.join('、') + '）' : ''}，直接問她。</span>
+        <a href={wordChatBack(wordChat)}>回到{wordChat.where}</a>
+      </div>}
+      {!card && !lesson && !topic && !packRef && !nurseMode && !wordChat && <div className="sp-links">
         <a className="sp-ielts-link" href="#speaking/gept">練全民英檢口說（朗讀、回答問題、看圖敘述）→</a>
         <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>
       </div>}
