@@ -54,6 +54,16 @@ test('先前四週的普通練習少會延長估計間隔，累爆不推進', ()
     sessions:['2026-11-24','2026-12-01','2026-12-08','2026-12-15'].map(day=>({day,energy:'normal' as const}))})
   assert.deepEqual(projected.filter(d=>d.kind==='lesson').map(d=>d.day),['2026-12-22','2026-12-29'])
 })
+test('打開 App 之後、第一堂課之前的日子不算沒上課：第 2 天的人照樣每天排課', () => {
+  const days = projectCalendar({...base,today:'2026-11-24',from:'2026-11-24',to:'2026-12-05',ranges:[{type:'exam' as const,start:'2026-11-13',end:'2026-11-19'}],
+    startedDay:'2026-11-13',cursor:1,
+    sessions:[{day:'2026-11-21',energy:'low' as const,advanced:false},{day:'2026-11-23',energy:'normal' as const}]})
+  assert.ok(days.filter(d=>d.day!=='2026-11-29').every(d=>d.kind==='lesson'),'週一到週六每天都有課，不會上一天就複習兩天')
+  assert.equal(days.find(d=>d.day==='2026-11-29')?.kind,'rest')
+  // 還沒上過任何一堂：照課表排，不估節奏。
+  const fresh = projectCalendar({...base,today:'2026-12-10',from:'2026-12-10',to:'2026-12-12',ranges:[],startedDay:'2026-11-13',cursor:0,sessions:[]})
+  assert.ok(fresh.every(d=>d.kind==='lesson'))
+})
 test('每個單元都有教材，單元 7 之後接著排單元 8；全部做完後不再排新課', () => {
   const ready = projectCalendar({...base,cursor:7*6-1,today:'2027-03-01',from:'2027-03-01',to:'2027-03-06',ranges:[]})
   assert.deepEqual([ready[0].unit,ready[0].lessonDay],[7,6])

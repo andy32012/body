@@ -59,7 +59,11 @@ export type PlannedDay = Omit<ProjectedDay, 'original'>
 // Count eligible days only. A period of rest has no weight in the next term's forecast.
 function recentPace(input: CalendarInput, weekdays: readonly number[]) {
   const practiced = new Set(input.sessions.filter(s => s.advanced ?? s.energy !== 'low').map(s => s.day))
-  const start = input.startedDay ?? input.sessions.reduce((first, s) => s.day < first ? s.day : first, input.today)
+  // Count from the first lesson actually done: days after opening the app but before the course began are not
+  // missed lessons (they made the calendar show two review days after every lesson for a learner on day 2).
+  const first = [...practiced].sort()[0]
+  if (!first) return 1
+  const start = input.startedDay && input.startedDay > first ? input.startedDay : first
   if (daysBetween(start, input.today) < 7) return 1
   const earliest = addDays(input.today,-28)
   let eligible = 0
@@ -166,7 +170,7 @@ function walk(input: CalendarInput): PlannedDay[] {
           }
         } else {
           item.kind = 'review'
-          item.label = '跟著近期節奏 · 複習或休息'
+          item.label = '照最近的上課節奏預估 · 複習或休息（想上課就直接上下一堂）'
         }
       } else if (!restDays.includes(dow) && period !== 'vacation') {
         item.kind = 'review'
