@@ -31,6 +31,7 @@
 .lesson-banner small { color: var(--muted); font-size: 12px; letter-spacing: .05em; }
 .lesson-banner strong { font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
 .lesson-banner button { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 14px; border-radius: 10px; border: 0; background: var(--lav); color: #1c1530; font-weight: 650; }
+:root[data-theme=light] .lesson-banner button { color: #fff; }
 
 @media (max-width: 760px) {
   .flight-deck .hero-body.lesson-body { max-width: 100%; padding: 18px; gap: 10px; }

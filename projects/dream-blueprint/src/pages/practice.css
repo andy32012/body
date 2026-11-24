@@ -293,18 +293,10 @@
 .pr-extras h2 { font-size: clamp(1.25rem, 2vw, 1.65rem); margin: 0 0 .9rem; }
 .pr-extras .pr-stack h3 { margin: .4rem 0; font-size: clamp(1.3rem, 2.7vw, 1.85rem); line-height: 1.5; }
 .pr-extras .pr-options button[aria-pressed="true"] { background: var(--practice-accent-wash); border-color: var(--practice-accent); box-shadow: inset 0 0 0 1px var(--practice-accent); }
-.library-page { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: start; gap: 16px; }
-.library-page > .pr-cover { grid-column: 1/-1; min-height: clamp(145px, 14vw, 200px); }
-.library-page > .practice-page { max-width: none; }
-/* Words, grammar, pronunciation and nursing English have the page to themselves (no lesson banner beside them). */
-.library-page:not([data-section="practice"]) > .practice-page { grid-column: 1 / -1; max-width: 920px; width: 100%; }
-/* The sections as chips: only where there is no sidebar (a phone). */
-.pr-sections { display: none; }
-@media (max-width: 760px) {
-  .pr-sections { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 .9rem; padding-bottom: .8rem; border-bottom: 1px dashed var(--practice-line); }
-  .practice-page .pr-sections button { flex: 1 1 auto; min-height: 38px; padding: .25rem .5rem; border-radius: 999px; font-size: .9rem; color: var(--practice-secondary); white-space: nowrap; }
-  .practice-page .pr-sections button[aria-current="page"] { color: var(--practice-ink); font-weight: 650; background: var(--practice-accent-wash); border-color: var(--practice-accent); box-shadow: inset 0 0 0 1px var(--practice-accent); }
-}
+/* Every library page is one column: the cover, then one kind of practice — or the 英文練習 list, or the level test. */
+.library-page { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 16px; }
+.library-page > .pr-cover { min-height: clamp(145px, 14vw, 200px); }
+.library-page > .practice-page, .library-page > .bl-card, .library-page > .lesson-banner, .library-page > .pm-menu { max-width: 920px; width: 100%; margin-inline: auto; box-sizing: border-box; }
 .library-page .pr-extras { margin: 0; padding: clamp(18px, 2.35vw, 30px); }
 .library-page .practice-dock .dock-panel { background: var(--space-reading); }
 .library-page .dock-preview { padding: 1rem; border-radius: 14px; background: var(--space-field); border: 1px solid var(--space-border); }
@@ -315,9 +307,6 @@
 :root[data-theme=light] .library-page .dock-choice[data-energy=normal] { --ec: #624a8a; }
 :root[data-theme=light] .library-page .dock-choice[data-energy=high] { --ec: #874412; }
 :root[data-theme=light] .library-page .dock-title svg { color:#486d61; }
-@media (max-width: 1080px) {
-  .library-page { grid-template-columns: minmax(0, 1fr); }
-}
 @media (max-width: 600px) {
   .pr-cover { min-height: 96px; border-radius: 17px; padding: 12px 18px 15px; }
   .pr-cover h1 { font-size: 1.65rem; }

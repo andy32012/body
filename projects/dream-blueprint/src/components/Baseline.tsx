@@ -1,13 +1,35 @@
-import { useRef, useState } from 'react'
-import { Mic, Square, Volume2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Gauge, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { dayKey } from '../lib/progress'
+import { dayKey, daysBetween } from '../lib/progress'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import './baseline.css'
 
-import { addResult, cefrOf, emptyCheck, forms, formSeen, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
+import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
+
+/** Pops up on the home page when the level test is due. Either button keeps it away for the rest of the day; while it is due,
+ *  the 英文練習 page also has a row that opens the test. */
+export function TestPrompt({ state, update, today }: Pick<PageProps, 'state' | 'update'> & { today: string }) {
+  const last = readResults(state.notes).at(-1)
+  const start = useRef<HTMLButtonElement>(null)
+  const later = () => update(prev => ({ ...prev, notes: { ...prev.notes, [laterKey]: today } }))
+  useEffect(() => { start.current?.focus() }, [])
+  return <div className="bl-pop" role="dialog" aria-modal="true" aria-labelledby="bl-pop-title" onKeyDown={e => { if (e.key === 'Escape') later() }}>
+    <section className="bl-pop-card">
+      <span className="bl-pop-icon" aria-hidden="true"><Gauge size={22} /></span>
+      <strong id="bl-pop-title">{last ? '英文程度回測的時間到了' : '先做一次起點測驗'}</strong>
+      <p>{last
+        ? '上次測驗是 ' + last.date + '，已經過了 ' + Math.floor(daysBetween(last.date, today) / 7) + ' 週。花大約 15 分鐘再測一次，看看自己進步了多少。'
+        : '聽力、閱讀各 3 題，再寫幾句、講一分鐘，大約 15 分鐘。結果會留下來，12 週後再比一次。'}</p>
+      <div className="bl-pop-actions">
+        <button type="button" ref={start} className="bl-main" onClick={() => { later(); location.hash = 'leveltest' }}>開始測驗</button>
+        <button type="button" onClick={later}>今天先不要</button>
+      </div>
+    </section>
+  </div>
+}
 
 /** The listening clip after the test: English, Chinese and the right answers, so he can see what he missed. */
 function ListenScript({ form }: { form: (typeof forms)[keyof typeof forms] }) {

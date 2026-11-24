@@ -1,0 +1,20 @@
+/* The 英文練習 page: one row per kind of practice, each opening its own page. */
+.pm-menu { display: grid; gap: 14px; }
+.pm-group { padding: 10px 14px 6px; border-radius: 16px; border: 1px solid var(--space-border, var(--line)); background: var(--space-card, var(--panel)); backdrop-filter: blur(12px); }
+.pm-group h2 { margin: 6px 6px 4px; font-size: 13px; font-weight: 620; letter-spacing: .1em; color: var(--muted); }
+.pm-group ul { list-style: none; margin: 0; padding: 0; }
+.pm-group li + li { border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.pm-group a, .pm-retest { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; min-height: 58px; padding: 9px 6px; border-radius: 11px; color: var(--text); text-decoration: none; }
+.pm-group a:hover, .pm-retest:hover { background: color-mix(in srgb, var(--lav) 8%, transparent); }
+.pm-group a:focus-visible, .pm-retest:focus-visible { outline: 2px solid var(--lav); outline-offset: 1px; }
+.pm-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: color-mix(in srgb, var(--lav) 14%, transparent); color: var(--lav); }
+.pm-text { min-width: 0; }
+.pm-text b { display: block; font-size: 15.5px; font-weight: 620; letter-spacing: .02em; }
+.pm-text small { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.pm-group em { font-style: normal; font-size: 12px; white-space: nowrap; color: var(--mint); border: 1px solid color-mix(in srgb, var(--mint) 40%, transparent); border-radius: 999px; padding: 2px 9px; }
+.pm-group a > svg:last-child, .pm-retest > svg:last-child { color: var(--muted); }
+.pm-retest { padding: 12px 14px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--lav) 45%, transparent); background: color-mix(in srgb, var(--lav) 12%, var(--space-card, var(--panel))); }
+@media (max-width: 600px) {
+  .pm-group { padding: 8px 10px 4px; }
+  .pm-group a, .pm-retest { gap: 10px; min-height: 56px; }
+}

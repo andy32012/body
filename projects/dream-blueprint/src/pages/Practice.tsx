@@ -54,9 +54,8 @@ import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/Grammar
 import StoryLibrary from "../components/StoryLibrary";
 import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
-import { librarySections, modeFromHash, modeLabel, sectionHash, sectionInfo, sectionModes, sectionOf, type LibraryMode } from "../lib/library";
+import type { LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
-import { hasPack, packUnits } from "../lib/bridge";
 import {
   heardKey,
   moveLesson,
@@ -142,7 +141,6 @@ function PracticeSession({
       globalThis.crypto?.randomUUID?.() ??
       Date.now() + "-" + Math.random().toString(36).slice(2),
   );
-  const [extra, setExtra] = useState(false);
   const [recalls, setRecalls] = useState<TranslationRecord[]>(() => resumeAt?.rec.recalls ?? []);
   // Today's variations done so far: two new sentences with the pattern after today's own sentence.
   const [varied, setVaried] = useState(() => resumeAt?.rec.varied ?? 0);
@@ -782,24 +780,13 @@ function PracticeSession({
               <button className="pr-main" onClick={() => navigate("today")}>
                 回到今天
               </button>
-              {!extra && (
-                <button onClick={() => setExtra(true)}>再多做一點</button>
-              )}
+              {/* More practice: the 英文練習 list, where each kind opens on its own page. */}
+              <button onClick={() => navigate("practice")}>再多做一點</button>
             </div>
           </>
         )}
         </div>
       </div>
-      {phase === "done" && extra && (
-        <Extras
-          state={state}
-          update={update}
-          navigate={navigate}
-          energy={energy}
-          sessionId={sessionId}
-          date={date}
-        />
-      )}
     </section>
   );
 }
@@ -831,7 +818,8 @@ function PracticeEntry(props: PageProps & { energy: Energy; resume?: boolean | s
 
 export default PracticeEntry;
 
-export function PracticeLibrary({ state, update, navigate }: PageProps) {
+/** One kind of practice on a page of its own (#library/<mode>); the 英文練習 menu lists them all. */
+export function PracticeLibrary({ state, update, navigate, mode }: PageProps & { mode: LibraryMode }) {
   const today = dayKey();
   const period = activePeriod(today, state.settings.periods);
   const energy =
@@ -859,7 +847,8 @@ export function PracticeLibrary({ state, update, navigate }: PageProps) {
   return (
     <div className="practice-page">
       <Extras
-        key={today + period}
+        key={today + period + mode}
+        mode={mode}
         state={state}
         update={update}
         onActivity={record}
@@ -873,6 +862,7 @@ export function PracticeLibrary({ state, update, navigate }: PageProps) {
 }
 
 function Extras({
+  mode,
   state,
   update,
   navigate,
@@ -881,12 +871,12 @@ function Extras({
   sessionId,
   onActivity = update,
 }: PageProps & {
+  mode: LibraryMode;
   energy: Energy;
   date: string;
   sessionId: string;
   onActivity?: PageProps["update"];
 }) {
-  type Mode = LibraryMode;
   // #library/story/listen opens the graded passages on that tab.
   const storyFromHash = (): StoryTab => {
     const t = location.hash.startsWith("#library/story/") ? location.hash.split("/")[2] : "";
@@ -896,22 +886,13 @@ function Extras({
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
-  const fromHash = (): Mode => modeFromHash(location.hash);
-  const [mode, setMode] = useState<Mode>(fromHash);
-  // A button of the open section: the address follows, so a reload or a shared link opens the same practice.
-  const choose = (m: Mode) => {
-    setMode(m);
-    history.replaceState(null, "", "#library/" + m);
-  };
+  // Another address of the same page (#library/words/listen, #library/writing/<id>, #library/story/listen) opens that part.
+  // A different kind of practice is a different page: the app opens it fresh.
   useEffect(() => {
     const onHash = () => {
-      if (location.hash === "#library" || location.hash.startsWith("#library/")) {
-        setMode(fromHash());
-        if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
-        if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
-        if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
-        document.querySelector(".pr-extras")?.scrollIntoView({ block: "start" });
-      }
+      if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
+      if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
+      if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
     };
     onHash();
     window.addEventListener("hashchange", onHash);
@@ -1058,33 +1039,9 @@ function Extras({
     setOffset(offset + 1);
     setSee(false);
   }
-  // Only the open section's kinds of practice are offered here; the other sections are in the main menu.
-  const section = sectionOf(mode, periodQuiet);
-  const quietModes: Mode[] = ["listen", "words", "translate", "passage", "grammar", "story", "sound", "reading", "nlisten", "nread", "nwords"];
-  const shownModes = sectionModes(section, periodQuiet)
-    .filter((key) => key !== "unit" || mode === "unit" || hasPack(state.curriculum.unit) || state.curriculum.unit > packUnits[0])
-    .filter((key) => !quiet || quietModes.includes(key) || ((key === "quiz" || key === "case") && periodQuiet));
+  // The page shows this one kind of practice and nothing else; the menu (sidebar, or the 英文練習 page) leads to the others.
   return (
-    <section className="pr-pane pr-extras">
-      {/* On a phone there is no sidebar: the sections of the library are a row of chips here. */}
-      <nav className="pr-sections" aria-label="練習分類">
-        {librarySections.map((s) => (
-          <button key={s.id} type="button" aria-current={s.id === section ? "page" : undefined}
-            aria-label={s.menu} onClick={() => { location.hash = sectionHash(s.id, periodQuiet); }}>
-            {s.chip}
-          </button>
-        ))}
-      </nav>
-      <h2>{sectionInfo(section).heading}</h2>
-      {shownModes.length > 1 && (
-        <div className="pr-options">
-          {shownModes.map((key) => (
-            <button key={key} aria-pressed={key === mode} onClick={() => choose(key)}>
-              {modeLabel(key, periodQuiet)}
-            </button>
-          ))}
-        </div>
-      )}
+    <section className="pr-pane pr-extras" data-mode={mode}>
       {mode === "words" && (() => {
         const count = skillSummary(state.notes, learning.map((w) => wordKey(w.en)));
         return (
@@ -1233,9 +1190,11 @@ function Extras({
       {mode === "case" && (!quiet || periodQuiet) && (
         <ClinicalCase state={state} onActivity={onActivity} date={date} />
       )}
-      {mode === "screen" && !quiet && (
+      {mode === "screen" && (quiet ? (
+        <p>考週和實習期間單字快篩先暫停，到期的單字卡在「單字複習」。</p>
+      ) : (
         <VocabScreen state={state} update={update} navigate={navigate} />
-      )}
+      ))}
     </section>
   );
 }

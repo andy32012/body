@@ -1,47 +1,74 @@
-/** The practice library is one page with many kinds of practice. They are grouped into sections; each section has its own
- *  entry in the main menu (the sidebar on a computer or tablet, a row of chips on a phone), so the page itself only shows the
- *  few kinds that belong to the section that is open. A kind of practice is addressed as #library/<mode>. */
+import { hasPack, packUnits } from './bridge'
+
+/** The practice library. Every kind of practice has a page of its own, #library/<mode>, and nothing puts two kinds on one
+ *  page. The main menu lists them under 英文練習 (the sidebar on a computer or tablet); on a phone the 英文練習 page itself
+ *  (#library) is that list. The speaking page (#speaking) is listed with them. */
 export type LibraryMode = 'words' | 'listen' | 'quiz' | 'case' | 'screen' | 'translate' | 'passage' | 'reading' | 'writing' | 'unit'
   | 'nlisten' | 'nread' | 'nwords' | 'grammar' | 'story' | 'sound'
-export type LibrarySection = 'practice' | 'words' | 'grammar' | 'sound' | 'nursing'
+/** An entry of the 英文練習 menu: a kind of practice, or the speaking page. */
+export type MenuId = LibraryMode | 'speaking'
+export type LibraryGroup = 'main' | 'words' | 'nursing'
 
 export const libraryModes: LibraryMode[] = ['listen', 'translate', 'story', 'reading', 'writing', 'unit', 'quiz', 'words', 'screen', 'passage',
   'grammar', 'sound', 'nlisten', 'nread', 'nwords', 'case']
-const labels: Record<LibraryMode, string> = {
+const labels: Record<MenuId, string> = {
   listen: '句子跟讀', translate: '中翻英', story: '短文讀聽', reading: '閱讀理解', writing: '寫作階梯', unit: '單元讀聽說寫', quiz: '選擇題',
   words: '單字複習', screen: '單字快篩', passage: '7000 單短文', grammar: '文法講解', sound: '發音課',
-  nlisten: '護理聽力', nread: '護理閱讀', nwords: '護理單字', case: '臨床情境',
+  nlisten: '護理聽力', nread: '護理閱讀', nwords: '護理單字', case: '臨床情境', speaking: '英文口說',
+}
+/** One line under each entry of the 英文練習 page: what you do there. */
+const notes: Record<MenuId, string> = {
+  translate: '看中文寫英文，Claude 批改；到期的句子卡也在這裡',
+  speaking: '跟 Emma 用英文聊天',
+  listen: '聽一句英文，跟著念',
+  story: '分級短文：讀、聽、聽寫',
+  reading: '讀一篇文章，回答問題',
+  writing: '從一句寫到一整篇，一階一階變難',
+  unit: '這個單元的聽、讀、說、寫和回測',
+  quiz: '英文和護理英文的選擇題',
+  grammar: '每個文法單元的講解和小練習',
+  sound: '自然發音、重音、連音',
+  words: '到期的單字卡，還有聽懂、說出、寫出',
+  screen: '篩出已經會的字，還有分級找字和字根字首',
+  passage: '用 7000 單寫成的短文',
+  nlisten: '護理師和病人的對話聽力',
+  nread: '護理文章閱讀',
+  nwords: '護理常用字，看懂、聽懂、說出、寫出',
+  case: '一步一步判斷臨床情境',
 }
 /** During exams and internship the questions are the nursing-English ones only. */
-export const modeLabel = (mode: LibraryMode, periodQuiet = false) => mode === 'quiz' && periodQuiet ? '護理英文題' : labels[mode]
+export const modeLabel = (mode: MenuId, periodQuiet = false) => mode === 'quiz' && periodQuiet ? '護理英文題' : labels[mode]
 
-export interface SectionInfo { id: LibrarySection; title: string; menu: string; chip: string; heading: string; modes: LibraryMode[] }
-/** `title` names the page, `menu` is the name in the sidebar, `chip` the two-character name on a phone, `heading` stands above the section's buttons. */
-export const librarySections: SectionInfo[] = [
-  { id: 'practice', title: '英文練習', menu: '英文練習', chip: '練習', heading: '自選加練', modes: ['listen', 'translate', 'story', 'reading', 'writing', 'unit', 'quiz'] },
-  { id: 'words', title: '單字', menu: '單字', chip: '單字', heading: '單字', modes: ['words', 'screen', 'passage'] },
-  { id: 'grammar', title: '文法講解', menu: '文法', chip: '文法', heading: '文法講解', modes: ['grammar'] },
-  { id: 'sound', title: '發音課', menu: '發音', chip: '發音', heading: '發音課', modes: ['sound'] },
-  { id: 'nursing', title: '護理英文', menu: '護理英文', chip: '護理', heading: '護理英文', modes: ['nlisten', 'nread', 'nwords', 'case'] },
+export interface MenuEntry { id: MenuId; label: string; note: string; hash: string }
+export interface MenuGroup { id: LibraryGroup; title: string; entries: MenuEntry[] }
+
+/** The menu's order: 中翻英 and 英文口說 first, then the other kinds of practice; words and nursing English each in a group. */
+const groups: { id: LibraryGroup; title: string; ids: MenuId[] }[] = [
+  { id: 'main', title: '聽說讀寫', ids: ['translate', 'speaking', 'listen', 'story', 'reading', 'writing', 'unit', 'quiz', 'grammar', 'sound'] },
+  { id: 'words', title: '單字', ids: ['words', 'screen', 'passage'] },
+  { id: 'nursing', title: '護理英文', ids: ['nlisten', 'nread', 'nwords', 'case'] },
 ]
-export const sectionInfo = (id: LibrarySection) => librarySections.find(s => s.id === id)!
+export const menuHash = (id: MenuId) => id === 'speaking' ? 'speaking' : 'library/' + id
+/** The unit packs (單元讀聽說寫) start at the first bridge unit. */
+export const unitPackOpen = (unit: number) => hasPack(unit) || unit > packUnits[0]
 
-/** The kinds of practice of a section, in the order of their buttons. The questions (quiz) sit with general practice in
- *  term time and with nursing English during exams and internship, when only the nursing questions are open. */
-export function sectionModes(section: LibrarySection, periodQuiet = false): LibraryMode[] {
-  const modes = sectionInfo(section).modes
-  if (!periodQuiet) return modes
-  if (section === 'practice') return modes.filter(m => m !== 'quiz')
-  return section === 'nursing' ? [...modes, 'quiz'] : modes
+/** What the menu lists now. Exams and internship add no new material: writing, the unit packs and the word screen rest, and
+ *  the questions are the nursing ones only, listed with nursing English as 護理英文題. */
+export function menuGroups({ periodQuiet = false, unit = 1 }: { periodQuiet?: boolean; unit?: number } = {}): MenuGroup[] {
+  const resting = new Set<MenuId>(periodQuiet ? ['writing', 'unit', 'screen'] : [])
+  if (!unitPackOpen(unit)) resting.add('unit')
+  return groups.map(g => {
+    let ids = g.ids.filter(id => !resting.has(id))
+    if (periodQuiet && g.id === 'main') ids = ids.filter(id => id !== 'quiz')
+    if (periodQuiet && g.id === 'nursing') ids = [...ids, 'quiz']
+    return { id: g.id, title: g.title, entries: ids.map(id => ({ id, label: modeLabel(id, periodQuiet), note: notes[id], hash: menuHash(id) })) }
+  })
 }
-export const sectionOf = (mode: LibraryMode, periodQuiet = false): LibrarySection =>
-  librarySections.find(s => sectionModes(s.id, periodQuiet).includes(mode))!.id
 
-/** "#library/story/listen", "library/words" or just the mode: the kind of practice it names. The page alone opens general practice. */
-export function modeFromHash(hash: string | undefined): LibraryMode {
+/** The kind of practice a library address opens: "#library/story/listen", "library/words" or just the mode. The page alone
+ *  (#library), or a name it does not know, opens the 英文練習 list: null. */
+export function libraryPage(hash: string | undefined): LibraryMode | null {
   const parts = (hash ?? '').replace(/^#/, '').split('/')
   const mode = (parts[0] === 'library' ? parts[1] : parts[0]) as LibraryMode
-  return libraryModes.includes(mode) ? mode : 'listen'
+  return libraryModes.includes(mode) ? mode : null
 }
-/** Where a section's menu entry leads: its first kind of practice. */
-export const sectionHash = (section: LibrarySection, periodQuiet = false) => 'library/' + sectionModes(section, periodQuiet)[0]

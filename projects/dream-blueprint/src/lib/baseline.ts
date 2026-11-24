@@ -106,6 +106,12 @@ export function retestInfo(results: readonly BaselineResult[], today: string) {
   const date = addDays(last.date, RETEST_DAYS)
   return { due: today >= date, date, days: Math.max(0, daysBetween(today, date)) }
 }
+/** The day 「今天先不要」 was pressed (or the test was opened from the pop-up): no pop-up again that day. */
+export const laterKey = 'baseline.later'
+/** The level test stays out of sight until it is due: no result yet, or 12 weeks after the last one. */
+export const testDue = (notes: Record<string, string>, today: string) => retestInfo(readResults(notes), today).due
+/** When it is due, it pops up on the home page once a day until it is done. */
+export const showTestPrompt = (notes: Record<string, string>, today: string) => testDue(notes, today) && notes[laterKey] !== today
 export { wordCount } from './writing'
 /** The CEFR guess Claude put on the first line of its feedback, if any. */
 export const cefrOf = (feedback: string) => feedback.match(/\b([ABC][12])\b/)?.[1] ?? ''
