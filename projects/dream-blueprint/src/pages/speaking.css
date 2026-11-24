@@ -102,3 +102,6 @@
 /* With the settings open on a small screen the wave has no room left: its hint would sit on top of the settings. */
 .sp-settings + .sp-wavebox .sp-hint, .sp-settings + .sp-wavebox .sp-tag { display: none; }
 .sp-settings + .sp-wavebox { min-height: 28px; }
+.sp-cost { margin: 0; font-size: 0.85rem; opacity: 0.8; text-align: center; }
+.sp-warn { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 10px; background: color-mix(in srgb, #e0a83a 18%, transparent); font-size: 0.9rem; text-align: center; }
+.sp-warn button { border: 1px solid currentColor; border-radius: 999px; padding: 0.25rem 0.8rem; background: transparent; color: inherit; font: inherit; cursor: pointer; }

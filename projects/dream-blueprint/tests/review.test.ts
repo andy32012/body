@@ -32,9 +32,16 @@ test('今天的複習：單字卡到上限、句子卡一天 5 句，其餘排�
   assert.equal(reviewLoad(state(words(80)), day, 'low').backlog, 30)
 })
 
-test('新字煞車：只有今天複習不完的單字卡會擋新字，排隊的句子卡不會', () => {
+test('新字煞車：今天複習不完的單字卡和排隊的句子卡（一句算五張）會擋新字', () => {
   const backlog = (cards: ReviewCard[]) => reviewLoad(state(cards), day, 'normal').backlog
-  assert.equal(dailyTarget({}, false, day, backlog([...words(90), ...sentences(300)])), 20, '句子卡排再多都不擋新字')
+  const both = (cards: ReviewCard[]) => { const l = reviewLoad(state(cards), day, 'normal'); return dailyTarget({}, false, day, l.backlog, l.queued) }
+  assert.equal(both([...words(90), ...sentences(5)]), 20, '今天做得完的句子卡不擋新字')
+  assert.equal(both([...words(90), ...sentences(12)]), 12, '排隊 7 句（算 35 張）：開始減少')
+  assert.equal(both([...words(90), ...sentences(300)]), 0, '句子卡積很多：先暫停新字')
+  // Exam and internship days: one word at most, and none when the pile is large.
+  assert.equal(dailyTarget({}, true, day, 0, 0), 1)
+  assert.equal(dailyTarget({}, true, day, 90, 0), 0, '考週也先看積壓')
+  assert.equal(dailyTarget({}, true, day, 0, 20), 0, '考週的句子卡積壓也算')
   assert.equal(dailyTarget({}, false, day, backlog(words(100))), 20, '今天清得完的卡不擋新字')
   assert.equal(dailyTarget({}, false, day, backlog(words(160))), 6, '積 60 張：新字減少')
   assert.equal(dailyTarget({}, false, day, backlog(words(180))), 0, '積 80 張：先暫停')

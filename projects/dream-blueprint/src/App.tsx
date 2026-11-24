@@ -151,6 +151,9 @@ function App() {
   const [route, changeRoute]=useState(readRoute)
   const [today,changeDay]=useState(dayKey)
   const [wordOpen,setWordOpen]=useState(false)
+  // Claude's monthly estimate passed US$70 or US$85 (usage.ts): one warning, closable.
+  const [usageAlert,setUsageAlert]=useState<number|null>(null)
+  useEffect(()=>{const on=(e:Event)=>setUsageAlert((e as CustomEvent<number>).detail);window.addEventListener('dream-usage-alert',on);return()=>window.removeEventListener('dream-usage-alert',on)},[])
   const closeWord=()=>{setWordOpen(false);update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})}
   const navigate=(p:Page)=>setView(p==='practice'?'library':p)
   const start=(e:Energy)=>setView('practice',e)
@@ -260,6 +263,7 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
+      {usageAlert!==null&&<p className="exam-offer usage-alert" role="alert">這個月 Claude 的用量估計已經超過 US${usageAlert}（上限 US$100）。可以到「設定 → 本月用量」看細節，或在設定裡改用比較便宜的模型。<button type="button" onClick={()=>setUsageAlert(null)}>知道了</button></p>}
       {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-section={section}><PracticeCover title={pageName}/>{section==='practice'&&<><LessonBanner state={state} today={today} start={start}/><Baseline state={state} update={update}/></>}<PracticeLibrary {...props}/></div>:page==='history'?<History {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined}/>:<Settings {...props}/>}
     </main></div>
     {page==='today'&&!syncing&&!pairing&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}

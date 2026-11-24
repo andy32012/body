@@ -48,7 +48,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   // A guided lesson that reached its end, or the unit checkpoint (which keeps no lesson record).
   const lessonDone = mainLessonDone(state, today)
   const checkpointDone = lessonDone && !lessonFinished(state.notes, today)
-  const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog)
+  const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog, load.queued)
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
   // A reading record saved today, or graded passages read today (logged as a reading day).
   const readToday = practisedOn(state.notes, state.sessions, 'read', today)
@@ -107,7 +107,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       auto: lessonDone, go: () => onStart(energy), goLabel: lessonDone ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
   const catalog: Record<Exclude<BlockId, 'review' | 'lesson'>, Omit<Task, 'min'>> = {
     focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: focusDone, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
-    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
+    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : (load.backlog ? '單字卡積了 ' + load.backlog + ' 張' : '') + (load.backlog && load.queued ? '、' : '') + (load.queued ? '句子卡排了 ' + load.queued + ' 句' : '') + '今天複習不完，先不加新字',
       auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
     input: testDay ? { id: 'input', title: '聽或讀：單元回測', detail: '單元 ' + pack + ' 最後一天：一篇沒看過的閱讀＋一段沒聽過的聽力，各只有一次機會', auto: !!(held.reading && held.listening),
         go: to('library/unit/test'), goLabel: '回測' }
