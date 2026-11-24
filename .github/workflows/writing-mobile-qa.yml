@@ -1,0 +1,84 @@
+name: Writing ladder mobile QA
+
+on:
+  push:
+    branches: [codex/writing14-mobile-qa]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing14-mobile-qa
+  cancel-in-progress: true
+
+jobs:
+  writing-mobile-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: projects/dream-blueprint
+    env:
+      WRITING_QA_PLAYWRIGHT_DIR: ${{ runner.temp }}/writing-playwright
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/writing-playwright-browsers
+      WRITING_QA_OUT: ${{ runner.temp }}/writing-mobile-qa-results
+      WRITING_QA_URL: http://127.0.0.1:4173/#library/writing
+    steps:
+      - name: Check out the QA branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install project dependencies
+        run: npm ci
+      - name: Run the full test suite
+        run: npm test
+      - name: Run the full test suite in Taiwan time
+        run: TZ=Asia/Taipei npm test
+      - name: Build the app
+        run: npm run build
+      - name: Check offline behavior
+        run: npm run check:offline
+      - name: Check that the published build matches the source
+        run: diff -r dist ../../dream
+      - name: Install the pinned Playwright version in temporary storage
+        run: |
+          npm install --prefix "$WRITING_QA_PLAYWRIGHT_DIR" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.62.1
+          "$WRITING_QA_PLAYWRIGHT_DIR/node_modules/.bin/playwright" --version
+          "$WRITING_QA_PLAYWRIGHT_DIR/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check the writing ladder at 390 by 844
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort > "$RUNNER_TEMP/writing-preview.log" 2>&1 &
+          writing_preview_pid=$!
+          trap 'kill "$writing_preview_pid" 2>/dev/null || true; wait "$writing_preview_pid" 2>/dev/null || true' EXIT
+          writing_preview_ready=0
+          for attempt in {1..30}; do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/; then
+              writing_preview_ready=1
+              break
+            fi
+            if ! kill -0 "$writing_preview_pid" 2>/dev/null; then
+              cat "$RUNNER_TEMP/writing-preview.log"
+              exit 1
+            fi
+            sleep 1
+          done
+          if [[ "$writing_preview_ready" != 1 ]]; then
+            cat "$RUNNER_TEMP/writing-preview.log"
+            exit 1
+          fi
+          node "$GITHUB_WORKSPACE/.github/qa/writing-mobile-qa.mjs"
+      - name: Upload only screenshots and the result report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: writing-ladder-mobile-qa
+          path: |
+            ${{ env.WRITING_QA_OUT }}/*.png
+            ${{ env.WRITING_QA_OUT }}/results.json
+          if-no-files-found: warn
+          retention-days: 7
