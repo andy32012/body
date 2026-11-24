@@ -1363,15 +1363,19 @@
     ]
    },
    {
-    "zh": "我沒有吃早餐，因為我太晚起床了。",
-    "en": "I did not eat breakfast because I got up too late.",
+    "zh": "我今天早上沒有吃早餐。",
+    "en": "I did not eat breakfast this morning.",
     "alt": [
-     "I did not have breakfast because I got up too late."
+     "I did not have breakfast this morning.",
+     "I didn't eat breakfast this morning."
     ]
    },
    {
-    "zh": "她昨天沒有去上班，因為她頭痛。",
-    "en": "She did not go to work yesterday because she had a headache."
+    "zh": "她昨天沒有去上班，她頭痛。",
+    "en": "She did not go to work yesterday. She had a headache.",
+    "alt": [
+     "She didn't go to work yesterday. She had a headache."
+    ]
    }
   ],
   "cando": "用 Did…? 問過去的事，用 didn't 說沒做（後面動詞回原形）",
@@ -2532,14 +2536,17 @@
     ]
    },
    {
-    "zh": "他通常走路上班，但是下雨的時候會搭公車。",
-    "en": "He usually walks to work, but he takes the bus when it rains."
+    "zh": "他通常走路上班，但是有時候會搭公車。",
+    "en": "He usually walks to work, but he sometimes takes the bus.",
+    "alt": [
+     "He usually walks to work, but sometimes he takes the bus."
+    ]
    },
    {
-    "zh": "我們總是先敲門再進去。",
-    "en": "We always knock before we go in.",
+    "zh": "我們總是先敲門。",
+    "en": "We always knock on the door first.",
     "alt": [
-     "We always knock on the door before we go in."
+     "We always knock first."
     ]
    }
   ],

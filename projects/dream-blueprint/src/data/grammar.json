@@ -238,7 +238,7 @@
    },
    {
     "k": "fill",
-    "q": "There are two ___ (baby) in the room.",
+    "q": "My sister has two ___ (baby).",
     "accept": [
      "babies"
     ],
@@ -394,7 +394,7 @@
    },
    {
     "k": "fill",
-    "q": "She bought a book. ___ book is about nursing.（填 a、an 或 the）",
+    "q": "She has a book. ___ book is about nursing.（填 a、an 或 the）",
     "accept": [
      "the"
     ],
@@ -549,7 +549,7 @@
     "accept": [
      "goes"
     ],
-    "why": "o 結尾加 -es。"
+    "why": "o 結尾加 -es。（by bus 是「搭公車」，by 後面直接接交通工具。）"
    },
    {
     "k": "choose",
@@ -2118,7 +2118,7 @@
      "many"
     ],
     "answer": 1,
-    "why": "否定句用 any。"
+    "why": "否定句用 any。（There isn't 是「沒有」：there is／there are 的用法，單元 17 會細講。）"
    },
    {
     "k": "fill",
@@ -3298,10 +3298,10 @@
    },
    {
     "k": "fix",
-    "q": "Because it was raining, so I took a taxi.",
+    "q": "Because it was late, so I took a taxi.",
     "accept": [
-     "Because it was raining, I took a taxi.",
-     "It was raining, so I took a taxi."
+     "Because it was late, I took a taxi.",
+     "It was late, so I took a taxi."
     ],
     "why": "because 和 so 只能留一個。"
    },

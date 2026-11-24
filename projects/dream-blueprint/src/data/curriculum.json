@@ -7745,7 +7745,7 @@
           ],
           "hints": [
             "先找時間線索，確認是不是過去的事。",
-            "前半用 was，後半 stay 加 -ed。"
+            "前半用 was，後半 stay 加 -ed；「所以」用 so，前面加逗號。"
           ],
           "reference": [
             "He was tired yesterday, so he stayed home.",
@@ -9314,7 +9314,7 @@
           ],
           "hints": [
             "看句子是否定還是問句，再找動詞。",
-            "前半用 did not come，後半用 was。"
+            "前半用 did not come，後半用 was；「因為」用 because，後面接原因。"
           ],
           "reference": [
             "He did not come yesterday because he was sick.",
@@ -10536,7 +10536,7 @@
           ],
           "hints": [
             "先決定要表達「能、應該、必須、可以」哪一種。",
-            "前半說天氣 It is hot today；後半 should 後面接原形 drink。"
+            "前半說天氣 It is hot today；後半 should 後面接原形 drink；中間可以用 so（所以）接起來，也可以分成兩句。"
           ],
           "reference": [
             "It's hot today, so you should drink more water.",
@@ -12702,7 +12702,7 @@
           ],
           "hints": [
             "先判斷這個名詞數不數得出來。",
-            "water 不可數，肯定句用 some，be 動詞用 is。"
+            "water 不可數，肯定句用 some，be 動詞用 is；「某個地方有…」說 There is…（單元 17 會細講）。"
           ],
           "reference": [
             "There is some water on the table.",
@@ -13244,7 +13244,7 @@
           ],
           "hints": [
             "看是兩個在比，還是三個以上裡面最怎樣。",
-            "hot 的比較級是 hotter（t 要重複）；more water than yesterday。"
+            "hot 的比較級是 hotter（t 要重複）；more water than yesterday；中間用 so（所以）接起來。"
           ],
           "reference": [
             "It is hotter today than yesterday, so you should drink more water than yesterday.",
@@ -19920,7 +19920,7 @@
       "unit": 24,
       "stage": "A",
       "title": "過去進行式",
-      "rule": "was 或 were 加動詞 ing，表示過去某個時間點正在進行的動作。常和 when 加過去式一起用：一個動作正在進行時，另一件事發生了。",
+      "rule": "was 或 were 加動詞 ing，表示過去某個時間點正在進行的動作。常和 when 加過去式一起用：一個動作正在進行時，另一件事發生了。也可以用 while（當…的時候）接正在進行的那件事：He fell while he was walking.",
       "examples": [
         "He was sleeping when I came in.",
         "What were you doing?"
@@ -24501,7 +24501,15 @@
             "Have you ever tried stinky tofu?"
           ],
           "why": "句子裡有明確、已經結束的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。注意 since yesterday（從昨天到現在）、for two days 這種「從過去一直到現在」的說法不是已經結束的時間，要用現在完成式：I have been sick since yesterday.",
-          "newWords": []
+          "newWords": [
+            {
+              "en": "stinky tofu",
+              "zh": "臭豆腐",
+              "example": "Stinky tofu smells strong, but many people love it.",
+              "exampleZh": "臭豆腐味道很重，但很多人很愛。",
+              "source": "curriculum"
+            }
+          ]
         },
         {
           "id": "u29-r2",
@@ -31228,6 +31236,14 @@
               "exampleZh": "他很有錢。",
               "source": "level1",
               "level": 1
+            },
+            {
+              "en": "lottery",
+              "zh": "樂透、彩券",
+              "example": "He won the lottery last year.",
+              "exampleZh": "他去年中了樂透。",
+              "source": "level6",
+              "level": 6
             }
           ],
           "words": [
@@ -33214,7 +33230,16 @@
             "The fall led to a hip fracture."
           ],
           "why": "because of、due to（由於）後面接名詞；because 後面接句子。therefore、as a result（因此）放在第二句開頭，後面加逗號。lead to、cause、result in 後面接結果。",
-          "newWords": []
+          "newWords": [
+            {
+              "en": "fracture",
+              "zh": "骨折",
+              "example": "The X-ray shows a fracture in his arm.",
+              "exampleZh": "X 光顯示他的手臂骨折。",
+              "source": "nursing",
+              "level": 6
+            }
+          ]
         },
         {
           "id": "u40-r3",
@@ -36097,6 +36122,14 @@
               "exampleZh": "在正常範圍內。",
               "source": "level2",
               "level": 2
+            },
+            {
+              "en": "Celsius",
+              "zh": "攝氏",
+              "example": "Water boils at 100 degrees Celsius.",
+              "exampleZh": "水在攝氏 100 度沸騰。",
+              "source": "level6",
+              "level": 6
             }
           ],
           "words": [
@@ -36374,7 +36407,15 @@
             "The urine output has decreased in the last four hours."
           ],
           "why": "上升用 increase、rise、go up；下降用 decrease、drop、fall、go down；不變用 remain、stay the same。from A to B 表示從多少到多少，by 表示變化的幅度。交班報告和檢定的圖表寫作都會用到。",
-          "newWords": []
+          "newWords": [
+            {
+              "en": "urine output",
+              "zh": "尿量",
+              "example": "Please record the patient's urine output every hour.",
+              "exampleZh": "請每小時記錄病人的尿量。",
+              "source": "nursing"
+            }
+          ]
         },
         {
           "id": "u44-r5",
