@@ -1,18 +1,19 @@
 import {
   AudioLines, BookA, BookOpenText, ChevronRight, ClipboardList, FileText, Gauge, Headphones, HeartPulse, Languages, Layers,
-  ListChecks, ListFilter, Mic, Newspaper, PenLine, Repeat, SpellCheck, Stethoscope,
+  ListChecks, ListFilter, Mic, Newspaper, PenLine, Repeat, Shuffle, SpellCheck, Stethoscope,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { AppState } from '../lib/store'
 import { menuGroups, type MenuId } from '../lib/library'
 import { activePeriod, reviewEnergy, reviewLoad } from '../lib/progress'
 import { readResults, testDue } from '../lib/baseline'
+import { dueThemeRun } from '../lib/themes'
 import './practice-menu.css'
 
 /** One icon per kind of practice, shared by the sidebar and the 英文練習 page. */
 export const menuIcons: Record<MenuId, LucideIcon> = {
   translate: Languages, speaking: Mic, listen: Repeat, story: BookOpenText, reading: FileText, writing: PenLine, unit: Layers,
-  quiz: ListChecks, grammar: SpellCheck, sound: AudioLines, words: BookA, screen: ListFilter, passage: Newspaper,
+  quiz: ListChecks, grammar: SpellCheck, theme: Shuffle, sound: AudioLines, words: BookA, screen: ListFilter, passage: Newspaper,
   nlisten: Headphones, nread: ClipboardList, nwords: Stethoscope, case: HeartPulse,
 }
 
@@ -24,6 +25,7 @@ export default function PracticeMenu({ state, today }: { state: AppState; today:
   const waiting: Partial<Record<MenuId, string>> = {
     ...(load.words ? { words: '今天 ' + load.words + ' 張' } : {}),
     ...(load.sentences ? { translate: '今天 ' + load.sentences + ' 句' } : {}),
+    ...(dueThemeRun(state.notes, state.curriculum.unit) ? { theme: '該考了' } : {}),
   }
   const retest = testDue(state.notes, today)
   return <nav className="pm-menu" aria-label="英文練習的種類">

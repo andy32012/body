@@ -1,3 +1,4 @@
+import type { AppState, Session } from './store'
 export type Energy = 'low' | 'normal' | 'high'
 export type Period = 'semester' | 'exam' | 'internship' | 'vacation'
 export type Feedback = 'right' | 'much' | 'more'
@@ -192,6 +193,22 @@ export const reviewEnergy = (day: string, periods: readonly PeriodRange[]): Ener
 export const SENTENCE_QUOTA = 5
 export const sentenceReviewKey = (day: string) => 'review.sentences.' + day
 const isDue = (c: ReviewCard, day: string) => c.due <= day && c.lastDay < day
+/** One written sentence, the way a practice session keeps it. */
+export type WrittenSentence = NonNullable<Session['translations']>[number]
+/** A sentence written in a practice (中翻英, 主題總複習) counts the same wherever it was written: its review card moves on
+ *  (or starts), a due card counts toward today's sentence review whatever the mark, and the answer joins the session. */
+export function logSentence(prev: AppState, sessionId: string, day: string, written: WrittenSentence): AppState {
+  const found = prev.cards.find((c) => c.id === written.sentenceId)
+  const result = found ? applyAnswer(found, day, written) : null
+  const counted = sentenceReviewKey(day)
+  return {
+    ...prev,
+    cards: result ? prev.cards.map((c) => (c.id === written.sentenceId ? result.card : c)) : [...prev.cards, newCard(written.sentenceId, day)],
+    notes: found && isDue(found, day) ? { ...prev.notes, [counted]: String((Number(prev.notes[counted]) || 0) + 1) } : prev.notes,
+    reviewEvents: result?.event ? [...prev.reviewEvents, result.event] : prev.reviewEvents,
+    sessions: prev.sessions.map((s) => (s.id === sessionId ? { ...s, translations: [...(s.translations ?? []), written] } : s)),
+  }
+}
 const isWordCard = (id: string) => id.startsWith('word:')
 /** How many cards are waiting today. */
 export const dueCount = (cards: readonly ReviewCard[], day: string) =>

@@ -22,6 +22,7 @@ import {
   applyAnswer,
   reviewEnergy,
   reviewLoad,
+  logSentence,
   sentenceReviewKey,
   SENTENCE_QUOTA,
   type Energy,
@@ -52,6 +53,7 @@ import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
 import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/GrammarTeach";
 import StoryLibrary from "../components/StoryLibrary";
+import ThemeReview from "../components/ThemeReview";
 import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
 import type { LibraryMode } from "../lib/library";
@@ -886,6 +888,9 @@ function Extras({
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
+  // #library/grammar/<unit> opens that unit's teaching (from 主題總複習).
+  const grammarFromHash = () => { const n = Number(location.hash.split("/")[2]); return location.hash.startsWith("#library/grammar/") && Number.isInteger(n) && n > 0 ? n : undefined; };
+  const [grammarUnit, setGrammarUnit] = useState<number | undefined>(grammarFromHash);
   // Another address of the same page (#library/words/listen, #library/writing/<id>, #library/story/listen) opens that part.
   // A different kind of practice is a different page: the app opens it fresh.
   useEffect(() => {
@@ -893,6 +898,7 @@ function Extras({
       if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
       if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
       if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
+      if (location.hash.startsWith("#library/grammar")) setGrammarUnit(grammarFromHash());
     };
     onHash();
     window.addEventListener("hashchange", onHash);
@@ -955,31 +961,7 @@ function Extras({
       revealed,
       verified: level === "independent",
     };
-    onActivity((prev) => {
-      const found = prev.cards.find((c) => c.id === repeat.id);
-      const result = found
-        ? applyAnswer(found, date, translation)
-        : null;
-      const cards = result
-        ? prev.cards.map((c) => (c.id === repeat.id ? result.card : c))
-        : [...prev.cards, newCard(repeat.id, date)];
-      // A due sentence card answered here counts toward today's sentence review, whatever the mark.
-      const wasDue = !!found && found.due <= date && found.lastDay < date;
-      const counted = sentenceReviewKey(date);
-      return {
-        ...prev,
-        cards,
-        notes: wasDue ? { ...prev.notes, [counted]: String((Number(prev.notes[counted]) || 0) + 1) } : prev.notes,
-        reviewEvents: result?.event
-          ? [...prev.reviewEvents, result.event]
-          : prev.reviewEvents,
-        sessions: prev.sessions.map((s) =>
-          s.id === sessionId
-            ? { ...s, translations: [...(s.translations ?? []), translation] }
-            : s,
-        ),
-      };
-    });
+    onActivity((prev) => logSentence(prev, sessionId, date, translation));
     setRepeatDone(true);
   }
   const listening = listeningPool[listen % Math.max(1, listeningPool.length)];
@@ -1174,7 +1156,8 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
-      {mode === "grammar" && <GrammarBook state={state} onActivity={onActivity} date={date} />}
+      {mode === "grammar" && <GrammarBook key={grammarUnit ?? "book"} initialUnit={grammarUnit} state={state} onActivity={onActivity} date={date} />}
+      {mode === "theme" && <ThemeReview state={state} onActivity={onActivity} date={date} sessionId={sessionId} />}
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}

@@ -30,9 +30,12 @@ export function Translation({
   saved,
   onHint,
   label,
+  hideTags = false,
 }: {
   preparation?: ReactNode;
   label?: string;
+  /** Leave out the grammar tags above the box, when choosing the grammar is part of the task (主題總複習). */
+  hideTags?: boolean;
   sentence: Sentence;
   onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) => void;
   checkpoint: boolean;
@@ -100,11 +103,13 @@ export function Translation({
     <>
       <div className="pr-label">{label ?? (checkpoint ? "單元小關卡" : "一句中翻英")}</div>
       <h2 className="pr-question">{sentence.zh}</h2>
-      <div className="pr-tags">
-        {sentence.grammar.map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
-      </div>
+      {!hideTags && (
+        <div className="pr-tags">
+          {sentence.grammar.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+      )}
       {preparation}
       <label className="pr-field">
         我的英文

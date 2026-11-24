@@ -54,7 +54,8 @@ export function GrammarExplain({ unit, rate }: { unit: number; rate: number }) {
   </div>
 }
 
-function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean, said: string) => void }) {
+/** One drill (choose, fill or fix) with its feedback; also used by 主題總複習. */
+export function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean, said: string) => void }) {
   // A fix drill starts from the wrong sentence, so only the wrong part needs retyping on a phone.
   const [text, setText] = useState(drill.k === 'fix' ? drill.q : '')
   const [picked, setPicked] = useState<number | null>(null)
@@ -144,8 +145,10 @@ export default function GrammarTeach({ unit, day, title, rule, notes, onSave, da
 
 /** In the practice library: the teaching and all the drills of any unit the course has reached, to go back to.
  *  Units ahead of the course stay locked until the lessons get there. */
-export function GrammarBook({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
-  const [unit, setUnit] = useState(() => Math.min(grammarUnits.length, Math.max(1, state.curriculum.unit)))
+export function GrammarBook({ state, onActivity, date, initialUnit }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialUnit?: number }) {
+  // A unit asked for in the address (from 主題總複習) opens if the course has reached it; otherwise the current unit.
+  const [unit, setUnit] = useState(() => initialUnit && initialUnit <= grammarUnits.length && reached(initialUnit, state.curriculum.unit) ? initialUnit
+    : Math.min(grammarUnits.length, Math.max(1, state.curriculum.unit)))
   const [round, setRound] = useState(0)
   const info = curriculum.units.find(u => u.unit === unit)
   const g = grammarFor(unit)

@@ -1,0 +1,42 @@
+/* 主題總複習: a finished grammar theme tested all mixed together (the drills reuse grammar.css). */
+.tr { display: grid; gap: .75rem; }
+.tr h3 { margin: 0; font-size: clamp(1.3rem, 2.7vw, 1.75rem); line-height: 1.45; }
+.tr p { margin: 0; line-height: 1.7; }
+.tr-kicker { color: var(--practice-accent); font-size: .82rem; font-weight: 650; letter-spacing: .08em; }
+.tr-lead { font-size: 1rem; }
+.tr-scope { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .6rem; }
+.tr-scope > div { padding: .65rem .8rem; border-radius: 12px; background: var(--practice-inset); border: 1px solid var(--practice-line); }
+.tr-scope b { display: block; font-size: .84rem; color: var(--practice-secondary); font-weight: 650; margin-bottom: .3rem; }
+.tr-scope ul { margin: 0; padding-inline-start: 1.1rem; display: grid; gap: .15rem; line-height: 1.55; }
+.tr-how, .tr-before { color: var(--practice-secondary); font-size: .9rem; }
+.tr-pick { display: grid; gap: .3rem; font-size: .86rem; color: var(--practice-secondary); margin-top: .3rem; }
+.tr-pick select { width: 100%; max-width: 100%; }
+.tr-head { display: flex; flex-wrap: wrap; gap: .2rem .8rem; align-items: baseline; justify-content: space-between; }
+.tr-head small { color: var(--practice-secondary); font-size: .82rem; font-variant-numeric: tabular-nums; }
+.tr-bar { height: 4px; border-radius: 99px; background: var(--practice-inset); overflow: hidden; }
+.tr-bar i { display: block; height: 100%; background: var(--practice-accent); transition: width .2s ease; }
+@media (prefers-reduced-motion: reduce) { .tr-bar i { transition: none; } }
+.tr-from { font-size: .88rem; color: var(--practice-secondary); }
+.tr-write .pr-question { margin-top: .2rem; }
+.tr-next { margin-top: .4rem; }
+.tr-verdict { padding: .6rem .8rem; border-radius: 12px; background: var(--practice-inset); border: 1px solid var(--practice-line); border-inline-start: 3px solid var(--practice-miss); }
+.tr-verdict[data-ok="true"] { border-inline-start-color: var(--practice-accent); }
+.tr-group { display: grid; gap: .3rem; }
+.tr-group > b { font-size: .84rem; color: var(--practice-secondary); font-weight: 650; }
+.tr-units { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--practice-line); border-radius: 12px; overflow: hidden; }
+.tr-units li { display: grid; grid-template-columns: minmax(0, 1fr) auto 4.2em; gap: .6rem; align-items: center; padding: .5rem .75rem; line-height: 1.5; }
+.tr-units li + li { border-top: 1px solid var(--practice-line); }
+.tr-units b { font-variant-numeric: tabular-nums; font-weight: 650; }
+.tr-units li[data-ok="false"] b { color: var(--practice-miss); }
+.tr-units a { color: var(--practice-accent); font-size: .86rem; text-align: end; }
+.tr-units i { color: var(--practice-accent); font-style: normal; text-align: end; }
+.tr-wrong summary { cursor: pointer; font-weight: 600; padding-block: .3rem; }
+.tr-wrong ol { margin: .4rem 0 0; padding-inline-start: 1.3rem; display: grid; gap: .55rem; }
+.tr-wrong li { display: grid; gap: 1px; line-height: 1.55; }
+.tr-wrong li span { overflow-wrap: anywhere; }
+.tr-wrong li b { color: var(--practice-accent); font-weight: 650; overflow-wrap: anywhere; }
+.tr-wrong li small, .tr-sentences small { color: var(--practice-secondary); font-size: .85rem; }
+.tr-sentences { display: grid; gap: .35rem; }
+.tr-sentences > b { font-size: .88rem; color: var(--practice-secondary); font-weight: 650; }
+.tr-sentences p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .1rem .8rem; }
+.tr-note { font-size: .88rem; color: var(--practice-secondary); }

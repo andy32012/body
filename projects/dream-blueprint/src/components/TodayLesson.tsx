@@ -10,6 +10,7 @@ import { activeLesson, coreSaved, mainLessonDone, pendingLessons, resumePhase, s
 import { getLessonPreview } from '../lib/todayLesson'
 import { nextFocus } from '../lib/nextFocus'
 import { dueTopic, partNumber, partPlan, skipKey, topicDoneToday, topicGoal } from '../lib/topics'
+import { dueThemeRun, themeDay, themeMinutes, themeScope } from '../lib/themes'
 import schedule from '../data/curriculumSchedule.json'
 import ScenePhoto from './ScenePhoto'
 import TodayPlan from './TodayPlan'
@@ -68,6 +69,10 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => p.date !== today && p.date !== (resume === 'later' ? active?.date : '')) : []
   const nextStep = !topic && active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const focus = quiet ? null : nextFocus(state, today, energy)
+  // A grammar theme taught over several units just finished: the rest day after it tests the whole theme, mixed with the
+  // related grammar learned before (主題總複習). It stays on rest days until done; the 英文練習 page has it any day.
+  const theme = !quiet && themeDay(kind, state.settings.restDays) ? dueThemeRun(state.notes, state.curriculum.unit) : null
+  const themeInfo = theme ? themeScope(theme) : null
   const practised = state.sessions.some(s => s.day === today)
   const low = choice.labels.low
   // The next level's lessons wait for the certificate of the level before them.
@@ -98,6 +103,8 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
           : !quiet && <p className="lesson-sentence">今天的句子：<span>{lesson.zh}</span></p>}
         {topic && <p className="lesson-why"><b>今天輪到生活主題</b>生活主題和文法課輪流上：先學會在情境裡聽、讀，再說和寫，最後隔幾天換個情境複習。
           <button type="button" onClick={skipTopic}>今天先上文法課</button></p>}
+        {themeInfo && <p className="lesson-why lesson-theme"><b>主題總複習</b>{themeInfo.title}上完了：今天把整個{theme?.theme.family === 'tense' ? '時態' : '主題'}{themeInfo.earlierThemes.length ? '和以前學過的' + themeInfo.earlierThemes.join('、') : ''}混在一起考一次，大約 {theme ? themeMinutes(theme) : 15} 分鐘。
+          <button type="button" onClick={() => { location.hash = 'library/theme' }}>開始主題總複習</button></p>}
         {focus?.reason && (!topic || focus.action) && <p className="lesson-why"><b>為什麼這樣排</b>{focus.reason}
           {focus.action && <button type="button" onClick={() => { location.hash = focus.action!.hash }}>{focus.action.label}</button>}</p>}
         <EnergyChoices choice={choice} label="今天的時間" />
