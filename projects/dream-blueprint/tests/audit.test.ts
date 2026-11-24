@@ -144,7 +144,7 @@ test('今天多久：首頁選項、清單分鐘和待辦用同一套；平常 1
       assert.ok(blocks.every(x => x.min > 0))
     }
   }
-  assert.deepEqual(planBlocks(90).map(x => [x.id, x.min]), [['review', 15], ['lesson', 25], ['words', 10], ['input', 20], ['output', 20]])
+  assert.deepEqual(planBlocks(90).map(x => [x.id, x.min]), [['review', 15], ['lesson', 30], ['words', 10], ['input', 20], ['output', 15]])
   assert.deepEqual(planBlocks(180).map(x => x.id), ['review', 'lesson', 'words', 'listen', 'read', 'write', 'speak', 'cert'])
   assert.deepEqual(planBlocks(240).at(-1), { id: 'extra', min: 60 })
   assert.deepEqual(planBlocks(90, 5).slice(0, 2), [{ id: 'focus', min: 5 }, { id: 'review', min: 10 }])

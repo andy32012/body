@@ -78,7 +78,8 @@ import {
   resumeTarget,
   sentenceFrame,
   updateLesson,
-  variationFor,
+  variationsFor,
+  promptFor,
   type ExpressRecord,
   type HintUse,
   type Lesson,
@@ -489,6 +490,8 @@ function PracticeSession({
   );
   const [extra, setExtra] = useState(false);
   const [recalls, setRecalls] = useState<TranslationRecord[]>(() => resumeAt?.rec.recalls ?? []);
+  // Today's variations done so far: two new sentences with the pattern after today's own sentence.
+  const [varied, setVaried] = useState(() => resumeAt?.rec.varied ?? 0);
   const [retention] = useState(() => {
     // Units finished with help come back first for an unaided recheck.
     const assisted = assistedUnits(state.notes).filter((u) => u < current.unit);
@@ -829,26 +832,41 @@ function PracticeSession({
             }}
           />
         )}
-        {live && lessonData && phase === "vary" && (
-          <LessonVariation
-            item={variationFor(lessonData, current.day)}
-            tutorId={item.id}
-            pattern={current.title}
-            rule={current.rule}
-            onDone={(m, answer, check) => {
-              if (!settled()) return;
-              const v = variationFor(lessonData, current.day);
-              evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
-              if (m !== "good")
-                update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
-              finish(false, "express");
-              step("pattern", { phase: "express" });
-            }}
-          />
-        )}
+        {live && lessonData && phase === "vary" && (() => {
+          const todays = variationsFor(lessonData, current.day);
+          const at = Math.min(varied, todays.length - 1);
+          const v = todays[at];
+          return (
+            <LessonVariation
+              key={at}
+              item={v}
+              count={[at + 1, todays.length]}
+              tutorId={item.id}
+              pattern={current.title}
+              rule={current.rule}
+              onDone={(m, answer, check) => {
+                if (!settled()) return;
+                evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
+                if (m !== "good")
+                  update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
+                if (at + 1 < todays.length) {
+                  // The next sentence is a new screen: a double tap must not mark it too.
+                  changedAt.current = Date.now();
+                  setVaried(at + 1);
+                  save({ varied: at + 1 });
+                  requestAnimationFrame(() => pane.current?.scrollIntoView({ block: "start" }));
+                  return;
+                }
+                finish(false, "express");
+                step("pattern", { phase: "express", varied: todays.length });
+              }}
+            />
+          );
+        })()}
         {live && lessonData && phase === "express" && (
           <LessonExpress
             lesson={lessonData}
+            prompt={promptFor(lessonData, current.day)}
             draftKey={"express." + current.unit + "." + current.day}
             pattern={current.title}
             saved={lessonRecord?.express}
@@ -865,7 +883,7 @@ function PracticeSession({
               // Something written counts as the step done, with or without Claude's correction (the summary said 「今天跳過」).
               save({ express: rec }, rec.first || answer.trim() ? "express" : undefined);
               evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.firstHelp ?? rec.help, answered: !!(rec.first || answer.trim()) }),
-                { source: "express", skill: "write", answer: rec.first || answer, prompt: lessonData.prompt.en, ref: lessonData.prompt.sample });
+                { source: "express", skill: "write", answer: rec.first || answer, prompt: promptFor(lessonData, current.day).en, ref: promptFor(lessonData, current.day).sample });
               go("done", {}, "done");
             }}
           />

@@ -1,12 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { lessonFinished, markLessonStep, readLessonRecord, variationFor, type Lesson } from '../src/lib/lesson.ts'
+import { lessonFinished, markLessonStep, promptFor, readLessonRecord, variationsFor, type Lesson } from '../src/lib/lesson.ts'
+import { matchesReference } from '../src/lib/evidence.ts'
 
 const lessons = JSON.parse(readFileSync(new URL('../src/data/lessons.json', import.meta.url), 'utf8')) as Lesson[]
 const curriculum = JSON.parse(readFileSync(new URL('../src/data/curriculum.json', import.meta.url), 'utf8'))
 
-test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內容：目標、對話、兩題聽力、兩個變化、開放題', () => {
+test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內容：目標、對話、兩題聽力、十句換個說法、每天一題開放題', () => {
   assert.equal(lessons.length, curriculum.units.length)
   assert.ok(lessons.length >= 48, '42 個主線單元加上至少 6 個橋接單元')
   for (const l of lessons) {
@@ -15,11 +16,12 @@ test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內
     assert.ok(l.dialogue.length >= 4 && l.dialogue.every(d => d.en && d.zh && d.who), '單元 ' + l.unit + ' 對話')
     assert.equal(l.questions.length, 2)
     for (const q of l.questions) assert.ok(q.options.length === 3 && q.answer >= 0 && q.answer < 3, '單元 ' + l.unit + ' 題目')
-    assert.equal(l.variations.length, 2)
-    assert.ok(l.prompt.en && l.prompt.zh && l.prompt.sample, '單元 ' + l.unit + ' 開放題')
+    assert.equal(l.variations.length, 10, '單元 ' + l.unit + '：第 1–5 天每天兩句')
+    assert.equal(l.prompts.length, 5, '單元 ' + l.unit + '：第 1–5 天每天一題')
+    for (const p of l.prompts) assert.ok(p.en && p.zh && p.sample, '單元 ' + l.unit + ' 開放題')
   }
-  assert.ok(lessons[38].prompt.chart?.points.length, '第 39 課要有圖表題')
-  assert.deepEqual(lessons[39].prompt.scaffold?.length, 4, '第 40 課要有意見＋理由＋例子＋結論的骨架')
+  assert.ok(lessons[38].prompts[0].chart?.points.length, '第 39 課要有圖表題')
+  assert.deepEqual(lessons[39].prompts[0].scaffold?.length, 4, '第 40 課要有意見＋理由＋例子＋結論的骨架')
 })
 test('一堂課的步驟會記下來；換天或換課就重新開始', () => {
   let notes = markLessonStep({}, '2026-11-21', 1, 1, 'listen')
@@ -31,9 +33,30 @@ test('一堂課的步驟會記下來；換天或換課就重新開始', () => {
   assert.equal(lessonFinished(notes, '2026-11-21'), true)
   notes = markLessonStep(notes, '2026-11-21', 1, 2, 'listen')
   assert.deepEqual(readLessonRecord(notes, '2026-11-21')?.steps, ['listen'])
-  assert.equal(variationFor(lessons[0], 1), lessons[0].variations[0])
-  assert.equal(variationFor(lessons[0], 2), lessons[0].variations[1])
-  assert.equal(variationFor(lessons[0], 3), lessons[0].variations[0])
+  // 第 1 天是前兩句，第 2 天接下來兩句……一週五天十句，不會重複。
+  assert.deepEqual(variationsFor(lessons[0], 1), lessons[0].variations.slice(0, 2))
+  assert.deepEqual(variationsFor(lessons[0], 2), lessons[0].variations.slice(2, 4))
+  assert.deepEqual(variationsFor(lessons[0], 5), lessons[0].variations.slice(8, 10))
+  assert.equal(new Set([1, 2, 3, 4, 5].flatMap(d => variationsFor(lessons[0], d))).size, 10)
+  assert.equal(promptFor(lessons[0], 1), lessons[0].prompts[0])
+  assert.equal(promptFor(lessons[0], 4), lessons[0].prompts[3])
+})
+
+test('換個說法：一個單元的十句都不一樣，也不跟這單元的每日句、小關卡、備用句重複；表達題每天不同', () => {
+  const zh = (t: string) => t.replace(/[，。？！、\s]/g, '')
+  for (const l of lessons) {
+    const unit = curriculum.units.find((u: { id: number }) => u.id === l.unit)
+    const taken = [...unit.days, ...unit.checkpoint, ...unit.backup] as { zh: string; reference: string[] }[]
+    assert.equal(new Set(l.variations.map(v => zh(v.zh))).size, 10, '單元 ' + l.unit + ' 中文重複')
+    assert.equal(new Set(l.variations.map(v => v.en.toLowerCase())).size, 10, '單元 ' + l.unit + ' 英文重複')
+    for (const v of l.variations) {
+      assert.ok(!taken.some(s => zh(s.zh) === zh(v.zh)), '單元 ' + l.unit + '「' + v.zh + '」已經是這單元的句子')
+      assert.ok(!taken.some(s => [v.en, ...(v.alt ?? [])].some(a => matchesReference(a, s.reference))), '單元 ' + l.unit + ' ' + v.en + ' 已經是這單元的答案')
+      assert.ok(/[.?!]$/.test(v.en), v.en)
+      for (const a of v.alt ?? []) assert.ok(matchesReference(a, [v.en, ...(v.alt ?? [])]), a)
+    }
+    assert.equal(new Set(l.prompts.map(p => p.en)).size, 5, '單元 ' + l.unit + ' 表達題重複')
+  }
 })
 
 test('Emma 的課堂模式：用今天上過的那一課，帶最近的錯句', async () => {

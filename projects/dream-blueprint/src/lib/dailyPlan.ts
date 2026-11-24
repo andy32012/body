@@ -83,13 +83,15 @@ export function dayBudget(day: string, settings: DaySettings): DayBudget {
 /** The pieces of a day, in order. Their minutes add up to the total shown; a focus for today comes out of review. */
 export type BlockId = 'focus' | 'review' | 'lesson' | 'words' | 'input' | 'output' | 'listen' | 'read' | 'write' | 'speak' | 'cert' | 'extra'
 export interface Block { id: BlockId; min: number }
-const dayOf: Block[] = [{ id: 'review', min: 15 }, { id: 'lesson', min: 25 }, { id: 'words', min: 10 }, { id: 'input', min: 20 }, { id: 'output', min: 20 }]
-const winterOf: Block[] = [{ id: 'review', min: 20 }, { id: 'lesson', min: 25 }, { id: 'words', min: 20 }, { id: 'listen', min: 25 }, { id: 'read', min: 25 },
-  { id: 'write', min: 25 }, { id: 'speak', min: 20 }, { id: 'cert', min: 20 }]
+/** The lesson writes three sentences with its pattern (today's and two variations) and its own open task, so it takes 30
+ *  minutes; 說或寫 gives it 5, since the lesson itself is writing. */
+const dayOf: Block[] = [{ id: 'review', min: 15 }, { id: 'lesson', min: 30 }, { id: 'words', min: 10 }, { id: 'input', min: 20 }, { id: 'output', min: 15 }]
+const winterOf: Block[] = [{ id: 'review', min: 20 }, { id: 'lesson', min: 30 }, { id: 'words', min: 20 }, { id: 'listen', min: 25 }, { id: 'read', min: 25 },
+  { id: 'write', min: 20 }, { id: 'speak', min: 20 }, { id: 'cert', min: 20 }]
 /** On a full day, review grows up to 10 minutes past its block when today's cards need it (word cards plus a few
- *  sentences). The time comes from the extra block, then 今日單字 (down to 5 minutes), then 說或寫 (down to 15),
+ *  sentences). The time comes from the extra block, then 今日單字 (down to 5 minutes), then 說或寫 (down to 10),
  *  so the day keeps its length. */
-const donors: readonly [BlockId, number][] = [['extra', 0], ['words', 5], ['output', 15]]
+const donors: readonly [BlockId, number][] = [['extra', 0], ['words', 5], ['output', 10]]
 export function planBlocks(total: number, focusWanted = 0, reviewNeed = 0): Block[] {
   if (total <= 30) {
     const words = total >= 30 ? 10 : total >= 15 ? 5 : 0

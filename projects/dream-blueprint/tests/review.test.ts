@@ -42,9 +42,9 @@ test('新字煞車：只有今天複習不完的單字卡會擋新字，排隊�
 
 test('一天的計畫：複習多的日子，複習時間最多多 10 分鐘，從今日單字和說或寫挪，總時數不變', () => {
   const sum = (b: { min: number }[]) => b.reduce((n, x) => n + x.min, 0)
-  assert.deepEqual(planBlocks(90, 0, 8).map(b => [b.id, b.min]), [['review', 15], ['lesson', 25], ['words', 10], ['input', 20], ['output', 20]])
-  assert.deepEqual(planBlocks(90, 0, 18).map(b => [b.id, b.min]), [['review', 20], ['lesson', 25], ['words', 5], ['input', 20], ['output', 20]])
-  assert.deepEqual(planBlocks(90, 0, 25).map(b => [b.id, b.min]), [['review', 25], ['lesson', 25], ['words', 5], ['input', 20], ['output', 15]])
+  assert.deepEqual(planBlocks(90, 0, 8).map(b => [b.id, b.min]), [['review', 15], ['lesson', 30], ['words', 10], ['input', 20], ['output', 15]])
+  assert.deepEqual(planBlocks(90, 0, 18).map(b => [b.id, b.min]), [['review', 20], ['lesson', 30], ['words', 5], ['input', 20], ['output', 15]])
+  assert.deepEqual(planBlocks(90, 0, 25).map(b => [b.id, b.min]), [['review', 25], ['lesson', 30], ['words', 5], ['input', 20], ['output', 10]])
   assert.equal(planBlocks(90, 0, 60).find(b => b.id === 'review')!.min, 25, '最多多 10 分鐘')
   assert.equal(sum(planBlocks(90, 0, 60)), 90)
   // A focus still comes out of review first; review then grows back toward what the cards need.

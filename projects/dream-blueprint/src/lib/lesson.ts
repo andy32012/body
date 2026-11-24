@@ -1,5 +1,5 @@
 /** The guided 30-minute lesson: recall → listen → pattern → express → fix → done.
- *  Content per unit lives in data/lessons.json (dialogue, questions, variations, an open task). */
+ *  Content per unit lives in data/lessons.json (dialogue, questions, ten variations, an open task for each day). */
 export interface LessonLine { who: string; en: string; zh: string }
 export interface LessonQuestion { q: string; options: string[]; answer: number }
 export interface LessonPrompt {
@@ -15,9 +15,11 @@ export interface Lesson {
   scene: string
   dialogue: LessonLine[]
   questions: LessonQuestion[]
-  /** alt: other answers that are just as right (I'll come earlier tomorrow / I will come early tomorrow). */
+  /** Ten more sentences with the pattern, two for each of days 1–5, none repeated.
+   *  alt: other answers that are just as right (I'll come earlier tomorrow / I will come early tomorrow). */
   variations: { zh: string; en: string; alt?: string[] }[]
-  prompt: LessonPrompt
+  /** An open task for each of days 1–5. */
+  prompts: LessonPrompt[]
 }
 
 export const lessonSteps = [
@@ -76,6 +78,8 @@ export interface LessonRecord {
   recalls?: Attempt[]; records?: Attempt[]
   hints?: Record<string, HintUse>
   express?: ExpressRecord
+  /** How many of today's variations are done (the lesson continues at the next one). */
+  varied?: number
 }
 export function readLessonRecord(notes: Record<string, string>, day: string): LessonRecord | null {
   try {
@@ -155,8 +159,16 @@ export function moveLesson(notes: Record<string, string>, from: string, to: stri
 }
 export const stepLabel: Record<LessonPhase, string> = { recall: '回想', listen: '聽懂', write: '句型', sound: '句型', vary: '句型', express: '表達', done: '完成' }
 
-/** Day 1–5 get one variation of the pattern; it alternates between the unit's two. */
-export const variationFor = (lesson: Lesson, day: number) => lesson.variations[(Math.max(1, day) - 1) % lesson.variations.length]
+/** Days 1–5 each write two new sentences with the pattern after today's sentence: day 1 the unit's first two, day 2 the
+ *  next two, and so on, so none of the ten comes back within the week. */
+export const VARIATIONS_PER_DAY = 2
+const lessonDay = (day: number) => Math.min(5, Math.max(1, day))
+export function variationsFor(lesson: Lesson, day: number) {
+  const n = lesson.variations.length
+  return Array.from({ length: VARIATIONS_PER_DAY }, (_, i) => lesson.variations[((lessonDay(day) - 1) * VARIATIONS_PER_DAY + i) % n])
+}
+/** Days 1–5 each have their own open task (表達). */
+export const promptFor = (lesson: Lesson, day: number) => lesson.prompts[(lessonDay(day) - 1) % lesson.prompts.length]
 
 /** A partial frame of the model sentence: word order and first letters, the rest left to you. "I a_ a n______ s______." */
 export function sentenceFrame(en: string) {

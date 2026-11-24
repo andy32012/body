@@ -12,7 +12,7 @@ import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
 import { topicById, topicInstructions, type TopicPart } from '../lib/topics'
 import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCard } from '../lib/ieltsSpeaking'
 import cueCards from '../data/cue-cards.json'
-import { markLessonStep, readLessonRecord } from '../lib/lesson'
+import { markLessonStep, promptFor, readLessonRecord, type Lesson } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import { emmaLevel } from '../lib/cefr'
 import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
@@ -67,7 +67,10 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   useEffect(() => {
     if (!lesson) return
     let alive = true
-    import('../data/lessons.json').then(f => { if (alive) setTask((f.default as { unit: number; prompt: { en: string } }[]).find(l => l.unit === lesson.unit)?.prompt.en) }).catch(() => {})
+    import('../data/lessons.json').then(f => {
+      const data = (f.default as Lesson[]).find(l => l.unit === lesson.unit)
+      if (alive) setTask(data && promptFor(data, lesson.day).en)
+    }).catch(() => {})
     return () => { alive = false }
   }, [lesson])
   const [key, setKey] = useState(openaiKey())

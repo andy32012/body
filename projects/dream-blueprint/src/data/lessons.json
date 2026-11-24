@@ -66,15 +66,84 @@
    {
     "zh": "你的病人很累嗎？",
     "en": "Is your patient tired?"
+   },
+   {
+    "zh": "我媽媽是一位老師。",
+    "en": "My mother is a teacher.",
+    "alt": [
+     "My mom is a teacher."
+    ]
+   },
+   {
+    "zh": "這個房間很冷。",
+    "en": "This room is cold.",
+    "alt": [
+     "This room is very cold."
+    ]
+   },
+   {
+    "zh": "他是你的同學嗎？",
+    "en": "Is he your classmate?"
+   },
+   {
+    "zh": "你們是護理系學生嗎？",
+    "en": "Are you nursing students?"
+   },
+   {
+    "zh": "她的手很冰。",
+    "en": "Her hands are cold.",
+    "alt": [
+     "Her hands are very cold."
+    ]
+   },
+   {
+    "zh": "我的朋友們都很忙。",
+    "en": "My friends are busy.",
+    "alt": [
+     "My friends are all busy."
+    ]
+   },
+   {
+    "zh": "他不是醫生，他是病人。",
+    "en": "He is not a doctor. He is a patient.",
+    "alt": [
+     "He is not a doctor, he is a patient."
+    ]
+   },
+   {
+    "zh": "我們今天不忙。",
+    "en": "We are not busy today."
    }
   ],
   "cando": "用 am／is／are 介紹自己和別人，說出身分和狀態",
   "scene": "實習第一天，在護理站",
-  "prompt": {
-   "en": "Introduce yourself in three sentences: who you are, where you are now, and how you feel.",
-   "zh": "用三句英文介紹自己：你是誰、你現在在哪裡、你現在感覺怎麼樣（用 am／is／are）。",
-   "sample": "I am a nursing student in Taiwan. I am at home now. I am tired, but I am happy."
-  }
+  "prompts": [
+   {
+    "en": "Introduce yourself in three sentences: who you are, where you are now, and how you feel.",
+    "zh": "用三句英文介紹自己：你是誰、你現在在哪裡、你現在感覺怎麼樣（用 am／is／are）。",
+    "sample": "I am a nursing student in Taiwan. I am at home now. I am tired, but I am happy."
+   },
+   {
+    "en": "Write three sentences about a friend: who he or she is, where he or she is now, and how he or she feels.",
+    "zh": "用三句英文介紹一位朋友：他／她是誰、現在在哪裡、感覺怎麼樣（he／she 配 is）。",
+    "sample": "My friend Amy is a nursing student. She is at school now. She is happy today."
+   },
+   {
+    "en": "Write three questions you can ask a patient. Start with Are you…? or Is…?",
+    "zh": "寫三個可以問病人的問題，用 Are you…? 或 Is…? 開頭。",
+    "sample": "Are you cold? Are you hungry? Is your room quiet?"
+   },
+   {
+    "en": "Describe your family in three sentences. Use is and are.",
+    "zh": "用三句英文說說你的家人，is 和 are 都要用到。",
+    "sample": "My father is a driver. My mother is a cook. My sisters are students."
+   },
+   {
+    "en": "Write two things you are not, and two things you are.",
+    "zh": "寫兩句「我不是…」，再寫兩句「我是…」（am not 和 am）。",
+    "sample": "I am not a doctor. I am not sleepy. I am a nursing student. I am ready for class."
+   }
+  ]
  },
  {
   "unit": 2,
@@ -138,15 +207,72 @@
    {
     "zh": "這是一顆雞蛋，不是一顆蘋果。",
     "en": "This is an egg, not an apple."
+   },
+   {
+    "zh": "這些是乾淨的毛巾。",
+    "en": "These are clean towels."
+   },
+   {
+    "zh": "那些是我的書。",
+    "en": "Those are my books."
+   },
+   {
+    "zh": "這些是你的手套嗎？",
+    "en": "Are these your gloves?"
+   },
+   {
+    "zh": "那是一顆柳橙嗎？",
+    "en": "Is that an orange?"
+   },
+   {
+    "zh": "她是一位很好的護理師。",
+    "en": "She is a good nurse.",
+    "alt": [
+     "She is a very good nurse."
+    ]
+   },
+   {
+    "zh": "這是一間舊醫院。",
+    "en": "This is an old hospital."
+   },
+   {
+    "zh": "這三個女人是護理師。",
+    "en": "These three women are nurses."
+   },
+   {
+    "zh": "那兩個男人是醫生。",
+    "en": "Those two men are doctors."
    }
   ],
   "cando": "用 a／an 和複數說出身邊的東西，例如病房裡的用品",
   "scene": "準備病房用品",
-  "prompt": {
-   "en": "Look around your room. Name three things you see. Use a, an, or plural -s.",
-   "zh": "看看你的房間，用英文說三樣你看到的東西，要用到 a、an 或複數 -s。",
-   "sample": "I see a bed, an umbrella, and two books."
-  }
+  "prompts": [
+   {
+    "en": "Look around your room. Name three things you see. Use a, an, or plural -s.",
+    "zh": "看看你的房間，用英文說三樣你看到的東西，要用到 a、an 或複數 -s。",
+    "sample": "I see a bed, an umbrella, and two books."
+   },
+   {
+    "en": "Look in your bag. Write three things in it. Use a, an, or plural -s.",
+    "zh": "看看你的包包，用 a、an 或複數寫三樣裡面的東西。",
+    "sample": "I have a pen, an eraser, and two books in my bag."
+   },
+   {
+    "en": "Name three things you can see in a hospital room. Use a, an, or plurals.",
+    "zh": "用 a、an 或複數，說三樣病房裡會看到的東西。",
+    "sample": "I see a bed, an ice pack, and three chairs."
+   },
+   {
+    "en": "Write about your family with plurals: how many brothers, sisters, or children are there?",
+    "zh": "用複數寫你的家人：有幾個兄弟、姊妹或小孩？",
+    "sample": "I have two sisters and a brother. My aunt has three children."
+   },
+   {
+    "en": "Write three sentences about the things on your desk. Use This is… and These are….",
+    "zh": "用 This is…／These are… 寫三句你桌上的東西。",
+    "sample": "This is a cup. These are my books. This is an old phone."
+   }
+  ]
  },
  {
   "unit": 3,
@@ -205,15 +331,76 @@
    {
     "zh": "我有一個朋友和一隻貓，那隻貓很胖。",
     "en": "I have a friend and a cat. The cat is fat."
+   },
+   {
+    "zh": "燈是開著的。",
+    "en": "The light is on."
+   },
+   {
+    "zh": "水是冷的。",
+    "en": "The water is cold."
+   },
+   {
+    "zh": "醫生在房間裡嗎？",
+    "en": "Is the doctor in the room?"
+   },
+   {
+    "zh": "鑰匙在你的包包裡嗎？",
+    "en": "Are the keys in your bag?"
+   },
+   {
+    "zh": "杯子在床旁邊。",
+    "en": "The cup is next to the bed.",
+    "alt": [
+     "The cup is by the bed.",
+     "The cup is beside the bed."
+    ]
+   },
+   {
+    "zh": "毛巾在地板上。",
+    "en": "The towel is on the floor."
+   },
+   {
+    "zh": "這是一張椅子。這張椅子是濕的。",
+    "en": "This is a chair. The chair is wet."
+   },
+   {
+    "zh": "我有一個包包，這個包包很重。",
+    "en": "I have a bag. The bag is heavy.",
+    "alt": [
+     "I have a bag. The bag is very heavy."
+    ]
    }
   ],
   "cando": "第一次提到用 a／an，再提到或雙方都知道是哪個時用 the",
   "scene": "給病人送藥和水",
-  "prompt": {
-   "en": "Name one thing in your room with a or an. Then say one more sentence about it with the.",
-   "zh": "先用 a／an 說你房間裡的一樣東西，再用 the 多說一句。",
-   "sample": "I have a desk. The desk is old, but it is clean."
-  }
+  "prompts": [
+   {
+    "en": "Name one thing in your room with a or an. Then say one more sentence about it with the.",
+    "zh": "先用 a／an 說你房間裡的一樣東西，再用 the 多說一句。",
+    "sample": "I have a desk. The desk is old, but it is clean."
+   },
+   {
+    "en": "Write about one thing in your kitchen: first with a or an, then one more sentence with the.",
+    "zh": "寫你家廚房的一樣東西：先用 a／an，再用 the 多說一句。",
+    "sample": "I have a fridge. The fridge is old, but it is clean."
+   },
+   {
+    "en": "Ask two questions about things in a room with Is the…? or Are the…?, then answer them.",
+    "zh": "用 Is the…? 或 Are the…? 問兩個關於房間裡東西的問題，再自己回答。",
+    "sample": "Is the door open? Yes, it is. Are the windows clean? No, they are not."
+   },
+   {
+    "en": "Write three sentences about where things are in your room. Use the and on, under, or next to.",
+    "zh": "用 the 和 on、under、next to，寫三句你房間裡東西的位置。",
+    "sample": "The phone is on the bed. The bag is under the desk. The lamp is next to the window."
+   },
+   {
+    "en": "Write about a friend and his or her pet: first with a, then with the.",
+    "zh": "寫一位朋友和他的寵物：先用 a，再用 the。",
+    "sample": "My friend has a dog. The dog is small and very cute."
+   }
+  ]
  },
  {
   "unit": 4,
@@ -277,15 +464,90 @@
    {
     "zh": "他每天晚上讀書。",
     "en": "He studies every night."
+   },
+   {
+    "zh": "我哥哥每天騎腳踏車上班。",
+    "en": "My brother rides a bike to work every day.",
+    "alt": [
+     "My brother rides his bike to work every day.",
+     "My older brother rides a bike to work every day."
+    ]
+   },
+   {
+    "zh": "她每個星期打掃她的房間。",
+    "en": "She cleans her room every week."
+   },
+   {
+    "zh": "他晚上不看電視。",
+    "en": "He does not watch TV at night."
+   },
+   {
+    "zh": "我們週末不上課。",
+    "en": "We do not have class on weekends.",
+    "alt": [
+     "We do not have classes on weekends."
+    ]
+   },
+   {
+    "zh": "護理師每天早上給他藥。",
+    "en": "The nurse gives him medicine every morning.",
+    "alt": [
+     "The nurse gives him his medicine every morning."
+    ]
+   },
+   {
+    "zh": "這位醫生每天看很多病人。",
+    "en": "The doctor sees many patients every day.",
+    "alt": [
+     "This doctor sees many patients every day.",
+     "The doctor sees a lot of patients every day."
+    ]
+   },
+   {
+    "zh": "他每天晚上九點去睡覺。",
+    "en": "He goes to bed at nine every night.",
+    "alt": [
+     "He goes to bed at 9 every night.",
+     "He goes to sleep at nine every night."
+    ]
+   },
+   {
+    "zh": "我妹妹有一隻狗。",
+    "en": "My sister has a dog.",
+    "alt": [
+     "My younger sister has a dog."
+    ]
    }
   ],
   "cando": "用現在簡單式說自己和別人每天的習慣（he／she 的動詞加 -s）",
   "scene": "同學聊每天的作息",
-  "prompt": {
-   "en": "Write three things you do every day, and one thing a family member does every day.",
-   "zh": "寫三件你每天做的事，再寫一件家人每天做的事（he／she 的動詞記得加 -s）。",
-   "sample": "I get up at seven. I take the bus to school. I study English at night. My mom cooks dinner every day."
-  }
+  "prompts": [
+   {
+    "en": "Write three things you do every day, and one thing a family member does every day.",
+    "zh": "寫三件你每天做的事，再寫一件家人每天做的事（he／she 的動詞記得加 -s）。",
+    "sample": "I get up at seven. I take the bus to school. I study English at night. My mom cooks dinner every day."
+   },
+   {
+    "en": "Write about your best friend's day: three things he or she does every day.",
+    "zh": "寫你最好的朋友每天做的三件事（he／she 的動詞要加 -s）。",
+    "sample": "My best friend gets up at six. She takes the bus to school. She plays basketball after class."
+   },
+   {
+    "en": "Write two things you do on weekends and one thing you do not do.",
+    "zh": "寫兩件你週末會做的事，再寫一件週末不做的事。",
+    "sample": "I sleep late on weekends. I watch movies with my sister. I do not study on Sunday morning."
+   },
+   {
+    "en": "Write three things a nurse does every day at work.",
+    "zh": "寫三件護理師每天上班會做的事（主詞是 a nurse，動詞要加 -s）。",
+    "sample": "A nurse checks the patients' blood pressure. She gives them medicine. She writes notes in the chart."
+   },
+   {
+    "en": "Write about one busy person in your family. What does he or she do every day?",
+    "zh": "寫一位很忙的家人，他／她每天做哪些事？",
+    "sample": "My father works in a factory. He leaves home at seven. He comes home at eight and watches TV."
+   }
+  ]
  },
  {
   "unit": 5,
@@ -347,17 +609,91 @@
     "en": "Do you exercise every day?"
    },
    {
-    "zh": "她不喝牛奶。",
-    "en": "She doesn't drink milk."
+    "zh": "我哥哥不抽菸。",
+    "en": "My brother does not smoke.",
+    "alt": [
+     "My older brother does not smoke."
+    ]
+   },
+   {
+    "zh": "我週末不工作。",
+    "en": "I do not work on weekends."
+   },
+   {
+    "zh": "他們不住在台北。",
+    "en": "They do not live in Taipei."
+   },
+   {
+    "zh": "你哥哥會說英文嗎？",
+    "en": "Does your brother speak English?",
+    "alt": [
+     "Does your older brother speak English?"
+    ]
+   },
+   {
+    "zh": "她每天打電話給你嗎？",
+    "en": "Does she call you every day?"
+   },
+   {
+    "zh": "這位病人需要枕頭嗎？",
+    "en": "Does the patient need a pillow?",
+    "alt": [
+     "Does this patient need a pillow?"
+    ]
+   },
+   {
+    "zh": "你的腳會痛嗎？",
+    "en": "Does your foot hurt?",
+    "alt": [
+     "Do your feet hurt?"
+    ]
+   },
+   {
+    "zh": "你每天都睡八個小時嗎？",
+    "en": "Do you sleep eight hours every day?",
+    "alt": [
+     "Do you sleep 8 hours every day?",
+     "Do you sleep for eight hours every day?",
+     "Do you sleep eight hours every night?"
+    ]
+   },
+   {
+    "zh": "他晚上會吃藥嗎？",
+    "en": "Does he take medicine at night?",
+    "alt": [
+     "Does he take his medicine at night?"
+    ]
    }
   ],
   "cando": "用 Do／Does 問別人的習慣，用 don't／doesn't 說沒有",
   "scene": "護理師問病人的生活習慣",
-  "prompt": {
-   "en": "Write two Do you…? questions for a new patient about their habits. Then answer them for yourself.",
-   "zh": "寫兩個用 Do you…? 問新病人生活習慣的問題，再用自己的情況回答。",
-   "sample": "Do you drink coffee? Yes, I do. Do you smoke? No, I don't."
-  }
+  "prompts": [
+   {
+    "en": "Write two Do you…? questions for a new patient about their habits. Then answer them for yourself.",
+    "zh": "寫兩個用 Do you…? 問新病人生活習慣的問題，再用自己的情況回答。",
+    "sample": "Do you drink coffee? Yes, I do. Do you smoke? No, I don't."
+   },
+   {
+    "en": "Write two things you do not do, and two things your friend does not do.",
+    "zh": "寫兩件你不做的事，再寫兩件朋友不做的事（don't／doesn't）。",
+    "sample": "I don't eat meat. I don't drive. My friend doesn't like coffee. She doesn't watch TV."
+   },
+   {
+    "en": "Write three Does he…? or Does she…? questions about a classmate's habits.",
+    "zh": "寫三個 Does he／she…? 的問題，問一位同學的習慣。",
+    "sample": "Does she live near school? Does she play sports? Does she like English?"
+   },
+   {
+    "en": "You are a nurse. Write three questions for a patient about pain, sleep, and food.",
+    "zh": "假裝你是護理師，寫三個問病人疼痛、睡眠和吃東西的問題。",
+    "sample": "Do you have any pain? Do you sleep well at night? Do you eat breakfast?"
+   },
+   {
+    "en": "Answer these with Yes, I do. or No, I don't., and add one more sentence each: Do you cook? Do you exercise? Do you read at night?",
+    "zh": "用 Yes, I do.／No, I don't. 回答這三題，每題再多說一句：Do you cook? Do you exercise? Do you read at night?",
+    "sample": "Do you cook? No, I don't. My mom cooks for me. Do you exercise? Yes, I do. I run on Sundays."
+   }
+  ]
  },
  {
   "unit": 6,
@@ -421,15 +757,89 @@
    {
     "zh": "他們沒有在看電視。",
     "en": "They are not watching TV."
+   },
+   {
+    "zh": "他正在講電話。",
+    "en": "He is talking on the phone.",
+    "alt": [
+     "He is on the phone."
+    ]
+   },
+   {
+    "zh": "我妹妹正在寫功課。",
+    "en": "My sister is doing her homework.",
+    "alt": [
+     "My sister is doing homework.",
+     "My younger sister is doing her homework."
+    ]
+   },
+   {
+    "zh": "你正在聽音樂嗎？",
+    "en": "Are you listening to music?"
+   },
+   {
+    "zh": "她正在吃藥嗎？",
+    "en": "Is she taking her medicine?",
+    "alt": [
+     "Is she taking medicine?"
+    ]
+   },
+   {
+    "zh": "醫生正在跟家屬說話。",
+    "en": "The doctor is talking to the family.",
+    "alt": [
+     "The doctor is talking with the family.",
+     "The doctor is speaking to the family."
+    ]
+   },
+   {
+    "zh": "護理師正在幫病人量體溫。",
+    "en": "The nurse is taking the patient's temperature.",
+    "alt": [
+     "The nurse is checking the patient's temperature."
+    ]
+   },
+   {
+    "zh": "我現在沒有在看手機。",
+    "en": "I am not looking at my phone now.",
+    "alt": [
+     "I am not looking at my phone right now."
+    ]
+   },
+   {
+    "zh": "外面沒有在下雨。",
+    "en": "It is not raining outside."
    }
   ],
   "cando": "用 am／is／are ＋ -ing 說現在正在做的事",
   "scene": "學姊打電話問病房現在的情況",
-  "prompt": {
-   "en": "Look around you, or imagine a hospital room. Write three sentences about what people are doing right now.",
-   "zh": "看看你周圍（或想像一間病房），寫三句「現在正在做什麼」。",
-   "sample": "I am sitting at my desk. My brother is playing games. My mom is cooking dinner."
-  }
+  "prompts": [
+   {
+    "en": "Look around you, or imagine a hospital room. Write three sentences about what people are doing right now.",
+    "zh": "看看你周圍（或想像一間病房），寫三句「現在正在做什麼」。",
+    "sample": "I am sitting at my desk. My brother is playing games. My mom is cooking dinner."
+   },
+   {
+    "en": "Imagine you are calling a friend. Tell her three things your family is doing now.",
+    "zh": "想像你在打電話給朋友，告訴她你家人現在正在做的三件事。",
+    "sample": "My dad is reading the news. My mom is cooking. My brother is sleeping on the sofa."
+   },
+   {
+    "en": "Write three questions you could ask on the phone about what someone is doing now.",
+    "zh": "寫三個講電話時可以問的「現在正在做什麼」問題。",
+    "sample": "Are you working now? Is your sister studying? What are you eating?"
+   },
+   {
+    "en": "Imagine a busy ward. Write three sentences about what the nurses and patients are doing.",
+    "zh": "想像一間很忙的病房，寫三句護理師和病人正在做什麼。",
+    "sample": "A nurse is checking a patient's pulse. Two patients are sleeping. The doctor is writing notes."
+   },
+   {
+    "en": "Write two things you are doing now and two things you are not doing.",
+    "zh": "寫兩件你現在正在做的事，和兩件現在沒在做的事。",
+    "sample": "I am sitting on my bed. I am writing in English. I am not eating. I am not watching TV."
+   }
+  ]
  },
  {
   "unit": 7,
@@ -493,15 +903,84 @@
    {
     "zh": "你們上週在台北嗎？",
     "en": "Were you in Taipei last week?"
+   },
+   {
+    "zh": "我的爸媽昨天很開心。",
+    "en": "My parents were happy yesterday."
+   },
+   {
+    "zh": "那間病房昨晚很安靜。",
+    "en": "The ward was quiet last night.",
+    "alt": [
+     "That ward was quiet last night."
+    ]
+   },
+   {
+    "zh": "他昨天在醫院嗎？",
+    "en": "Was he at the hospital yesterday?",
+    "alt": [
+     "Was he in the hospital yesterday?"
+    ]
+   },
+   {
+    "zh": "你們剛才在教室裡嗎？",
+    "en": "Were you in the classroom a moment ago?",
+    "alt": [
+     "Were you in the classroom just now?"
+    ]
+   },
+   {
+    "zh": "她的血壓昨天很低。",
+    "en": "Her blood pressure was low yesterday."
+   },
+   {
+    "zh": "病人們今天早上很餓。",
+    "en": "The patients were hungry this morning."
+   },
+   {
+    "zh": "他現在很好，但是昨天生病了。",
+    "en": "He is fine now, but he was sick yesterday.",
+    "alt": [
+     "He is OK now, but he was sick yesterday."
+    ]
+   },
+   {
+    "zh": "我昨天不在家。",
+    "en": "I was not at home yesterday.",
+    "alt": [
+     "I was not home yesterday."
+    ]
    }
   ],
   "cando": "用 was／were 說昨天或剛才的狀態",
   "scene": "交班時談昨晚的病人",
-  "prompt": {
-   "en": "Write three sentences about yesterday: where you were, who you were with, and how you felt.",
-   "zh": "寫三句昨天的事：你在哪裡、跟誰在一起、感覺怎麼樣（用 was／were）。",
-   "sample": "I was at school yesterday. I was with my classmates. We were tired after class."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences about yesterday: where you were, who you were with, and how you felt.",
+    "zh": "寫三句昨天的事：你在哪裡、跟誰在一起、感覺怎麼樣（用 was／were）。",
+    "sample": "I was at school yesterday. I was with my classmates. We were tired after class."
+   },
+   {
+    "en": "Write three sentences about last weekend: where you were, who was with you, and how the weather was.",
+    "zh": "寫三句上週末的事：你在哪裡、誰跟你在一起、天氣怎麼樣（用 was／were）。",
+    "sample": "I was in Tainan last weekend. My cousins were with me. The weather was hot."
+   },
+   {
+    "en": "Write three Was…? or Were…? questions you could ask a classmate about yesterday.",
+    "zh": "寫三個 Was…? 或 Were…? 的問題，問同學昨天的事。",
+    "sample": "Were you at home last night? Was the test hard? Were you tired after class?"
+   },
+   {
+    "en": "You are giving a report at shift change. Write three sentences about a patient last night.",
+    "zh": "假裝你在交班，寫三句病人昨晚的狀況（用 was／were）。",
+    "sample": "Mr. Lin was in pain last night. He was awake at two. His temperature was normal this morning."
+   },
+   {
+    "en": "Write about your first day at school or work. Use was, were, wasn't, or weren't.",
+    "zh": "寫你第一天上學或上班的情況，用到 was、were、wasn't 或 weren't。",
+    "sample": "My first day at the hospital was busy. The nurses were very kind. I wasn't nervous after lunch."
+   }
+  ]
  },
  {
   "unit": 8,
@@ -565,15 +1044,78 @@
    {
     "zh": "他們上週末在家看了電影。",
     "en": "They watched a movie at home last weekend."
+   },
+   {
+    "zh": "我們昨天下午在公園散步。",
+    "en": "We walked in the park yesterday afternoon."
+   },
+   {
+    "zh": "我昨晚煮了晚餐。",
+    "en": "I cooked dinner last night."
+   },
+   {
+    "zh": "我上週打電話給我奶奶。",
+    "en": "I called my grandmother last week.",
+    "alt": [
+     "I called my grandma last week."
+    ]
+   },
+   {
+    "zh": "她昨天幫了我。",
+    "en": "She helped me yesterday."
+   },
+   {
+    "zh": "護理師剛才檢查了他的脈搏。",
+    "en": "The nurse checked his pulse a moment ago.",
+    "alt": [
+     "The nurse checked his pulse just now."
+    ]
+   },
+   {
+    "zh": "醫生打開了窗戶。",
+    "en": "The doctor opened the window."
+   },
+   {
+    "zh": "公車在醫院前面停了下來。",
+    "en": "The bus stopped in front of the hospital."
+   },
+   {
+    "zh": "她昨晚讀書讀到十一點。",
+    "en": "She studied until eleven last night.",
+    "alt": [
+     "She studied until 11 last night."
+    ]
    }
   ],
   "cando": "用規則動詞 -ed 說昨天做了什麼",
   "scene": "病人說昨天過得怎麼樣",
-  "prompt": {
-   "en": "Write three things you did yesterday. Use verbs with -ed, like walked, cooked, or studied.",
-   "zh": "寫三件你昨天做的事，用加 -ed 的動詞。",
-   "sample": "I walked to school. I studied English after dinner. I washed the dishes."
-  }
+  "prompts": [
+   {
+    "en": "Write three things you did yesterday. Use verbs with -ed, like walked, cooked, or studied.",
+    "zh": "寫三件你昨天做的事，用加 -ed 的動詞。",
+    "sample": "I walked to school. I studied English after dinner. I washed the dishes."
+   },
+   {
+    "en": "Write three things your family did last weekend. Use verbs with -ed.",
+    "zh": "寫三件你家人上週末做的事，用加 -ed 的動詞。",
+    "sample": "My mom cooked a big lunch. My dad washed the car. We watched a movie at night."
+   },
+   {
+    "en": "Write three things you or your classmates did at school yesterday.",
+    "zh": "寫昨天在學校的事：三件你或同學做的事（用 -ed）。",
+    "sample": "We listened to the teacher. I asked a question. My friends played basketball after class."
+   },
+   {
+    "en": "Write three things a nurse did for a patient this morning.",
+    "zh": "寫三件護理師今天早上幫病人做的事（用 -ed）。",
+    "sample": "The nurse checked his blood pressure. She changed the sheets. She helped him to the bathroom."
+   },
+   {
+    "en": "Write about a rainy day. What did you do? Use -ed verbs and so.",
+    "zh": "寫一個下雨天你做了什麼，用 -ed 動詞和 so。",
+    "sample": "It rained all day, so I stayed home. I cleaned my room. I played games with my brother."
+   }
+  ]
  },
  {
   "unit": 9,
@@ -637,15 +1179,91 @@
    {
     "zh": "她昨天看到那位醫生了。",
     "en": "She saw the doctor yesterday."
+   },
+   {
+    "zh": "我們上週去了台中。",
+    "en": "We went to Taichung last week."
+   },
+   {
+    "zh": "他昨天來我家。",
+    "en": "He came to my house yesterday.",
+    "alt": [
+     "He came to my home yesterday."
+    ]
+   },
+   {
+    "zh": "他今天早上吃了兩顆藥。",
+    "en": "He took two pills this morning."
+   },
+   {
+    "zh": "她給了我一杯水。",
+    "en": "She gave me a glass of water.",
+    "alt": [
+     "She gave me a cup of water."
+    ]
+   },
+   {
+    "zh": "我昨晚只睡了五個小時。",
+    "en": "I only slept five hours last night.",
+    "alt": [
+     "I slept only five hours last night.",
+     "I only slept for five hours last night.",
+     "I only slept 5 hours last night."
+    ]
+   },
+   {
+    "zh": "病人昨天下午覺得好多了。",
+    "en": "The patient felt much better yesterday afternoon.",
+    "alt": [
+     "The patient felt a lot better yesterday afternoon."
+    ]
+   },
+   {
+    "zh": "她在浴室跌倒了，然後告訴了護理師。",
+    "en": "She fell in the bathroom and told the nurse.",
+    "alt": [
+     "She fell in the bathroom and then told the nurse.",
+     "She fell in the bathroom, and then she told the nurse."
+    ]
+   },
+   {
+    "zh": "我們吃了晚餐，然後看了電影。",
+    "en": "We had dinner and then watched a movie.",
+    "alt": [
+     "We ate dinner and then watched a movie.",
+     "We had dinner, and then we watched a movie."
+    ]
    }
   ],
   "cando": "用常見的不規則過去式說發生過的事",
   "scene": "病人說昨晚怎麼跌倒的",
-  "prompt": {
-   "en": "Write about last weekend in three sentences. Use at least two of these: went, ate, saw, had, took.",
-   "zh": "用三句寫上週末，至少用到兩個：went、ate、saw、had、took。",
-   "sample": "I went to Taichung last weekend. I ate beef noodles with my family. We had a good time."
-  }
+  "prompts": [
+   {
+    "en": "Write about last weekend in three sentences. Use at least two of these: went, ate, saw, had, took.",
+    "zh": "用三句寫上週末，至少用到兩個：went、ate、saw、had、took。",
+    "sample": "I went to Taichung last weekend. I ate beef noodles with my family. We had a good time."
+   },
+   {
+    "en": "Write about a trip you took. Use went, saw, and ate.",
+    "zh": "寫一次你出去玩的經驗，用到 went、saw、ate。",
+    "sample": "I went to Kenting last summer. I saw the sea. I ate a lot of seafood."
+   },
+   {
+    "en": "Write three things you did this morning before class. Use irregular verbs.",
+    "zh": "寫三件你今天早上上課前做的事，用不規則過去式。",
+    "sample": "I got up at six. I had toast for breakfast. I took the bus to school."
+   },
+   {
+    "en": "A patient fell last night. Write three sentences about what happened. Use fell, felt, told, or came.",
+    "zh": "有位病人昨晚跌倒了，寫三句發生了什麼事（用 fell、felt、told 或 came）。",
+    "sample": "Mr. Wang fell in the bathroom at night. He felt a lot of pain in his leg. The nurse came and told the doctor."
+   },
+   {
+    "en": "Write about a good day you had. What did you do, see, and eat?",
+    "zh": "寫你過得很開心的一天：做了什麼、看到什麼、吃了什麼？",
+    "sample": "I had a great day last Sunday. I went to the night market with my friends. We saw a funny show and ate stinky tofu."
+   }
+  ]
  },
  {
   "unit": 10,
@@ -709,15 +1327,82 @@
    {
     "zh": "他沒有打電話給我。",
     "en": "He didn't call me."
+   },
+   {
+    "zh": "我昨晚沒有看電視。",
+    "en": "I did not watch TV last night."
+   },
+   {
+    "zh": "他們上週沒有來上課。",
+    "en": "They did not come to class last week."
+   },
+   {
+    "zh": "你昨天有吃晚餐嗎？",
+    "en": "Did you eat dinner yesterday?",
+    "alt": [
+     "Did you have dinner yesterday?"
+    ]
+   },
+   {
+    "zh": "你昨天有運動嗎？",
+    "en": "Did you exercise yesterday?"
+   },
+   {
+    "zh": "醫生今天早上有來看他嗎？",
+    "en": "Did the doctor see him this morning?",
+    "alt": [
+     "Did the doctor come to see him this morning?",
+     "Did the doctor visit him this morning?"
+    ]
+   },
+   {
+    "zh": "她昨天有量血壓嗎？",
+    "en": "Did she check her blood pressure yesterday?",
+    "alt": [
+     "Did she take her blood pressure yesterday?"
+    ]
+   },
+   {
+    "zh": "我沒有吃早餐，因為我太晚起床了。",
+    "en": "I did not eat breakfast because I got up too late.",
+    "alt": [
+     "I did not have breakfast because I got up too late."
+    ]
+   },
+   {
+    "zh": "她昨天沒有去上班，因為她頭痛。",
+    "en": "She did not go to work yesterday because she had a headache."
    }
   ],
   "cando": "用 Did…? 問過去的事，用 didn't 說沒做（後面動詞回原形）",
   "scene": "早上確認病人睡得好不好、有沒有吃藥",
-  "prompt": {
-   "en": "Write two Did…? questions you can ask a patient in the morning, and a short answer to each.",
-   "zh": "寫兩個早上可以問病人的 Did…? 問句，各配一個簡短回答。",
-   "sample": "Did you sleep well? No, I didn't. Did you eat breakfast? Yes, I did."
-  }
+  "prompts": [
+   {
+    "en": "Write two Did…? questions you can ask a patient in the morning, and a short answer to each.",
+    "zh": "寫兩個早上可以問病人的 Did…? 問句，各配一個簡短回答。",
+    "sample": "Did you sleep well? No, I didn't. Did you eat breakfast? Yes, I did."
+   },
+   {
+    "en": "Write two things you did not do yesterday, and why.",
+    "zh": "寫兩件你昨天沒做的事，說說為什麼（didn't…because…）。",
+    "sample": "I didn't go to the gym because it rained. I didn't cook because I was tired."
+   },
+   {
+    "en": "Write three Did you…? questions for a friend about last weekend.",
+    "zh": "寫三個 Did you…? 問朋友上週末的事。",
+    "sample": "Did you go out last weekend? Did you see a movie? Did you eat anything good?"
+   },
+   {
+    "en": "You are a nurse on the morning shift. Write three Did…? questions about a patient's night, with the answers.",
+    "zh": "你是早班護理師，寫三個問病人昨晚情況的 Did…? 問句和回答。",
+    "sample": "Did you sleep well? No, I didn't. Did you have any pain? Yes, I did. Did you drink water? Yes, I did."
+   },
+   {
+    "en": "Write about a day when things went wrong. What did you not do?",
+    "zh": "寫一天很不順的事：有哪些事你沒做到？",
+    "sample": "Last Monday I didn't hear my alarm. I didn't eat breakfast. I didn't bring my homework to class."
+   }
+  ]
  },
  {
   "unit": 11,
@@ -786,15 +1471,91 @@
    {
     "zh": "我們下週要去看醫生。",
     "en": "We are going to see the doctor next week."
+   },
+   {
+    "zh": "護理師等一下會給你藥。",
+    "en": "The nurse will give you medicine later.",
+    "alt": [
+     "The nurse will give you your medicine later."
+    ]
+   },
+   {
+    "zh": "公車十分鐘後會到。",
+    "en": "The bus will come in ten minutes.",
+    "alt": [
+     "The bus will arrive in ten minutes.",
+     "The bus will come in 10 minutes."
+    ]
+   },
+   {
+    "zh": "你今晚會打電話給我嗎？",
+    "en": "Will you call me tonight?"
+   },
+   {
+    "zh": "你下週要去台北嗎？",
+    "en": "Are you going to go to Taipei next week?",
+    "alt": [
+     "Are you going to Taipei next week?",
+     "Will you go to Taipei next week?"
+    ]
+   },
+   {
+    "zh": "我等一下會幫你換床單。",
+    "en": "I will change your sheets later.",
+    "alt": [
+     "I will change the sheets later."
+    ]
+   },
+   {
+    "zh": "明天早上我們會幫你抽血。",
+    "en": "We will take your blood tomorrow morning.",
+    "alt": [
+     "We are going to take your blood tomorrow morning.",
+     "We will take a blood sample tomorrow morning."
+    ]
+   },
+   {
+    "zh": "我今天很忙，但是明天不會。",
+    "en": "I am busy today, but I will not be busy tomorrow."
+   },
+   {
+    "zh": "她下個月要開始上班。",
+    "en": "She is going to start work next month.",
+    "alt": [
+     "She will start work next month.",
+     "She is going to start working next month."
+    ]
    }
   ],
   "cando": "用 will／be going to 說之後的安排和計畫",
   "scene": "護理師說明明天的抽血檢查",
-  "prompt": {
-   "en": "Write three plans for this weekend. Use will or be going to.",
-   "zh": "寫三個這週末的計畫，用 will 或 be going to。",
-   "sample": "I am going to clean my room. I will study for my test. I will call my grandma."
-  }
+  "prompts": [
+   {
+    "en": "Write three plans for this weekend. Use will or be going to.",
+    "zh": "寫三個這週末的計畫，用 will 或 be going to。",
+    "sample": "I am going to clean my room. I will study for my test. I will call my grandma."
+   },
+   {
+    "en": "Write three things you are going to do after class today.",
+    "zh": "寫三件你今天下課後要做的事（be going to）。",
+    "sample": "I am going to have dinner with my friends. I am going to do my homework. I am going to call my mom."
+   },
+   {
+    "en": "Write three Will you…? or Are you going to…? questions for a friend about next weekend.",
+    "zh": "寫三個問朋友下週末計畫的問題（Will you…? 或 Are you going to…?）。",
+    "sample": "Will you go home next weekend? Are you going to see a movie? Will you study for the test?"
+   },
+   {
+    "en": "A patient will have a test tomorrow. Write three sentences to tell him what will happen.",
+    "zh": "病人明天要做檢查，寫三句告訴他明天會發生什麼事（用 will）。",
+    "sample": "The nurse will take your blood at seven. You will not eat breakfast before the test. The doctor will tell you the results in the afternoon."
+   },
+   {
+    "en": "Write about next year: one thing you will do and one thing you will not do, with a reason for each.",
+    "zh": "寫明年的計畫：一件你會做的事、一件你不會做的事，各說一個原因。",
+    "sample": "I will take the GEPT next year because I want to work in the US. I will not stay up late, because I need to study in the morning."
+   }
+  ]
  },
  {
   "unit": 12,
@@ -858,15 +1619,93 @@
    {
     "zh": "我不會游泳。",
     "en": "I can't swim."
+   },
+   {
+    "zh": "她會開車。",
+    "en": "She can drive."
+   },
+   {
+    "zh": "我可以用左手寫字。",
+    "en": "I can write with my left hand."
+   },
+   {
+    "zh": "你可以幫我開門嗎？",
+    "en": "Can you open the door for me?",
+    "alt": [
+     "Could you open the door for me?"
+    ]
+   },
+   {
+    "zh": "我可以喝水嗎？",
+    "en": "Can I drink water?",
+    "alt": [
+     "Can I drink some water?",
+     "May I drink water?",
+     "May I drink some water?"
+    ]
+   },
+   {
+    "zh": "你必須在八點前回來。",
+    "en": "You must come back before eight.",
+    "alt": [
+     "You have to come back before eight.",
+     "You must be back before eight.",
+     "You must come back before 8."
+    ]
+   },
+   {
+    "zh": "我們今天不用交作業。",
+    "en": "We don't have to hand in our homework today.",
+    "alt": [
+     "We do not have to turn in our homework today.",
+     "We don't have to hand in the homework today."
+    ]
+   },
+   {
+    "zh": "你不應該一個人走路。",
+    "en": "You should not walk alone.",
+    "alt": [
+     "You should not walk by yourself."
+    ]
+   },
+   {
+    "zh": "訪客晚上九點以後不准進來。",
+    "en": "Visitors must not come in after nine at night.",
+    "alt": [
+     "Visitors must not come in after 9 p.m.",
+     "Visitors cannot come in after nine at night."
+    ]
    }
   ],
   "cando": "用 can／should／must 說能不能、該不該、一定要（衛教用語）",
   "scene": "術後衛教：能不能洗澡、走路",
-  "prompt": {
-   "en": "A friend has a cold. Give three pieces of advice with should or should not.",
-   "zh": "朋友感冒了，用 should／should not 給三個建議。",
-   "sample": "You should drink more water. You should rest at home. You should not stay up late."
-  }
+  "prompts": [
+   {
+    "en": "A friend has a cold. Give three pieces of advice with should or should not.",
+    "zh": "朋友感冒了，用 should／should not 給三個建議。",
+    "sample": "You should drink more water. You should rest at home. You should not stay up late."
+   },
+   {
+    "en": "Write three things you can do and one thing you cannot do.",
+    "zh": "寫三件你會做的事，和一件你不會的事（can／can't）。",
+    "sample": "I can cook rice. I can ride a bike. I can speak some English. I can't drive."
+   },
+   {
+    "en": "Write three polite questions you can ask a nurse with Can I…? or May I…?",
+    "zh": "寫三個可以問護理師的禮貌問句，用 Can I…? 或 May I…?。",
+    "sample": "Can I take a shower today? May I have some water? Can I walk in the hallway?"
+   },
+   {
+    "en": "Write three rules for a hospital ward. Use must, must not, or don't have to.",
+    "zh": "寫三條病房規定，用 must、must not 或 don't have to。",
+    "sample": "Visitors must wash their hands. Patients must not smoke. Families don't have to bring towels."
+   },
+   {
+    "en": "A patient has high blood pressure. Give three pieces of advice with should or should not.",
+    "zh": "病人血壓高，用 should／should not 給三個衛教建議。",
+    "sample": "You should walk every day. You should not eat too much salt. You should take your medicine on time."
+   }
+  ]
  },
  {
   "unit": 13,
@@ -930,15 +1769,92 @@
    {
     "zh": "我們星期五晚上在餐廳見面。",
     "en": "We will meet at the restaurant on Friday night."
+   },
+   {
+    "zh": "我們星期六不用上課。",
+    "en": "We don't have class on Saturday.",
+    "alt": [
+     "We do not have classes on Saturday.",
+     "We don't have class on Saturdays."
+    ]
+   },
+   {
+    "zh": "我的英文課在星期二和星期四。",
+    "en": "My English class is on Tuesday and Thursday.",
+    "alt": [
+     "My English classes are on Tuesday and Thursday.",
+     "My English class is on Tuesdays and Thursdays."
+    ]
+   },
+   {
+    "zh": "你的考試在六月嗎？",
+    "en": "Is your test in June?",
+    "alt": [
+     "Is your exam in June?"
+    ]
+   },
+   {
+    "zh": "你早上上班嗎？",
+    "en": "Do you work in the morning?"
+   },
+   {
+    "zh": "你的門診在星期三下午兩點。",
+    "en": "Your appointment is on Wednesday at two in the afternoon.",
+    "alt": [
+     "Your appointment is at two on Wednesday afternoon.",
+     "Your appointment is on Wednesday at 2 p.m."
+    ]
+   },
+   {
+    "zh": "她的生日是十月五日。",
+    "en": "Her birthday is on October 5.",
+    "alt": [
+     "Her birthday is on October fifth.",
+     "Her birthday is October 5."
+    ]
+   },
+   {
+    "zh": "我會在公車站等你。",
+    "en": "I will wait for you at the bus stop."
+   },
+   {
+    "zh": "他每天早上七點去上班。",
+    "en": "He goes to work at seven every morning.",
+    "alt": [
+     "He goes to work at 7 every morning.",
+     "Every morning he goes to work at seven."
+    ]
    }
   ],
   "cando": "用 at／on／in 說清楚時間和地點（約診、上課）",
   "scene": "打電話確認門診時間",
-  "prompt": {
-   "en": "Write your schedule for tomorrow in three sentences. Use at, on, and in.",
-   "zh": "用三句寫你明天的行程，要用到 at、on、in。",
-   "sample": "I have class at eight in the morning. My class is in Room 302 on the third floor. I will be at home in the evening."
-  }
+  "prompts": [
+   {
+    "en": "Write your schedule for tomorrow in three sentences. Use at, on, and in.",
+    "zh": "用三句寫你明天的行程，要用到 at、on、in。",
+    "sample": "I have class at eight in the morning. My class is in Room 302 on the third floor. I will be at home in the evening."
+   },
+   {
+    "en": "Write three sentences about your week: what you do on different days. Use on.",
+    "zh": "用 on 寫三句你這週不同天要做的事。",
+    "sample": "I have English class on Monday. I work at a café on Saturday. I visit my grandma on Sunday."
+   },
+   {
+    "en": "Write three questions about time with When…? or What time…?, and answer them with at, on, or in.",
+    "zh": "寫三個用 When…? 或 What time…? 問時間的問題，再用 at、on、in 回答。",
+    "sample": "What time do you get up? At six. When is your birthday? In May. When is the test? On Friday."
+   },
+   {
+    "en": "A patient calls to ask about an appointment. Write three sentences to tell him the day, the time, and the place.",
+    "zh": "病人打電話問門診，用三句告訴他日期、時間和地點。",
+    "sample": "Your appointment is on Thursday. Please come at ten in the morning. The clinic is on the second floor."
+   },
+   {
+    "en": "Write where you were at different times yesterday. Use at, in, and to.",
+    "zh": "寫昨天不同時間你在哪裡，用 at、in、to。",
+    "sample": "I was at school in the morning. I went to the library at two. I was in my room at night."
+   }
+  ]
  },
  {
   "unit": 14,
@@ -996,21 +1912,91 @@
   ],
   "variations": [
    {
-    "zh": "我沒有很多時間。",
-    "en": "I don't have much time."
+    "zh": "他沒有很多朋友。",
+    "en": "He does not have many friends.",
+    "alt": [
+     "He does not have a lot of friends."
+    ]
    },
    {
     "zh": "他吃了很多餅乾。",
     "en": "He ate a lot of cookies."
+   },
+   {
+    "zh": "她沒有吃很多飯。",
+    "en": "She did not eat much rice."
+   },
+   {
+    "zh": "我們今天沒有很多作業。",
+    "en": "We do not have much homework today."
+   },
+   {
+    "zh": "你有任何過敏嗎？",
+    "en": "Do you have any allergies?"
+   },
+   {
+    "zh": "冰箱裡有牛奶嗎？",
+    "en": "Is there any milk in the fridge?"
+   },
+   {
+    "zh": "你一天喝幾杯咖啡？",
+    "en": "How many cups of coffee do you drink a day?",
+    "alt": [
+     "How many cups of coffee do you drink every day?",
+     "How many cups of coffee do you drink each day?"
+    ]
+   },
+   {
+    "zh": "這瓶水多少錢？",
+    "en": "How much is this bottle of water?",
+    "alt": [
+     "How much does this bottle of water cost?"
+    ]
+   },
+   {
+    "zh": "你可以吃一點糖，但是不要吃太多。",
+    "en": "You can eat a little sugar, but do not eat too much.",
+    "alt": [
+     "You can have a little sugar, but do not eat too much."
+    ]
+   },
+   {
+    "zh": "我買了一些蘋果和一點起司。",
+    "en": "I bought some apples and a little cheese.",
+    "alt": [
+     "I bought a few apples and a little cheese."
+    ]
    }
   ],
   "cando": "用 many／much／a few／a little／some／any 說數量",
   "scene": "營養師問飲食",
-  "prompt": {
-   "en": "Write about what you ate and drank yesterday. Use much, many, a few, or a little.",
-   "zh": "寫你昨天吃了什麼、喝了什麼，用 much、many、a few 或 a little。",
-   "sample": "I drank a lot of water yesterday. I ate a few cookies. I did not eat much rice."
-  }
+  "prompts": [
+   {
+    "en": "Write about what you ate and drank yesterday. Use much, many, a few, or a little.",
+    "zh": "寫你昨天吃了什麼、喝了什麼，用 much、many、a few 或 a little。",
+    "sample": "I drank a lot of water yesterday. I ate a few cookies. I did not eat much rice."
+   },
+   {
+    "en": "Look in your fridge, or imagine it. Write three sentences with some, any, or a lot of.",
+    "zh": "看看你家冰箱（或想像一下），用 some、any 或 a lot of 寫三句。",
+    "sample": "There is some milk in the fridge. There are a lot of eggs. There is not any juice."
+   },
+   {
+    "en": "Write three questions a dietitian can ask a patient. Use How much…? or How many…?",
+    "zh": "寫三個營養師可以問病人的問題，用 How much…? 或 How many…?。",
+    "sample": "How much water do you drink a day? How many meals do you eat? How much rice do you eat at dinner?"
+   },
+   {
+    "en": "Write about your free time and money this week. Use much, many, a few, or a little.",
+    "zh": "寫這週你有多少空閒時間和錢，用 much、many、a few 或 a little。",
+    "sample": "I don't have much free time this week. I have a few hours on Saturday. I have a little money, so I will cook at home."
+   },
+   {
+    "en": "Give a patient three tips about salt, sugar, and water. Use some, a little, or not too much.",
+    "zh": "給病人三個關於鹽、糖、水的建議，用 some、a little 或 not too much。",
+    "sample": "You can use a little salt, but not too much. Don't eat much sugar. Drink some water every hour."
+   }
+  ]
  },
  {
   "unit": 15,
@@ -1068,21 +2054,91 @@
   ],
   "variations": [
    {
-    "zh": "我的房間比你的小。",
-    "en": "My room is smaller than yours."
+    "zh": "我的書包比你的重。",
+    "en": "My bag is heavier than yours.",
+    "alt": [
+     "My schoolbag is heavier than yours."
+    ]
    },
    {
     "zh": "這是最貴的藥。",
     "en": "This is the most expensive medicine."
+   },
+   {
+    "zh": "這件外套比較便宜。",
+    "en": "This coat is cheaper.",
+    "alt": [
+     "This jacket is cheaper."
+    ]
+   },
+   {
+    "zh": "我的手機比較新。",
+    "en": "My phone is newer."
+   },
+   {
+    "zh": "台北比台南冷嗎？",
+    "en": "Is Taipei colder than Tainan?"
+   },
+   {
+    "zh": "這個枕頭比那個軟嗎？",
+    "en": "Is this pillow softer than that one?"
+   },
+   {
+    "zh": "他的咳嗽比上週好。",
+    "en": "His cough is better than last week.",
+    "alt": [
+     "His cough is better than it was last week."
+    ]
+   },
+   {
+    "zh": "她的燒比今天早上高。",
+    "en": "Her fever is higher than this morning.",
+    "alt": [
+     "Her temperature is higher than this morning.",
+     "Her fever is higher than it was this morning."
+    ]
+   },
+   {
+    "zh": "這是醫院裡最大的病房。",
+    "en": "This is the biggest ward in the hospital.",
+    "alt": [
+     "This is the largest ward in the hospital."
+    ]
+   },
+   {
+    "zh": "星期一是我最忙的一天。",
+    "en": "Monday is my busiest day."
    }
   ],
   "cando": "用比較級和最高級比較兩樣東西、說出「最…」",
   "scene": "病人比較今天和昨天的狀況",
-  "prompt": {
-   "en": "Compare two people or two places you know. Then use a superlative to say that one of them is the most … in a bigger group (your family, your class, Taiwan…).",
-   "zh": "比較兩個你認識的人或地方，再用最高級說其中一個在更大的範圍裡「最…」（全家、全班、全台灣……）。",
-   "sample": "My sister is taller than I am. I am more patient than she is. She is the tallest person in our family."
-  }
+  "prompts": [
+   {
+    "en": "Compare two people or two places you know. Then use a superlative to say that one of them is the most … in a bigger group (your family, your class, Taiwan…).",
+    "zh": "比較兩個你認識的人或地方，再用最高級說其中一個在更大的範圍裡「最…」（全家、全班、全台灣……）。",
+    "sample": "My sister is taller than I am. I am more patient than she is. She is the tallest person in our family."
+   },
+   {
+    "en": "Compare two things you own, like two phones or two bags. Write three sentences with -er or more.",
+    "zh": "比較你的兩樣東西（例如兩支手機、兩個包包），用 -er 或 more 寫三句。",
+    "sample": "My new phone is bigger than my old one. It is more expensive. My old phone is lighter."
+   },
+   {
+    "en": "Write three questions to compare two places, like two cities or two night markets.",
+    "zh": "寫三個比較兩個地方的問題（例如兩個城市、兩個夜市）。",
+    "sample": "Is Taipei bigger than Taichung? Is Tainan hotter than Taipei? Which night market is cheaper?"
+   },
+   {
+    "en": "A patient feels different today. Write three sentences comparing today with yesterday.",
+    "zh": "病人今天的狀況不一樣，寫三句比較今天和昨天。",
+    "sample": "His pain is better than yesterday. His temperature is lower. But he is more tired than yesterday."
+   },
+   {
+    "en": "Write about your family with superlatives: who is the tallest, the oldest, and the funniest?",
+    "zh": "用最高級寫你的家人：誰最高、最年長、最好笑？",
+    "sample": "My dad is the tallest person in my family. My grandma is the oldest. My little brother is the funniest."
+   }
+  ]
  },
  {
   "unit": 16,
@@ -1156,15 +2212,75 @@
    {
     "zh": "你是怎麼來醫院的？",
     "en": "How did you come to the hospital?"
+   },
+   {
+    "zh": "你在哪裡工作？",
+    "en": "Where do you work?"
+   },
+   {
+    "zh": "你幾歲？",
+    "en": "How old are you?"
+   },
+   {
+    "zh": "你什麼時候開始頭痛的？",
+    "en": "When did your headache start?",
+    "alt": [
+     "When did the headache start?"
+    ]
+   },
+   {
+    "zh": "你昨天打電話給誰？",
+    "en": "Who did you call yesterday?"
+   },
+   {
+    "zh": "你的頭痛有多嚴重？",
+    "en": "How bad is your headache?"
+   },
+   {
+    "zh": "誰帶你來醫院的？",
+    "en": "Who brought you to the hospital?"
+   },
+   {
+    "zh": "你多久運動一次？",
+    "en": "How often do you exercise?"
+   },
+   {
+    "zh": "你一天吃幾餐？",
+    "en": "How many meals do you eat a day?",
+    "alt": [
+     "How many meals do you have a day?"
+    ]
    }
   ],
   "cando": "用 What／Where／When／Who／How 問病人的基本資料和症狀",
   "scene": "入院問診",
-  "prompt": {
-   "en": "Write four questions you can ask a new patient. Use four different question words.",
-   "zh": "寫四個可以問新病人的問題，用四個不同的疑問詞。",
-   "sample": "What is your name? Where do you live? When did the pain start? Who is your emergency contact?"
-  }
+  "prompts": [
+   {
+    "en": "Write four questions you can ask a new patient. Use four different question words.",
+    "zh": "寫四個可以問新病人的問題，用四個不同的疑問詞。",
+    "sample": "What is your name? Where do you live? When did the pain start? Who is your emergency contact?"
+   },
+   {
+    "en": "Write four questions to get to know a new classmate. Use What, Where, How, and Who.",
+    "zh": "寫四個認識新同學的問題，用 What、Where、How、Who。",
+    "sample": "What is your favorite food? Where are you from? How do you come to school? Who is your best friend?"
+   },
+   {
+    "en": "Write three questions about last weekend with Where did…?, What did…?, and Who…?",
+    "zh": "寫三個問上週末的問題：Where did…?、What did…?、Who…?。",
+    "sample": "Where did you go last weekend? What did you eat? Who went with you?"
+   },
+   {
+    "en": "A patient has stomach pain. Write four questions to ask about the pain.",
+    "zh": "病人肚子痛，寫四個問疼痛的問題。",
+    "sample": "Where is the pain? When did it start? How bad is it? What did you eat yesterday?"
+   },
+   {
+    "en": "Write three questions with How often…?, How long…?, and How much…?, and answer them for yourself.",
+    "zh": "寫三個 How…? 的問題（How often、How long、How much），再用自己的情況回答。",
+    "sample": "How often do you exercise? Twice a week. How long do you sleep? About seven hours. How much water do you drink? Two bottles."
+   }
+  ]
  },
  {
   "unit": 17,
@@ -1228,15 +2344,83 @@
    {
     "zh": "我想睡覺，但是我還有功課。",
     "en": "I want to sleep, but I still have homework."
+   },
+   {
+    "zh": "我很渴，所以喝了一杯水。",
+    "en": "I was thirsty, so I drank a glass of water."
+   },
+   {
+    "zh": "公車沒來，所以我們走路回家。",
+    "en": "The bus did not come, so we walked home."
+   },
+   {
+    "zh": "你很累是因為你昨晚沒睡嗎？",
+    "en": "Are you tired because you did not sleep last night?"
+   },
+   {
+    "zh": "她哭是因為她很痛嗎？",
+    "en": "Is she crying because she is in pain?"
+   },
+   {
+    "zh": "他沒有胃口，因為他很緊張。",
+    "en": "He has no appetite because he is nervous.",
+    "alt": [
+     "He does not have an appetite because he is nervous."
+    ]
+   },
+   {
+    "zh": "她頭暈，因為她沒吃早餐。",
+    "en": "She feels dizzy because she did not eat breakfast.",
+    "alt": [
+     "She is dizzy because she did not eat breakfast.",
+     "She feels dizzy because she did not have breakfast."
+    ]
+   },
+   {
+    "zh": "我量了他的體溫，而且寫在紀錄上。",
+    "en": "I took his temperature and wrote it in the chart.",
+    "alt": [
+     "I checked his temperature and wrote it in the chart.",
+     "I took his temperature and wrote it in the record."
+    ]
+   },
+   {
+    "zh": "她很聰明，而且很友善。",
+    "en": "She is smart and very friendly.",
+    "alt": [
+     "She is smart and friendly."
+    ]
    }
   ],
   "cando": "用 and／but／so／because 把兩件事接成一句",
   "scene": "考試前同學聊天",
-  "prompt": {
-   "en": "Write three sentences about your day. Use three of these: and, but, so, because.",
-   "zh": "寫三句今天的事，用到 and、but、so、because 其中三個。",
-   "sample": "I was busy today, but I went to the gym. I was hungry after that, so I ate a big dinner. I am tired now because I walked a lot."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences about your day. Use three of these: and, but, so, because.",
+    "zh": "寫三句今天的事，用到 and、but、so、because 其中三個。",
+    "sample": "I was busy today, but I went to the gym. I was hungry after that, so I ate a big dinner. I am tired now because I walked a lot."
+   },
+   {
+    "en": "Write about a problem you had this week and what you did. Use so.",
+    "zh": "寫這週遇到的一個問題和你怎麼做，用 so。",
+    "sample": "My phone was broken, so I used my brother's phone. I had no money, so I walked to school."
+   },
+   {
+    "en": "Write three Why…? questions and answer them with because.",
+    "zh": "寫三個 Why…? 的問題，再用 because 回答。",
+    "sample": "Why are you tired? Because I studied late. Why is she happy? Because she passed the test. Why did he stay home? Because he was sick."
+   },
+   {
+    "en": "A patient doesn't want to eat. Write three sentences about why, and what the nurse does. Use because, so, and but.",
+    "zh": "病人不想吃東西，寫三句說明原因和護理師怎麼做，用 because、so、but。",
+    "sample": "Mr. Lin doesn't want to eat because he feels sick. The nurse gives him some soup, but he only eats a little. He is weak, so the nurse tells the doctor."
+   },
+   {
+    "en": "Write what you like and don't like about your school. Use and and but.",
+    "zh": "寫你喜歡和不喜歡學校的地方，用 and 和 but。",
+    "sample": "My school is big and beautiful. The teachers are kind, but the classes are long. I like my friends, but I don't like the food."
+   }
+  ]
  },
  {
   "unit": 18,
@@ -1300,15 +2484,97 @@
    {
     "zh": "如果明天下雨，我們就不去了。",
     "en": "If it rains tomorrow, we will not go."
+   },
+   {
+    "zh": "我下課以後會去圖書館。",
+    "en": "I will go to the library after class.",
+    "alt": [
+     "After class, I will go to the library."
+    ]
+   },
+   {
+    "zh": "她洗完澡以後會去睡覺。",
+    "en": "She will go to bed after she takes a shower.",
+    "alt": [
+     "After she takes a shower, she will go to bed.",
+     "She will go to bed after she showers."
+    ]
+   },
+   {
+    "zh": "如果你覺得痛，就按這個按鈕。",
+    "en": "Press this button if you feel pain.",
+    "alt": [
+     "If you feel pain, press this button.",
+     "If you are in pain, press this button."
+    ]
+   },
+   {
+    "zh": "如果你有時間，就打電話給我。",
+    "en": "Call me if you have time.",
+    "alt": [
+     "If you have time, call me."
+    ]
+   },
+   {
+    "zh": "睡前吃這顆藥。",
+    "en": "Take this pill before bed.",
+    "alt": [
+     "Take this pill before you go to bed.",
+     "Take this pill before going to bed."
+    ]
+   },
+   {
+    "zh": "飯前量你的血糖。",
+    "en": "Check your blood sugar before meals.",
+    "alt": [
+     "Check your blood sugar before you eat."
+    ]
+   },
+   {
+    "zh": "當你覺得累的時候，你應該停下來休息。",
+    "en": "When you feel tired, you should stop and rest.",
+    "alt": [
+     "You should stop and rest when you feel tired."
+    ]
+   },
+   {
+    "zh": "傷口流血的時候，馬上打電話給我們。",
+    "en": "When the wound bleeds, call us right away.",
+    "alt": [
+     "Call us right away when the wound bleeds.",
+     "If the wound bleeds, call us right away."
+    ]
    }
   ],
   "cando": "用 when／before／after／if 說明步驟和條件（衛教）",
   "scene": "出院衛教：吃藥和換藥",
-  "prompt": {
-   "en": "Write three sentences about how you take care of yourself when you have a cold. Use when, before, after, or if.",
-   "zh": "用三句說明你感冒時怎麼照顧自己，用到 when、before、after 或 if。",
-   "sample": "When I have a cold, I drink a lot of water. I take medicine after I eat. If I have a fever, I see a doctor."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences about how you take care of yourself when you have a cold. Use when, before, after, or if.",
+    "zh": "用三句說明你感冒時怎麼照顧自己，用到 when、before、after 或 if。",
+    "sample": "When I have a cold, I drink a lot of water. I take medicine after I eat. If I have a fever, I see a doctor."
+   },
+   {
+    "en": "Write your evening routine in three sentences. Use before and after.",
+    "zh": "用 before 和 after 寫三句你晚上的作息。",
+    "sample": "I eat dinner after I get home. I do my homework before I watch TV. I take a shower before I go to bed."
+   },
+   {
+    "en": "Write three if sentences about tomorrow.",
+    "zh": "寫三句「如果明天…」的句子（if 後面用現在式，主要句用 will）。",
+    "sample": "If it is sunny tomorrow, I will go to the beach. If I have time, I will visit my grandma. If I am tired, I will sleep early."
+   },
+   {
+    "en": "A patient is going home after surgery. Give three instructions with when, before, after, or if.",
+    "zh": "病人手術後要出院，用 when、before、after 或 if 給三個衛教指示。",
+    "sample": "Wash your hands before you change the dressing. Take this pill after meals. If the wound gets red, call the clinic."
+   },
+   {
+    "en": "Write what you do when you feel stressed. Use when and give three examples.",
+    "zh": "寫你壓力大的時候會做什麼，用 when，舉三個例子。",
+    "sample": "When I feel stressed, I listen to music. When I can't sleep, I read a book. When I am very tired, I call my best friend."
+   }
+  ]
  },
  {
   "unit": 19,
@@ -1372,15 +2638,85 @@
    {
     "zh": "她在這家醫院工作十年了。",
     "en": "She has worked at this hospital for ten years."
+   },
+   {
+    "zh": "我學英文學了兩年了。",
+    "en": "I have studied English for two years.",
+    "alt": [
+     "I have learned English for two years."
+    ]
+   },
+   {
+    "zh": "他們認識她很久了。",
+    "en": "They have known her for a long time."
+   },
+   {
+    "zh": "你看過這部電影嗎？",
+    "en": "Have you seen this movie?",
+    "alt": [
+     "Have you ever seen this movie?"
+    ]
+   },
+   {
+    "zh": "你寫完作業了嗎？",
+    "en": "Have you finished your homework?"
+   },
+   {
+    "zh": "他咳嗽一個星期了。",
+    "en": "He has had a cough for a week.",
+    "alt": [
+     "He has had a cough for one week."
+    ]
+   },
+   {
+    "zh": "她的腳從昨天就很痛。",
+    "en": "Her foot has hurt since yesterday.",
+    "alt": [
+     "Her foot has been sore since yesterday.",
+     "Her foot has been hurting since yesterday."
+    ]
+   },
+   {
+    "zh": "我從星期一就沒見到他了，所以我很擔心。",
+    "en": "I have not seen him since Monday, so I am worried."
+   },
+   {
+    "zh": "她還沒吃藥，所以頭還在痛。",
+    "en": "She has not taken her medicine yet, so her head still hurts.",
+    "alt": [
+     "She has not taken the medicine yet, so her head still hurts."
+    ]
    }
   ],
   "cando": "用 have／has ＋ 過去分詞說經驗和持續多久（for／since）",
   "scene": "問診：咳嗽多久了",
-  "prompt": {
-   "en": "Write three sentences: something you have done, something you have never done, and how long you have studied nursing.",
-   "zh": "寫三句：一件你做過的事、一件你從沒做過的事、你讀護理多久了。",
-   "sample": "I have been to Kaohsiung. I have never been on a plane. I have studied nursing for two years."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences: something you have done, something you have never done, and how long you have studied nursing.",
+    "zh": "寫三句：一件你做過的事、一件你從沒做過的事、你讀護理多久了。",
+    "sample": "I have been to Kaohsiung. I have never been on a plane. I have studied nursing for two years."
+   },
+   {
+    "en": "Write three sentences with for or since: how long you have lived in your home, known your best friend, and had your phone.",
+    "zh": "用 for 或 since 寫三句：你住在現在的家多久、認識最好的朋友多久、用現在的手機多久。",
+    "sample": "I have lived in Taichung since 2015. I have known my best friend for ten years. I have had this phone for two years."
+   },
+   {
+    "en": "Write three Have you ever…? questions for a classmate. Then answer one of them for yourself.",
+    "zh": "寫三個 Have you ever…? 問同學，再回答其中一題自己的情況。",
+    "sample": "Have you ever been to Japan? Have you ever cooked for your family? Have you ever ridden a horse? I have never ridden a horse."
+   },
+   {
+    "en": "A patient has a cough. Write three questions or sentences about how long. Use for or since.",
+    "zh": "病人在咳嗽，用 for 或 since 寫三句問或說「持續多久」。",
+    "sample": "How long have you had this cough? I have had it for five days. I have not slept well since Monday."
+   },
+   {
+    "en": "Write about this week: two things you have already done and one thing you haven't done yet.",
+    "zh": "寫這週：兩件已經做完的事、一件還沒做的事（already／yet）。",
+    "sample": "I have already finished my report. I have cleaned my room. I haven't called my grandma yet."
+   }
+  ]
  },
  {
   "unit": 20,
@@ -1444,15 +2780,87 @@
    {
     "zh": "他上個月去了花蓮。",
     "en": "He went to Hualien last month."
+   },
+   {
+    "zh": "我讀過這本書。",
+    "en": "I have read this book."
+   },
+   {
+    "zh": "她把鑰匙弄丟了（到現在還沒找到）。",
+    "en": "She has lost her keys."
+   },
+   {
+    "zh": "你什麼時候到台北的？",
+    "en": "When did you arrive in Taipei?",
+    "alt": [
+     "When did you get to Taipei?"
+    ]
+   },
+   {
+    "zh": "你去過花蓮嗎？",
+    "en": "Have you ever been to Hualien?",
+    "alt": [
+     "Have you been to Hualien?"
+    ]
+   },
+   {
+    "zh": "我今天早上喝了一杯咖啡。我今天已經喝了三杯咖啡了。",
+    "en": "I drank a cup of coffee this morning. I have had three cups of coffee today.",
+    "alt": [
+     "I drank a cup of coffee this morning. I have drunk three cups of coffee today."
+    ]
+   },
+   {
+    "zh": "她上週生病了，到現在還沒回學校。",
+    "en": "She got sick last week and has not come back to school.",
+    "alt": [
+     "She got sick last week and has not come back to school since then."
+    ]
+   },
+   {
+    "zh": "他三天前出院，從那時起就在家休息。",
+    "en": "He was discharged three days ago and has rested at home since then.",
+    "alt": [
+     "He was discharged three days ago and has been resting at home since then."
+    ]
+   },
+   {
+    "zh": "我 2024 年開始學英文，到現在學了兩年。",
+    "en": "I started learning English in 2024, and I have studied it for two years.",
+    "alt": [
+     "I started to learn English in 2024, and I have studied it for two years."
+    ]
    }
   ],
   "cando": "有明確過去時間用過去式，從以前延續到現在用現在完成式",
   "scene": "交班報告：入院經過",
-  "prompt": {
-   "en": "Say something you have done (no time). Then add when you did it, in the past tense.",
-   "zh": "先用現在完成式說一件你做過的事，再用過去式說是什麼時候做的。",
-   "sample": "I have been to Kenting. I went there last summer with my family."
-  }
+  "prompts": [
+   {
+    "en": "Say something you have done (no time). Then add when you did it, in the past tense.",
+    "zh": "先用現在完成式說一件你做過的事，再用過去式說是什麼時候做的。",
+    "sample": "I have been to Kenting. I went there last summer with my family."
+   },
+   {
+    "en": "Write two things you have done in your life (present perfect). Then say when you did each one (past tense).",
+    "zh": "寫兩件你人生中做過的事（現在完成式），再分別說是什麼時候做的（過去式）。",
+    "sample": "I have climbed Yushan. I climbed it in 2023 with my father. I have won a prize. I won it in high school."
+   },
+   {
+    "en": "Write three questions: two with Have you ever…? and one with When did…?",
+    "zh": "寫三個問題：兩個 Have you ever…?、一個 When did…?。",
+    "sample": "Have you ever been to Japan? Have you ever eaten durian? When did you start nursing school?"
+   },
+   {
+    "en": "You are giving a handoff report. Write three sentences: what happened yesterday (past) and what has happened since then (present perfect).",
+    "zh": "你在交班，寫三句：昨天發生什麼（過去式）、從那之後的狀況（現在完成式）。",
+    "sample": "Mrs. Chen fell yesterday afternoon. She has not walked since then. Her pain has gotten better today."
+   },
+   {
+    "en": "Write two things you have done this year and one thing you did last year.",
+    "zh": "寫兩件今年做過的事（現在完成式），和一件去年做的事（過去式）。",
+    "sample": "I have read three English books this year. I have saved some money. Last year I started my part-time job."
+   }
+  ]
  },
  {
   "unit": 21,
@@ -1516,15 +2924,90 @@
    {
     "zh": "很多國家都說英文。",
     "en": "English is spoken in many countries."
+   },
+   {
+    "zh": "這張照片是我爸爸拍的。",
+    "en": "This photo was taken by my father.",
+    "alt": [
+     "This photo was taken by my dad.",
+     "This picture was taken by my father."
+    ]
+   },
+   {
+    "zh": "這座橋是十年前蓋的。",
+    "en": "This bridge was built ten years ago."
+   },
+   {
+    "zh": "血液檢體抽了嗎？",
+    "en": "Was the blood sample taken?",
+    "alt": [
+     "Has the blood sample been taken?"
+    ]
+   },
+   {
+    "zh": "這個房間打掃過了嗎？",
+    "en": "Was this room cleaned?",
+    "alt": [
+     "Has this room been cleaned?",
+     "Was the room cleaned?"
+    ]
+   },
+   {
+    "zh": "病人的生命徵象每四小時量一次。",
+    "en": "The patient's vital signs are checked every four hours."
+   },
+   {
+    "zh": "他的傷口敷料今天早上換過了。",
+    "en": "His dressing was changed this morning.",
+    "alt": [
+     "His wound dressing was changed this morning."
+    ]
+   },
+   {
+    "zh": "他被送到急診，然後由醫生檢查。",
+    "en": "He was taken to the ER and was examined by a doctor.",
+    "alt": [
+     "He was taken to the emergency room and examined by a doctor.",
+     "He was taken to the ER and examined by a doctor."
+    ]
+   },
+   {
+    "zh": "這些手套每次用完就丟掉。",
+    "en": "These gloves are thrown away after each use.",
+    "alt": [
+     "These gloves are thrown away after every use."
+    ]
    }
   ],
   "cando": "用 be ＋ 過去分詞說「被做」的事（處置、紀錄）",
   "scene": "口頭交班：藥和檢驗",
-  "prompt": {
-   "en": "Write three passive sentences about your school or a hospital: something done every day and something done yesterday.",
-   "zh": "用被動寫三句學校或醫院的事：每天被做的事、昨天被做的事。",
-   "sample": "The classroom is cleaned every day. The test was given yesterday. Our homework was checked by the teacher."
-  }
+  "prompts": [
+   {
+    "en": "Write three passive sentences about your school or a hospital: something done every day and something done yesterday.",
+    "zh": "用被動寫三句學校或醫院的事：每天被做的事、昨天被做的事。",
+    "sample": "The classroom is cleaned every day. The test was given yesterday. Our homework was checked by the teacher."
+   },
+   {
+    "en": "Write three passive sentences about things in your home: who made them or when they were bought.",
+    "zh": "用被動寫三句家裡的東西：是誰做的、什麼時候買的。",
+    "sample": "This table was made by my grandfather. My phone was bought last year. These cookies were baked by my mom."
+   },
+   {
+    "en": "Write three passive questions a nurse might ask at handoff, like Was…given?",
+    "zh": "寫三個交班時可能問的被動問句（像 Was…given?）。",
+    "sample": "Was the morning medicine given? Was his blood pressure checked? Was the doctor called?"
+   },
+   {
+    "en": "Describe how a hospital room is cleaned. Use three passive sentences.",
+    "zh": "用三句被動句說明病房是怎麼清潔的。",
+    "sample": "The floor is cleaned every morning. The sheets are changed every day. The trash is taken out twice a day."
+   },
+   {
+    "en": "Write about a famous place in Taiwan: when it was built and what it is used for.",
+    "zh": "寫台灣一個有名的地方：什麼時候蓋的、拿來做什麼（用被動）。",
+    "sample": "Taipei 101 was finished in 2004. It is used for offices and shops. It is visited by many people every year."
+   }
+  ]
  },
  {
   "unit": 22,
@@ -1588,15 +3071,87 @@
    {
     "zh": "你介意等一下嗎？",
     "en": "Do you mind waiting?"
+   },
+   {
+    "zh": "我爸爸喜歡釣魚。",
+    "en": "My father enjoys fishing.",
+    "alt": [
+     "My dad enjoys fishing."
+    ]
+   },
+   {
+    "zh": "我們晚餐後一直聊天。",
+    "en": "We kept talking after dinner.",
+    "alt": [
+     "We kept chatting after dinner."
+    ]
+   },
+   {
+    "zh": "你想喝點東西嗎？",
+    "en": "Do you want to drink something?",
+    "alt": [
+     "Do you want something to drink?"
+    ]
+   },
+   {
+    "zh": "你打算什麼時候回家？",
+    "en": "When do you plan to go home?"
+   },
+   {
+    "zh": "她需要多走路。",
+    "en": "She needs to walk more."
+   },
+   {
+    "zh": "病人一直想下床。",
+    "en": "The patient keeps trying to get out of bed.",
+    "alt": [
+     "The patient keeps trying to get up."
+    ]
+   },
+   {
+    "zh": "你應該避免熬夜，因為你需要睡眠。",
+    "en": "You should avoid staying up late because you need sleep.",
+    "alt": [
+     "You should avoid staying up late because you need to sleep."
+    ]
+   },
+   {
+    "zh": "她很擅長照顧病人。",
+    "en": "She is good at taking care of patients.",
+    "alt": [
+     "She is good at caring for patients."
+    ]
    }
   ],
   "cando": "分得出 want／need／plan to ＋ 原形，和 enjoy／finish／stop ＋ -ing",
   "scene": "病人想出院",
-  "prompt": {
-   "en": "Write one thing you enjoy doing, one thing you want to do this year, and one thing you need to stop doing.",
-   "zh": "寫：一件你喜歡做的事（enjoy -ing）、一件今年想做的事（want to）、一件該停止的事（stop -ing）。",
-   "sample": "I enjoy listening to music. I want to pass the English test this year. I need to stop staying up late."
-  }
+  "prompts": [
+   {
+    "en": "Write one thing you enjoy doing, one thing you want to do this year, and one thing you need to stop doing.",
+    "zh": "寫：一件你喜歡做的事（enjoy -ing）、一件今年想做的事（want to）、一件該停止的事（stop -ing）。",
+    "sample": "I enjoy listening to music. I want to pass the English test this year. I need to stop staying up late."
+   },
+   {
+    "en": "Write three sentences about your hobbies. Use enjoy, like, or love + -ing.",
+    "zh": "用 enjoy／like／love 加 -ing 寫三句你的興趣。",
+    "sample": "I enjoy playing basketball. I like cooking on weekends. I love watching Korean dramas."
+   },
+   {
+    "en": "Write three questions for a classmate with Do you want to…?, Do you plan to…?, and Do you enjoy…?",
+    "zh": "用 Do you want to…?、Do you plan to…?、Do you enjoy…? 寫三個問同學的問題。",
+    "sample": "Do you want to work in a big hospital? Do you plan to study abroad? Do you enjoy night shifts?"
+   },
+   {
+    "en": "A patient wants to go home early. Write three sentences about what he needs to do first. Use need to, try to, or avoid + -ing.",
+    "zh": "病人想早點出院，寫三句他出院前要做的事，用 need to、try to 或 avoid -ing。",
+    "sample": "You need to walk without help first. Try to eat a little more. Avoid lifting heavy things for two weeks."
+   },
+   {
+    "en": "Write about a habit you want to change: what you want to stop doing and what you plan to start doing.",
+    "zh": "寫一個你想改的習慣：想停止做什麼（stop -ing）、打算開始做什麼（plan to）。",
+    "sample": "I want to stop drinking soda. I plan to drink more water. I also hope to sleep before midnight."
+   }
+  ]
  },
  {
   "unit": 23,
@@ -1660,15 +3215,92 @@
    {
     "zh": "早點睡很重要。",
     "en": "It is important to go to bed early."
+   },
+   {
+    "zh": "我們班上有二十個學生。",
+    "en": "There are twenty students in our class.",
+    "alt": [
+     "There are 20 students in our class."
+    ]
+   },
+   {
+    "zh": "這棟大樓有五層樓。",
+    "en": "There are five floors in this building.",
+    "alt": [
+     "This building has five floors."
+    ]
+   },
+   {
+    "zh": "這裡有廁所嗎？",
+    "en": "Is there a restroom here?",
+    "alt": [
+     "Is there a bathroom here?",
+     "Is there a toilet here?"
+    ]
+   },
+   {
+    "zh": "今天有英文課嗎？",
+    "en": "Is there an English class today?"
+   },
+   {
+    "zh": "他的手臂上有一個小傷口。",
+    "en": "There is a small wound on his arm.",
+    "alt": [
+     "There is a small cut on his arm."
+    ]
+   },
+   {
+    "zh": "床單上有一些水。",
+    "en": "There is some water on the sheet.",
+    "alt": [
+     "There is some water on the sheets."
+    ]
+   },
+   {
+    "zh": "用英文寫報告很難。",
+    "en": "It is hard to write reports in English.",
+    "alt": [
+     "It is difficult to write reports in English."
+    ]
+   },
+   {
+    "zh": "從我家走路到學校要二十分鐘。",
+    "en": "It takes twenty minutes to walk from my home to school.",
+    "alt": [
+     "It takes 20 minutes to walk from my home to school.",
+     "It takes twenty minutes to walk from my house to school."
+    ]
    }
   ],
   "cando": "用 There is／There are 說某處有什麼，用 It is … to … 說看法",
   "scene": "帶新病人認識病房",
-  "prompt": {
-   "en": "Describe your room or your classroom in three sentences with there is or there are.",
-   "zh": "用 there is／there are 寫三句描述你的房間或教室。",
-   "sample": "There is a bed by the window. There are many books on my desk. There is a small plant next to the door."
-  }
+  "prompts": [
+   {
+    "en": "Describe your room or your classroom in three sentences with there is or there are.",
+    "zh": "用 there is／there are 寫三句描述你的房間或教室。",
+    "sample": "There is a bed by the window. There are many books on my desk. There is a small plant next to the door."
+   },
+   {
+    "en": "Describe your neighborhood in three sentences. Use there is, there are, or there isn't.",
+    "zh": "用 there is／there are／there isn't 寫三句你家附近。",
+    "sample": "There is a park near my home. There are two convenience stores on my street. There isn't a hospital nearby."
+   },
+   {
+    "en": "You are showing a new patient the ward. Write three sentences about what is there and where.",
+    "zh": "你在帶新病人認識病房，寫三句病房裡有什麼、在哪裡。",
+    "sample": "There is a call button next to your bed. There are two bathrooms at the end of the hall. There is a water machine near the nurses' station."
+   },
+   {
+    "en": "Write three It is … to … sentences about studying English.",
+    "zh": "用 It is … to … 寫三句學英文的看法。",
+    "sample": "It is fun to watch movies in English. It is hard to remember new words. It is important to practice every day."
+   },
+   {
+    "en": "Use It to write about today's weather, the time now, and how long it takes you to get to school.",
+    "zh": "用 It 當主詞寫：今天的天氣、現在幾點、去學校要多久。",
+    "sample": "It is cloudy today. It is seven o'clock now. It takes thirty minutes to get to school by bus."
+   }
+  ]
  },
  {
   "unit": 24,
@@ -1732,15 +3364,85 @@
    {
     "zh": "這個藥一天吃三次。",
     "en": "Take this medicine three times a day."
+   },
+   {
+    "zh": "她常常在晚上運動。",
+    "en": "She often exercises at night."
+   },
+   {
+    "zh": "我爸爸從來不抽菸。",
+    "en": "My father never smokes.",
+    "alt": [
+     "My dad never smokes."
+    ]
+   },
+   {
+    "zh": "你多久回家一次？",
+    "en": "How often do you go home?"
+   },
+   {
+    "zh": "你通常幾點吃晚餐？",
+    "en": "What time do you usually eat dinner?",
+    "alt": [
+     "What time do you usually have dinner?"
+    ]
+   },
+   {
+    "zh": "這個藥膏一天擦三次。",
+    "en": "Use this cream three times a day.",
+    "alt": [
+     "Put this cream on three times a day.",
+     "Apply this cream three times a day."
+    ]
+   },
+   {
+    "zh": "每兩小時幫他翻一次身。",
+    "en": "Turn him every two hours.",
+    "alt": [
+     "Turn him over every two hours."
+    ]
+   },
+   {
+    "zh": "他通常走路上班，但是下雨的時候會搭公車。",
+    "en": "He usually walks to work, but he takes the bus when it rains."
+   },
+   {
+    "zh": "我們總是先敲門再進去。",
+    "en": "We always knock before we go in.",
+    "alt": [
+     "We always knock on the door before we go in."
+    ]
    }
   ],
   "cando": "用 always／usually／sometimes／never 和 once／twice a day 說頻率",
   "scene": "問病人吃藥和運動的頻率",
-  "prompt": {
-   "en": "Write about your week: two things you always or usually do, and one thing you never do. Add how often (twice a week, every day…) to at least one of them.",
-   "zh": "寫你的一週：兩件總是或通常做的事、一件從來不做的事；至少一句加上次數（once a week、every day…），其他句可以只說時間。",
-   "sample": "I usually get up at seven. I go to the gym twice a week. I never skip breakfast."
-  }
+  "prompts": [
+   {
+    "en": "Write about your week: two things you always or usually do, and one thing you never do. Add how often (twice a week, every day…) to at least one of them.",
+    "zh": "寫你的一週：兩件總是或通常做的事、一件從來不做的事；至少一句加上次數（once a week、every day…），其他句可以只說時間。",
+    "sample": "I usually get up at seven. I go to the gym twice a week. I never skip breakfast."
+   },
+   {
+    "en": "Write about a family member's habits. Use always, usually, sometimes, and never.",
+    "zh": "寫一位家人的習慣，用 always、usually、sometimes、never。",
+    "sample": "My mom always gets up early. She usually cooks breakfast. She sometimes watches TV at night. She never drinks coffee."
+   },
+   {
+    "en": "Write three How often…? questions for a patient, and answer them with once a day, twice a week, and so on.",
+    "zh": "寫三個問病人的 How often…? 問題，用 once a day、twice a week 這類說法回答。",
+    "sample": "How often do you take this medicine? Twice a day. How often do you exercise? Once a week. How often do you drink alcohol? Never."
+   },
+   {
+    "en": "Write the instructions for two medicines: how many pills and how often.",
+    "zh": "寫兩種藥的用法：一次幾顆、多久吃一次。",
+    "sample": "Take one white pill every morning. Take two yellow pills three times a day after meals."
+   },
+   {
+    "en": "Write about your study habits: how often you study English and what you usually do.",
+    "zh": "寫你的讀書習慣：多久讀一次英文、通常做什麼。",
+    "sample": "I study English six days a week. I usually learn twenty new words a day. I sometimes watch English videos before bed."
+   }
+  ]
  },
  {
   "unit": 25,
@@ -1809,15 +3511,88 @@
    {
     "zh": "可以請你說慢一點嗎？",
     "en": "Could you speak more slowly?"
+   },
+   {
+    "zh": "不要忘記你的藥。",
+    "en": "Do not forget your medicine."
+   },
+   {
+    "zh": "請不要在這裡講電話。",
+    "en": "Please do not talk on the phone here."
+   },
+   {
+    "zh": "可以請你關燈嗎？",
+    "en": "Could you turn off the light?",
+    "alt": [
+     "Could you turn the light off?",
+     "Can you turn off the light, please?"
+    ]
+   },
+   {
+    "zh": "可以請你幫我拿那杯水嗎？",
+    "en": "Could you get me that glass of water?",
+    "alt": [
+     "Could you pass me that glass of water?",
+     "Can you get me that glass of water, please?"
+    ]
+   },
+   {
+    "zh": "可以請你把手臂伸直嗎？",
+    "en": "Could you straighten your arm?",
+    "alt": [
+     "Can you straighten your arm for me?",
+     "Could you keep your arm straight?"
+    ]
+   },
+   {
+    "zh": "可以請你站到磅秤上嗎？",
+    "en": "Could you stand on the scale?",
+    "alt": [
+     "Could you step on the scale?",
+     "Can you step onto the scale, please?"
+    ]
+   },
+   {
+    "zh": "我需要你坐起來，然後身體往前傾。",
+    "en": "I need you to sit up and lean forward.",
+    "alt": [
+     "I need you to sit up and then lean forward."
+    ]
+   },
+   {
+    "zh": "我需要你在這張表格上簽名。",
+    "en": "I need you to sign this form."
    }
   ],
   "cando": "用祈使句和 Could you…? 有禮貌地請病人配合",
   "scene": "抽血",
-  "prompt": {
-   "en": "You are going to take a patient's temperature. Write three polite requests or instructions.",
-   "zh": "你要幫病人量體溫，寫三句有禮貌的請求或指示。",
-   "sample": "Please sit down. Could you turn your head a little? Please don't move for a few seconds."
-  }
+  "prompts": [
+   {
+    "en": "You are going to take a patient's temperature. Write three polite requests or instructions.",
+    "zh": "你要幫病人量體溫，寫三句有禮貌的請求或指示。",
+    "sample": "Please sit down. Could you turn your head a little? Please don't move for a few seconds."
+   },
+   {
+    "en": "You are helping a patient get out of bed. Write three short instructions.",
+    "zh": "你在協助病人下床，寫三句簡短的指示。",
+    "sample": "Please sit up slowly. Put your feet on the floor. Hold my arm and stand up."
+   },
+   {
+    "en": "Write three polite requests to a classmate with Could you…? or Can you…?",
+    "zh": "用 Could you…? 或 Can you…? 寫三個請同學幫忙的禮貌請求。",
+    "sample": "Could you lend me your notes? Can you help me with this question? Could you save me a seat?"
+   },
+   {
+    "en": "You are giving an injection. Write three instructions or requests for the patient.",
+    "zh": "你要幫病人打針，寫三句給病人的指示或請求。",
+    "sample": "Could you roll up your sleeve? Please relax your arm. Don't look if you feel scared."
+   },
+   {
+    "en": "A visitor is breaking the ward rules. Write three polite but clear sentences. Use please, don't, or I need you to.",
+    "zh": "有訪客違反病房規定，用 please、don't 或 I need you to 寫三句有禮貌但清楚的話。",
+    "sample": "Please talk more quietly. Don't eat on the patient's bed. I need you to leave by nine o'clock."
+   }
+  ]
  },
  {
   "unit": 26,
@@ -1881,15 +3656,95 @@
    {
     "zh": "這是我昨天買的手機。",
     "en": "This is the phone that I bought yesterday."
+   },
+   {
+    "zh": "這是我媽媽做的蛋糕。",
+    "en": "This is the cake that my mom made.",
+    "alt": [
+     "This is the cake my mom made.",
+     "This is the cake that my mother made."
+    ]
+   },
+   {
+    "zh": "我找不到你給我的那張紙。",
+    "en": "I cannot find the paper that you gave me.",
+    "alt": [
+     "I cannot find the paper you gave me."
+    ]
+   },
+   {
+    "zh": "他是住在你隔壁的那個人嗎？",
+    "en": "Is he the man who lives next to you?",
+    "alt": [
+     "Is he the man who lives next door to you?",
+     "Is he the person who lives next to you?"
+    ]
+   },
+   {
+    "zh": "這是你昨天說的那本書嗎？",
+    "en": "Is this the book that you talked about yesterday?",
+    "alt": [
+     "Is this the book you talked about yesterday?"
+    ]
+   },
+   {
+    "zh": "在 3 號房的那位病人需要幫忙。",
+    "en": "The patient who is in Room 3 needs help.",
+    "alt": [
+     "The patient in Room 3 needs help."
+    ]
+   },
+   {
+    "zh": "對花生過敏的那個小孩今天出院。",
+    "en": "The child who is allergic to peanuts goes home today.",
+    "alt": [
+     "The child who is allergic to peanuts is going home today."
+    ]
+   },
+   {
+    "zh": "這是你睡前要點的眼藥水。",
+    "en": "These are the eye drops that you should use before bed.",
+    "alt": [
+     "These are the eye drops you should use before bed."
+    ]
+   },
+   {
+    "zh": "那是一種會讓你想睡覺的藥。",
+    "en": "That is a medicine that can make you sleepy.",
+    "alt": [
+     "That is a medicine which can make you sleepy."
+    ]
    }
   ],
   "cando": "用 who／which／that 補充說明是哪一個人或東西",
   "scene": "交班：說清楚是哪一位病人",
-  "prompt": {
-   "en": "Describe two people or things in your life with who, which, or that.",
-   "zh": "用 who／which／that 描述你生活中的兩個人或兩樣東西。",
-   "sample": "I have a friend who studies medicine. My favorite song is the one that my mom often sings."
-  }
+  "prompts": [
+   {
+    "en": "Describe two people or things in your life with who, which, or that.",
+    "zh": "用 who／which／that 描述你生活中的兩個人或兩樣東西。",
+    "sample": "I have a friend who studies medicine. My favorite song is the one that my mom often sings."
+   },
+   {
+    "en": "Describe three things in your room with that or which.",
+    "zh": "用 that 或 which 描述你房間裡的三樣東西。",
+    "sample": "I have a lamp that my sister gave me. The bag which I use every day is black. There is a poster that I bought in Japan."
+   },
+   {
+    "en": "Write three questions to find the right person, like Is she the nurse who…?",
+    "zh": "寫三個確認「是哪一個人」的問題，像 Is she the nurse who…?。",
+    "sample": "Is he the doctor who works at night? Is she the student who sits by the window? Are they the visitors who came this morning?"
+   },
+   {
+    "en": "At handoff, make it clear which patient you mean. Write three sentences with who.",
+    "zh": "交班時要說清楚是哪一位病人，用 who 寫三句。",
+    "sample": "The patient who had surgery yesterday has some pain. The woman who is in Bed 2 cannot walk. The man who came in at midnight needs a blood test."
+   },
+   {
+    "en": "Write about a person who is important to you. Use who and that at least once each.",
+    "zh": "寫一位對你很重要的人，who 和 that 至少各用一次。",
+    "sample": "My grandma is the person who taught me to cook. She has a garden that is full of flowers. She is the one who always believes in me."
+   }
+  ]
  },
  {
   "unit": 27,
@@ -1953,15 +3808,88 @@
    {
     "zh": "我不記得他住在哪裡。",
     "en": "I don't remember where he lives."
+   },
+   {
+    "zh": "我不知道這個字是什麼意思。",
+    "en": "I do not know what this word means."
+   },
+   {
+    "zh": "他不知道他的鑰匙在哪裡。",
+    "en": "He does not know where his keys are."
+   },
+   {
+    "zh": "可以告訴我藥局幾點開門嗎？",
+    "en": "Can you tell me what time the pharmacy opens?",
+    "alt": [
+     "Could you tell me what time the pharmacy opens?",
+     "Can you tell me when the pharmacy opens?"
+    ]
+   },
+   {
+    "zh": "你知道公車站在哪裡嗎？",
+    "en": "Do you know where the bus stop is?"
+   },
+   {
+    "zh": "可以告訴我你今天吃了什麼嗎？",
+    "en": "Can you tell me what you ate today?",
+    "alt": [
+     "Could you tell me what you ate today?"
+    ]
+   },
+   {
+    "zh": "可以告訴我痛了多久嗎？",
+    "en": "Can you tell me how long you have had the pain?",
+    "alt": [
+     "Can you tell me how long it has hurt?",
+     "Could you tell me how long you have had the pain?",
+     "Can you tell me how long you have had this pain?"
+    ]
+   },
+   {
+    "zh": "你記得你昨晚幾點睡覺嗎？",
+    "en": "Do you remember what time you went to bed last night?",
+    "alt": [
+     "Do you remember when you went to bed last night?"
+    ]
+   },
+   {
+    "zh": "我不確定醫生明天會不會來。",
+    "en": "I am not sure if the doctor will come tomorrow.",
+    "alt": [
+     "I am not sure whether the doctor will come tomorrow.",
+     "I am not sure if the doctor is coming tomorrow."
+    ]
    }
   ],
   "cando": "用 Can you tell me…／Do you know… 有禮貌地問（後面用直述句語序）",
   "scene": "家屬在病房問路、問狀況",
-  "prompt": {
-   "en": "You are lost in a new hospital. Write three polite questions that start with Can you tell me… or Do you know…",
-   "zh": "你在新醫院迷路了，寫三個用 Can you tell me… 或 Do you know… 開頭的問句。",
-   "sample": "Can you tell me where the elevator is? Do you know what time the pharmacy closes? Can you tell me how I get to the emergency room?"
-  }
+  "prompts": [
+   {
+    "en": "You are lost in a new hospital. Write three polite questions that start with Can you tell me… or Do you know…",
+    "zh": "你在新醫院迷路了，寫三個用 Can you tell me… 或 Do you know… 開頭的問句。",
+    "sample": "Can you tell me where the elevator is? Do you know what time the pharmacy closes? Can you tell me how I get to the emergency room?"
+   },
+   {
+    "en": "Write three things you don't know about the future. Use I don't know if… or I don't know when…",
+    "zh": "寫三件你不確定的未來的事，用 I don't know if… 或 I don't know when…。",
+    "sample": "I don't know if I will pass the test. I don't know when my sister will come home. I don't know where I will work after school."
+   },
+   {
+    "en": "You are at a train station. Write three polite questions with Could you tell me… or Do you know…",
+    "zh": "你在火車站，用 Could you tell me… 或 Do you know… 寫三個禮貌的問題。",
+    "sample": "Could you tell me where Platform 2 is? Do you know when the next train leaves? Could you tell me how much a ticket costs?"
+   },
+   {
+    "en": "A patient's family asks you questions. Write three of their questions as polite indirect questions.",
+    "zh": "家屬問你問題，把三個問題寫成有禮貌的間接問句。",
+    "sample": "Can you tell me when the doctor will come? Do you know if my father can eat now? Could you tell me how long he will stay here?"
+   },
+   {
+    "en": "Write about a time you didn't understand something. Use I didn't know what… or I wasn't sure how…",
+    "zh": "寫一次你搞不懂某件事的經驗，用 I didn't know what… 或 I wasn't sure how…。",
+    "sample": "On my first day, I didn't know where the nurses' station was. I wasn't sure how I should use the machine. I asked my teacher what I should do."
+   }
+  ]
  },
  {
   "unit": 28,
@@ -2025,15 +3953,89 @@
    {
     "zh": "昨天這個時候他們在開會。",
     "en": "They were having a meeting at this time yesterday."
+   },
+   {
+    "zh": "那時候我們在看電視。",
+    "en": "We were watching TV at that time."
+   },
+   {
+    "zh": "昨天下午三點他在打籃球。",
+    "en": "He was playing basketball at three yesterday afternoon.",
+    "alt": [
+     "At three yesterday afternoon, he was playing basketball."
+    ]
+   },
+   {
+    "zh": "地震的時候你在做什麼？",
+    "en": "What were you doing when the earthquake happened?",
+    "alt": [
+     "What were you doing when the earthquake came?"
+    ]
+   },
+   {
+    "zh": "她打電話來的時候你在睡覺嗎？",
+    "en": "Were you sleeping when she called?"
+   },
+   {
+    "zh": "我們到的時候，醫生正在跟家屬說話。",
+    "en": "The doctor was talking to the family when we arrived.",
+    "alt": [
+     "When we arrived, the doctor was talking to the family."
+    ]
+   },
+   {
+    "zh": "停電的時候我們正在吃晚餐。",
+    "en": "We were eating dinner when the power went out.",
+    "alt": [
+     "We were having dinner when the power went out.",
+     "When the power went out, we were eating dinner."
+    ]
+   },
+   {
+    "zh": "她在下樓梯的時候滑倒了，所以撞到頭。",
+    "en": "She slipped while she was going down the stairs, so she hit her head.",
+    "alt": [
+     "She slipped while she was walking down the stairs, so she hit her head."
+    ]
+   },
+   {
+    "zh": "我在騎腳踏車的時候下起雨來，所以我全身都濕了。",
+    "en": "It started to rain while I was riding my bike, so I got wet.",
+    "alt": [
+     "It began to rain while I was riding my bike, so I got wet.",
+     "It started raining while I was riding my bike, so I got wet."
+    ]
    }
   ],
   "cando": "用 was／were ＋ -ing 說事情發生時正在做什麼",
   "scene": "問病人跌倒經過",
-  "prompt": {
-   "en": "Write about what you and your family were doing at eight last night.",
-   "zh": "寫昨晚八點你和家人各自在做什麼（was／were ＋ -ing）。",
-   "sample": "At eight last night, I was studying in my room. My dad was watching TV. My sister was talking on the phone."
-  }
+  "prompts": [
+   {
+    "en": "Write about what you and your family were doing at eight last night.",
+    "zh": "寫昨晚八點你和家人各自在做什麼（was／were ＋ -ing）。",
+    "sample": "At eight last night, I was studying in my room. My dad was watching TV. My sister was talking on the phone."
+   },
+   {
+    "en": "Write what you were doing at three different times yesterday.",
+    "zh": "寫昨天三個不同時間你正在做什麼。",
+    "sample": "At seven in the morning, I was eating breakfast. At noon, I was walking to the library. At ten at night, I was watching a movie."
+   },
+   {
+    "en": "Write three questions to ask a patient about a fall. Use the past continuous.",
+    "zh": "寫三個問病人跌倒經過的問題，用過去進行式。",
+    "sample": "What were you doing when you fell? Were you walking to the bathroom? Was anyone helping you?"
+   },
+   {
+    "en": "Write about a time something surprised you. What were you doing when it happened?",
+    "zh": "寫一次讓你嚇一跳的事：發生的時候你正在做什麼？",
+    "sample": "I was studying in my room when my phone rang very loudly. It was my old friend from high school. I was so happy."
+   },
+   {
+    "en": "You saw an accident. Write three sentences about what people were doing when it happened.",
+    "zh": "你目擊一場意外，寫三句事情發生時大家正在做什麼。",
+    "sample": "I was waiting for the bus when the accident happened. A man was crossing the road. The driver was looking at his phone."
+   }
+  ]
  },
  {
   "unit": 29,
@@ -2097,15 +4099,99 @@
    {
     "zh": "如果你明天很忙，我們下週再去。",
     "en": "If you are busy tomorrow, we will go next week."
+   },
+   {
+    "zh": "如果你不吃早餐，你會很餓。",
+    "en": "If you do not eat breakfast, you will be hungry.",
+    "alt": [
+     "If you do not eat breakfast, you will get hungry.",
+     "You will be hungry if you do not eat breakfast."
+    ]
+   },
+   {
+    "zh": "如果我們不快一點，我們會遲到。",
+    "en": "If we do not hurry, we will be late.",
+    "alt": [
+     "If we do not hurry up, we will be late."
+    ]
+   },
+   {
+    "zh": "如果他打電話來，你會告訴我嗎？",
+    "en": "Will you tell me if he calls?",
+    "alt": [
+     "If he calls, will you tell me?"
+    ]
+   },
+   {
+    "zh": "如果明天很熱，你會去游泳嗎？",
+    "en": "Will you go swimming if it is hot tomorrow?",
+    "alt": [
+     "If it is hot tomorrow, will you go swimming?"
+    ]
+   },
+   {
+    "zh": "如果傷口變紅，就打電話給我們。",
+    "en": "If the wound gets red, call us.",
+    "alt": [
+     "Call us if the wound gets red.",
+     "If the wound turns red, call us."
+    ]
+   },
+   {
+    "zh": "如果你覺得想吐，就告訴我。",
+    "en": "If you feel nauseous, tell me.",
+    "alt": [
+     "Tell me if you feel nauseous.",
+     "If you feel sick, tell me.",
+     "If you feel like throwing up, tell me."
+    ]
+   },
+   {
+    "zh": "如果你的體溫超過三十八度，你應該去看醫生。",
+    "en": "If your temperature is over 38 degrees, you should see a doctor.",
+    "alt": [
+     "If your fever is over 38 degrees, you should see a doctor.",
+     "If your temperature goes over 38 degrees, you should see a doctor."
+    ]
+   },
+   {
+    "zh": "如果你明天還在咳嗽，就要回來看診。",
+    "en": "If you are still coughing tomorrow, you should come back to the clinic.",
+    "alt": [
+     "If you still have a cough tomorrow, come back to the clinic.",
+     "If you are still coughing tomorrow, come back to the clinic."
+    ]
    }
   ],
   "cando": "用 If ＋ 現在式, will／祈使句 說可能發生的情況和怎麼處理",
   "scene": "出院衛教：什麼情況要回診",
-  "prompt": {
-   "en": "Give a patient three if-instructions for after they go home.",
-   "zh": "給出院病人三個 if 的提醒（如果…就…）。",
-   "sample": "If you feel dizzy, sit down and rest. If the pain gets worse, call us. If you have questions about your medicine, ask your pharmacist."
-  }
+  "prompts": [
+   {
+    "en": "Give a patient three if-instructions for after they go home.",
+    "zh": "給出院病人三個 if 的提醒（如果…就…）。",
+    "sample": "If you feel dizzy, sit down and rest. If the pain gets worse, call us. If you have questions about your medicine, ask your pharmacist."
+   },
+   {
+    "en": "Write three if-sentences about what will happen if you don't do something.",
+    "zh": "寫三句「如果你不…就會…」。",
+    "sample": "If I don't sleep, I will be tired. If I don't study, I won't pass. If I don't eat lunch, I will get a headache."
+   },
+   {
+    "en": "Write three Will you…if…? questions for a friend about this weekend.",
+    "zh": "寫三個 Will you…if…? 問朋友這週末的打算。",
+    "sample": "Will you go hiking if it is sunny? Will you come to my party if you are free? Will you call me if you need help?"
+   },
+   {
+    "en": "Write three warning signs a patient with a new wound should watch for, and what to do. Use if.",
+    "zh": "寫三個傷口病人要注意的警訊和處理方法，用 if。",
+    "sample": "If the wound gets hot, call the clinic. If there is a lot of blood, press on it and call 119. If you have a fever, come back to the hospital."
+   },
+   {
+    "en": "Write about your plans after graduation with if.",
+    "zh": "用 if 寫你畢業後的計畫。",
+    "sample": "If I pass the licensing exam, I will work in a big hospital. If I save enough money, I will study in the US. If I get a job there, my family will visit me."
+   }
+  ]
  },
  {
   "unit": 30,
@@ -2163,21 +4249,109 @@
   ],
   "variations": [
    {
-    "zh": "他說他明天會來。",
-    "en": "He said he would come tomorrow."
+    "zh": "他昨天說他今天會來。",
+    "en": "Yesterday he said he would come today.",
+    "alt": [
+     "He said yesterday that he would come today.",
+     "Yesterday he said that he would come today."
+    ]
    },
    {
     "zh": "她告訴我她是護理師。",
     "en": "She told me that she was a nurse."
+   },
+   {
+    "zh": "他告訴我他很喜歡那份工作。",
+    "en": "He told me that he liked the job.",
+    "alt": [
+     "He told me he liked the job.",
+     "He told me that he really liked the job."
+    ]
+   },
+   {
+    "zh": "她告訴我們她會晚一點到。",
+    "en": "She told us that she would be late.",
+    "alt": [
+     "She told us she would be late.",
+     "She told us that she would come a little late."
+    ]
+   },
+   {
+    "zh": "他剛才跟你說了什麼？",
+    "en": "What did he tell you just now?",
+    "alt": [
+     "What did he say to you just now?",
+     "What did he tell you a moment ago?"
+    ]
+   },
+   {
+    "zh": "醫生有說你什麼時候可以回家嗎？",
+    "en": "Did the doctor say when you can go home?",
+    "alt": [
+     "Did the doctor say when you could go home?"
+    ]
+   },
+   {
+    "zh": "病人說她的傷口很癢。",
+    "en": "The patient says her wound is itchy.",
+    "alt": [
+     "The patient says that her wound is itchy.",
+     "The patient says her wound itches."
+    ]
+   },
+   {
+    "zh": "家屬說他昨晚吃得很少。",
+    "en": "The family says he ate very little last night.",
+    "alt": [
+     "His family says he ate very little last night.",
+     "The family says he did not eat much last night."
+    ]
+   },
+   {
+    "zh": "病人主訴頭痛，而且說他昨晚沒睡好。",
+    "en": "The patient complains of a headache and says he did not sleep well last night.",
+    "alt": [
+     "The patient complains of a headache and says that he did not sleep well last night."
+    ]
+   },
+   {
+    "zh": "病人否認有胸痛。",
+    "en": "The patient denies chest pain.",
+    "alt": [
+     "The patient denies any chest pain.",
+     "The patient denies having chest pain."
+    ]
    }
   ],
   "cando": "用 say／tell 轉述病人或醫生說的話",
   "scene": "向醫師報告病人說了什麼",
-  "prompt": {
-   "en": "Think of something a friend or teacher told you this week. Report it in three sentences with say or tell.",
-   "zh": "想一件這週朋友或老師跟你說的事，用 say／tell 轉述成三句。",
-   "sample": "My teacher said the test was next Friday. She told us to review Chapter 5. My friend says she is nervous."
-  }
+  "prompts": [
+   {
+    "en": "Think of something a friend or teacher told you this week. Report it in three sentences with say or tell.",
+    "zh": "想一件這週朋友或老師跟你說的事，用 say／tell 轉述成三句。",
+    "sample": "My teacher said the test was next Friday. She told us to review Chapter 5. My friend says she is nervous."
+   },
+   {
+    "en": "Write three sentences about what your parents told you when you were a child. Use told me to… or told me (that)…",
+    "zh": "寫三句你小時候爸媽跟你說過的話，用 told me to… 或 told me (that)…。",
+    "sample": "My mom told me to eat my vegetables. My dad told me that hard work is important. They told me not to talk to strangers."
+   },
+   {
+    "en": "You missed a class. Write three questions to ask a classmate about what the teacher said.",
+    "zh": "你沒去上課，寫三個問同學「老師說了什麼」的問題。",
+    "sample": "What did the teacher say about the test? Did she say when the report is due? Did she tell you which pages to read?"
+   },
+   {
+    "en": "Report to the doctor what a patient told you. Write three sentences with says, reports, or denies.",
+    "zh": "向醫師報告病人說了什麼，用 says、reports 或 denies 寫三句。",
+    "sample": "Mr. Chen says his chest feels tight. He reports that the pain started an hour ago. He denies any shortness of breath."
+   },
+   {
+    "en": "Write about a phone call you had this week. Report what the other person said.",
+    "zh": "寫這週的一通電話，轉述對方說了什麼。",
+    "sample": "My aunt called me on Tuesday. She said that she was coming to Taichung next week. She told me to wait for her at the station."
+   }
+  ]
  },
  {
   "unit": 31,
@@ -2241,15 +4415,81 @@
    {
     "zh": "她從早上就一直在讀書。",
     "en": "She has been studying since this morning."
+   },
+   {
+    "zh": "他從中午就一直在工作。",
+    "en": "He has been working since noon."
+   },
+   {
+    "zh": "我的手機整個早上一直在響。",
+    "en": "My phone has been ringing all morning."
+   },
+   {
+    "zh": "你頭暈多久了？",
+    "en": "How long have you been feeling dizzy?"
+   },
+   {
+    "zh": "她打噴嚏打了多久了？",
+    "en": "How long has she been sneezing?"
+   },
+   {
+    "zh": "他從昨天就一直在發抖。",
+    "en": "He has been shaking since yesterday.",
+    "alt": [
+     "He has been shivering since yesterday."
+    ]
+   },
+   {
+    "zh": "她這三天一直肚子痛。",
+    "en": "She has been having stomach pain for three days.",
+    "alt": [
+     "She has had stomach pain for three days."
+    ]
+   },
+   {
+    "zh": "他從早上就一直拉肚子，而且沒有吃任何東西。",
+    "en": "He has been having diarrhea since this morning and has not eaten anything.",
+    "alt": [
+     "He has had diarrhea since this morning and has not eaten anything."
+    ]
+   },
+   {
+    "zh": "她這個月一直在加班，所以很累。",
+    "en": "She has been working overtime this month, so she is very tired.",
+    "alt": [
+     "She has been working late this month, so she is very tired."
+    ]
    }
   ],
   "cando": "用 have／has been ＋ -ing 說一個動作持續了多久（症狀持續時間）",
   "scene": "急診問診：咳嗽、打噴嚏多久了",
-  "prompt": {
-   "en": "Write three sentences about things you have been doing lately. Use for or since.",
-   "zh": "用三句寫你最近一直在做的事，加上 for 或 since。",
-   "sample": "I have been studying English for two months. I have been going to bed late since my exams started. I have been drinking more water since last week."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences about things you have been doing lately. Use for or since.",
+    "zh": "用三句寫你最近一直在做的事，加上 for 或 since。",
+    "sample": "I have been studying English for two months. I have been going to bed late since my exams started. I have been drinking more water since last week."
+   },
+   {
+    "en": "Write about something that has been happening around you lately, like the weather, a noise, or a problem. Use since or for.",
+    "zh": "寫你身邊最近一直發生的事（天氣、聲音、問題……），用 since 或 for。",
+    "sample": "It has been raining for three days. My neighbor has been playing loud music since Friday. I have been feeling sleepy all week."
+   },
+   {
+    "en": "Write three How long have you been…? questions to ask a patient in the ER.",
+    "zh": "寫三個急診問病人的 How long have you been…? 問題。",
+    "sample": "How long have you been feeling this pain? How long have you been vomiting? How long have you been taking this medicine?"
+   },
+   {
+    "en": "Write a short handoff note: what a patient has been doing or feeling since your shift started.",
+    "zh": "寫一段簡短的交班：從你上班到現在，病人一直怎麼樣。",
+    "sample": "Mrs. Lee has been sleeping since two o'clock. She has been breathing more easily. Her son has been staying with her all afternoon."
+   },
+   {
+    "en": "Write about your English study: what you have been doing and for how long.",
+    "zh": "寫你的英文學習：你一直在做什麼、做多久了。",
+    "sample": "I have been learning new words every day for three months. I have been watching English videos since September. I have been feeling more confident lately."
+   }
+  ]
  },
  {
   "unit": 32,
@@ -2313,15 +4553,98 @@
    {
     "zh": "她去日本以前從沒看過雪。",
     "en": "She had never seen snow before she went to Japan."
+   },
+   {
+    "zh": "我出門前已經吃過早餐了。",
+    "en": "I had eaten breakfast before I left home.",
+    "alt": [
+     "I had already eaten breakfast before I left home."
+    ]
+   },
+   {
+    "zh": "他們到家之前雨已經停了。",
+    "en": "The rain had stopped before they got home.",
+    "alt": [
+     "It had stopped raining before they got home."
+    ]
+   },
+   {
+    "zh": "你上大學之前學過護理嗎？",
+    "en": "Had you studied nursing before you went to college?",
+    "alt": [
+     "Had you learned nursing before you went to college?",
+     "Had you studied nursing before you started college?"
+    ]
+   },
+   {
+    "zh": "你昨天到學校的時候，課已經開始了嗎？",
+    "en": "Had the class already started when you got to school yesterday?",
+    "alt": [
+     "Had the class started when you got to school yesterday?",
+     "When you got to school yesterday, had the class already started?"
+    ]
+   },
+   {
+    "zh": "救護車到之前，他已經失去意識了。",
+    "en": "He had lost consciousness before the ambulance arrived.",
+    "alt": [
+     "He had passed out before the ambulance arrived.",
+     "He had become unconscious before the ambulance came."
+    ]
+   },
+   {
+    "zh": "她入院前已經發燒三天了。",
+    "en": "She had had a fever for three days before she was admitted.",
+    "alt": [
+     "She had had a fever for three days before she came to the hospital."
+    ]
+   },
+   {
+    "zh": "我回到病房的時候，他已經把點滴拔掉了。",
+    "en": "When I came back to the room, he had pulled out his IV.",
+    "alt": [
+     "He had pulled out his IV when I came back to the room.",
+     "When I returned to the room, he had pulled out his IV."
+    ]
+   },
+   {
+    "zh": "醫生到的時候，護理師們已經開始做 CPR 了。",
+    "en": "When the doctor arrived, the nurses had already started CPR.",
+    "alt": [
+     "The nurses had already started CPR when the doctor arrived.",
+     "When the doctor arrived, the nurses had started CPR."
+    ]
    }
   ],
   "cando": "用 had ＋ 過去分詞說過去某件事之前就已經發生的事",
   "scene": "描述病人到院前的經過",
-  "prompt": {
-   "en": "Write about a time you were late. Say what had already happened when you arrived.",
-   "zh": "寫一次你遲到的經驗：你到的時候，什麼事已經發生了？",
-   "sample": "I was late for class last week. When I arrived, the teacher had already started the quiz. My friends had finished the first page."
-  }
+  "prompts": [
+   {
+    "en": "Write about a time you were late. Say what had already happened when you arrived.",
+    "zh": "寫一次你遲到的經驗：你到的時候，什麼事已經發生了？",
+    "sample": "I was late for class last week. When I arrived, the teacher had already started the quiz. My friends had finished the first page."
+   },
+   {
+    "en": "Write about a trip. Say two things you had done before you left.",
+    "zh": "寫一次旅行：出發前你已經做好哪兩件事？",
+    "sample": "Before we went to Japan, I had saved money for a year. I had learned some Japanese words. I had never been on a plane before that trip."
+   },
+   {
+    "en": "Write three Had you ever…before…? questions for a classmate about life before nursing school.",
+    "zh": "寫三個 Had you ever…before…? 問同學讀護理系之前的經驗。",
+    "sample": "Had you ever worked in a hospital before you started nursing school? Had you met a nurse before? Had you ever given an injection before last year?"
+   },
+   {
+    "en": "Describe what had happened to a patient before he came to the hospital. Write three sentences.",
+    "zh": "描述病人來醫院之前已經發生的事，寫三句。",
+    "sample": "Mr. Lin had fallen off his bike before he came to the ER. He had taken two pain pills at home. His wife had cleaned the wound with water."
+   },
+   {
+    "en": "Write about a time you went back somewhere and things had changed.",
+    "zh": "寫一次你回到某個地方，發現事情已經變了。",
+    "sample": "When I went back to my old school, the library had moved. My favorite teacher had retired. They had built a new gym."
+   }
+  ]
  },
  {
   "unit": 33,
@@ -2385,15 +4708,95 @@
    {
     "zh": "如果我是他，我會去看醫生。",
     "en": "If I were him, I would see a doctor."
+   },
+   {
+    "zh": "如果我有更多錢，我會去美國讀書。",
+    "en": "If I had more money, I would study in the US.",
+    "alt": [
+     "If I had more money, I would study in the United States.",
+     "I would study in the US if I had more money."
+    ]
+   },
+   {
+    "zh": "如果他早一點睡，他就不會那麼累。",
+    "en": "If he went to bed earlier, he would not be so tired.",
+    "alt": [
+     "He would not be so tired if he went to bed earlier."
+    ]
+   },
+   {
+    "zh": "如果你可以去任何地方，你會去哪裡？",
+    "en": "Where would you go if you could go anywhere?",
+    "alt": [
+     "If you could go anywhere, where would you go?"
+    ]
+   },
+   {
+    "zh": "如果你是護理長，你會改變什麼？",
+    "en": "What would you change if you were the head nurse?",
+    "alt": [
+     "If you were the head nurse, what would you change?"
+    ]
+   },
+   {
+    "zh": "如果她每天走路，她的血壓會比較低。",
+    "en": "If she walked every day, her blood pressure would be lower.",
+    "alt": [
+     "Her blood pressure would be lower if she walked every day."
+    ]
+   },
+   {
+    "zh": "如果這個藥沒有那麼貴，會有更多病人用它。",
+    "en": "If this drug were not so expensive, more patients would use it.",
+    "alt": [
+     "If this medicine were not so expensive, more patients would use it.",
+     "If this drug was not so expensive, more patients would use it."
+    ]
+   },
+   {
+    "zh": "如果我是醫生，我會花更多時間跟病人說話。",
+    "en": "If I were a doctor, I would spend more time talking with patients.",
+    "alt": [
+     "If I were a doctor, I would spend more time talking to patients."
+    ]
+   },
+   {
+    "zh": "如果我住在醫院附近，我就不用那麼早起床。",
+    "en": "If I lived near the hospital, I would not have to get up so early.",
+    "alt": [
+     "I would not have to get up so early if I lived near the hospital."
+    ]
    }
   ],
   "cando": "用 If ＋ 過去式, would ＋ 原形說跟事實相反的假設、給建議",
   "scene": "同學聊「如果…會怎樣」",
-  "prompt": {
-   "en": "If you could work in any country, where would you work and why? Write three sentences.",
-   "zh": "如果你可以在任何國家工作，你會去哪裡？為什麼？寫三句。",
-   "sample": "If I could work in any country, I would work in the US. I would learn a lot there. If I lived there, my English would get better."
-  }
+  "prompts": [
+   {
+    "en": "If you could work in any country, where would you work and why? Write three sentences.",
+    "zh": "如果你可以在任何國家工作，你會去哪裡？為什麼？寫三句。",
+    "sample": "If I could work in any country, I would work in the US. I would learn a lot there. If I lived there, my English would get better."
+   },
+   {
+    "en": "Write three things you would do if you had a free week.",
+    "zh": "寫三件如果你有一整個禮拜空閒會做的事。",
+    "sample": "If I had a free week, I would visit my grandparents. I would sleep until ten every day. I would read an English novel."
+   },
+   {
+    "en": "Write three What would you do if…? questions for a classmate about hard situations at work.",
+    "zh": "寫三個 What would you do if…? 問同學工作上的難題。",
+    "sample": "What would you do if a patient refused his medicine? What would you do if you made a mistake? What would you do if a family member shouted at you?"
+   },
+   {
+    "en": "Give advice to a friend who has a problem. Start with If I were you, I would…",
+    "zh": "朋友遇到問題，用 If I were you, I would… 給三個建議。",
+    "sample": "If I were you, I would talk to your teacher. I would not quit the class. I would ask a classmate to study with me."
+   },
+   {
+    "en": "Write about a dream you have. What would change if it came true?",
+    "zh": "寫一個你的夢想：如果實現了，什麼會改變？",
+    "sample": "If I worked as a nurse in New York, I would speak English every day. My life would be very different. My family would be proud of me."
+   }
+  ]
  },
  {
   "unit": 34,
@@ -2462,15 +4865,92 @@
    {
     "zh": "這個問題可以很快解決。",
     "en": "This problem can be solved quickly."
+   },
+   {
+    "zh": "這些盒子應該放在架子上。",
+    "en": "These boxes should be put on the shelf.",
+    "alt": [
+     "These boxes should be placed on the shelf."
+    ]
+   },
+   {
+    "zh": "會議會改到下週。",
+    "en": "The meeting will be moved to next week.",
+    "alt": [
+     "The meeting will be changed to next week."
+    ]
+   },
+   {
+    "zh": "這顆藥可以剝成一半嗎？",
+    "en": "Can this pill be cut in half?",
+    "alt": [
+     "Can this pill be broken in half?",
+     "Can this tablet be cut in half?"
+    ]
+   },
+   {
+    "zh": "這份報告可以明天再交嗎？",
+    "en": "Can this report be handed in tomorrow?",
+    "alt": [
+     "Can this report be turned in tomorrow?"
+    ]
+   },
+   {
+    "zh": "胰島素應該在飯前打。",
+    "en": "Insulin should be given before meals.",
+    "alt": [
+     "The insulin should be given before meals."
+    ]
+   },
+   {
+    "zh": "他的血糖應該每四小時量一次。",
+    "en": "His blood sugar should be checked every four hours."
+   },
+   {
+    "zh": "病人必須每兩小時翻身一次，而且他的皮膚應該每天檢查。",
+    "en": "The patient must be turned every two hours, and his skin should be checked every day.",
+    "alt": [
+     "The patient must be turned every two hours, and his skin should be checked daily."
+    ]
+   },
+   {
+    "zh": "針頭用完必須丟進黃色的桶子，而且不可以再蓋回去。",
+    "en": "Needles must be put in the yellow box after use and must not be recapped.",
+    "alt": [
+     "Needles must be put in the yellow bin after use and must not be recapped.",
+     "Needles must be put in the sharps box after use and must not be recapped."
+    ]
    }
   ],
   "cando": "用 must／should／can ＋ be ＋ 過去分詞說處置規定（給藥、傷口照護）",
   "scene": "給藥和傷口照護說明",
-  "prompt": {
-   "en": "Write three rules for your classroom or a hospital ward with must be, should be, or can't be.",
-   "zh": "用 must be／should be／can't be 寫三條教室或病房的規定。",
-   "sample": "Phones must be turned off in class. The floor should be cleaned every night. Food can't be eaten in the lab."
-  }
+  "prompts": [
+   {
+    "en": "Write three rules for your classroom or a hospital ward with must be, should be, or can't be.",
+    "zh": "用 must be／should be／can't be 寫三條教室或病房的規定。",
+    "sample": "Phones must be turned off in class. The floor should be cleaned every night. Food can't be eaten in the lab."
+   },
+   {
+    "en": "Write three sentences about how things should be done at home, like cleaning, cooking, or recycling. Use should be or must be.",
+    "zh": "用 should be 或 must be 寫三句家裡的事應該怎麼做（打掃、煮飯、回收）。",
+    "sample": "The trash should be taken out every night. Plastic bottles must be washed before recycling. The kitchen should be cleaned after dinner."
+   },
+   {
+    "en": "Write three questions about a new rule with Can … be …? or Should … be …?",
+    "zh": "針對一條新規定，用 Can … be …? 或 Should … be …? 寫三個問題。",
+    "sample": "Can the form be filled out online? Should it be signed by a parent? Can it be handed in after Friday?"
+   },
+   {
+    "en": "Write care instructions for an IV site. Use must be, should be, and can be.",
+    "zh": "寫靜脈注射部位的照護說明，用 must be、should be、can be。",
+    "sample": "The IV site must be checked every shift. The dressing should be changed if it gets wet. The line can be flushed with saline."
+   },
+   {
+    "en": "Write about a problem at your school or hospital and how it could be fixed.",
+    "zh": "寫學校或醫院的一個問題，以及可以怎麼被解決。",
+    "sample": "The elevators are always crowded at noon. More signs for the stairs should be put up. Lunch times could be changed for different classes."
+   }
+  ]
  },
  {
   "unit": 35,
@@ -2534,15 +5014,99 @@
    {
     "zh": "我希望明天是晴天。",
     "en": "I hope it will be sunny tomorrow."
+   },
+   {
+    "zh": "我希望你的面試很順利。",
+    "en": "I hope your interview goes well.",
+    "alt": [
+     "I hope that your interview goes well.",
+     "I hope your interview will go well."
+    ]
+   },
+   {
+    "zh": "我希望我能通過護理師考試。",
+    "en": "I hope I can pass the nursing exam.",
+    "alt": [
+     "I hope that I can pass the nursing exam.",
+     "I hope I will pass the nursing exam.",
+     "I hope I can pass the licensing exam."
+    ]
+   },
+   {
+    "zh": "你確定這是對的藥嗎？",
+    "en": "Are you sure this is the right medicine?",
+    "alt": [
+     "Are you sure that this is the right medicine?",
+     "Are you sure this is the right drug?"
+    ]
+   },
+   {
+    "zh": "你覺得他會準時嗎？",
+    "en": "Do you think he will be on time?",
+    "alt": [
+     "Do you think that he will be on time?"
+    ]
+   },
+   {
+    "zh": "病人每天量體重很重要。",
+    "en": "It is important that the patient checks his weight every day.",
+    "alt": [
+     "It is important that the patient weighs himself every day.",
+     "It is important that the patient check his weight every day."
+    ]
+   },
+   {
+    "zh": "有可能是這個藥讓你頭暈。",
+    "en": "It is possible that this medicine makes you dizzy.",
+    "alt": [
+     "It is possible that this medicine is making you dizzy."
+    ]
+   },
+   {
+    "zh": "醫生認為手術很成功，但你還是需要多休息。",
+    "en": "The doctor thinks that the surgery went well, but you still need to rest a lot.",
+    "alt": [
+     "The doctor thinks the surgery went well, but you still need to rest a lot.",
+     "The doctor thinks the surgery was successful, but you still need to get more rest."
+    ]
+   },
+   {
+    "zh": "我知道你想回家，但是你的血壓還太高。",
+    "en": "I know that you want to go home, but your blood pressure is still too high.",
+    "alt": [
+     "I know you want to go home, but your blood pressure is still too high."
+    ]
    }
   ],
   "cando": "用 I think／I hope／I'm sure (that)… 說看法和希望",
   "scene": "家屬會談",
-  "prompt": {
-   "en": "Write three sentences about your future with I think…, I hope…, and I'm sure…",
-   "zh": "用 I think…、I hope…、I'm sure… 寫三句關於你未來的話。",
-   "sample": "I think nursing is a good job for me. I hope I can pass the NCLEX. I'm sure my family will support me."
-  }
+  "prompts": [
+   {
+    "en": "Write three sentences about your future with I think…, I hope…, and I'm sure…",
+    "zh": "用 I think…、I hope…、I'm sure… 寫三句關於你未來的話。",
+    "sample": "I think nursing is a good job for me. I hope I can pass the NCLEX. I'm sure my family will support me."
+   },
+   {
+    "en": "Write three wishes for people you love. Use I hope (that)…",
+    "zh": "用 I hope (that)… 為你在乎的人寫三個祝福。",
+    "sample": "I hope my mom stays healthy. I hope my brother passes his exam. I hope my best friend finds a good job."
+   },
+   {
+    "en": "Write three Do you think…? questions to ask a classmate about the future.",
+    "zh": "寫三個 Do you think…? 問同學對未來的看法。",
+    "sample": "Do you think we will pass the exam? Do you think robots will help nurses? Do you think you will work abroad?"
+   },
+   {
+    "en": "Talk with a patient's family. Write three sentences with I'm sure…, It's important that…, and I understand that…",
+    "zh": "跟家屬會談，用 I'm sure…、It's important that…、I understand that… 寫三句。",
+    "sample": "I understand that you are worried. It's important that your father rests today. I'm sure the doctor will explain the results this afternoon."
+   },
+   {
+    "en": "Give your opinion about learning English with an app. Use I think…, I believe…, or I'm not sure…",
+    "zh": "用 I think…、I believe… 或 I'm not sure… 寫你對用 app 學英文的看法。",
+    "sample": "I think learning with an app is convenient. I believe practicing every day is more important than long classes. I'm not sure that an app can replace a real teacher."
+   }
+  ]
  },
  {
   "unit": 36,
@@ -2606,15 +5170,94 @@
    {
     "zh": "這是一本用簡單英文寫的書。",
     "en": "This is a book written in simple English."
+   },
+   {
+    "zh": "這是一首用台語唱的歌。",
+    "en": "This is a song sung in Taiwanese.",
+    "alt": [
+     "This is a song sung in Taiwanese Hokkien."
+    ]
+   },
+   {
+    "zh": "我收到一封用英文寫的信。",
+    "en": "I got a letter written in English.",
+    "alt": [
+     "I received a letter written in English."
+    ]
+   },
+   {
+    "zh": "你有看到那個拿著紅色雨傘的男人嗎？",
+    "en": "Did you see the man holding a red umbrella?",
+    "alt": [
+     "Do you see the man holding a red umbrella?"
+    ]
+   },
+   {
+    "zh": "你認識那位正在跟護理長說話的醫生嗎？",
+    "en": "Do you know the doctor talking to the head nurse?",
+    "alt": [
+     "Do you know the doctor talking with the head nurse?"
+    ]
+   },
+   {
+    "zh": "坐在輪椅上的那位病人想去廁所。",
+    "en": "The patient sitting in the wheelchair wants to go to the bathroom.",
+    "alt": [
+     "The patient sitting in the wheelchair wants to use the bathroom."
+    ]
+   },
+   {
+    "zh": "今天早上開的抽血檢查還沒做。",
+    "en": "The blood test ordered this morning has not been done yet.",
+    "alt": [
+     "The blood test ordered this morning has not been done."
+    ]
+   },
+   {
+    "zh": "今天早上轉來的那位病人，正在等昨天開的藥。",
+    "en": "The patient transferred this morning is waiting for the medicine ordered yesterday.",
+    "alt": [
+     "The patient transferred this morning is waiting for the medication ordered yesterday."
+    ]
+   },
+   {
+    "zh": "在走廊等的家屬想知道手術什麼時候結束。",
+    "en": "The family waiting in the hallway wants to know when the surgery will finish.",
+    "alt": [
+     "The family waiting in the hallway wants to know when the surgery will end.",
+     "The family members waiting in the hallway want to know when the surgery will be over."
+    ]
    }
   ],
   "cando": "用 -ing／過去分詞片語接在名詞後面，說清楚是哪一位",
   "scene": "交班時指認病人",
-  "prompt": {
-   "en": "Describe three people or things in a place you know. Use -ing phrases (\"the man standing…\", \"the girl wearing…\") in two sentences and a past participle phrase (\"a book written in English\", \"the medicine kept in the fridge\") in one.",
-   "zh": "描述一個場景裡的三個人或東西：兩句用 -ing 片語（the man standing…、the girl wearing…），一句用過去分詞片語（a book written in English、the medicine kept in the fridge）。",
-   "sample": "The man standing at the door is a security guard. The girl wearing a pink coat is waiting for her mom. The medicine kept in the fridge is for the patient in Bed 5."
-  }
+  "prompts": [
+   {
+    "en": "Describe three people or things in a place you know. Use -ing phrases (\"the man standing…\", \"the girl wearing…\") in two sentences and a past participle phrase (\"a book written in English\", \"the medicine kept in the fridge\") in one.",
+    "zh": "描述一個場景裡的三個人或東西：兩句用 -ing 片語（the man standing…、the girl wearing…），一句用過去分詞片語（a book written in English、the medicine kept in the fridge）。",
+    "sample": "The man standing at the door is a security guard. The girl wearing a pink coat is waiting for her mom. The medicine kept in the fridge is for the patient in Bed 5."
+   },
+   {
+    "en": "Write three sentences about things in your home: where they were made or who gave them to you. Use past participle phrases.",
+    "zh": "用過去分詞片語寫三句家裡的東西：在哪裡做的、誰送的。",
+    "sample": "I have a cup made in Japan. The bag given by my aunt is my favorite. The pictures painted by my sister are on the wall."
+   },
+   {
+    "en": "Write three questions about people in a picture or a room, like Who is the man wearing…?",
+    "zh": "寫三個問圖片或房間裡的人的問題，像 Who is the man wearing…?。",
+    "sample": "Who is the girl standing next to you? Who is the man wearing glasses? Do you know the woman talking on the phone?"
+   },
+   {
+    "en": "At handoff, point out three patients with -ing or past participle phrases.",
+    "zh": "交班時用 -ing 或過去分詞片語指出三位病人。",
+    "sample": "The man sleeping in Bed 1 had surgery this morning. The patient admitted at midnight has a fever. The woman walking in the hall wants to talk to the doctor."
+   },
+   {
+    "en": "Describe a busy place, like a market, a station, or an ER, with -ing phrases.",
+    "zh": "用 -ing 片語描述一個熱鬧的地方（市場、車站、急診）。",
+    "sample": "The ER was very busy. There were people waiting at the door. A child holding his arm was crying. Nurses wearing masks were running everywhere."
+   }
+  ]
  },
  {
   "unit": 37,
@@ -2678,15 +5321,98 @@
    {
     "zh": "儘管下雨，比賽還是照常進行。",
     "en": "Despite the rain, the game went on."
+   },
+   {
+    "zh": "儘管頭痛，她還是去考試了。",
+    "en": "Despite her headache, she took the test.",
+    "alt": [
+     "Despite the headache, she still took the test.",
+     "In spite of her headache, she took the test."
+    ]
+   },
+   {
+    "zh": "儘管很忙，他還是每天打電話給媽媽。",
+    "en": "Despite being busy, he calls his mother every day.",
+    "alt": [
+     "In spite of being busy, he calls his mother every day.",
+     "Despite being busy, he still calls his mother every day."
+    ]
+   },
+   {
+    "zh": "雖然你發燒，你還是去上班了嗎？",
+    "en": "Did you go to work even though you had a fever?",
+    "alt": [
+     "Did you still go to work although you had a fever?",
+     "Did you still go to work even though you had a fever?"
+    ]
+   },
+   {
+    "zh": "雖然他很痛，他還是不吃止痛藥嗎？",
+    "en": "Does he still refuse the painkiller even though he is in pain?",
+    "alt": [
+     "Does he still refuse the pain medicine even though he is in pain?",
+     "Is he still refusing the painkiller even though he is in pain?"
+    ]
+   },
+   {
+    "zh": "雖然她八十歲了，她還是自己走路。",
+    "en": "Although she is eighty, she still walks by herself.",
+    "alt": [
+     "Even though she is 80, she still walks by herself.",
+     "Although she is 80, she still walks on her own."
+    ]
+   },
+   {
+    "zh": "雖然傷口很小，但它很深。",
+    "en": "Although the wound is small, it is deep.",
+    "alt": [
+     "Even though the wound is small, it is deep."
+    ]
+   },
+   {
+    "zh": "病人說他不痛。然而，他看起來很不舒服。",
+    "en": "The patient says he is not in pain. However, he looks uncomfortable.",
+    "alt": [
+     "The patient says he has no pain. However, he looks uncomfortable."
+    ]
+   },
+   {
+    "zh": "他的體溫已經正常了。然而，他還是在咳嗽。",
+    "en": "His temperature is normal now. However, he is still coughing.",
+    "alt": [
+     "His temperature is back to normal. However, he is still coughing."
+    ]
    }
   ],
   "cando": "用 although／despite／however 說出兩件相反的事",
   "scene": "跟醫師報告病人狀況",
-  "prompt": {
-   "en": "Write two contrasts about yourself: one with although (in one sentence), and one with however (two short sentences, the second starting with However).",
-   "zh": "寫你身上兩組相反的事：一組用 although（一句寫完）；一組用 however（先寫一句，下一句用 However 開頭說相反的事）。",
-   "sample": "Although English is hard for me, I practice every day. I love nursing. However, night shifts are tiring."
-  }
+  "prompts": [
+   {
+    "en": "Write two contrasts about yourself: one with although (in one sentence), and one with however (two short sentences, the second starting with However).",
+    "zh": "寫你身上兩組相反的事：一組用 although（一句寫完）；一組用 however（先寫一句，下一句用 However 開頭說相反的事）。",
+    "sample": "Although English is hard for me, I practice every day. I love nursing. However, night shifts are tiring."
+   },
+   {
+    "en": "Write three sentences about doing something difficult. Use despite or in spite of + a noun or -ing.",
+    "zh": "寫三句你克服困難做某件事，用 despite 或 in spite of 加名詞或 -ing。",
+    "sample": "Despite the heavy rain, I went to class. In spite of feeling nervous, I gave my presentation. Despite my busy schedule, I study English every day."
+   },
+   {
+    "en": "Write three questions for a classmate with even though.",
+    "zh": "用 even though 寫三個問同學的問題。",
+    "sample": "Do you still drink coffee even though it keeps you awake? Did you go out even though it was cold? Would you work night shifts even though they are tiring?"
+   },
+   {
+    "en": "Report on a patient to a doctor: two good things and one worrying thing. Use however or although.",
+    "zh": "向醫師報告病人：兩件好的、一件令人擔心的，用 however 或 although。",
+    "sample": "Mr. Wu ate all his lunch and walked in the hallway. However, his blood sugar is still high. Although he feels fine, I think we should check it again."
+   },
+   {
+    "en": "Compare two people you know with while or whereas.",
+    "zh": "用 while 或 whereas 比較你認識的兩個人。",
+    "sample": "My father likes the mountains, while my mother prefers the beach. I study at night, whereas my roommate studies in the morning."
+   }
+  ]
  },
  {
   "unit": 38,
@@ -2750,15 +5476,99 @@
    {
     "zh": "他沒睡覺，因此他今天很累。",
     "en": "He did not sleep. Therefore, he is very tired today."
+   },
+   {
+    "zh": "她每天練習。因此，她的英文進步得很快。",
+    "en": "She practices every day. Therefore, her English has improved quickly.",
+    "alt": [
+     "She practices every day. As a result, her English has improved quickly.",
+     "She practices every day. Therefore, her English is improving quickly."
+    ]
+   },
+   {
+    "zh": "他忘了吃藥。結果，他的血壓升高了。",
+    "en": "He forgot to take his medicine. As a result, his blood pressure went up.",
+    "alt": [
+     "He forgot to take his medicine. As a result, his blood pressure rose.",
+     "He forgot to take his medicine. Therefore, his blood pressure went up."
+    ]
+   },
+   {
+    "zh": "會議是因為颱風取消的嗎？",
+    "en": "Was the meeting canceled because of the typhoon?",
+    "alt": [
+     "Was the meeting cancelled due to the typhoon?",
+     "Was the meeting canceled due to the typhoon?"
+    ]
+   },
+   {
+    "zh": "他的頭痛是因為睡眠不足嗎？",
+    "en": "Is his headache due to a lack of sleep?",
+    "alt": [
+     "Is his headache because of a lack of sleep?",
+     "Is his headache caused by a lack of sleep?"
+    ]
+   },
+   {
+    "zh": "他的出院因為感染而延後了。",
+    "en": "His discharge was delayed because of an infection.",
+    "alt": [
+     "His discharge was delayed due to an infection.",
+     "His discharge was postponed because of an infection."
+    ]
+   },
+   {
+    "zh": "她因為低血糖而昏倒了。",
+    "en": "She fainted because of low blood sugar.",
+    "alt": [
+     "She passed out due to low blood sugar.",
+     "She fainted due to low blood sugar."
+    ]
+   },
+   {
+    "zh": "吃太多鹽會導致高血壓，因此你應該少吃加工食品。",
+    "en": "Eating too much salt can lead to high blood pressure. Therefore, you should eat less processed food.",
+    "alt": [
+     "Too much salt can lead to high blood pressure. Therefore, you should eat less processed food."
+    ]
+   },
+   {
+    "zh": "長時間躺在床上可能造成壓瘡，因此病人需要常常翻身。",
+    "en": "Lying in bed for a long time can cause pressure sores. Therefore, patients need to be turned often.",
+    "alt": [
+     "Staying in bed for a long time can lead to pressure ulcers. Therefore, patients need to be turned often."
+    ]
    }
   ],
   "cando": "用 because of／due to／therefore／as a result 寫因果（報告用語）",
   "scene": "討論手術延後的原因",
-  "prompt": {
-   "en": "Write two sentences about a cause and its result in your life. Use because of or due to, and therefore or as a result.",
-   "zh": "寫兩句你生活中的因果，用 because of／due to 和 therefore／as a result。",
-   "sample": "I missed the bus because of the heavy rain. As a result, I was late for my first class."
-  }
+  "prompts": [
+   {
+    "en": "Write two sentences about a cause and its result in your life. Use because of or due to, and therefore or as a result.",
+    "zh": "寫兩句你生活中的因果，用 because of／due to 和 therefore／as a result。",
+    "sample": "I missed the bus because of the heavy rain. As a result, I was late for my first class."
+   },
+   {
+    "en": "Write about a good habit and its results. Use therefore or as a result.",
+    "zh": "寫一個好習慣和它帶來的結果，用 therefore 或 as a result。",
+    "sample": "I started walking to school every day. As a result, I sleep better at night. I also feel less stressed. Therefore, I want to keep doing it."
+   },
+   {
+    "en": "Write three questions about causes with Was it because of…? or Was … due to…?",
+    "zh": "用 Was it because of…? 或 Was … due to…? 寫三個問原因的問題。",
+    "sample": "Was the bus late because of the rain? Was the surgery delayed due to his fever? Was the store closed because of the holiday?"
+   },
+   {
+    "en": "Write a short incident report: what happened, why, and the result. Use due to, caused, and as a result.",
+    "zh": "寫一段簡短的事件報告：發生什麼、為什麼、結果怎樣，用 due to、caused、as a result。",
+    "sample": "At 3 a.m., Mrs. Chen fell in the bathroom due to dizziness. The fall caused a small cut on her head. As a result, the doctor ordered a CT scan."
+   },
+   {
+    "en": "Explain one health problem and its causes in three sentences. Use can lead to or can cause.",
+    "zh": "用三句說明一個健康問題和它的原因，用 can lead to 或 can cause。",
+    "sample": "Using your phone in bed can cause poor sleep. Poor sleep can lead to headaches. Therefore, you should put your phone away an hour before bed."
+   }
+  ]
  },
  {
   "unit": 39,
@@ -2822,40 +5632,176 @@
    {
     "zh": "價格去年維持不變。",
     "en": "The price remained the same last year."
+   },
+   {
+    "zh": "病房的病人數從 30 人降到 18 人。",
+    "en": "The number of patients in the ward dropped from 30 to 18.",
+    "alt": [
+     "The number of patients in the ward decreased from 30 to 18.",
+     "The number of patients in the ward fell from 30 to 18."
+    ]
+   },
+   {
+    "zh": "公車票價從 15 元漲到 20 元。",
+    "en": "The bus fare rose from 15 to 20 dollars.",
+    "alt": [
+     "The bus fare increased from 15 to 20 dollars.",
+     "The bus fare went up from 15 to 20 dollars."
+    ]
+   },
+   {
+    "zh": "她的心跳有升高嗎？",
+    "en": "Did her heart rate go up?",
+    "alt": [
+     "Did her heart rate increase?",
+     "Did her heart rate rise?"
+    ]
+   },
+   {
+    "zh": "他的體重這個月有維持不變嗎？",
+    "en": "Did his weight remain the same this month?",
+    "alt": [
+     "Did his weight stay the same this month?"
+    ]
+   },
+   {
+    "zh": "她的血糖從 250 降到 140。",
+    "en": "Her blood sugar dropped from 250 to 140.",
+    "alt": [
+     "Her blood sugar decreased from 250 to 140.",
+     "Her blood sugar fell from 250 to 140."
+    ]
+   },
+   {
+    "zh": "他的血氧從 88% 升到 96%。",
+    "en": "His oxygen saturation rose from 88 to 96 percent.",
+    "alt": [
+     "His oxygen saturation increased from 88% to 96%.",
+     "His oxygen level went up from 88 to 96 percent.",
+     "His oxygen saturation rose from 88% to 96%."
+    ]
+   },
+   {
+    "zh": "開始運動之後，她的體重三個月內減少了五公斤，而血壓維持穩定。",
+    "en": "After she started exercising, her weight decreased by five kilograms in three months, while her blood pressure remained stable.",
+    "alt": [
+     "After she started exercising, her weight dropped by five kilograms in three months, while her blood pressure remained stable.",
+     "After she started exercising, her weight decreased by five kilograms in three months, and her blood pressure stayed stable."
+    ]
+   },
+   {
+    "zh": "夜班的時候，他的體溫從 37 度升到 38.5 度，而心跳增加到每分鐘 110 下。",
+    "en": "During the night shift, his temperature rose from 37 to 38.5 degrees, and his heart rate increased to 110 beats per minute.",
+    "alt": [
+     "During the night shift, his temperature went up from 37 to 38.5 degrees, and his heart rate increased to 110 beats per minute.",
+     "During the night shift, his temperature rose from 37 to 38.5 degrees, while his heart rate increased to 110 beats per minute."
+    ]
    }
   ],
   "cando": "用 rise／drop／remain stable ＋ from…to… 描述圖表和數字的變化",
   "scene": "看體溫和心跳的紀錄",
-  "prompt": {
-   "en": "Describe the chart in three or four sentences: where it starts, how it changes, and where it ends. Use the numbers.",
-   "zh": "用三到四句描述這張圖：一開始多少、怎麼變化、最後多少（要寫出數字）。",
-   "sample": "On Monday, her systolic blood pressure was 150 mmHg. It dropped to 130 on Wednesday. Then it remained stable for one day. On Friday, it was 128.",
-   "chart": {
-    "title": "Mrs. Chen's systolic blood pressure (mmHg)",
-    "points": [
-     {
-      "label": "Mon",
-      "value": 150.0
-     },
-     {
-      "label": "Tue",
-      "value": 142.0
-     },
-     {
-      "label": "Wed",
-      "value": 130.0
-     },
-     {
-      "label": "Thu",
-      "value": 130.0
-     },
-     {
-      "label": "Fri",
-      "value": 128.0
-     }
-    ]
+  "prompts": [
+   {
+    "en": "Describe the chart in three or four sentences: where it starts, how it changes, and where it ends. Use the numbers.",
+    "zh": "用三到四句描述這張圖：一開始多少、怎麼變化、最後多少（要寫出數字）。",
+    "sample": "On Monday, her systolic blood pressure was 150 mmHg. It dropped to 130 on Wednesday. Then it remained stable for one day. On Friday, it was 128.",
+    "chart": {
+     "title": "Mrs. Chen's systolic blood pressure (mmHg)",
+     "points": [
+      {
+       "label": "Mon",
+       "value": 150.0
+      },
+      {
+       "label": "Tue",
+       "value": 142.0
+      },
+      {
+       "label": "Wed",
+       "value": 130.0
+      },
+      {
+       "label": "Thu",
+       "value": 130.0
+      },
+      {
+       "label": "Fri",
+       "value": 128.0
+      }
+     ]
+    }
+   },
+   {
+    "en": "Describe the chart in three or four sentences. Use rose, dropped, and remained the same, with the numbers.",
+    "zh": "用三到四句描述這張圖，用 rose、dropped、remained the same，並寫出數字。",
+    "sample": "On Monday, 40 patients came to the ER. The number rose to 52 on Tuesday and remained the same on Wednesday. It dropped to 35 on Thursday. On Friday, it rose sharply to 60.",
+    "chart": {
+     "title": "Patients in the ER each day",
+     "points": [
+      {
+       "label": "Mon",
+       "value": 40
+      },
+      {
+       "label": "Tue",
+       "value": 52
+      },
+      {
+       "label": "Wed",
+       "value": 52
+      },
+      {
+       "label": "Thu",
+       "value": 35
+      },
+      {
+       "label": "Fri",
+       "value": 60
+      }
+     ]
+    }
+   },
+   {
+    "en": "Write three questions about changes in your life with Did … go up?, Did … drop?, or Did … stay the same?",
+    "zh": "用 Did … go up?、Did … drop?、Did … stay the same? 寫三個問生活中變化的問題。",
+    "sample": "Did your rent go up this year? Did the price of eggs drop? Did your sleep time stay the same?"
+   },
+   {
+    "en": "Describe Mr. Lin's temperature during the day in four sentences. Use from…to… and by.",
+    "zh": "用四句描述林先生一天的體溫變化，用 from…to… 和 by。",
+    "sample": "At 6 a.m., Mr. Lin's temperature was 38.9 degrees. It dropped to 37.4 degrees by 2 p.m. It remained the same at 6 p.m. Then it rose by 0.4 degrees to 37.8 at 10 p.m.",
+    "chart": {
+     "title": "Mr. Lin's temperature (°C)",
+     "points": [
+      {
+       "label": "6 a.m.",
+       "value": 38.9
+      },
+      {
+       "label": "10 a.m.",
+       "value": 38.0
+      },
+      {
+       "label": "2 p.m.",
+       "value": 37.4
+      },
+      {
+       "label": "6 p.m.",
+       "value": 37.4
+      },
+      {
+       "label": "10 p.m.",
+       "value": 37.8
+      }
+     ]
+    }
+   },
+   {
+    "en": "Write about something in your life that changed over the past year, like your study time, savings, or screen time. Use increased by or decreased by.",
+    "zh": "寫過去一年你生活中變化的東西（讀書時間、存款、看螢幕的時間），用 increased by 或 decreased by。",
+    "sample": "My study time increased by thirty minutes a day. My savings increased by 20,000 dollars. My screen time decreased by two hours a day."
    }
-  }
+  ]
  },
  {
   "unit": 40,
@@ -2919,21 +5865,109 @@
    {
     "zh": "舉例來說，我每天花一個小時通勤。",
     "en": "For example, I spend an hour commuting every day."
+   },
+   {
+    "zh": "我認為早起比較好，因為頭腦比較清楚。",
+    "en": "I think getting up early is better because my mind is clearer.",
+    "alt": [
+     "I think waking up early is better because my mind is clearer.",
+     "In my opinion, getting up early is better because my mind is clearer."
+    ]
+   },
+   {
+    "zh": "我相信讀書會很有用，因為大家可以互相幫忙。",
+    "en": "I believe study groups are useful because people can help each other.",
+    "alt": [
+     "I believe study groups are helpful because people can help each other."
+    ]
+   },
+   {
+    "zh": "你同意手機在上課時應該關機嗎？",
+    "en": "Do you agree that phones should be turned off in class?",
+    "alt": [
+     "Do you agree that phones should be turned off during class?"
+    ]
+   },
+   {
+    "zh": "你同意護理師應該學第二種語言嗎？",
+    "en": "Do you agree that nurses should learn a second language?"
+   },
+   {
+    "zh": "在我看來，醫院需要更多護理師，因為護理師太累了。",
+    "en": "In my opinion, hospitals need more nurses because nurses are too tired.",
+    "alt": [
+     "I think hospitals need more nurses because nurses are too tired."
+    ]
+   },
+   {
+    "zh": "我認為病人應該知道自己的檢查結果，因為那是他們的身體。",
+    "en": "I think patients should know their test results because it is their body.",
+    "alt": [
+     "In my opinion, patients should know their test results because it is their body."
+    ]
+   },
+   {
+    "zh": "主要的理由是運動能減輕壓力。例如，我跑完步就覺得比較放鬆。",
+    "en": "The main reason is that exercise reduces stress. For example, I feel more relaxed after I run.",
+    "alt": [
+     "The main reason is that exercise can reduce stress. For example, I feel more relaxed after running."
+    ]
+   },
+   {
+    "zh": "總之，好的睡眠對學習很重要。",
+    "en": "In conclusion, good sleep is important for learning.",
+    "alt": [
+     "To sum up, good sleep is important for learning."
+    ]
    }
   ],
   "cando": "用「意見 → 理由 → 例子 → 結論」把口說回答講長",
   "scene": "口說測驗練習",
-  "prompt": {
-   "en": "Question: Should students have part-time jobs? Answer in four sentences: your opinion, a reason, an example, and a conclusion.",
-   "zh": "題目：學生應該打工嗎？用四句回答：意見、理由、例子、結論。",
-   "sample": "I think students can have part-time jobs. The main reason is that they learn to manage money. For example, my friend works at a café and saves money every month. So, a part-time job can be good if it does not hurt your grades.",
-   "scaffold": [
-    "I think…",
-    "The main reason is that…",
-    "For example, …",
-    "So, …"
-   ]
-  }
+  "prompts": [
+   {
+    "en": "Question: Should students have part-time jobs? Answer in four sentences: your opinion, a reason, an example, and a conclusion.",
+    "zh": "題目：學生應該打工嗎？用四句回答：意見、理由、例子、結論。",
+    "sample": "I think students can have part-time jobs. The main reason is that they learn to manage money. For example, my friend works at a café and saves money every month. So, a part-time job can be good if it does not hurt your grades.",
+    "scaffold": [
+     "I think…",
+     "The main reason is that…",
+     "For example, …",
+     "So, …"
+    ]
+   },
+   {
+    "en": "Question: Is it better to live alone or with your family? Answer in four sentences: your opinion, a reason, an example, and a conclusion.",
+    "zh": "題目：一個人住比較好，還是跟家人住比較好？用四句回答：意見、理由、例子、結論。",
+    "sample": "In my opinion, living with family is better for students. The main reason is that you can save money. For example, I don't pay rent, so I can buy more books. That is why I live with my parents now.",
+    "scaffold": [
+     "In my opinion, …",
+     "The main reason is that…",
+     "For example, …",
+     "That is why…"
+    ]
+   },
+   {
+    "en": "Question: Do you agree that everyone should learn to cook? Give your answer with a reason and an example.",
+    "zh": "題目：你同意每個人都應該學煮飯嗎？說出你的答案、理由和例子。",
+    "sample": "I agree that everyone should learn to cook. Cooking at home is healthier and cheaper. For example, my roommate cooks rice and vegetables, and she spends less money than I do."
+   },
+   {
+    "en": "Question: Should hospitals let a family member stay overnight? Answer in four sentences.",
+    "zh": "題目：醫院應該讓家屬留下來過夜嗎？用四句回答。",
+    "sample": "In my opinion, hospitals should let one family member stay overnight. The main reason is that patients feel safer. For example, older patients often sleep better when their children are near. However, the family must follow the ward rules.",
+    "scaffold": [
+     "In my opinion, …",
+     "The main reason is that…",
+     "For example, …",
+     "However, …"
+    ]
+   },
+   {
+    "en": "Question: What is the best way to learn English? Give your opinion, two reasons, and a conclusion.",
+    "zh": "題目：學英文最好的方法是什麼？寫你的意見、兩個理由和結論。",
+    "sample": "I believe the best way is to practice a little every day. First, you don't forget what you learned. Second, small steps are easy to keep. That is why I study English for ninety minutes every day."
+   }
+  ]
  },
  {
   "unit": 41,
@@ -2997,15 +6031,90 @@
    {
     "zh": "冰箱裡的牛奶過期了。",
     "en": "The milk in the fridge has expired."
+   },
+   {
+    "zh": "醫生常常很忙。",
+    "en": "Doctors are often busy."
+   },
+   {
+    "zh": "貓喜歡睡覺。",
+    "en": "Cats like to sleep.",
+    "alt": [
+     "Cats like sleeping."
+    ]
+   },
+   {
+    "zh": "你會說日文嗎？",
+    "en": "Do you speak Japanese?",
+    "alt": [
+     "Can you speak Japanese?"
+    ]
+   },
+   {
+    "zh": "你午餐吃了什麼？",
+    "en": "What did you have for lunch?",
+    "alt": [
+     "What did you eat for lunch?"
+    ]
+   },
+   {
+    "zh": "她有氣喘，而且今天發燒。",
+    "en": "She has asthma and a fever today.",
+    "alt": [
+     "She has asthma, and she has a fever today."
+    ]
+   },
+   {
+    "zh": "我爸爸有高血壓。",
+    "en": "My father has high blood pressure.",
+    "alt": [
+     "My dad has high blood pressure."
+    ]
+   },
+   {
+    "zh": "窗邊的那張床是空的，而且它是這間病房最舒服的床。",
+    "en": "The bed by the window is empty, and it is the most comfortable bed in this room.",
+    "alt": [
+     "The bed next to the window is empty, and it is the most comfortable bed in this room."
+    ]
+   },
+   {
+    "zh": "她每天早上七點去上學。",
+    "en": "She goes to school at seven every morning.",
+    "alt": [
+     "She goes to school at 7 every morning."
+    ]
    }
   ],
   "cando": "泛指不加冠詞，特指才用 the；說得出疾病名稱的冠詞",
   "scene": "衛教：講健康觀念",
-  "prompt": {
-   "en": "Write three health tips about things in general, with no \"the\" — for example, Water…, Vegetables…, Exercise…",
-   "zh": "寫三個健康小建議，用泛指的說法、不加 the，例如 Water…、Vegetables…、Exercise…",
-   "sample": "Water is good for your skin. Vegetables give you vitamins. Exercise helps you sleep better."
-  }
+  "prompts": [
+   {
+    "en": "Write three health tips about things in general, with no \"the\" — for example, Water…, Vegetables…, Exercise…",
+    "zh": "寫三個健康小建議，用泛指的說法、不加 the，例如 Water…、Vegetables…、Exercise…",
+    "sample": "Water is good for your skin. Vegetables give you vitamins. Exercise helps you sleep better."
+   },
+   {
+    "en": "Write three sentences about jobs in general, like nurses, teachers, or drivers. Use plural nouns without the.",
+    "zh": "用泛指的複數（不加 the）寫三句關於職業的話，例如 nurses、teachers、drivers。",
+    "sample": "Nurses work long hours. Teachers need a lot of patience. Bus drivers start work very early."
+   },
+   {
+    "en": "Write three questions about daily life with meals, languages, or sports. Use no article with them.",
+    "zh": "用三餐、語言或運動（前面不加冠詞）寫三個生活問題。",
+    "sample": "What time do you have dinner? Do you speak Korean? Do you play basketball on weekends?"
+   },
+   {
+    "en": "A patient has two health problems. Write three sentences, using a / an or no article correctly with the diseases.",
+    "zh": "病人有兩個健康問題，寫三句，病名前的冠詞要用對。",
+    "sample": "Mrs. Lin has diabetes. Today she also has a fever and a sore throat. She needs to check her blood sugar more often."
+   },
+   {
+    "en": "Describe your town. Use the + a superlative, and the for things there is only one of.",
+    "zh": "描述你住的地方：用 the 加最高級，以及「只有一個」的東西加 the。",
+    "sample": "The night market is the busiest place in my town. The river is very clean. The train station is the oldest building here."
+   }
+  ]
  },
  {
   "unit": 42,
@@ -3069,15 +6178,98 @@
    {
     "zh": "請填寫這張表格。",
     "en": "Please fill out this form."
+   },
+   {
+    "zh": "請把你的眼鏡拿下來。",
+    "en": "Please take off your glasses.",
+    "alt": [
+     "Please take your glasses off."
+    ]
+   },
+   {
+    "zh": "外面很冷，穿上你的外套。",
+    "en": "It is cold outside. Put on your jacket.",
+    "alt": [
+     "It is cold outside, so put on your jacket.",
+     "It is cold outside. Put your jacket on.",
+     "It is cold outside. Put on your coat."
+    ]
+   },
+   {
+    "zh": "你什麼時候要回來複診？",
+    "en": "When will you come back for a follow-up?",
+    "alt": [
+     "When are you coming back for a follow-up?"
+    ]
+   },
+   {
+    "zh": "你跟醫生約好了嗎？",
+    "en": "Have you made an appointment with the doctor?",
+    "alt": [
+     "Did you make an appointment with the doctor?"
+    ]
+   },
+   {
+    "zh": "她明天要動手術。",
+    "en": "She will have surgery tomorrow.",
+    "alt": [
+     "She is having surgery tomorrow.",
+     "She is going to have surgery tomorrow."
+    ]
+   },
+   {
+    "zh": "護理師剛幫他打了一針。",
+    "en": "The nurse just gave him an injection.",
+    "alt": [
+     "The nurse just gave him a shot.",
+     "The nurse has just given him an injection."
+    ]
+   },
+   {
+    "zh": "我上週感冒了，花了一個禮拜才好。",
+    "en": "I came down with a cold last week, and it took me a week to get over it.",
+    "alt": [
+     "I came down with a cold last week, and it took a week to get over it."
+    ]
+   },
+   {
+    "zh": "他請了三天假，因為他要照顧生病的媽媽。",
+    "en": "He took three days off because he had to look after his sick mother.",
+    "alt": [
+     "He took three days off because he needed to take care of his sick mother.",
+     "He took three days off to look after his sick mother."
+    ]
    }
   ],
   "cando": "用整組搭配和片語動詞（make an appointment、take off、look after）說得更自然",
   "scene": "打電話預約和請假",
-  "prompt": {
-   "en": "Write a short message to your teacher: you are sick and need to take a day off. Use two phrases from this unit.",
-   "zh": "寫一則簡短訊息給老師：你生病了要請假，用到兩個這單元的片語。",
-   "sample": "Hi, Ms. Chen. I came down with a cold, so I need to take a day off today. I will make an appointment with a doctor. I will catch up on the homework tomorrow."
-  }
+  "prompts": [
+   {
+    "en": "Write a short message to your teacher: you are sick and need to take a day off. Use two phrases from this unit.",
+    "zh": "寫一則簡短訊息給老師：你生病了要請假，用到兩個這單元的片語。",
+    "sample": "Hi, Ms. Chen. I came down with a cold, so I need to take a day off today. I will make an appointment with a doctor. I will catch up on the homework tomorrow."
+   },
+   {
+    "en": "Write a short message to a clinic to make or change an appointment. Use make an appointment, come back, or fill out.",
+    "zh": "寫一則簡短訊息給診所，預約或更改門診，用 make an appointment、come back 或 fill out。",
+    "sample": "Hello, I would like to make an appointment for Friday morning. Last time the doctor asked me to come back in two weeks. Do I need to fill out a new form?"
+   },
+   {
+    "en": "Write three questions a nurse asks before a procedure. Use collocations like have surgery, take medicine, or take off.",
+    "zh": "寫三個護理師在處置前會問的問題，用 have surgery、take medicine、take off 這類搭配。",
+    "sample": "Have you ever had surgery? Did you take any medicine this morning? Can you take off your watch and necklace?"
+   },
+   {
+    "en": "Write about a time you were sick. Use come down with, throw up or pass out, and get over.",
+    "zh": "寫一次你生病的經驗，用 come down with、throw up 或 pass out、get over。",
+    "sample": "Last winter I came down with the flu. I threw up twice on the first night. It took me five days to get over it."
+   },
+   {
+    "en": "Write three sentences about someone who looks after you, or someone you look after.",
+    "zh": "寫三句照顧你的人，或你照顧的人（look after／take care of）。",
+    "sample": "My grandma looked after me when I was little. Now I take care of her on weekends. I help her put on her shoes and take her medicine."
+   }
+  ]
  },
  {
   "unit": 43,
@@ -3149,15 +6341,98 @@
      "She used to go running every morning.",
      "She used to jog every morning."
     ]
+   },
+   {
+    "zh": "我在洗澡的時候停電了。",
+    "en": "The power went out while I was taking a shower.",
+    "alt": [
+     "While I was taking a shower, the power went out."
+    ]
+   },
+   {
+    "zh": "他在過馬路的時候被一台腳踏車撞到。",
+    "en": "He was crossing the street when a bike hit him.",
+    "alt": [
+     "A bike hit him while he was crossing the street.",
+     "He was hit by a bike while he was crossing the street."
+    ]
+   },
+   {
+    "zh": "我到藥局的時候，它已經關門了。",
+    "en": "When I got to the pharmacy, it had already closed.",
+    "alt": [
+     "The pharmacy had already closed when I got there.",
+     "When I arrived at the pharmacy, it had already closed."
+    ]
+   },
+   {
+    "zh": "考試開始之前，我已經複習了三次。",
+    "en": "I had reviewed three times before the test started.",
+    "alt": [
+     "Before the test started, I had reviewed three times.",
+     "I had already reviewed three times before the exam started."
+    ]
+   },
+   {
+    "zh": "我以前很怕打針，現在不怕了。",
+    "en": "I used to be afraid of needles, but I am not anymore.",
+    "alt": [
+     "I used to be scared of needles, but now I am not.",
+     "I used to be afraid of needles, but now I am not."
+    ]
+   },
+   {
+    "zh": "我們家以前沒有養狗。",
+    "en": "We didn't use to have a dog.",
+    "alt": [
+     "We did not use to have a dog.",
+     "My family didn't use to have a dog."
+    ]
+   },
+   {
+    "zh": "我在寫報告的時候，鄰居一直很吵。",
+    "en": "While I was writing my report, my neighbors kept making noise.",
+    "alt": [
+     "My neighbors kept making noise while I was writing my report."
+    ]
+   },
+   {
+    "zh": "我們在等醫生的時候，病人的血壓一直往下掉。",
+    "en": "While we were waiting for the doctor, the patient's blood pressure kept dropping.",
+    "alt": [
+     "The patient's blood pressure kept dropping while we were waiting for the doctor."
+    ]
    }
   ],
   "cando": "用過去式、過去進行式、過去完成式和 used to 把一件事的先後講清楚",
   "scene": "交班時說昨晚發生的事",
-  "prompt": {
-   "en": "Write four sentences about something that happened to you or a friend. Use the past simple, the past continuous (was/were + -ing), the past perfect (had + past participle) and used to — one in each sentence.",
-   "zh": "寫四句，說一件你或朋友身上發生過的事：過去式、過去進行式、過去完成式和 used to 各用一次。",
-   "sample": "I used to ride my scooter to school. Last winter, I was riding home in the rain when I slipped. When my friend arrived, I had already called my mom. Luckily, I only hurt my knee."
-  }
+  "prompts": [
+   {
+    "en": "Write four sentences about something that happened to you or a friend. Use the past simple, the past continuous (was/were + -ing), the past perfect (had + past participle) and used to — one in each sentence.",
+    "zh": "寫四句，說一件你或朋友身上發生過的事：過去式、過去進行式、過去完成式和 used to 各用一次。",
+    "sample": "I used to ride my scooter to school. Last winter, I was riding home in the rain when I slipped. When my friend arrived, I had already called my mom. Luckily, I only hurt my knee."
+   },
+   {
+    "en": "Write about your childhood in three sentences. Use used to and didn't use to.",
+    "zh": "用三句寫你的童年，用 used to 和 didn't use to。",
+    "sample": "I used to live with my grandparents. I used to play in the rice fields after school. I didn't use to like reading, but now I love it."
+   },
+   {
+    "en": "Tell a short story about a surprise: what you were doing, what happened, and what had already happened before.",
+    "zh": "說一個驚喜的小故事：你那時正在做什麼、發生了什麼、在那之前已經發生了什麼。",
+    "sample": "I was studying in my room when my sister knocked on the door. She had baked a cake for my birthday. I had completely forgotten that it was my birthday."
+   },
+   {
+    "en": "Write a short handoff about something that happened on the night shift. Use the past simple, the past continuous, and the past perfect.",
+    "zh": "寫一段交班，說夜班發生的一件事，用過去式、過去進行式、過去完成式。",
+    "sample": "At 2 a.m., Mr. Huang was walking to the bathroom when he felt dizzy. He had not eaten dinner. We helped him back to bed and checked his blood sugar."
+   },
+   {
+    "en": "Compare your life five years ago and now. Use used to in two sentences and the past simple in one.",
+    "zh": "比較你五年前和現在的生活：兩句用 used to、一句用過去式。",
+    "sample": "I used to stay up late every night. I used to drink a lot of soda. Two years ago, I started nursing school, and my life changed."
+   }
+  ]
  },
  {
   "unit": 44,
@@ -3231,15 +6506,98 @@
      "I'll have finished the report by ten.",
      "By ten, I'll have finished the report."
     ]
+   },
+   {
+    "zh": "明天下午三點，我會正在考試。",
+    "en": "At three tomorrow afternoon, I'll be taking an exam.",
+    "alt": [
+     "At 3 tomorrow afternoon, I will be taking an exam.",
+     "At three tomorrow afternoon, I'll be taking a test."
+    ]
+   },
+   {
+    "zh": "下個月這個時候，我們會正在日本旅行。",
+    "en": "This time next month, we'll be traveling in Japan.",
+    "alt": [
+     "This time next month, we will be traveling in Japan.",
+     "This time next month, we'll be travelling in Japan."
+    ]
+   },
+   {
+    "zh": "到了下週五，我就會讀完這三章了。",
+    "en": "By next Friday, I'll have read these three chapters.",
+    "alt": [
+     "By next Friday, I will have read these three chapters.",
+     "I'll have read these three chapters by next Friday."
+    ]
+   },
+   {
+    "zh": "等你畢業的時候，你就會學到很多了。",
+    "en": "By the time you graduate, you'll have learned a lot.",
+    "alt": [
+     "By the time you graduate, you will have learned a lot."
+    ]
+   },
+   {
+    "zh": "等救護車到的時候，我們就已經幫他止住血了。",
+    "en": "By the time the ambulance arrives, we'll have stopped the bleeding.",
+    "alt": [
+     "By the time the ambulance arrives, we will have stopped the bleeding."
+    ]
+   },
+   {
+    "zh": "等醫生來查房的時候，我就已經量完所有病人的生命徵象了。",
+    "en": "By the time the doctor does his rounds, I'll have checked all the patients' vital signs.",
+    "alt": [
+     "By the time the doctor comes on rounds, I'll have checked all the patients' vital signs.",
+     "By the time the doctor does his rounds, I will have checked all the patients' vital signs."
+    ]
+   },
+   {
+    "zh": "她下個月要搬到台北。",
+    "en": "She's moving to Taipei next month.",
+    "alt": [
+     "She is moving to Taipei next month."
+    ]
+   },
+   {
+    "zh": "我們明天早上十點要開會。",
+    "en": "We're having a meeting at ten tomorrow morning.",
+    "alt": [
+     "We are having a meeting at 10 tomorrow morning.",
+     "We're having a meeting at ten o'clock tomorrow morning."
+    ]
    }
   ],
   "cando": "說清楚未來的安排、某個時間正在做的事，以及在那之前會完成什麼",
   "scene": "安排下週的班表和考試",
-  "prompt": {
-   "en": "Write four sentences about next week: one arrangement you have made (present continuous), what you will be doing at a certain time (will be + -ing), and two things you will have finished by the end of the week (will have + past participle).",
-   "zh": "寫四句，說你下週的計畫：一個已經約好的安排（現在進行式）、某個時間你會正在做什麼（will be + -ing），還有兩件週末前會完成的事（will have + 過去分詞）。",
-   "sample": "I'm meeting my study group on Monday evening. At nine on Wednesday morning, I'll be taking a pharmacology quiz. By Friday, I'll have finished my care plan. I'll also have learned sixty new words by the end of the week."
-  }
+  "prompts": [
+   {
+    "en": "Write four sentences about next week: one arrangement you have made (present continuous), what you will be doing at a certain time (will be + -ing), and two things you will have finished by the end of the week (will have + past participle).",
+    "zh": "寫四句，說你下週的計畫：一個已經約好的安排（現在進行式）、某個時間你會正在做什麼（will be + -ing），還有兩件週末前會完成的事（will have + 過去分詞）。",
+    "sample": "I'm meeting my study group on Monday evening. At nine on Wednesday morning, I'll be taking a pharmacology quiz. By Friday, I'll have finished my care plan. I'll also have learned sixty new words by the end of the week."
+   },
+   {
+    "en": "Write what you will be doing at three different times tomorrow. Use will be + -ing.",
+    "zh": "寫明天三個不同時間你會正在做什麼，用 will be + -ing。",
+    "sample": "At eight tomorrow, I'll be sitting in my first class. At one, I'll be eating lunch with my classmates. At nine at night, I'll be reviewing my notes."
+   },
+   {
+    "en": "Write three goals with By the end of this year, I'll have… or By the time I graduate, I'll have…",
+    "zh": "用 By the end of this year, I'll have… 或 By the time I graduate, I'll have… 寫三個目標。",
+    "sample": "By the end of this year, I'll have passed the GEPT elementary test. By the time I graduate, I'll have finished my clinical practice. I'll also have saved enough money for the IELTS."
+   },
+   {
+    "en": "Plan a patient's day before surgery. Write three sentences with arrangements (present continuous), will be + -ing, and will have + past participle.",
+    "zh": "安排病人手術前一天的行程，用現在進行式的安排、will be + -ing 和 will have + 過去分詞寫三句。",
+    "sample": "The anesthesiologist is seeing you at four this afternoon. At midnight, you'll be starting your fast. By seven tomorrow, the nurse will have started your IV."
+   },
+   {
+    "en": "Write about your life ten years from now: where you will be living and what you will have done.",
+    "zh": "寫十年後的你：會住在哪裡、會已經完成哪些事。",
+    "sample": "Ten years from now, I'll be living in New York. I'll be working as an RN in a big hospital. By then, I'll have passed the NCLEX, and I'll have helped many patients."
+   }
+  ]
  },
  {
   "unit": 45,
@@ -3313,15 +6671,96 @@
      "She can't be at home because her car isn't there.",
      "She cannot be at home. Her car is not there."
     ]
+   },
+   {
+    "zh": "他可能在餐廳。",
+    "en": "He might be in the cafeteria.",
+    "alt": [
+     "He may be in the cafeteria.",
+     "He could be in the cafeteria."
+    ]
+   },
+   {
+    "zh": "這個藥可能不適合你。",
+    "en": "This medicine might not be right for you.",
+    "alt": [
+     "This medicine may not be right for you."
+    ]
+   },
+   {
+    "zh": "那不可能是他的車，他沒有駕照。",
+    "en": "That can't be his car. He doesn't have a driver's license.",
+    "alt": [
+     "That cannot be his car. He does not have a driver's license."
+    ]
+   },
+   {
+    "zh": "她不可能四十歲了，她看起來好年輕。",
+    "en": "She can't be forty. She looks so young.",
+    "alt": [
+     "She can't be 40. She looks so young.",
+     "She cannot be forty. She looks very young."
+    ]
+   },
+   {
+    "zh": "地板是濕的，一定有人把水打翻了。",
+    "en": "The floor is wet. Someone must have spilled water.",
+    "alt": [
+     "The floor is wet. Someone must have spilled some water."
+    ]
+   },
+   {
+    "zh": "他的血糖很低，他一定沒吃午餐。",
+    "en": "His blood sugar is low. He must have skipped lunch.",
+    "alt": [
+     "His blood sugar is low. He must not have eaten lunch."
+    ]
+   },
+   {
+    "zh": "他不可能吃了那顆藥，藥還在杯子裡。",
+    "en": "He can't have taken the pill. It's still in the cup.",
+    "alt": [
+     "He cannot have taken the pill. It is still in the cup."
+    ]
+   },
+   {
+    "zh": "她可能已經下班了，她的包包不見了。",
+    "en": "She might have gone home already. Her bag is gone.",
+    "alt": [
+     "She may have gone home already. Her bag is gone.",
+     "She might have left already. Her bag is gone."
+    ]
    }
   ],
   "cando": "根據線索推測現在和過去的事，分清楚確定、可能和不可能",
   "scene": "照顧病人時根據線索推測",
-  "prompt": {
-   "en": "Look at the clues and write four guesses: a patient's bed is empty, his slippers are gone, and the bathroom light is on. Use must, might and can't — two guesses about now and two about the past (must/might/can't have + past participle).",
-   "zh": "看線索寫四句推測：病人的床是空的、拖鞋不見了、廁所的燈亮著。用 must、might、can't：兩句推測現在，兩句推測過去（must／might／can't have + 過去分詞）。",
-   "sample": "He must be in the bathroom. He might need help getting back to bed. He must have woken up before breakfast. He can't have left the ward, because his shoes are still under the bed."
-  }
+  "prompts": [
+   {
+    "en": "Look at the clues and write four guesses: a patient's bed is empty, his slippers are gone, and the bathroom light is on. Use must, might and can't — two guesses about now and two about the past (must/might/can't have + past participle).",
+    "zh": "看線索寫四句推測：病人的床是空的、拖鞋不見了、廁所的燈亮著。用 must、might、can't：兩句推測現在，兩句推測過去（must／might／can't have + 過去分詞）。",
+    "sample": "He must be in the bathroom. He might need help getting back to bed. He must have woken up before breakfast. He can't have left the ward, because his shoes are still under the bed."
+   },
+   {
+    "en": "Your friend hasn't answered your messages all day. Write three guesses with might or could.",
+    "zh": "你朋友一整天沒回訊息，用 might 或 could 寫三句推測。",
+    "sample": "She might be busy at work. Her phone could be broken. She might have forgotten to charge it."
+   },
+   {
+    "en": "A mystery at home: someone ate your cake. Write three sentences with must have, might have, and can't have.",
+    "zh": "家裡的謎團：有人吃了你的蛋糕。用 must have、might have、can't have 寫三句。",
+    "sample": "My brother must have eaten it, because there is cream on his shirt. My mom can't have eaten it, because she doesn't like sweets. My dad might have had a small piece too."
+   },
+   {
+    "en": "A patient's IV bag is empty and the pump alarm is ringing. Write three guesses about what happened with must have, might have, or can't have.",
+    "zh": "病人的點滴袋空了、幫浦警報在響，用 must have、might have、can't have 寫三句推測發生了什麼。",
+    "sample": "The night nurse must have forgotten to hang a new bag. The patient might have pressed the wrong button. The pump can't have been broken, because it worked this morning."
+   },
+   {
+    "en": "Write about a time you guessed wrong about someone. Use I thought he must be… or might be…, but…",
+    "zh": "寫一次你猜錯別人的經驗，用 I thought he must be… 或 might be…, but…。",
+    "sample": "On my first day, I thought the man in the white coat must be a doctor. But he was a patient's son. I thought he might be angry, but he was very kind."
+   }
+  ]
  },
  {
   "unit": 46,
@@ -3394,15 +6833,96 @@
      "If she had slept earlier, she wouldn't have been late.",
      "If she'd gone to bed earlier, she wouldn't have been late."
     ]
+   },
+   {
+    "zh": "如果他有吃午餐，他就不會那麼餓了。",
+    "en": "If he had eaten lunch, he wouldn't have been so hungry.",
+    "alt": [
+     "If he had had lunch, he wouldn't have been so hungry.",
+     "If he had eaten lunch, he would not have been so hungry."
+    ]
+   },
+   {
+    "zh": "如果我們有訂位，我們就不用等了。",
+    "en": "If we had booked a table, we wouldn't have had to wait.",
+    "alt": [
+     "If we had made a reservation, we wouldn't have had to wait."
+    ]
+   },
+   {
+    "zh": "如果我知道你要來，我就會去車站接你。",
+    "en": "If I had known you were coming, I would have picked you up at the station.",
+    "alt": [
+     "If I had known that you were coming, I would have picked you up at the station."
+    ]
+   },
+   {
+    "zh": "如果你早點問我，我就可以幫你了。",
+    "en": "If you had asked me earlier, I could have helped you.",
+    "alt": [
+     "If you'd asked me earlier, I could have helped you."
+    ]
+   },
+   {
+    "zh": "如果她有按時吃藥，她的血壓就不會這麼高了。",
+    "en": "If she had taken her medicine on time, her blood pressure wouldn't have been so high.",
+    "alt": [
+     "If she had taken her medication on time, her blood pressure wouldn't have been so high."
+    ]
+   },
+   {
+    "zh": "如果當時有人扶著他，他就不會跌倒了。",
+    "en": "If someone had helped him, he wouldn't have fallen.",
+    "alt": [
+     "He wouldn't have fallen if someone had helped him.",
+     "If someone had held him, he wouldn't have fallen."
+    ]
+   },
+   {
+    "zh": "如果我沒有核對手圈，我就會把藥給錯病人了。",
+    "en": "If I hadn't checked the wristband, I would have given the medicine to the wrong patient.",
+    "alt": [
+     "If I had not checked the ID band, I would have given the medicine to the wrong patient.",
+     "If I hadn't checked the wristband, I would have given the wrong patient the medicine."
+    ]
+   },
+   {
+    "zh": "如果她沒有馬上打 119，情況可能會更糟。",
+    "en": "If she hadn't called 119 right away, things might have been worse.",
+    "alt": [
+     "If she had not called 119 right away, it might have been worse."
+    ]
    }
   ],
   "cando": "說出「當初如果…，結果就會…」，談過去的後悔和教訓",
   "scene": "檢討一次差點出錯的事",
-  "prompt": {
-   "en": "Think of a time something went wrong. Write four sentences: what happened, and three 'If I had…, I would/wouldn't have…' sentences about what could have been different.",
-   "zh": "想一次出錯的經驗。寫四句：發生了什麼事，再用三句「If I had…, I would／wouldn't have…」說當初如果不一樣，結果會怎樣。",
-   "sample": "Last month I missed my train to Taichung. If I had checked the time, I wouldn't have missed it. If I had left home earlier, I would have caught it easily. If I hadn't missed it, I would have arrived at class on time."
-  }
+  "prompts": [
+   {
+    "en": "Think of a time something went wrong. Write four sentences: what happened, and three 'If I had…, I would/wouldn't have…' sentences about what could have been different.",
+    "zh": "想一次出錯的經驗。寫四句：發生了什麼事，再用三句「If I had…, I would／wouldn't have…」說當初如果不一樣，結果會怎樣。",
+    "sample": "Last month I missed my train to Taichung. If I had checked the time, I wouldn't have missed it. If I had left home earlier, I would have caught it easily. If I hadn't missed it, I would have arrived at class on time."
+   },
+   {
+    "en": "Think of a good decision you made. Write three sentences with If I hadn't…, I wouldn't have…",
+    "zh": "想一個你做對的決定，用 If I hadn't…, I wouldn't have… 寫三句。",
+    "sample": "If I hadn't chosen nursing, I wouldn't have met my best friends. If I hadn't studied English, I wouldn't have found this dream. If I hadn't moved to Taichung, I wouldn't have learned to live alone."
+   },
+   {
+    "en": "Write three questions with What would you have done if…? about difficult situations.",
+    "zh": "用 What would you have done if…? 寫三個關於困難情況的問題。",
+    "sample": "What would you have done if the patient had refused the injection? What would you have done if you had missed the exam? What would you have done if your phone had died on the trip?"
+   },
+   {
+    "en": "A near miss: a nurse almost gave the wrong medicine. Write three sentences about what could have happened and what saved the patient.",
+    "zh": "一次差點出錯：護理師差點給錯藥。寫三句：當初可能發生什麼、是什麼救了病人。",
+    "sample": "The two patients had similar names. If the nurse hadn't checked the wristband, she would have given the wrong pill. If the patient had taken it, his blood pressure might have dropped too much."
+   },
+   {
+    "en": "Write about a time you were lucky. Use If … hadn't…, … would have…",
+    "zh": "寫一次你很幸運的經驗，用 If … hadn't…, … would have…。",
+    "sample": "Last year a typhoon came during my trip. If the hotel hadn't let us stay another night, we would have slept at the station. If we had driven home that day, we might have had an accident."
+   }
+  ]
  },
  {
   "unit": 47,
@@ -3473,15 +6993,94 @@
     "alt": [
      "You should not have skipped breakfast."
     ]
+   },
+   {
+    "zh": "我真希望我當時有拍照。",
+    "en": "I wish I had taken a picture.",
+    "alt": [
+     "I wish I had taken a photo.",
+     "I wish I'd taken a picture."
+    ]
+   },
+   {
+    "zh": "她真希望她沒有說那句話。",
+    "en": "She wishes she hadn't said that.",
+    "alt": [
+     "She wishes she had not said that."
+    ]
+   },
+   {
+    "zh": "你應該先洗手的。",
+    "en": "You should have washed your hands first."
+   },
+   {
+    "zh": "我們應該早點訂票的。",
+    "en": "We should have booked the tickets earlier.",
+    "alt": [
+     "We should have bought the tickets earlier."
+    ]
+   },
+   {
+    "zh": "他不應該一個人下床的。",
+    "en": "He shouldn't have gotten out of bed by himself.",
+    "alt": [
+     "He should not have got out of bed by himself.",
+     "He shouldn't have gotten out of bed alone."
+    ]
+   },
+   {
+    "zh": "我昨晚不應該喝那麼多咖啡。",
+    "en": "I shouldn't have drunk so much coffee last night.",
+    "alt": [
+     "I should not have drunk so much coffee last night."
+    ]
+   },
+   {
+    "zh": "要是我爸媽住得近一點就好了。",
+    "en": "If only my parents lived closer.",
+    "alt": [
+     "I wish my parents lived closer.",
+     "If only my parents lived nearer."
+    ]
+   },
+   {
+    "zh": "要是我今天不用考試就好了。",
+    "en": "If only I didn't have a test today.",
+    "alt": [
+     "I wish I didn't have a test today.",
+     "If only I didn't have an exam today."
+    ]
    }
   ],
   "cando": "說出現在的願望和對過去的遺憾，用 should have 檢討做錯的事",
   "scene": "下班後聊願望和遺憾",
-  "prompt": {
-   "en": "Write four sentences: two wishes about your life now (I wish / If only + past tense) and two regrets about the past (I wish I had… / I should have…).",
-   "zh": "寫四句：兩句現在的願望（I wish／If only + 過去式），兩句對過去的遺憾（I wish I had… 或 I should have…）。",
-   "sample": "I wish I had more free time. If only my English were better. I wish I had started learning English earlier. I should have practiced speaking more last year."
-  }
+  "prompts": [
+   {
+    "en": "Write four sentences: two wishes about your life now (I wish / If only + past tense) and two regrets about the past (I wish I had… / I should have…).",
+    "zh": "寫四句：兩句現在的願望（I wish／If only + 過去式），兩句對過去的遺憾（I wish I had… 或 I should have…）。",
+    "sample": "I wish I had more free time. If only my English were better. I wish I had started learning English earlier. I should have practiced speaking more last year."
+   },
+   {
+    "en": "Write three wishes about your school or work now. Use I wish + past tense.",
+    "zh": "用 I wish + 過去式寫三個對現在學校或工作的願望。",
+    "sample": "I wish our classes started later. I wish the library were open on Sundays. I wish I knew more English words."
+   },
+   {
+    "en": "Write about a trip that didn't go well. Use should have and shouldn't have in three sentences.",
+    "zh": "寫一次不太順利的旅行，用 should have 和 shouldn't have 寫三句。",
+    "sample": "We should have checked the weather. We shouldn't have stayed out so late. I should have brought a jacket."
+   },
+   {
+    "en": "A new nurse made a small mistake. Give kind feedback in three sentences with should have and next time.",
+    "zh": "新進護理師犯了小錯，用 should have 和 next time 給三句溫和的回饋。",
+    "sample": "You should have checked the patient's name before giving the pill. It's OK, because you noticed it in time. Next time, please read the wristband out loud."
+   },
+   {
+    "en": "Write about a regret and what you learned from it. Use I wish I had…, If only…, and I should have…",
+    "zh": "寫一個遺憾和你學到的事，用 I wish I had…、If only…、I should have…。",
+    "sample": "I wish I had spent more time with my grandpa. If only I had visited him more often. I should have called him every week. Now I call my grandma every Sunday."
+   }
+  ]
  },
  {
   "unit": 48,
@@ -3553,14 +7152,95 @@
      "He forgot to bring his keys, which made him angry.",
      "He forgot his keys, which made him very angry."
     ]
+   },
+   {
+    "zh": "花蓮是我爸爸長大的地方，那裡有很美的海灘。",
+    "en": "Hualien, where my father grew up, has beautiful beaches.",
+    "alt": [
+     "Hualien, where my dad grew up, has beautiful beaches."
+    ]
+   },
+   {
+    "zh": "這間醫院是我實習的地方，它有一千張病床。",
+    "en": "This hospital, where I did my internship, has 1,000 beds.",
+    "alt": [
+     "This hospital, where I did my internship, has one thousand beds.",
+     "This hospital, where I did my internship, has a thousand beds."
+    ]
+   },
+   {
+    "zh": "李太太的腳受傷了，她需要輪椅。",
+    "en": "Mrs. Li, whose leg is injured, needs a wheelchair.",
+    "alt": [
+     "Mrs. Li, whose leg was injured, needs a wheelchair."
+    ]
+   },
+   {
+    "zh": "那位學生的英文很好，她幫我們翻譯。",
+    "en": "That student, whose English is very good, translated for us.",
+    "alt": [
+     "The student, whose English is very good, translated for us."
+    ]
+   },
+   {
+    "zh": "病人拒絕吃藥，這讓護理師很擔心。",
+    "en": "The patient refused his medicine, which worried the nurse.",
+    "alt": [
+     "The patient refused his medicine, which made the nurse worried.",
+     "The patient refused to take his medicine, which worried the nurse."
+    ]
+   },
+   {
+    "zh": "公車晚了半小時，這讓我錯過了第一堂課。",
+    "en": "The bus was thirty minutes late, which made me miss my first class.",
+    "alt": [
+     "The bus was half an hour late, which made me miss my first class."
+    ]
+   },
+   {
+    "zh": "這本書是老師推薦的，對考試很有幫助。",
+    "en": "This book, which my teacher recommended, is very helpful for the exam.",
+    "alt": [
+     "This book, which my teacher recommended, is very useful for the exam.",
+     "This book, which my teacher recommended, is very helpful for the test."
+    ]
+   },
+   {
+    "zh": "那台血壓計上個月才換過，又壞了。",
+    "en": "That blood pressure monitor, which was replaced last month, is broken again.",
+    "alt": [
+     "That blood pressure monitor, which we replaced last month, is broken again."
+    ]
    }
   ],
   "cando": "用逗號加 who／which／whose／where 補充說明，把資訊整合成一句",
   "scene": "介紹病房裡的人和地方",
-  "prompt": {
-   "en": "Write four sentences about people and places in your life. Use who, which, whose and where with commas — one in each sentence.",
-   "zh": "寫四句介紹你生活裡的人和地方：用逗號加 who、which、whose、where，每句用一個。",
-   "sample": "My best friend, who studies nursing with me, lives in Taichung. Our school library, which opens at eight, is my favorite place to study. My neighbor, whose dog barks every night, is very friendly. Tainan, where my grandparents live, has the best food in Taiwan."
-  }
+  "prompts": [
+   {
+    "en": "Write four sentences about people and places in your life. Use who, which, whose and where with commas — one in each sentence.",
+    "zh": "寫四句介紹你生活裡的人和地方：用逗號加 who、which、whose、where，每句用一個。",
+    "sample": "My best friend, who studies nursing with me, lives in Taichung. Our school library, which opens at eight, is my favorite place to study. My neighbor, whose dog barks every night, is very friendly. Tainan, where my grandparents live, has the best food in Taiwan."
+   },
+   {
+    "en": "Write three sentences about places you know with , where … ,",
+    "zh": "用「, where … ,」寫三句你知道的地方。",
+    "sample": "Taichung, where I study, is a very convenient city. The night market, where we eat every Friday, is near my school. Kenting, where I went last summer, has beautiful beaches."
+   },
+   {
+    "en": "Introduce three people at your school or hospital with , who … , and , whose … ,",
+    "zh": "用「, who … ,」和「, whose … ,」介紹學校或醫院裡的三個人。",
+    "sample": "Ms. Lin, who teaches anatomy, is very funny. Our head nurse, whose son is a doctor, always helps new nurses. Kevin, who sits next to me, wants to work in the ICU."
+   },
+   {
+    "en": "Write a short handoff that adds extra information with commas. Use who, which, or whose.",
+    "zh": "寫一段用逗號補充資訊的交班，用 who、which 或 whose。",
+    "sample": "Mr. Chang, who is in Bed 6, had surgery this morning. His wife, whose phone number is on the chart, will visit at seven. His pain medicine, which he gets every six hours, is due at ten."
+   },
+   {
+    "en": "Write about something surprising that happened this week. Use , which… to comment on the whole event.",
+    "zh": "寫這週發生的一件意外的事，用「, which…」評論整件事。",
+    "sample": "My teacher gave us an extra day for the report, which was a big help. Then it rained all weekend, which meant I could stay home and write. I finished early, which made me very happy."
+   }
+  ]
  }
 ]

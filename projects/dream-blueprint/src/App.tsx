@@ -107,7 +107,7 @@ function FirstGuide({state,update}:Pick<PageProps,'state'|'update'>) {
   return <section className="orbit-card content-notice first-guide" role="note" aria-label="第一次使用">
     <strong>第一次用？照這三步就好</strong>
     <ol>
-      <li>按下面的「開始這一堂」上今天的課：聽一段對話 → 看文法講解、做幾題小練習 → 寫一句英文 → 跟著念 → 用自己的話寫幾句。大約 25 分鐘。</li>
+      <li>按下面的「開始這一堂」上今天的課：聽一段對話 → 看文法講解、做幾題小練習 → 寫一句英文 → 跟著念 → 換個說法再寫兩句 → 用自己的話寫幾句。大約 30 分鐘。</li>
       <li>上完回到這一頁，照「今天的 1.5 小時」清單由上往下做：做完的會自己打勾，不用的也可以自己勾掉。</li>
       <li>時間不夠就選「15 分鐘」只做複習。明天用同一個網址再打開，進度會接著走。</li>
     </ol>

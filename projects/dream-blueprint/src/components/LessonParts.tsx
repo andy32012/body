@@ -166,7 +166,9 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
 export interface VariationCheck { firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean }
 /** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
  *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
-export function LessonVariation({ item, tutorId, pattern, rule, onDone }: { item: { zh: string; en: string; alt?: string[] }
+export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }: { item: { zh: string; en: string; alt?: string[] }
+  /** Which of today's variations this is, and how many there are. */
+  count?: [number, number]
   /** The id of today's sentence, so the teacher knows the unit and its rule. */
   tutorId?: string; pattern?: string; rule?: string
   onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => void }) {
@@ -186,7 +188,7 @@ export function LessonVariation({ item, tutorId, pattern, rule, onDone }: { item
     draft: answer,
   })
   return <section className="ls-vary">
-    <div className="pr-label">換個說法 · 同一個句型</div>
+    <div className="pr-label">換個說法{count ? ' ' + count[0] + '／' + count[1] : ''} · 同一個句型</div>
     <h2 className="pr-question">{item.zh}</h2>
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請老師批改或看答案" />
@@ -240,8 +242,9 @@ export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']>
 /** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again.
  *  Help comes in layers — purpose (中文說明) → cue (句型) → frame (句架) → model (參考寫法) — and every layer used is saved,
  *  as are the first answer, its feedback and the corrected try, so a reload comes back to the same feedback. */
-export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
-  lesson: Lesson; draftKey: string; pattern: string; saved?: ExpressRecord
+export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
+  /** The open task is today's (promptFor), not always the unit's first. */
+  lesson: Lesson; prompt: LessonPrompt; draftKey: string; pattern: string; saved?: ExpressRecord
   onRecord: (rec: ExpressRecord, corrected: boolean) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
 }) {
   const [answer, setAnswer] = useState(() => readDraft(draftKey) || saved?.lastAnswer || '')
@@ -250,7 +253,7 @@ export function LessonExpress({ lesson, draftKey, pattern, saved, onRecord, onSa
   const [shown, setShown] = useState<string[]>(() => saved?.help ?? [])
   const mountedAt = useRef(Date.now())
   const keyed = !!tutorKey()
-  const p = lesson.prompt
+  const p = prompt
   const corrected = rec.corrections > 0
   const firstSentence = p.sample.match(/^[^.?!]+[.?!]/)?.[0] ?? p.sample
   useTaskContext({
