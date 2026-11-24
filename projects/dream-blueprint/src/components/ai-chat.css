@@ -7,6 +7,8 @@
   line-height: 1.4; vertical-align: middle; white-space: nowrap;
 }
 .ask-word:hover { background: color-mix(in srgb, var(--lav) 22%, transparent); }
+.ask-word.ask-pet { width: 34px; height: 34px; min-height: 34px; padding: 0; justify-content: center; border-radius: 50%; flex: none; }
+.ask-word .pet-icon { display: block; flex: none; }
 
 .ai-veil {
   position: fixed; inset: 0; z-index: 60;

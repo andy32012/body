@@ -32,6 +32,17 @@ function Rects({ list, fill }: { list: Px[]; fill?: string }) {
   return <>{list.map(p => <rect key={p.x + '-' + p.y} x={p.x} y={p.y} width={1.02} height={1.02} fill={fill ?? palette[p.c]} />)}</>
 }
 
+/** The same pet, still, as a few paths (one per colour): light enough to sit on every word of a long list. */
+const iconPaths = Object.entries(pixels.reduce<Record<string, string>>((m, p) => {
+  m[p.c] = (m[p.c] ?? '') + 'M' + p.x + ' ' + p.y + 'h1v1h-1z'
+  return m
+}, {}))
+export function PetIcon({ size = 22 }: { size?: number }) {
+  return <svg className="pet-icon" width={size} height={size * 14 / 18} viewBox="0 0 18 14" shapeRendering="crispEdges" aria-hidden="true">
+    {iconPaths.map(([c, d]) => <path key={c} d={d} fill={palette[c]} />)}
+  </svg>
+}
+
 export type PetAction = 'idle' | 'look' | 'walk' | 'hop' | 'wag' | 'spin' | 'turn' | 'dance' | 'heart' | 'sleep' | 'surprise' | 'wave' | 'stretch'
 
 export function PixelPet({ action = 'idle', size = 26 }: { action?: PetAction; size?: number }) {

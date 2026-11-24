@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowUp, Sparkles, X } from 'lucide-react'
+import { ArrowUp, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
 import { askEvent, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { useModal } from '../lib/modal'
 import { PencilCaret, SketchIntro, SketchThinking } from './Sketch'
-import { HoverPet, PixelPet, usePet } from './PixelPet'
+import { HoverPet, PetIcon, PixelPet, usePet } from './PixelPet'
 import './ai-chat.css'
 import './sketch.css'
 
@@ -149,9 +149,14 @@ const wordSystem = [
 export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: string; label?: string }) {
   const [open, setOpen] = useState(false)
   return <>
-    <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en}>
-      <Sparkles size={13} aria-hidden="true" />{label}
-    </button>
+    {/* Just the pet: 問問 Claude on every word reads as clutter. A word used as its own button keeps its text. */}
+    {label === '問問 Claude' || label === '問'
+      ? <button type="button" className="ask-word ask-pet" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en} title="問問 Claude">
+          <PetIcon />
+        </button>
+      : <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en}>
+          <PetIcon size={16} />{label}
+        </button>}
     {open && <AISheet title={<><span lang="en">{en}</span>{zh ? <small> · {zh}</small> : null}</>} onClose={() => setOpen(false)}>
       <AIChat system={personaText() + '\n\n' + wordSystem} opening={'請教我這個單字：' + en + (zh ? '（' + zh + '）' : '')}
         placeholder="例如：可以再給我一個例句嗎？" suggestions={['再給我一個例句', '怎麼記比較好？', '跟它很像的字是什麼？']} />

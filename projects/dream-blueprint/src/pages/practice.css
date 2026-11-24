@@ -345,7 +345,8 @@
 .passage-library .pr-tags > span { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; border: 0; border-bottom: 1px solid var(--practice-line); border-radius: 0; padding: .45rem .1rem; font-size: .92rem; }
 .passage-library .pr-tags > span:last-child { border-bottom: 0; }
 .passage-library .pr-tags .ctx-meaning { flex-basis: 100%; }
-.practice-page .passage-library button.ask-word { min-height: 28px; padding: .1rem .55rem; border-radius: 999px; font-size: .8rem; }
+.practice-page button.ask-word.ask-pet { width: 34px; min-height: 34px; padding: 0; border-radius: 50%; }
+.practice-page .passage-library button.ask-word:not(.ask-pet) { min-height: 28px; padding: .1rem .55rem; border-radius: 999px; font-size: .8rem; }
 .ws-head { margin-bottom: 0; }
 .practice-page button.ws-play { justify-self: start; display: inline-flex; align-items: center; gap: .5rem; border-color: var(--practice-accent); }
 .ws-answer { margin: 0; font-size: 1.25rem; font-weight: 650; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
