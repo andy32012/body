@@ -59,7 +59,17 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
   ].filter(Boolean).join('\n')
 }
 
+type Block = { type: 'text'; text: string } | { type: 'image'; source: { type: 'base64'; media_type: string; data: string } }
+
 export async function askTutor(system: string, turns: TutorTurn[], signal?: AbortSignal) {
+  return callClaude(system, turns, signal)
+}
+/** One question about a picture (a photo he chose): the image goes first, then the text. */
+export async function askTutorImage(system: string, text: string, image: { media: string; data: string }, signal?: AbortSignal) {
+  return callClaude(system, [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: image.media, data: image.data } }, { type: 'text', text }] }], signal)
+}
+
+async function callClaude(system: string, turns: { role: 'user' | 'assistant'; content: string | Block[] }[], signal?: AbortSignal) {
   const key = tutorKey()
   if (!key) throw new Error('還沒有設定 API 金鑰，請到設定 → 連接 Claude 填。')
   const res = await fetch('https://api.anthropic.com/v1/messages', {

@@ -1,3 +1,4 @@
+import ReadAloudCheck from './ReadAloudCheck'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronLeft, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
@@ -293,11 +294,11 @@ function Shadow({ lesson, speaking, onSay, saidOn, today, onDone }: { lesson: Pr
     if (!finished && nextSaid.every(Boolean)) { setFinished(true); onDone() }
   }
   return <>
-    <small className="pn-hint">先聽，再自己念出聲，念過就打勾。可以錄下來跟示範比一比（錄音只留在這個畫面）。</small>
+    <small className="pn-hint">先聽，再自己念出聲，念過就打勾。可以錄下來跟示範比一比（錄音只留在這個畫面），或按「念念看，幫我比對」看哪些字語音辨識沒聽出來。</small>
     <ol className="pn-lines">
       {list.map((s, i) => <li key={s.en} data-on={speaking(s.en)}>
         <button type="button" className="st-say" aria-label={'聽這一句：' + s.en} onClick={() => onSay(s.en)}><Volume2 size={14} /></button>
-        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder /></div>
+        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder /><ReadAloudCheck text={s.en} compact maxMs={20000} /></div>
         <button type="button" className="pn-tick" aria-pressed={said[i]} aria-label={(said[i] ? '取消：' : '我念過了：') + s.en} onClick={() => tick(i)}>
           {said[i] ? <Check size={14} strokeWidth={3} /> : '念了'}</button>
       </li>)}

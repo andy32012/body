@@ -1,0 +1,19 @@
+.ra-box { display: grid; gap: 8px; justify-items: start; }
+.ra-box button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line, rgba(255,255,255,.18)); border-radius: 10px; min-height: 40px; padding: 6px 12px; background: transparent; color: inherit; font: inherit; font-size: 14px; cursor: pointer; }
+.ra-start { border-color: var(--lav, #b9a7ff) !important; color: var(--lav, #b9a7ff) !important; }
+.ra-stop { background: var(--lav, #b9a7ff) !important; color: #1c1530 !important; font-weight: 650; }
+.ra-live { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.ra-error { color: #ef8b7d; margin: 0; font-size: 14px; }
+.ra-result { display: grid; gap: 8px; width: 100%; }
+.ra-result p { margin: 0; }
+.ra-text { line-height: 1.9; font-size: 16px; overflow-wrap: anywhere; }
+.ra-text .ok { color: inherit; }
+.ra-text .miss { color: #ef8b7d; text-decoration: underline wavy; text-underline-offset: 4px; }
+.ra-sum { font-size: 14px; color: var(--muted); }
+.ra-missed { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ra-missed small { width: 100%; color: var(--muted); }
+.ra-missed button { min-height: 32px !important; padding: 3px 9px !important; font-size: 13px !important; }
+.ra-heard { display: grid; gap: 2px; font-size: 14px; }
+.ra-heard small { color: var(--muted); }
+.ra-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.ra-box.compact .ra-text { font-size: 15px; }

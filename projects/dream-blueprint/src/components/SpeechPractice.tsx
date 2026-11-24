@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import ReadAloudCheck from './ReadAloudCheck'
 
 interface Props {
   english: string
@@ -148,6 +149,7 @@ function SentenceAudio({ english, chinese, rate = 0.85, onSpoken }: Props) {
         setSpoken(true)
         onSpoken?.()
       }}>{spoken ? '已跟讀一次' : '我跟著說了一次'}</button>
+      <ReadAloudCheck text={english} rate={rate} maxMs={30000} compact />
       <p>想聽自己的發音時可以錄一句，最長 30 秒。</p>
       <div className="speech-controls">
         {phase === 'recording'

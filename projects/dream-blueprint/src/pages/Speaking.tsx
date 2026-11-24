@@ -268,7 +268,10 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         {status === 'live' && liveAt && <p className="sp-timer">{youFrom ? '從你開口算起 ' + clock(tick - youFrom) + ' · 實際出聲 ' + clock(youMs) : '等你開口才開始計時'} · 通話 {clock(tick - liveAt)}（Part 2 目標從開口算 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
-      {!card && !lesson && !topic && !packRef && <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>}
+      {!card && !lesson && !topic && !packRef && !nurseMode && <div className="sp-links">
+        <a className="sp-ielts-link" href="#speaking/gept">練全民英檢口說（朗讀、回答問題、看圖敘述）→</a>
+        <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>
+      </div>}
 
       {settings && <div className="sp-settings">
         <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>

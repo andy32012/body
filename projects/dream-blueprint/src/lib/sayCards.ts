@@ -6,12 +6,12 @@ export interface SayCard {
   en: string
   wrong?: string
   why?: string
-  from?: 'emma' | 'passage' | 'lesson'
+  from?: 'emma' | 'passage' | 'lesson' | 'gept'
   /** The weak point this mistake belongs to (a name from weakPoints.ts), so reviewing the card counts for it. */
   tag?: string
 }
 export const sayKey = (id: string) => 'say.' + id
-const sources = { emma: '口說錯句', passage: '短文錯句', lesson: '課堂錯句' } as const
+const sources = { emma: '口說錯句', passage: '短文錯句', lesson: '課堂錯句', gept: '英檢口說錯句' } as const
 
 export function readSayCard(value: string): SayCard | null {
   try {
@@ -49,10 +49,10 @@ export function removeSayCard<S extends { notes: Record<string, string>; cards: 
 /** How a saved card shows up in the translation drill. */
 export function sayCardSentence(id: string, d: SayCard) {
   const from = d.from ?? 'emma'
-  const where = from === 'emma' ? '你在口說時說成：' : from === 'passage' ? '你在短文裡寫成：' : '你在課堂上寫成：'
+  const where = from === 'emma' ? '你在口說時說成：' : from === 'gept' ? '你在英檢口說練習說成：' : from === 'passage' ? '你在短文裡寫成：' : '你在課堂上寫成：'
   return {
     id, zh: d.zh, grammar: d.tag ? [sources[from], d.tag] : [sources[from]],
-    hints: [d.why || (from === 'emma' ? '想想 Emma 當時怎麼幫你改的' : '想想批改時改了哪裡'), '開頭：' + d.en.split(' ')[0] + ' …'],
+    hints: [d.why || (from === 'emma' ? '想想 Emma 當時怎麼幫你改的' : from === 'gept' ? '想想練習後的回饋怎麼改的' : '想想批改時改了哪裡'), '開頭：' + d.en.split(' ')[0] + ' …'],
     reference: [d.en],
     why: (d.wrong ? where + d.wrong + '。' : '') + (d.why || ''),
     newWords: [] as { en: string; zh: string }[],

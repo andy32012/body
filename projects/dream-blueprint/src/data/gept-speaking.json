@@ -1,0 +1,177 @@
+{
+  "elementary": [
+    {
+      "id": "e1",
+      "repeat": [
+        "I usually walk to school with my sister.",
+        "Could you open the window, please?",
+        "We had noodles for dinner last night.",
+        "The library is next to the post office.",
+        "My father is going to visit Tainan this weekend."
+      ],
+      "readSentences": [
+        "Please turn off your phone before the movie starts.",
+        "How much is this blue umbrella?",
+        "Tom didn't finish his homework yesterday.",
+        "It is going to rain this afternoon, so take a raincoat.",
+        "My grandmother likes to drink hot tea in the morning."
+      ],
+      "readPassage": "Last Sunday, my family went to the night market near our home. It was very crowded, but we had a great time. My little brother bought a bag of fried chicken, and I tried bubble tea for the first time. My parents played a game and won a small toy bear. We walked home at nine o'clock. I hope we can go again next month.",
+      "questions": [
+        "What time do you usually get up?",
+        "What did you eat for breakfast today?",
+        "Who is your best friend? What does he or she look like?",
+        "What do you like to do on weekends?",
+        "How do you go to school?",
+        "What's the weather like today?",
+        "Tell me about a place you want to visit. Why do you want to go there?"
+      ]
+    },
+    {
+      "id": "e2",
+      "repeat": [
+        "She is reading a book in the living room.",
+        "Don't forget to bring your student card.",
+        "There are three apples on the table.",
+        "I'm sorry, I can't come to your party.",
+        "What time does the next train leave?"
+      ],
+      "readSentences": [
+        "My mother works at a hospital in Taipei.",
+        "Would you like some coffee or tea?",
+        "The children were playing in the park when it started to rain.",
+        "You should drink more water when it's hot.",
+        "Where did you buy that nice jacket?"
+      ],
+      "readPassage": "Amy is a nursing student. Every morning, she gets up at six and takes the bus to school. Her classes start at eight. She enjoys learning about the human body, but some of her tests are very hard. After school, she works at a coffee shop for three hours. On weekends, she likes to sleep late and watch movies with her friends.",
+      "questions": [
+        "Where do you live?",
+        "What did you do last weekend?",
+        "What is your favorite food? Why?",
+        "How often do you exercise?",
+        "Do you like rainy days? Why or why not?",
+        "What do you usually do after school or work?",
+        "Tell me about your family."
+      ]
+    },
+    {
+      "id": "e3",
+      "repeat": [
+        "My brother plays basketball every Saturday.",
+        "Please wait here for a few minutes.",
+        "We went to the beach last summer.",
+        "Is there a convenience store near here?",
+        "I will call you when I get home."
+      ],
+      "readSentences": [
+        "The museum is closed on Mondays.",
+        "Can you help me carry these boxes?",
+        "Jenny was born in a small town in Hualien.",
+        "Remember to wash your hands before you eat.",
+        "Which season do you like best, summer or winter?"
+      ],
+      "readPassage": "Kevin wanted to give his mother a special birthday present. He did not have much money, so he decided to cook dinner for her. He went to the market and bought some vegetables, fish, and a small cake. He spent two hours in the kitchen. The fish was a little salty, but his mother said it was the best dinner of her life.",
+      "questions": [
+        "What is your favorite day of the week? Why?",
+        "What time did you go to bed last night?",
+        "Do you have a pet? If not, what pet would you like to have?",
+        "What do you usually buy at a convenience store?",
+        "How do you celebrate your birthday?",
+        "What kind of music do you like?",
+        "Tell me about the last time you were sick. What did you do?"
+      ]
+    }
+  ],
+  "intermediate": [
+    {
+      "id": "i1",
+      "passages": [
+        "Many people in Taiwan start their day at a breakfast shop. These small shops open very early, some as early as five in the morning, and they sell everything from egg pancakes to sandwiches and soy milk. For busy students and office workers, breakfast shops are convenient and cheap. However, some doctors worry that many popular breakfast foods contain too much oil and sugar. They suggest choosing items with more vegetables and protein, and drinking unsweetened soy milk or water instead of sweet milk tea. A healthy breakfast, they say, gives people more energy and helps them focus better at school or work.",
+        "Last month, our city library started a new program called \"Read with a Volunteer.\" Every Saturday afternoon, children can come to the library and read stories with retired teachers, nurses, and other volunteers. The program was created because many parents work on weekends and have little time to read with their children. So far, the response has been very positive. More than two hundred children have joined, and several volunteers say that the program has made them feel useful and connected to their community. The library hopes to start a similar program for elderly people who have trouble reading small print."
+      ],
+      "questions": [
+        "Your classmate tells you she failed an important exam. What would you say to her?",
+        "You want to borrow your friend's notebook. What would you say?",
+        "A tourist asks you where the nearest MRT station is. How would you answer?",
+        "Your friend invites you to a movie tonight, but you are busy. What would you say?",
+        "How do you usually spend your free time on weekends?",
+        "Do you prefer studying alone or with friends? Why?",
+        "What is one thing you would like to change about your city? Why?",
+        "Some people say that students should not use phones at school. What do you think?",
+        "Describe a person who has helped you a lot. What did this person do?",
+        "If you could live in another country for a year, where would you go and why?"
+      ],
+      "picture": {
+        "scene": "ward",
+        "title": "病房",
+        "questions": [
+          "Where are these people?",
+          "What are they doing?",
+          "How do you think the patient feels? Why?",
+          "Have you ever visited someone in the hospital? Tell me about it."
+        ],
+        "describe": "A hospital room in the morning. A young female nurse in light blue scrubs is checking the blood pressure of an older man who is sitting up in a hospital bed under a white blanket. An IV bag hangs on a pole next to the bed. A woman, probably his daughter, is standing by the window holding a bunch of flowers. A doctor in a white coat is standing at the door and writing on a clipboard. A clock on the wall shows ten o'clock. On a small table there is a cup of water and a basket of fruit."
+      }
+    },
+    {
+      "id": "i2",
+      "passages": [
+        "More and more young people in Taiwan are choosing to ride bicycles to work or school. Cycling is good for the environment because it does not produce air pollution, and it is also a great way to exercise. Many cities now have bike-sharing systems, so people can rent a bike for a short time at a low price. However, cycling on busy streets can be dangerous. Riders should always wear a helmet, follow traffic rules, and use lights at night. If the government builds more bike lanes, even more people may feel safe enough to leave their cars and scooters at home.",
+        "Sleep is just as important as food and exercise, but many students do not get enough of it. Some stay up late to study for exams, while others spend hours watching videos or playing games on their phones. Without enough sleep, it is harder to remember new information, and people are more likely to catch colds. Experts suggest that teenagers sleep eight to ten hours a night. They also recommend putting phones away at least thirty minutes before bed and going to sleep at the same time every day. Small changes like these can make a big difference."
+      ],
+      "questions": [
+        "Your neighbor's music is too loud late at night. What would you say to him?",
+        "You bought a shirt, but it is too small. What would you say to the clerk?",
+        "Your friend has a bad cold. What advice would you give him?",
+        "You arrive late for class. What would you say to your teacher?",
+        "What did you do last night before you went to bed?",
+        "Do you think it is better to live in a big city or in the countryside? Why?",
+        "What is the most useful thing you have learned this year? Explain.",
+        "Many people order food online instead of cooking. Is this a good or bad thing? Why?",
+        "Tell me about a festival in Taiwan that you enjoy. What do people do?",
+        "What kind of job would you like to have in ten years? Why?"
+      ],
+      "picture": {
+        "scene": "park",
+        "title": "公園",
+        "questions": [
+          "Where are these people?",
+          "What are the people in the picture doing?",
+          "What is the weather like? How do you know?",
+          "What do you like to do when you go to a park?"
+        ],
+        "describe": "A city park on a sunny weekend. A family of four (a father, a mother, a small girl and a baby boy) is having a picnic on a blue-and-white blanket with sandwiches, drinks and a basket. An older boy is flying a red kite on the grass. A young woman is walking a small brown dog on a leash along the path. An old man is sitting on a bench under a big tree, reading a newspaper. The sky is blue with a few white clouds, and the sun is shining."
+      }
+    },
+    {
+      "id": "i3",
+      "passages": [
+        "Convenience stores are everywhere in Taiwan, and they offer much more than snacks and drinks. People can pay their bills, pick up packages, print documents, and buy train tickets there. Many stores are open twenty-four hours a day, which makes them very useful for night workers and students. Some stores also have seats where customers can eat a simple meal or charge their phones. Visitors from other countries are often surprised by how many services one small shop can provide. For many people in Taiwan, the convenience store has become a part of daily life.",
+        "Nurses play an important role in hospitals, but their work is often harder than people imagine. A nurse may take care of eight or more patients in one shift. Besides giving medicine and checking vital signs, nurses also talk with worried family members, teach patients how to take care of themselves at home, and write detailed records. Because hospitals are open day and night, many nurses work long hours or night shifts. In recent years, some hospitals have tried to hire more nurses and use new technology to reduce paperwork, so that nurses can spend more time with their patients."
+      ],
+      "questions": [
+        "Your friend is going on a long trip tomorrow. What would you say to her?",
+        "You are in a restaurant and your soup is cold. What would you say to the waiter?",
+        "A classmate asks you for help with homework, but you don't understand it either. What would you say?",
+        "Your friend just got a new job. What would you say to him?",
+        "What is your favorite place to relax? Why?",
+        "Do you think people should eat less meat? Why or why not?",
+        "Describe a time when you were very nervous. What happened?",
+        "Is it important for children to learn a second language? Explain your opinion.",
+        "What are the good and bad points of using social media?",
+        "If you had a free day tomorrow, how would you spend it?"
+      ],
+      "picture": {
+        "scene": "market",
+        "title": "夜市",
+        "questions": [
+          "Where are these people?",
+          "What are they doing?",
+          "What kind of food do you think the stall is selling? How do you know?",
+          "Do you like night markets? Why or why not?"
+        ],
+        "describe": "A busy night market in Taiwan at night. Red lanterns hang above the stalls. A man wearing an apron is frying chicken at a stall with a sign that says fried chicken and a price. Three people are waiting in line in front of the stall. A young woman is taking a photo of her bubble tea with her phone. A couple is sitting at a small folding table eating noodles. A boy is holding a balloon and pointing at a game stall with prizes."
+      }
+    }
+  ]
+}
