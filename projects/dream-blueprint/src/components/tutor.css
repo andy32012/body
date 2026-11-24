@@ -69,3 +69,4 @@
 .pr-compare .pr-diff-extra { text-decoration: underline wavy #e06a5a; text-underline-offset: 3px; }
 .pr-compare .pr-diff-missing { color: #e0a83a; }
 .pr-mark-note { flex-basis: 100%; margin: .55rem 0 0; font-size: 13px; line-height: 1.55; opacity: .9; }
+.tu-new { display: block; font-weight: 600; opacity: 0.9; }

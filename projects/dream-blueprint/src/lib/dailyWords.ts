@@ -62,16 +62,22 @@ export function changeSorted<S extends Sortable>(prev: S, k: string, known: bool
 }
 
 /** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */
-export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0) {
+export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0, queuedSentences = 0) {
   const chosen = Number(notes[countKey])
   const full = DAILY_CHOICES.includes(chosen as (typeof DAILY_CHOICES)[number]) ? chosen : DEFAULT_DAILY
+  // The brake comes first, on every kind of day: a pile of overdue cards stops new words in exam weeks too.
+  const allowance = newWordAllowance(reviewPressure(backlog, queuedSentences))
   // Exam and internship days show one word unless the learner asks for the full set.
-  if (quiet && notes[moreKey(day)] !== '1') return 1
-  return Math.min(full, newWordAllowance(backlog))
+  if (quiet && notes[moreKey(day)] !== '1') return Math.min(1, allowance)
+  return Math.min(full, allowance)
 }
 
-/** New words share one budget with review: the more word cards pile up past today's review, the fewer new words.
- *  Cards today's review will clear, and sentence cards waiting their turn, never hold new words back. */
+/** Overdue review in word-card terms: a sentence card takes about a minute, as long as five word cards. */
+export const SENTENCE_AS_WORDS = 5
+export const reviewPressure = (wordBacklog: number, queuedSentences: number) => wordBacklog + queuedSentences * SENTENCE_AS_WORDS
+
+/** New words share one budget with review: the more overdue cards pile up past today's review (word cards, and sentence
+ *  cards waiting for a later day, counted as five word cards each), the fewer new words. Cards today's review will clear never hold new words back. */
 export function newWordAllowance(backlog: number) {
   if (backlog >= 80) return 0
   if (backlog <= 30) return 99

@@ -263,7 +263,7 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   assert.doesNotMatch(t2b, /立場/)
   assert.equal(wordCount('Résumé café 37.5 well-known'), 4)
   const { default: writing } = await import('../src/data/writing.json', { with: { type: 'json' } })
-  assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'sentence')
+  assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'a1', '從 A1 分級寫作開始')
 })
 
 test('配對 QR：要對的配對碼、10 分鐘內才打得開', async () => {

@@ -7,6 +7,7 @@ import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
+import { answerAllowed, useClaudeGate } from '../lib/answerGate'
 import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
@@ -164,8 +165,9 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
 
 /** What Claude said about a variation: the verdict on the first try with the exact text it judged, and whether it gave the answer away. */
 export interface VariationCheck { firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean }
-/** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
- *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
+/** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher checks it
+ *  (hints before the answer, as in the main sentence) and the reference opens once the teacher says it is right or
+ *  hands over the answer. 看答案 appears only when Claude cannot be reached, after one try; it counts as a revealed answer. */
 export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }: { item: { zh: string; en: string; alt?: string[] }
   /** Which of today's variations this is, and how many there are. */
   count?: [number, number]
@@ -179,7 +181,10 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
   const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer, check) }
-  const reveal = () => { shownAt.current = Date.now(); setShown(true) }
+  const gate = useClaudeGate()
+  const tried = !!answer.trim()
+  // Opening the answer yourself is a revealed answer: an exact copy afterwards must not count as written alone.
+  const reveal = () => { shownAt.current = Date.now(); setShown(true); setCheck(c => ({ ...c, revealed: true })) }
   const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
   const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)
   useTaskContext({
@@ -193,14 +198,21 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請老師批改或看答案" />
     </label>
-    <TutorChat sentence={sentence} answer={answer}
-      onReveal={() => setCheck(c => ({ ...c, revealed: true }))}
+    <TutorChat sentence={sentence} answer={answer} onFail={gate.failed} onOk={gate.worked}
+      onReveal={() => { shownAt.current = Date.now(); setShown(true); setCheck(c => ({ ...c, revealed: true })) }}
       onVerdict={(v, attempt, text) => {
         if (attempt === 1) setCheck(c => c.firstVerdict ? c : { ...c, firstVerdict: v, checkedText: text })
         // The teacher says it is right: the reference and the marks open without another tap.
         if (v === 'good') setShown(true)
       }} />
-    {!shown ? <div className="pr-actions"><button type="button" className={tutorKey() ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div> : <>
+    {!shown ? <>
+      {gate.usable ? <p className="ls-help">先寫寫看，再請老師批改；答案會由老師一步一步帶你。完全不會就按「不會」，這句會進複習。</p>
+        : !tried ? <p className="ls-help">現在沒有 Claude 可以批改：先自己寫一次，才能看答案。</p> : null}
+      <div className="pr-actions">
+        {answerAllowed(gate.usable, tried) && <button type="button" className="pr-main" onClick={() => { if (ready()) reveal() }}>看答案</button>}
+        <button type="button" className="pr-link" onClick={() => { if (ready()) done('again') }}>不會（加入複習）</button>
+      </div>
+    </> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
       <fieldset className="pr-marks"><legend>我寫得…</legend>
         <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
@@ -253,6 +265,9 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
   const [shown, setShown] = useState<string[]>(() => saved?.help ?? [])
   const mountedAt = useRef(Date.now())
   const keyed = !!tutorKey()
+  const gate = useClaudeGate()
+  // The model answer (④) is a way on only when Claude cannot check this, and only after writing something first.
+  const sampleAllowed = answerAllowed(gate.usable, !!answer.trim())
   const p = prompt
   const corrected = rec.corrections > 0
   const firstSentence = p.sample.match(/^[^.?!]+[.?!]/)?.[0] ?? p.sample
@@ -310,7 +325,7 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
       <button type="button" aria-pressed={sees('zh')} onClick={() => help('zh')}>① 要做什麼</button>
       <button type="button" aria-pressed={sees('cue')} onClick={() => help('cue')}>② 用哪個句型</button>
       <button type="button" aria-pressed={sees('frame')} onClick={() => help('frame')}>③ 句架</button>
-      <button type="button" aria-pressed={sees('sample')} onClick={() => help('sample')}>④ 參考寫法</button>
+      {(sampleAllowed || sees('sample')) && <button type="button" aria-pressed={sees('sample')} onClick={() => help('sample')}>④ 參考寫法</button>}
       <StuckButton onUse={() => help('claude')} />
     </div>
     {sees('zh') && <p className="ls-help">{p.zh}</p>}
@@ -321,10 +336,10 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
       {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={submit}>{corrected ? '改好了，再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
-    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
+    {!keyed && <p className="ls-help">還沒連接 Claude，先自己寫一次，再打開「④ 參考寫法」對照檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
     <CorrectBox run={run} mode="open" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
-      previous={previous} selfFix={!corrected || !rec.revealed}
+      previous={previous} selfFix={!corrected || !rec.revealed} onError={gate.failed} onOk={gate.worked}
       onReveal={() => { if (!rec.revealed) { const next = { ...rec, revealed: true }; setRec(next); onRecord(next, false) } }}
       onSave={onSave} onResult={(_, __, r) => result(r)} />
     {corrected && !rec.fixed && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}

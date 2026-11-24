@@ -107,7 +107,8 @@
     "zh": "他不是醫生，他是病人。",
     "en": "He is not a doctor. He is a patient.",
     "alt": [
-     "He is not a doctor, he is a patient."
+     "He isn't a doctor. He's a patient.",
+     "He is not a doctor; he is a patient."
     ]
    },
    {
@@ -691,7 +692,7 @@
    {
     "en": "Answer these with Yes, I do. or No, I don't., and add one more sentence each: Do you cook? Do you exercise? Do you read at night?",
     "zh": "用 Yes, I do.／No, I don't. 回答這三題，每題再多說一句：Do you cook? Do you exercise? Do you read at night?",
-    "sample": "Do you cook? No, I don't. My mom cooks for me. Do you exercise? Yes, I do. I run on Sundays."
+    "sample": "Do you cook? No, I don't. My mom cooks for me. Do you exercise? Yes, I do. I run on Sundays. Do you read at night? Yes, I do. I read a short story before bed."
    }
   ]
  },

@@ -3,16 +3,16 @@
   "unit": 1,
   "steps": [
    {
-    "t": "be 動詞就是「是」，英文句子不能少了它",
-    "p": "中文可以說「我很累」，英文不能說 I tired，中間一定要放 am／is／are。",
+    "t": "be 動詞用在「是什麼、怎麼樣、在哪裡」",
+    "p": "主詞後面接名詞（身分）、形容詞（狀態）或地點時，中間要放 am／is／are：中文說「我很累」，英文不能說 I tired，要說 I am tired。但句子裡已經有一般動詞（study、work、eat）時就不用 be：說 I study English.，不說 I am study English.。",
     "ex": [
      {
       "en": "I am tired.",
       "zh": "我很累。"
      },
      {
-      "en": "She is a nurse.",
-      "zh": "她是護理師。"
+      "en": "I study English.",
+      "zh": "我讀英文。"
      }
     ]
    },
@@ -49,12 +49,17 @@
    {
     "bad": "I tired.",
     "good": "I am tired.",
-    "why": "英文句子一定要有動詞，形容詞前面要放 be 動詞。"
+    "why": "tired 是形容詞，不是動詞；形容詞前面要放 be 動詞。"
    },
    {
     "bad": "She are a student.",
     "good": "She is a student.",
     "why": "she 是單數，配 is。"
+   },
+   {
+    "bad": "I am study English.",
+    "good": "I study English.",
+    "why": "study 已經是動詞，不用再加 am。be 動詞只放在名詞、形容詞或地點前面。"
    }
   ],
   "drills": [
@@ -3037,7 +3042,7 @@
    },
    {
     "t": "all／most／none 和 both／either／neither",
-    "p": "all 全部、most 大部分、none 一個都沒有；兩個東西用 both（兩個都）、either（任一個）、neither（兩個都不）。後面接 the、my 或代名詞時要加 of。",
+    "p": "all 全部、most 大部分、none 一個都沒有；兩個東西用 both（兩個都）、either（任一個）、neither（兩個都不）。接 the、my 時：all 和 both 的 of 可加可不加（All my friends = All of my friends）；most、none、either、neither 一定要加 of（most of the students）。接代名詞時全部都要 of：all of them、both of us。",
     "ex": [
      {
       "en": "All of my friends are nurses.",
@@ -3074,6 +3079,11 @@
     "bad": "I didn't eat nothing.",
     "good": "I didn't eat anything.",
     "why": "not 已經是否定，後面用 anything，不能再用 nothing。"
+   },
+   {
+    "bad": "All them are nurses.",
+    "good": "All of them are nurses.",
+    "why": "all 接代名詞（them、us）時一定要加 of。接 the、my 時才可以省略 of：All my friends are nurses. 也對。"
    }
   ],
   "drills": [
@@ -3164,13 +3174,13 @@
     [
      "all／most／none",
      "全部／大部分／一個都沒有",
-     "複數名詞（接 the、my 要加 of）",
+     "複數名詞（接 the、my：all 可省 of，most／none 要 of；接 them、us 都要 of）",
      "All of the beds are full."
     ],
     [
      "both／either／neither",
      "兩個都／任一個／兩個都不",
-     "兩個人或東西",
+     "兩個人或東西（both 接 the、my 時 of 可省；either／neither 要 of）",
      "Neither answer is right."
     ],
     [
@@ -3377,8 +3387,8 @@
     ]
    },
    {
-    "t": "講未來：這幾個字後面用現在式，主要句才用 will",
-    "p": "不能說 when you will come。",
+    "t": "講未來：當「…的時候、如果」用時，後面用現在式，主要句才用 will",
+    "p": "when、before、after、if 當「…的時候、之前、之後、如果」講未來時，後面用現在式：I will call you when I arrive.（不說 when I will arrive）。但 when 當「什麼時候」、if 當「是不是」時可以用 will：When will he come?、I don't know when he will come.、I don't know if he will come.（單元 32 會教）。",
     "ex": [
      {
       "en": "I will call you when I arrive.",
@@ -3395,7 +3405,7 @@
    {
     "bad": "I will call you when I will arrive.",
     "good": "I will call you when I arrive.",
-    "why": "when 後面講未來的事用現在式。"
+    "why": "when 在這裡是「…的時候」，講未來的事後面用現在式。（When will you arrive? 問「什麼時候」就可以用 will。）"
    },
    {
     "bad": "Before eat, wash your hands.",
@@ -3459,7 +3469,7 @@
     "accept": [
      "Call me if you need help."
     ],
-    "why": "if 後面用現在式，不用 will。"
+    "why": "if 在這裡是「如果」，後面用現在式，不用 will。"
    },
    {
     "k": "fix",
@@ -4157,8 +4167,8 @@
     ]
    },
    {
-    "t": "Who 當主詞不加 did",
-    "p": "Who、What 是「做事的人或東西」時，直接接動詞：Who called you? What happened?；問「做了誰、什麼」才用 did：Who did you call?",
+    "t": "Who 當主詞：一般問法不加 did",
+    "p": "Who、What 是「做事的人或東西」時，一般直接接動詞：Who called you? What happened?；問「做了誰、什麼」才用 did：Who did you call?（Who did call you? 只在特別強調「到底是誰」時才說，平常不要這樣問。）",
     "ex": [
      {
       "en": "Who opened the window?",
@@ -4194,7 +4204,7 @@
    {
     "bad": "Who did call you?",
     "good": "Who called you?",
-    "why": "Who 當主詞時直接接動詞，不加 did。"
+    "why": "一般問「誰打給你」時，Who 是主詞，直接接動詞：Who called you?。Who did call you? 只在強調「到底是誰」時才會說，平常不要這樣問。"
    }
   ],
   "drills": [
@@ -4249,11 +4259,11 @@
    },
    {
     "k": "fix",
-    "q": "Who did help you?",
+    "q": "Who did helped you?",
     "accept": [
      "Who helped you?"
     ],
-    "why": "Who 當主詞，不加 did，直接用過去式 helped。"
+    "why": "did 和過去式 helped 不能一起用。一般問「誰幫了你」，Who 是主詞，直接用過去式：Who helped you?"
    },
    {
     "k": "fix",
@@ -5408,8 +5418,8 @@
     ]
    },
    {
-    "t": "to 說目的；make／let／help＋人＋原形",
-    "p": "to＋原形放在句子後面表示「為了……」；make（叫人非做不可）、let（允許）、help 後面接人再接原形，不加 to。",
+    "t": "to 說目的；make／let＋人＋原形；help 兩種都可以",
+    "p": "to＋原形放在句子後面表示「為了……」；make（叫人非做不可）和 let（允許）後面接人再接原形，不加 to。help 比較特別：help＋人＋原形 和 help＋人＋to＋原形 都對（help him carry／help him to carry）。",
     "ex": [
      {
       "en": "I went out to buy lunch.",
@@ -5534,8 +5544,8 @@
      "I went out to buy lunch."
     ],
     [
-     "make／let／help＋人＋原形",
-     "使／讓／幫某人做",
+     "make／let＋人＋原形；help＋人＋(to)＋原形",
+     "使／讓／幫某人做（help 加不加 to 都可以）",
      "Let me help you."
     ],
     [
@@ -7102,8 +7112,8 @@
     ]
    },
    {
-    "t": "三餐、語言、運動、多數疾病不加；小毛病要加 a",
-    "p": "have breakfast、speak English、play basketball、have diabetes；但 a cold、a fever、a headache 要加 a。",
+    "t": "三餐、語言、運動、多數疾病不加；有些症狀要加 a，要一個一個記",
+    "p": "have breakfast、speak English、play basketball、have diabetes；但 a cold、a fever、a headache、a cough、a sore throat 要加 a。這不是看中文「小毛病」決定的：have the flu 常加 the，have diarrhea、have insomnia 不加。遇到新的症狀，查字典或看例句，整組記。",
     "ex": [
      {
       "en": "I have breakfast at seven.",
@@ -7139,7 +7149,7 @@
    {
     "bad": "She has headache.",
     "good": "She has a headache.",
-    "why": "headache 前面要加 a。"
+    "why": "headache 這個字前面要加 a（have a headache）。冠詞要跟著每個症狀的字記，不是看中文是不是小毛病。"
    }
   ],
   "drills": [
@@ -7233,9 +7243,9 @@
      "have diabetes、have cancer"
     ],
     [
-     "小毛病",
+     "要加 a 的症狀（逐一記）",
      "a／an",
-     "have a cold、a fever、a headache"
+     "have a cold、a fever、a headache、a cough"
     ],
     [
      "最高級、唯一",
@@ -7278,7 +7288,7 @@
    },
    {
     "t": "受詞放哪裡",
-    "p": "put on your mask 和 put your mask on 都可以；受詞是 it／them 時一定放中間：put it on。",
+    "p": "可以拆開的片語動詞（put on、take off、turn off、pick up）：put on your mask 和 put your mask on 都可以；受詞是 it／them 時一定放中間：put it on。不能拆開的（look after、get over、come down with）受詞永遠放最後：look after them，不說 look them after。",
     "ex": [
      {
       "en": "Please take off your shoes.",
@@ -7300,7 +7310,7 @@
    {
     "bad": "Please put on it.",
     "good": "Please put it on.",
-    "why": "受詞是 it 時要放在中間。"
+    "why": "put on 可以拆開；受詞是 it 時要放在中間：put it on。"
    }
   ],
   "drills": [
@@ -7367,7 +7377,7 @@
     "accept": [
      "Your shoes are dirty. Please take them off."
     ],
-    "why": "受詞是 them 時要放在中間。"
+    "why": "take off 可以拆開；受詞是 them 時要放在中間：take them off。"
    }
   ],
   "table": {
@@ -7908,7 +7918,7 @@
    },
    {
     "t": "三類假設放在一起看",
-    "p": "第一類講未來可能；第二類講現在的想像；第三類講過去來不及的事。",
+    "p": "第一類講未來可能；第二類講現在的想像；第三類講過去來不及的事。如果「過去沒做」影響的是「現在」，if 用 had + 過去分詞、主要句用 would + 原形（If I had slept, I wouldn't be tired now.），這叫混合假設，也是對的。",
     "ex": [
      {
       "en": "If he had seen a doctor earlier, the wound wouldn't have gotten infected.",
@@ -7928,9 +7938,9 @@
     "why": "if 那一句用 had + 過去分詞，不用 would have。"
    },
    {
-    "bad": "If she had studied, she would pass.",
-    "good": "If she had studied, she would have passed.",
-    "why": "講過去的結果用 would have + 過去分詞。"
+    "bad": "If she had studied, she would pass the test last week.",
+    "good": "If she had studied, she would have passed the test last week.",
+    "why": "考試是上週的事，結果也在過去，用 would have + 過去分詞。（如果結果在現在，例如 If she had studied, she would be a nurse now.，是「混合假設」，也對，之後會學。）"
    }
   ],
   "drills": [

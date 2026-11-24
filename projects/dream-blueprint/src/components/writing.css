@@ -28,3 +28,6 @@
 .wl-next { padding: .5rem .7rem; border-radius: 10px; background: color-mix(in srgb, currentColor 6%, transparent); }
 .wl-note { opacity: .7; }
 .wl-count { display: block; opacity: .75; font-size: .82rem; line-height: 1.5; }
+.wl-hint { margin: .35rem 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .5rem; font-size: .92rem; opacity: .9; }
+.wl-hint span { padding: .1rem .55rem; border-radius: 999px; background: color-mix(in srgb, currentColor 9%, transparent); }
+.wl-tasks button:disabled { opacity: .45; cursor: default; }

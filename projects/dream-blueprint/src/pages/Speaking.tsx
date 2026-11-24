@@ -18,6 +18,8 @@ import { emmaLevel } from '../lib/cefr'
 import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
 import { nurseInstructions, nurseSpeakKey, type NurseListening } from '../lib/nursing'
 import { PairPaste } from '../components/PairDevice'
+import { extend, heard, liveVerdict, startClock, stopMessages, type LiveClock, type LiveVerdict } from '../lib/liveLimits'
+import { liveCost, recordLive } from '../lib/usage'
 import './speaking.css'
 
 const NAME = EMMA
@@ -89,6 +91,37 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const log = useRef<HTMLDivElement>(null)
   const linesRef = useRef<Line[]>([])
   linesRef.current = lines
+  // Cost guard (liveLimits.ts): idle warning and cut-off, 20 minutes at a time, ends when the app goes to the background.
+  const clockRef = useRef<LiveClock | null>(null)
+  const startedRef = useRef(0)
+  const [guardState, setGuardState] = useState<LiveVerdict>({ stop: null, warnIdle: false, warnLimit: false })
+  const [until, setUntil] = useState(0)
+  function endCall(reason: keyof typeof stopMessages) {
+    if (!session.current) return
+    session.current.stop()
+    setError(stopMessages[reason])
+  }
+  useEffect(() => {
+    if (status !== 'live') { setGuardState({ stop: null, warnIdle: false, warnLimit: false }); return }
+    const t = setInterval(() => {
+      const c = clockRef.current
+      if (!c) return
+      const v = liveVerdict(c, Date.now())
+      if (v.stop) endCall(v.stop)
+      else setGuardState(g => g.warnIdle === v.warnIdle && g.warnLimit === v.warnLimit ? g : v)
+    }, 1000)
+    const hidden = () => { if (document.visibilityState === 'hidden') endCall('hidden') }
+    const leave = () => endCall('hidden')
+    document.addEventListener('visibilitychange', hidden)
+    window.addEventListener('pagehide', leave)
+    return () => { clearInterval(t); document.removeEventListener('visibilitychange', hidden); window.removeEventListener('pagehide', leave) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+  // His transcript also counts as being heard (the level meter may be missing on some devices).
+  useEffect(() => {
+    const last = lines[lines.length - 1]
+    if (last?.role === 'user' && clockRef.current) clockRef.current = heard(clockRef.current, Date.now())
+  }, [lines])
 
   useEffect(() => () => session.current?.stop(), [])
   // Keys that arrive from the computer (QR pairing) fill in here without a reload.
@@ -103,7 +136,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       const { her, you } = levels.current
       const now = her > 0.06 ? 'her' : you > 0.08 ? 'you' : ''
       setWho(now)
-      if (now === 'you') { setYouMs(ms => ms + 220); setYouFrom(at => at ?? Date.now()) }
+      if (now === 'you') { setYouMs(ms => ms + 220); setYouFrom(at => at ?? Date.now()); if (clockRef.current) clockRef.current = heard(clockRef.current, Date.now()) }
     }, 220)
     return () => clearInterval(t)
   }, [status])
@@ -127,9 +160,18 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
           setStatus(s)
-          if (s === 'live') setLiveAt(Date.now())
+          if (s === 'live') {
+            const now = Date.now()
+            setLiveAt(now); startedRef.current = now
+            clockRef.current = startClock(now); setUntil(clockRef.current.until)
+          }
           if (detail) setError(detail)
-          if (s === 'closed') { session.current = null; void wrapUp() }
+          if (s === 'closed') {
+            // The connected time goes into this month's voice estimate (設定 → 用量).
+            if (startedRef.current) { recordLive(Date.now() - startedRef.current); startedRef.current = 0 }
+            clockRef.current = null
+            session.current = null; void wrapUp()
+          }
         },
       })
     } catch (e) {
@@ -276,6 +318,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         </div>)}
       </div>}
 
+      {status === 'live' && liveAt && <p className="sp-cost" role="status">通話 {clock(tick - liveAt)} · 約 US${liveCost(tick - liveAt).toFixed(2)}（說話中每分鐘約 0.05 美元，不說話也算）</p>}
+      {status === 'live' && guardState.warnIdle && <p className="sp-warn" role="alert">你已經 2 分鐘沒說話了；再 1 分鐘沒說話會自動掛斷。</p>}
+      {status === 'live' && guardState.warnLimit && <div className="sp-warn" role="alert">
+        <span>這次快 20 分鐘了（還有 {Math.max(0, Math.ceil((until - tick) / 1000))} 秒）；要繼續就按「繼續」，不然時間到會自動掛斷。</span>
+        <button type="button" onClick={() => { if (clockRef.current) { clockRef.current = extend(clockRef.current, Date.now()); setUntil(clockRef.current.until); setGuardState(g => ({ ...g, warnLimit: false })) } }}>繼續 20 分鐘</button>
+      </div>}
       {error && <p className="sp-error" role="alert">{error}</p>}
       <footer className="sp-bar">
         <button type="button" className={'sp-mic' + (live ? ' on' : '')}

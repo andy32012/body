@@ -143,3 +143,5 @@ button:focus-visible,a:focus-visible,summary:focus-visible {outline:2px solid #a
 
 
 .library-page>.practice-dock{grid-template-columns:1fr}.library-page>.practice-dock .dock-choices{max-width:600px}.library-page>.practice-dock .dock-launch{max-width:330px}
+.usage-alert { flex-wrap: wrap; }
+.usage-alert button { margin-left: auto; border: 1px solid currentColor; border-radius: 999px; padding: 4px 12px; background: transparent; color: inherit; font: inherit; cursor: pointer; }

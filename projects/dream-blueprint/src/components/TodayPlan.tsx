@@ -15,6 +15,8 @@ import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
 import { readSkills } from '../lib/wordSkills'
 import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
 import { nextPron, pronLessons } from '../lib/pronunciation'
+import writingData from '../data/writing.json'
+import { nextTask, writeDue, writeMinutes, type WriteStage } from '../lib/writing'
 import './today-plan.css'
 
 const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) === 'nursing').map(q => q.id))
@@ -48,7 +50,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   // A guided lesson that reached its end, or the unit checkpoint (which keeps no lesson record).
   const lessonDone = mainLessonDone(state, today)
   const checkpointDone = lessonDone && !lessonFinished(state.notes, today)
-  const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog)
+  const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog, load.queued)
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
   // A reading record saved today, or graded passages read today (logged as a reading day).
   const readToday = practisedOn(state.notes, state.sessions, 'read', today)
@@ -59,13 +61,18 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   // on a tie, listening and speaking go first (they are the harder ones to fit in, and VisaScreen asks for speaking 7).
   const week = weekCounts(state.notes, state.sessions, today)
   const listenFirst = week.listen <= week.read
-  const speakFirst = week.speak <= week.write
+  // Graded writing twice a week (the lesson already has a short writing task every day); speaking the other days.
+  // (Decided below once the next writing piece is known.)
   // A bridge unit's skills pack, when the current unit has one; on its last day, the held-out test comes first.
   const unit = state.curriculum.unit
   const pack = hasPack(unit) ? unit : null
   const held = pack ? readHeld(state.notes, pack) : {}
   const testDay = !!pack && heldOpen(state.curriculum, pack) && !(held.reading && held.listening)
   const where = (tab: string, other: string) => pack ? 'library/unit/' + tab : other
+  // The next graded piece (A1 → A2+, opened by the grammar units already finished).
+  const nextWrite = nextTask(writingData.stages as WriteStage[], state.notes, unit)
+  const speakFirst = !writeDue(week, !!pack || !!nextWrite)
+  const writeDetail = nextWrite ? nextWrite.stage.name + '一題（' + writeMinutes(nextWrite.stage) + '），批改後自己改一版' : '寫作一題，批改後自己改一版'
   // Reading: the passages with comprehension questions first; once the A1–B1 ones are done, the graded passages.
   const questionsLeft = plainReadCount(state.notes) < QUESTION_PASSAGES
   const readHash = questionsLeft ? 'library/reading' : 'library/story/read'
@@ -107,7 +114,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       auto: lessonDone, go: () => onStart(energy), goLabel: lessonDone ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
   const catalog: Record<Exclude<BlockId, 'review' | 'lesson'>, Omit<Task, 'min'>> = {
     focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: focusDone, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
-    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
+    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : (load.backlog ? '單字卡積了 ' + load.backlog + ' 張' : '') + (load.backlog && load.queued ? '、' : '') + (load.queued ? '句子卡排了 ' + load.queued + ' 句' : '') + '今天複習不完，先不加新字',
       auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
     input: testDay ? { id: 'input', title: '聽或讀：單元回測', detail: '單元 ' + pack + ' 最後一天：一篇沒看過的閱讀＋一段沒聽過的聽力，各只有一次機會', auto: !!(held.reading && held.listening),
         go: to('library/unit/test'), goLabel: '回測' }
@@ -120,7 +127,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     output: { id: 'output', title: '說或寫', auto: wroteToday || spokeToday,
       detail: '這週說 ' + week.speak + ' 天、寫 ' + week.write + ' 天 → 今天先' + (speakFirst
         ? '說：' + (pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務' : sound ? soundDetail + '；也可以跟 Emma 聊 10 分鐘' : '跟 Emma 聊 10 分鐘')
-        : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : '寫作階梯一題')),
+        : '寫：' + (pack ? '單元 ' + pack + ' 的段落寫作' : writeDetail)),
       go: to(speakFirst ? where('speak', speakHash) : where('write', 'library/writing')), goLabel: speakFirst ? speakLabel : '寫',
       go2: to(speakFirst ? where('write', 'library/writing') : where('speak', speakHash)), go2Label: speakFirst ? '寫' : speakLabel },
     // Listening is the graded passages (whole passage first, then line by line, then dictation); sentence shadowing stays one tap away.
@@ -129,7 +136,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     read: testDay ? { id: 'read', title: '單元回測', detail: '單元 ' + pack + ' 最後一天：沒看過的閱讀和聽力，各只有一次機會', auto: !!(held.reading && held.listening), go: to('library/unit/test'), goLabel: '回測' }
       : { id: 'read', title: '閱讀', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '閱讀理解一到兩篇（錯的題目選「卡在哪」），再讀幾段短文', auto: readToday,
         go: to(where('read', 'library/reading')), goLabel: pack ? '閱讀' : '閱讀理解', go2: to(pack ? 'library/reading' : 'library/story/read'), go2Label: pack ? '其他文章' : '短文' },
-    write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : '寫作階梯一題，批改完改一版', auto: wroteToday,
+    write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : writeDetail, auto: wroteToday,
       go: to(where('write', 'library/writing')), goLabel: '寫作' },
     speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : sound ? soundDetail + '；再跟 Emma 聊 10 分鐘' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,
       go: to(where('speak', 'speaking')), goLabel: 'Emma', go2: to(sound && !pack ? 'library/sound' : 'speaking/ielts'), go2Label: sound && !pack ? '發音' : 'Part 2' },

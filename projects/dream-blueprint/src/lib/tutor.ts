@@ -1,5 +1,7 @@
 import curriculum from '../data/curriculum.json'
 import { teachingRules } from './handoff'
+import { learnedLines, type LearnedContext } from './learned'
+import { recordClaude } from './usage'
 
 /** The key stays in this browser only; it is never part of the backup file or the repo. */
 const KEY = 'dream-blueprint.claude-key'
@@ -28,7 +30,8 @@ export type TutorSentence = { id: string; zh: string; reference: string[]; gramm
 const unitOf = new Map<string, { title: string; rule?: string }>()
 for (const unit of curriculum.units) for (const s of [...unit.days, ...unit.checkpoint, ...unit.backup]) unitOf.set(s.id, unit)
 
-export function tutorSystem(sentence: TutorSentence, learned: string[]) {
+/** `learned` is what this learner has been taught (see learnedFor); a plain list of unit titles still works. */
+export function tutorSystem(sentence: TutorSentence, learned: LearnedContext | string[] = []) {
   const unit = unitOf.get(sentence.id)
   return [
     '你是玄燁的英文家教。他是台灣護理系學生，英文約國中程度，目標是考雅思、去美國當註冊護理師。他正在用「一次一句中翻英」的方法學文法。',
@@ -40,7 +43,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
     '課本的提示：' + sentence.hints.join(' ／ '),
     '說明：' + sentence.why,
     sentence.newWords.length ? '這題的新字（沒學過，可以直接教）：' + sentence.newWords.map(w => w.en + ' ' + w.zh).join('、') : '',
-    learned.length ? '他已經過關的單元：' + learned.join('、') : '',
+    ...(Array.isArray(learned) ? [learned.length ? '他已經過關的單元：' + learned.join('、') : ''] : ['', ...learnedLines(learned)]),
     '',
     '教法（一定要照做）：',
     ...teachingRules.map((r, i) => (i + 1) + '. ' + r),
@@ -59,6 +62,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
 export async function askTutor(system: string, turns: TutorTurn[], signal?: AbortSignal) {
   const key = tutorKey()
   if (!key) throw new Error('還沒有設定 API 金鑰，請到設定 → 連接 Claude 填。')
+  const model = tutorModel()
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     signal,
@@ -68,7 +72,7 @@ export async function askTutor(system: string, turns: TutorTurn[], signal?: Abor
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true',
     },
-    body: JSON.stringify({ model: tutorModel(), max_tokens: 1200, system, messages: turns }),
+    body: JSON.stringify({ model, max_tokens: 1200, system, messages: turns }),
   })
   const data = await res.json().catch(() => null)
   if (!res.ok) {
@@ -77,6 +81,8 @@ export async function askTutor(system: string, turns: TutorTurn[], signal?: Abor
     if (res.status === 429) throw new Error('打太快或額度用完了，等一下再試。（' + msg + '）')
     throw new Error('連線失敗：' + msg)
   }
+  // The tokens this reply used, for the monthly estimate in 設定 (usage.ts).
+  recordClaude(model, data?.usage)
   return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
 }
 

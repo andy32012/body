@@ -1101,7 +1101,7 @@
       "Washing hands is one of the easiest ways to stop the spread of germs. Use soap and clean water, and scrub all parts of your hands for at least twenty seconds. Don't forget your thumbs and the skin between your fingers.",
       "In hospitals, hand hygiene is even more important. Patients are often weak, and germs can make them very sick. Nurses clean their hands before and after they touch a patient. When their hands are not visibly dirty, they can also use hand rub with alcohol."
     ],
-    "zh": "細菌很小看不到，住在門把、手機和錢上。摸了再碰眼睛嘴巴，細菌就會進入身體。洗手是阻止細菌傳播最簡單的方法之一：用肥皂和清水，搓洗手的每個部位至少二十秒，別忘了拇指和指縫。在醫院手部衛生更重要，因為病人比較虛弱。護理師碰病人前後都要清潔雙手，手沒有明顯髒污時也可以用含酒精的乾洗手。",
+    "zh": "病菌很小看不到，住在門把、手機和錢上。摸了再碰眼睛嘴巴，病菌就會進入身體。洗手是阻止病菌傳播最簡單的方法之一：用肥皂和清水，搓洗手的每個部位至少二十秒，別忘了拇指和指縫。在醫院手部衛生更重要，因為病人比較虛弱。護理師碰病人前後都要清潔雙手，手沒有明顯髒污時也可以用含酒精的乾洗手。",
     "qs": [
       {
         "type": "detail",
@@ -1159,7 +1159,7 @@
           "To describe a hospital building"
         ],
         "answer": 0,
-        "why": "全文說細菌怎麼傳播、怎麼洗手、醫院為什麼更重要。"
+        "why": "全文說病菌怎麼傳播、怎麼洗手、醫院為什麼更重要。"
       }
     ]
   },
@@ -2004,7 +2004,7 @@
     "words": 133,
     "paras": [
       "Flu season is coming. Sunshine Clinic will give flu shots from October 1 to November 30.",
-      "You do not need an appointment. Just come on a weekday between 9 a.m. and 5 p.m. Please bring your ID card and your health insurance card. The shot is free for children and for adults over sixty-five. For other people, it costs NT$500.",
+      "You do not need an appointment. Just come on a weekday between 9 a.m. and 5 p.m. Please bring your ID card and your health insurance card. The shot is free for children and for adults aged sixty-five and older. For other people, it costs NT$500.",
       "Before the shot, a nurse will check your temperature and ask a few questions. If you have a fever that day, please come back when you feel better. Tell the nurse if you had a problem after a shot before, or if you have any allergies.",
       "After the shot, please sit in the waiting area for thirty minutes. Your arm may feel a little sore for one or two days. This is normal."
     ],
@@ -2031,7 +2031,7 @@
         ],
         "answer": 1,
         "why": "兒童和 65 歲以上免費，其他人（for other people）要付 500 元，所以是三十歲的成人。",
-        "evidence": "The shot is free for children and for adults over sixty-five."
+        "evidence": "The shot is free for children and for adults aged sixty-five and older."
       },
       {
         "type": "detail",
@@ -2394,7 +2394,7 @@
       "When a colleague died after being cut by a student's knife during an autopsy, with an illness similar to childbed fever, Semmelweis formed a theory. He believed that 'particles' from the bodies were being carried on the doctors' hands to the women. In 1847, he required staff to wash their hands in a chlorinated lime solution before examining patients. Deaths in the first clinic fell dramatically.",
       "Despite these results, many doctors rejected his ideas. Some were offended by the suggestion that they themselves were causing deaths, and germ theory had not yet been developed to explain the findings. Semmelweis died in 1865, long before his work was widely accepted. Today, he is remembered as an early pioneer of hand hygiene, a practice that remains one of the most effective ways to prevent infections in hospitals."
     ],
-    "zh": "1840 年代維也納總醫院有兩個產科病房，第一病房死於產褥熱的產婦遠多於第二病房，有些產婦拜託進第二病房，甚至寧願在街上生。匈牙利年輕醫師塞麥爾維斯在第一病房工作，發現第一病房由醫師和醫學生負責，第二病房由助產士負責，而醫師和學生常剛做完大體解剖就直接過來。一位同事解剖時被學生的刀割傷後死亡，病況類似產褥熱，他推論屍體的「微粒」被醫師的手帶到產婦身上。1847 年他要求工作人員檢查病人前用含氯石灰溶液洗手，第一病房死亡率大幅下降。但很多醫師不接受，有人覺得被冒犯，當時也還沒有細菌理論。他 1865 年過世，遠早於他的研究被普遍接受。今天他被視為手部衛生的先驅。",
+    "zh": "1840 年代維也納總醫院有兩個產科病房，第一病房死於產褥熱的產婦遠多於第二病房，有些產婦拜託進第二病房，甚至寧願在街上生。匈牙利年輕醫師塞麥爾維斯在第一病房工作，發現第一病房由醫師和醫學生負責，第二病房由助產士負責，而醫師和學生常剛做完大體解剖就直接過來。一位同事解剖時被學生的刀割傷後死亡，病況類似產褥熱，他推論屍體的「微粒」被醫師的手帶到產婦身上。1847 年他要求工作人員檢查病人前用含氯石灰溶液洗手，第一病房死亡率大幅下降。但很多醫師不接受，有人覺得被冒犯，當時也還沒有「病菌致病」的理論。他 1865 年過世，遠早於他的研究被普遍接受。今天他被視為手部衛生的先驅。",
     "qs": [
       {
         "type": "heading",

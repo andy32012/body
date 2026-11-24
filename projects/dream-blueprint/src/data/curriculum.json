@@ -2088,7 +2088,7 @@
                 "名詞單複數、a／an"
               ],
               "hints": [
-                "檢查看到一顆藥時名詞前面要放什麼。",
+                "檢查 apple 前面要放 a 還是 an。",
                 "apple 的開頭是母音，前面放 an。"
               ],
               "reference": [
@@ -3095,7 +3095,7 @@
                 "the"
               ],
               "hints": [
-                "這裡說的是哪一位醫師、哪一間病房？",
+                "這裡說的是哪一位老師、哪一間教室？",
                 "雙方都知道是哪位老師、哪間教室，兩個都用 the。"
               ],
               "reference": [
@@ -7658,7 +7658,9 @@
             "The nurse washed the patient's hands for him.",
             "The nurse washed the patient's hands for her.",
             "The nurse helped the patient wash his hands.",
-            "The nurse helped the patient wash her hands."
+            "The nurse helped the patient wash her hands.",
+            "The nurse helped the patient to wash his hands.",
+            "The nurse helped the patient to wash her hands."
           ],
           "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
           "newWords": [
@@ -7714,7 +7716,9 @@
                 "The nurse washed the patient's hands for him.",
                 "The nurse washed the patient's hands for her.",
                 "The nurse helped the patient wash his hands.",
-                "The nurse helped the patient wash her hands."
+                "The nurse helped the patient wash her hands.",
+                "The nurse helped the patient to wash his hands.",
+                "The nurse helped the patient to wash her hands."
               ],
               "why": "過去發生的事，動詞字尾加 -ed；字尾是 e 只加 d（live → lived）；子音加 y 要把 y 改成 ied（study → studied）；一個母音加一個子音結尾、重音又在最後的字，子音要多寫一個再加 -ed（stop → stopped、plan → planned；visit 重音在前面，所以是 visited；w、x、y 結尾不雙寫，fix → fixed）。主詞是誰都一樣。",
               "newWords": []
@@ -11398,9 +11402,9 @@
               ],
               "reference": [
                 "I get up at seven.",
-                "I wake up at seven."
+                "I get up at seven o'clock."
               ],
-              "why": "時間：幾點用 at，星期幾和日期用 on，月份、年份、早上下午用 in。地點：一個點用 at，在裡面用 in，在表面上用 on，去某地用 to。",
+              "why": "時刻前面用 at。「起床」是 get up；wake up 是「醒來」，醒來不一定起床，所以這題要用 get up。",
               "newWords": []
             }
           ],
@@ -16752,7 +16756,7 @@
       "unit": 20,
       "stage": "A",
       "title": "限定詞：every、all、both、one、something",
-      "rule": "every、each 後面接單數名詞，動詞也用單數（Every patient has a wristband.）。all（全部）、most（大部分）、none（一個都沒有）說一群裡有多少，後面接 the、my 或代名詞時要加 of（All of the beds are full.）。兩個東西用 both（兩個都）、either（兩個裡任一個）、neither（兩個都不）。前面說過的可數名詞，不想再說一次就用 one（單數）或 ones（複數）。some-、any-、no-、every- 加上 -body／-one（人）、-thing（東西）、-where（地方）：somebody、anything、nothing、everywhere，當主詞時動詞用單數；問句和否定句多用 any- 開頭的字。",
+      "rule": "every、each 後面接單數名詞，動詞也用單數（Every patient has a wristband.）。all（全部）、most（大部分）、none（一個都沒有）說一群裡有多少，接 the、my 時，all 的 of 可加可不加（All the beds／All of the beds are full.），most、none 一定要加 of（most of the students）；接代名詞時都要 of（all of them）。兩個東西用 both（兩個都）、either（兩個裡任一個）、neither（兩個都不）；both 接 the、my 時 of 也可省（Both my sisters／Both of my sisters），either、neither 要加 of（Neither of them smokes.）。前面說過的可數名詞，不想再說一次就用 one（單數）或 ones（複數）。some-、any-、no-、every- 加上 -body／-one（人）、-thing（東西）、-where（地方）：somebody、anything、nothing、everywhere，當主詞時動詞用單數；問句和否定句多用 any- 開頭的字。",
       "examples": [
         "Every patient has a wristband.",
         "Both nurses are busy."
@@ -18056,8 +18060,8 @@
                 "連接詞 and／but／so／because"
               ],
               "hints": [
-                "先看兩個句子的關係是並列、轉折、結果還是原因。",
-                "because 和 so 只能用一個。"
+                "「想去」和「很忙」意思相反，用哪個連接詞？",
+                "意思相反用 but：I want to go, but I am busy."
               ],
               "reference": [
                 "I want to go, but I am busy."
@@ -18359,7 +18363,7 @@
       "unit": 22,
       "stage": "A",
       "title": "when／before／after／if",
-      "rule": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+      "rule": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
       "examples": [
         "Wash your hands before you eat.",
         "Call me if you need help."
@@ -18384,7 +18388,7 @@
             "Wash your hands before you eat.",
             "Wash your hands before eating."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": [
             {
               "en": "before",
@@ -18437,7 +18441,7 @@
                 "Wash your hands before you eat.",
                 "Wash your hands before eating."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             }
           ],
@@ -18464,7 +18468,7 @@
             "I will call you after I get home.",
             "After I get home, I will call you."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": [
             {
               "en": "home",
@@ -18517,7 +18521,7 @@
                 "I will call you after I get home.",
                 "After I get home, I will call you."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             }
           ],
@@ -18552,7 +18556,7 @@
             "Call me if you need help.",
             "If you need help, call me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": [
             {
               "en": "need",
@@ -18605,7 +18609,7 @@
                 "Call me if you need help.",
                 "If you need help, call me."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             }
           ],
@@ -18640,7 +18644,7 @@
             "Take this medicine after meals.",
             "Take this medicine after you eat."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
           "newWords": [
             {
               "en": "meal",
@@ -18693,7 +18697,7 @@
                 "Take this medicine after meals.",
                 "Take this medicine after you eat."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             }
           ],
@@ -18724,7 +18728,7 @@
             "When you feel dizzy, you should sit down.",
             "You should sit down when you feel dizzy."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": [
             {
               "en": "breathe",
@@ -18777,7 +18781,7 @@
                 "When you feel dizzy, you should sit down.",
                 "You should sit down when you feel dizzy."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             }
           ],
@@ -18816,7 +18820,7 @@
             "Brush your teeth before you go to bed.",
             "Brush your teeth before bed."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -18835,7 +18839,7 @@
                 "Brush your teeth before you go to bed.",
                 "Brush your teeth before bed."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             },
             {
@@ -18853,7 +18857,7 @@
                 "If it rains tomorrow, I will stay home.",
                 "I will stay home if it rains tomorrow."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             },
             {
@@ -18871,7 +18875,7 @@
                 "I will tell him when he comes.",
                 "When he comes, I will tell him."
               ],
-              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+              "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
               "newWords": []
             }
           ],
@@ -18908,7 +18912,7 @@
             "Brush your teeth before you go to bed.",
             "Brush your teeth before bed."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -18926,7 +18930,7 @@
             "If it rains tomorrow, I will stay home.",
             "I will stay home if it rains tomorrow."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -18944,7 +18948,7 @@
             "I will tell him when he comes.",
             "When he comes, I will tell him."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         }
       ],
@@ -18964,7 +18968,7 @@
             "You cannot eat after the surgery.",
             "You can't eat after surgery."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
           "newWords": []
         },
         {
@@ -18982,7 +18986,7 @@
             "Please tell me if you have a question.",
             "If you have any questions, please tell me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19000,7 +19004,7 @@
             "I will study after I eat lunch.",
             "I will study after lunch."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19017,7 +19021,7 @@
           "reference": [
             "Please close the door before you leave."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19035,7 +19039,7 @@
             "When he is tired, he is very quiet.",
             "He is very quiet when he is tired."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         }
       ],
@@ -19055,7 +19059,7 @@
             "You cannot eat after the surgery.",
             "You can't eat after surgery."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）（術後能不能吃、什麼時候能吃，是這位病人自己的醫囑，每個人不一樣；實際照護要照醫囑再確認。）",
           "newWords": []
         },
         {
@@ -19073,7 +19077,7 @@
             "Please tell me if you have a question.",
             "If you have any questions, please tell me."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19091,7 +19095,7 @@
             "I will study after I eat lunch.",
             "I will study after lunch."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19108,7 +19112,7 @@
           "reference": [
             "Please close the door before you leave."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         },
         {
@@ -19126,7 +19130,7 @@
             "When he is tired, he is very quiet.",
             "He is very quiet when he is tired."
           ],
-          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 if 是「如果」；if 當「是不是」用時，例如 I don't know if he will come，可以用 will，單元 32 會教。）",
+          "why": "when（當…的時候）、before（在…之前）、after（在…之後）、if（如果）後面可以接一個完整的句子（主詞加動詞）；before、after 也可以直接接名詞或 V-ing（after meals、before eating）。講未來的事時，這幾個字後面的句子用現在式，主要句才用 will。（這裡的 when 是「…的時候」、if 是「如果」；when 當「什麼時候」、if 當「是不是」用時，例如 I don't know when／if he will come，可以用 will，單元 32 會教。）",
           "newWords": []
         }
       ],
@@ -19625,17 +19629,17 @@
             {
               "id": "u23-c2",
               "day": 6,
-              "zh": "我做完功課了。",
+              "zh": "他寫完報告了。",
               "grammar": [
                 "不定詞和動名詞"
               ],
               "hints": [
-                "看前面那個動詞是接 to 加原形，還是接 ing。",
+                "finish 後面的動詞要用什麼形式？",
                 "finish 後面接動詞 ing。"
               ],
               "reference": [
-                "I finished doing my homework.",
-                "I have finished doing my homework."
+                "He finished writing the report.",
+                "He has finished writing the report."
               ],
               "why": "finish 後面接動詞 ing，所以是 finished writing the report。",
               "newWords": []
@@ -22264,7 +22268,7 @@
       "unit": 27,
       "stage": "A",
       "title": "附和和問句：So do I、Who called you?、What is it like?",
-      "rule": "附和別人的肯定句用 So＋助動詞＋主詞（I'm tired. — So am I.／I like tea. — So do I.）；附和否定句用 Neither＋助動詞＋主詞（I can't swim. — Neither can I.），也可以說 I can't either。助動詞要跟著前一句：be 動詞用 am／is／are，一般動詞用 do／does／did，can 就用 can。問「誰做了這件事」時，Who 就是主詞，直接接動詞，不加 did（Who called you?）；問「你做了誰、什麼」才加 did（Who did you call?）。介系詞常放在問句最後（Who are you talking to?）；What is…like? 是問「……怎麼樣」。問花多久時間用 How long does it take (you) to＋原形？",
+      "rule": "附和別人的肯定句用 So＋助動詞＋主詞（I'm tired. — So am I.／I like tea. — So do I.）；附和否定句用 Neither＋助動詞＋主詞（I can't swim. — Neither can I.），也可以說 I can't either。助動詞要跟著前一句：be 動詞用 am／is／are，一般動詞用 do／does／did，can 就用 can。問「誰做了這件事」時，Who 就是主詞，一般直接接動詞，不加 did（Who called you?；Who did call you? 只在特別強調時才說）；問「你做了誰、什麼」才加 did（Who did you call?）。介系詞常放在問句最後（Who are you talking to?）；What is…like? 是問「……怎麼樣」。問花多久時間用 How long does it take (you) to＋原形？",
       "examples": [
         "I'm hungry. — So am I.",
         "Who called you?"
@@ -22932,7 +22936,7 @@
             "What happened?",
             "What has happened?"
           ],
-          "why": "What 當主詞時不用 did：What happened?，不是 What did happen?",
+          "why": "What 當主詞時一般不用 did：What happened?。What did happen? 只有在強調「那到底發生了什麼」時才說，平常不要這樣問。",
           "newWords": []
         },
         {
@@ -23025,7 +23029,7 @@
             "What happened?",
             "What has happened?"
           ],
-          "why": "What 當主詞時不用 did：What happened?，不是 What did happen?",
+          "why": "What 當主詞時一般不用 did：What happened?。What did happen? 只有在強調「那到底發生了什麼」時才說，平常不要這樣問。",
           "newWords": []
         },
         {
@@ -28622,7 +28626,7 @@
       "unit": 35,
       "stage": "B",
       "title": "動詞句型：tell 人 to、make／let、used to",
-      "rule": "want／ask／tell／remind＋人＋to＋原形：要（請、叫、提醒）某人做某事（The doctor told me to rest.），否定在 to 前面加 not（told me not to run）。to＋原形放在句子後面可以說「為了……」（I went to the pharmacy to buy medicine.）。make／let／help＋人＋原形，中間不加 to：make 是叫人非做不可，let 是讓、允許（Let me help you.）。remember、forget、stop 後面接 to 或 -ing 意思不一樣：remember to call（記得要打）、remember calling（記得打過）、stop to rest（停下來休息）、stop smoking（不再抽菸）。used to＋原形說「以前常常……（現在不再）」：I used to smoke.；問句和否定句有 did，要寫成 use to。",
+      "rule": "want／ask／tell／remind＋人＋to＋原形：要（請、叫、提醒）某人做某事（The doctor told me to rest.），否定在 to 前面加 not（told me not to run）。to＋原形放在句子後面可以說「為了……」（I went to the pharmacy to buy medicine.）。make／let＋人＋原形，中間不加 to：make 是叫人非做不可，let 是讓、允許（Let me help you.）；help＋人 後面加不加 to 都對（help him carry／help him to carry）。remember、forget、stop 後面接 to 或 -ing 意思不一樣：remember to call（記得要打）、remember calling（記得打過）、stop to rest（停下來休息）、stop smoking（不再抽菸）。used to＋原形說「以前常常……（現在不再）」：I used to smoke.；問句和否定句有 did，要寫成 use to。",
       "examples": [
         "The doctor told me to rest.",
         "Let me help you."
@@ -28841,7 +28845,7 @@
             "My mom does not let me go out at night.",
             "My mother does not let me go out at night."
           ],
-          "why": "let／make／help＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。",
+          "why": "let／make＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。（help 不一樣：help me go 和 help me to go 都對。）",
           "newWords": [
             {
               "en": "let",
@@ -28894,7 +28898,7 @@
                 "My mom does not let me go out at night.",
                 "My mother does not let me go out at night."
               ],
-              "why": "let／make／help＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。",
+              "why": "let／make＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。（help 不一樣：help me go 和 help me to go 都對。）",
               "newWords": []
             }
           ],
@@ -29755,9 +29759,9 @@
             },
             {
               "en": "shortness of breath",
-              "zh": "呼吸急促",
+              "zh": "呼吸困難（喘）",
               "example": "He has shortness of breath.",
-              "exampleZh": "他呼吸急促。",
+              "exampleZh": "他呼吸困難。",
               "source": "nursing",
               "level": 4
             }
@@ -29773,9 +29777,9 @@
             },
             {
               "en": "shortness of breath",
-              "zh": "呼吸急促",
+              "zh": "呼吸困難（喘）",
               "example": "He has shortness of breath.",
-              "exampleZh": "他呼吸急促。",
+              "exampleZh": "他呼吸困難。",
               "source": "nursing",
               "level": 4
             }
@@ -30720,19 +30724,19 @@
             {
               "id": "u37-c2",
               "day": 6,
-              "zh": "她從來沒有見過他。",
+              "zh": "在那之前，她從來沒有見過他。",
               "grammar": [
                 "過去完成式"
               ],
               "hints": [
-                "找出兩件過去的事裡哪一件先發生。",
-                "先發生的用 had 加過去分詞，後發生的用過去式。"
+                "「在那之前」是指過去某個時間點之前，用哪個時態？",
+                "比過去更早的經驗用 had 加過去分詞：had never met。"
               ],
               "reference": [
-                "She had never met him before.",
-                "She had never seen him before."
+                "She had never met him before that.",
+                "Before that, she had never met him."
               ],
-              "why": "had 加過去分詞，表示在過去某個時間點或某件事「之前」就已經發生的事（When I arrived, the bus had left 我到的時候公車已經開走了）。要特別強調誰先誰後、或照時間順序講不清楚時，先發生的用過去完成式，後發生的用過去式。如果已經用 before、after 講清楚順序，或照發生順序一件一件說，兩件都用過去式也可以（I ate before I left）。",
+              "why": "有一個過去的時間點（那時），比它更早的經驗用過去完成式 had never met。",
               "newWords": []
             },
             {
@@ -31865,14 +31869,14 @@
                 "對比和讓步"
               ],
               "hints": [
-                "看兩個句子是「雖然…還是…」還是「一個這樣、另一個那樣」。",
-                "Although 接句子，後面不要再用 but。"
+                "although 和 but 可以同時用嗎？",
+                "Although 接一個句子，後面直接接 we still went out，不要再加 but。"
               ],
               "reference": [
-                "Although it was raining, we went.",
-                "Although it rained, we still went."
+                "Although it was raining, we still went out.",
+                "Although it was raining, we went anyway."
               ],
-              "why": "although、even though（雖然）後面接句子；despite、in spite of（儘管）後面接名詞或動詞 ing。while、whereas 用來對比兩件事。however（然而）放在第二句開頭，後面加逗號。although 和 but 不能同時用。",
+              "why": "Although 已經表示「雖然」，後面不要再加 but；「還是」可以用 still 或 anyway。",
               "newWords": []
             }
           ],
@@ -33844,9 +33848,9 @@
               ],
               "reference": [
                 "This pill must not be crushed.",
-                "This pill should not be crushed."
+                "This pill mustn't be crushed."
               ],
-              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
+              "why": "「不可以」是禁止，用 must not be crushed（助動詞＋be＋過去分詞）。should not 是「不應該」，語氣比較弱，意思不一樣。（這句講的是「這個藥」：飯前、飯後、跟食物一起吃、能不能壓碎，每種藥都不一樣，要看醫囑和藥袋上的說明。）",
               "newWords": []
             },
             {
@@ -35427,19 +35431,19 @@
             {
               "id": "u43-c3",
               "day": 6,
-              "zh": "在哭的那個小孩需要他的媽媽。",
+              "zh": "在門口哭的那個小孩需要他的媽媽。",
               "grammar": [
                 "分詞片語"
               ],
               "hints": [
-                "先判斷名詞是在做動作，還是被做。",
-                "名詞自己在做用動詞 ing；名詞是被做的用過去分詞。"
+                "小孩是自己在哭，還是被弄哭？",
+                "自己在做的動作用 ing：the child crying at the door，主要動詞是 needs。"
               ],
               "reference": [
-                "The child crying needs his mother.",
-                "The crying child needs his mother."
+                "The child crying at the door needs his mother.",
+                "The child who is crying at the door needs his mother."
               ],
-              "why": "把關係子句縮短：主動的用動詞 ing，被動的用過去分詞，直接放在名詞後面。the patient who is lying in bed 3 可以縮成 the patient lying in bed 3；the medicine that was given at eight 可以縮成 the medicine given at eight。",
+              "why": "小孩自己在哭，用 crying at the door 放在 child 後面說明；主要動詞是 needs。",
               "newWords": []
             }
           ],
@@ -36983,8 +36987,8 @@
                 "先說 In my opinion 或 I think，再用 because 給理由，再用 For example 舉例。"
               ],
               "reference": [
-                "For example, I study ten minutes every day.",
-                "For example, I study for ten minutes every day."
+                "For example, I study for ten minutes every day.",
+                "For example, I study ten minutes a day."
               ],
               "why": "口說檢定要把回答講長：先講意見（I think、In my opinion、I believe），再講理由（because、The main reason is that），再舉例（For example、For instance），最後收尾（That is why…）。同意和不同意可以說 I agree that…、I do not agree that…。",
               "newWords": []
@@ -37272,7 +37276,7 @@
       "unit": 46,
       "stage": "C",
       "title": "冠詞進階",
-      "rule": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+      "rule": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
       "examples": [
         "He has diabetes and a cold.",
         "Nurses work hard."
@@ -37296,7 +37300,7 @@
           "reference": [
             "Water is important."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": [
             {
               "en": "important",
@@ -37348,7 +37352,7 @@
               "reference": [
                 "Water is important."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             }
           ],
@@ -37379,7 +37383,7 @@
             "Nurses work hard.",
             "Nurses work very hard."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": [
             {
               "en": "work",
@@ -37432,7 +37436,7 @@
                 "Nurses work hard.",
                 "Nurses work very hard."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             }
           ],
@@ -37463,7 +37467,7 @@
             "Have you had breakfast?",
             "Have you eaten breakfast yet?"
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": [
             {
               "en": "breakfast",
@@ -37516,7 +37520,7 @@
                 "Have you had breakfast?",
                 "Have you eaten breakfast yet?"
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             }
           ],
@@ -37550,7 +37554,7 @@
           "reference": [
             "He has diabetes and a cold."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": [
             {
               "en": "diabetes",
@@ -37602,7 +37606,7 @@
               "reference": [
                 "He has diabetes and a cold."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             }
           ],
@@ -37637,7 +37641,7 @@
             "The medicine on the table is for the patient in bed 5, and it is the most expensive medicine here.",
             "The medicine on the table is for the patient in bed five, and it is the most expensive drug here."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
           "newWords": [
             {
               "en": "cancer",
@@ -37690,7 +37694,7 @@
                 "The medicine on the table is for the patient in bed 5, and it is the most expensive medicine here.",
                 "The medicine on the table is for the patient in bed five, and it is the most expensive drug here."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。（實際給藥前一定要用兩種身分資料核對病人，例如全名和出生日期；床號不能當作辨識病人的方法。）",
               "newWords": []
             }
           ],
@@ -37724,7 +37728,7 @@
           "reference": [
             "I go to bed at eleven every night."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -37742,7 +37746,7 @@
               "reference": [
                 "I go to bed at eleven every night."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             },
             {
@@ -37760,7 +37764,7 @@
                 "She has a cold and a slight headache.",
                 "She has a cold and a little headache."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             },
             {
@@ -37778,7 +37782,7 @@
                 "The sun is strong today.",
                 "The sun is very bright today."
               ],
-              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+              "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
               "newWords": []
             }
           ],
@@ -37814,7 +37818,7 @@
           "reference": [
             "I go to bed at eleven every night."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37832,7 +37836,7 @@
             "She has a cold and a slight headache.",
             "She has a cold and a little headache."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37850,7 +37854,7 @@
             "The sun is strong today.",
             "The sun is very bright today."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         }
       ],
@@ -37869,7 +37873,7 @@
           "reference": [
             "Children need love."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37887,7 +37891,7 @@
             "I speak English and Chinese.",
             "I can speak English and Chinese."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37905,7 +37909,7 @@
             "The lunch I had yesterday was delicious.",
             "The lunch that I ate yesterday was good."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37923,7 +37927,7 @@
             "He has pneumonia.",
             "He got pneumonia."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37940,7 +37944,7 @@
           "reference": [
             "This is the tallest building in the city."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         }
       ],
@@ -37959,7 +37963,7 @@
           "reference": [
             "Children need love."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37977,7 +37981,7 @@
             "I speak English and Chinese.",
             "I can speak English and Chinese."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -37995,7 +37999,7 @@
             "The lunch I had yesterday was delicious.",
             "The lunch that I ate yesterday was good."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -38013,7 +38017,7 @@
             "He has pneumonia.",
             "He got pneumonia."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         },
         {
@@ -38030,7 +38034,7 @@
           "reference": [
             "This is the tallest building in the city."
           ],
-          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache 要加 a。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
+          "why": "泛指不可數名詞和複數名詞時不加冠詞（Water is important、Nurses work hard）。特指才加 the。三餐、語言、運動、多數疾病名稱不加冠詞（have breakfast、speak English、have diabetes）；但 a cold、a fever、a headache、a cough 要加 a，have the flu 常加 the，have diarrhea 不加，要跟著每個字記，不是看中文「小毛病」。世界上唯一的東西和最高級要加 the。go to bed、go to school 這類固定說法不加。「住院」英式說 in hospital，美式說 in the hospital；你要去美國工作，先學 in the hospital。",
           "newWords": []
         }
       ],
@@ -38041,7 +38045,7 @@
       "unit": 47,
       "stage": "C",
       "title": "常見搭配和片語動詞",
-      "rule": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
+      "rule": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。受詞放哪裡要看能不能拆開：put on、take off 可以拆開，受詞是 it／them 時放中間（put it on）；look after、get over、come down with 不能拆開，受詞放最後（look after them）。",
       "examples": [
         "He passed out in the bathroom.",
         "I need to make an appointment."
@@ -38512,8 +38516,8 @@
                 "搭配和片語動詞要整組記，不能照中文一個字一個字翻。"
               ],
               "reference": [
-                "I need to take your history.",
-                "I need to take your medical history."
+                "I need to take your medical history.",
+                "I need to take your history."
               ],
               "why": "有些字習慣一起用，要整組記：take medicine、take a history、make an appointment、have surgery、do an exam、give an injection。片語動詞是動詞加小字，意思要整組記：pass out（昏倒）、throw up（嘔吐）、come down with（染上）、look after（照顧）、get over（康復）、put on（穿上）、take off（脫下）。",
               "newWords": []
@@ -41178,7 +41182,7 @@
       "unit": 51,
       "stage": "BR",
       "title": "第三類假設：跟過去事實相反",
-      "rule": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）",
+      "rule": "跟過去事實相反的假設：If + 過去完成式（had + 過去分詞），主要句子用 would／could／might have + 過去分詞。If I had left earlier, I wouldn't have been late.（事實是：沒有早點出門，所以遲到了。）（如果過去的事影響的是現在，主要句用 would + 原形：If I had slept earlier, I wouldn't be tired now. 這是混合假設，也對。）",
       "examples": [
         "If I had left earlier, I wouldn't have been late.",
         "If he had seen a doctor earlier, the wound wouldn't have gotten infected."
@@ -42087,7 +42091,7 @@
             {
               "en": "habit",
               "zh": "習慣",
-              "example": "Sleeping late is a bad habit.",
+              "example": "Staying up late is a bad habit.",
               "exampleZh": "晚睡是壞習慣。",
               "source": "level1",
               "level": 1
@@ -42105,7 +42109,7 @@
             {
               "en": "habit",
               "zh": "習慣",
-              "example": "Sleeping late is a bad habit.",
+              "example": "Staying up late is a bad habit.",
               "exampleZh": "晚睡是壞習慣。",
               "source": "level1",
               "level": 1

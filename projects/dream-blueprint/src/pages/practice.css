@@ -296,12 +296,17 @@
 .library-page { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: start; gap: 16px; }
 .library-page > .pr-cover { grid-column: 1/-1; min-height: clamp(145px, 14vw, 200px); }
 .library-page > .practice-page { max-width: none; }
-/* Words, grammar, pronunciation and nursing English have the page to themselves (no lesson banner beside them). */
+/* Every practice has the page to itself (no lesson banner beside it). */
 .library-page:not([data-section="practice"]) > .practice-page { grid-column: 1 / -1; max-width: 920px; width: 100%; }
+/* 英文練習 itself is only today's lesson (and the level check when it is due): one column, and the practice pane
+   holds nothing but the phone's section chips, so it is hidden where the sidebar is. */
+.library-page[data-section="practice"] { grid-template-columns: minmax(0, 1fr); }
+.library-page[data-section="practice"] > * { grid-column: 1 / -1; }
+@media (min-width: 761px) { .library-page[data-section="practice"] > .practice-page { display: none; } }
 /* The sections as chips: only where there is no sidebar (a phone). */
 .pr-sections { display: none; }
 @media (max-width: 760px) {
-  .pr-sections { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 .9rem; padding-bottom: .8rem; border-bottom: 1px dashed var(--practice-line); }
+  .pr-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; margin: 0 0 .9rem; padding-bottom: .8rem; border-bottom: 1px dashed var(--practice-line); }
   .practice-page .pr-sections button { flex: 1 1 auto; min-height: 38px; padding: .25rem .5rem; border-radius: 999px; font-size: .9rem; color: var(--practice-secondary); white-space: nowrap; }
   .practice-page .pr-sections button[aria-current="page"] { color: var(--practice-ink); font-weight: 650; background: var(--practice-accent-wash); border-color: var(--practice-accent); box-shadow: inset 0 0 0 1px var(--practice-accent); }
 }
