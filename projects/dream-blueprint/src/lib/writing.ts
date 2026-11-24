@@ -80,11 +80,14 @@ export function nextTask(stages: readonly WriteStage[], notes: Record<string, st
   const found = best as { stage: WriteStage; task: WriteTask } | null
   return found ? { stage: found.stage, task: found.task } : null
 }
-/** The stage of the next piece; once every open task is done, the last stage of the ladder. */
+/** The stage of the next piece. With nothing open yet, the stage whose first piece opens soonest (A1 at the start);
+ *  once everything is done, the last stage of the ladder. */
 export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>, unit = Infinity) {
   const next = nextTask(stages, notes, unit)
   if (next) return next.stage.id
   const ladder = stages.filter(s => !s.pack)
+  const waiting = ladder.flatMap(s => s.tasks.filter(t => !taskOpen(t, unit) && !taskDone(readWrite(notes, t.id), !!s.ielts)).map(t => ({ s, after: t.after ?? 0 })))
+  if (waiting.length) return waiting.reduce((a, b) => b.after < a.after ? b : a).s.id
   return ladder[ladder.length - 1].id
 }
 /** About how long one piece takes at each level (for today's plan). */

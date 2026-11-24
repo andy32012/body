@@ -37,6 +37,7 @@ test('a piece opens only after its grammar unit is finished', () => {
   assert.equal(taskOpen(first, 1), false, 'still learning unit 1')
   assert.equal(taskOpen(first, 2), true)
   assert.equal(nextTask(stages, {}, 1), null, 'nothing to write before unit 1 is finished')
+  assert.equal(suggestedStage(stages, {}, 1), 'a1', 'the page still opens on A1, showing when it opens')
 })
 
 test('the next piece follows the course without skipping', () => {
