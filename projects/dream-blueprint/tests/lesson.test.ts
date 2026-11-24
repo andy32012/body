@@ -223,7 +223,7 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   // 每一階都照官方評分表：句子＝全民英檢初級單句寫作、一段＝初級段落寫作、多段和橋接＝中級英文作文、Task 1／2＝IELTS。
   const ws = w.stages as Parameters<typeof suggestedStage>[0]
   const by = (id: string) => ws.find(s => s.id === id)!
-  assert.deepEqual(ws.map(s => rubricFor(s).id), ['gept-sentence', 'gept-paragraph', 'gept-essay', 'ielts-task1', 'ielts-task2', 'gept-essay'])
+  assert.deepEqual(['sentence', 'paragraph', 'multi', 'task1', 'task2', 'bridge'].map(id => rubricFor(by(id)).id), ['gept-sentence', 'gept-paragraph', 'gept-essay', 'ielts-task1', 'ielts-task2', 'gept-essay'])
   assert.deepEqual(sentenceParts(by('sentence').tasks[0]), ['用 and 的句子', '用 but 的句子', '用 because 的句子'])
   assert.deepEqual(sentenceParts(by('sentence').tasks[3]), ['用 should 的句子', '用 if 的句子', '用 because 的句子'])
   // IELTS：四項都是整數 band；順序亂了照名字放回去；這一題的 band 由四項平均照雅思進位算出來，不用 Claude 給的。
@@ -283,7 +283,7 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   assert.doesNotMatch(t2b, /立場/)
   assert.equal(wordCount('Résumé café 37.5 well-known'), 4)
   const { default: writing } = await import('../src/data/writing.json', { with: { type: 'json' } })
-  assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'sentence')
+  assert.equal(suggestedStage(writing.stages as Parameters<typeof suggestedStage>[0], {}), 'basic')
 })
 
 test('配對 QR：要對的配對碼、10 分鐘內才打得開', async () => {

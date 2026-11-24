@@ -1,8 +1,358 @@
 {
  "stages": [
   {
+   "id": "basic",
+   "name": "① 一句完整的話",
+   "goal": "先把「誰＋做什麼／是什麼」寫成完整的一句，再分開寫三句。",
+   "criteria": [
+    "寫三個簡單的完整句子，每句只說一件事",
+    "每句有主詞和動詞，be 動詞或一般動詞用對",
+    "he、she、it 或一個人當主詞時，現在式動詞的變化正確",
+    "句首大寫，句尾有標點；整題至少 10 字"
+   ],
+   "grammar": {
+    "title": "完整句子：主詞＋be 動詞，或主詞＋一般動詞",
+    "points": [
+     "先寫主詞（誰），再寫動詞：I study. 是完整的一句；只有 I 或 My school 還沒說完。句首大寫，句尾加句點。",
+     "介紹身分用 be 動詞：I am、he／she／it is、you／we／they are；例如 I am a student.。",
+     "說平常做的事用一般動詞：I like；he／she／it 或一個人當主詞時加 s／es。study 變 studies，have 變 has。",
+     "一個可數的東西前面常要 a／an（a nurse、an apple）；說「誰的」可用 my／your／our，或在名字、單數名詞後加 ’s，例如 a patient’s name（病人的姓名）。"
+    ],
+    "examples": [
+     {
+      "en": "I am a nursing student.",
+      "zh": "我是護理系學生。"
+     },
+     {
+      "en": "My mother is a nurse.",
+      "zh": "我媽媽是護理師。"
+     },
+     {
+      "en": "We are students.",
+      "zh": "我們是學生。"
+     },
+     {
+      "en": "I study English.",
+      "zh": "我讀英文。"
+     },
+     {
+      "en": "She likes music.",
+      "zh": "她喜歡音樂。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I a student.",
+      "good": "I am a student.",
+      "why": "介紹身分也需要動詞；I 後面補上 am。"
+     },
+     {
+      "bad": "She like music.",
+      "good": "She likes music.",
+      "why": "She 是第三人稱單數，現在式的 like 要加 s。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "b1",
+     "prompt": "Write three sentences about yourself and your family. Use am, is, and are.",
+     "zh": "一次先寫一句，分三句介紹自己和家人：分別用 am、is、are。三句合計至少 10 字，不用把句子連起來。",
+     "min": 10,
+     "sample": "I am a student. My mother is a nurse. We are a family."
+    },
+    {
+     "id": "b2",
+     "prompt": "Write three sentences about studying and reading. Use study, reads, and like.",
+     "zh": "分三句寫自己或家人的學習：分別用 study、reads、like。每句只寫一件事。",
+     "min": 10,
+     "sample": "I study English. My sister reads books. We like our school."
+    },
+    {
+     "id": "b3",
+     "prompt": "Write three sentences about someone in your family. Use likes, plays, and watches.",
+     "zh": "分三句寫一位家人的喜好或活動，用 likes、plays、watches 各寫一句。提醒：一個人當主詞，動詞要有 s 或 es。",
+     "min": 10,
+     "sample": "My sister likes music. She plays tennis. She watches nursing videos."
+    },
+    {
+     "id": "b4",
+     "prompt": "Write three sentences about your school. Use has, teaches, and helps.",
+     "zh": "分三句介紹學校裡的人或事物，用 has、teaches、helps 各寫一句。has 是 have 搭配一個人或事物的寫法。",
+     "min": 10,
+     "sample": "My school has a library. Our teacher teaches nursing. My friend helps students."
+    },
+    {
+     "id": "b5",
+     "prompt": "Write three sentences about yourself and nursing.",
+     "zh": "分三句介紹自己、讀的科目或對護理的喜好。每句有「誰＋是什麼／做什麼」就好，不用寫原因。",
+     "min": 10,
+     "sample": "I am a nursing student. I study English. I like nursing books."
+    }
+   ]
+  },
+  {
+   "id": "longer",
+   "name": "② 把句子寫長",
+   "goal": "保留簡單句，再加上樣子、地點、時間或做事的頻率。",
+   "criteria": [
+    "分開寫三句，每句仍有主詞和動詞",
+    "依題目加入形容詞、地點、時間或頻率",
+    "形容詞和 always、usually、often 放在正確的位置",
+    "不必連成長句；整題至少 15 字"
+   ],
+   "grammar": {
+    "title": "讓簡單句更清楚：形容詞、地點、時間、頻率",
+    "points": [
+     "形容詞可以放名詞前面：a small room；也可以放 be 動詞後面：The room is small.。",
+     "地點放在動作後面：study in the library、work at school，說清楚在哪裡。",
+     "時間常放句尾：at seven 是七點，every morning 是每天早上；先寫完整句子，再加時間。",
+     "always／usually／often 通常放一般動詞前面（I often read），但放 be 動詞後面（She is often busy）。"
+    ],
+    "examples": [
+     {
+      "en": "My school has a small library.",
+      "zh": "我的學校有一間小圖書館。"
+     },
+     {
+      "en": "The classroom is bright.",
+      "zh": "教室很明亮。"
+     },
+     {
+      "en": "I study in the library.",
+      "zh": "我在圖書館讀書。"
+     },
+     {
+      "en": "She reads every evening.",
+      "zh": "她每天晚上閱讀。"
+     },
+     {
+      "en": "My roommate is usually quiet.",
+      "zh": "我的室友通常很安靜。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I study every day English.",
+      "good": "I study English every day.",
+      "why": "先把 study English 寫完整，再把時間 every day 放句尾。"
+     },
+     {
+      "bad": "I usually studies in my room.",
+      "good": "I usually study in my room.",
+      "why": "usually 不改變主詞；主詞是 I，所以用 study，不加 s。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "l1",
+     "prompt": "Write three sentences about your school. Add an adjective to each sentence.",
+     "zh": "分三句介紹學校，每句加一個描述樣子的字，例如 small（小的）、bright（明亮的）、blue（藍色的）。",
+     "min": 15,
+     "sample": "My school has a small library. My classroom is bright. Our teacher has a blue bag."
+    },
+    {
+     "id": "l2",
+     "prompt": "Write three sentences about where you and your family study or work.",
+     "zh": "分三句寫自己或家人在哪裡讀書、工作。可以用 in the library（在圖書館）、at school（在學校）、in a hospital（在醫院）。",
+     "min": 15,
+     "sample": "I study in the library. My friend reads at school. My sister works in a hospital."
+    },
+    {
+     "id": "l3",
+     "prompt": "Write three sentences about your school day. Add a time to each sentence.",
+     "zh": "分三句寫上學日的活動，每句加上時間，例如 at seven、every morning、every evening。",
+     "min": 15,
+     "sample": "I eat breakfast at seven every morning. My first class starts at eight. I study English every evening."
+    },
+    {
+     "id": "l4",
+     "prompt": "Write three sentences about life in your dormitory. Use always, usually, and often.",
+     "zh": "分三句寫宿舍生活，用 always（總是）、usually（通常）、often（常常）各寫一句。",
+     "min": 15,
+     "sample": "I always eat breakfast at seven. My roommate usually studies in our room. Our room is often quiet."
+    },
+    {
+     "id": "l5",
+     "prompt": "Write three sentences about your room and your roommate. Add details about place, time, or appearance.",
+     "zh": "分三句介紹房間和室友，可以加地點、時間或樣子。roommate 是室友，desk 是書桌。",
+     "min": 15,
+     "sample": "My roommate is a nursing student. She usually reads in our quiet room. I study English at my small desk every evening."
+    }
+   ]
+  },
+  {
+   "id": "negq",
+   "name": "③ 否定句和問句",
+   "goal": "把熟悉的現在式句子改成「不……」和簡單的問題。",
+   "criteria": [
+    "寫出題目指定的三句，否定句和問句都算一句",
+    "一般動詞用 do／does，be 動詞用 am／is／are",
+    "does／doesn’t 後面的動詞回到原形",
+    "問句用問號，整題至少 15 字"
+   ],
+   "grammar": {
+    "title": "否定和問句：先分清楚 be 動詞與一般動詞",
+    "points": [
+     "一般動詞的否定用 don’t／doesn’t＋原形動詞：I don’t drink；she doesn’t drink，不再加 s。",
+     "be 動詞的否定直接加 not：am not、is not（isn’t）、are not（aren’t），不用 do。",
+     "問「是不是／有沒有」時，把 be 動詞移到主詞前；一般動詞則用 Do／Does＋主詞＋原形動詞。",
+     "問詳細資訊時，把 What（什麼）、Where（哪裡）、When（何時）放在問句前面：Where do you study?。"
+    ],
+    "examples": [
+     {
+      "en": "I don't drink coffee at night.",
+      "zh": "我晚上不喝咖啡。"
+     },
+     {
+      "en": "She doesn't live in the dormitory.",
+      "zh": "她不住在宿舍。"
+     },
+     {
+      "en": "Our classroom isn't noisy.",
+      "zh": "我們的教室不吵。"
+     },
+     {
+      "en": "Is she a nursing student?",
+      "zh": "她是護理系學生嗎？"
+     },
+     {
+      "en": "What do you study at school?",
+      "zh": "你在學校讀什麼？"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "She doesn't likes coffee.",
+      "good": "She doesn't like coffee.",
+      "why": "doesn’t 已經負責第三人稱，後面用原形 like。"
+     },
+     {
+      "bad": "Do she is a nurse?",
+      "good": "Is she a nurse?",
+      "why": "這句的動詞是 is，直接把 is 放到主詞 she 前面。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "n1",
+     "prompt": "Write three negative sentences about school life. Use don't, doesn't, and isn't.",
+     "zh": "分三句寫上學生活中「不做／不是」的事情，用 don’t、doesn’t、isn’t 各寫一句。",
+     "min": 15,
+     "sample": "I don't drink coffee at night. My roommate doesn't eat breakfast at school. Our classroom isn't noisy."
+    },
+    {
+     "id": "n2",
+     "prompt": "Write three questions about students at your school. Use Do you, Does she, and Are they.",
+     "zh": "寫三個問題，分別用 Do you、Does she、Are they 開頭。dormitory 是宿舍。",
+     "min": 15,
+     "sample": "Do you study English every day? Does she live in the school dormitory? Are they nursing students at our school?"
+    },
+    {
+     "id": "n3",
+     "prompt": "Write three questions about a classmate's school day. Use What, Where, and When.",
+     "zh": "問同學三個問題：用 What 問什麼、Where 問哪裡、When 問什麼時候，各寫一句。",
+     "min": 15,
+     "sample": "What do you study at school? Where do you eat lunch every day? When does your first class start?"
+    },
+    {
+     "id": "n4",
+     "prompt": "Write three sentences about people at school. Include one question with be and two negative sentences. Use Is she, isn't, and aren't.",
+     "zh": "寫三句：第一句用 Is she 問問題，第二句用 isn’t，第三句用 aren’t。be 動詞不用再加 do。",
+     "min": 15,
+     "sample": "Is she a nurse at our school? My classmate isn't late for class. We aren't in the library now."
+    }
+   ]
+  },
+  {
+   "id": "yesterday",
+   "name": "④ 寫昨天的事",
+   "goal": "用三個簡單句，說清楚昨天或上週發生的事情。",
+   "criteria": [
+    "分開寫三句，內容是已經發生的事情",
+    "be 動詞用 was／were，一般動詞改成過去式",
+    "did／did not 後面用原形動詞",
+    "加入 yesterday 或 last week 等時間，整題至少 20 字"
+   ],
+   "grammar": {
+    "title": "過去式：was／were、動詞過去式、did",
+    "points": [
+     "已經過去的身分或狀態用 was／were：I／he／she／it was；you／we／they were。否定直接加 not。",
+     "規則動詞通常加 ed：watch → watched、clean → cleaned；study 要改成 studied。",
+     "常見不規則動詞要另外記：go → went、eat → ate、have → had；搭配 yesterday／last week 表示過去。",
+     "過去的一般動詞否定用 did not＋原形；問句用 Did＋主詞＋原形，不要同時再用過去式。"
+    ],
+    "examples": [
+     {
+      "en": "I was at school yesterday.",
+      "zh": "我昨天在學校。"
+     },
+     {
+      "en": "We were in the library after lunch.",
+      "zh": "我們午餐後在圖書館。"
+     },
+     {
+      "en": "She studied English last night.",
+      "zh": "她昨晚讀英文。"
+     },
+     {
+      "en": "I went to school early yesterday.",
+      "zh": "我昨天很早去學校。"
+     },
+     {
+      "en": "Did you finish your homework?",
+      "zh": "你做完作業了嗎？"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I did not studied yesterday.",
+      "good": "I did not study yesterday.",
+      "why": "did 已經表示過去，後面用原形 study。"
+     },
+     {
+      "bad": "We was at school.",
+      "good": "We were at school.",
+      "why": "We 的 be 動詞過去式要用 were。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "y1",
+     "prompt": "Write three sentences about yesterday at school. Use was, were, and was not.",
+     "zh": "分三句回想昨天在學校的情況，用 was、were、was not 各寫一句。",
+     "min": 20,
+     "sample": "I was in the school library yesterday afternoon. My classmates were in the classroom after lunch. Our teacher was not late yesterday."
+    },
+    {
+     "id": "y2",
+     "prompt": "Write three sentences about your study day yesterday. Use studied, watched, and cleaned.",
+     "zh": "分三句寫昨天讀書或宿舍的事情，用 studied、watched、cleaned 各寫一句。before bedtime 是睡前。",
+     "min": 20,
+     "sample": "I studied English in my dormitory yesterday evening. My roommate watched a nursing video after dinner. We cleaned our small room before bedtime."
+    },
+    {
+     "id": "y3",
+     "prompt": "Write three sentences about yesterday. Use went, ate, and had.",
+     "zh": "分三句寫昨天，用 went（go 的過去式）、ate（eat 的過去式）、had（have 的過去式）各寫一句。cafeteria 是學生餐廳。",
+     "min": 20,
+     "sample": "I went to school early yesterday morning. My friend ate breakfast in the school cafeteria. We had an English class after lunch."
+    },
+    {
+     "id": "y4",
+     "prompt": "Write three sentences about yesterday at school. Include two negative sentences and one question. Use did not study, did not drink, and Did you.",
+     "zh": "寫三句：前兩句寫昨天沒做的事，最後一句問同學昨天的事。分別用 did not study、did not drink、Did you。",
+     "min": 20,
+     "sample": "I did not study in the library yesterday evening. My friend did not drink coffee after dinner. Did you finish your homework before bedtime?"
+    }
+   ]
+  },
+  {
    "id": "sentence",
-   "name": "① 句子",
+   "name": "⑤ 連成一句",
    "goal": "把兩個想法連成一句",
    "criteria": [
     "文法正確（主詞動詞、時態）",
@@ -38,11 +388,129 @@
      "min": 25,
      "sample": "On hot days, you should drink more water because you lose water when you sweat. If you feel dizzy, you should sit down. You should sleep early because sleep helps you learn."
     }
+   ],
+   "grammar": {
+    "title": "連接想法：and、but、so、because、時間與條件",
+    "points": [
+     "and 接同方向的想法，but 表示轉折，so 接結果；兩邊都先想成完整句子，再連起來。",
+     "because 後面接原因；同一句不要寫 Because…so…，選一種連法就好。",
+     "when 表示「當……時」，after 表示「在……之後」；後面接完整句子，放句首時先用逗號隔開。",
+     "should＋原形動詞表示建議；if＋現在式句子表示條件，例如 If you feel dizzy, you should sit down.。"
+    ],
+    "examples": [
+     {
+      "en": "My sister studies nursing, and I study English.",
+      "zh": "我姊姊讀護理，而我讀英文。"
+     },
+     {
+      "en": "I am tired, but I finish my homework.",
+      "zh": "我很累，但我把作業做完。"
+     },
+     {
+      "en": "I missed the bus, so I was late.",
+      "zh": "我錯過公車，所以遲到了。"
+     },
+     {
+      "en": "When class ends, I go home because I like reading there.",
+      "zh": "下課時我回家，因為我喜歡在那裡閱讀。（like 後面接動作時，可用動詞加 -ing，例如 reading。）"
+     },
+     {
+      "en": "If you feel dizzy, you should sit down.",
+      "zh": "如果你覺得頭暈，就應該坐下。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "Because I was sick, so I stayed home.",
+      "good": "I stayed home because I was sick.",
+      "why": "英文這種原因句選 because 或 so 其中一種，不要兩個一起接。"
+     },
+     {
+      "bad": "You should to rest.",
+      "good": "You should rest.",
+      "why": "should 後面直接用原形動詞 rest，不加 to。"
+     }
+    ]
+   }
+  },
+  {
+   "id": "steps",
+   "name": "⑥ 三到五句的小短文",
+   "goal": "把三到五個簡單句照先後順序排好，寫出一件事的步驟。",
+   "criteria": [
+    "寫三到五句，步驟依實際先後順序排列",
+    "用 First、Then、After that、Finally 幫讀者跟上順序",
+    "每一步說清楚誰做了什麼，時態一致",
+    "護理情境內容正確，整題至少 40 字"
+   ],
+   "grammar": {
+    "title": "照順序寫：First、Then、After that、Finally",
+    "points": [
+     "First 寫第一步，Then／After that 寫接下來，Finally 寫最後一步；放句首時，後面先加逗號。",
+     "每一步還是完整的「主詞＋動詞」：First, I wash my hands.，不要只剩 First, my hands.。",
+     "寫每天的流程用現在式；寫昨天的一次經驗用過去式，同一段的時間要一致。",
+     "一句先說一個步驟；兩個緊接著的動作可以用 and 連起來，但不要為了湊字數塞進不相關的事。"
+    ],
+    "examples": [
+     {
+      "en": "First, I get up at six.",
+      "zh": "首先，我六點起床。"
+     },
+     {
+      "en": "Then, I wash my face.",
+      "zh": "接著，我洗臉。"
+     },
+     {
+      "en": "After that, I eat breakfast in my room.",
+      "zh": "在那之後，我在房間吃早餐。"
+     },
+     {
+      "en": "Finally, I check my bag and go to school.",
+      "zh": "最後，我檢查書包，然後去學校。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "First, my breakfast.",
+      "good": "First, I eat breakfast.",
+      "why": "步驟也要寫出誰做什麼，補上 I eat 才是完整句子。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "st1",
+     "prompt": "Write four sentences about your morning before school. Use First, Then, After that, and Finally.",
+     "zh": "用四句寫上學前的早晨，依序用 First、Then、After that、Finally。各句寫清楚活動和時間或地點，合計至少 40 字。",
+     "min": 40,
+     "sample": "First, I get up at six and drink some water in my room. Then, I wash my face and brush my teeth in the bathroom. After that, I eat breakfast with my roommate at seven. Finally, I check my school bag and walk to class."
+    },
+    {
+     "id": "st2",
+     "prompt": "Write five sentences about washing your hands with soap at home. Describe the steps in order.",
+     "zh": "寫五句「在家用肥皂洗手」的步驟：濕手、抹肥皂、搓洗所有部位至少 20 秒、沖淨、擦乾。20 秒是搓洗時間，不是整個洗手過程；fingers 是手指，nails 是指甲。",
+     "min": 40,
+     "sample": "First, I wet my hands with clean running water and add soap. Then, I rub all parts of my hands for at least twenty seconds. I clean between my fingers and under my nails too. After that, I rinse my hands with clean running water. Finally, I dry them with a clean towel."
+    },
+    {
+     "id": "st3",
+     "prompt": "Write five sentences about a nurse checking a seated patient's blood pressure. Describe quiet rest, body position, the cuff, and the readings.",
+     "zh": "用五句描述坐姿量血壓：先安靜休息至少 5 分鐘，背有支撐、雙腳平放不交叉；尺寸合適的壓脈帶（cuff）放裸露上臂，手臂支撐在心臟高度；測量時不動、不說話，兩次量測間隔至少 1 分鐘。另留意量測前 30 分鐘避免咖啡因、運動與吸菸，並先排空膀胱。",
+     "min": 40,
+     "sample": "First, the patient sits quietly for at least five minutes with back support and both feet flat on the floor. Then, the nurse puts a cuff of the correct size on the bare upper arm. After that, the arm rests on a table at heart level. The patient stays still and does not talk during the measurement. Finally, the nurse waits one minute and takes another reading."
+    },
+    {
+     "id": "st4",
+     "prompt": "Write four sentences about checking a patient's identity with your teacher before care. Describe the steps in order.",
+     "zh": "用四句寫在老師指導下確認病人身分：請病人說完整姓名和出生日期，核對手圈與照護紀錄；資料不符就停下來請護理師協助，不用床號代替身分。date of birth＝出生日期；wristband＝手圈；match＝相符。",
+     "min": 40,
+     "sample": "First, I greet the patient and say my name. Then, I ask for the patient's full name and date of birth. After that, my teacher and I compare both details with the patient's wristband and care record. Finally, we stop and ask the nurse for help if the details do not match."
+    }
    ]
   },
   {
    "id": "paragraph",
-   "name": "② 一段",
+   "name": "⑦ 一段",
    "goal": "主題句 → 三個支持 → 結論",
    "criteria": [
     "主題句：第一句說出整段要講什麼",
@@ -73,11 +541,138 @@
      "min": 60,
      "sample": "My favorite place to study is the school library. First, it is very quiet, so I can focus on my notes for a long time. Second, there are many books and computers that I can use for free. Also, the chairs are comfortable, and the light is bright enough for reading. Finally, my classmates study there too, so I can ask them questions. Because of this, I go to the library almost every day after class."
     }
+   ],
+   "grammar": {
+    "title": "一段一個重點：主題句、支持句、結論句",
+    "points": [
+     "主題句先說這一整段要談什麼，讓讀者第一句就知道主題。",
+     "支持句各補一個理由、例子或細節；這一階練三個支持，別用不同字重複同一件事。",
+     "用 First、Also、In addition 把支持接起來；that 可接在名詞後補充它，例如 a job that I can do，that 已代表 job，do 後面不再補 it。",
+     "結論句用 For these reasons 或 That is why 收回主題，不加沒解釋過的新想法。"
+    ],
+    "examples": [
+     {
+      "en": "I want to be a nurse for three reasons.",
+      "zh": "我想當護理師，有三個原因。（主題句；want to＋原形動詞表示想做。）"
+     },
+     {
+      "en": "First, I like helping people.",
+      "zh": "第一，我喜歡幫助別人。（支持句；like／enjoy 後面可以接動作加 -ing。）"
+     },
+     {
+      "en": "Also, nursing is a job that I can do in many countries.",
+      "zh": "此外，護理是我能在許多國家從事的工作。（that 補充 job；can＋原形動詞表示能夠。）"
+     },
+     {
+      "en": "In addition, I learn about the human body while I study nursing.",
+      "zh": "另外，我讀護理時也能認識人體。（這是第三個理由；while＋完整句子表示兩件事同時發生。）"
+     },
+     {
+      "en": "For these reasons, I think nursing is right for me.",
+      "zh": "因為這些理由，我認為護理適合我。（結論句收回主題。）"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I want be a nurse.",
+      "good": "I want to be a nurse.",
+      "why": "want 後面接另一個動作時，要加 to。"
+     },
+     {
+      "bad": "Also, I can helps people.",
+      "good": "Also, I can help people.",
+      "why": "can 後面用原形 help，不加 s。"
+     }
+    ]
+   }
+  },
+  {
+   "id": "opinion",
+   "name": "⑧ 說出意見和理由",
+   "goal": "用一段話說出立場，接兩個理由和一個生活例子。",
+   "criteria": [
+    "開頭說清楚自己的看法",
+    "給兩個不同的理由，不只重複「很好」",
+    "至少一個具體例子能支持前面的理由",
+    "用連接詞把理由和例子接好，整題至少 80 字"
+   ],
+   "grammar": {
+    "title": "把意見說清楚：I think、because、For example",
+    "points": [
+     "I think 後面接完整的一句，直接說立場：I think English is useful.；中間也可以加 that，意思一樣。",
+     "because 後面寫原因，而且要有主詞和動詞；不要只寫 because useful。",
+     "用 First、Second 分開兩個理由；每個理由都要說明它怎麼支持你的看法。",
+     "For example 後面寫一件具體的事；最後用 In my opinion 重申看法，不突然加入第三個新理由。"
+    ],
+    "examples": [
+     {
+      "en": "I think English is useful for nursing students.",
+      "zh": "我認為英文對護理系學生有用。"
+     },
+     {
+      "en": "I study English because some patients speak English.",
+      "zh": "我讀英文，因為有些病人說英文。"
+     },
+     {
+      "en": "First, English helps me understand nursing words.",
+      "zh": "第一，英文幫助我理解護理單字。"
+     },
+     {
+      "en": "For example, I practised a short conversation yesterday.",
+      "zh": "例如，我昨天練了一段簡短對話。"
+     },
+     {
+      "en": "In my opinion, daily practice is useful.",
+      "zh": "依我看，每天練習很有用。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I am think English is useful.",
+      "good": "I think English is useful.",
+      "why": "think 本身就是動詞；說「我認為」用 I think，不再加 am。"
+     },
+     {
+      "bad": "I study English because useful.",
+      "good": "I study English because it is useful.",
+      "why": "because 後面要有主詞和動詞，補上 it is。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "o1",
+     "prompt": "Do you think English practice is useful for nursing students? Write one paragraph with your opinion, two reasons, and one example.",
+     "zh": "你覺得護理系學生練英文有用嗎？寫一段：立場、兩個理由、一個例子，最後收尾。take turns 是輪流。",
+     "min": 80,
+     "sample": "I think English is useful for nursing students because it helps us learn about nursing. First, many nursing books have English words, so English practice helps us understand these words. Second, some patients speak English, so simple English helps us talk to them. For example, I practise saying my name and asking simple questions in English with a classmate. We take turns after class. We also check our sentences with our teacher. In my opinion, a little English practice every day is a useful part of nursing school."
+    },
+    {
+     "id": "o2",
+     "prompt": "Is the school library a good place to study? Write one paragraph with your opinion, two reasons, and one example.",
+     "zh": "學校圖書館適合讀書嗎？寫一段，提出兩個理由並舉一次具體經驗。body parts 是身體部位，each other 是彼此。",
+     "min": 80,
+     "sample": "I think the school library is a good place to study because it is quiet. First, I do not hear my roommates' music there, so I can focus on my work. Second, the library has many nursing books, and I can read them for free. For example, last week I studied the names of body parts there with a classmate. We used a book and checked each other's answers. We finished our work before dinner. In my opinion, the library is a helpful place for nursing students."
+    },
+    {
+     "id": "o3",
+     "prompt": "Should nursing students ask questions during clinical practice? Write one paragraph with your opinion, two reasons, and one example.",
+     "zh": "護理學生實習時應不應該提問？用兩個理由和一個例子說明。patient safety 是病人安全；unsure 是不確定，instruction 是指示。",
+     "min": 80,
+     "sample": "I think nursing students should ask questions during clinical practice because patient safety comes first. First, a student does not know every hospital rule, so questions help the student learn. Second, a student sometimes feels unsure about a task, and help from a nurse is important. For example, I did not understand an instruction in practice last week. I stopped and asked my teacher for help. She explained the task again. In my opinion, questions support safe care and help students learn the correct steps."
+    },
+    {
+     "id": "o4",
+     "prompt": "Are short study breaks useful for you? Write one paragraph with your opinion, two reasons, and one example from your own routine.",
+     "zh": "短暫休息對你讀書有幫助嗎？用自己的生活寫一段，給兩個理由和一個例子。study break 是讀書中間的休息。",
+     "min": 80,
+     "sample": "I think short study breaks are useful because they help me continue with my work. First, a break gives me time for a drink of water. Second, I can rest my eyes from my notes and move around the room. For example, I studied English in my dormitory last night. After twenty minutes, I closed my book and walked around for a few minutes. Then, I returned to my desk and finished the exercise. In my opinion, a simple plan with short breaks works well for me."
+    }
    ]
   },
   {
    "id": "multi",
-   "name": "③ 多段",
+   "name": "⑨ 多段",
    "goal": "開頭、內容、結尾分段寫",
    "criteria": [
     "每段有自己的工作（開頭、內容、結尾）",
@@ -108,11 +703,202 @@
      "min": 120,
      "sample": "Hi Amy,\n\nGuess what? Yesterday was my first day of clinical practice! I followed a senior nurse all day. In the morning, I checked patients' blood pressure and temperature, and I wrote the numbers on the chart. In the afternoon, I helped an elderly patient walk to the bathroom.\n\nI was very nervous at first, and my hands were shaking when I used the blood pressure cuff. But the nurse was kind. She told me to take my time and showed me again.\n\nI learned that it is OK to ask questions, and that patients notice when you speak to them gently. I am tired, but I am also proud of myself. I will be braver tomorrow, and I will tell you all about it!\n\nTalk soon,\nXuanye"
     }
+   ],
+   "grammar": {
+    "title": "把文章分段：開頭交代目的，內容展開，結尾收好",
+    "points": [
+     "第一段交代寫作目的；信件先有稱呼，結尾加感謝與署名，語氣跟對象相配。",
+     "中間一段負責一個重點；敘事照時間寫，說意見則把理由和例子放在一起。",
+     "說進行中的事用 be＋動詞 -ing（am feeling／was shaking）；說接下來的安排可用 will＋原形動詞。",
+     "禮貌請求可用 Could you please…；tell me 後面若再接問題，改用主詞在動詞前的順序。"
+    ],
+    "examples": [
+     {
+      "en": "I am writing to ask about yesterday's class.",
+      "zh": "我寫信是想詢問昨天的課。（開頭說明目的。）"
+     },
+     {
+      "en": "I missed class because I was sick.",
+      "zh": "我因為生病而缺課。（接著說明事情。）"
+     },
+     {
+      "en": "Could you please tell me which pages I should read?",
+      "zh": "請問您可以告訴我該讀哪些頁嗎？（which pages 後面是 I should read，不倒裝。）"
+     },
+     {
+      "en": "I will come to class tomorrow.",
+      "zh": "我明天會來上課。（will 後面用原形 come。）"
+     },
+     {
+      "en": "Thank you for your help.",
+      "zh": "謝謝您的協助。（用合適的句子收尾。）"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "Could you tell me what should I study?",
+      "good": "Could you tell me what I should study?",
+      "why": "問題放進 tell me 後面時，順序改成 I should study。"
+     },
+     {
+      "bad": "I will to come tomorrow.",
+      "good": "I will come tomorrow.",
+      "why": "will 後面直接用原形動詞，不加 to。"
+     }
+    ]
+   }
+  },
+  {
+   "id": "numbers",
+   "name": "⑩ 描述數字和變化（Task 1 暖身）",
+   "goal": "先用簡單句讀懂小圖表，寫出上升、下降、不變與最高最低。",
+   "criteria": [
+    "開頭說圖表在記什麼，並用一句話說主要變化",
+    "挑出數字，至少寫一次變化或比較",
+    "from…to… 寫起點和終點，by… 寫增加或減少多少",
+    "數字與單位符合圖表，不猜原因，整題至少 80 字"
+   ],
+   "grammar": {
+    "title": "看圖說數字：rise／fall、from…to…、by…",
+    "points": [
+     "先用 The chart shows… 說圖表內容，再用 Overall 說最明顯的整體變化；只描述圖上有的資訊。",
+     "上升是 rise，下降是 fall，不變是 stay the same；說已過去的資料時用 rose、fell、stayed the same。",
+     "from 10 to 20 表示從 10 到 20；rose by 10 表示增加 10。by 後面是差額，不是最後的數字。",
+     "the highest／the lowest 表示最高／最低；兩個數字相同可以寫 had the same number，別忘記分鐘、人次等單位。"
+    ],
+    "examples": [
+     {
+      "en": "The chart shows daily clinic visits.",
+      "zh": "圖表呈現診所每天的看診人次。"
+     },
+     {
+      "en": "The number rose from 20 to 30.",
+      "zh": "數字從 20 增加到 30。"
+     },
+     {
+      "en": "The number fell by 10.",
+      "zh": "數字減少了 10。"
+     },
+     {
+      "en": "The figure stayed the same on Thursday.",
+      "zh": "週四的數字維持不變。"
+     },
+     {
+      "en": "Tuesday had the highest figure, and Friday had the lowest.",
+      "zh": "週二的數字最高，週五最低。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "The number rose from 20 to 30, an increase of 30.",
+      "good": "The number rose from 20 to 30, an increase of 10.",
+      "why": "30 是終點；增加量要算 30 減 20，所以是 10。"
+     },
+     {
+      "bad": "Tuesday had the most highest figure.",
+      "good": "Tuesday had the highest figure.",
+      "why": "highest 已經是最高，不要再加 most。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "nu1",
+     "prompt": "Describe the chart of one nursing student's English practice time. Include the overall change, the highest and lowest figures, and one change with from, to, or by.",
+     "zh": "讀這張練習用圖表，寫一位護理學生週一到週五練英文的分鐘數。先說整體變化，再寫最高、最低和增加多少；不用猜變化原因。",
+     "min": 80,
+     "sample": "The chart shows one nursing student's English practice time from Monday to Friday. Overall, the time rose during these five days. The student studied for 10 minutes on Monday and 15 minutes on Tuesday. The time stayed the same on Wednesday. After that, it rose to 20 minutes on Thursday and 25 minutes on Friday. Friday had the highest figure, and Monday had the lowest figure. The time rose by 15 minutes from Monday to Friday. The chart does not explain the reason for this change.",
+     "chart": {
+      "title": "English practice time (minutes)",
+      "points": [
+       {
+        "label": "Mon",
+        "value": 10
+       },
+       {
+        "label": "Tue",
+        "value": 15
+       },
+       {
+        "label": "Wed",
+        "value": 15
+       },
+       {
+        "label": "Thu",
+        "value": 20
+       },
+       {
+        "label": "Fri",
+        "value": 25
+       }
+      ]
+     }
+    },
+    {
+     "id": "nu2",
+     "prompt": "Describe the chart of daily clinic visits. Include the overall change, the highest and lowest figures, and one change with from, to, or by.",
+     "zh": "讀這張練習用圖表，描述診所每天的看診人次。同一個人看兩次算兩人次，不是兩位不同的病人。指出最高、最低、不變和減少多少。",
+     "min": 80,
+     "sample": "The chart shows the number of visits to a clinic from Monday to Friday. These are visits, not different people. Overall, visits fell from 40 on Monday to 20 on Friday. The number first rose to 50 on Tuesday, and Tuesday had the highest figure. Then, it fell by 20 to 30 on Wednesday. It stayed the same on Thursday. Friday had the lowest figure, with 20 visits. The chart shows a total fall of 20 visits between Monday and Friday. It does not show the reason.",
+     "chart": {
+      "title": "Clinic visits per day",
+      "points": [
+       {
+        "label": "Mon",
+        "value": 40
+       },
+       {
+        "label": "Tue",
+        "value": 50
+       },
+       {
+        "label": "Wed",
+        "value": 30
+       },
+       {
+        "label": "Thu",
+        "value": 30
+       },
+       {
+        "label": "Fri",
+        "value": 20
+       }
+      ]
+     }
+    },
+    {
+     "id": "nu3",
+     "prompt": "Describe the chart of nursing book loans at a school library. Include the overall change, the highest and lowest figures, and one change with from, to, or by.",
+     "zh": "讀這張練習用圖表，描述學校圖書館一到四月護理書的借出次數。loan 是一次借出紀錄；指出整體變化、最高、最低，以及哪兩個月一樣。",
+     "min": 80,
+     "sample": "The chart shows nursing book loans at a school library in four months. Overall, the number rose from January to April. The library recorded 20 loans in January. The number rose to 30 in February and stayed the same in March. It then rose by 10 to 40 in April. April had the highest number, and January had the lowest. February and March had the same number. From January to April, the number rose by 20 loans. The chart only gives numbers, so it does not explain this change.",
+     "chart": {
+      "title": "Nursing book loans per month",
+      "points": [
+       {
+        "label": "Jan",
+        "value": 20
+       },
+       {
+        "label": "Feb",
+        "value": 30
+       },
+       {
+        "label": "Mar",
+        "value": 30
+       },
+       {
+        "label": "Apr",
+        "value": 40
+       }
+      ]
+     }
+    }
    ]
   },
   {
    "id": "task1",
-   "name": "④ 雅思 Task 1",
+   "name": "⑪ 雅思 Task 1",
    "goal": "描述圖表：總覽＋重點數據＋比較",
    "criteria": [
     "Task Achievement：有總覽（overview），挑出重要數據並比較",
@@ -191,11 +977,131 @@
      },
      "sample": "The line graph illustrates the number of visits to a small clinic each month in the first half of the year, from January to June.\n\nOverall, visits peaked in February and then fell to their lowest level in April, before recovering slightly by June. The figure at the end of the period was still lower than at the beginning.\n\nIn January, the clinic had 420 visits, and this number rose to a high of 460 in February. After that, there was a sharp decline to 380 in March and 300 in April, a drop of 160 visits in only two months.\n\nFrom April onwards, the figures increased gradually. There were 310 visits in May, only 10 more than in April, and 350 in June. However, even the June figure was 70 visits lower than in January and 110 lower than the February peak.\n\nIn short, the clinic was busiest in February and quietest in April, and the gap between these two months was 160 visits. The figures for May and June show only a partial recovery."
     }
+   ],
+   "grammar": {
+    "title": "Task 1：先寫總覽，再用數據支持",
+    "points": [
+     "第一段用自己的話說圖表的對象、單位和時間，不要逐字照抄題目。",
+     "overview（總覽）用一兩句說最大趨勢、最高最低或主要差別；不要只列數字，也不要加入個人意見或猜原因。",
+     "細節段挑關鍵數字做比較：from…to… 寫起終點，by… 寫差額；higher／lower than 表示比另一個數字高／低。",
+     "The chart shows 用現在式介紹圖；描述已經發生的變化用過去式，例如 rose、fell、remained stable，全文時間要一致。"
+    ],
+    "examples": [
+     {
+      "en": "The chart shows the number of clinic visits from January to June.",
+      "zh": "圖表呈現一到六月的診所看診人次。"
+     },
+     {
+      "en": "Overall, visits fell during the period.",
+      "zh": "整體而言，這段期間的看診人次下降。"
+     },
+     {
+      "en": "The figure rose from 20 to 30.",
+      "zh": "數字從 20 增加到 30。"
+     },
+     {
+      "en": "The final figure was 10 higher than the first.",
+      "zh": "最後的數字比一開始高 10。"
+     },
+     {
+      "en": "The figure remained stable at 30 in March.",
+      "zh": "三月的數字維持在 30。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "In my opinion, the clinic did a good job.",
+      "good": "Overall, the number of visits increased.",
+      "why": "Task 1 要描述圖表；圖上沒有提供經營表現，就不要自己評論。"
+     },
+     {
+      "bad": "The number was rose to 30.",
+      "good": "The number rose to 30.",
+      "why": "rose 本身就是過去式動詞，前面不再加 was。"
+     }
+    ]
+   }
+  },
+  {
+   "id": "twosides",
+   "name": "⑫ 兩面意見的短文（Task 2 暖身）",
+   "goal": "用四段簡單英文寫兩邊的理由，再說清楚自己的選擇。",
+   "criteria": [
+    "分四段：開頭、第一種看法、第二種看法、結尾",
+    "兩邊各有理由，至少有一個具體例子",
+    "用 On the one hand、On the other hand 或 However 表示轉換",
+    "結尾有自己的意見，不突然改立場，整題至少 150 字"
+   ],
+   "grammar": {
+    "title": "四段談兩邊：On the one hand…、On the other hand…",
+    "points": [
+     "開頭先用一兩句交代兩種看法，再讓讀者知道自己的立場；一段只做一件事。",
+     "On the one hand 放第一個主體段，接第一邊的理由和例子，不要只把題目重寫一次。",
+     "On the other hand 換另一邊；However 表示轉折，放新句句首時後面加逗號。",
+     "結尾用 In conclusion 收回重點；I agree that 後面接完整句子，I agree with 後面接人或看法。"
+    ],
+    "examples": [
+     {
+      "en": "Some students like online classes, but others prefer classes at school.",
+      "zh": "有些學生喜歡線上課，有些比較喜歡在學校上課。"
+     },
+     {
+      "en": "On the one hand, online classes save travel time.",
+      "zh": "一方面，線上課省下交通時間。"
+     },
+     {
+      "en": "On the other hand, students need practice with a teacher.",
+      "zh": "另一方面，學生需要在老師指導下練習。"
+     },
+     {
+      "en": "However, one method does not meet every need.",
+      "zh": "不過，一種方法無法滿足所有需要。"
+     },
+     {
+      "en": "In conclusion, I agree that both methods are useful.",
+      "zh": "總結來說，我同意兩種方法都有用。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I am agree that both methods are useful.",
+      "good": "I agree that both methods are useful.",
+      "why": "agree 本身就是動詞，不需要再加 am。"
+     },
+     {
+      "bad": "Online classes are useful, however, students need practice.",
+      "good": "Online classes are useful. However, students need practice.",
+      "why": "however 不能只靠逗號把兩個完整句子接起來；這裡先分成兩句。"
+     }
+    ]
+   },
+   "tasks": [
+    {
+     "id": "ts1",
+     "prompt": "Some nursing students like online classes. Others prefer classes at school. Write four paragraphs about both views and give your own opinion.",
+     "zh": "護理課適合線上上課，還是在學校上課？用四段寫兩邊的理由，再說自己的看法。training equipment＝練習器材；skills lesson＝技術練習課。",
+     "min": 150,
+     "sample": "Some nursing students like online classes, but others prefer classes at school. I think both have useful points, and nursing schools should use them for different lessons.\n\nOn the one hand, online classes are useful for some study activities. Students can listen to an English lesson at home and read the notes on a computer. For example, I can review nursing words in my dormitory. I do not need to travel to school for this short practice, so I have time for other work.\n\nOn the other hand, practice at school is important. Students can use training equipment with a teacher and ask questions at once. For example, a teacher can check a student's hand position during a skills lesson. However, an online lesson does not offer the same practice.\n\nIn conclusion, I agree that online classes are useful for learning words and ideas. However, nursing students also need practice with teachers and equipment at school."
+    },
+    {
+     "id": "ts2",
+     "prompt": "Some people want flexible hospital visiting hours. Others want fixed visiting hours. Write four paragraphs about both views and give your own opinion.",
+     "zh": "醫院探病時間應彈性，還是固定？用四段討論兩邊，最後說你的想法。這是意見練習，不是任何醫院的現行規定。flexible＝有彈性的；privacy＝隱私；permission＝同意。",
+     "min": 150,
+     "sample": "Some people think hospital visiting hours should be flexible. Others think hospitals need fixed hours. I think visitors are important, but hospitals also need clear rules.\n\nOn the one hand, flexible hours help families with different schedules. A person sometimes finishes work late and misses a short visiting period. A flexible time gives this person a chance to visit. For example, a patient sometimes wants a family member nearby after a difficult day. The family also has time to ask questions with the patient's permission.\n\nOn the other hand, patients need rest, privacy, and time for care. Many visitors in one room can make it noisy. Staff also need space for their work. However, a fixed rule sometimes needs an exception for a patient's situation.\n\nIn conclusion, I agree that hospitals should have clear visiting rules. They should also consider the patient's wishes and care needs. Staff and families can discuss a suitable visiting time together."
+    },
+    {
+     "id": "ts3",
+     "prompt": "Some nursing students use phones during clinical practice. Others keep their phones away. Write four paragraphs about both views and give your own opinion.",
+     "zh": "護理學生實習時使用手機，有什麼好處和需要留意的地方？用四段寫兩邊，再說自己的立場。要尊重病人隱私並遵守實習單位規定。approved tools＝經單位核准的工具。",
+     "min": 150,
+     "sample": "Some nursing students use phones during clinical practice, but others keep their phones away. I think phones can help with study, but patient care needs clear rules.\n\nOn the one hand, a phone is a useful study tool. A student can check an English word during a break. Students can also read learning materials that their teacher shares. For example, I use a dictionary on my phone after a lesson. It helps me understand a word in my notes.\n\nOn the other hand, a phone can take a student's attention away from other people. Messages and games interrupt work. Patient privacy is also important. Students should not take patient photos on a personal phone. However, they can ask their teacher about safe ways to use approved tools.\n\nIn conclusion, I agree that phones have useful learning functions. However, nursing students should follow the hospital's rules and use their phones only at suitable times. Patient care and privacy come first."
+    }
    ]
   },
   {
    "id": "task2",
-   "name": "⑤ 雅思 Task 2",
+   "name": "⑬ 雅思 Task 2",
    "goal": "議論文：立場＋兩個論點＋結論",
    "criteria": [
     "Task Response：回答題目所有部分，立場清楚，論點有發展",
@@ -227,11 +1133,50 @@
      "min": 250,
      "sample": "Some people believe that building more sports facilities is the best way to improve public health, while others think that other measures work better. I partly agree that sports facilities are helpful, but I believe they are not the most effective solution on their own.\n\nIt is true that sports facilities can make people healthier. When there is a park, a swimming pool or a basketball court near their home, people are more likely to exercise regularly. Regular exercise lowers the risk of heart disease, diabetes and obesity, and it can also reduce stress. Free or cheap facilities are especially important for families who cannot pay for a gym.\n\nHowever, facilities alone do not change people's habits. Many people are too busy or too tired to exercise after work, and some do not know why exercise matters. In addition, public health depends on more than exercise. A healthy diet, clean air, regular health checks and not smoking are just as important. For example, a city with many gyms will still have health problems if fast food is cheaper than vegetables or if people cannot afford to see a doctor early.\n\nFor these reasons, I think governments should use several measures together. They can build sports facilities, but they should also teach healthy eating at school, put clear labels on unhealthy food, offer free health checks and support people who want to quit smoking.\n\nIn conclusion, more sports facilities are a good step, but public health improves most when exercise is combined with education, prevention and healthy food choices."
     }
-   ]
+   ],
+   "grammar": {
+    "title": "Task 2：先認題型，再選開頭和論點",
+    "points": [
+     "討論兩方（Discuss both views）：開頭交代兩種看法並表態；主體段兩邊都要討論，不能只寫自己支持的那一邊。",
+     "問題＋解決（Problems and solutions）：開頭說明問題範圍；每個解法都要對應前面提出的問題，這類題目不一定要寫同不同意。",
+     "優點＋缺點（Advantages and disadvantages）：開頭點出要比較的兩面；題目若問哪邊較多，還要明確回答。",
+     "同意程度（To what extent）：用 I agree／I partly agree／I disagree 說清楚程度；兩個主體段支持這個立場，結論保持一致。"
+    ],
+    "examples": [
+     {
+      "en": "Some people support free hospital care, while others think patients should pay.",
+      "zh": "有人支持免費醫療，也有人認為病人應付費。（討論兩方；while 在這裡表示對照。）"
+     },
+     {
+      "en": "This essay discusses the problems and suggests solutions.",
+      "zh": "本文討論問題並提出解決方法。（問題＋解決的開頭。）"
+     },
+     {
+      "en": "Online learning has both advantages and disadvantages.",
+      "zh": "線上學習有優點，也有缺點。（優缺點題的開頭。）"
+     },
+     {
+      "en": "I partly agree that more sports facilities improve public health.",
+      "zh": "我部分同意增加運動設施能改善大眾健康。（說清楚同意的程度。）"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "I am partly agree with this view.",
+      "good": "I partly agree with this view.",
+      "why": "agree 是動詞，前面不加 am；partly 表示部分同意。"
+     },
+     {
+      "bad": "In conclusion, a completely different issue is important too.",
+      "good": "In conclusion, both views have value, but I support the first for these reasons.",
+      "why": "結論要收回前面已經說明的論點，不突然換一個沒討論的議題。"
+     }
+    ]
+   }
   },
   {
    "id": "bridge",
-   "name": "⑥ 橋接段落",
+   "name": "⑭ 橋接段落",
    "goal": "用這一課的文法寫一段，句子之間接得順",
    "pack": true,
    "criteria": [
@@ -349,7 +1294,41 @@
      "unit": 53,
      "focus": "非限定關係子句：加逗號的 who／which／whose／where 補充說明（不能用 that）"
     }
-   ]
+   ],
+   "grammar": {
+    "title": "橋接段落：用當課句型，把時間、原因和轉折接順",
+    "points": [
+     "先看題目標出的「這一課的文法」，用那一課的句型回答任務；每題的重點不同，不必把所有高階句型都塞進去。",
+     "時間順序用 At first、Then、After that；寫哪個時間點，就配合當課學到的時態。",
+     "原因和結果用 because、so、As a result；轉折用 However，連接詞要符合前後真正的關係。",
+     "it、this、they 要能看出指的是誰或哪件事；最後一句收回這段重點，讓讀者跟得上。"
+    ],
+    "examples": [
+     {
+      "en": "At first, I felt nervous during clinical practice.",
+      "zh": "一開始，實習時我很緊張。"
+     },
+     {
+      "en": "However, my teacher explained the task again.",
+      "zh": "不過，老師又把任務解釋了一次。"
+     },
+     {
+      "en": "After that, I understood the steps.",
+      "zh": "在那之後，我了解了步驟。"
+     },
+     {
+      "en": "As a result, I felt ready for the practice.",
+      "zh": "因此，我覺得自己準備好練習了。"
+     }
+    ],
+    "mistakes": [
+     {
+      "bad": "However, but I asked my teacher for help.",
+      "good": "However, I asked my teacher for help.",
+      "why": "however 已經表示轉折，不要在後面再加 but。"
+     }
+    ]
+   }
   }
  ]
 }

@@ -22,7 +22,7 @@
   "pronunciation": ["p00","p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","p13","p14","p15","p16"],
   "starters": ["start-01","start-02","start-03","start-04","start-05","start-06","start-07","start-08","start-09","start-10","start-11","start-12","start-13","start-14","start-15","start-16","start-17","start-18","start-19","start-20"],
   "GEPT speaking": ["e1","e2","e3","i1","i2","i3"],
-  "writing": ["sentence","s1","s2","s3","s4","paragraph","p1","p2","p3","multi","m1","m2","m3","task1","t1a","t1b","task2","t2a","t2b","t2c","bridge","br43a","br43b","br44a","br44b","br45a","br45b","br46a","br46b","br47a","br47b","br48a","br48b"],
+  "writing": ["sentence","s1","s2","s3","s4","paragraph","p1","p2","p3","multi","m1","m2","m3","task1","t1a","t1b","task2","t2a","t2b","t2c","bridge","br43a","br43b","br44a","br44b","br45a","br45b","br46a","br46b","br47a","br47b","br48a","br48b","basic","b1","b2","b3","b4","b5","longer","l1","l2","l3","l4","l5","negq","n1","n2","n3","n4","yesterday","y1","y2","y3","y4","steps","st1","st2","st3","st4","opinion","o1","o2","o3","o4","numbers","nu1","nu2","nu3","twosides","ts1","ts2","ts3"],
   "exam subjects": ["basic-med","fundamentals","med-surg","ob-peds","psych-community"],
   "photos": ["d01","d02","d03","d04","d05","d06","d07","d08","d09","d10","g01","g02","g03","g04","g05","g06","g07","g08","g09","g10","g11","g12","n01","n02","n03","n04","n05","n06","n07","n08","n09","n10","n11","n12","p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","s01","s02","s03","s04","s05","s06","s07","s08","s09","s10"],
   "rivals": ["suwq","liury","gunq","linyx"],

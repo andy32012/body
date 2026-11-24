@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Volume2 } from 'lucide-react'
 import data from '../data/writing.json'
 import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
@@ -8,9 +9,11 @@ import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubri
 import { packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
+import { speakEnglish, stopSpeaking } from '../lib/tts'
 import { MiniChart } from './LessonParts'
 import StuckButton from './StuckButton'
 import { RubricTable } from './RubricTable'
+import './grammar.css'
 import './writing.css'
 
 const stages = data.stages as WriteStage[]
@@ -76,6 +79,16 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
   const [ticks, setTicks] = useState<boolean[]>([])
   const [endAt, setEndAt] = useState<number>()
   const [now, setNow] = useState(Date.now())
+  const stageStrip = useRef<HTMLDivElement>(null)
+  const stageStarted = stage.tasks.some(t => readWrite(state.notes, t.id) !== null)
+  useEffect(() => {
+    const strip = stageStrip.current
+    const selected = strip?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')
+    if (!strip || !selected) return
+    // Move only this row, keeping the current stage visible without jumping the page vertically.
+    strip.scrollLeft += selected.getBoundingClientRect().left - strip.getBoundingClientRect().left - (strip.clientWidth - selected.offsetWidth) / 2
+  }, [stage.id])
+  useEffect(() => () => stopSpeaking(), [stage.id])
   // Each check carries a number; switching task cancels it, so a late reply never lands on another question.
   const request = useRef(0)
   useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,7 +139,7 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
     : stage.ielts ? '練習估計 ' + rec.best : sentencePoints ? Math.round(rec.best / 5 * sentencePoints) + ' / ' + sentencePoints + ' 分' : (Number.isInteger(rec.best) ? rec.best : rec.best.toFixed(1)) + ' / 5 級分'
 
   return <div className="pr-stack wl">
-    <div className="pr-options wl-stages" role="group" aria-label="寫作階梯">
+    <div ref={stageStrip} className="pr-options wl-stages" role="group" aria-label="寫作階梯">
       {stages.map((s, i) => {
         const before = !s.pack ? stages.slice(0, i).filter(x => !x.pack).at(-1) : undefined
         return <button key={s.id} type="button" aria-pressed={s.id === stage.id} disabled={!openStage[s.id]} data-locked={!openStage[s.id]} onClick={() => { setStageId(s.id); setTaskId(firstOpenTask(s).id) }}>
@@ -135,6 +148,25 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
       })}
     </div>
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
+    {stage.grammar && <details key={stage.id} className="wl-grammar" open={!stageStarted}>
+      <summary>這一階要用的文法</summary>
+      <div className="gm-explain">
+        <h4>{stage.grammar.title}</h4>
+        <ul className="wl-grammar-points">{stage.grammar.points.map(point => <li key={point}>{point}</li>)}</ul>
+        <ul className="gm-ex">{stage.grammar.examples.map(example => <li key={example.en}>
+          <button type="button" className="gm-say" aria-label={'聽這一句：' + example.en} onClick={() => void speakEnglish(example.en, state.settings.speechRate)}><Volume2 size={18} aria-hidden="true" /></button>
+          <span><b lang="en">{example.en}</b><small>{example.zh}</small></span>
+        </li>)}</ul>
+        {!!stage.grammar.mistakes?.length && <section className="gm-mistakes">
+          <h4>常見錯誤</h4>
+          {stage.grammar.mistakes.map(mistake => <p key={mistake.bad}>
+            <span className="gm-bad" lang="en">✗ {mistake.bad}</span>
+            <span className="gm-good" lang="en">✓ {mistake.good}</span>
+            <small>{mistake.why}</small>
+          </p>)}
+        </section>}
+      </div>
+    </details>}
     {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => {
       const open = writeTaskOpen(t, unit)
       return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} data-locked={!open} title={open ? undefined : '上到單元 ' + t.unit + ' 才打開'} onClick={() => setTaskId(t.id)}>
@@ -150,8 +182,8 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
       <RubricTable rubric={rubric} />
     </section>
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={stage.id === 'sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
-        onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={stage.id === 'sentence' ? '一句一行也可以' : '先照結構提示寫，寫不出來的地方先留空'} />
+      <textarea lang="en" rows={rubric.id === 'gept-sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
+        onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
     </label>
     <div className="wl-bar">
       <span data-ok={words >= task.min}>{words} / {task.min} 字</span>

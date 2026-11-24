@@ -2,11 +2,12 @@ import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, typ
 import { openSteps, reached } from './unlock'
 import { unitPackOpen } from './bridge'
 
-/** 寫作階梯：句子 → 一段 → 多段 → IELTS Task 1 → Task 2. Claude grades each stage by a published table (see rubricFor). */
+/** 寫作階梯：從完整的簡單句逐步練到 IELTS。Claude grades each stage by a published table (see rubricFor). */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
   /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
   unit?: number; focus?: string }
 export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
+  grammar?: { title: string; points: string[]; examples: { en: string; zh: string }[]; mistakes?: { bad: string; good: string; why: string }[] }
   /** Tasks that belong to the units' skills packs: opened from the pack, never the suggested stage. */
   pack?: boolean }
 export interface CriterionResult { name: string; score: number; comment: string }
@@ -71,11 +72,13 @@ export function taskDone(r: WriteRecord | null, ielts: boolean) {
   return !!r && typeof r.best === 'number' && r.best <= (ielts ? 9 : 5) && r.best >= (ielts ? 5.5 : 3.5)
 }
 export const selfChecked = (r: WriteRecord | null) => !!r && (r.self ?? 0) >= 1 && typeof r.best !== 'number'
-/** The first stage with fewer than two tasks done by checked feedback. Pack stages are opened from their unit, not suggested. */
+/** Continue from the furthest stage already practised or preserved during the upgrade, so added earlier steps do not
+ *  send a returning learner back to the beginning. Pack stages are opened from their unit, never suggested. */
 export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>) {
   const ladder = stages.filter(s => !s.pack)
-  for (const s of ladder) if (s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length < Math.min(2, s.tasks.length)) return s.id
-  return ladder[ladder.length - 1].id
+  const from = Math.max(0, writingFrontier(ladder, notes))
+  for (const s of ladder.slice(from)) if (!stageComplete(s, notes)) return s.id
+  return ladder.at(-1)?.id ?? ''
 }
 /** Task 2 questions ask for different essays: the outline, the Task Response point and Claude's check follow the question. */
 export type Essay = 'discuss' | 'problem' | 'advantages' | 'extent'
@@ -109,9 +112,12 @@ export function criteriaFor(stage: WriteStage, task: WriteTask) {
   return stage.criteria
 }
 
-/** Which published table each stage is graded by: 句子 = 全民英檢初級「單句寫作」(each required sentence 0–2), 一段 =
- *  初級「段落寫作」, 多段 and 橋接段落 = 中級「英文作文」(B1), Task 1 / Task 2 = the IELTS band descriptors. */
-const stageRubrics: Record<string, RubricId> = { sentence: 'gept-sentence', paragraph: 'gept-paragraph', multi: 'gept-essay', bridge: 'gept-essay', task1: 'ielts-task1', task2: 'ielts-task2' }
+/** The published table stays the same throughout each group of small steps; IELTS uses its own band descriptors. */
+const stageRubrics: Record<string, RubricId> = {
+  basic: 'gept-sentence', longer: 'gept-sentence', negq: 'gept-sentence', yesterday: 'gept-sentence', sentence: 'gept-sentence',
+  steps: 'gept-paragraph', paragraph: 'gept-paragraph', opinion: 'gept-paragraph',
+  multi: 'gept-essay', numbers: 'gept-essay', twosides: 'gept-essay', bridge: 'gept-essay', task1: 'ielts-task1', task2: 'ielts-task2',
+}
 export const rubricFor = (stage: Pick<WriteStage, 'id' | 'ielts'>): Rubric => rubrics[stageRubrics[stage.id] ?? (stage.ielts ? 'ielts-task2' : 'gept-paragraph')]
 
 /** The sentences a 句子 task asks for, one per word the prompt names ("Use and, but, and because."). */
@@ -125,9 +131,9 @@ export function scoredParts(stage: WriteStage, task: WriteTask): string[] {
   const r = rubricFor(stage)
   return r.id === 'gept-sentence' ? sentenceParts(task) : r.scales.map(s => s.name)
 }
-/** The stage's own requirements, checked done / not done beside the score. The 句子 stage scores each sentence and the
+/** The stage's own requirements, checked done / not done beside the score. Single-sentence stages score each sentence and the
  *  IELTS stages score the four criteria, so they have none. */
-export const checksFor = (stage: WriteStage, task: WriteTask): string[] => stage.ielts || stage.id === 'sentence' ? [] : criteriaFor(stage, task)
+export const checksFor = (stage: WriteStage, task: WriteTask): string[] => stage.ielts || rubricFor(stage).id === 'gept-sentence' ? [] : criteriaFor(stage, task)
 
 /** Claude's instructions for one writing check: the task, the published table and the JSON to answer with. */
 export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) {
@@ -136,6 +142,7 @@ export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) 
   return [
     '你是英文寫作老師，批改台灣護理系學生玄燁（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
+    ...(stage.grammar ? ['這一階教過的文法：' + stage.grammar.title + '；' + stage.grammar.points.join('；') + '。他是照這個程度寫的，不要因為沒用到更難的文法扣分；分數仍只照下面的官方評分表，不能另加要求，也不能放寬官方標準。'] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，回應題目要照這種題目該有的結構：' + essays[kind].outline.join('；')] : []),
     ...(task.focus ? ['這一課的文法重點：' + task.focus + '。題目要他用這些句型：有沒有用、用得對不對，算在「題目的要求」裡；沒用到就照表給分並說明要怎麼加。'] : []),
     ...(r.id === 'gept-sentence' ? ['題目要的每一句各給一個分數：先找出他寫的哪一句是那一句；沒寫到、或沒用到指定的字，那一句就是 0。'] : []),
@@ -191,11 +198,41 @@ export function parseGrade(text: string, rubric: Rubric, parts: readonly string[
 
 /** Tasks done in a stage before the next one opens: two (all, if a stage has fewer) — the bar that moves the suggestion on. */
 export const stageTarget = (stage: WriteStage) => Math.min(2, stage.tasks.length)
-/** Which stages are open: each ladder stage once the one before it has its two tasks done; the bridge stage once the
- *  course reaches the bridge units. */
+const stageComplete = (stage: WriteStage, notes: Record<string, string>) =>
+  stage.tasks.filter(t => taskDone(readWrite(notes, t.id), !!stage.ielts)).length >= stageTarget(stage)
+/** A one-time snapshot of the old ladder's open stages. New installs store [] so later progress cannot accidentally
+ *  bypass the new intermediate stages. Existing write.<id> records and all storage keys stay untouched. */
+export const writingMigrationKey = 'migrate.writing-ladder-14'
+const legacyStageIds = ['sentence', 'paragraph', 'multi', 'task1', 'task2']
+function preservedWritingStages(stages: readonly WriteStage[], notes: Record<string, string>): string[] {
+  if (notes[writingMigrationKey] !== undefined) {
+    try {
+      const saved: unknown = JSON.parse(notes[writingMigrationKey])
+      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string' && legacyStageIds.includes(id)) : []
+    } catch { return [] }
+  }
+  const legacy = legacyStageIds.flatMap(id => stages.filter(s => s.id === id && !s.pack))
+  if (!legacy.some(s => s.tasks.some(t => readWrite(notes, t.id) !== null))) return []
+  const open = openSteps(legacy.map(s => stageComplete(s, notes)))
+  return legacy.filter((_, i) => open[i]).map(s => s.id)
+}
+export function migrateWritingProgress(stages: readonly WriteStage[], notes: Record<string, string>): Record<string, string> {
+  return notes[writingMigrationKey] !== undefined ? notes : { ...notes, [writingMigrationKey]: JSON.stringify(preservedWritingStages(stages, notes)) }
+}
+function writingFrontier(ladder: readonly WriteStage[], notes: Record<string, string>) {
+  const preserved = new Set(preservedWritingStages(ladder, notes))
+  for (let i = ladder.length - 1; i >= 0; i--) {
+    const s = ladder[i]
+    if (preserved.has(s.id) || s.tasks.some(t => readWrite(notes, t.id) !== null)) return i
+  }
+  return -1
+}
+/** Each stage opens after two checked passes in the preceding stage. Any recorded later stage keeps its whole prefix
+ *  open, as do stages already unlocked before the extra steps were added. Bridge access still follows the course. */
 export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, string>, unit: number): Record<string, boolean> {
   const ladder = stages.filter(s => !s.pack)
-  const open = openSteps(ladder.map(s => s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length >= stageTarget(s)))
+  const frontier = writingFrontier(ladder, notes)
+  const open = openSteps(ladder.map((s, i) => i < frontier || stageComplete(s, notes)))
   return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i]]), ...stages.filter(s => s.pack).map((s): [string, boolean] => [s.id, unitPackOpen(unit)])])
 }
 /** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
