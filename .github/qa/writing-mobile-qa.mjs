@@ -41,6 +41,11 @@ async function openCase(name, fixture) {
   return { context, page, errors }
 }
 
+async function assertGrammarOpen(page, expected, label = 'grammar disclosure state') {
+  await page.waitForFunction(value => document.querySelector('.wl-grammar')?.open === value, expected, { timeout: 5000 })
+  assert.equal(await page.locator('.wl-grammar').evaluate(e => e.open), expected, label)
+}
+
 async function geometry(page, label) {
   // React scrolls the selected button in an effect; wait for that specific result,
   // rather than taking a timing-dependent measurement immediately after a click.
@@ -76,7 +81,7 @@ try {
   const a = await openCase('fresh', fresh)
   assert.match((await a.page.locator('.wl-stages [aria-pressed="true"]').innerText()), /① 一句完整的話/)
   assert.equal(await a.page.locator('.wl-stages button:disabled').count(), 13)
-  assert.equal(await a.page.locator('.wl-grammar').evaluate(e => e.open), true)
+  await assertGrammarOpen(a.page, true)
   assert.equal(await a.page.locator('.wl-grammar .gm-ex li').count(), stages[0].grammar.examples.length)
   await a.page.locator('.wl-grammar .gm-say').first().click()
   const spoken = await a.page.evaluate(() => window.__spoken.at(-1))
@@ -99,12 +104,12 @@ try {
   await a.page.getByRole('button', { name: '自己對照評分表檢查', exact: true }).click()
   for (const box of await a.page.locator('.wl-self input[type="checkbox"]').all()) await box.check()
   await a.page.getByRole('button', { name: '都做到了，記下來', exact: true }).click()
-  assert.equal(await a.page.locator('.wl-grammar').evaluate(e => e.open), false, 'first saved attempt collapses grammar')
+  await assertGrammarOpen(a.page, false, 'first saved attempt collapses grammar')
   await a.page.reload({ waitUntil: 'networkidle' })
-  assert.equal(await a.page.locator('.wl-grammar').evaluate(e => e.open), false, 'saved stage remains collapsed after restart')
+  await assertGrammarOpen(a.page, false, 'saved stage remains collapsed after restart')
   assert.equal(await a.page.locator('textarea').inputValue(), 'I am a student. She is a nurse. We are students.', 'draft survives restart')
   await a.page.locator('.wl-grammar summary').click()
-  assert.equal(await a.page.locator('.wl-grammar').evaluate(e => e.open), true, 'grammar can be reopened manually')
+  await assertGrammarOpen(a.page, true, 'grammar can be reopened manually')
   assert.deepEqual(a.errors, [])
   await a.context.close()
 
@@ -121,9 +126,9 @@ try {
   await b.page.locator('.wl-stages').scrollIntoViewIfNeeded()
   await b.page.screenshot({ path: out + '/legacy-paragraph.png', fullPage: true })
   await b.page.locator('.wl-stages button').nth(4).click()
-  assert.equal(await b.page.locator('.wl-grammar').evaluate(e => e.open), false, 'legacy attempted stage starts collapsed')
+  await assertGrammarOpen(b.page, false, 'legacy attempted stage starts collapsed')
   await b.page.locator('.wl-stages button').first().click()
-  assert.equal(await b.page.locator('.wl-grammar').evaluate(e => e.open), true, 'unattempted foundation starts expanded')
+  await assertGrammarOpen(b.page, true, 'unattempted foundation starts expanded')
   assert.deepEqual(b.errors, [])
   await b.context.close()
 
@@ -136,7 +141,7 @@ try {
   await geometry(c.page, 'advanced-task2')
   const y = await c.page.evaluate(() => scrollY)
   await c.page.locator('.wl-stages button').nth(9).click()
-  assert.equal(await c.page.locator('.wl-grammar').evaluate(e => e.open), true)
+  await assertGrammarOpen(c.page, true)
   assert.ok(await c.page.locator('.wl-task svg').count() > 0, 'number warmup renders chart')
   await geometry(c.page, 'numbers-dark')
   await c.page.locator('.wl-grammar summary').click()
@@ -149,6 +154,7 @@ try {
   await c.page.screenshot({ path: out + '/numbers-light.png', fullPage: true })
   for (let i = 0; i < stages.length; i++) {
     await c.page.locator('.wl-stages button').nth(i).click()
+    await c.page.waitForFunction(title => document.querySelector('.wl-grammar .gm-explain > h4')?.textContent === title, stages[i].grammar.title, { timeout: 5000 })
     assert.equal(await c.page.locator('.wl-grammar .gm-explain > h4').innerText(), stages[i].grammar.title)
     await geometry(c.page, 'stage-' + stages[i].id)
   }
