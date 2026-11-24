@@ -155,6 +155,10 @@ try {
   for (let i = 0; i < stages.length; i++) {
     await c.page.locator('.wl-stages button').nth(i).click()
     await c.page.waitForFunction(title => document.querySelector('.wl-grammar .gm-explain > h4')?.textContent === title, stages[i].grammar.title, { timeout: 5000 })
+    if (!(await c.page.locator('.wl-grammar').evaluate(e => e.open))) {
+      await c.page.locator('.wl-grammar summary').click()
+      await assertGrammarOpen(c.page, true)
+    }
     assert.equal(await c.page.locator('.wl-grammar .gm-explain > h4').innerText(), stages[i].grammar.title)
     await geometry(c.page, 'stage-' + stages[i].id)
   }
