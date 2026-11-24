@@ -40,7 +40,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
     '課本的提示：' + sentence.hints.join(' ／ '),
     '說明：' + sentence.why,
     sentence.newWords.length ? '這題的新字（沒學過，可以直接教）：' + sentence.newWords.map(w => w.en + ' ' + w.zh).join('、') : '',
-    learned.length ? '他已經過關的單元：' + learned.join('、') : '',
+    learned.length ? '他已經學過的單元（這些規則寫錯，照分層提示）：' + learned.join('、') + '。後面還沒教到的文法，照「沒學過」直接教。' : '',
     '',
     '教法（一定要照做）：',
     ...teachingRules.map((r, i) => (i + 1) + '. ' + r),

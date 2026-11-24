@@ -16752,7 +16752,7 @@
       "unit": 20,
       "stage": "A",
       "title": "限定詞：every、all、both、one、something",
-      "rule": "every、each 後面接單數名詞，動詞也用單數（Every patient has a wristband.）。all（全部）、most（大部分）、none（一個都沒有）說一群裡有多少，後面接 the、my 或代名詞時要加 of（All of the beds are full.）。兩個東西用 both（兩個都）、either（兩個裡任一個）、neither（兩個都不）。前面說過的可數名詞，不想再說一次就用 one（單數）或 ones（複數）。some-、any-、no-、every- 加上 -body／-one（人）、-thing（東西）、-where（地方）：somebody、anything、nothing、everywhere，當主詞時動詞用單數；問句和否定句多用 any- 開頭的字。",
+      "rule": "every、each 後面接單數名詞，動詞也用單數（Every patient has a wristband.）。all（全部）、most（大部分）、none（一個都沒有）說一群裡有多少：most、none 後面接 the、my 或代名詞一定要加 of（most of the patients）；all 的 of 可加可不加（all the beds＝all of the beds），但接代名詞一定要 of（all of them）。兩個東西用 both（兩個都）、either（兩個裡任一個）、neither（兩個都不）。前面說過的可數名詞，不想再說一次就用 one（單數）或 ones（複數）。some-、any-、no-、every- 加上 -body／-one（人）、-thing（東西）、-where（地方）：somebody、anything、nothing、everywhere，當主詞時動詞用單數；問句和否定句多用 any- 開頭的字。",
       "examples": [
         "Every patient has a wristband.",
         "Both nurses are busy."
@@ -24187,8 +24187,8 @@
             {
               "en": "admit",
               "zh": "收住院、承認",
-              "example": "He was admitted yesterday.",
-              "exampleZh": "他昨天住院。",
+              "example": "The hospital admitted him yesterday.",
+              "exampleZh": "醫院昨天收他住院。",
               "source": "level2",
               "level": 2
             }
@@ -24205,8 +24205,8 @@
             {
               "en": "admit",
               "zh": "收住院、承認",
-              "example": "He was admitted yesterday.",
-              "exampleZh": "他昨天住院。",
+              "example": "The hospital admitted him yesterday.",
+              "exampleZh": "醫院昨天收他住院。",
               "source": "level2",
               "level": 2
             }
@@ -24249,25 +24249,27 @@
         {
           "id": "u29-d5",
           "day": 5,
-          "zh": "她兩天前住院，從那時起就沒有發燒了。",
+          "zh": "她兩天前開始吃藥，從那時起就沒有發燒了。",
           "grammar": [
             "現在完成式和過去式的差別"
           ],
           "hints": [
             "找句子裡有沒有明確的過去時間。",
-            "前半有明確時間用過去式；後半用現在完成式加 since then。"
+            "前半有明確時間（two days ago）用過去式 started；後半用現在完成式加 since then。"
           ],
           "reference": [
-            "She was admitted two days ago and has not had a fever since then.",
-            "She was admitted two days ago, and she hasn't had a fever since then."
+            "She started taking the medicine two days ago and has not had a fever since then.",
+            "She started taking the medicine two days ago, and she hasn't had a fever since then.",
+            "She started the medicine two days ago and has not had a fever since then.",
+            "She began taking the medicine two days ago and has not had a fever since then."
           ],
           "why": "句子裡有明確、已經結束的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。注意 since yesterday（從昨天到現在）、for two days 這種「從過去一直到現在」的說法不是已經結束的時間，要用現在完成式：I have been sick since yesterday.",
           "newWords": [
             {
               "en": "discharge",
               "zh": "出院",
-              "example": "He will be discharged tomorrow.",
-              "exampleZh": "他明天出院。",
+              "example": "The doctor will discharge him tomorrow.",
+              "exampleZh": "醫師明天會讓他出院。",
               "source": "level6",
               "level": 6
             },
@@ -24284,8 +24286,8 @@
             {
               "en": "discharge",
               "zh": "出院",
-              "example": "He will be discharged tomorrow.",
-              "exampleZh": "他明天出院。",
+              "example": "The doctor will discharge him tomorrow.",
+              "exampleZh": "醫師明天會讓他出院。",
               "source": "level6",
               "level": 6
             },
@@ -24302,17 +24304,19 @@
             {
               "id": "u29-d5",
               "day": 5,
-              "zh": "她兩天前住院，從那時起就沒有發燒了。",
+              "zh": "她兩天前開始吃藥，從那時起就沒有發燒了。",
               "grammar": [
                 "現在完成式和過去式的差別"
               ],
               "hints": [
                 "找句子裡有沒有明確的過去時間。",
-                "前半有明確時間用過去式；後半用現在完成式加 since then。"
+                "前半有明確時間（two days ago）用過去式 started；後半用現在完成式加 since then。"
               ],
               "reference": [
-                "She was admitted two days ago and has not had a fever since then.",
-                "She was admitted two days ago, and she hasn't had a fever since then."
+                "She started taking the medicine two days ago and has not had a fever since then.",
+                "She started taking the medicine two days ago, and she hasn't had a fever since then.",
+                "She started the medicine two days ago and has not had a fever since then.",
+                "She began taking the medicine two days ago and has not had a fever since then."
               ],
               "why": "句子裡有明確、已經結束的過去時間（yesterday、last week、two days ago、in 2020）就用過去式。沒有講明確時間、重點在到現在為止的結果或經驗，用現在完成式。注意 since yesterday（從昨天到現在）、for two days 這種「從過去一直到現在」的說法不是已經結束的時間，要用現在完成式：I have been sick since yesterday.",
               "newWords": []
@@ -24321,8 +24325,8 @@
           "bonusWords": [],
           "listening": [
             {
-              "en": "She was admitted two days ago and has not had a fever since then.",
-              "zh": "她兩天前住院，從那時起就沒有發燒了。"
+              "en": "She started taking the medicine two days ago and has not had a fever since then.",
+              "zh": "她兩天前開始吃藥，從那時起就沒有發燒了。"
             },
             {
               "en": "He fell yesterday. He has fallen twice this week.",
@@ -28622,7 +28626,7 @@
       "unit": 35,
       "stage": "B",
       "title": "動詞句型：tell 人 to、make／let、used to",
-      "rule": "want／ask／tell／remind＋人＋to＋原形：要（請、叫、提醒）某人做某事（The doctor told me to rest.），否定在 to 前面加 not（told me not to run）。to＋原形放在句子後面可以說「為了……」（I went to the pharmacy to buy medicine.）。make／let／help＋人＋原形，中間不加 to：make 是叫人非做不可，let 是讓、允許（Let me help you.）。remember、forget、stop 後面接 to 或 -ing 意思不一樣：remember to call（記得要打）、remember calling（記得打過）、stop to rest（停下來休息）、stop smoking（不再抽菸）。used to＋原形說「以前常常……（現在不再）」：I used to smoke.；問句和否定句有 did，要寫成 use to。",
+      "rule": "want／ask／tell／remind＋人＋to＋原形：要（請、叫、提醒）某人做某事（The doctor told me to rest.），否定在 to 前面加 not（told me not to run）。to＋原形放在句子後面可以說「為了……」（I went to the pharmacy to buy medicine.）。make／let＋人＋原形，中間不加 to：make 是叫人非做不可，let 是讓、允許（Let me help you.）；help＋人＋原形或 to＋原形都可以（help me carry／help me to carry）。remember、forget、stop 後面接 to 或 -ing 意思不一樣：remember to call（記得要打）、remember calling（記得打過）、stop to rest（停下來休息）、stop smoking（不再抽菸）。used to＋原形說「以前常常……（現在不再）」：I used to smoke.；問句和否定句有 did，要寫成 use to。",
       "examples": [
         "The doctor told me to rest.",
         "Let me help you."
@@ -28841,7 +28845,7 @@
             "My mom does not let me go out at night.",
             "My mother does not let me go out at night."
           ],
-          "why": "let／make／help＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。",
+          "why": "let／make＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可；help 比較特別，help me carry 和 help me to carry 都對。",
           "newWords": [
             {
               "en": "let",
@@ -28894,7 +28898,7 @@
                 "My mom does not let me go out at night.",
                 "My mother does not let me go out at night."
               ],
-              "why": "let／make／help＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可。",
+              "why": "let／make＋人＋原形，中間不加 to：let me go out。let 是允許，make 是叫人非做不可；help 比較特別，help me carry 和 help me to carry 都對。",
               "newWords": []
             }
           ],
@@ -42087,8 +42091,8 @@
             {
               "en": "habit",
               "zh": "習慣",
-              "example": "Sleeping late is a bad habit.",
-              "exampleZh": "晚睡是壞習慣。",
+              "example": "Staying up late is a bad habit.",
+              "exampleZh": "熬夜是壞習慣。",
               "source": "level1",
               "level": 1
             },
@@ -42105,8 +42109,8 @@
             {
               "en": "habit",
               "zh": "習慣",
-              "example": "Sleeping late is a bad habit.",
-              "exampleZh": "晚睡是壞習慣。",
+              "example": "Staying up late is a bad habit.",
+              "exampleZh": "熬夜是壞習慣。",
               "source": "level1",
               "level": 1
             },

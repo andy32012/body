@@ -3,7 +3,7 @@
   "unit": 1,
   "steps": [
    {
-    "t": "be 動詞就是「是」，英文句子不能少了它",
+    "t": "be 動詞就是「是」：說身分、狀態、在哪裡時不能少了它",
     "p": "中文可以說「我很累」，英文不能說 I tired，中間一定要放 am／is／are。",
     "ex": [
      {
@@ -3037,7 +3037,7 @@
    },
    {
     "t": "all／most／none 和 both／either／neither",
-    "p": "all 全部、most 大部分、none 一個都沒有；兩個東西用 both（兩個都）、either（任一個）、neither（兩個都不）。後面接 the、my 或代名詞時要加 of。",
+    "p": "all 全部、most 大部分、none 一個都沒有；兩個東西用 both（兩個都）、either（任一個）、neither（兩個都不）。most、none、either、neither 接 the、my 或代名詞要加 of；all、both 的 of 可加可不加（both my sisters＝both of my sisters），接代名詞（them、us）一定要 of。",
     "ex": [
      {
       "en": "All of my friends are nurses.",
@@ -3164,7 +3164,7 @@
     [
      "all／most／none",
      "全部／大部分／一個都沒有",
-     "複數名詞（接 the、my 要加 of）",
+     "複數名詞（most、none 接 the、my 要加 of；all 可省）",
      "All of the beds are full."
     ],
     [
@@ -5408,8 +5408,8 @@
     ]
    },
    {
-    "t": "to 說目的；make／let／help＋人＋原形",
-    "p": "to＋原形放在句子後面表示「為了……」；make（叫人非做不可）、let（允許）、help 後面接人再接原形，不加 to。",
+    "t": "to 說目的；make／let＋人＋原形",
+    "p": "to＋原形放在句子後面表示「為了……」；make（叫人非做不可）、let（允許）後面接人再接原形，不加 to；help 後面接原形或 to＋原形都可以。",
     "ex": [
      {
       "en": "I went out to buy lunch.",
@@ -5534,7 +5534,7 @@
      "I went out to buy lunch."
     ],
     [
-     "make／let／help＋人＋原形",
+     "make／let＋人＋原形（help 加不加 to 都可以）",
      "使／讓／幫某人做",
      "Let me help you."
     ],

@@ -90,7 +90,7 @@
   { "en": "positive", "zh": "陽性", "area": "檢查與檢驗", "ex": "The flu test was positive.", "exZh": "流感檢驗是陽性。" },
   { "en": "negative", "zh": "陰性", "area": "檢查與檢驗", "ex": "The test result is negative.", "exZh": "檢驗結果是陰性。" },
   { "en": "blood glucose", "zh": "血糖", "area": "檢查與檢驗", "ex": "Check her blood glucose before meals.", "exZh": "飯前幫她測血糖。" },
-  { "en": "hemoglobin", "zh": "血紅素", "area": "檢查與檢驗", "ex": "Her hemoglobin is 8, so she needs blood.", "exZh": "她的血紅素是 8，所以需要輸血。" },
+  { "en": "hemoglobin", "zh": "血紅素", "area": "檢查與檢驗", "ex": "Her hemoglobin is 8 g/dL, so the nurse reports it to the doctor.", "exZh": "她的血紅素是 8 g/dL，護理師把這個數值報告給醫師。" },
   { "en": "electrolytes", "zh": "電解質", "area": "檢查與檢驗", "ex": "Vomiting can change your electrolytes.", "exZh": "嘔吐會讓電解質改變。" },
   { "en": "potassium", "zh": "鉀", "area": "檢查與檢驗", "ex": "His potassium level is high.", "exZh": "他的鉀離子偏高。" },
   { "en": "sodium", "zh": "鈉", "area": "檢查與檢驗", "ex": "Eat less sodium to control your blood pressure.", "exZh": "少吃鈉可以控制血壓。" },
