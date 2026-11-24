@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { newCard, reviewEnergy, reviewLoad, sentenceReviewKey, SENTENCE_QUOTA, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
-import { dailyTarget } from '../src/lib/dailyWords.ts'
+import { dailyTarget, newWordPlan } from '../src/lib/dailyWords.ts'
 import { planBlocks } from '../src/lib/dailyPlan.ts'
 import { createInitialState, exportBackup, importBackup } from '../src/lib/store.ts'
 
@@ -38,6 +38,27 @@ test('新字煞車：只有今天複習不完的單字卡會擋新字，排隊�
   assert.equal(dailyTarget({}, false, day, backlog(words(100))), 20, '今天清得完的卡不擋新字')
   assert.equal(dailyTarget({}, false, day, backlog(words(160))), 6, '積 60 張：新字減少')
   assert.equal(dailyTarget({}, false, day, backlog(words(180))), 0, '積 80 張：先暫停')
+})
+
+test('新字跟著複習量調整：積卡、接下來一週很多、最近記得少，都會讓新字變少，並說原因', () => {
+  // Nothing piling up: the chosen number.
+  assert.deepEqual(newWordPlan(state(words(50)), day, false, 'normal'), { target: 20, backlog: 0, reason: '', short: '' })
+  // Next week heavy: 90 word cards due on each of the next days (a day takes about 100).
+  const heavy: ReviewCard[] = []
+  for (let k = 1; k <= 7; k++) for (let i = 0; i < 90; i++) heavy.push({ ...newCard('word:h' + k + '-' + i, '2027-03-01'), due: '2027-03-' + String(10 + k).padStart(2, '0') })
+  const busy = newWordPlan(state(heavy), day, false, 'normal')
+  assert.equal(busy.target, 10)
+  assert.match(busy.reason, /接下來一週每天平均要複習 90 張/)
+  // Poor recall over two weeks: half the new words.
+  const missed = Array.from({ length: 40 }, (_, i): ReviewEvent => ({ id: 'word:m' + i, day: '2027-03-05', gap: 4, remembered: i < 24, shownAnswer: false }))
+  const weak = newWordPlan(state([], missed), day, false, 'normal')
+  assert.equal(weak.target, 10)
+  assert.match(weak.reason, /只記得 60%/)
+  assert.equal(newWordPlan(state([], missed.map(e => ({ ...e, remembered: true }))), day, false, 'normal').target, 20, '記得好就照原本的數量')
+  // Cards piling up today still win.
+  assert.equal(newWordPlan(state(words(180)), day, false, 'normal').target, 0)
+  // Exam days: one word unless asked for more.
+  assert.equal(newWordPlan(state([]), day, true, 'low').target, 1)
 })
 
 test('一天的計畫：複習多的日子，複習時間最多多 10 分鐘，從今日單字和說或寫挪，總時數不變', () => {

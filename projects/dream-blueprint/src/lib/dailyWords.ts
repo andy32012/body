@@ -1,5 +1,5 @@
 import { officialWords, wordKey } from './vocab'
-import { addDays, newCard, type ReviewCard } from './progress'
+import { addDays, newCard, recentRecall, reviewBudget, reviewLoad, wordForecast, type Energy, type ReviewCard, type ReviewEvent } from './progress'
 import { createSceneDeck } from './backgroundRotation'
 import { seedOf } from './starfield'
 
@@ -68,6 +68,41 @@ export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: 
   // Exam and internship days show one word unless the learner asks for the full set.
   if (quiet && notes[moreKey(day)] !== '1') return 1
   return Math.min(full, newWordAllowance(backlog))
+}
+
+export interface WordPlan { target: number; backlog: number; reason: string; short: string }
+/** Today's new words, adapted to the review they will cause. Three brakes, the strongest wins:
+ *  word cards already piling up past today's review; the next week's word reviews (from the FSRS due dates) close to
+ *  what a day's review can take; and a poor recall rate over the last two weeks (new words wait until the old stick). */
+export function newWordPlan(s: { notes: Record<string, string>; cards: readonly ReviewCard[]; reviewEvents: readonly ReviewEvent[] }, day: string, quiet: boolean, energy: Energy): WordPlan {
+  const { backlog } = reviewLoad(s, day, energy)
+  const chosen = Number(s.notes[countKey])
+  const full = DAILY_CHOICES.includes(chosen as (typeof DAILY_CHOICES)[number]) ? chosen : DEFAULT_DAILY
+  if (quiet && s.notes[moreKey(day)] !== '1') return { target: 1, backlog, reason: '', short: '' }
+  let target = Math.min(full, newWordAllowance(backlog))
+  let reason = backlog > 30 ? '單字卡積了 ' + backlog + ' 張今天複習不完，新字先' + (target === 0 ? '暫停' : '減少到 ' + target + ' 個') + '；積的卡消下去，新字就會加回來。' : ''
+  let short = backlog > 30 ? '單字卡積太多' : ''
+  const budget = reviewBudget(energy)
+  const coming = wordForecast(s.cards, day, 8).slice(1)
+  const average = coming.reduce((a, b) => a + b, 0) / coming.length
+  if (target > 0 && average > budget * 0.8) {
+    const cap = average > budget ? 5 : 10
+    if (cap < target) {
+      target = cap
+      reason = '接下來一週每天平均要複習 ' + Math.round(average) + ' 張單字卡（一天大約複習得完 ' + budget + ' 張），新字先減到 ' + cap + ' 個，免得複習越積越多。'
+      short = '接下來複習很多'
+    }
+  }
+  const recall = recentRecall(s.reviewEvents, day)
+  if (target > 5 && recall.n >= 30 && recall.rate < 0.75) {
+    const cap = Math.max(5, Math.floor(full / 2))
+    if (cap < target) {
+      target = cap
+      reason = '最近兩週複習單字只記得 ' + Math.round(recall.rate * 100) + '%，新字先減到 ' + cap + ' 個，把舊的記牢再加回來。'
+      short = '最近記得比較少'
+    }
+  }
+  return { target, backlog, reason, short }
 }
 
 /** New words share one budget with review: the more word cards pile up past today's review, the fewer new words.

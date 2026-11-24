@@ -8,7 +8,7 @@ import { activeLesson, lessonFinished, mainLessonDone } from '../lib/lesson'
 import { dueTopic, partNumber, partPlan, topicDoneToday } from '../lib/topics'
 import type { Focus } from '../lib/nextFocus'
 import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
-import { dailyTarget, doneKey } from '../lib/dailyWords'
+import { doneKey, newWordPlan } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
 import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
@@ -48,7 +48,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   // A guided lesson that reached its end, or the unit checkpoint (which keeps no lesson record).
   const lessonDone = mainLessonDone(state, today)
   const checkpointDone = lessonDone && !lessonFinished(state.notes, today)
-  const wordTarget = dailyTarget(state.notes, budget.quiet, today, load.backlog)
+  const wordPlan = newWordPlan(state, today, budget.quiet, reviewEnergy(today, state.settings.periods))
+  const wordTarget = wordPlan.target
   const wordsDone = Number(state.notes[doneKey(today)] || 0)
   // A reading record saved today, or graded passages read today (logged as a reading day).
   const readToday = practisedOn(state.notes, state.sessions, 'read', today)
@@ -107,7 +108,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       auto: lessonDone, go: () => onStart(energy), goLabel: lessonDone ? '再上' : activeLesson(state.notes) ? '繼續' : '開始' }
   const catalog: Record<Exclude<BlockId, 'review' | 'lesson'>, Omit<Task, 'min'>> = {
     focus: { id: 'focus', title: '先補強', detail: focus?.reason ?? '', auto: focusDone, go: focus?.action ? to(focus.action.hash) : undefined, goLabel: '去做' },
-    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' ? '（寒假可以把每天看幾個調到 25–30）' : '') : '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
+    words: { id: 'words', title: '今日單字', detail: wordTarget ? '今天 ' + wordTarget + ' 個新字' + (wordPlan.short ? '（' + wordPlan.short + '，先少一點）' : '') + (wordsDone ? '，看了 ' + Math.min(wordsDone, wordTarget) + ' 個' : '') + (budget.kind === 'winter' && !wordPlan.short ? '（寒假可以把每天看幾個調到 25–30）' : '') : wordPlan.reason || '單字卡積了 ' + load.backlog + ' 張今天複習不完，先不加新字',
       auto: wordTarget > 0 && wordsDone >= wordTarget, go: onWord, goLabel: '打開' },
     input: testDay ? { id: 'input', title: '聽或讀：單元回測', detail: '單元 ' + pack + ' 最後一天：一篇沒看過的閱讀＋一段沒聽過的聽力，各只有一次機會', auto: !!(held.reading && held.listening),
         go: to('library/unit/test'), goLabel: '回測' }

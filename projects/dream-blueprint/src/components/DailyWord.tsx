@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, RotateCcw, Volume2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { activePeriod, addDays, newCard, reviewEnergy, reviewLoad } from '../lib/progress'
+import { activePeriod, addDays, newCard, reviewEnergy } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
@@ -9,7 +9,7 @@ import { markSkill } from '../lib/wordSkills'
 import { paintSky, seedOf } from '../lib/starfield'
 import { useModal } from '../lib/modal'
 import { formLines, meaningLine, wordKey } from '../lib/vocab'
-import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, dailyQueue, dailyTarget, dailyWordPhoto, doneKey, moreKey, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
+import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, dailyQueue, dailyWordPhoto, doneKey, moreKey, newWordPlan, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -17,9 +17,9 @@ type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () 
 export default function DailyWord({ state, update, today, onClose }: Props) {
   const period = activePeriod(today, state.settings.periods)
   const quiet = period === 'exam' || period === 'internship'
-  // Only word cards today's review cannot fit hold back new words; cards today's review will clear do not.
-  const backlog = reviewLoad(state, today, reviewEnergy(today, state.settings.periods)).backlog
-  const target = dailyTarget(state.notes, quiet, today, backlog)
+  // New words adapt to the review they cause: cards piling up, a heavy week ahead, or poor recall slow them down.
+  const plan = newWordPlan(state, today, quiet, reviewEnergy(today, state.settings.periods))
+  const target = plan.target
   const done = Number(state.notes[doneKey(today)] || 0)
   const queue = useMemo(() => dailyQueue(state.knownWords, state.learningWords),
     [state.knownWords, state.learningWords])
@@ -125,7 +125,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
         </div>
       </> : <div className="daily-word-body daily-word-finished">
         <strong className="daily-word-term">{!queue.length ? '六級單字都看過一輪了' : target === 0 ? '今天先複習' : '今天的 ' + done + ' 個看完了'}</strong>
-        {backlog > 30 && queue.length > 0 && <p className="daily-word-meaning">單字卡積了 {backlog} 張今天複習不完，新字先{target === 0 ? '暫停' : '減少到 ' + target + ' 個'}；積的卡消下去，新字就會加回來。</p>}
+        {plan.reason && queue.length > 0 && <p className="daily-word-meaning">{plan.reason}</p>}
         <p className="daily-word-meaning">{queue.length ? '還不熟的字明天會出現在複習裡。' : '之後從待學單字和複習繼續。'}</p>
         {quiet && queue.length > 0 && state.notes[moreKey(today)] !== '1' &&
           <button type="button" className="daily-word-reveal" onClick={() => setNote(moreKey(today), '1')}>考週只排 1 個。還想再看幾個</button>}

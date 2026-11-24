@@ -13,6 +13,8 @@ import {
   practiceDays,
   attendance,
   reviewBonus,
+  wordForecast,
+  recentRecall,
 } from '../src/lib/progress.ts'
 
 test('手機當地四點換日、週一四點換週，能跨月與跨年', () => {
@@ -52,26 +54,56 @@ test('時期含起訖日，日期重疊時以考週和實習優先', () => {
     ],
   )
 })
-test('十格卡片，熟字間隔拉長到 240、365 天，忘記時退兩格，同日防刷', () => {
+test('FSRS 排程：記得就越拉越長（最長 365 天）、忘了不從零開始、同日防刷', () => {
   let card = newCard('word', '2026-11-01')
   assert.equal(card.due, '2026-11-02')
-  for (const gap of [2, 4, 8, 16, 30, 60, 120, 240, 365, 365]) {
+  const gaps = []
+  for (let i = 0; i < 9; i++) {
     const day = card.due
     const result = reviewCard(card, day, true)
     card = result.card
-    assert.equal(daysBetween(day, card.due), gap)
-    assert.equal(reviewCard(card, day, true).event, null)
+    gaps.push(daysBetween(day, card.due))
+    assert.equal(reviewCard(card, day, true).event, null, '同一天再按不算')
   }
+  assert.deepEqual(gaps, [2, 6, 17, 44, 102, 220, 365, 365, 365], '新卡是不會的字，第一次記得先隔兩天，之後一路拉長')
   assert.equal(card.box, 10)
   assert.equal(card.mastered, true)
+  assert.ok(card.s > 365 && card.d >= 1 && card.d <= 10, '記憶狀態存在卡片上')
   const forgotten = reviewCard(card, card.due, false)
-  assert.equal(forgotten.card.box, 8, '365 天忘了退回 120 天')
+  const back = daysBetween(forgotten.card.lastDay, forgotten.card.due)
+  assert.ok(back > 1 && back < 30, '一年後忘了，退回幾天後再看，不是從一天重來：' + back)
   assert.equal(forgotten.card.mastered, true)
-  assert.equal(daysBetween(forgotten.card.lastDay, forgotten.card.due), 120)
   let young = reviewCard(newCard('w2', '2026-11-01'), '2026-11-02', true).card
   young = reviewCard(young, young.due, false).card
+  assert.equal(daysBetween(young.lastDay, young.due), 1, '剛學的字忘了，明天再看')
   assert.equal(young.box, 1)
-  assert.equal(reviewCard(young, young.due, true, true).card.box, 1)
+  const seen = reviewCard(young, young.due, true, true).card
+  assert.equal(daysBetween(seen.lastDay, seen.due), 1, '看了答案算忘記')
+  // A small mistake (Hard) still climbs, but more slowly than a clean recall.
+  const hard = reviewCard(newCard('u1-d1', '2026-11-01'), '2026-11-02', false, false, 2).card
+  const good = reviewCard(newCard('u1-d2', '2026-11-01'), '2026-11-02', true).card
+  assert.ok(daysBetween(hard.lastDay, hard.due) <= daysBetween(good.lastDay, good.due))
+  // A card from the old shelves keeps its interval as the starting point.
+  const old = { id: 'word:x', box: 6, lastDay: '2026-10-01', due: '2026-10-31', mastered: true }
+  const kept = reviewCard(old, '2026-11-02', true).card
+  assert.ok(daysBetween(kept.lastDay, kept.due) > 30, '舊的 30 天卡記得了，間隔比 30 天長')
+})
+test('單字預估：接下來幾天每天要複習幾張，和最近兩週記得幾成', () => {
+  const cards = [
+    { id: 'word:a', box: 1, lastDay: '2026-11-20', due: '2026-11-21', mastered: false },
+    { id: 'word:b', box: 2, lastDay: '2026-11-22', due: '2026-11-24', mastered: false },
+    { id: 'word:c', box: 3, lastDay: '2026-11-22', due: '2026-11-26', mastered: false },
+    { id: 'u1-d1', box: 1, lastDay: '2026-11-22', due: '2026-11-24', mastered: false },
+  ]
+  assert.deepEqual(wordForecast(cards, '2026-11-24', 4), [2, 0, 1, 0], '今天含過期的，句子卡不算')
+  const events = [
+    { id: 'word:a', day: '2026-11-20', gap: 4, remembered: true, shownAnswer: false },
+    { id: 'word:b', day: '2026-11-21', gap: 4, remembered: false, shownAnswer: false },
+    { id: 'word:b', day: '2026-11-21', gap: 4, remembered: false, shownAnswer: false },
+    { id: 'word:c', day: '2026-11-22', gap: 1, remembered: false, shownAnswer: false },
+    { id: 'word:d', day: '2026-10-01', gap: 8, remembered: false, shownAnswer: false },
+  ]
+  assert.deepEqual(recentRecall(events, '2026-11-24'), { n: 2, rate: 0.5 }, '同一天同一張只算一次；隔一天的和太久以前的不算')
 })
 test('每日複習依時間分配，未到期的卡片不出現', () => {
   const cards = Array.from({ length: 100 }, (_, i) =>

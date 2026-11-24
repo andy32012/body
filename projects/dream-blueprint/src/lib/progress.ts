@@ -42,10 +42,15 @@ export function activePeriod(
 
 export interface ReviewCard {
   id: string
+  /** A bucket for the review shelves (which interval the card is on now: 1, 2, 4 … 365 days). */
   box: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
   lastDay: string
   due: string
   mastered: boolean
+  /** FSRS memory state: stability (days until recall drops to 90%) and difficulty (1–10). Missing on a card that has
+   *  not been reviewed since FSRS came in; its current interval stands in for the stability then. */
+  s?: number
+  d?: number
 }
 export interface ReviewEvent {
   id: string
@@ -57,48 +62,122 @@ export interface ReviewEvent {
 export function newCard(id: string, day: string): ReviewCard {
   return { id, box: 1, lastDay: day, due: addDays(day, 1), mastered: false }
 }
-/** Days until the next check for each box. Cards only climb after an unaided recall.
- *  After 120 days a card still remembered waits 240, then 365 days, so cards known well stop filling the daily review;
- *  a card forgotten there steps back two boxes (365 → 120, 240 → 60). */
+/** The shelves: a card sits on the longest interval it has reached. Cards are reviewed by FSRS (below), not by shelf. */
 export const intervals = [1, 2, 4, 8, 16, 30, 60, 120, 240, 365]
 export const TOP_BOX = intervals.length
+const boxFor = (interval: number) => Math.max(1, intervals.filter(i => i <= interval).length) as ReviewCard['box']
+
+/**
+ * FSRS-6 (open-spaced-repetition, default parameters): each card keeps a stability S and a difficulty D. The chance
+ * of recalling it after t days is R = (1 + F·t/S)^-w20; the next review is planned for when R falls to 90%, which is
+ * t = S. A recall makes S grow — more when the card was nearly forgotten, less for a hard card — and a lapse shrinks S
+ * instead of starting over. Longest interval 365 days, so every word comes back at least once a year.
+ */
+export const FSRS_W = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+const W = FSRS_W
+const DECAY = -W[20]
+const FACTOR = Math.pow(0.9, 1 / DECAY) - 1
+export const RETENTION = 0.9
+export const MAX_INTERVAL = 365
+/** 1 forgot (or saw the answer), 2 recalled with a small mistake, 3 recalled, 4 easy. */
+export type Grade = 1 | 2 | 3 | 4
+const clampD = (d: number) => Math.min(10, Math.max(1, d))
+const initialD = (g: Grade) => W[4] - Math.exp(W[5] * (g - 1)) + 1
+/** Chance of recall after t days with stability s. */
+export const retrievability = (t: number, s: number) => Math.pow(1 + FACTOR * Math.max(0, t) / s, DECAY)
+export function nextInterval(s: number) {
+  return Math.min(MAX_INTERVAL, Math.max(1, Math.round(s / FACTOR * (Math.pow(RETENTION, 1 / DECAY) - 1))))
+}
+/** The memory state after one review t days after the last one. A new card was made the day he met something he did
+ *  not know yet (a word sorted 還不熟, a sentence from a lesson), so it starts as a first rating of "forgot" on that day.
+ *  A card from the old shelves starts from its current interval with a middle difficulty. */
+export function fsrsStep(card: Pick<ReviewCard, 's' | 'd' | 'box' | 'lastDay' | 'due'>, t: number, g: Grade): { s: number; d: number } {
+  let s = card.s, d = card.d
+  if (s === undefined || d === undefined) {
+    const fresh = card.box <= 1 && daysBetween(card.lastDay, card.due) <= 1
+    s = fresh ? W[0] : Math.max(1, daysBetween(card.lastDay, card.due))
+    d = fresh ? clampD(initialD(1)) : 5
+  }
+  const r = retrievability(t, s)
+  const delta = -W[6] * (g - 3)
+  const damped = d + (10 - d) * delta / 9
+  const nd = clampD(W[7] * initialD(4) + (1 - W[7]) * damped)
+  let ns: number
+  if (g === 1) {
+    const longTerm = W[11] * Math.pow(d, -W[12]) * (Math.pow(s + 1, W[13]) - 1) * Math.exp((1 - r) * W[14])
+    ns = Math.min(longTerm, s / Math.exp(W[17] * W[18]))
+  } else {
+    const hard = g === 2 ? W[15] : 1
+    const easy = g === 4 ? W[16] : 1
+    ns = s * (1 + Math.exp(W[8]) * (11 - d) * Math.pow(s, -W[9]) * (Math.exp((1 - r) * W[10]) - 1) * hard * easy)
+  }
+  return { s: Math.max(0.001, ns), d: nd }
+}
+
 export function reviewCard(
   card: ReviewCard,
   day: string,
   remembered: boolean,
   shownAnswer = false,
+  grade?: Grade,
 ): { card: ReviewCard; event: ReviewEvent | null } {
   if (day <= card.lastDay || day < card.due) return { card, event: null }
   const recalled = remembered && !shownAnswer
-  // Forgetting a well-known card steps it back a little instead of starting over.
-  const box = (recalled ? Math.min(card.box + 1, TOP_BOX) : card.box > 3 ? card.box - 2 : 1) as ReviewCard['box']
+  // Seeing the answer counts as forgetting, whatever grade was asked for.
+  const g: Grade = shownAnswer ? 1 : grade ?? (recalled ? 3 : 1)
+  const gap = daysBetween(card.lastDay, day)
+  const { s, d } = fsrsStep(card, gap, g)
+  const interval = nextInterval(s)
   return {
     card: {
       ...card,
-      box,
+      box: boxFor(interval),
       lastDay: day,
-      due: addDays(day, intervals[box - 1]),
-      mastered: card.mastered || (card.box >= 5 && recalled),
+      due: addDays(day, interval),
+      // Known for good once recalled after an interval of two weeks or more.
+      mastered: card.mastered || (g >= 3 && card.box >= 5),
+      s: Math.round(s * 1000) / 1000,
+      d: Math.round(d * 1000) / 1000,
     },
-    event: {
-      id: card.id,
-      day,
-      gap: daysBetween(card.lastDay, day),
-      remembered,
-      shownAnswer,
-    },
+    event: { id: card.id, day, gap, remembered, shownAnswer },
   }
 }
 /** A self-marked "correct" nobody could check: the card neither climbs nor drops, and no recall is recorded. */
 export function holdCard(card: ReviewCard, day: string): ReviewCard {
   if (day <= card.lastDay || day < card.due) return card
-  return { ...card, lastDay: day, due: addDays(day, intervals[card.box - 1]) }
+  const interval = card.s !== undefined ? nextInterval(card.s) : intervals[card.box - 1]
+  return { ...card, lastDay: day, due: addDays(day, interval) }
 }
-/** A written answer applied to its review card: checked and correct climbs, wrong or seen drops,
- *  correct but unchecked (自評完成・待確認) holds — self-marking alone never makes a card look learned. */
+/** A written answer applied to its review card: checked and correct climbs, a small mistake is a hard recall, wrong or
+ *  seen drops, correct but unchecked (自評完成・待確認) holds — self-marking alone never makes a card look learned. */
 export function applyAnswer(card: ReviewCard, day: string, a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; verified?: boolean }): { card: ReviewCard; event: ReviewEvent | null } {
   if (a.rating === 'correct' && !a.revealed && a.verified !== true) return { card: holdCard(card, day), event: null }
-  return reviewCard(card, day, a.rating === 'correct', a.revealed)
+  return reviewCard(card, day, a.rating === 'correct', a.revealed, a.rating === 'minor' && !a.revealed ? 2 : undefined)
+}
+
+/** Word cards due on each of the next `days` days (day 0 includes everything overdue), from the cards' due dates. */
+export function wordForecast(cards: readonly ReviewCard[], day: string, days = 7): number[] {
+  const out = new Array<number>(days).fill(0)
+  for (const c of cards) {
+    if (!c.id.startsWith('word:')) continue
+    const at = c.due <= day ? 0 : daysBetween(day, c.due)
+    if (at < days) out[at]++
+  }
+  return out
+}
+/** How well word cards were recalled in the last two weeks (cards that waited at least two days). */
+export function recentRecall(events: readonly ReviewEvent[], day: string) {
+  const seen = new Set<string>()
+  let n = 0, ok = 0
+  for (const e of events) {
+    if (!e.id.startsWith('word:') || e.gap < 2 || e.day > day || daysBetween(e.day, day) >= 14) continue
+    const key = e.day + '/' + e.id
+    if (seen.has(key)) continue
+    seen.add(key)
+    n++
+    if (e.remembered && !e.shownAnswer) ok++
+  }
+  return { n, rate: n ? ok / n : 1 }
 }
 /** Word-card review is limited by time, not a fixed handful: roughly five cards a minute. */
 export const reviewMinutes = { low: 10, normal: 20, high: 25 } as const

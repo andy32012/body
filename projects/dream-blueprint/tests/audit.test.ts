@@ -36,16 +36,22 @@ test('縮寫：學生的縮寫兩種讀法都試；參考句照後面的字決�
   assert.ok(matchesReference("I'll take a photo of you.", u47.reference))
 })
 
-test('複習卡：自評的「對了」先停在原地，確認過才往上升；錯或看答案往下', () => {
-  const card = { ...newCard('u1-d1', '2026-11-01'), box: 2 as const, due: '2026-11-20' }
-  const held = applyAnswer(card, '2026-11-22', { rating: 'correct', revealed: false })
+test('複習卡：自評的「對了」先停在原地，確認過才往上升；小錯慢慢升；錯或看答案往下', () => {
+  const card = { ...newCard('u1-d1', '2026-11-01'), box: 2 as const, due: '2026-11-03' }
+  const held = applyAnswer(card, '2026-11-04', { rating: 'correct', revealed: false })
   assert.equal(held.card.box, 2)
   assert.equal(held.event, null)
-  assert.equal(held.card.lastDay, '2026-11-22')
-  assert.ok(held.card.due > '2026-11-22')
-  assert.equal(applyAnswer(card, '2026-11-22', { rating: 'correct', revealed: false, verified: true }).card.box, 3)
-  assert.equal(applyAnswer(card, '2026-11-22', { rating: 'again', revealed: false }).card.box, 1)
-  assert.equal(applyAnswer(card, '2026-11-22', { rating: 'correct', revealed: true, verified: true }).card.box, 1)
+  assert.equal(held.card.lastDay, '2026-11-04')
+  assert.ok(held.card.due > '2026-11-04')
+  const gap = (c: { lastDay: string; due: string }) => (Date.parse(c.due) - Date.parse(c.lastDay)) / 864e5
+  const good = applyAnswer(card, '2026-11-04', { rating: 'correct', revealed: false, verified: true }).card
+  const minor = applyAnswer(card, '2026-11-04', { rating: 'minor', revealed: false }).card
+  const again = applyAnswer(card, '2026-11-04', { rating: 'again', revealed: false }).card
+  const seen = applyAnswer(card, '2026-11-04', { rating: 'correct', revealed: true, verified: true }).card
+  assert.ok(good.box > 2 && gap(good) > 2, '確認對了往上升')
+  assert.ok(gap(minor) >= 2 && gap(minor) < gap(good), '小錯不會掉回去，但升得比較慢')
+  assert.equal(again.box, 1)
+  assert.equal(seen.box, 1)
 })
 
 test('雲端同步：雲端比出發點新，本機也改過就是衝突，不會互蓋', () => {

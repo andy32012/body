@@ -186,8 +186,8 @@ export default function History({ state, update }: PageProps) {
       <h2>隔幾天，還記得嗎？</h2>
       <p>{delayed.length ? "相隔至少四天再複習且未看答案，共 " + delayed.length + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
         {delayed.length > 0 && <strong> {Math.round(recalled / delayed.length * 100)}%</strong>}</p>
-      <h3>單字複習盒</h3><div className="history-boxes">{intervals.map((interval, index) =>
-        <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval} 天格</small></div>)}</div>
+      <h3>單字卡現在隔幾天複習</h3><p className="history-note">用 FSRS 依每張卡的記憶狀態排：記得越穩，隔得越久（最長一年）；忘了就縮短，不會從頭來。</p><div className="history-boxes">{intervals.map((interval, index) =>
+        <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval === 1 ? '1 天' : '≥' + interval + ' 天'}</small></div>)}</div>
       <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 快篩已認得 {state.knownWords.length} 個字</p>
     </section>
     {settings.rivalsEnabled && pastSeason && <section className="history-section"><h2>上一季 · {pastSeason.label}</h2>
