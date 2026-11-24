@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { criteriaFor, essayKind, essays, parseFeedback, readWrite, scoreOf, selfChecked, suggestedStage, taskDone, wordCount, writeKey, type WriteFeedback, type WriteStage, type WriteTask } from '../lib/writing'
+import { criteriaFor, essayKind, essays, nextTask, parseFeedback, readWrite, scoreOf, selfChecked, suggestedStage, taskDone, taskOpen, wordCount, writeKey, type WriteFeedback, type WriteStage, type WriteTask } from '../lib/writing'
 import { MiniChart } from './LessonParts'
 import StuckButton from './StuckButton'
 import { answerAllowed, isAbort, useClaudeGate } from '../lib/answerGate'
@@ -15,6 +15,10 @@ import './writing.css'
 
 const stages = data.stages as WriteStage[]
 const outlines: Record<string, string[]> = {
+  a1: ['照題目寫 3–5 句，一句說一件事', '先用給你的開頭，再換成自己的內容', '句首大寫，句尾加句點'],
+  a1plus: ['寫 5–6 句', '把兩件有關的事用 and 接成一句（學完單元 21 再加 but、so、because）', '最後一句收尾：感覺或結果'],
+  a2: ['開頭一句：說這段要講什麼', '中間 3–4 句：細節（什麼時候、做了什麼、為什麼）', '結尾一句：感想或結果'],
+  a2plus: ['開頭：打招呼，說為什麼寫這封信', '中間：照順序講（First, … Then, … After that, …）', '結尾：請對方回覆或道謝，再署名'],
   paragraph: ['Topic sentence：一句說整段要講什麼', 'First, …', 'Also / Second, …', 'Finally, …', 'Conclusion：For these reasons, …'],
   multi: ['第一段：開頭（打招呼／說出主題或立場）', '第二段：內容（理由、例子、經過）', '第三段：結尾（總結／請求／祝福）'],
   task1: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
@@ -30,6 +34,7 @@ function system(stage: WriteStage, task: WriteTask, prompt: string, step: Stage 
   return [
     '你是英文寫作老師，批改台灣護理系學生（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
+    ...(stage.graded ? ['這是 ' + stage.level + ' 程度的分級寫作（' + stage.goal + '）。照這個程度評分，不要用更高程度的標準扣分；寫得對就給高分，不要要求他寫得更難。'] : []),
     ...(task.after ? ['這題只用到單元 ' + task.after + ' 以前教過的文法；用到還沒教的結構不扣分，在 hint 簡單教。'] : []),
     ...(learned.length ? ['', ...learned, ''] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，照這種題目該有的結構評：' + essays[kind].outline.join('；')] : []),
@@ -51,14 +56,21 @@ function system(stage: WriteStage, task: WriteTask, prompt: string, step: Stage 
 
 /** 寫作階梯 with criteria feedback; IELTS tasks get a timer and a word target. */
 export default function WritingLadder({ state, onActivity, date, initialTask }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }) {
-  const suggested = suggestedStage(stages, state.notes)
+  // Each task opens once the grammar unit it needs is finished (taskOpen); pack tasks open from their unit.
+  const unit = state.curriculum.unit
+  const isOpen = (s: WriteStage, t: WriteTask) => !!s.pack || taskOpen(t, unit)
+  const suggested = suggestedStage(stages, state.notes, unit)
+  const next = nextTask(stages, state.notes, unit)
   // A task opened from a unit's pack (library/writing/<id>) starts on that task.
   const opened = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask)) : undefined
   const [stageId, setStageId] = useState(() => opened?.id ?? suggested)
   const stage = stages.find(s => s.id === stageId)!
-  const firstOpen = stage.tasks.find(t => !taskDone(readWrite(state.notes, t.id), !!stage.ielts)) ?? stage.tasks[0]
+  const firstOpen = (next?.stage.id === stage.id ? next.task : undefined)
+    ?? stage.tasks.find(t => isOpen(stage, t) && !taskDone(readWrite(state.notes, t.id), !!stage.ielts))
+    ?? stage.tasks.find(t => isOpen(stage, t)) ?? stage.tasks[0]
   const [taskId, setTaskId] = useState(() => opened && initialTask ? initialTask : firstOpen.id)
   const task = stage.tasks.find(t => t.id === taskId) ?? firstOpen
+  const locked = !isOpen(stage, task)
   const draftKey = 'write.' + task.id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [busy, setBusy] = useState(false)
@@ -142,21 +154,34 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
 
   return <div className="pr-stack wl">
     <div className="pr-options wl-stages" role="group" aria-label="寫作階梯">
-      {stages.map(s => <button key={s.id} type="button" aria-pressed={s.id === stage.id} onClick={() => { setStageId(s.id); setTaskId((s.tasks.find(t => !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks[0]).id) }}>
-        {s.name}<small>{stageDone[s.id]} / {s.tasks.length}{s.id === suggested ? ' · 建議' : ''}</small></button>)}
+      {stages.map(s => {
+        const open = s.tasks.filter(t => isOpen(s, t))
+        const from = Math.min(...s.tasks.map(t => t.after ?? 0))
+        return <button key={s.id} type="button" aria-pressed={s.id === stage.id} onClick={() => {
+          setStageId(s.id)
+          setTaskId((open.find(t => !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? open[0] ?? s.tasks[0]).id)
+        }}>
+          {s.name}<small>{open.length ? stageDone[s.id] + ' / ' + s.tasks.length + (open.length < s.tasks.length ? ' · 開了 ' + open.length + ' 題' : '') : '學完單元 ' + from + ' 開放'}{s.id === suggested ? ' · 建議' : ''}</small></button>
+      })}
     </div>
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
-    {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => <button key={t.id} type="button" aria-pressed={t.id === task.id} onClick={() => setTaskId(t.id)}>
-      {stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>)}</div>}
+    {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => {
+      const open = isOpen(stage, t)
+      return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} title={open ? undefined : '學完單元 ' + t.after + ' 才開放'} onClick={() => setTaskId(t.id)}>
+        {stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{!open ? ' 🔒' : taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
+    })}</div>}
     <section className="wl-task">
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>
+      {locked && <p className="tu-error" role="status">這題要學完單元 {task.after} 才開放：題目會用到還沒教的文法。先寫已經開放的題目。</p>}
+      {task.starter && <p className="wl-hint">可以這樣開頭：{task.starter.map((x, i) => <span key={i} lang="en">{x}</span>)}</p>}
+      {task.words && <p className="wl-hint">可能用到的字：{task.words.map((x, i) => <span key={i}>{x}</span>)}</p>}
       {task.chart && <MiniChart chart={task.chart} />}
       {outline && <details className="wl-outline"><summary>結構提示{kind ? '（' + essays[kind].name + '題）' : ''}</summary><ol>{outline.map(o => <li key={o}>{o}</li>)}</ol></details>}
       <details className="wl-criteria"><summary>這{kind ? '題' : '一階'}怎麼評分（{criteria.length} 項）</summary><ul>{criteria.map(c => <li key={c}>{c}</li>)}</ul></details>
     </section>
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={stage.id === 'sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
+      <textarea lang="en" rows={stage.id === 'sentence' || stage.id === 'a1' ? 4 : stage.id === 'a1plus' ? 6 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
         onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={stage.id === 'sentence' ? '一句一行也可以' : '先照結構提示寫，寫不出來的地方先留空'} />
     </label>
     <div className="wl-bar">
@@ -167,7 +192,7 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
     </div>
     {stage.ielts && <small className="wl-count">字數怎麼算：英文字和數字各算一個（well-known、don't、37.5 都算一個），標點不算。跟考場算法接近，但不完全一樣，寧可多寫幾個字。</small>}
     <div className="pr-actions">
-      {keyed ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? '批改中……' : fb ? '改好了，再批一次' : '照評分項目批改'}</button>
+      {keyed ? <button type="button" className="pr-main" disabled={!text.trim() || busy || locked} onClick={check}>{busy ? '批改中……' : fb ? '改好了，再批一次' : '照評分項目批改'}</button>
         : <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setChecks(criteria.map(() => false))}>自己對照評分項目檢查</button>}
       <StuckButton />
       {task.sample && (answerAllowed(gate.usable, !!text.trim()) || showSample) && <button type="button" className="pr-link" onClick={() => setShowSample(!showSample)}>{showSample ? '收起參考範文' : '看參考範文'}</button>}

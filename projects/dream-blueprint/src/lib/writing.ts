@@ -1,10 +1,14 @@
-/** 寫作階梯：句子 → 一段 → 多段 → IELTS Task 1 → Task 2. Feedback is given against each stage's criteria. */
+/** 寫作：分級寫作 A1 → A1+ → A2 → A2+，再到一段、多段、IELTS Task 1／2. Each task opens after the grammar unit it needs; feedback follows each stage's criteria. */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
   /** Opens once this grammar unit is finished (the task needs only grammar taught up to it). */
   after?: number
+  /** Graded tasks: words he may need, and ways to begin. */
+  words?: string[]; starter?: string[]
   /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
   unit?: number; focus?: string }
 export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
+  /** CEFR-style level shown on the stage (A1, A1+, A2, …). Graded stages are the short pieces that grow step by step. */
+  level?: string; graded?: boolean
   /** Tasks that belong to the units' skills packs: opened from the pack, never the suggested stage. */
   pack?: boolean }
 export interface CriterionResult { name: string; score: number; comment: string }
@@ -59,12 +63,41 @@ export function taskDone(r: WriteRecord | null, ielts: boolean) {
   return !!r && typeof r.best === 'number' && r.best <= (ielts ? 9 : 5) && r.best >= (ielts ? 5.5 : 3.5)
 }
 export const selfChecked = (r: WriteRecord | null) => !!r && (r.self ?? 0) >= 1 && typeof r.best !== 'number'
-/** The first stage with fewer than two tasks done by checked feedback. Pack stages are opened from their unit, not suggested. */
-export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>) {
+/** A task opens once the grammar unit it needs is finished: the course is past unit `after`. */
+export const taskOpen = (task: Pick<WriteTask, 'after'>, unit: number) => !task.after || unit > task.after
+/** The next piece to write: the open, not yet done task that needs the earliest grammar (then the stage and task order),
+ *  so the pieces get harder step by step with the course and none is skipped. Pack stages are opened from their unit. */
+export function nextTask(stages: readonly WriteStage[], notes: Record<string, string>, unit = Infinity): { stage: WriteStage; task: WriteTask } | null {
+  let best: { stage: WriteStage; task: WriteTask; key: [number, number, number] } | null = null
+  stages.forEach((stage, si) => {
+    if (stage.pack) return
+    stage.tasks.forEach((task, ti) => {
+      if (!taskOpen(task, unit) || taskDone(readWrite(notes, task.id), !!stage.ielts)) return
+      const key: [number, number, number] = [task.after ?? 0, si, ti]
+      if (!best || key[0] < best.key[0] || (key[0] === best.key[0] && (key[1] < best.key[1] || (key[1] === best.key[1] && key[2] < best.key[2])))) best = { stage, task, key }
+    })
+  })
+  const found = best as { stage: WriteStage; task: WriteTask } | null
+  return found ? { stage: found.stage, task: found.task } : null
+}
+/** The stage of the next piece; once every open task is done, the last stage of the ladder. */
+export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>, unit = Infinity) {
+  const next = nextTask(stages, notes, unit)
+  if (next) return next.stage.id
   const ladder = stages.filter(s => !s.pack)
-  for (const s of ladder) if (s.tasks.filter(t => taskDone(readWrite(notes, t.id), !!s.ielts)).length < Math.min(2, s.tasks.length)) return s.id
   return ladder[ladder.length - 1].id
 }
+/** About how long one piece takes at each level (for today's plan). */
+export function writeMinutes(stage: Pick<WriteStage, 'id' | 'ielts'>) {
+  return ({ a1: '5–10 分鐘', a1plus: '約 10 分鐘', a2: '10–15 分鐘', a2plus: '約 15 分鐘' } as Record<string, string>)[stage.id]
+    ?? (stage.ielts ? '20–40 分鐘' : '約 20 分鐘')
+}
+/** Graded writing goes in today's plan twice a week (the lesson itself already has a short writing task every day). */
+export const WRITES_PER_WEEK = 2
+/** Whether today's 說或寫 should be writing: fewer than two pieces this week, writing not ahead of speaking, and a piece
+ *  is open to write at all (at the very start every task is still locked by its grammar unit). */
+export const writeDue = (week: { write: number; speak: number }, canWrite: boolean) =>
+  canWrite && week.write < WRITES_PER_WEEK && week.write <= week.speak
 /** Reads Claude's JSON. Anything that is not a usable assessment — a missing or out-of-range score (band 99, 0, "7"),
  *  the wrong number of criteria, a name that is not one of this stage's criteria or the same one twice, a missing
  *  IELTS band or one that does not follow the four criteria (all 4s with band 8) — returns null: it is shown as a

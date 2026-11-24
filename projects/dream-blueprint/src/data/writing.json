@@ -1,8 +1,1208 @@
 {
  "stages": [
   {
+   "id": "a1",
+   "name": "A1 短句",
+   "level": "A1",
+   "graded": true,
+   "goal": "3–5 句、約 20–40 字，只用學過的句型，把自己的事說清楚",
+   "criteria": [
+    "用到學過的句型，主詞和動詞配對正確",
+    "照題目寫到 3–5 句，意思清楚",
+    "拼字正確、句首大寫、句尾有標點"
+   ],
+   "tasks": [
+    {
+     "id": "a1-01",
+     "prompt": "Write 3–5 sentences about yourself: your name, where you are from, and how you are today.",
+     "zh": "寫 3–5 句介紹自己：名字、哪裡人、是什麼學生、今天感覺怎麼樣。",
+     "min": 20,
+     "after": 1,
+     "words": [
+      "name",
+      "from（從…來）",
+      "student",
+      "nursing",
+      "tired",
+      "happy"
+     ],
+     "starter": [
+      "My name is …",
+      "I am …"
+     ],
+     "sample": "My name is Lin Wei. I am from Taichung. I am a nursing student. I am twenty-two years old. I am not tired today. I am happy."
+    },
+    {
+     "id": "a1-02",
+     "prompt": "Write 3–5 sentences about your family. Who are they? What are they like?",
+     "zh": "寫 3–5 句介紹家人：他們是誰、是什麼樣的人。",
+     "min": 20,
+     "after": 1,
+     "words": [
+      "father",
+      "mother",
+      "brother",
+      "sister",
+      "kind",
+      "busy"
+     ],
+     "starter": [
+      "My father is …",
+      "My mother is …"
+     ],
+     "sample": "My father is a bus driver. He is very kind. My mother is a nurse. She is very busy. My sister is a student. She is fifteen."
+    },
+    {
+     "id": "a1-03",
+     "prompt": "Write 3–5 sentences about your best friend.",
+     "zh": "寫 3–5 句介紹你最好的朋友。",
+     "min": 20,
+     "after": 1,
+     "words": [
+      "friend",
+      "classmate",
+      "funny",
+      "tall",
+      "smart"
+     ],
+     "starter": [
+      "My best friend is …",
+      "She / He is …"
+     ],
+     "sample": "My best friend is Amy. She is my classmate. She is tall. She is very funny. She is not shy. She is a good friend."
+    },
+    {
+     "id": "a1-04",
+     "prompt": "Write 3–5 sentences: How are you today? How are the people in your family today?",
+     "zh": "寫 3–5 句：你今天怎麼樣？家人今天怎麼樣？",
+     "min": 20,
+     "after": 1,
+     "words": [
+      "hungry",
+      "sleepy",
+      "busy",
+      "sick",
+      "fine"
+     ],
+     "starter": [
+      "I am … today.",
+      "My … is …"
+     ],
+     "sample": "I am sleepy today. I am not hungry. My mother is busy today. My brother is sick. He is in bed. My father is fine."
+    },
+    {
+     "id": "a1-05",
+     "prompt": "You are a nurse. Write 3–5 sentences about a patient. Use is and is not.",
+     "zh": "假裝你是護理師，寫 3–5 句說一位病人的狀況，用 is 和 is not。",
+     "min": 20,
+     "after": 1,
+     "words": [
+      "patient",
+      "awake",
+      "cold",
+      "thirsty",
+      "in pain（在痛）"
+     ],
+     "starter": [
+      "The patient is …",
+      "He / She is not …"
+     ],
+     "sample": "The patient in bed 5 is Mr. Wang. He is seventy years old. He is awake. He is not hungry. He is cold. He is a little thirsty."
+    },
+    {
+     "id": "a1-06",
+     "prompt": "Write 3–5 sentences about the things in your bag. Use This is a / an … and These are …",
+     "zh": "寫 3–5 句說你包包裡的東西，用 This is a／an … 和 These are …。",
+     "min": 20,
+     "after": 2,
+     "words": [
+      "pen",
+      "umbrella",
+      "phone",
+      "keys",
+      "notebook",
+      "apple"
+     ],
+     "starter": [
+      "This is a …",
+      "These are …"
+     ],
+     "sample": "This is my bag. This is a pen. This is an umbrella. These are my keys. These are two notebooks. This is an apple."
+    },
+    {
+     "id": "a1-07",
+     "prompt": "Look at your desk. Write 3–5 sentences about the things on it. Use a, an and plurals (-s).",
+     "zh": "看看你的書桌，寫 3–5 句說上面的東西，用 a、an 和複數 -s。",
+     "min": 20,
+     "after": 2,
+     "words": [
+      "lamp",
+      "cup",
+      "books",
+      "eraser",
+      "glasses"
+     ],
+     "starter": [
+      "This is a …",
+      "These are …"
+     ],
+     "sample": "This is my desk. This is a lamp. This is an eraser. These are my books. These are my glasses. That is a cup."
+    },
+    {
+     "id": "a1-08",
+     "prompt": "Write 3–5 sentences about things in a hospital room. Use a, an and plurals.",
+     "zh": "寫 3–5 句說病房裡的東西，用 a、an 和複數。",
+     "min": 20,
+     "after": 2,
+     "words": [
+      "bed",
+      "mask",
+      "gloves",
+      "ice pack",
+      "syringes"
+     ],
+     "starter": [
+      "This is a …",
+      "These are …"
+     ],
+     "sample": "This is a hospital room. This is a bed. These are masks. This is an ice pack. These are gloves. Those are syringes."
+    },
+    {
+     "id": "a1-09",
+     "prompt": "Write 3–5 sentences about your room. Say a / an first, then use the.",
+     "zh": "寫 3–5 句說你的房間：第一次說用 a／an，再說到同一個東西用 the。",
+     "min": 20,
+     "after": 3,
+     "words": [
+      "bed",
+      "window",
+      "desk",
+      "small",
+      "soft",
+      "big"
+     ],
+     "starter": [
+      "This is a …",
+      "The … is …"
+     ],
+     "sample": "This is my room. It is small. This is a bed. The bed is soft. This is a window. The window is big."
+    },
+    {
+     "id": "a1-10",
+     "prompt": "Write 3–5 sentences about your classroom. Use a / an and the.",
+     "zh": "寫 3–5 句說你的教室，用 a／an 和 the。",
+     "min": 20,
+     "after": 3,
+     "words": [
+      "classroom",
+      "board",
+      "door",
+      "chairs",
+      "clean",
+      "open"
+     ],
+     "starter": [
+      "This is …",
+      "The … is / are …"
+     ],
+     "sample": "This is our classroom. It is clean. This is a board. The board is white. The door is open. The chairs are blue."
+    },
+    {
+     "id": "a1-11",
+     "prompt": "Write 3–5 sentences about your day. What do you do every day?",
+     "zh": "寫 3–5 句說你每天做的事。",
+     "min": 20,
+     "after": 4,
+     "words": [
+      "get up",
+      "eat breakfast",
+      "take the bus",
+      "study",
+      "go to bed"
+     ],
+     "starter": [
+      "I get up …",
+      "I … every day."
+     ],
+     "sample": "I get up early every day. I eat breakfast with my mother. I take the bus to school. I study English every day. I go to bed early."
+    },
+    {
+     "id": "a1-12",
+     "prompt": "Write 3–5 sentences about a family member's day. Remember: he / she + verb with -s.",
+     "zh": "寫 3–5 句說一位家人每天做的事。主詞是 he／she，動詞要加 -s。",
+     "min": 20,
+     "after": 4,
+     "words": [
+      "gets up",
+      "cooks",
+      "works",
+      "watches TV",
+      "goes to bed"
+     ],
+     "starter": [
+      "My mother gets up …",
+      "She …"
+     ],
+     "sample": "My mother gets up early. She cooks breakfast for us. She works in a store. She watches TV at night. She goes to bed early."
+    },
+    {
+     "id": "a1-13",
+     "prompt": "Write 3–5 sentences: What do you like? What does your friend like?",
+     "zh": "寫 3–5 句：你喜歡什麼？你的朋友喜歡什麼？",
+     "min": 20,
+     "after": 4,
+     "words": [
+      "like",
+      "music",
+      "coffee",
+      "dogs",
+      "basketball",
+      "movies"
+     ],
+     "starter": [
+      "I like …",
+      "My friend likes …"
+     ],
+     "sample": "I like music. I like coffee. I like dogs. My friend Amy likes basketball. She likes movies too. Her brother likes cats."
+    },
+    {
+     "id": "a1-14",
+     "prompt": "Write 3–5 sentences about your favorite food.",
+     "zh": "寫 3–5 句說你最喜歡的食物。",
+     "min": 20,
+     "after": 4,
+     "words": [
+      "favorite",
+      "beef noodles",
+      "delicious",
+      "cook",
+      "eat"
+     ],
+     "starter": [
+      "My favorite food is …",
+      "It is …"
+     ],
+     "sample": "My favorite food is beef noodles. It is delicious. I eat it on Sundays. My mother cooks it. My brother likes it too."
+    },
+    {
+     "id": "a1-15",
+     "prompt": "Write 3–5 sentences about what a nurse does every day.",
+     "zh": "寫 3–5 句說護理師每天做什麼。",
+     "min": 20,
+     "after": 4,
+     "words": [
+      "checks",
+      "gives",
+      "talks to",
+      "writes",
+      "helps"
+     ],
+     "starter": [
+      "A nurse …",
+      "She / He …"
+     ],
+     "sample": "A nurse works in a hospital. She checks blood pressure. She gives medicine to patients. She talks to their families. She writes notes."
+    },
+    {
+     "id": "a1-16",
+     "prompt": "Write 2 things you do and 2 things you don't do on weekends.",
+     "zh": "寫 2 件你週末會做的事，再寫 2 件週末不做的事。",
+     "min": 20,
+     "after": 5,
+     "words": [
+      "don't",
+      "clean",
+      "play games",
+      "study",
+      "get up early"
+     ],
+     "starter": [
+      "On weekends, I …",
+      "I don't …"
+     ],
+     "sample": "On weekends, I clean my room. I play games with my brother. I don't study on Sunday. I don't get up early. I sleep a lot."
+    },
+    {
+     "id": "a1-17",
+     "prompt": "Write 3 questions for a new classmate. Then answer them for yourself.",
+     "zh": "寫 3 個問新同學的問題，再用自己的情況回答。",
+     "min": 20,
+     "after": 5,
+     "words": [
+      "Do you …?",
+      "Are you …?",
+      "live",
+      "cook",
+      "like"
+     ],
+     "starter": [
+      "Do you …?",
+      "Are you …?"
+     ],
+     "sample": "Do you like coffee? Yes, I do. Are you from Taichung? No, I'm not. Do you cook? No, I don't. Do you live in the dorm? Yes, I do."
+    },
+    {
+     "id": "a1-18",
+     "prompt": "Write 3–5 sentences: What are the people in your home doing now?",
+     "zh": "寫 3–5 句：家裡的人現在正在做什麼？",
+     "min": 20,
+     "after": 6,
+     "words": [
+      "is cooking",
+      "is watching",
+      "is sleeping",
+      "is reading",
+      "am writing"
+     ],
+     "starter": [
+      "I am …ing",
+      "My … is …ing"
+     ],
+     "sample": "I am writing in my room now. My mother is cooking dinner. My father is watching TV. My sister is sleeping. The cat is playing."
+    },
+    {
+     "id": "a1-19",
+     "prompt": "Write 3–5 sentences about what people are doing in a busy ward right now.",
+     "zh": "寫 3–5 句：很忙的病房裡，大家現在正在做什麼？",
+     "min": 20,
+     "after": 6,
+     "words": [
+      "checking",
+      "talking",
+      "sleeping",
+      "eating",
+      "waiting"
+     ],
+     "starter": [
+      "The nurse is …ing",
+      "A patient is …ing"
+     ],
+     "sample": "The ward is very busy now. A nurse is checking a patient. The doctor is talking to a family. One patient is sleeping. Another patient is eating lunch."
+    },
+    {
+     "id": "a1-20",
+     "prompt": "Write 2 things you do every day and 2 things you are doing now.",
+     "zh": "寫 2 件你每天做的事，再寫 2 件你現在正在做的事。",
+     "min": 20,
+     "after": 6,
+     "words": [
+      "every day",
+      "now",
+      "study",
+      "listen to",
+      "drink"
+     ],
+     "starter": [
+      "I … every day.",
+      "Now I am …ing"
+     ],
+     "sample": "I study English every day. I drink milk every day. Now I am listening to music. Now I am sitting at my desk. I am happy."
+    }
+   ]
+  },
+  {
+   "id": "a1plus",
+   "name": "A1+ 連句",
+   "level": "A1+",
+   "graded": true,
+   "goal": "5–6 句、約 40–60 字，開始用 and 把兩件事接在一起（學完單元 21 再加 but、so、because）",
+   "criteria": [
+    "文法正確（be 動詞、現在式、過去式、單複數）",
+    "句子之間接得起來（用 and）",
+    "內容照題目寫完整"
+   ],
+   "tasks": [
+    {
+     "id": "a1p-01",
+     "prompt": "Write 5–6 sentences about yesterday. Where were you? How were you? Join two ideas with and.",
+     "zh": "寫 5–6 句說昨天：你在哪裡？感覺怎麼樣？（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 7,
+     "words": [
+      "was",
+      "were",
+      "at school",
+      "at home",
+      "tired",
+      "and"
+     ],
+     "starter": [
+      "Yesterday was …",
+      "I was …, and …"
+     ],
+     "sample": "Yesterday was Monday. I was at school all day, and I was very tired. My classes were long. My friends were tired too. In the evening, I was at home, and my mother was busy in the kitchen. It was a long day."
+    },
+    {
+     "id": "a1p-02",
+     "prompt": "Write 5–6 sentences about last weekend. Use verbs with -ed.",
+     "zh": "寫 5–6 句說上個週末做了什麼，用加 -ed 的動詞。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 8,
+     "words": [
+      "stayed",
+      "cleaned",
+      "watched",
+      "played",
+      "visited",
+      "cooked"
+     ],
+     "starter": [
+      "Last weekend, I …",
+      "On Saturday, I …ed …, and …"
+     ],
+     "sample": "Last weekend I stayed home. On Saturday, I cleaned my room, and I watched a movie. My brother played games all day. On Sunday, we visited my grandmother. She cooked lunch for us, and we talked a lot. I enjoyed it."
+    },
+    {
+     "id": "a1p-03",
+     "prompt": "Write 5–6 sentences about a good day you had. Use past verbs like went, ate, saw and bought.",
+     "zh": "寫 5–6 句說過去很開心的一天，用 went、ate、saw、bought 這類不規則過去式。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 9,
+     "words": [
+      "went",
+      "ate",
+      "drank",
+      "saw",
+      "bought",
+      "had"
+     ],
+     "starter": [
+      "Last … was a good day.",
+      "I went to …"
+     ],
+     "sample": "Last Friday was a good day. I went to the night market with my friends. We ate fried chicken, and we drank bubble tea. I bought a new T-shirt. We saw a funny show, and we laughed a lot. I got home late."
+    },
+    {
+     "id": "a1p-04",
+     "prompt": "Write 5–6 sentences about your first day at college.",
+     "zh": "寫 5–6 句說你上大學的第一天。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 9,
+     "words": [
+      "took",
+      "felt",
+      "met",
+      "had",
+      "was / were"
+     ],
+     "starter": [
+      "My first day at college was …",
+      "I felt …"
+     ],
+     "sample": "My first day at college was in September. I took the bus to school, and I felt very nervous. I met my classmates in the classroom. They were friendly. We had lunch together, and I felt happy. It was a good start."
+    },
+    {
+     "id": "a1p-05",
+     "prompt": "Write 5–6 sentences: What did you do last night? What didn't you do?",
+     "zh": "寫 5–6 句：你昨晚做了什麼？沒做什麼？（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 10,
+     "words": [
+      "did",
+      "didn't",
+      "studied",
+      "finished",
+      "slept"
+     ],
+     "starter": [
+      "Last night I …",
+      "I didn't …"
+     ],
+     "sample": "Last night I had a lot of homework. I studied for two hours, and I finished my notes. I didn't watch TV. I didn't call my friends. I didn't sleep well, and I was tired this morning. I drank two cups of tea."
+    },
+    {
+     "id": "a1p-06",
+     "prompt": "Write 5–6 sentences about your plans for next weekend. Use will or be going to.",
+     "zh": "寫 5–6 句說下個週末的計畫，用 will 或 be going to。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 11,
+     "words": [
+      "am going to",
+      "will",
+      "visit",
+      "take the train",
+      "rest"
+     ],
+     "starter": [
+      "Next weekend I am going to …",
+      "I will …"
+     ],
+     "sample": "Next weekend I am going to visit my family in Changhua. I am going to take the train on Saturday morning. My mother will cook dinner for me, and we will eat together. On Sunday, I will rest at home. I will study a little at night."
+    },
+    {
+     "id": "a1p-07",
+     "prompt": "Your friend is always tired. Write 5–6 sentences of advice. Use should, shouldn't and can.",
+     "zh": "朋友每天都很累，寫 5–6 句建議，用 should、shouldn't、can。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 12,
+     "words": [
+      "should",
+      "shouldn't",
+      "can",
+      "go to bed",
+      "drink water",
+      "take a walk"
+     ],
+     "starter": [
+      "You should …",
+      "You shouldn't …"
+     ],
+     "sample": "You look tired every day. You should go to bed early. You shouldn't drink coffee at night. You can take a short walk after dinner. You should drink water, and you should eat breakfast. You can rest on Sunday too."
+    },
+    {
+     "id": "a1p-08",
+     "prompt": "Write 5–6 sentences about things you can and can't do.",
+     "zh": "寫 5–6 句說你會和不會做的事，用 can 和 can't。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 12,
+     "words": [
+      "can",
+      "can't",
+      "swim",
+      "drive",
+      "cook",
+      "speak"
+     ],
+     "starter": [
+      "I can …",
+      "I can't …"
+     ],
+     "sample": "I can swim, and I can ride a bike. I can't drive a car. My sister can cook very well, and she can bake cakes. I can speak a little English. I can't speak Japanese. I can play the piano a little."
+    },
+    {
+     "id": "a1p-09",
+     "prompt": "Write 5–6 sentences about your week. Use at, on and in for time.",
+     "zh": "寫 5–6 句說你一週的生活，用 at、on、in 說時間。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 13,
+     "words": [
+      "at eight",
+      "on Monday",
+      "in the morning",
+      "in the afternoon",
+      "at night"
+     ],
+     "starter": [
+      "On Monday, I …",
+      "My class starts at …"
+     ],
+     "sample": "My classes start at eight on Monday. I have a nursing class in the morning. On Tuesday, I have no class in the morning, and I sleep late. I study in the library in the afternoon. On Thursday, I have pharmacology. I go to bed at eleven at night."
+    },
+    {
+     "id": "a1p-10",
+     "prompt": "Write 5–6 sentences about where things are in your room. Use in, on, under and next to.",
+     "zh": "寫 5–6 句說房間裡的東西在哪裡，用 in、on、under、next to。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 13,
+     "words": [
+      "on the desk",
+      "in my bag",
+      "under the bed",
+      "next to",
+      "in the box"
+     ],
+     "starter": [
+      "My … is on …",
+      "My … are in …"
+     ],
+     "sample": "My phone is on the desk. My books are in my bag. My shoes are under the bed. The lamp is next to the computer. My cat is in the box, and she is sleeping. My bag is on the chair."
+    },
+    {
+     "id": "a1p-11",
+     "prompt": "Write 5–6 sentences about the food in your kitchen. Use some, any, much and many.",
+     "zh": "寫 5–6 句說廚房裡的食物，用 some、any、much、many。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 14,
+     "words": [
+      "some",
+      "any",
+      "much",
+      "many",
+      "milk",
+      "eggs"
+     ],
+     "starter": [
+      "We have some …",
+      "We don't have any …"
+     ],
+     "sample": "We have some rice in the kitchen. We don't have any milk. We need some eggs and some apples. My mother doesn't buy much sugar. We eat many vegetables, and we drink a lot of water. We need some bread too."
+    },
+    {
+     "id": "a1p-12",
+     "prompt": "Write 5–6 sentences comparing two places you know.",
+     "zh": "寫 5–6 句比較你知道的兩個地方，用比較級和最高級。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 15,
+     "words": [
+      "bigger",
+      "smaller",
+      "quieter",
+      "more expensive",
+      "the best"
+     ],
+     "starter": [
+      "… is bigger than …",
+      "… is the …est …"
+     ],
+     "sample": "Taichung is bigger than my hometown. My hometown is quieter, and the air is cleaner. Taichung is busier, and the traffic is worse. Food in Taichung is more expensive. My hometown is the best place for my family. It is also the friendliest place."
+    },
+    {
+     "id": "a1p-13",
+     "prompt": "Write 5–6 sentences comparing two people in your family.",
+     "zh": "寫 5–6 句比較兩位家人。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 15,
+     "words": [
+      "older",
+      "younger",
+      "taller",
+      "more patient",
+      "the funniest"
+     ],
+     "starter": [
+      "My … is older than …",
+      "… is more … than …"
+     ],
+     "sample": "My brother is older than me. He is taller than my father too. I am more patient than my brother, and I am quieter. My sister is the youngest in my family. She is the funniest, and everyone loves her."
+    },
+    {
+     "id": "a1p-14",
+     "prompt": "You meet a new patient. Write 5 questions to ask him or her, using What, Where, When, How and Who.",
+     "zh": "遇到一位新病人，寫 5 個問題，用 What、Where、When、How、Who。",
+     "min": 25,
+     "after": 16,
+     "words": [
+      "What",
+      "Where",
+      "When",
+      "How",
+      "Who"
+     ],
+     "starter": [
+      "What is …?",
+      "When did …?"
+     ],
+     "sample": "What is your name? How old are you? Where do you live? When did the pain start? How do you feel now? Who is with you today?"
+    },
+    {
+     "id": "a1p-15",
+     "prompt": "Write 5–6 sentences about your neighborhood. Use there is and there are.",
+     "zh": "寫 5–6 句說你家附近，用 there is／there are。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 17,
+     "words": [
+      "there is",
+      "there are",
+      "park",
+      "convenience store",
+      "bus stop",
+      "near"
+     ],
+     "starter": [
+      "There is a … near my home.",
+      "There are …"
+     ],
+     "sample": "There is a small park near my home. There are two convenience stores on my street. There is a bus stop next to the park. There isn't a hospital here. There are many old people in my neighborhood, and they are very friendly."
+    },
+    {
+     "id": "a1p-16",
+     "prompt": "Describe one floor of a hospital in 5–6 sentences. Use there is and there are.",
+     "zh": "用 5–6 句描述醫院的一層樓，用 there is／there are。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 17,
+     "words": [
+      "nurses' station",
+      "rooms",
+      "elevator",
+      "bathroom",
+      "beds"
+     ],
+     "starter": [
+      "There is a … on this floor.",
+      "There are …"
+     ],
+     "sample": "There are twenty rooms on this floor. There is a nurses' station in the middle. There are two elevators next to the station. There is a bathroom in every room. There are four beds in each room, and there is a chair next to each bed."
+    },
+    {
+     "id": "a1p-17",
+     "prompt": "Write 5–6 sentences about how often you do things.",
+     "zh": "寫 5–6 句說你多常做這些事，用頻率副詞和 once／twice a week。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 18,
+     "words": [
+      "always",
+      "usually",
+      "sometimes",
+      "never",
+      "once a week",
+      "twice a week"
+     ],
+     "starter": [
+      "I always …",
+      "I … twice a week."
+     ],
+     "sample": "I always eat breakfast. I usually take the bus to school. I sometimes cook dinner for my family. I never drink alcohol. I exercise twice a week, and I clean my room once a week. I call my grandmother every Sunday."
+    },
+    {
+     "id": "a1p-18",
+     "prompt": "Write a short note (5–6 sentences) to your roommate. Ask for some things politely.",
+     "zh": "寫一張 5–6 句的紙條給室友，客氣地請他幫忙或不要做某些事。",
+     "min": 30,
+     "after": 19,
+     "words": [
+      "Please",
+      "Could you …?",
+      "Don't …",
+      "turn off",
+      "close"
+     ],
+     "starter": [
+      "Hi …,",
+      "Could you …?"
+     ],
+     "sample": "Hi Mei, I have an exam tomorrow. Could you turn off the music at eleven? Please close the door quietly. Please don't eat my yogurt. Could you buy some bread for me? Thank you! Wei"
+    },
+    {
+     "id": "a1p-19",
+     "prompt": "Write 5–6 sentences about your class. Use every, all, both and everyone.",
+     "zh": "寫 5–6 句說你的班級，用 every、all、both、everyone。（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 20,
+     "words": [
+      "every",
+      "all of",
+      "both",
+      "everyone",
+      "most of"
+     ],
+     "starter": [
+      "Every student …",
+      "All of us …"
+     ],
+     "sample": "There are forty students in my class. Every student has a laptop. All of us study nursing. Both of my best friends are from Tainan. Most of my classmates live in the dorm, and everyone is busy in exam week."
+    },
+    {
+     "id": "a1p-20",
+     "prompt": "Write 5–6 sentences about a part-time job or a club you have. What do you usually do there?",
+     "zh": "寫 5–6 句說你的打工或社團：你通常在那裡做什麼？（用 and 把兩件有關的事接成一句：I was tired, and I went to bed.）",
+     "min": 40,
+     "after": 18,
+     "words": [
+      "usually",
+      "sometimes",
+      "on weekends",
+      "customers",
+      "members"
+     ],
+     "starter": [
+      "I work at …",
+      "I usually …"
+     ],
+     "sample": "I work at a café on weekends. I usually start at nine in the morning. I make coffee, and I sometimes clean the tables. The customers are usually friendly. I never feel lonely there, and I like my coworkers. It is a nice job."
+    }
+   ]
+  },
+  {
+   "id": "a2",
+   "name": "A2 一段",
+   "level": "A2",
+   "graded": true,
+   "goal": "一段 60–90 字：開頭一句＋3–4 個細節＋結尾，會用過去式、未來式、because／so",
+   "criteria": [
+    "時態用對（過去式、現在式、未來式）",
+    "有開頭、3–4 個細節和結尾",
+    "用 because、so 等連接詞說原因和結果",
+    "拼字和用字正確"
+   ],
+   "tasks": [
+    {
+     "id": "a2-01",
+     "prompt": "Write one paragraph (60–90 words): Why did you choose nursing? Use because and so.",
+     "zh": "寫一段（60–90 字）：你為什麼選護理？用 because 和 so。開頭一句說主題，中間 3–4 個細節，最後一句收尾。",
+     "min": 60,
+     "after": 21,
+     "words": [
+      "because",
+      "so",
+      "help people",
+      "hospital",
+      "future"
+     ],
+     "starter": [
+      "I chose nursing because …",
+      "So …"
+     ],
+     "sample": "I chose nursing for three reasons. First, I like helping people, so I want a job in a hospital. My aunt is a nurse, and I often listened to her stories as a child. Also, nurses can find work in many places, so I am not worried about my future. Nursing is hard, but it is the right job for me."
+    },
+    {
+     "id": "a2-02",
+     "prompt": "Write one paragraph (60–90 words) about a busy day last week. Use and, but, so and because.",
+     "zh": "寫一段（60–90 字）說上週很忙的一天，用 and、but、so、because。",
+     "min": 60,
+     "after": 21,
+     "words": [
+      "busy",
+      "because",
+      "so",
+      "but",
+      "finally"
+     ],
+     "starter": [
+      "Last … was a very busy day.",
+      "I was tired, but …"
+     ],
+     "sample": "Last Wednesday was a very busy day. I had three classes in the morning, so I didn't have time for breakfast. In the afternoon, I studied in the library because we had a test the next day. I was tired, but I didn't stop. In the evening, I worked at the café. Finally, I got home at ten and went to bed."
+    },
+    {
+     "id": "a2-03",
+     "prompt": "Write one paragraph (60–90 words) about your favorite season and why you like it.",
+     "zh": "寫一段（60–90 字）說你最喜歡的季節和原因。",
+     "min": 60,
+     "after": 21,
+     "words": [
+      "season",
+      "weather",
+      "because",
+      "so",
+      "cool",
+      "warm"
+     ],
+     "starter": [
+      "My favorite season is …",
+      "I like it because …"
+     ],
+     "sample": "My favorite season is autumn. I like it because the weather is cool and dry. In summer, Taiwan is very hot, so I don't go out much. In autumn, I often walk in the park after dinner. There are also many festivals, and my family eats moon cakes together. Autumn is short, but it is the best time of the year for me."
+    },
+    {
+     "id": "a2-04",
+     "prompt": "Your friend invited you to dinner, but you can't go. Write a message (60–90 words). Say sorry, give the reason, and suggest another day.",
+     "zh": "朋友約你吃晚餐，但你不能去。寫一則訊息（60–90 字）：道歉、說原因、提議改天。",
+     "min": 60,
+     "after": 21,
+     "words": [
+      "sorry",
+      "because",
+      "so",
+      "free",
+      "another day"
+     ],
+     "starter": [
+      "Hi …, thank you for …",
+      "I'm sorry, but …"
+     ],
+     "sample": "Hi Amy, thank you for the invitation to dinner on Friday. I'm really sorry, but I can't go. I have a pharmacology exam on Saturday morning, so I need to study on Friday night. I am free next Tuesday evening. Can we have dinner then? Let's try the new ramen place near school. It is cheap and very popular. Let me know! Wei"
+    },
+    {
+     "id": "a2-05",
+     "prompt": "Write one paragraph (60–90 words) about a trip you took. Use when, before and after.",
+     "zh": "寫一段（60–90 字）說一次出遊，用 when、before、after。",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "when",
+      "before",
+      "after",
+      "trip",
+      "beautiful"
+     ],
+     "starter": [
+      "Last …, I went to …",
+      "Before we …, …"
+     ],
+     "sample": "Last summer, I went to Hualien with my family. Before we left, my father checked the car. When we arrived, the sea was very blue and beautiful. We walked on the beach and took many photos. After we had dinner, we went to a night market. I was tired when we got back to the hotel, but it was a great trip."
+    },
+    {
+     "id": "a2-06",
+     "prompt": "Write one paragraph (60–90 words) about your morning. Use before, after and when.",
+     "zh": "寫一段（60–90 字）說你早上的流程，用 before、after、when。",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "before",
+      "after",
+      "when",
+      "brush",
+      "leave home"
+     ],
+     "starter": [
+      "I get up at …",
+      "Before I …, I …"
+     ],
+     "sample": "I usually get up at six thirty. Before I eat breakfast, I wash my face and brush my teeth. After breakfast, I check my phone for messages from my classmates. When it rains, I take the bus, but on sunny days I ride my scooter. I always leave home before seven thirty, so I am never late for class. My first class starts at eight."
+    },
+    {
+     "id": "a2-07",
+     "prompt": "Write one paragraph (60–90 words) about a time you were sick. What happened? What did you do?",
+     "zh": "寫一段（60–90 字）說你生病的一次經驗：發生什麼事？你做了什麼？",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "when",
+      "after",
+      "fever",
+      "clinic",
+      "medicine",
+      "rest"
+     ],
+     "starter": [
+      "Last …, I was sick.",
+      "When I woke up, …"
+     ],
+     "sample": "Last winter, I was sick for three days. When I woke up on Monday, I had a fever and a sore throat. My mother took me to a clinic near our home. The doctor gave me some medicine. After I took it, I slept for many hours. I drank a lot of water, and I didn't go to school. On Thursday, I felt much better."
+    },
+    {
+     "id": "a2-08",
+     "prompt": "Write one paragraph (60–90 words) about your plans for this weekend. What will you do if it rains?",
+     "zh": "寫一段（60–90 字）說這個週末的計畫，下雨的話要做什麼（if＋現在式，主要句用 will）。",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "if",
+      "will",
+      "rain",
+      "sunny",
+      "stay home"
+     ],
+     "starter": [
+      "This weekend, I am going to …",
+      "If it rains, I will …"
+     ],
+     "sample": "This weekend, I am going to meet my friends on Saturday. If it is sunny, we will ride bikes along the river. If it rains, we will watch a movie at the mall. On Sunday, I will stay home and study. If I finish my notes early, I will cook dinner for my family. I hope for good weather. I don't like rainy weekends."
+    },
+    {
+     "id": "a2-09",
+     "prompt": "Write a message (60–90 words) to your roommates about cleaning the room. Use when and if.",
+     "zh": "寫一則訊息（60–90 字）給室友，講好怎麼打掃房間，用 when 和 if。",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "when",
+      "if",
+      "take out the trash",
+      "clean",
+      "please"
+     ],
+     "starter": [
+      "Hi everyone,",
+      "When you …, please …"
+     ],
+     "sample": "Hi everyone, our room is very messy, so let's make a plan. When you use the bathroom, please clean the sink. If the trash can is full, please take out the trash. I will clean the floor on Wednesday. Mei will clean the desks on Saturday. If you are busy, tell us in the group chat. Let's keep our room clean. Thanks!"
+    },
+    {
+     "id": "a2-10",
+     "prompt": "Write one paragraph (60–90 words) about your hobbies. Use like / enjoy + -ing and want to.",
+     "zh": "寫一段（60–90 字）說你的興趣，用 like／enjoy＋-ing 和 want to。",
+     "min": 60,
+     "after": 23,
+     "words": [
+      "enjoy",
+      "like",
+      "want to",
+      "hobby",
+      "relax"
+     ],
+     "starter": [
+      "In my free time, I enjoy …",
+      "I want to …"
+     ],
+     "sample": "In my free time, I enjoy listening to music and watching dramas. I also like cooking, especially on weekends. Cooking is a good way to rest after a long week. Last month, I made dumplings for my family, and they loved them. Next year, I want to learn to play the guitar because I love music. I hope to play songs for my friends."
+    },
+    {
+     "id": "a2-11",
+     "prompt": "Write one paragraph (60–90 words) about something you want to learn and why.",
+     "zh": "寫一段（60–90 字）說你想學的一件事和原因。",
+     "min": 60,
+     "after": 23,
+     "words": [
+      "want to",
+      "learn",
+      "decide to",
+      "because",
+      "practice"
+     ],
+     "starter": [
+      "I want to learn …",
+      "I decided to …"
+     ],
+     "sample": "I want to learn to swim well. When I was a child, I didn't like water, so I never took lessons. Now I am older, and swimming is a useful skill. It is also good exercise. I decided to join a class at the sports center near my school. I plan to practice twice a week. I hope to swim fifty meters next summer."
+    },
+    {
+     "id": "a2-12",
+     "prompt": "Write one paragraph (60–90 words) about a small accident. What were you doing when it happened?",
+     "zh": "寫一段（60–90 字）說一次小意外：發生時你正在做什麼？（過去進行式＋過去式）",
+     "min": 60,
+     "after": 24,
+     "words": [
+      "was walking",
+      "when",
+      "while",
+      "fell",
+      "hurt"
+     ],
+     "starter": [
+      "Last …, I was … when …",
+      "While I was …, …"
+     ],
+     "sample": "Last month, I was walking to class when it started to rain. I was looking at my phone, so I didn't see a hole in the road. I fell and hurt my knee. While I was sitting on the ground, a classmate stopped to help me. She took me to the school nurse. My knee was fine after a few days."
+    },
+    {
+     "id": "a2-13",
+     "prompt": "Write one paragraph (60–90 words) about a surprising moment at school or at a hospital.",
+     "zh": "寫一段（60–90 字）說在學校或醫院一個讓你驚訝的時刻（過去進行式＋過去式）。",
+     "min": 60,
+     "after": 24,
+     "words": [
+      "was waiting",
+      "when",
+      "while",
+      "surprised",
+      "suddenly"
+     ],
+     "starter": [
+      "I was … when …",
+      "I was surprised because …"
+     ],
+     "sample": "Last week, I was waiting for my grandmother at the hospital. While I was sitting in the hall, an old man started to cough very badly. A young nurse was walking by when she saw him. She stopped and helped him at once. I was surprised because she was so calm. At that moment, I felt proud to study nursing."
+    },
+    {
+     "id": "a2-14",
+     "prompt": "Write one paragraph (60–90 words) about interesting things you have done. Use have / has + past participle.",
+     "zh": "寫一段（60–90 字）說你做過的有趣的事，用現在完成式。",
+     "min": 60,
+     "after": 25,
+     "words": [
+      "have been to",
+      "have tried",
+      "have never",
+      "ever",
+      "since"
+     ],
+     "starter": [
+      "I have …",
+      "I have never …"
+     ],
+     "sample": "I have done some interesting things in my life. I have been to Japan twice, and I have tried many kinds of Japanese food. I have also climbed Jade Mountain with my father. But I have never seen snow, and I have never been on a plane alone. I have wanted to visit the United States since I was in high school."
+    },
+    {
+     "id": "a2-15",
+     "prompt": "Write one paragraph (60–90 words) about what you have done this semester so far.",
+     "zh": "寫一段（60–90 字）說這學期到目前為止你做了什麼，用現在完成式。",
+     "min": 60,
+     "after": 25,
+     "words": [
+      "have learned",
+      "have finished",
+      "so far",
+      "already",
+      "yet"
+     ],
+     "starter": [
+      "This semester, I have …",
+      "I haven't … yet."
+     ],
+     "sample": "This semester has been busy. So far, I have learned how to check blood pressure and heart sounds. I have finished two big reports, and I have already taken my midterm exams. I have also started to study English every day. I haven't joined any clubs yet because I don't have time. I have enjoyed most of my classes, and I have made some new friends."
+    },
+    {
+     "id": "a2-16",
+     "prompt": "Write one paragraph (60–90 words): What will you do if you pass your next big exam?",
+     "zh": "寫一段（60–90 字）：如果下一個大考考過了，你會做什麼？（第一類假設）",
+     "min": 60,
+     "after": 26,
+     "words": [
+      "if",
+      "will",
+      "pass",
+      "celebrate",
+      "unless"
+     ],
+     "starter": [
+      "If I pass …, I will …",
+      "If I have time, …"
+     ],
+     "sample": "My next big exam is in January. If I pass it, I will celebrate with my classmates. We will go to a hot pot restaurant near school. If I have time after that, I will visit my grandparents in the countryside. If the weather is good, we will go hiking. But if I fail, I will study harder and take it again."
+    },
+    {
+     "id": "a2-17",
+     "prompt": "Write one paragraph (60–90 words) giving advice to a new nursing student. Use if, should and will.",
+     "zh": "寫一段（60–90 字）給護理系新生建議，用 if、should、will。",
+     "min": 60,
+     "after": 26,
+     "words": [
+      "if",
+      "should",
+      "will",
+      "review",
+      "ask for help"
+     ],
+     "starter": [
+      "If you …, you will …",
+      "You should …"
+     ],
+     "sample": "Nursing school is hard, but you will be fine if you plan well. You should review your notes every day. If you wait until the night before an exam, you will feel stressed. If you don't understand something, you should ask your teacher or a classmate. Also, you should sleep enough. If you take care of yourself, you will learn better."
+    },
+    {
+     "id": "a2-18",
+     "prompt": "Write one paragraph (60–90 words) about a family celebration you remember.",
+     "zh": "寫一段（60–90 字）說一次你記得的家庭聚會或慶祝。",
+     "min": 60,
+     "after": 21,
+     "words": [
+      "celebrate",
+      "because",
+      "so",
+      "birthday",
+      "together"
+     ],
+     "starter": [
+      "Last …, my family celebrated …",
+      "It was special because …"
+     ],
+     "sample": "Last year, my family celebrated my grandmother's eightieth birthday. All my aunts and cousins came to our house, so it was very crowded. My mother and I cooked many dishes, and my uncle bought a big cake. We sang songs and took a lot of photos. My grandmother cried because she was so happy. It was a special day for all of us."
+    },
+    {
+     "id": "a2-19",
+     "prompt": "Write one paragraph (60–90 words) about a visit to a hospital or a clinic. What did you see? How did you feel?",
+     "zh": "寫一段（60–90 字）說一次去醫院或診所：你看到什麼？感覺怎麼樣？",
+     "min": 60,
+     "after": 22,
+     "words": [
+      "when",
+      "before",
+      "after",
+      "waiting room",
+      "nervous"
+     ],
+     "starter": [
+      "Last …, I went to …",
+      "When I arrived, …"
+     ],
+     "sample": "Last month, I went to a clinic with my little brother because he had a bad cough. When we arrived, the waiting room was full. Before we saw the doctor, a nurse checked his temperature. She was very kind to him, so he wasn't nervous. After the doctor listened to his chest, she gave him some medicine. He felt better two days later."
+    },
+    {
+     "id": "a2-20",
+     "prompt": "Write a message (60–90 words) to a friend. Plan a day out together next weekend.",
+     "zh": "寫一則訊息（60–90 字）給朋友，約下週末一起出去，說要去哪裡、做什麼。",
+     "min": 60,
+     "after": 23,
+     "words": [
+      "want to",
+      "would like to",
+      "how about",
+      "meet",
+      "plan"
+     ],
+     "starter": [
+      "Hi …, do you want to …?",
+      "How about …?"
+     ],
+     "sample": "Hi Jason, do you want to go out next Saturday? I would like to visit the new science museum in Taichung. It opens at nine, so we can meet at the train station at eight thirty. After the museum, how about having lunch at the night market? I want to try the famous pepper buns. Are you free? Let me know. See you!"
+    }
+   ]
+  },
+  {
    "id": "sentence",
-   "name": "① 句子",
+   "name": "A2 連接詞句子",
+   "level": "A2",
    "goal": "把兩個想法連成一句",
    "criteria": [
     "文法正確（主詞動詞、時態）",
@@ -15,34 +1215,436 @@
      "prompt": "Write three sentences about your family. Use and, but, and because.",
      "zh": "用三句寫你的家人，要用到 and、but、because。",
      "min": 25,
-     "sample": "My father is a bus driver, and my mother is a nurse. My brother likes sports, but I like reading. I love my grandmother because she always cooks for us."
+     "sample": "My father is a bus driver, and my mother is a nurse. My brother likes sports, but I like reading. I love my grandmother because she always cooks for us.",
+     "after": 21
     },
     {
      "id": "s2",
      "prompt": "Write three sentences about your school day. Use so, but, and when.",
      "zh": "用三句寫你在學校的一天，要用到 so、but、when。",
      "min": 25,
-     "sample": "My first class starts at eight, so I get up at six. Anatomy is interesting, but it is difficult. When classes finish, I study in the library."
+     "sample": "My first class starts at eight, so I get up at six. Anatomy is interesting, but it is difficult. When classes finish, I study in the library.",
+     "after": 22
     },
     {
      "id": "s3",
      "prompt": "Write three sentences about a time you were sick. Use because, so, and after.",
      "zh": "用三句寫你生病的一次經驗，要用到 because、so、after。",
      "min": 25,
-     "sample": "I stayed home last week because I had a fever. I felt very tired, so I slept all day. After I took some medicine, I felt better."
+     "sample": "I stayed home last week because I had a fever. I felt very tired, so I slept all day. After I took some medicine, I felt better.",
+     "after": 22
     },
     {
      "id": "s4",
      "prompt": "Write three sentences to give health advice. Use should, if, and because.",
      "zh": "用三句給健康建議，要用到 should、if、because。",
      "min": 25,
-     "sample": "On hot days, you should drink more water because you lose water when you sweat. If you feel dizzy, you should sit down. You should sleep early because sleep helps you learn."
+     "sample": "On hot days, you should drink more water because you lose water when you sweat. If you feel dizzy, you should sit down. You should sleep early because sleep helps you learn.",
+     "after": 22
+    }
+   ]
+  },
+  {
+   "id": "a2plus",
+   "name": "A2+ 短信",
+   "level": "A2+",
+   "graded": true,
+   "goal": "80–100 字、有目的的訊息或 email（邀請、請求、道歉、說明），用 first／then／after that 排順序",
+   "criteria": [
+    "寫到這封信的目的（邀請、請求、道歉或說明）",
+    "用 first、then、after that 等把內容排出順序",
+    "開頭、結尾和語氣適合對象",
+    "文法和用字正確"
+   ],
+   "tasks": [
+    {
+     "id": "a2p-01",
+     "prompt": "Write an invitation (80–100 words) to your birthday dinner. Say when and where it is, what you will do, and ask your friend to reply.",
+     "zh": "寫一封邀請（80–100 字）請朋友來你的生日晚餐：時間、地點、要做什麼，並請對方回覆。",
+     "min": 80,
+     "after": 27,
+     "words": [
+      "invite",
+      "would you like to",
+      "first",
+      "then",
+      "let me know"
+     ],
+     "starter": [
+      "Hi …, I'd like to invite you to …",
+      "First, … Then, …"
+     ],
+     "sample": "Hi Amy, I'd like to invite you to my birthday dinner next Friday, March 12. It will be at Sunny Hot Pot near the train station at seven o'clock. First, we will have dinner with a few classmates. Then, we will go to a karaoke place nearby. After that, you can go home if you are tired. Would you like to come? Please let me know before Wednesday, so I can book a table. I really want to see you there! Wei"
+    },
+    {
+     "id": "a2p-02",
+     "prompt": "Write a message (80–100 words) to your teacher. Ask for one more day to finish your report and explain why.",
+     "zh": "寫一則訊息（80–100 字）給老師，請求多一天交報告並說明原因。",
+     "min": 80,
+     "after": 27,
+     "words": [
+      "could I",
+      "would it be possible",
+      "because",
+      "finish",
+      "thank you"
+     ],
+     "starter": [
+      "Dear Professor …,",
+      "Could I …?"
+     ],
+     "sample": "Dear Professor Chen, I am writing about my case report. It is due tomorrow. I am sorry, but I could not finish it on time because I had a high fever last weekend. I went to a clinic on Saturday and stayed in bed for two days. I have finished most of the report. Could I hand it in on Thursday instead? I can send you the doctor's note too. Thank you very much for your understanding. Best regards, Lin Wei"
+    },
+    {
+     "id": "a2p-03",
+     "prompt": "Write an apology (80–100 words) to a friend because you missed a meeting. Explain what happened in order.",
+     "zh": "寫一封道歉信（80–100 字）給朋友，因為你錯過了約定。用 first、then、after that 照順序說明經過。",
+     "min": 80,
+     "after": 28,
+     "words": [
+      "sorry",
+      "first",
+      "then",
+      "after that",
+      "make it up to you"
+     ],
+     "starter": [
+      "Hi …, I'm so sorry about …",
+      "First, … Then, … After that, …"
+     ],
+     "sample": "Hi Jason, I'm so sorry about yesterday. You waited for me at the café for a long time. First, my scooter didn't start, so I walked to the bus stop. Then, I waited for twenty minutes, but the bus didn't come. After that, I tried to call you, but my phone battery was dead. I felt terrible all evening. Can I buy you lunch this weekend to make it up to you? Again, I'm really sorry. It won't happen again. Wei"
+    },
+    {
+     "id": "a2p-04",
+     "prompt": "A classmate wants to visit you. Write a message (80–100 words) with directions from the station to your home.",
+     "zh": "同學要來你家，寫一則訊息（80–100 字）說明從車站到你家怎麼走，用 first、then、after that 和 across、along、into。",
+     "min": 80,
+     "after": 28,
+     "words": [
+      "first",
+      "then",
+      "after that",
+      "across",
+      "along",
+      "turn left"
+     ],
+     "starter": [
+      "When you get off the train, …",
+      "First, … Then, …"
+     ],
+     "sample": "Hi Mei, here is how to get to my home from Changhua Station. First, go out of the front exit and walk across the big road. Then, walk along Guangfu Road for about five minutes. You will see a 7-Eleven on your right. After that, turn left into the small lane next to it. My home is the third house on the left. It has a green door. Call me if you get lost. My phone is always on. See you soon! Wei"
+    },
+    {
+     "id": "a2p-05",
+     "prompt": "Write instructions (80–100 words) for children: how to wash their hands. Put the steps in order.",
+     "zh": "寫一份給小朋友的說明（80–100 字）：怎麼洗手。用 first、then、after that、finally 排好步驟。",
+     "min": 80,
+     "after": 28,
+     "words": [
+      "first",
+      "then",
+      "after that",
+      "finally",
+      "soap",
+      "rinse"
+     ],
+     "starter": [
+      "Clean hands keep you healthy.",
+      "First, …"
+     ],
+     "sample": "Clean hands keep you healthy, so let's learn how to wash them. First, wet your hands with clean water. Then, put some soap on your hands. Rub your hands together for twenty seconds. Don't forget your thumbs, your fingers and the backs of your hands. After that, rinse your hands under the water. Finally, dry them with a clean towel. Wash your hands before you eat and after you use the toilet. Also wash them when you come home from school. Good job!"
+    },
+    {
+     "id": "a2p-06",
+     "prompt": "Write an email (80–100 words) to a friend who moved away. Tell them what has happened this semester and one special event.",
+     "zh": "寫一封 email（80–100 字）給搬走的朋友，說這學期到現在的生活（現在完成式），再用過去式講一件特別的事。",
+     "min": 80,
+     "after": 29,
+     "words": [
+      "have been",
+      "have started",
+      "last month",
+      "so far",
+      "miss"
+     ],
+     "starter": [
+      "Hi …, how have you been?",
+      "This semester, I have …"
+     ],
+     "sample": "Hi Lily, how have you been? I haven't heard from you for a long time. This semester has been very busy. I have started my physical assessment class, and I have learned to listen to heart sounds. I have also joined the English club. Last month, something special happened. Our class visited a nursing home, and I talked with an old man. He was a teacher before. It was the best day of my semester. I miss you! Write back soon. Wei"
+    },
+    {
+     "id": "a2p-07",
+     "prompt": "Write a thank-you note (80–100 words) to a nurse who took care of your grandmother.",
+     "zh": "寫一張感謝卡（80–100 字）給照顧過你奶奶的護理師。",
+     "min": 80,
+     "after": 29,
+     "words": [
+      "thank you for",
+      "when",
+      "have recovered",
+      "kind",
+      "patient"
+     ],
+     "starter": [
+      "Dear Nurse …,",
+      "Thank you for …"
+     ],
+     "sample": "Dear Nurse Huang, I am writing to thank you for taking care of my grandmother last month. When she was in the hospital, she was scared, but you always talked to her gently. You explained her medicine to us clearly and answered all our questions. Since she came home, she has recovered well, and she can walk in the park again. I want to be a nurse like you. Thank you again for everything. My whole family is grateful. Best wishes, Lin Wei"
+    },
+    {
+     "id": "a2p-08",
+     "prompt": "A friend is nervous about a health check. Write a message (80–100 words) explaining what usually happens. Use the passive.",
+     "zh": "朋友很怕健康檢查，寫一則訊息（80–100 字）說明健檢通常怎麼進行，用被動語態。",
+     "min": 80,
+     "after": 30,
+     "words": [
+      "is checked",
+      "are taken",
+      "is measured",
+      "first",
+      "then"
+     ],
+     "starter": [
+      "Don't worry! A health check is easy.",
+      "First, your … is …"
+     ],
+     "sample": "Don't worry! A health check is easy, and it doesn't hurt much. First, your height and weight are measured. Then, your blood pressure is checked by a nurse. After that, a little blood is taken from your arm. It hurts for one second only. Your eyes and ears are also tested. Finally, the results are sent to you about a week later. If something is wrong, the doctor will explain it. You can ask questions at any time. You will be fine!"
+    },
+    {
+     "id": "a2p-09",
+     "prompt": "Write a notice (80–100 words) for your dorm about recycling. Explain the rules in order. Use the passive.",
+     "zh": "寫一張宿舍公告（80–100 字）說明資源回收規則，照順序寫，用被動語態。",
+     "min": 80,
+     "after": 30,
+     "words": [
+      "is collected",
+      "must be",
+      "should be",
+      "first",
+      "then"
+     ],
+     "starter": [
+      "Recycling rules for our dorm",
+      "Trash is collected on …"
+     ],
+     "sample": "Recycling rules for our dorm. Trash is collected every Monday, Wednesday and Friday at eight in the evening. First, wash bottles and cans before they are recycled. Then, put them in the blue bins on the first floor. Paper is collected on Fridays, so please keep it dry. Food waste is collected in the green bucket next to the kitchen. Please do not leave trash in the hallway. Thank you for helping to keep our dorm clean! If you have questions, ask the dorm office."
+    },
+    {
+     "id": "a2p-10",
+     "prompt": "Recommend a restaurant to a friend (80–100 words). Use who, which or that to describe things and people.",
+     "zh": "寫一則訊息（80–100 字）推薦一家餐廳給朋友，用 who、which、that 說明。",
+     "min": 80,
+     "after": 31,
+     "words": [
+      "that",
+      "which",
+      "who",
+      "recommend",
+      "delicious"
+     ],
+     "starter": [
+      "You should try …",
+      "It is a place that …"
+     ],
+     "sample": "You should try Little Garden. It is a small restaurant that is near our school gate. The owner, who is from Tainan, cooks every dish herself. My favorite dish is the curry rice, which comes with a fried egg. The prices are cheap, so it is good for students. There is a table that looks out onto the garden, and it is great for studying in the afternoon. Go there this week, and tell me about it! You will love it, I promise."
+    },
+    {
+     "id": "a2p-11",
+     "prompt": "Write a short story (80–100 words) about a person who helped you. Use who and that.",
+     "zh": "寫一小段（80–100 字）說一位幫助過你的人，用 who 和 that。",
+     "min": 80,
+     "after": 31,
+     "words": [
+      "who",
+      "that",
+      "helped",
+      "never forget",
+      "kind"
+     ],
+     "starter": [
+      "There is someone who …",
+      "The person who helped me was …"
+     ],
+     "sample": "The person who helped me most in high school was my English teacher, Ms. Lee. She was a teacher who always stayed after class to answer questions. When my grades dropped, she gave me some books that were easy and interesting. She also gave me a lot of encouragement when I made mistakes. Thanks to her, I started to like English again. She is the reason that I study English every day now. I will never forget her kindness. I still send her a card every New Year."
+    },
+    {
+     "id": "a2p-12",
+     "prompt": "Write an email (80–100 words) to a clinic. Ask about their opening hours and the vaccine you need. Use polite indirect questions.",
+     "zh": "寫一封 email（80–100 字）問診所開診時間和你要打的疫苗，用禮貌的間接問句。",
+     "min": 80,
+     "after": 32,
+     "words": [
+      "Could you tell me",
+      "I would like to know",
+      "whether",
+      "if",
+      "vaccine"
+     ],
+     "starter": [
+      "Dear Sir or Madam,",
+      "Could you tell me when …?"
+     ],
+     "sample": "Dear Sir or Madam, I am a nursing student, and I need a hepatitis B vaccine before my clinical practice. Could you tell me when your clinic is open on weekends? I would also like to know whether I need to make an appointment first. Could you let me know how much the vaccine costs? I am not sure if my health insurance covers it. Thank you very much for your help. I look forward to your reply. Best regards, Lin Wei"
+    },
+    {
+     "id": "a2p-13",
+     "prompt": "Write a message (80–100 words) to a landlord about a room for rent. Ask three questions politely.",
+     "zh": "寫一則訊息（80–100 字）給房東詢問出租的房間，禮貌地問三個問題（間接問句）。",
+     "min": 80,
+     "after": 32,
+     "words": [
+      "I was wondering",
+      "Could you tell me",
+      "whether",
+      "rent",
+      "deposit"
+     ],
+     "starter": [
+      "Hello, I saw your ad for …",
+      "I was wondering if …"
+     ],
+     "sample": "Hello, I saw your ad for the room on Taichung Port Road. I am a nursing student at a university nearby, and I am looking for a quiet room from next month. Could you tell me how much the rent is each month? I was wondering whether the electricity bill is included. I would also like to know if I can see the room this Saturday afternoon or on Sunday. Thank you, and I hope to hear from you soon. Lin Wei"
+    },
+    {
+     "id": "a2p-14",
+     "prompt": "Your classmate missed a lecture. Write a message (80–100 words) telling them what the teacher said. Use said and told.",
+     "zh": "同學沒來上課，寫一則訊息（80–100 字）轉述老師說了什麼，用 said、told。",
+     "min": 80,
+     "after": 33,
+     "words": [
+      "said that",
+      "told us",
+      "asked us to",
+      "next week",
+      "remember"
+     ],
+     "starter": [
+      "Hi …, here is what the teacher said today.",
+      "She said that …"
+     ],
+     "sample": "Hi Mei, here is what Professor Lin said today. She said that the midterm exam would be on November 19. She told us that it would cover chapters three to six. She also said that heart sounds would be very important, so we should practice with a partner. She said that we should bring our stethoscopes to class next week. Finally, she said that we must not forget the case report. I hope you feel better soon! Call me if you have questions. Wei"
+    },
+    {
+     "id": "a2p-15",
+     "prompt": "Write a message (80–100 words) to your family. Tell them what the doctor said about your grandfather.",
+     "zh": "寫一則訊息（80–100 字）給家人，轉述醫生說爺爺的情況，用 said、told。",
+     "min": 80,
+     "after": 33,
+     "words": [
+      "the doctor said",
+      "told us to",
+      "asked him to",
+      "should",
+      "next week"
+     ],
+     "starter": [
+      "Hi everyone, I just talked with the doctor.",
+      "He said that …"
+     ],
+     "sample": "Hi everyone, I just talked with Grandpa's doctor. He said that the X-ray looked better than last week. He told us that Grandpa could probably go home on Friday. He also said that Grandpa should walk a little every day, but he must not lift anything heavy. Grandpa has to go back to the clinic next Tuesday. He also said that we should call the ward if Grandpa has a fever. I will visit him again tomorrow after class. Wei"
+    },
+    {
+     "id": "a2p-16",
+     "prompt": "Write a polite complaint (80–100 words) to an online shop about a product. Use too and enough.",
+     "zh": "寫一封客氣的抱怨信（80–100 字）給網路商店，說商品的問題，用 too、enough。",
+     "min": 80,
+     "after": 34,
+     "words": [
+      "too",
+      "not … enough",
+      "disappointed",
+      "return",
+      "refund"
+     ],
+     "starter": [
+      "Dear Customer Service,",
+      "Unfortunately, …"
+     ],
+     "sample": "Dear Customer Service, last week I bought a pair of white nursing shoes from your online shop, order number 3051. Unfortunately, they are too small for me, but I ordered my usual size. They are also not comfortable enough for long shifts at the hospital. I was quite disappointed because your shop has good reviews. I would like to return the shoes and get a bigger size. Could you tell me how to send them back? Thank you. Lin Wei"
+    },
+    {
+     "id": "a2p-17",
+     "prompt": "Write a short review (80–100 words) of a movie or a TV show. Use -ed / -ing adjectives and as … as.",
+     "zh": "寫一段短評（80–100 字）評一部電影或影集，用 bored／boring 這類形容詞和 as … as。",
+     "min": 80,
+     "after": 34,
+     "words": [
+      "interesting",
+      "bored",
+      "exciting",
+      "as … as",
+      "not as … as"
+     ],
+     "starter": [
+      "I recently watched …",
+      "It was …"
+     ],
+     "sample": "I recently watched a Korean drama called Hospital Playlist. It is about five doctors who are old friends. I was not bored at all, because every episode was interesting and funny. The music is as good as the story, and the actors are excellent. Some parts are a little slow, and the second season is not as exciting as the first one. Still, the hospital scenes felt very real. Nursing students will enjoy it. I give it four stars out of five, and I am waiting for the next season."
+    },
+    {
+     "id": "a2p-18",
+     "prompt": "Write a message (80–100 words) asking two classmates to help you prepare for an exam. Use ask someone to, help someone (to) and let.",
+     "zh": "寫一則訊息（80–100 字）請兩位同學幫你準備考試，用 ask 人 to、help 人 (to)、let。",
+     "min": 80,
+     "after": 35,
+     "words": [
+      "could you help me",
+      "ask you to",
+      "let me",
+      "practice",
+      "in return"
+     ],
+     "starter": [
+      "Hi …, I need your help.",
+      "Could you help me …?"
+     ],
+     "sample": "Hi Mei and Jason, I need your help with the physical assessment exam next week. Could you help me practice taking blood pressure on Thursday afternoon? I always forget the steps, so I want to ask you to watch me and check my mistakes. If you let me practice on your arms, I will buy bubble tea for both of you. In return, I can help you review the drug cards. Let me know if Thursday works for you. Thanks! Wei"
+    },
+    {
+     "id": "a2p-19",
+     "prompt": "Write a letter (80–100 words) to a younger cousin about how your life used to be different when you were his or her age.",
+     "zh": "寫一封信（80–100 字）給年紀小的表弟妹，說你在他們這個年紀時生活跟現在有什麼不一樣，用 used to。",
+     "min": 80,
+     "after": 35,
+     "words": [
+      "used to",
+      "didn't use to",
+      "now",
+      "when I was",
+      "different"
+     ],
+     "starter": [
+      "Dear …,",
+      "When I was your age, I used to …"
+     ],
+     "sample": "Dear Kevin, you asked me what my life was like when I was twelve. Well, it was quite different. When I was your age, I used to play basketball every afternoon. I didn't use to like reading, and I never did my homework on time. I used to be afraid of doctors and needles, too. Now I study nursing, and I give injections to practice! People really can change. Study hard, but have fun too. And don't be afraid of doctors! Love, Cousin Wei"
+    },
+    {
+     "id": "a2p-20",
+     "prompt": "A friend invited you on a trip. Write a reply (80–100 words): accept the invitation and ask three questions about the plan.",
+     "zh": "朋友邀你去旅行，寫一則回覆（80–100 字）：答應邀請，再問三個關於計畫的問題。",
+     "min": 80,
+     "after": 27,
+     "words": [
+      "I'd love to",
+      "How long",
+      "What should I",
+      "Who else",
+      "How much"
+     ],
+     "starter": [
+      "Hi …, thanks for inviting me!",
+      "I'd love to come."
+     ],
+     "sample": "Hi Amy, thanks for inviting me on the trip to Kenting! I'd love to come. I have finished all my exams, so I am free that week. I have a few questions about the plan. How long are we going to stay there? Who else is coming with us? What should I bring, and how much money do I need for the hotel? I can also book the train tickets if you want. I am so excited already. See you soon! Wei"
     }
    ]
   },
   {
    "id": "paragraph",
-   "name": "② 一段",
+   "name": "B1 一段",
+   "level": "B1",
    "goal": "主題句 → 三個支持 → 結論",
    "criteria": [
     "主題句：第一句說出整段要講什麼",
@@ -57,27 +1659,31 @@
      "prompt": "Write one paragraph: Why do you want to be a nurse?",
      "zh": "寫一段：你為什麼想當護理師？",
      "min": 60,
-     "sample": "I want to be a nurse for three reasons. First, I like helping people, especially older people like my grandmother. Also, nursing is a job that I can do in many countries, so it can help me reach my dream of working in the United States. Finally, I enjoy learning about the human body. For these reasons, I believe nursing is the right job for me."
+     "sample": "I want to be a nurse for three reasons. First, I like helping people, especially older people like my grandmother. Also, nursing is a job that I can do in many countries, so it can help me reach my dream of working in the United States. Finally, I enjoy learning about the human body. For these reasons, I believe nursing is the right job for me.",
+     "after": 26
     },
     {
      "id": "p2",
      "prompt": "Write one paragraph about a healthy habit you have or want to have.",
      "zh": "寫一段：你有或想培養的一個健康習慣。",
      "min": 60,
-     "sample": "One healthy habit I want to have is walking every day. First, walking is free and easy, so I do not need a gym or special equipment. Also, it helps me relax after class and sleep better at night. In addition, I can listen to English podcasts while I walk, so I practice English at the same time. That is why I plan to walk for thirty minutes every evening after dinner."
+     "sample": "One healthy habit I want to have is walking every day. First, walking is free and easy, so I do not need a gym or special equipment. Also, it helps me relax after class and sleep better at night. In addition, I can listen to English podcasts while I walk, so I practice English at the same time. That is why I plan to walk for thirty minutes every evening after dinner.",
+     "after": 26
     },
     {
      "id": "p3",
      "prompt": "Write one paragraph describing your favorite place to study.",
      "zh": "寫一段：描述你最喜歡讀書的地方。",
      "min": 60,
-     "sample": "My favorite place to study is the school library. First, it is very quiet, so I can focus on my notes for a long time. Second, there are many books and computers that I can use for free. Also, the chairs are comfortable, and the light is bright enough for reading. Finally, my classmates study there too, so I can ask them questions. Because of this, I go to the library almost every day after class."
+     "sample": "My favorite place to study is the school library. First, it is very quiet, so I can focus on my notes for a long time. Second, there are many books and computers that I can use for free. Also, the chairs are comfortable, and the light is bright enough for reading. Finally, my classmates study there too, so I can ask them questions. Because of this, I go to the library almost every day after class.",
+     "after": 26
     }
    ]
   },
   {
    "id": "multi",
-   "name": "③ 多段",
+   "name": "B1 多段",
+   "level": "B1",
    "goal": "開頭、內容、結尾分段寫",
    "criteria": [
     "每段有自己的工作（開頭、內容、結尾）",
@@ -92,36 +1698,40 @@
      "prompt": "Write an email to your teacher. You were sick and missed a class. Say sorry, explain what happened, and ask what you should study.",
      "zh": "寫 email 給老師：你生病缺課。道歉、說明發生什麼事、問該補讀什麼。",
      "min": 90,
-     "sample": "Dear Ms. Lin,\n\nI am sorry that I missed your class yesterday. On Monday night I had a high fever and a bad headache, so I went to a clinic. The doctor told me to stay home and rest for one day.\n\nI am feeling much better now, and I will come to class tomorrow. Could you please tell me which pages I should read and whether there was any homework? If there was a handout, I can get a copy from a classmate this afternoon.\n\nThank you for your understanding.\n\nBest regards,\nXuanye"
+     "sample": "Dear Ms. Lin,\n\nI am sorry that I missed your class yesterday. On Monday night I had a high fever and a bad headache, so I went to a clinic. The doctor told me to stay home and rest for one day.\n\nI am feeling much better now, and I will come to class tomorrow. Could you please tell me which pages I should read and whether there was any homework? If there was a handout, I can get a copy from a classmate this afternoon.\n\nThank you for your understanding.\n\nBest regards,\nXuanye",
+     "after": 33
     },
     {
      "id": "m2",
      "prompt": "Some students study late at night before tests. Is this a good idea? Write three paragraphs: your opinion, your reasons, and a conclusion.",
      "zh": "有些學生考前熬夜讀書，好不好？寫三段：你的看法、理由、結論。",
      "min": 120,
-     "sample": "Many students stay up late to study before a test. In my opinion, this is not a good way to prepare.\n\nFirst, our brain needs sleep to remember what we learned. When we sleep less, we forget new words and important details more easily. Second, tired students often feel stressed during the test, so they make careless mistakes. For example, last year I studied until 3 a.m. before a pharmacology exam, and the next morning I misread several easy questions. Third, staying up late again and again is bad for our health.\n\nIn conclusion, it is better to study a little every day and get enough sleep the night before a test. A clear mind is more useful than a few extra hours of reading."
+     "sample": "Many students stay up late to study before a test. In my opinion, this is not a good way to prepare.\n\nFirst, our brain needs sleep to remember what we learned. When we sleep less, we forget new words and important details more easily. Second, tired students often feel stressed during the test, so they make careless mistakes. For example, last year I studied until 3 a.m. before a pharmacology exam, and the next morning I misread several easy questions. Third, staying up late again and again is bad for our health.\n\nIn conclusion, it is better to study a little every day and get enough sleep the night before a test. A clear mind is more useful than a few extra hours of reading.",
+     "after": 33
     },
     {
      "id": "m3",
      "prompt": "Write to a friend about your first day of clinical practice: what you did, how you felt, and what you learned.",
      "zh": "寫信給朋友，說你第一天實習：做了什麼、感覺如何、學到什麼。",
      "min": 120,
-     "sample": "Hi Amy,\n\nGuess what? Yesterday was my first day of clinical practice! I followed a senior nurse all day. In the morning, I checked patients' blood pressure and temperature, and I wrote the numbers on the chart. In the afternoon, I helped an elderly patient walk to the bathroom.\n\nI was very nervous at first, and my hands were shaking when I used the blood pressure cuff. But the nurse was kind. She told me to take my time and showed me again.\n\nI learned that it is OK to ask questions, and that patients notice when you speak to them gently. I am tired, but I am also proud of myself. I will be braver tomorrow, and I will tell you all about it!\n\nTalk soon,\nXuanye"
+     "sample": "Hi Amy,\n\nGuess what? Yesterday was my first day of clinical practice! I followed a senior nurse all day. In the morning, I checked patients' blood pressure and temperature, and I wrote the numbers on the chart. In the afternoon, I helped an elderly patient walk to the bathroom.\n\nI was very nervous at first, and my hands were shaking when I used the blood pressure cuff. But the nurse was kind. She told me to take my time and showed me again.\n\nI learned that it is OK to ask questions, and that patients notice when you speak to them gently. I am tired, but I am also proud of myself. I will be braver tomorrow, and I will tell you all about it!\n\nTalk soon,\nXuanye",
+     "after": 33
     }
    ]
   },
   {
    "id": "task1",
-   "name": "④ 雅思 Task 1",
+   "name": "B2 雅思 Task 1",
+   "level": "B2",
    "goal": "描述圖表：總覽＋重點數據＋比較",
+   "ielts": true,
+   "minutes": 20,
    "criteria": [
     "Task Achievement：有總覽（overview），挑出重要數據並比較",
     "Coherence & Cohesion：段落清楚、用對連接詞",
     "Lexical Resource：描述趨勢的用字多樣（rise、drop、remain stable）",
     "Grammatical Range & Accuracy：句型有變化、錯誤少"
    ],
-   "ielts": true,
-   "minutes": 20,
    "tasks": [
     {
      "id": "t1a",
@@ -153,7 +1763,8 @@
        }
       ]
      },
-     "sample": "The line graph shows changes in one patient's systolic blood pressure over five days, from Monday to Friday.\n\nOverall, the patient's blood pressure declined over the week, apart from one day when it remained stable. By the end of the period, it was much lower than at the start.\n\nOn Monday, the reading was at its highest point of the week, 150 mmHg. It then dropped by 8 mmHg to 142 mmHg on Tuesday and fell more sharply to 130 mmHg on Wednesday. This was the biggest daily decrease, 12 mmHg.\n\nOn Thursday, the figure stayed the same at 130 mmHg. By Friday, the blood pressure had decreased again to 124 mmHg, which was the lowest reading in the period. In total, it went down by 26 mmHg between Monday and Friday, so Friday's reading was about one sixth lower than Monday's.\n\nIn short, most of the fall happened in the first half of the week: the reading dropped by 20 mmHg from Monday to Wednesday, but by only 6 mmHg from Wednesday to Friday."
+     "sample": "The line graph shows changes in one patient's systolic blood pressure over five days, from Monday to Friday.\n\nOverall, the patient's blood pressure declined over the week, apart from one day when it remained stable. By the end of the period, it was much lower than at the start.\n\nOn Monday, the reading was at its highest point of the week, 150 mmHg. It then dropped by 8 mmHg to 142 mmHg on Tuesday and fell more sharply to 130 mmHg on Wednesday. This was the biggest daily decrease, 12 mmHg.\n\nOn Thursday, the figure stayed the same at 130 mmHg. By Friday, the blood pressure had decreased again to 124 mmHg, which was the lowest reading in the period. In total, it went down by 26 mmHg between Monday and Friday, so Friday's reading was about one sixth lower than Monday's.\n\nIn short, most of the fall happened in the first half of the week: the reading dropped by 20 mmHg from Monday to Wednesday, but by only 6 mmHg from Wednesday to Friday.",
+     "after": 44
     },
     {
      "id": "t1b",
@@ -189,49 +1800,55 @@
        }
       ]
      },
-     "sample": "The line graph illustrates the number of visits to a small clinic each month in the first half of the year, from January to June.\n\nOverall, visits peaked in February and then fell to their lowest level in April, before recovering slightly by June. The figure at the end of the period was still lower than at the beginning.\n\nIn January, the clinic had 420 visits, and this number rose to a high of 460 in February. After that, there was a sharp decline to 380 in March and 300 in April, a drop of 160 visits in only two months.\n\nFrom April onwards, the figures increased gradually. There were 310 visits in May, only 10 more than in April, and 350 in June. However, even the June figure was 70 visits lower than in January and 110 lower than the February peak.\n\nIn short, the clinic was busiest in February and quietest in April, and the gap between these two months was 160 visits. The figures for May and June show only a partial recovery."
+     "sample": "The line graph illustrates the number of visits to a small clinic each month in the first half of the year, from January to June.\n\nOverall, visits peaked in February and then fell to their lowest level in April, before recovering slightly by June. The figure at the end of the period was still lower than at the beginning.\n\nIn January, the clinic had 420 visits, and this number rose to a high of 460 in February. After that, there was a sharp decline to 380 in March and 300 in April, a drop of 160 visits in only two months.\n\nFrom April onwards, the figures increased gradually. There were 310 visits in May, only 10 more than in April, and 350 in June. However, even the June figure was 70 visits lower than in January and 110 lower than the February peak.\n\nIn short, the clinic was busiest in February and quietest in April, and the gap between these two months was 160 visits. The figures for May and June show only a partial recovery.",
+     "after": 44
     }
    ]
   },
   {
    "id": "task2",
-   "name": "⑤ 雅思 Task 2",
+   "name": "B2 雅思 Task 2",
+   "level": "B2",
    "goal": "議論文：立場＋兩個論點＋結論",
+   "ielts": true,
+   "minutes": 40,
    "criteria": [
     "Task Response：回答題目所有部分，立場清楚，論點有發展",
     "Coherence & Cohesion：段落分明，每段一個重點",
     "Lexical Resource：用字精準、有變化",
     "Grammatical Range & Accuracy：複雜句用得對、錯誤少"
    ],
-   "ielts": true,
-   "minutes": 40,
    "tasks": [
     {
      "id": "t2a",
      "prompt": "Some people think that hospitals should be free for everyone. Others think patients should pay for their own treatment. Discuss both views and give your own opinion.",
      "zh": "有人認為醫院應該對所有人免費，有人認為病人應自付。討論兩種看法並提出你的意見。",
      "min": 250,
-     "sample": "People have different opinions about who should pay for hospital care. Some believe hospitals should be free for everyone, while others think patients should pay for their own treatment. In my opinion, basic hospital care should be free, but patients can share a small part of the cost.\n\nOn the one hand, there are strong reasons to make hospitals free. Illness is often not a person's fault, and a serious disease can cost more than a family earns in a year. If treatment is expensive, poor people may wait too long before they see a doctor, and a small problem can become a dangerous one. Free care also protects the whole society, because people with infectious diseases are more likely to get treatment early.\n\nOn the other hand, some people argue that patients should pay for their own treatment. Hospitals need a lot of money for staff, equipment and medicine, and if everything is free, more public money would be needed, which could mean higher taxes. They also believe that when services cost nothing, some people use them too often, for example by going to the emergency room for a minor cold. This makes waiting times longer for patients who really need help.\n\nIn my view, the best system combines both ideas. The government should pay for most hospital treatment, especially for serious illnesses, children and older people. At the same time, a small fee for each visit can stop people from using hospitals when they do not need to.\n\nIn conclusion, health care should not depend on how much money a person has, but a fair shared system is more realistic than completely free hospitals."
+     "sample": "People have different opinions about who should pay for hospital care. Some believe hospitals should be free for everyone, while others think patients should pay for their own treatment. In my opinion, basic hospital care should be free, but patients can share a small part of the cost.\n\nOn the one hand, there are strong reasons to make hospitals free. Illness is often not a person's fault, and a serious disease can cost more than a family earns in a year. If treatment is expensive, poor people may wait too long before they see a doctor, and a small problem can become a dangerous one. Free care also protects the whole society, because people with infectious diseases are more likely to get treatment early.\n\nOn the other hand, some people argue that patients should pay for their own treatment. Hospitals need a lot of money for staff, equipment and medicine, and if everything is free, more public money would be needed, which could mean higher taxes. They also believe that when services cost nothing, some people use them too often, for example by going to the emergency room for a minor cold. This makes waiting times longer for patients who really need help.\n\nIn my view, the best system combines both ideas. The government should pay for most hospital treatment, especially for serious illnesses, children and older people. At the same time, a small fee for each visit can stop people from using hospitals when they do not need to.\n\nIn conclusion, health care should not depend on how much money a person has, but a fair shared system is more realistic than completely free hospitals.",
+     "after": 45
     },
     {
      "id": "t2b",
      "prompt": "Many young people today spend several hours a day on their phones. What problems does this cause, and what can be done to solve them?",
      "zh": "現在很多年輕人每天花好幾小時滑手機。這造成什麼問題？可以怎麼解決？",
      "min": 250,
-     "sample": "Nowadays, many young people spend several hours a day on their phones. Although smartphones are useful, using them too much can cause serious problems. This essay will discuss these problems and suggest some solutions.\n\nThe first problem is health. Young people who look at their screens late at night often sleep less, and poor sleep makes it harder to concentrate at school. Sitting for hours also means less exercise, and some teenagers develop neck and eye pain. The second problem is social. When friends spend a meal looking at their own phones, they talk less face to face, and some young people feel lonely even though they are always online. Finally, social media can affect mental health, because users often compare their lives with the perfect photos they see.\n\nThere are several ways to deal with these problems. First, young people can use the screen-time tools that most phones already have, such as daily limits and a sleep mode that turns off notifications at night. Second, schools can teach students how social media apps are designed to keep them scrolling, so that they can make better choices. Third, families can create simple rules, for example no phones at the dinner table, and parents should follow the same rules.\n\nIn conclusion, spending too much time on phones can harm young people's health and their relationships with friends and family. However, with personal limits, education at school and support from families, young people can enjoy the benefits of their phones without letting the phones control their lives."
+     "sample": "Nowadays, many young people spend several hours a day on their phones. Although smartphones are useful, using them too much can cause serious problems. This essay will discuss these problems and suggest some solutions.\n\nThe first problem is health. Young people who look at their screens late at night often sleep less, and poor sleep makes it harder to concentrate at school. Sitting for hours also means less exercise, and some teenagers develop neck and eye pain. The second problem is social. When friends spend a meal looking at their own phones, they talk less face to face, and some young people feel lonely even though they are always online. Finally, social media can affect mental health, because users often compare their lives with the perfect photos they see.\n\nThere are several ways to deal with these problems. First, young people can use the screen-time tools that most phones already have, such as daily limits and a sleep mode that turns off notifications at night. Second, schools can teach students how social media apps are designed to keep them scrolling, so that they can make better choices. Third, families can create simple rules, for example no phones at the dinner table, and parents should follow the same rules.\n\nIn conclusion, spending too much time on phones can harm young people's health and their relationships with friends and family. However, with personal limits, education at school and support from families, young people can enjoy the benefits of their phones without letting the phones control their lives.",
+     "after": 45
     },
     {
      "id": "t2c",
      "prompt": "Some people believe that the best way to improve public health is to increase the number of sports facilities. Others think other measures are more effective. To what extent do you agree or disagree?",
      "zh": "有人認為改善大眾健康最好的方法是增加運動設施，也有人認為其他方法更有效。你同意到什麼程度？",
      "min": 250,
-     "sample": "Some people believe that building more sports facilities is the best way to improve public health, while others think that other measures work better. I partly agree that sports facilities are helpful, but I believe they are not the most effective solution on their own.\n\nIt is true that sports facilities can make people healthier. When there is a park, a swimming pool or a basketball court near their home, people are more likely to exercise regularly. Regular exercise lowers the risk of heart disease, diabetes and obesity, and it can also reduce stress. Free or cheap facilities are especially important for families who cannot pay for a gym.\n\nHowever, facilities alone do not change people's habits. Many people are too busy or too tired to exercise after work, and some do not know why exercise matters. In addition, public health depends on more than exercise. A healthy diet, clean air, regular health checks and not smoking are just as important. For example, a city with many gyms will still have health problems if fast food is cheaper than vegetables or if people cannot afford to see a doctor early.\n\nFor these reasons, I think governments should use several measures together. They can build sports facilities, but they should also teach healthy eating at school, put clear labels on unhealthy food, offer free health checks and support people who want to quit smoking.\n\nIn conclusion, more sports facilities are a good step, but public health improves most when exercise is combined with education, prevention and healthy food choices."
+     "sample": "Some people believe that building more sports facilities is the best way to improve public health, while others think that other measures work better. I partly agree that sports facilities are helpful, but I believe they are not the most effective solution on their own.\n\nIt is true that sports facilities can make people healthier. When there is a park, a swimming pool or a basketball court near their home, people are more likely to exercise regularly. Regular exercise lowers the risk of heart disease, diabetes and obesity, and it can also reduce stress. Free or cheap facilities are especially important for families who cannot pay for a gym.\n\nHowever, facilities alone do not change people's habits. Many people are too busy or too tired to exercise after work, and some do not know why exercise matters. In addition, public health depends on more than exercise. A healthy diet, clean air, regular health checks and not smoking are just as important. For example, a city with many gyms will still have health problems if fast food is cheaper than vegetables or if people cannot afford to see a doctor early.\n\nFor these reasons, I think governments should use several measures together. They can build sports facilities, but they should also teach healthy eating at school, put clear labels on unhealthy food, offer free health checks and support people who want to quit smoking.\n\nIn conclusion, more sports facilities are a good step, but public health improves most when exercise is combined with education, prevention and healthy food choices.",
+     "after": 45
     }
    ]
   },
   {
    "id": "bridge",
-   "name": "⑥ 橋接段落",
+   "name": "B1→B2 橋接段落",
+   "level": "B1→B2",
    "goal": "用這一課的文法寫一段，句子之間接得順",
    "pack": true,
    "criteria": [

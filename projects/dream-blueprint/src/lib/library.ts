@@ -10,7 +10,7 @@ export type LibrarySection = 'practice' | 'listen' | 'translate' | 'story' | 're
 export const libraryModes: LibraryMode[] = ['home', 'listen', 'translate', 'story', 'reading', 'writing', 'unit', 'quiz', 'words', 'screen', 'passage',
   'grammar', 'sound', 'nlisten', 'nread', 'nwords', 'case']
 const labels: Record<LibraryMode, string> = {
-  home: '英文練習', listen: '句子跟讀', translate: '中翻英', story: '短文讀聽', reading: '閱讀理解', writing: '寫作階梯', unit: '單元讀聽說寫', quiz: '選擇題',
+  home: '英文練習', listen: '句子跟讀', translate: '中翻英', story: '短文讀聽', reading: '閱讀理解', writing: '寫作', unit: '單元讀聽說寫', quiz: '選擇題',
   words: '單字複習', screen: '單字快篩', passage: '7000 單短文', grammar: '文法講解', sound: '發音課',
   nlisten: '護理聽力', nread: '護理閱讀', nwords: '護理單字', case: '臨床情境',
 }
