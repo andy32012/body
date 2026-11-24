@@ -66,6 +66,7 @@ import { librarySections, modeFromHash, modeLabel, sectionHash, sectionInfo, sec
 import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
 import { useTaskContext } from "../lib/taskContext";
+import { answerAllowed, useClaudeGate } from "../lib/answerGate";
 import {
   heardKey,
   lessonFinished,
@@ -185,6 +186,10 @@ export function Translation({
   // The exact text Claude's first verdict was about: editing the answer afterwards makes that verdict stale.
   const [checkedText, setCheckedText] = useState<string | undefined>(() => saved?.vt);
   const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
+  // No reference sentence while Claude can teach: it comes from Claude after the hints (直接告訴我). Only when
+  // Claude cannot be reached, and after trying once, does 看參考句 appear.
+  const gate = useClaudeGate();
+  const mayReveal = answerAllowed(gate.usable, answered(answer));
   function record(h: number, r: boolean, v = firstVerdict, c = askedHelp, vt = checkedText) {
     setHintLevel(h);
     setSeen(r);
@@ -253,7 +258,7 @@ export function Translation({
           <StuckButton onUse={() => { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }} />
         </div>
       )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)} onFail={gate.failed} onOk={gate.worked}
         onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
@@ -261,6 +266,7 @@ export function Translation({
           <p>{sentence.hints[0]}</p>
           {hint >= 2 && <p>{sentence.hints[1] || sentence.why}</p>}
           {hint >= 3 && <p className="pr-frame" lang="en">{sentenceFrame(sentence.reference[0])}</p>}
+          {hint < 4 && !gate.usable && !answered(answer) && <p className="pr-blank-note">現在沒有 Claude 可以批改：先自己寫一次，才能看參考句。</p>}
           {hint < 4 && (
             <div className="pr-actions">
               {hint === 1 && (
@@ -273,9 +279,11 @@ export function Translation({
                   給我句架
                 </button>
               )}
-              <button className="pr-link" onClick={() => setHint(4)}>
-                看參考句
-              </button>
+              {mayReveal && (
+                <button className="pr-link" onClick={() => setHint(4)}>
+                  看參考句
+                </button>
+              )}
             </div>
           )}
         </section>

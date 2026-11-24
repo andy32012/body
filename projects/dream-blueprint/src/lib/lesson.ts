@@ -1,3 +1,4 @@
+import type { Result } from './correction'
 /** The guided 30-minute lesson: recall → listen → pattern → express → fix → done.
  *  Content per unit lives in data/lessons.json (dialogue, questions, ten variations, an open task for each day). */
 export interface LessonLine { who: string; en: string; zh: string }
@@ -53,7 +54,8 @@ export function readHints(notes: Record<string, string>, day: string): Record<st
 export function writeHint(notes: Record<string, string>, day: string, id: string, use: HintUse): Record<string, string> {
   return { ...notes, [hintsKey(day)]: JSON.stringify({ ...readHints(notes, day), [id]: use }) }
 }
-export interface CorrectionResult { verdict: 'good' | 'small' | 'again' | 'changed'; corrected: string; fixes: { wrong: string; right: string; why: string; zh?: string; en?: string }[]; note?: string; resolved?: number[]; still?: number[] }
+/** Claude's check of a piece of writing; hint-only checks are `partial` and carry no corrected text. */
+export type CorrectionResult = Result
 /** A rewrite counts as fixed when every issue from the round before is resolved, or nothing is left to fix.
  *  Sending the same answer again is a retry, not a fix. */
 export function issuesFixed(r: CorrectionResult, previous?: CorrectionResult): boolean {

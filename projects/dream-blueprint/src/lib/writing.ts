@@ -1,13 +1,21 @@
 /** 寫作階梯：句子 → 一段 → 多段 → IELTS Task 1 → Task 2. Feedback is given against each stage's criteria. */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
+  /** Opens once this grammar unit is finished (the task needs only grammar taught up to it). */
+  after?: number
   /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
   unit?: number; focus?: string }
 export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
   /** Tasks that belong to the units' skills packs: opened from the pack, never the suggested stage. */
   pack?: boolean }
 export interface CriterionResult { name: string; score: number; comment: string }
-export interface WriteFeedback { criteria: CriterionResult[]; band?: number; next: string; fixes: { wrong: string; right: string; why: string }[]; revised?: string; summary?: string }
-export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number }
+/** One mistake. A hint-only check has a kind (type) and a hint instead of the right answer. */
+export interface WriteFix { wrong: string; right?: string; why?: string; type?: string; hint?: string; learned?: boolean }
+export interface WriteFeedback { criteria: CriterionResult[]; band?: number; next: string; fixes: WriteFix[]; revised?: string; summary?: string
+  /** The first checks give hints only: no right answers and no revised text. */
+  partial?: boolean }
+export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number
+  /** Asked for the full correction before fixing it alone. */
+  revealed?: boolean }
 export const writeKey = (id: string) => 'write.' + id
 
 /** Words for these exercises: letters with accents count as one word (résumé, café), so do numbers (150, 37.5, 10,000)
@@ -61,7 +69,7 @@ export function suggestedStage(stages: readonly WriteStage[], notes: Record<stri
  *  the wrong number of criteria, a name that is not one of this stage's criteria or the same one twice, a missing
  *  IELTS band or one that does not follow the four criteria (all 4s with band 8) — returns null: it is shown as a
  *  failed check and never counted. Items without names are taken in the order asked. */
-export function parseFeedback(text: string, criteria: readonly string[], ielts = false): WriteFeedback | null {
+export function parseFeedback(text: string, criteria: readonly string[], ielts = false, hintOnly = false): WriteFeedback | null {
   try {
     const j = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1))
     if (!Array.isArray(j.criteria) || j.criteria.length !== criteria.length) return null
@@ -74,8 +82,17 @@ export function parseFeedback(text: string, criteria: readonly string[], ielts =
     if (ielts && (!validScore(j.band, true) || Math.abs(j.band - mean) > 0.5)) return null
     const crit = order.map((at, i) => ({ at, name: criteria[at], score: scores[i], comment: String(j.criteria[i].comment ?? '') }))
       .sort((a, b) => a.at - b.at).map(({ name, score, comment }) => ({ name, score, comment }))
-    return { criteria: crit, band: ielts ? j.band : undefined, next: String(j.next ?? ''), summary: j.summary ? String(j.summary) : undefined,
-      fixes: Array.isArray(j.fixes) ? j.fixes.filter((f: { wrong?: unknown; right?: unknown }) => f && typeof f.right === 'string').slice(0, 8) : [], revised: typeof j.revised === 'string' ? j.revised : undefined }
+    const base = { criteria: crit, band: ielts ? j.band : undefined, next: String(j.next ?? ''), summary: j.summary ? String(j.summary) : undefined }
+    const raw: Record<string, unknown>[] = Array.isArray(j.fixes) ? j.fixes.filter((f: unknown) => f && typeof f === 'object') : []
+    if (hintOnly) {
+      // A hint check keeps only the place, the kind of mistake and the hint: a right answer or revised text is dropped.
+      const fixes = raw.filter(f => typeof f.wrong === 'string' && (typeof f.hint === 'string' || typeof f.why === 'string')).slice(0, 8).map(f => {
+        const hint = String(f.hint ?? f.why)
+        return { wrong: String(f.wrong), hint, why: hint, ...(typeof f.type === 'string' ? { type: f.type } : {}), ...(typeof f.learned === 'boolean' ? { learned: f.learned } : {}) }
+      })
+      return { ...base, fixes, partial: true }
+    }
+    return { ...base, fixes: raw.filter(f => typeof f.right === 'string').slice(0, 8) as unknown as WriteFix[], revised: typeof j.revised === 'string' ? j.revised : undefined }
   } catch { return null }
 }
 /** Task 2 questions ask for different essays: the outline, the Task Response point and Claude's check follow the question. */

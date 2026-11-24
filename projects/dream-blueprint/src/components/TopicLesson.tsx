@@ -10,6 +10,7 @@ import { answered, judgeExpress, judgeWritten, levelNames, sameEnglish, type Lev
 import { readHints, sentenceFrame, writeHint } from '../lib/lesson'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { tutorKey } from '../lib/tutor'
+import { answerAllowed, useClaudeGate } from '../lib/answerGate'
 import { openaiKey } from '../lib/voice'
 import { addSayCard } from '../lib/sayCards'
 import { useTaskContext } from '../lib/taskContext'
@@ -369,6 +370,8 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
   const L = topic.listen
   const key = 'topic-retell-' + topic.id
   const open = useOpenTask(rec, 'retell', save)
+  // The model answer appears only when Claude cannot check this, and after writing something first.
+  const gate = useClaudeGate()
   const [text, setText] = useState(() => readDraft(key))
   const [run, setRun] = useState(0)
   const ready = useReady()
@@ -380,12 +383,12 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
       <textarea lang="en" rows={3} value={text} spellCheck={false} autoComplete="off" onChange={e => { setText(e.target.value); writeDraft(key, e.target.value) }} />
     </label>
     <div className="ls-helps" role="group" aria-label="需要幫忙時打開">
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>看參考說法</button>
+      {(answerAllowed(gate.usable, !!text.trim()) || open.help.includes('sample')) && <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>看參考說法</button>}
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{L.retellSample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>請 Claude 看</button></div>}
-    <CorrectBox run={run} mode="open" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
+    <CorrectBox run={run} mode="open" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix onError={gate.failed} onOk={gate.worked}
       onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)} />
     <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { clearDraft(key); onDone(judgeExpress({ answered: true, help: open.help, firstVerdict: open.verdictFor(text) })) }}>完成聽力</button>
@@ -481,6 +484,8 @@ const modeNames: Record<SpeakMode, string> = { recorded: '說出來了（有錄�
  *  Feedback comes from the transcript, so pronunciation is 未評估; one or two goals for next time. */
 function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepProps & { part: TopicPart; task: SpeakTask }) {
   const open = useOpenTask(rec, part + '-speak', save)
+  // The model answer appears only when Claude cannot check this, and after writing something first.
+  const gate = useClaudeGate()
   const draftKey = 'topic-speak-' + topic.id + '-' + part
   const [text, setText] = useState(() => readDraft(draftKey))
   // How it was done: out loud with a recording, out loud without one, or typed only (typing is not speaking).
@@ -544,14 +549,14 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <div className="ls-helps" role="group" aria-label="卡住了再打開">
       <span>卡住了？</span>
       <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>句型提示</button>
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>參考說法</button>
+      {(answerAllowed(gate.usable, !!text.trim()) || open.help.includes('sample')) && <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>參考說法</button>}
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points[0]}</p>}
     {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{task.sample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，再看一次' : '請 Claude 看文字稿'}</button></div>}
     <CorrectBox run={run} mode="open" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
-      reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
+      reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix onError={gate.failed} onOk={gate.worked}
       onReveal={() => open.addHelp('sample')}
       onResult={(v, _n, r) => { open.setVerdict(v); setResult(r) }}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
@@ -577,6 +582,8 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
 function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
   const W = topic.write
   const open = useOpenTask(rec, 'write', save)
+  // The model answer appears only when Claude cannot check this, and after writing something first.
+  const gate = useClaudeGate()
   const draftKey = 'topic-write-' + topic.id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [run, setRun] = useState(0)
@@ -603,14 +610,14 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
       <span>卡住了？一層一層打開：</span>
       <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>① 用哪個句型</button>
       <button type="button" aria-pressed={open.help.includes('frame')} onClick={() => { if (ready()) open.addHelp('frame') }}>② 句架</button>
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>③ 參考寫法</button>
+      {(answerAllowed(gate.usable, !!text.trim()) || open.help.includes('sample')) && <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>③ 參考寫法</button>}
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
     {open.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     {open.help.includes('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{W.sample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，再批一次' : '請 Claude 批改'}</button></div>}
-    <CorrectBox run={run} mode="open" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
+    <CorrectBox run={run} mode="open" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix onError={gate.failed} onOk={gate.worked}
       onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>寫完勾一下：我有寫到</legend>
