@@ -72,12 +72,12 @@ test('文法小練習：縮寫和完整寫法都算對，選項裡的「不加�
   const u11 = grammarFor(11)!
   const wont = u11.drills.find(d => d.k === 'fill' && d.q.includes('will 的否定'))!
   assert.ok(checkDrill(wont, "won't") && checkDrill(wont, 'will not'))
-  const u41 = grammarFor(41)!
+  const u41 = grammarFor(46)!
   const breakfast = u41.drills.find(d => d.q.includes('breakfast'))!
   assert.equal(drillAnswer(breakfast), 'I usually have breakfast at seven.')
   const u16 = grammarFor(16)!
   assert.equal(drillAnswer(u16.drills.find(d => d.q.includes('your doctor'))!), 'Who is your doctor? — Dr. Lin.')
-  const u43 = grammarFor(43)!
+  const u43 = grammarFor(48)!
   assert.equal(drillAnswer(u43.drills.find(d => d.q.includes('the meeting'))!), 'When we arrived, the meeting had already started.')
   const fix = grammarFor(1)!.drills.find(d => d.k === 'fix')!
   assert.ok(checkDrill(fix, "He's my friend.") && checkDrill(fix, 'he is my friend'), '改錯題接受縮寫、不管大小寫和句點')

@@ -57,14 +57,16 @@ function unitsOf(stages: readonly string[]): [number, number] | null {
   const ids = curriculum.overview.filter(o => stages.includes(o.stage)).map(o => o.unit)
   return ids.length ? [Math.min(...ids), Math.max(...ids)] : null
 }
+/** "1–28": a step's units as the plan texts write them. */
+const span = (stages: readonly string[]) => (unitsOf(stages) ?? []).join('–')
 export const steps: readonly Step[] = [
-  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 3 月看完', target: '2027 年中', hours: '約 200 小時', exams: ['gept-a2', 'other'],
-    practice: '每日課單元 1–16、7000 單第 1–2 級、閱讀 A1–A2、寫作①句子、生活主題' },
+  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 3 月看完', target: '2027 年下半年', hours: '約 200 小時', exams: ['gept-a2', 'other'],
+    practice: '每日課單元 ' + span(['A']) + '、7000 單第 1–2 級、閱讀 A1–A2、寫作①句子、生活主題' },
   { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 7 月、第 4 級約 2027 年 12 月看完，趕在實習之前', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
-    practice: '每日課單元 17–30、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
+    practice: '每日課單元 ' + span(['B']) + '、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
   { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2029 年 10 月看完', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
     bookWhen: '先不考：等 7000 單第 5–6 級看完（約 2029 年 10 月，國考後）再報名',
-    practice: '每日課單元 31–42，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
+    practice: '每日課單元 ' + span(['C']) + '，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
   { from: 'B2', to: 'C1', units: unitsOf(['C1']), words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
     practice: '每日課教材還在寫；先用雅思閱讀、寫作 Task 1／2、口說 Part 2 和 Emma 練，最後一年找真人老師練口說' },
   { from: 'C1', to: 'C2', units: null, words: null, target: '選修，到美國以後', hours: '約 1,000–1,200 小時', exams: ['ielts', 'other'], ielts: 8.5, optional: true,

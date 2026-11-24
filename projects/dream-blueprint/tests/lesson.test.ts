@@ -7,9 +7,9 @@ import { matchesReference } from '../src/lib/evidence.ts'
 const lessons = JSON.parse(readFileSync(new URL('../src/data/lessons.json', import.meta.url), 'utf8')) as Lesson[]
 const curriculum = JSON.parse(readFileSync(new URL('../src/data/curriculum.json', import.meta.url), 'utf8'))
 
-test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內容：目標、對話、兩題聽力、十句換個說法、每天一題開放題', () => {
+test('每個單元（47 個主線＋B1→B2 橋接）都有今天這一堂的內容：目標、對話、兩題聽力、十句換個說法、每天一題開放題', () => {
   assert.equal(lessons.length, curriculum.units.length)
-  assert.ok(lessons.length >= 48, '42 個主線單元加上至少 6 個橋接單元')
+  assert.ok(lessons.length >= 53, '47 個主線單元加上至少 6 個橋接單元')
   for (const l of lessons) {
     const unit = curriculum.units.find((u: { id: number }) => u.id === l.unit)
     assert.equal(unit.cando, l.cando, '單元 ' + l.unit + ' 的目標要和課表一致')
@@ -20,8 +20,8 @@ test('每個單元（42 個主線＋B1→B2 橋接）都有今天這一堂的內
     assert.equal(l.prompts.length, 5, '單元 ' + l.unit + '：第 1–5 天每天一題')
     for (const p of l.prompts) assert.ok(p.en && p.zh && p.sample, '單元 ' + l.unit + ' 開放題')
   }
-  assert.ok(lessons[38].prompts[0].chart?.points.length, '第 39 課要有圖表題')
-  assert.deepEqual(lessons[39].prompts[0].scaffold?.length, 4, '第 40 課要有意見＋理由＋例子＋結論的骨架')
+  assert.ok(lessons[43].prompts[0].chart?.points.length, '第 44 課（描述數字的變化）要有圖表題')
+  assert.deepEqual(lessons[44].prompts[0].scaffold?.length, 4, '第 45 課（表達意見）要有意見＋理由＋例子＋結論的骨架')
 })
 test('一堂課的步驟會記下來；換天或換課就重新開始', () => {
   let notes = markLessonStep({}, '2026-11-21', 1, 1, 'listen')

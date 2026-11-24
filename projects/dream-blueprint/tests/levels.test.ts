@@ -6,16 +6,16 @@ import {
 import { projectCalendar } from '../src/lib/projection.ts'
 import { createInitialState, importBackup } from '../src/lib/store.ts'
 
-test('程度階梯：A1→A2→B1→B2→C1→C2，主線 42 單元＋橋接單元分成前三段', () => {
+test('程度階梯：A1→A2→B1→B2→C1→C2，主線 47 單元＋橋接單元分成前三段', () => {
   assert.deepEqual(steps.map(s => s.from + '→' + s.to), ['A1→A2', 'A2→B1', 'B1→B2', 'B2→C1', 'C1→C2'])
-  assert.equal(stepOfUnit(1).to, 'A2'); assert.equal(stepOfUnit(16).to, 'A2')
-  assert.equal(stepOfUnit(17).to, 'B1'); assert.equal(stepOfUnit(30).to, 'B1')
-  assert.equal(stepOfUnit(31).to, 'B2'); assert.equal(stepOfUnit(42).to, 'B2')
-  assert.equal(stepOfUnit(43).to, 'B2', '橋接單元在 B2 證照之前')
-  assert.equal(stepOfUnit(48).to, 'B2')
-  assert.deepEqual(steps[2].units, [31, 48])
-  assert.equal(stepOfUnit(49).to, 'C1', '橋接之後是還在寫的 B2→C1')
-  assert.deepEqual(courseProgress(3), { step: steps[0], done: 2, total: 16 })
+  assert.equal(stepOfUnit(1).to, 'A2'); assert.equal(stepOfUnit(28).to, 'A2')
+  assert.equal(stepOfUnit(29).to, 'B1'); assert.equal(stepOfUnit(40).to, 'B1')
+  assert.equal(stepOfUnit(41).to, 'B2'); assert.equal(stepOfUnit(47).to, 'B2')
+  assert.equal(stepOfUnit(48).to, 'B2', '橋接單元在 B2 證照之前')
+  assert.equal(stepOfUnit(53).to, 'B2')
+  assert.deepEqual(steps[2].units, [41, 53])
+  assert.equal(stepOfUnit(54).to, 'C1', '橋接之後是還在寫的 B2→C1')
+  assert.deepEqual(courseProgress(3), { step: steps[0], done: 2, total: 28 })
   assert.ok(steps.at(-1)!.optional, 'C2 是選修，不排進五年')
 })
 
@@ -30,28 +30,28 @@ test('全民英檢及格線：聽讀合計 160、單項 72；說寫初級寫 70 
 
 test('升級關卡：報名後就能先讀下一段；沒過要再報名；兩半可以分開考過', () => {
   let notes: Record<string, string> = {}
-  assert.equal(unitGate(notes, 16), null, 'A1→A2 這一段不用等')
-  assert.equal(unitGate(notes, 17)?.to, 'A2', '單元 17 要等全民英檢初級')
-  assert.equal(firstLockedUnit(notes, 3), 17)
+  assert.equal(unitGate(notes, 28), null, 'A1→A2 這一段不用等')
+  assert.equal(unitGate(notes, 29)?.to, 'A2', '單元 29 要等全民英檢初級')
+  assert.equal(firstLockedUnit(notes, 3), 29)
   notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both' })
   assert.equal(certStatus(notes, 'A2').state, 'waiting')
-  assert.equal(unitGate(notes, 17), null, '報名了，等成績也能先讀')
-  assert.equal(firstLockedUnit(notes, 3), 31, '下一個關卡在單元 31')
+  assert.equal(unitGate(notes, 29), null, '報名了，等成績也能先讀')
+  assert.equal(firstLockedUnit(notes, 3), 41, '下一個關卡在單元 41')
   notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both', lr: [90, 85], sw: [65, 85] })
   assert.equal(certStatus(notes, 'A2').state, 'partial', '聽讀過、寫作 65 沒過')
-  assert.equal(unitGate(notes, 20)?.to, 'A2', '沒過就要再報名才接著上')
+  assert.equal(unitGate(notes, 32)?.to, 'A2', '沒過就要再報名才接著上')
   notes = saveAttempt(notes, 'A2', { id: 'b', exam: 'gept-a2', date: '2027-06-12', parts: 'sw' })
-  assert.equal(unitGate(notes, 20), null)
+  assert.equal(unitGate(notes, 32), null)
   notes = saveAttempt(notes, 'A2', { id: 'b', exam: 'gept-a2', date: '2027-06-12', parts: 'sw', sw: [75, 82] })
   assert.deepEqual([certStatus(notes, 'A2').state, certStatus(notes, 'A2').passedOn], ['passed', '2027-06-12'])
   assert.equal(officialLevel(notes), 'A2')
-  assert.equal(unitGate(notes, 31)?.to, 'B1')
+  assert.equal(unitGate(notes, 41)?.to, 'B1')
 })
 
 test('其他證照、雅思和跳級：證照上寫到哪一級就算哪一級', () => {
   let notes = saveAttempt({}, 'B1', { id: 'm', exam: 'gept-b1', date: '2027-08-15', parts: 'both', lr: [88, 90], sw: [82, 80] })
   assert.equal(officialLevel(notes), 'B1', '沒考初級，直接考過中級也算 B1')
-  assert.equal(unitGate(notes, 17), null)
+  assert.equal(unitGate(notes, 29), null)
   notes = saveAttempt({}, 'A2', { id: 'o', exam: 'other', date: '2027-05-01', passed: true, otherName: 'A2 Key', otherLevel: 'A2' })
   assert.equal(officialLevel(notes), 'A2')
   notes = saveAttempt({}, 'B2', { id: 'i', exam: 'ielts', date: '2030-05-01', band: { overall: 5.5, speaking: 6 } })
@@ -63,17 +63,17 @@ test('其他證照、雅思和跳級：證照上寫到哪一級就算哪一級',
 })
 
 test('日曆：一段上完標出要報名哪張證照；已經上到下一段第一天還沒報名才停住', () => {
-  const base = { today: '2027-04-12', from: '2027-04-12', to: '2027-04-30', cursor: 15 * 6 + 3, sessions: [], ranges: [], weekdays: [1, 2, 3, 4, 5, 6], restDays: [0] }
+  const base = { today: '2027-04-12', from: '2027-04-12', to: '2027-04-30', cursor: 27 * 6 + 3, sessions: [], ranges: [], weekdays: [1, 2, 3, 4, 5, 6], restDays: [0] }
   const open = projectCalendar(base)
   const end = open.find(d => d.gate)!
-  assert.deepEqual([end.unit, end.lessonDay, end.gate], [16, 6, 'A2'])
+  assert.deepEqual([end.unit, end.lessonDay, end.gate], [28, 6, 'A2'])
   assert.match(end.label, /報名全民英檢初級/)
-  assert.equal(open.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 17)
+  assert.equal(open.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 29)
   // 關卡還在後面：和計畫一樣，當作上完就報名，不會先把後面都排成複習。
-  const ahead = projectCalendar({ ...base, lockedUnit: 17 })
-  assert.equal(ahead.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 17)
-  // 已經上到單元 17 還沒報名：停在升級關卡，直到報名。
-  const atGate = projectCalendar({ ...base, cursor: 16 * 6, lockedUnit: 17 })
+  const ahead = projectCalendar({ ...base, lockedUnit: 29 })
+  assert.equal(ahead.find(d => d.day > end.day && d.kind === 'lesson')?.unit, 29)
+  // 已經上到單元 29 還沒報名：停在升級關卡，直到報名。
+  const atGate = projectCalendar({ ...base, cursor: 28 * 6, lockedUnit: 29 })
   const after = atGate.filter(d => d.kind !== 'rest')
   assert.ok(after.length && after.every(d => d.kind === 'review' && /升級關卡/.test(d.label)))
 })

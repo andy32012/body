@@ -2536,6 +2536,662 @@
   "unit": 17,
   "steps": [
    {
+    "t": "「有」：There is + 單數或不可數，There are + 複數",
+    "p": "看後面的名詞決定用 is 還是 are。",
+    "ex": [
+     {
+      "en": "There is a chair in the room.",
+      "zh": "房間裡有一張椅子。"
+     },
+     {
+      "en": "There are two nurses on duty.",
+      "zh": "有兩位護理師值班。"
+     }
+    ]
+   },
+   {
+    "t": "過去用 There was／There were；問句把 be 動詞搬到前面",
+    "p": "問句：Is there…? Are there…? 回答用 Yes, there is.／No, there aren't.",
+    "ex": [
+     {
+      "en": "There was a car accident yesterday.",
+      "zh": "昨天有一場車禍。"
+     },
+     {
+      "en": "Is there any water?",
+      "zh": "有水嗎？"
+     }
+    ]
+   },
+   {
+    "t": "天氣、時間、距離用 It 當主詞",
+    "p": "這個 it 沒有意思，只是佔位子。後面才講真正的事：It is important to…",
+    "ex": [
+     {
+      "en": "It is raining.",
+      "zh": "在下雨。"
+     },
+     {
+      "en": "It is important to rest.",
+      "zh": "休息很重要。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "There have a book on the desk.",
+    "good": "There is a book on the desk.",
+    "why": "「某個地方有…」用 There is，不用 have。"
+   },
+   {
+    "bad": "There is many people here.",
+    "good": "There are many people here.",
+    "why": "people 是複數，用 are。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ a pharmacy near here.",
+    "options": [
+     "There is",
+     "There are",
+     "It is"
+    ],
+    "answer": 0,
+    "why": "「有一間藥局」用 There is。"
+   },
+   {
+    "k": "choose",
+    "q": "___ five people in my family.",
+    "options": [
+     "There is",
+     "There are",
+     "They have"
+    ],
+    "answer": 1,
+    "why": "five people 是複數，用 There are。"
+   },
+   {
+    "k": "fill",
+    "q": "___ is cold today.（填一個字）",
+    "accept": [
+     "it"
+    ],
+    "why": "講天氣用 It 當主詞。"
+   },
+   {
+    "k": "choose",
+    "q": "___ any milk in the fridge?",
+    "options": [
+     "Is there",
+     "Are there",
+     "Is it"
+    ],
+    "answer": 0,
+    "why": "milk 不可數，問句用 Is there。"
+   },
+   {
+    "k": "fill",
+    "q": "There ___ (be) two doctors here yesterday.",
+    "accept": [
+     "were"
+    ],
+    "why": "two doctors 是複數；yesterday 是過去，用 were。"
+   },
+   {
+    "k": "fix",
+    "q": "There are a pen on the table.",
+    "accept": [
+     "There is a pen on the table."
+    ],
+    "why": "a pen 是單數，用 is。"
+   },
+   {
+    "k": "fix",
+    "q": "There is important to drink water.",
+    "accept": [
+     "It is important to drink water."
+    ],
+    "why": "「做某件事很重要」用 It is important to…。"
+   }
+  ],
+  "table": {
+   "title": "There 和 It",
+   "head": [
+    "句型",
+    "什麼時候用",
+    "例子"
+   ],
+   "rows": [
+    [
+     "There is",
+     "有一個／不可數",
+     "There is some blood on the dressing."
+    ],
+    [
+     "There are",
+     "有兩個以上",
+     "There are three beds."
+    ],
+    [
+     "It is",
+     "天氣、時間、距離",
+     "It is ten o'clock."
+    ],
+    [
+     "It is + 形容詞 + to…",
+     "做某件事怎麼樣",
+     "It is hard to sleep."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 18,
+  "steps": [
+   {
+    "t": "頻率副詞：從「總是」到「從不」",
+    "p": "always（總是）＞ usually（通常）＞ often（常常）＞ sometimes（有時）＞ never（從不）。",
+    "ex": [
+     {
+      "en": "I always wash my hands.",
+      "zh": "我總是洗手。"
+     },
+     {
+      "en": "He never eats breakfast.",
+      "zh": "他從不吃早餐。"
+     }
+    ]
+   },
+   {
+    "t": "位置：一般動詞前面、be 動詞後面",
+    "p": "sometimes、usually、often 也可以放句首或句尾。",
+    "ex": [
+     {
+      "en": "She usually gets up at six.",
+      "zh": "她通常六點起床。"
+     },
+     {
+      "en": "He is often late.",
+      "zh": "他常遲到。"
+     }
+    ]
+   },
+   {
+    "t": "次數：once、twice、three times + a day／a week，放句尾",
+    "p": "every four hours 是「每四小時」。問「多常」用 How often。",
+    "ex": [
+     {
+      "en": "Take this pill twice a day.",
+      "zh": "這顆藥一天吃兩次。"
+     },
+     {
+      "en": "I exercise three times a week.",
+      "zh": "我一週運動三次。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "He eats never breakfast.",
+    "good": "He never eats breakfast.",
+    "why": "never 放在一般動詞前面。"
+   },
+   {
+    "bad": "She always is tired.",
+    "good": "She is always tired.",
+    "why": "頻率副詞放在 be 動詞後面。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I ___ late for class.",
+    "options": [
+     "never am",
+     "am never",
+     "am not never"
+    ],
+    "answer": 1,
+    "why": "頻率副詞放在 be 動詞後面。"
+   },
+   {
+    "k": "choose",
+    "q": "Take this medicine ___.",
+    "options": [
+     "three times a day",
+     "a day three times",
+     "three time a day"
+    ],
+    "answer": 0,
+    "why": "次數 + a day，times 要加 s。"
+   },
+   {
+    "k": "fill",
+    "q": "She ___ (usually，get) up at six.",
+    "accept": [
+     "usually gets"
+    ],
+    "why": "usually 放在一般動詞前面；she 的動詞加 s。"
+   },
+   {
+    "k": "choose",
+    "q": "___ do you exercise? — Twice a week.",
+    "options": [
+     "How long",
+     "How often",
+     "How many"
+    ],
+    "answer": 1,
+    "why": "問「多常」用 How often。"
+   },
+   {
+    "k": "fill",
+    "q": "Brush your teeth ___ a day.（兩次，一個字）",
+    "accept": [
+     "twice"
+    ],
+    "why": "兩次是 twice。"
+   },
+   {
+    "k": "fix",
+    "q": "He goes often to the gym.",
+    "accept": [
+     "He often goes to the gym."
+    ],
+    "why": "often 放在一般動詞前面。"
+   },
+   {
+    "k": "fix",
+    "q": "I take this pill two time a day.",
+    "accept": [
+     "I take this pill two times a day.",
+     "I take this pill twice a day."
+    ],
+    "why": "兩次是 twice 或 two times，time 要加 s。"
+   }
+  ],
+  "table": {
+   "title": "頻率的說法",
+   "head": [
+    "多常",
+    "英文",
+    "位置"
+   ],
+   "rows": [
+    [
+     "100%",
+     "always",
+     "一般動詞前、be 動詞後"
+    ],
+    [
+     "約 80%",
+     "usually",
+     "一般動詞前、be 動詞後"
+    ],
+    [
+     "約 60%",
+     "often",
+     "一般動詞前、be 動詞後"
+    ],
+    [
+     "約 30%",
+     "sometimes",
+     "動詞前、句首或句尾"
+    ],
+    [
+     "0%",
+     "never",
+     "一般動詞前、be 動詞後"
+    ],
+    [
+     "次數",
+     "once／twice／three times a day",
+     "句尾"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 19,
+  "steps": [
+   {
+    "t": "叫對方做事：原形動詞開頭，沒有主詞",
+    "p": "句子直接從動詞開始。加 please 比較有禮貌。",
+    "ex": [
+     {
+      "en": "Sit down, please.",
+      "zh": "請坐。"
+     },
+     {
+      "en": "Take a deep breath.",
+      "zh": "深呼吸。"
+     }
+    ]
+   },
+   {
+    "t": "叫對方不要做：Do not（Don't）+ 原形",
+    "p": "不管對方是誰都用 Don't。",
+    "ex": [
+     {
+      "en": "Don't move.",
+      "zh": "不要動。"
+     },
+     {
+      "en": "Please do not eat after midnight.",
+      "zh": "午夜後請不要吃東西。"
+     }
+    ]
+   },
+   {
+    "t": "更客氣的請求和清楚的指示",
+    "p": "客氣：Could you／Can you + 原形…? 清楚直接：I need you to + 原形（護理師請病人配合時很常用）。",
+    "ex": [
+     {
+      "en": "Could you lie down, please?",
+      "zh": "可以請你躺下嗎？"
+     },
+     {
+      "en": "I need you to stay in bed.",
+      "zh": "我需要你待在床上。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Don't to move.",
+    "good": "Don't move.",
+    "why": "Don't 後面直接接原形，不加 to。"
+   },
+   {
+    "bad": "Could you to help me?",
+    "good": "Could you help me?",
+    "why": "Could you 後面接原形。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ your hand, please.",
+    "options": [
+     "Raise",
+     "Raises",
+     "Raising"
+    ],
+    "answer": 0,
+    "why": "祈使句用原形動詞開頭。"
+   },
+   {
+    "k": "choose",
+    "q": "___ touch the wound.",
+    "options": [
+     "Not",
+     "Don't",
+     "Doesn't"
+    ],
+    "answer": 1,
+    "why": "叫對方不要做，用 Don't + 原形。"
+   },
+   {
+    "k": "fill",
+    "q": "Could you ___ (sit) here, please?",
+    "accept": [
+     "sit"
+    ],
+    "why": "Could you 後面用原形。"
+   },
+   {
+    "k": "choose",
+    "q": "I need you ___ still.",
+    "options": [
+     "stay",
+     "to stay",
+     "staying"
+    ],
+    "answer": 1,
+    "why": "I need you to + 原形。"
+   },
+   {
+    "k": "fill",
+    "q": "Please ___ (not，worry).",
+    "accept": [
+     "do not worry",
+     "don't worry"
+    ],
+    "why": "否定的祈使句：do not + 原形。"
+   },
+   {
+    "k": "fix",
+    "q": "Please to sit down.",
+    "accept": [
+     "Please sit down."
+    ],
+    "why": "Please 後面直接接原形。"
+   },
+   {
+    "k": "fix",
+    "q": "Doesn't eat before the test.",
+    "accept": [
+     "Don't eat before the test.",
+     "Do not eat before the test."
+    ],
+    "why": "祈使句的否定一律用 Don't。"
+   }
+  ],
+  "table": {
+   "title": "請對方做事的幾種說法",
+   "head": [
+    "語氣",
+    "句型",
+    "例子"
+   ],
+   "rows": [
+    [
+     "直接",
+     "原形…",
+     "Open your mouth."
+    ],
+    [
+     "加禮貌",
+     "Please + 原形…",
+     "Please open your mouth."
+    ],
+    [
+     "客氣請求",
+     "Could you + 原形…?",
+     "Could you open your mouth?"
+    ],
+    [
+     "清楚指示",
+     "I need you to + 原形",
+     "I need you to open your mouth."
+    ],
+    [
+     "禁止",
+     "Don't + 原形",
+     "Don't open your eyes."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 20,
+  "steps": [
+   {
+    "t": "every／each 接單數名詞",
+    "p": "every 和 each 都是「每一個」，後面接單數名詞，動詞也用單數；everyone、everything 也是單數。",
+    "ex": [
+     {
+      "en": "Every room has a window.",
+      "zh": "每個房間都有一扇窗。"
+     },
+     {
+      "en": "Everyone is here.",
+      "zh": "大家都到了。"
+     }
+    ]
+   },
+   {
+    "t": "all／most／none 和 both／either／neither",
+    "p": "all 全部、most 大部分、none 一個都沒有；兩個東西用 both（兩個都）、either（任一個）、neither（兩個都不）。後面接 the、my 或代名詞時要加 of。",
+    "ex": [
+     {
+      "en": "All of my friends are nurses.",
+      "zh": "我的朋友全都是護理師。"
+     },
+     {
+      "en": "Neither of them was late.",
+      "zh": "他們兩個都沒遲到。"
+     }
+    ]
+   },
+   {
+    "t": "one／ones 和 something／anything／nothing",
+    "p": "前面說過的可數名詞用 one／ones 代替；不知道是誰、什麼，用 somebody、something；問句和否定句多用 anybody、anything；nothing 本身就是否定。",
+    "ex": [
+     {
+      "en": "I need a new one.",
+      "zh": "我需要一個新的。"
+     },
+     {
+      "en": "I didn't see anything.",
+      "zh": "我什麼都沒看到。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Every students have a locker.",
+    "good": "Every student has a locker.",
+    "why": "every 後面接單數名詞，動詞也用單數。"
+   },
+   {
+    "bad": "I didn't eat nothing.",
+    "good": "I didn't eat anything.",
+    "why": "not 已經是否定，後面用 anything，不能再用 nothing。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ patient has a call button.",
+    "options": [
+     "Every",
+     "All",
+     "Both"
+    ],
+    "answer": 0,
+    "why": "後面是單數 patient、動詞 has，用 Every。"
+   },
+   {
+    "k": "choose",
+    "q": "___ my parents are teachers.",
+    "options": [
+     "Every",
+     "Both",
+     "Either"
+    ],
+    "answer": 1,
+    "why": "兩個人都是，動詞用 are，用 Both。"
+   },
+   {
+    "k": "fill",
+    "q": "This cup is dirty. Can I have a clean ___?（填一個字）",
+    "accept": [
+     "one"
+    ],
+    "why": "代替前面的單數可數名詞 cup，用 one。"
+   },
+   {
+    "k": "choose",
+    "q": "I didn't see ___ in the room.",
+    "options": [
+     "something",
+     "anything",
+     "nothing"
+    ],
+    "answer": 1,
+    "why": "否定句用 anything；用 nothing 會變成雙重否定。"
+   },
+   {
+    "k": "fill",
+    "q": "___ of my roommates smokes. They both hate it.（填一個字）",
+    "accept": [
+     "Neither",
+     "neither"
+    ],
+    "why": "兩個都不，用 Neither。"
+   },
+   {
+    "k": "fix",
+    "q": "All of the bed are full.",
+    "accept": [
+     "All of the beds are full.",
+     "All the beds are full."
+    ],
+    "why": "all of the 後面接複數名詞 beds。"
+   },
+   {
+    "k": "fix",
+    "q": "Somebody are at the door.",
+    "accept": [
+     "Somebody is at the door.",
+     "Someone is at the door."
+    ],
+    "why": "somebody 當主詞是單數，動詞用 is。"
+   }
+  ],
+  "table": {
+   "title": "說範圍的字",
+   "head": [
+    "字",
+    "意思",
+    "後面接",
+    "例子"
+   ],
+   "rows": [
+    [
+     "every／each",
+     "每一個",
+     "單數名詞＋單數動詞",
+     "Every room has a sink."
+    ],
+    [
+     "all／most／none",
+     "全部／大部分／一個都沒有",
+     "複數名詞（接 the、my 要加 of）",
+     "All of the beds are full."
+    ],
+    [
+     "both／either／neither",
+     "兩個都／任一個／兩個都不",
+     "兩個人或東西",
+     "Neither answer is right."
+    ],
+    [
+     "one／ones",
+     "代替前面說過的名詞",
+     "單數／複數",
+     "I need a new one."
+    ],
+    [
+     "some-／any-／no-／every-",
+     "加 -body、-thing、-where",
+     "當主詞用單數動詞",
+     "Nobody is here."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 21,
+  "steps": [
+   {
     "t": "and 把東西加起來，but 表示轉折",
     "p": "and 接同方向的事；but 接相反或意外的事。",
     "ex": [
@@ -2690,7 +3346,7 @@
   }
  },
  {
-  "unit": 18,
+  "unit": 22,
   "steps": [
    {
     "t": "這四個字後面接一個完整的句子",
@@ -2846,7 +3502,317 @@
   }
  },
  {
-  "unit": 19,
+  "unit": 23,
+  "steps": [
+   {
+    "t": "這些動詞後面接 to + 原形",
+    "p": "常見的有 want、need、decide、hope、plan、would like。",
+    "ex": [
+     {
+      "en": "He wants to go home.",
+      "zh": "他想回家。"
+     },
+     {
+      "en": "I need to rest.",
+      "zh": "我需要休息。"
+     }
+    ]
+   },
+   {
+    "t": "這些動詞後面接動詞 ing",
+    "p": "enjoy、finish、avoid、keep、mind。介系詞後面的動詞也用 ing。",
+    "ex": [
+     {
+      "en": "She finished eating.",
+      "zh": "她吃完了。"
+     },
+     {
+      "en": "Thank you for helping me.",
+      "zh": "謝謝你幫我。"
+     }
+    ]
+   },
+   {
+    "t": "有些兩種都能接，但意思不同",
+    "p": "stop smoking 是「戒菸」；stop to smoke 是「停下來去抽菸」。",
+    "ex": [
+     {
+      "en": "He stopped smoking last year.",
+      "zh": "他去年戒菸了。"
+     },
+     {
+      "en": "He stopped to buy some water.",
+      "zh": "他停下來買水。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I want go home.",
+    "good": "I want to go home.",
+    "why": "want 後面要 to + 原形。"
+   },
+   {
+    "bad": "She enjoys to read.",
+    "good": "She enjoys reading.",
+    "why": "enjoy 後面接動詞 ing。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I need ___ a doctor.",
+    "options": [
+     "see",
+     "to see",
+     "seeing"
+    ],
+    "answer": 1,
+    "why": "need 後面接 to + 原形。"
+   },
+   {
+    "k": "choose",
+    "q": "He enjoys ___ basketball.",
+    "options": [
+     "play",
+     "to play",
+     "playing"
+    ],
+    "answer": 2,
+    "why": "enjoy 後面接動詞 ing。"
+   },
+   {
+    "k": "fill",
+    "q": "She decided ___ (study) nursing.",
+    "accept": [
+     "to study"
+    ],
+    "why": "decide 後面接 to + 原形。"
+   },
+   {
+    "k": "choose",
+    "q": "Please keep ___.",
+    "options": [
+     "walk",
+     "to walk",
+     "walking"
+    ],
+    "answer": 2,
+    "why": "keep 後面接動詞 ing。"
+   },
+   {
+    "k": "fill",
+    "q": "Wash your hands before ___ (eat).",
+    "accept": [
+     "eating"
+    ],
+    "why": "介系詞 before 後面的動詞用 ing。"
+   },
+   {
+    "k": "fix",
+    "q": "I finished to write the report.",
+    "accept": [
+     "I finished writing the report."
+    ],
+    "why": "finish 後面接動詞 ing。"
+   },
+   {
+    "k": "fix",
+    "q": "They hope visiting Japan next year.",
+    "accept": [
+     "They hope to visit Japan next year."
+    ],
+    "why": "hope 後面接 to + 原形。"
+   }
+  ],
+  "table": {
+   "title": "後面接什麼",
+   "head": [
+    "接 to + 原形",
+    "接動詞 ing"
+   ],
+   "rows": [
+    [
+     "want to",
+     "enjoy -ing"
+    ],
+    [
+     "need to",
+     "finish -ing"
+    ],
+    [
+     "decide to",
+     "avoid -ing"
+    ],
+    [
+     "hope to",
+     "keep -ing"
+    ],
+    [
+     "plan to",
+     "mind -ing"
+    ],
+    [
+     "would like to",
+     "介系詞 + -ing（after eating）"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 24,
+  "steps": [
+   {
+    "t": "過去某個時間點正在做：was／were + 動詞 ing",
+    "p": "I、he、she、it 用 was；you、we、they 用 were。",
+    "ex": [
+     {
+      "en": "I was sleeping at ten last night.",
+      "zh": "我昨晚十點在睡覺。"
+     },
+     {
+      "en": "They were eating dinner.",
+      "zh": "他們那時在吃晚餐。"
+     }
+    ]
+   },
+   {
+    "t": "一件事正在進行，另一件事突然發生",
+    "p": "長的、進行中的用過去進行式；短的、突然發生的用過去式，常用 when 連接。",
+    "ex": [
+     {
+      "en": "He was sleeping when I came in.",
+      "zh": "我進來的時候他在睡覺。"
+     },
+     {
+      "en": "I was cooking when the phone rang.",
+      "zh": "電話響的時候我在煮飯。"
+     }
+    ]
+   },
+   {
+    "t": "while + 過去進行式",
+    "p": "while（在…的期間）後面常接正在進行的那件事。",
+    "ex": [
+     {
+      "en": "She fell while she was walking to the bathroom.",
+      "zh": "她走去浴室的時候跌倒了。"
+     },
+     {
+      "en": "What were you doing at that time?",
+      "zh": "那時候你在做什麼？"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I was sleep when you called.",
+    "good": "I was sleeping when you called.",
+    "why": "was 後面的動詞要加 ing。"
+   },
+   {
+    "bad": "They was watching TV.",
+    "good": "They were watching TV.",
+    "why": "they 配 were。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I ___ a shower when the phone rang.",
+    "options": [
+     "took",
+     "was taking",
+     "am taking"
+    ],
+    "answer": 1,
+    "why": "電話響的時候「正在」洗澡，用過去進行式。"
+   },
+   {
+    "k": "choose",
+    "q": "What ___ you doing at nine last night?",
+    "options": [
+     "was",
+     "were",
+     "did"
+    ],
+    "answer": 1,
+    "why": "you 配 were。"
+   },
+   {
+    "k": "fill",
+    "q": "He ___ (sleep) when the nurse came in.",
+    "accept": [
+     "was sleeping"
+    ],
+    "why": "護理師進來時他「正在」睡，用 was sleeping。"
+   },
+   {
+    "k": "choose",
+    "q": "She was walking to the toilet when she ___.",
+    "options": [
+     "fell",
+     "was falling",
+     "falls"
+    ],
+    "answer": 0,
+    "why": "突然發生的短動作用過去式 fell。"
+   },
+   {
+    "k": "fill",
+    "q": "They ___ (watch) TV at eight last night.",
+    "accept": [
+     "were watching"
+    ],
+    "why": "昨晚八點正在看，用 were watching。"
+   },
+   {
+    "k": "fix",
+    "q": "I was cook dinner when he arrived.",
+    "accept": [
+     "I was cooking dinner when he arrived."
+    ],
+    "why": "was 後面的動詞要加 ing。"
+   },
+   {
+    "k": "fix",
+    "q": "We was studying at that time.",
+    "accept": [
+     "We were studying at that time."
+    ],
+    "why": "we 配 were。"
+   }
+  ],
+  "table": {
+   "title": "過去進行式的三種句子",
+   "head": [
+    "句型",
+    "公式",
+    "例子"
+   ],
+   "rows": [
+    [
+     "肯定",
+     "was／were + 動詞 ing",
+     "He was reading."
+    ],
+    [
+     "否定",
+     "wasn't／weren't + 動詞 ing",
+     "He wasn't reading."
+    ],
+    [
+     "問句",
+     "Was／Were + 主詞 + 動詞 ing?",
+     "Was he reading?"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 25,
   "steps": [
    {
     "t": "have／has + 過去分詞",
@@ -3023,7 +3989,482 @@
   }
  },
  {
-  "unit": 20,
+  "unit": 26,
+  "steps": [
+   {
+    "t": "有可能發生的條件：If + 現在式，主要句 will + 原形",
+    "p": "if 那一句講條件，主要句講結果。",
+    "ex": [
+     {
+      "en": "If you rest, you will feel better.",
+      "zh": "如果你休息，就會好一點。"
+     },
+     {
+      "en": "If it rains, I will stay home.",
+      "zh": "如果下雨，我就待在家。"
+     }
+    ]
+   },
+   {
+    "t": "if 那一句不用 will",
+    "p": "if 可以放前面（後面要加逗號）或放後面（不加逗號）。",
+    "ex": [
+     {
+      "en": "I will call you if I need help.",
+      "zh": "需要幫忙我會打給你。"
+     },
+     {
+      "en": "If she comes, I will tell her.",
+      "zh": "如果她來，我會告訴她。"
+     }
+    ]
+   },
+   {
+    "t": "主要句也可以是祈使句、can、should；unless 是「除非」",
+    "p": "衛教最常用：If…，就做某件事。",
+    "ex": [
+     {
+      "en": "If the pain gets worse, press the call button.",
+      "zh": "如果更痛了，就按呼叫鈴。"
+     },
+     {
+      "en": "You will not get better unless you rest.",
+      "zh": "除非你休息，不然不會好。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "If it will rain, I will stay home.",
+    "good": "If it rains, I will stay home.",
+    "why": "if 那一句用現在式，不用 will。"
+   },
+   {
+    "bad": "If he come, I will tell him.",
+    "good": "If he comes, I will tell him.",
+    "why": "he 的現在式動詞要加 s。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "If you ___ this medicine, you will feel better.",
+    "options": [
+     "take",
+     "will take",
+     "took"
+    ],
+    "answer": 0,
+    "why": "if 那一句用現在式。"
+   },
+   {
+    "k": "choose",
+    "q": "If it rains tomorrow, we ___ at home.",
+    "options": [
+     "stay",
+     "will stay",
+     "stayed"
+    ],
+    "answer": 1,
+    "why": "主要句用 will + 原形。"
+   },
+   {
+    "k": "fill",
+    "q": "If she ___ (call), I will tell you.",
+    "accept": [
+     "calls"
+    ],
+    "why": "if 那一句用現在式；she 的動詞加 s。"
+   },
+   {
+    "k": "choose",
+    "q": "___ you hurry, you will miss the bus.",
+    "options": [
+     "If",
+     "Unless",
+     "Because"
+    ],
+    "answer": 1,
+    "why": "「除非你快一點，不然會錯過」用 Unless。"
+   },
+   {
+    "k": "fill",
+    "q": "If you feel dizzy, ___ (sit) down.",
+    "accept": [
+     "sit"
+    ],
+    "why": "主要句是祈使句，用原形。"
+   },
+   {
+    "k": "fix",
+    "q": "If I will see him, I will give him the book.",
+    "accept": [
+     "If I see him, I will give him the book."
+    ],
+    "why": "if 那一句用現在式，不用 will。"
+   },
+   {
+    "k": "fix",
+    "q": "If you don't eat, you are hungry later.",
+    "accept": [
+     "If you don't eat, you will be hungry later."
+    ],
+    "why": "主要句講之後的結果，用 will be。"
+   }
+  ],
+  "table": {
+   "title": "第一類假設",
+   "head": [
+    "if 那一句（條件）",
+    "主要句（結果）"
+   ],
+   "rows": [
+    [
+     "If + 現在式",
+     "will + 原形"
+    ],
+    [
+     "If you feel dizzy,",
+     "sit down.（祈使句）"
+    ],
+    [
+     "If you have questions,",
+     "you can ask me."
+    ],
+    [
+     "Unless + 現在式（除非）",
+     "will + 原形"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 27,
+  "steps": [
+   {
+    "t": "So am I／Neither do I：附和別人",
+    "p": "肯定句用 So＋助動詞＋主詞，否定句用 Neither＋助動詞＋主詞（或 I don't either）。助動詞看前一句：be 動詞用 am／is／are，一般動詞用 do／does／did，can 就用 can。",
+    "ex": [
+     {
+      "en": "I'm cold. — So am I.",
+      "zh": "我好冷。——我也是。"
+     },
+     {
+      "en": "I didn't call her. — Neither did I.",
+      "zh": "我沒打給她。——我也沒有。"
+     }
+    ]
+   },
+   {
+    "t": "Who 當主詞不加 did",
+    "p": "Who、What 是「做事的人或東西」時，直接接動詞：Who called you? What happened?；問「做了誰、什麼」才用 did：Who did you call?",
+    "ex": [
+     {
+      "en": "Who opened the window?",
+      "zh": "誰開了窗戶？"
+     },
+     {
+      "en": "Who did you meet?",
+      "zh": "你見了誰？"
+     }
+    ]
+   },
+   {
+    "t": "介系詞放最後、What…like、How long does it take",
+    "p": "Who are you talking to? 介系詞放句尾；What is it like? 問怎麼樣；How long does it take (you) to＋原形？問花多久，回答 It takes＋時間。",
+    "ex": [
+     {
+      "en": "What are you looking for?",
+      "zh": "你在找什麼？"
+     },
+     {
+      "en": "It takes an hour to get there.",
+      "zh": "到那裡要一個小時。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I don't like it. — So do I.",
+    "good": "I don't like it. — Neither do I.",
+    "why": "附和否定句要用 Neither。"
+   },
+   {
+    "bad": "Who did call you?",
+    "good": "Who called you?",
+    "why": "Who 當主詞時直接接動詞，不加 did。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I'm hungry. — So ___ I.",
+    "options": [
+     "am",
+     "do",
+     "is"
+    ],
+    "answer": 0,
+    "why": "前一句是 be 動詞 am，附和用 So am I。"
+   },
+   {
+    "k": "choose",
+    "q": "I don't eat meat. — ___ do I.",
+    "options": [
+     "So",
+     "Neither",
+     "Either"
+    ],
+    "answer": 1,
+    "why": "附和否定句用 Neither。"
+   },
+   {
+    "k": "fill",
+    "q": "Who ___ the door?（open 的過去式）",
+    "accept": [
+     "opened"
+    ],
+    "why": "Who 當主詞，直接接過去式 opened。"
+   },
+   {
+    "k": "choose",
+    "q": "What is your new teacher ___?",
+    "options": [
+     "like",
+     "likes",
+     "liking"
+    ],
+    "answer": 0,
+    "why": "What is…like? 問怎麼樣，like 是介系詞。"
+   },
+   {
+    "k": "fill",
+    "q": "How long does it ___ you to get to school?（填一個字）",
+    "accept": [
+     "take"
+    ],
+    "why": "How long does it take…? 問花多久。"
+   },
+   {
+    "k": "fix",
+    "q": "Who did help you?",
+    "accept": [
+     "Who helped you?"
+    ],
+    "why": "Who 當主詞，不加 did，直接用過去式 helped。"
+   },
+   {
+    "k": "fix",
+    "q": "I can't drive. — I can't too.",
+    "accept": [
+     "I can't drive. — I can't either.",
+     "I can't drive. — Neither can I."
+    ],
+    "why": "否定句的「也」用 either，不用 too。"
+   }
+  ],
+  "table": {
+   "title": "附和和問句",
+   "head": [
+    "要說的",
+    "說法",
+    "例子"
+   ],
+   "rows": [
+    [
+     "肯定句的「我也是」",
+     "So＋助動詞＋I",
+     "I'm tired. — So am I."
+    ],
+    [
+     "否定句的「我也不」",
+     "Neither＋助動詞＋I／I…either",
+     "I can't swim. — Neither can I."
+    ],
+    [
+     "問誰做了",
+     "Who＋動詞（不加 did）",
+     "Who called you?"
+    ],
+    [
+     "問做了誰",
+     "Who did＋主詞＋原形",
+     "Who did you call?"
+    ],
+    [
+     "問怎麼樣／花多久",
+     "What is…like?／How long does it take…?",
+     "What is she like?"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 28,
+  "steps": [
+   {
+    "t": "方向：into、out of、through、across、along",
+    "p": "into 進去、out of 出來、through 穿過、across 橫越、along 沿著、up／down 往上／往下，接在移動的動詞後面：walk into、run across。",
+    "ex": [
+     {
+      "en": "She ran out of the room.",
+      "zh": "她跑出房間。"
+     },
+     {
+      "en": "We walked through the park.",
+      "zh": "我們走過公園。"
+     }
+    ]
+   },
+   {
+    "t": "方法和時間範圍：by、with、from…to、until、during",
+    "p": "by＋交通或方式（by bus，不加 the），with＋工具；from…to 從…到…，until 直到，during＋名詞（during class），for＋一段時間（for two hours）。",
+    "ex": [
+     {
+      "en": "I paid by card.",
+      "zh": "我刷卡付錢。"
+     },
+     {
+      "en": "She slept during the movie.",
+      "zh": "她看電影的時候睡著了。"
+     }
+    ]
+   },
+   {
+    "t": "固定搭配：afraid of、wait for",
+    "p": "有些形容詞和動詞一定配某個介系詞：afraid of、good at、worried about、allergic to、wait for、listen to、look for、look at、take care of。介系詞後面接名詞或動詞 -ing。",
+    "ex": [
+     {
+      "en": "He is good at cooking.",
+      "zh": "他很會煮飯。"
+     },
+     {
+      "en": "Please listen to the nurse.",
+      "zh": "請聽護理師說。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I'm waiting the bus.",
+    "good": "I'm waiting for the bus.",
+    "why": "wait 後面接人或東西要加 for。"
+   },
+   {
+    "bad": "I go to school by the bus.",
+    "good": "I go to school by bus.",
+    "why": "by＋交通工具，中間不加 the。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "He walked ___ the room and sat down.",
+    "options": [
+     "into",
+     "at",
+     "of"
+    ],
+    "answer": 0,
+    "why": "走進房間，方向用 into。"
+   },
+   {
+    "k": "choose",
+    "q": "I'm afraid ___ dogs.",
+    "options": [
+     "of",
+     "at",
+     "for"
+    ],
+    "answer": 0,
+    "why": "afraid 固定配 of。"
+   },
+   {
+    "k": "fill",
+    "q": "We go to work ___ train.（填一個字）",
+    "accept": [
+     "by"
+    ],
+    "why": "by＋交通工具。"
+   },
+   {
+    "k": "choose",
+    "q": "Don't talk ___ the test.",
+    "options": [
+     "during",
+     "for",
+     "until"
+    ],
+    "answer": 0,
+    "why": "during＋名詞：在考試期間。"
+   },
+   {
+    "k": "fill",
+    "q": "Please wait ___ me here.（填一個字）",
+    "accept": [
+     "for"
+    ],
+    "why": "wait for＋人。"
+   },
+   {
+    "k": "fix",
+    "q": "She is good in English.",
+    "accept": [
+     "She is good at English.",
+     "She's good at English."
+    ],
+    "why": "擅長是 good at。"
+   },
+   {
+    "k": "fix",
+    "q": "Please listen me.",
+    "accept": [
+     "Please listen to me."
+    ],
+    "why": "listen 後面接人要加 to。"
+   }
+  ],
+  "table": {
+   "title": "介系詞進階",
+   "head": [
+    "用途",
+    "介系詞",
+    "例子"
+   ],
+   "rows": [
+    [
+     "方向",
+     "into／out of／through／across／along／up／down",
+     "walk into the room"
+    ],
+    [
+     "方法",
+     "by（交通、方式）／with（工具）",
+     "by bus、with a spoon"
+    ],
+    [
+     "時間範圍",
+     "from…to／until／during／for",
+     "from 7 to 3、during class"
+    ],
+    [
+     "固定搭配（形容詞）",
+     "afraid of／good at／worried about／allergic to",
+     "afraid of needles"
+    ],
+    [
+     "固定搭配（動詞）",
+     "wait for／listen to／look for／take care of",
+     "wait for the bus"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 29,
   "steps": [
    {
     "t": "有明確的過去時間：用過去式",
@@ -3175,7 +4616,7 @@
   }
  },
  {
-  "unit": 21,
+  "unit": 30,
   "steps": [
    {
     "t": "主詞是「被做的那一方」：be + 過去分詞",
@@ -3326,652 +4767,7 @@
   }
  },
  {
-  "unit": 22,
-  "steps": [
-   {
-    "t": "這些動詞後面接 to + 原形",
-    "p": "常見的有 want、need、decide、hope、plan、would like。",
-    "ex": [
-     {
-      "en": "He wants to go home.",
-      "zh": "他想回家。"
-     },
-     {
-      "en": "I need to rest.",
-      "zh": "我需要休息。"
-     }
-    ]
-   },
-   {
-    "t": "這些動詞後面接動詞 ing",
-    "p": "enjoy、finish、avoid、keep、mind。介系詞後面的動詞也用 ing。",
-    "ex": [
-     {
-      "en": "She finished eating.",
-      "zh": "她吃完了。"
-     },
-     {
-      "en": "Thank you for helping me.",
-      "zh": "謝謝你幫我。"
-     }
-    ]
-   },
-   {
-    "t": "有些兩種都能接，但意思不同",
-    "p": "stop smoking 是「戒菸」；stop to smoke 是「停下來去抽菸」。",
-    "ex": [
-     {
-      "en": "He stopped smoking last year.",
-      "zh": "他去年戒菸了。"
-     },
-     {
-      "en": "He stopped to buy some water.",
-      "zh": "他停下來買水。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "I want go home.",
-    "good": "I want to go home.",
-    "why": "want 後面要 to + 原形。"
-   },
-   {
-    "bad": "She enjoys to read.",
-    "good": "She enjoys reading.",
-    "why": "enjoy 後面接動詞 ing。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "I need ___ a doctor.",
-    "options": [
-     "see",
-     "to see",
-     "seeing"
-    ],
-    "answer": 1,
-    "why": "need 後面接 to + 原形。"
-   },
-   {
-    "k": "choose",
-    "q": "He enjoys ___ basketball.",
-    "options": [
-     "play",
-     "to play",
-     "playing"
-    ],
-    "answer": 2,
-    "why": "enjoy 後面接動詞 ing。"
-   },
-   {
-    "k": "fill",
-    "q": "She decided ___ (study) nursing.",
-    "accept": [
-     "to study"
-    ],
-    "why": "decide 後面接 to + 原形。"
-   },
-   {
-    "k": "choose",
-    "q": "Please keep ___.",
-    "options": [
-     "walk",
-     "to walk",
-     "walking"
-    ],
-    "answer": 2,
-    "why": "keep 後面接動詞 ing。"
-   },
-   {
-    "k": "fill",
-    "q": "Wash your hands before ___ (eat).",
-    "accept": [
-     "eating"
-    ],
-    "why": "介系詞 before 後面的動詞用 ing。"
-   },
-   {
-    "k": "fix",
-    "q": "I finished to write the report.",
-    "accept": [
-     "I finished writing the report."
-    ],
-    "why": "finish 後面接動詞 ing。"
-   },
-   {
-    "k": "fix",
-    "q": "They hope visiting Japan next year.",
-    "accept": [
-     "They hope to visit Japan next year."
-    ],
-    "why": "hope 後面接 to + 原形。"
-   }
-  ],
-  "table": {
-   "title": "後面接什麼",
-   "head": [
-    "接 to + 原形",
-    "接動詞 ing"
-   ],
-   "rows": [
-    [
-     "want to",
-     "enjoy -ing"
-    ],
-    [
-     "need to",
-     "finish -ing"
-    ],
-    [
-     "decide to",
-     "avoid -ing"
-    ],
-    [
-     "hope to",
-     "keep -ing"
-    ],
-    [
-     "plan to",
-     "mind -ing"
-    ],
-    [
-     "would like to",
-     "介系詞 + -ing（after eating）"
-    ]
-   ]
-  }
- },
- {
-  "unit": 23,
-  "steps": [
-   {
-    "t": "「有」：There is + 單數或不可數，There are + 複數",
-    "p": "看後面的名詞決定用 is 還是 are。",
-    "ex": [
-     {
-      "en": "There is a chair in the room.",
-      "zh": "房間裡有一張椅子。"
-     },
-     {
-      "en": "There are two nurses on duty.",
-      "zh": "有兩位護理師值班。"
-     }
-    ]
-   },
-   {
-    "t": "過去用 There was／There were；問句把 be 動詞搬到前面",
-    "p": "問句：Is there…? Are there…? 回答用 Yes, there is.／No, there aren't.",
-    "ex": [
-     {
-      "en": "There was a car accident yesterday.",
-      "zh": "昨天有一場車禍。"
-     },
-     {
-      "en": "Is there any water?",
-      "zh": "有水嗎？"
-     }
-    ]
-   },
-   {
-    "t": "天氣、時間、距離用 It 當主詞",
-    "p": "這個 it 沒有意思，只是佔位子。後面才講真正的事：It is important to…",
-    "ex": [
-     {
-      "en": "It is raining.",
-      "zh": "在下雨。"
-     },
-     {
-      "en": "It is important to rest.",
-      "zh": "休息很重要。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "There have a book on the desk.",
-    "good": "There is a book on the desk.",
-    "why": "「某個地方有…」用 There is，不用 have。"
-   },
-   {
-    "bad": "There is many people here.",
-    "good": "There are many people here.",
-    "why": "people 是複數，用 are。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "___ a pharmacy near here.",
-    "options": [
-     "There is",
-     "There are",
-     "It is"
-    ],
-    "answer": 0,
-    "why": "「有一間藥局」用 There is。"
-   },
-   {
-    "k": "choose",
-    "q": "___ five people in my family.",
-    "options": [
-     "There is",
-     "There are",
-     "They have"
-    ],
-    "answer": 1,
-    "why": "five people 是複數，用 There are。"
-   },
-   {
-    "k": "fill",
-    "q": "___ is cold today.（填一個字）",
-    "accept": [
-     "it"
-    ],
-    "why": "講天氣用 It 當主詞。"
-   },
-   {
-    "k": "choose",
-    "q": "___ any milk in the fridge?",
-    "options": [
-     "Is there",
-     "Are there",
-     "Is it"
-    ],
-    "answer": 0,
-    "why": "milk 不可數，問句用 Is there。"
-   },
-   {
-    "k": "fill",
-    "q": "There ___ (be) two doctors here yesterday.",
-    "accept": [
-     "were"
-    ],
-    "why": "two doctors 是複數；yesterday 是過去，用 were。"
-   },
-   {
-    "k": "fix",
-    "q": "There are a pen on the table.",
-    "accept": [
-     "There is a pen on the table."
-    ],
-    "why": "a pen 是單數，用 is。"
-   },
-   {
-    "k": "fix",
-    "q": "There is important to drink water.",
-    "accept": [
-     "It is important to drink water."
-    ],
-    "why": "「做某件事很重要」用 It is important to…。"
-   }
-  ],
-  "table": {
-   "title": "There 和 It",
-   "head": [
-    "句型",
-    "什麼時候用",
-    "例子"
-   ],
-   "rows": [
-    [
-     "There is",
-     "有一個／不可數",
-     "There is some blood on the dressing."
-    ],
-    [
-     "There are",
-     "有兩個以上",
-     "There are three beds."
-    ],
-    [
-     "It is",
-     "天氣、時間、距離",
-     "It is ten o'clock."
-    ],
-    [
-     "It is + 形容詞 + to…",
-     "做某件事怎麼樣",
-     "It is hard to sleep."
-    ]
-   ]
-  }
- },
- {
-  "unit": 24,
-  "steps": [
-   {
-    "t": "頻率副詞：從「總是」到「從不」",
-    "p": "always（總是）＞ usually（通常）＞ often（常常）＞ sometimes（有時）＞ never（從不）。",
-    "ex": [
-     {
-      "en": "I always wash my hands.",
-      "zh": "我總是洗手。"
-     },
-     {
-      "en": "He never eats breakfast.",
-      "zh": "他從不吃早餐。"
-     }
-    ]
-   },
-   {
-    "t": "位置：一般動詞前面、be 動詞後面",
-    "p": "sometimes、usually、often 也可以放句首或句尾。",
-    "ex": [
-     {
-      "en": "She usually gets up at six.",
-      "zh": "她通常六點起床。"
-     },
-     {
-      "en": "He is often late.",
-      "zh": "他常遲到。"
-     }
-    ]
-   },
-   {
-    "t": "次數：once、twice、three times + a day／a week，放句尾",
-    "p": "every four hours 是「每四小時」。問「多常」用 How often。",
-    "ex": [
-     {
-      "en": "Take this pill twice a day.",
-      "zh": "這顆藥一天吃兩次。"
-     },
-     {
-      "en": "I exercise three times a week.",
-      "zh": "我一週運動三次。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "He eats never breakfast.",
-    "good": "He never eats breakfast.",
-    "why": "never 放在一般動詞前面。"
-   },
-   {
-    "bad": "She always is tired.",
-    "good": "She is always tired.",
-    "why": "頻率副詞放在 be 動詞後面。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "I ___ late for class.",
-    "options": [
-     "never am",
-     "am never",
-     "am not never"
-    ],
-    "answer": 1,
-    "why": "頻率副詞放在 be 動詞後面。"
-   },
-   {
-    "k": "choose",
-    "q": "Take this medicine ___.",
-    "options": [
-     "three times a day",
-     "a day three times",
-     "three time a day"
-    ],
-    "answer": 0,
-    "why": "次數 + a day，times 要加 s。"
-   },
-   {
-    "k": "fill",
-    "q": "She ___ (usually，get) up at six.",
-    "accept": [
-     "usually gets"
-    ],
-    "why": "usually 放在一般動詞前面；she 的動詞加 s。"
-   },
-   {
-    "k": "choose",
-    "q": "___ do you exercise? — Twice a week.",
-    "options": [
-     "How long",
-     "How often",
-     "How many"
-    ],
-    "answer": 1,
-    "why": "問「多常」用 How often。"
-   },
-   {
-    "k": "fill",
-    "q": "Brush your teeth ___ a day.（兩次，一個字）",
-    "accept": [
-     "twice"
-    ],
-    "why": "兩次是 twice。"
-   },
-   {
-    "k": "fix",
-    "q": "He goes often to the gym.",
-    "accept": [
-     "He often goes to the gym."
-    ],
-    "why": "often 放在一般動詞前面。"
-   },
-   {
-    "k": "fix",
-    "q": "I take this pill two time a day.",
-    "accept": [
-     "I take this pill two times a day.",
-     "I take this pill twice a day."
-    ],
-    "why": "兩次是 twice 或 two times，time 要加 s。"
-   }
-  ],
-  "table": {
-   "title": "頻率的說法",
-   "head": [
-    "多常",
-    "英文",
-    "位置"
-   ],
-   "rows": [
-    [
-     "100%",
-     "always",
-     "一般動詞前、be 動詞後"
-    ],
-    [
-     "約 80%",
-     "usually",
-     "一般動詞前、be 動詞後"
-    ],
-    [
-     "約 60%",
-     "often",
-     "一般動詞前、be 動詞後"
-    ],
-    [
-     "約 30%",
-     "sometimes",
-     "動詞前、句首或句尾"
-    ],
-    [
-     "0%",
-     "never",
-     "一般動詞前、be 動詞後"
-    ],
-    [
-     "次數",
-     "once／twice／three times a day",
-     "句尾"
-    ]
-   ]
-  }
- },
- {
-  "unit": 25,
-  "steps": [
-   {
-    "t": "叫對方做事：原形動詞開頭，沒有主詞",
-    "p": "句子直接從動詞開始。加 please 比較有禮貌。",
-    "ex": [
-     {
-      "en": "Sit down, please.",
-      "zh": "請坐。"
-     },
-     {
-      "en": "Take a deep breath.",
-      "zh": "深呼吸。"
-     }
-    ]
-   },
-   {
-    "t": "叫對方不要做：Do not（Don't）+ 原形",
-    "p": "不管對方是誰都用 Don't。",
-    "ex": [
-     {
-      "en": "Don't move.",
-      "zh": "不要動。"
-     },
-     {
-      "en": "Please do not eat after midnight.",
-      "zh": "午夜後請不要吃東西。"
-     }
-    ]
-   },
-   {
-    "t": "更客氣的請求和清楚的指示",
-    "p": "客氣：Could you／Can you + 原形…? 清楚直接：I need you to + 原形（護理師請病人配合時很常用）。",
-    "ex": [
-     {
-      "en": "Could you lie down, please?",
-      "zh": "可以請你躺下嗎？"
-     },
-     {
-      "en": "I need you to stay in bed.",
-      "zh": "我需要你待在床上。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "Don't to move.",
-    "good": "Don't move.",
-    "why": "Don't 後面直接接原形，不加 to。"
-   },
-   {
-    "bad": "Could you to help me?",
-    "good": "Could you help me?",
-    "why": "Could you 後面接原形。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "___ your hand, please.",
-    "options": [
-     "Raise",
-     "Raises",
-     "Raising"
-    ],
-    "answer": 0,
-    "why": "祈使句用原形動詞開頭。"
-   },
-   {
-    "k": "choose",
-    "q": "___ touch the wound.",
-    "options": [
-     "Not",
-     "Don't",
-     "Doesn't"
-    ],
-    "answer": 1,
-    "why": "叫對方不要做，用 Don't + 原形。"
-   },
-   {
-    "k": "fill",
-    "q": "Could you ___ (sit) here, please?",
-    "accept": [
-     "sit"
-    ],
-    "why": "Could you 後面用原形。"
-   },
-   {
-    "k": "choose",
-    "q": "I need you ___ still.",
-    "options": [
-     "stay",
-     "to stay",
-     "staying"
-    ],
-    "answer": 1,
-    "why": "I need you to + 原形。"
-   },
-   {
-    "k": "fill",
-    "q": "Please ___ (not，worry).",
-    "accept": [
-     "do not worry",
-     "don't worry"
-    ],
-    "why": "否定的祈使句：do not + 原形。"
-   },
-   {
-    "k": "fix",
-    "q": "Please to sit down.",
-    "accept": [
-     "Please sit down."
-    ],
-    "why": "Please 後面直接接原形。"
-   },
-   {
-    "k": "fix",
-    "q": "Doesn't eat before the test.",
-    "accept": [
-     "Don't eat before the test.",
-     "Do not eat before the test."
-    ],
-    "why": "祈使句的否定一律用 Don't。"
-   }
-  ],
-  "table": {
-   "title": "請對方做事的幾種說法",
-   "head": [
-    "語氣",
-    "句型",
-    "例子"
-   ],
-   "rows": [
-    [
-     "直接",
-     "原形…",
-     "Open your mouth."
-    ],
-    [
-     "加禮貌",
-     "Please + 原形…",
-     "Please open your mouth."
-    ],
-    [
-     "客氣請求",
-     "Could you + 原形…?",
-     "Could you open your mouth?"
-    ],
-    [
-     "清楚指示",
-     "I need you to + 原形",
-     "I need you to open your mouth."
-    ],
-    [
-     "禁止",
-     "Don't + 原形",
-     "Don't open your eyes."
-    ]
-   ]
-  }
- },
- {
-  "unit": 26,
+  "unit": 31,
   "steps": [
    {
     "t": "用一句話說明「是哪一個」",
@@ -4123,7 +4919,7 @@
   }
  },
  {
-  "unit": 27,
+  "unit": 32,
   "steps": [
    {
     "t": "把問句放進另一句裡，順序變回一般句子",
@@ -4274,309 +5070,7 @@
   }
  },
  {
-  "unit": 28,
-  "steps": [
-   {
-    "t": "過去某個時間點正在做：was／were + 動詞 ing",
-    "p": "I、he、she、it 用 was；you、we、they 用 were。",
-    "ex": [
-     {
-      "en": "I was sleeping at ten last night.",
-      "zh": "我昨晚十點在睡覺。"
-     },
-     {
-      "en": "They were eating dinner.",
-      "zh": "他們那時在吃晚餐。"
-     }
-    ]
-   },
-   {
-    "t": "一件事正在進行，另一件事突然發生",
-    "p": "長的、進行中的用過去進行式；短的、突然發生的用過去式，常用 when 連接。",
-    "ex": [
-     {
-      "en": "He was sleeping when I came in.",
-      "zh": "我進來的時候他在睡覺。"
-     },
-     {
-      "en": "I was cooking when the phone rang.",
-      "zh": "電話響的時候我在煮飯。"
-     }
-    ]
-   },
-   {
-    "t": "while + 過去進行式",
-    "p": "while（在…的期間）後面常接正在進行的那件事。",
-    "ex": [
-     {
-      "en": "She fell while she was walking to the bathroom.",
-      "zh": "她走去浴室的時候跌倒了。"
-     },
-     {
-      "en": "What were you doing at that time?",
-      "zh": "那時候你在做什麼？"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "I was sleep when you called.",
-    "good": "I was sleeping when you called.",
-    "why": "was 後面的動詞要加 ing。"
-   },
-   {
-    "bad": "They was watching TV.",
-    "good": "They were watching TV.",
-    "why": "they 配 were。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "I ___ a shower when the phone rang.",
-    "options": [
-     "took",
-     "was taking",
-     "am taking"
-    ],
-    "answer": 1,
-    "why": "電話響的時候「正在」洗澡，用過去進行式。"
-   },
-   {
-    "k": "choose",
-    "q": "What ___ you doing at nine last night?",
-    "options": [
-     "was",
-     "were",
-     "did"
-    ],
-    "answer": 1,
-    "why": "you 配 were。"
-   },
-   {
-    "k": "fill",
-    "q": "He ___ (sleep) when the nurse came in.",
-    "accept": [
-     "was sleeping"
-    ],
-    "why": "護理師進來時他「正在」睡，用 was sleeping。"
-   },
-   {
-    "k": "choose",
-    "q": "She was walking to the toilet when she ___.",
-    "options": [
-     "fell",
-     "was falling",
-     "falls"
-    ],
-    "answer": 0,
-    "why": "突然發生的短動作用過去式 fell。"
-   },
-   {
-    "k": "fill",
-    "q": "They ___ (watch) TV at eight last night.",
-    "accept": [
-     "were watching"
-    ],
-    "why": "昨晚八點正在看，用 were watching。"
-   },
-   {
-    "k": "fix",
-    "q": "I was cook dinner when he arrived.",
-    "accept": [
-     "I was cooking dinner when he arrived."
-    ],
-    "why": "was 後面的動詞要加 ing。"
-   },
-   {
-    "k": "fix",
-    "q": "We was studying at that time.",
-    "accept": [
-     "We were studying at that time."
-    ],
-    "why": "we 配 were。"
-   }
-  ],
-  "table": {
-   "title": "過去進行式的三種句子",
-   "head": [
-    "句型",
-    "公式",
-    "例子"
-   ],
-   "rows": [
-    [
-     "肯定",
-     "was／were + 動詞 ing",
-     "He was reading."
-    ],
-    [
-     "否定",
-     "wasn't／weren't + 動詞 ing",
-     "He wasn't reading."
-    ],
-    [
-     "問句",
-     "Was／Were + 主詞 + 動詞 ing?",
-     "Was he reading?"
-    ]
-   ]
-  }
- },
- {
-  "unit": 29,
-  "steps": [
-   {
-    "t": "有可能發生的條件：If + 現在式，主要句 will + 原形",
-    "p": "if 那一句講條件，主要句講結果。",
-    "ex": [
-     {
-      "en": "If you rest, you will feel better.",
-      "zh": "如果你休息，就會好一點。"
-     },
-     {
-      "en": "If it rains, I will stay home.",
-      "zh": "如果下雨，我就待在家。"
-     }
-    ]
-   },
-   {
-    "t": "if 那一句不用 will",
-    "p": "if 可以放前面（後面要加逗號）或放後面（不加逗號）。",
-    "ex": [
-     {
-      "en": "I will call you if I need help.",
-      "zh": "需要幫忙我會打給你。"
-     },
-     {
-      "en": "If she comes, I will tell her.",
-      "zh": "如果她來，我會告訴她。"
-     }
-    ]
-   },
-   {
-    "t": "主要句也可以是祈使句、can、should；unless 是「除非」",
-    "p": "衛教最常用：If…，就做某件事。",
-    "ex": [
-     {
-      "en": "If the pain gets worse, press the call button.",
-      "zh": "如果更痛了，就按呼叫鈴。"
-     },
-     {
-      "en": "You will not get better unless you rest.",
-      "zh": "除非你休息，不然不會好。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "If it will rain, I will stay home.",
-    "good": "If it rains, I will stay home.",
-    "why": "if 那一句用現在式，不用 will。"
-   },
-   {
-    "bad": "If he come, I will tell him.",
-    "good": "If he comes, I will tell him.",
-    "why": "he 的現在式動詞要加 s。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "If you ___ this medicine, you will feel better.",
-    "options": [
-     "take",
-     "will take",
-     "took"
-    ],
-    "answer": 0,
-    "why": "if 那一句用現在式。"
-   },
-   {
-    "k": "choose",
-    "q": "If it rains tomorrow, we ___ at home.",
-    "options": [
-     "stay",
-     "will stay",
-     "stayed"
-    ],
-    "answer": 1,
-    "why": "主要句用 will + 原形。"
-   },
-   {
-    "k": "fill",
-    "q": "If she ___ (call), I will tell you.",
-    "accept": [
-     "calls"
-    ],
-    "why": "if 那一句用現在式；she 的動詞加 s。"
-   },
-   {
-    "k": "choose",
-    "q": "___ you hurry, you will miss the bus.",
-    "options": [
-     "If",
-     "Unless",
-     "Because"
-    ],
-    "answer": 1,
-    "why": "「除非你快一點，不然會錯過」用 Unless。"
-   },
-   {
-    "k": "fill",
-    "q": "If you feel dizzy, ___ (sit) down.",
-    "accept": [
-     "sit"
-    ],
-    "why": "主要句是祈使句，用原形。"
-   },
-   {
-    "k": "fix",
-    "q": "If I will see him, I will give him the book.",
-    "accept": [
-     "If I see him, I will give him the book."
-    ],
-    "why": "if 那一句用現在式，不用 will。"
-   },
-   {
-    "k": "fix",
-    "q": "If you don't eat, you are hungry later.",
-    "accept": [
-     "If you don't eat, you will be hungry later."
-    ],
-    "why": "主要句講之後的結果，用 will be。"
-   }
-  ],
-  "table": {
-   "title": "第一類假設",
-   "head": [
-    "if 那一句（條件）",
-    "主要句（結果）"
-   ],
-   "rows": [
-    [
-     "If + 現在式",
-     "will + 原形"
-    ],
-    [
-     "If you feel dizzy,",
-     "sit down.（祈使句）"
-    ],
-    [
-     "If you have questions,",
-     "you can ask me."
-    ],
-    [
-     "Unless + 現在式（除非）",
-     "will + 原形"
-    ]
-   ]
-  }
- },
- {
-  "unit": 30,
+  "unit": 33,
   "steps": [
    {
     "t": "say (that) + 句子；tell + 人 + (that) + 句子",
@@ -4728,7 +5222,337 @@
   }
  },
  {
-  "unit": 31,
+  "unit": 34,
+  "steps": [
+   {
+    "t": "as…as 一樣，not as…as 沒那麼",
+    "p": "as 和 as 中間放形容詞或副詞的原形。not as…as 等於「比較沒有……」，常用來說病情好轉。",
+    "ex": [
+     {
+      "en": "She is as tall as her mother.",
+      "zh": "她跟她媽媽一樣高。"
+     },
+     {
+      "en": "My room is not as big as yours.",
+      "zh": "我的房間沒有你的大。"
+     }
+    ]
+   },
+   {
+    "t": "too 太（不好），enough 夠",
+    "p": "too 放在形容詞前面，表示超過、不好；enough 放在形容詞後面、名詞前面。後面都可以接 to＋原形。",
+    "ex": [
+     {
+      "en": "The box is too heavy to lift.",
+      "zh": "箱子太重了，抬不起來。"
+     },
+     {
+      "en": "Is the water warm enough?",
+      "zh": "水夠溫嗎？"
+     }
+    ]
+   },
+   {
+    "t": "-ed 說人的感覺，-ing 說事情",
+    "p": "bored／boring、tired／tiring、interested／interesting、excited／exciting、worried／worrying：人覺得怎樣用 -ed，事情讓人怎樣用 -ing。",
+    "ex": [
+     {
+      "en": "I am tired after work.",
+      "zh": "我下班後很累。"
+     },
+     {
+      "en": "The night shift is tiring.",
+      "zh": "大夜班很累人。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "He is enough old to drive.",
+    "good": "He is old enough to drive.",
+    "why": "enough 放在形容詞後面。"
+   },
+   {
+    "bad": "I am boring in this class.",
+    "good": "I am bored in this class.",
+    "why": "說自己的感覺用 bored；I am boring 是「我這個人很無聊」。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "This bag is ___ heavy for me to carry.",
+    "options": [
+     "too",
+     "enough",
+     "as"
+    ],
+    "answer": 0,
+    "why": "太重而搬不動，用 too。"
+   },
+   {
+    "k": "choose",
+    "q": "Is the room ___?",
+    "options": [
+     "enough warm",
+     "warm enough",
+     "too enough"
+    ],
+    "answer": 1,
+    "why": "enough 放在形容詞後面。"
+   },
+   {
+    "k": "fill",
+    "q": "My brother is as ___ as my dad.（tall）",
+    "accept": [
+     "tall"
+    ],
+    "why": "as…as 中間用原形 tall。"
+   },
+   {
+    "k": "choose",
+    "q": "The movie was very ___. I fell asleep.",
+    "options": [
+     "bored",
+     "boring",
+     "bore"
+    ],
+    "answer": 1,
+    "why": "電影讓人無聊，用 boring。"
+   },
+   {
+    "k": "fill",
+    "q": "Today is not ___ hot as yesterday.（填一個字）",
+    "accept": [
+     "as"
+    ],
+    "why": "not as…as：沒有那麼……。"
+   },
+   {
+    "k": "fix",
+    "q": "I'm too tired to walking.",
+    "accept": [
+     "I'm too tired to walk.",
+     "I am too tired to walk."
+    ],
+    "why": "too…to 後面接原形 walk。"
+   },
+   {
+    "k": "fix",
+    "q": "She is interesting in music.",
+    "accept": [
+     "She is interested in music.",
+     "She's interested in music."
+    ],
+    "why": "人有興趣用 interested，後面接 in。"
+   }
+  ],
+  "table": {
+   "title": "程度的說法",
+   "head": [
+    "說法",
+    "意思",
+    "位置",
+    "例子"
+   ],
+   "rows": [
+    [
+     "as…as",
+     "一樣……",
+     "as＋形容詞原形＋as",
+     "as tall as my dad"
+    ],
+    [
+     "not as…as",
+     "沒有那麼……",
+     "not as＋形容詞＋as",
+     "not as bad as yesterday"
+    ],
+    [
+     "too",
+     "太……（不好）",
+     "too＋形容詞（＋to 原形）",
+     "too hot to drink"
+    ],
+    [
+     "enough",
+     "夠……",
+     "形容詞＋enough／enough＋名詞",
+     "warm enough、enough beds"
+    ],
+    [
+     "-ed／-ing",
+     "人的感覺／事情讓人",
+     "bored／boring",
+     "I'm bored. It's boring."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 35,
+  "steps": [
+   {
+    "t": "tell／ask／want＋人＋to＋原形",
+    "p": "叫、請、要某人做某事：tell／ask／want／remind＋人＋to＋原形。否定在 to 前面加 not：told me not to run。",
+    "ex": [
+     {
+      "en": "She asked me to wait.",
+      "zh": "她請我等一下。"
+     },
+     {
+      "en": "The nurse told him not to eat.",
+      "zh": "護理師叫他不要吃東西。"
+     }
+    ]
+   },
+   {
+    "t": "to 說目的；make／let／help＋人＋原形",
+    "p": "to＋原形放在句子後面表示「為了……」；make（叫人非做不可）、let（允許）、help 後面接人再接原形，不加 to。",
+    "ex": [
+     {
+      "en": "I went out to buy lunch.",
+      "zh": "我出去買午餐。"
+     },
+     {
+      "en": "Let him sleep.",
+      "zh": "讓他睡吧。"
+     }
+    ]
+   },
+   {
+    "t": "remember to／-ing 和 used to",
+    "p": "remember／forget to＋原形是「記得／忘記要做」，接 -ing 是「記得／忘了做過」；stop to＋原形是停下來去做，stop＋-ing 是不再做。used to＋原形說以前的習慣，現在不再；問句和否定用 use to。",
+    "ex": [
+     {
+      "en": "I forgot to lock the door.",
+      "zh": "我忘了鎖門。"
+     },
+     {
+      "en": "We used to live in Taichung.",
+      "zh": "我們以前住在台中。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The doctor told me rest.",
+    "good": "The doctor told me to rest.",
+    "why": "tell＋人＋to＋原形，to 不能少。"
+   },
+   {
+    "bad": "My mom made me to clean my room.",
+    "good": "My mom made me clean my room.",
+    "why": "make＋人＋原形，不加 to。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The nurse told me ___ water.",
+    "options": [
+     "drink",
+     "to drink",
+     "drinking"
+    ],
+    "answer": 1,
+    "why": "tell＋人＋to＋原形。"
+   },
+   {
+    "k": "choose",
+    "q": "My parents don't let me ___ late.",
+    "options": [
+     "stay up",
+     "to stay up",
+     "staying up"
+    ],
+    "answer": 0,
+    "why": "let＋人＋原形。"
+   },
+   {
+    "k": "fill",
+    "q": "I went to the store ___ buy milk.（填一個字）",
+    "accept": [
+     "to"
+    ],
+    "why": "to＋原形表示目的。"
+   },
+   {
+    "k": "choose",
+    "q": "Remember ___ your medicine after meals.",
+    "options": [
+     "take",
+     "to take",
+     "taking"
+    ],
+    "answer": 1,
+    "why": "記得要去做：remember to＋原形。"
+   },
+   {
+    "k": "fill",
+    "q": "I ___ to live in Tainan, but now I live in Taipei.（填一個字）",
+    "accept": [
+     "used"
+    ],
+    "why": "以前住（現在不住）：used to。"
+   },
+   {
+    "k": "fix",
+    "q": "She made me to wait for an hour.",
+    "accept": [
+     "She made me wait for an hour."
+    ],
+    "why": "make＋人＋原形，不加 to。"
+   },
+   {
+    "k": "fix",
+    "q": "Did you used to play the piano?",
+    "accept": [
+     "Did you use to play the piano?"
+    ],
+    "why": "問句有 did，used 要變回 use。"
+   }
+  ],
+  "table": {
+   "title": "動詞句型",
+   "head": [
+    "句型",
+    "意思",
+    "例子"
+   ],
+   "rows": [
+    [
+     "tell／ask／want＋人＋to＋原形",
+     "叫／請／要某人做",
+     "The doctor told me to rest."
+    ],
+    [
+     "to＋原形（放後面）",
+     "為了……",
+     "I went out to buy lunch."
+    ],
+    [
+     "make／let／help＋人＋原形",
+     "使／讓／幫某人做",
+     "Let me help you."
+    ],
+    [
+     "remember to／remember -ing",
+     "記得要做／記得做過",
+     "Remember to call her."
+    ],
+    [
+     "used to＋原形",
+     "以前常常（現在不再）",
+     "I used to smoke."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 36,
   "steps": [
    {
     "t": "have／has been + 動詞 ing：從以前一直做到現在",
@@ -4879,7 +5703,7 @@
   }
  },
  {
-  "unit": 32,
+  "unit": 37,
   "steps": [
    {
     "t": "had + 過去分詞：比過去更早",
@@ -5025,7 +5849,7 @@
   }
  },
  {
-  "unit": 33,
+  "unit": 38,
   "steps": [
    {
     "t": "跟現在事實相反：If + 過去式，主要句 would + 原形",
@@ -5171,467 +5995,7 @@
   }
  },
  {
-  "unit": 34,
-  "steps": [
-   {
-    "t": "助動詞 + be + 過去分詞",
-    "p": "can be done、should be given、must be checked、will be discharged。醫囑和衛教很常這樣說。",
-    "ex": [
-     {
-      "en": "This drug should be given with food.",
-      "zh": "這個藥應該跟食物一起吃。"
-     },
-     {
-      "en": "The wound must be kept dry.",
-      "zh": "傷口必須保持乾燥。"
-     }
-    ]
-   },
-   {
-    "t": "be 永遠是原形 be",
-    "p": "助動詞後面接原形，所以不會變成 is／are／was。",
-    "ex": [
-     {
-      "en": "The test can be done today.",
-      "zh": "這個檢查今天可以做。"
-     },
-     {
-      "en": "He will be discharged tomorrow.",
-      "zh": "他明天會出院。"
-     }
-    ]
-   },
-   {
-    "t": "否定加在助動詞後面",
-    "p": "例如 should not be、must not be、cannot be。",
-    "ex": [
-     {
-      "en": "This medicine should not be taken with milk.",
-      "zh": "這個藥不該配牛奶吃。"
-     },
-     {
-      "en": "The form must not be changed.",
-      "zh": "這張表不可以改。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "The medicine should give at eight.",
-    "good": "The medicine should be given at eight.",
-    "why": "藥是「被給」，要用 be + 過去分詞。"
-   },
-   {
-    "bad": "It must is done today.",
-    "good": "It must be done today.",
-    "why": "助動詞後面用原形 be。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "The wound should ___ every day.",
-    "options": [
-     "clean",
-     "be cleaned",
-     "is cleaned"
-    ],
-    "answer": 1,
-    "why": "傷口是「被清潔」，助動詞後面用 be + 過去分詞。"
-   },
-   {
-    "k": "choose",
-    "q": "This form must be ___ by the patient.",
-    "options": [
-     "sign",
-     "signing",
-     "signed"
-    ],
-    "answer": 2,
-    "why": "be 後面用過去分詞 signed。"
-   },
-   {
-    "k": "fill",
-    "q": "The results will ___ (send) tomorrow.",
-    "accept": [
-     "be sent"
-    ],
-    "why": "結果是「被寄出」，用 will be sent。"
-   },
-   {
-    "k": "choose",
-    "q": "This medicine ___ be taken with food.",
-    "options": [
-     "should",
-     "should to",
-     "is should"
-    ],
-    "answer": 0,
-    "why": "助動詞 should 直接接 be。"
-   },
-   {
-    "k": "fill",
-    "q": "The door must ___ (keep) closed.",
-    "accept": [
-     "be kept"
-    ],
-    "why": "門是「被保持」關著，用 must be kept。"
-   },
-   {
-    "k": "fix",
-    "q": "The room must cleaned today.",
-    "accept": [
-     "The room must be cleaned today."
-    ],
-    "why": "少了 be。"
-   },
-   {
-    "k": "fix",
-    "q": "He will is discharged tomorrow.",
-    "accept": [
-     "He will be discharged tomorrow."
-    ],
-    "why": "will 後面用原形 be。"
-   }
-  ],
-  "table": {
-   "title": "主動變被動",
-   "head": [
-    "主動",
-    "被動"
-   ],
-   "rows": [
-    [
-     "You should take this pill.",
-     "This pill should be taken."
-    ],
-    [
-     "We can do the test.",
-     "The test can be done."
-    ],
-    [
-     "The nurse will check it.",
-     "It will be checked."
-    ],
-    [
-     "You must keep it dry.",
-     "It must be kept dry."
-    ]
-   ]
-  }
- },
- {
-  "unit": 35,
-  "steps": [
-   {
-    "t": "that + 一整句，當「想、覺得、希望」的內容",
-    "p": "that 後面是完整的句子（主詞 + 動詞）。",
-    "ex": [
-     {
-      "en": "I think that he is right.",
-      "zh": "我覺得他是對的。"
-     },
-     {
-      "en": "I hope that you feel better soon.",
-      "zh": "希望你早日康復。"
-     }
-    ]
-   },
-   {
-    "t": "口語常常省略 that",
-    "p": "意思完全一樣。",
-    "ex": [
-     {
-      "en": "I think he is right.",
-      "zh": "我覺得他是對的。"
-     },
-     {
-      "en": "I'm sure she will come.",
-      "zh": "我確定她會來。"
-     }
-    ]
-   },
-   {
-    "t": "It is + 形容詞 + that…",
-    "p": "It is important that…（…很重要）、It is possible that…（有可能…）。",
-    "ex": [
-     {
-      "en": "It is important that you take the antibiotics.",
-      "zh": "按時吃抗生素很重要。"
-     },
-     {
-      "en": "It is possible that he forgot.",
-      "zh": "他有可能忘了。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "I think that is he right.",
-    "good": "I think that he is right.",
-    "why": "that 後面是一般句子的順序：主詞 + 動詞。"
-   },
-   {
-    "bad": "I hope you to get well.",
-    "good": "I hope you get well.",
-    "why": "hope 後面接完整句子，不是 you to…。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "I think ___ she is a good nurse.",
-    "options": [
-     "that",
-     "what",
-     "which"
-    ],
-    "answer": 0,
-    "why": "I think that + 句子。"
-   },
-   {
-    "k": "choose",
-    "q": "It is important ___ you drink enough water.",
-    "options": [
-     "what",
-     "that",
-     "to"
-    ],
-    "answer": 1,
-    "why": "It is important that + 句子。"
-   },
-   {
-    "k": "fill",
-    "q": "I hope that he ___ (be) OK.",
-    "accept": [
-     "is",
-     "will be"
-    ],
-    "why": "that 後面是完整句子；he 配 is。"
-   },
-   {
-    "k": "choose",
-    "q": "I'm sure ___.",
-    "options": [
-     "he will come",
-     "will he come",
-     "he coming"
-    ],
-    "answer": 0,
-    "why": "後面是一般句子的順序。"
-   },
-   {
-    "k": "fill",
-    "q": "It is possible ___ she forgot.（填一個字）",
-    "accept": [
-     "that"
-    ],
-    "why": "It is possible that + 句子。"
-   },
-   {
-    "k": "fix",
-    "q": "I think that is it too expensive.",
-    "accept": [
-     "I think that it is too expensive.",
-     "I think it is too expensive."
-    ],
-    "why": "that 後面用一般句子的順序：it is。"
-   },
-   {
-    "k": "fix",
-    "q": "I hope you to feel better soon.",
-    "accept": [
-     "I hope you feel better soon.",
-     "I hope that you feel better soon."
-    ],
-    "why": "hope 後面接完整句子。"
-   }
-  ],
-  "table": {
-   "title": "常用的開頭",
-   "head": [
-    "開頭",
-    "例子"
-   ],
-   "rows": [
-    [
-     "I think (that)…",
-     "I think (that) it is too late."
-    ],
-    [
-     "I hope (that)…",
-     "I hope (that) she is OK."
-    ],
-    [
-     "I'm sure (that)…",
-     "I'm sure (that) he knows."
-    ],
-    [
-     "It is important that…",
-     "It is important that you rest."
-    ],
-    [
-     "It is possible that…",
-     "It is possible that it is an allergy."
-    ]
-   ]
-  }
- },
- {
-  "unit": 36,
-  "steps": [
-   {
-    "t": "把 who is／which is 拿掉，句子變短",
-    "p": "the patient who is lying in bed 3 可以縮成 the patient lying in bed 3。",
-    "ex": [
-     {
-      "en": "The patient lying in bed 3 needs help.",
-      "zh": "躺在三床的病人需要幫忙。"
-     },
-     {
-      "en": "The woman talking to the doctor is my mother.",
-      "zh": "在跟醫師講話的那位女士是我媽媽。"
-     }
-    ]
-   },
-   {
-    "t": "自己在做的（主動）用動詞 ing",
-    "p": "名詞自己在做這個動作。",
-    "ex": [
-     {
-      "en": "The man sitting by the window is my uncle.",
-      "zh": "坐在窗邊的男人是我叔叔。"
-     },
-     {
-      "en": "Students living far away take the bus.",
-      "zh": "住得遠的學生搭公車。"
-     }
-    ]
-   },
-   {
-    "t": "被做的（被動）用過去分詞",
-    "p": "名詞是被做的那一方。",
-    "ex": [
-     {
-      "en": "The medicine given at eight was aspirin.",
-      "zh": "八點給的藥是阿斯匹靈。"
-     },
-     {
-      "en": "The book written by her is popular.",
-      "zh": "她寫的那本書很受歡迎。"
-     }
-    ]
-   }
-  ],
-  "mistakes": [
-   {
-    "bad": "The man sit over there is my teacher.",
-    "good": "The man sitting over there is my teacher.",
-    "why": "說明名詞要用 sitting，不能用原形。"
-   },
-   {
-    "bad": "The letter writing by him was long.",
-    "good": "The letter written by him was long.",
-    "why": "信是「被寫」，用過去分詞 written。"
-   }
-  ],
-  "drills": [
-   {
-    "k": "choose",
-    "q": "The girl ___ next to me is my sister.",
-    "options": [
-     "sit",
-     "sitting",
-     "sat"
-    ],
-    "answer": 1,
-    "why": "女孩自己坐著（主動），用 sitting。"
-   },
-   {
-    "k": "choose",
-    "q": "The medicine ___ by the doctor is expensive.",
-    "options": [
-     "prescribing",
-     "prescribed",
-     "prescribe"
-    ],
-    "answer": 1,
-    "why": "藥是「被開立」，用過去分詞。"
-   },
-   {
-    "k": "fill",
-    "q": "The patients ___ (wait) outside are tired.",
-    "accept": [
-     "waiting"
-    ],
-    "why": "病人自己在等（主動），用 waiting。"
-   },
-   {
-    "k": "choose",
-    "q": "The window ___ yesterday has been fixed.",
-    "options": [
-     "breaking",
-     "broken",
-     "break"
-    ],
-    "answer": 1,
-    "why": "窗戶是「被打破」，用過去分詞 broken。"
-   },
-   {
-    "k": "fill",
-    "q": "The report ___ (write) last week was very long.",
-    "accept": [
-     "written"
-    ],
-    "why": "報告是「被寫」，用過去分詞 written。"
-   },
-   {
-    "k": "fix",
-    "q": "The nurse stand at the door is new.",
-    "accept": [
-     "The nurse standing at the door is new."
-    ],
-    "why": "護理師自己站著，用 standing。"
-   },
-   {
-    "k": "fix",
-    "q": "The food cooking by my mother is delicious.",
-    "accept": [
-     "The food cooked by my mother is delicious."
-    ],
-    "why": "食物是「被煮」，用過去分詞 cooked。"
-   }
-  ],
-  "table": {
-   "title": "完整的說法和縮短的說法",
-   "head": [
-    "完整的關係子句",
-    "縮短後"
-   ],
-   "rows": [
-    [
-     "the nurse who is standing there",
-     "the nurse standing there"
-    ],
-    [
-     "the patients who are waiting outside",
-     "the patients waiting outside"
-    ],
-    [
-     "the drug that was given at eight",
-     "the drug given at eight"
-    ],
-    [
-     "the tests that were done yesterday",
-     "the tests done yesterday"
-    ]
-   ]
-  }
- },
- {
-  "unit": 37,
+  "unit": 39,
   "steps": [
    {
     "t": "although／even though（雖然）+ 句子",
@@ -5791,7 +6155,7 @@
   }
  },
  {
-  "unit": 38,
+  "unit": 40,
   "steps": [
    {
     "t": "because of／due to（由於）+ 名詞；because + 句子",
@@ -5952,7 +6316,467 @@
   }
  },
  {
-  "unit": 39,
+  "unit": 41,
+  "steps": [
+   {
+    "t": "助動詞 + be + 過去分詞",
+    "p": "can be done、should be given、must be checked、will be discharged。醫囑和衛教很常這樣說。",
+    "ex": [
+     {
+      "en": "This drug should be given with food.",
+      "zh": "這個藥應該跟食物一起吃。"
+     },
+     {
+      "en": "The wound must be kept dry.",
+      "zh": "傷口必須保持乾燥。"
+     }
+    ]
+   },
+   {
+    "t": "be 永遠是原形 be",
+    "p": "助動詞後面接原形，所以不會變成 is／are／was。",
+    "ex": [
+     {
+      "en": "The test can be done today.",
+      "zh": "這個檢查今天可以做。"
+     },
+     {
+      "en": "He will be discharged tomorrow.",
+      "zh": "他明天會出院。"
+     }
+    ]
+   },
+   {
+    "t": "否定加在助動詞後面",
+    "p": "例如 should not be、must not be、cannot be。",
+    "ex": [
+     {
+      "en": "This medicine should not be taken with milk.",
+      "zh": "這個藥不該配牛奶吃。"
+     },
+     {
+      "en": "The form must not be changed.",
+      "zh": "這張表不可以改。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The medicine should give at eight.",
+    "good": "The medicine should be given at eight.",
+    "why": "藥是「被給」，要用 be + 過去分詞。"
+   },
+   {
+    "bad": "It must is done today.",
+    "good": "It must be done today.",
+    "why": "助動詞後面用原形 be。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The wound should ___ every day.",
+    "options": [
+     "clean",
+     "be cleaned",
+     "is cleaned"
+    ],
+    "answer": 1,
+    "why": "傷口是「被清潔」，助動詞後面用 be + 過去分詞。"
+   },
+   {
+    "k": "choose",
+    "q": "This form must be ___ by the patient.",
+    "options": [
+     "sign",
+     "signing",
+     "signed"
+    ],
+    "answer": 2,
+    "why": "be 後面用過去分詞 signed。"
+   },
+   {
+    "k": "fill",
+    "q": "The results will ___ (send) tomorrow.",
+    "accept": [
+     "be sent"
+    ],
+    "why": "結果是「被寄出」，用 will be sent。"
+   },
+   {
+    "k": "choose",
+    "q": "This medicine ___ be taken with food.",
+    "options": [
+     "should",
+     "should to",
+     "is should"
+    ],
+    "answer": 0,
+    "why": "助動詞 should 直接接 be。"
+   },
+   {
+    "k": "fill",
+    "q": "The door must ___ (keep) closed.",
+    "accept": [
+     "be kept"
+    ],
+    "why": "門是「被保持」關著，用 must be kept。"
+   },
+   {
+    "k": "fix",
+    "q": "The room must cleaned today.",
+    "accept": [
+     "The room must be cleaned today."
+    ],
+    "why": "少了 be。"
+   },
+   {
+    "k": "fix",
+    "q": "He will is discharged tomorrow.",
+    "accept": [
+     "He will be discharged tomorrow."
+    ],
+    "why": "will 後面用原形 be。"
+   }
+  ],
+  "table": {
+   "title": "主動變被動",
+   "head": [
+    "主動",
+    "被動"
+   ],
+   "rows": [
+    [
+     "You should take this pill.",
+     "This pill should be taken."
+    ],
+    [
+     "We can do the test.",
+     "The test can be done."
+    ],
+    [
+     "The nurse will check it.",
+     "It will be checked."
+    ],
+    [
+     "You must keep it dry.",
+     "It must be kept dry."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 42,
+  "steps": [
+   {
+    "t": "that + 一整句，當「想、覺得、希望」的內容",
+    "p": "that 後面是完整的句子（主詞 + 動詞）。",
+    "ex": [
+     {
+      "en": "I think that he is right.",
+      "zh": "我覺得他是對的。"
+     },
+     {
+      "en": "I hope that you feel better soon.",
+      "zh": "希望你早日康復。"
+     }
+    ]
+   },
+   {
+    "t": "口語常常省略 that",
+    "p": "意思完全一樣。",
+    "ex": [
+     {
+      "en": "I think he is right.",
+      "zh": "我覺得他是對的。"
+     },
+     {
+      "en": "I'm sure she will come.",
+      "zh": "我確定她會來。"
+     }
+    ]
+   },
+   {
+    "t": "It is + 形容詞 + that…",
+    "p": "It is important that…（…很重要）、It is possible that…（有可能…）。",
+    "ex": [
+     {
+      "en": "It is important that you take the antibiotics.",
+      "zh": "按時吃抗生素很重要。"
+     },
+     {
+      "en": "It is possible that he forgot.",
+      "zh": "他有可能忘了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I think that is he right.",
+    "good": "I think that he is right.",
+    "why": "that 後面是一般句子的順序：主詞 + 動詞。"
+   },
+   {
+    "bad": "I hope you to get well.",
+    "good": "I hope you get well.",
+    "why": "hope 後面接完整句子，不是 you to…。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I think ___ she is a good nurse.",
+    "options": [
+     "that",
+     "what",
+     "which"
+    ],
+    "answer": 0,
+    "why": "I think that + 句子。"
+   },
+   {
+    "k": "choose",
+    "q": "It is important ___ you drink enough water.",
+    "options": [
+     "what",
+     "that",
+     "to"
+    ],
+    "answer": 1,
+    "why": "It is important that + 句子。"
+   },
+   {
+    "k": "fill",
+    "q": "I hope that he ___ (be) OK.",
+    "accept": [
+     "is",
+     "will be"
+    ],
+    "why": "that 後面是完整句子；he 配 is。"
+   },
+   {
+    "k": "choose",
+    "q": "I'm sure ___.",
+    "options": [
+     "he will come",
+     "will he come",
+     "he coming"
+    ],
+    "answer": 0,
+    "why": "後面是一般句子的順序。"
+   },
+   {
+    "k": "fill",
+    "q": "It is possible ___ she forgot.（填一個字）",
+    "accept": [
+     "that"
+    ],
+    "why": "It is possible that + 句子。"
+   },
+   {
+    "k": "fix",
+    "q": "I think that is it too expensive.",
+    "accept": [
+     "I think that it is too expensive.",
+     "I think it is too expensive."
+    ],
+    "why": "that 後面用一般句子的順序：it is。"
+   },
+   {
+    "k": "fix",
+    "q": "I hope you to feel better soon.",
+    "accept": [
+     "I hope you feel better soon.",
+     "I hope that you feel better soon."
+    ],
+    "why": "hope 後面接完整句子。"
+   }
+  ],
+  "table": {
+   "title": "常用的開頭",
+   "head": [
+    "開頭",
+    "例子"
+   ],
+   "rows": [
+    [
+     "I think (that)…",
+     "I think (that) it is too late."
+    ],
+    [
+     "I hope (that)…",
+     "I hope (that) she is OK."
+    ],
+    [
+     "I'm sure (that)…",
+     "I'm sure (that) he knows."
+    ],
+    [
+     "It is important that…",
+     "It is important that you rest."
+    ],
+    [
+     "It is possible that…",
+     "It is possible that it is an allergy."
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 43,
+  "steps": [
+   {
+    "t": "把 who is／which is 拿掉，句子變短",
+    "p": "the patient who is lying in bed 3 可以縮成 the patient lying in bed 3。",
+    "ex": [
+     {
+      "en": "The patient lying in bed 3 needs help.",
+      "zh": "躺在三床的病人需要幫忙。"
+     },
+     {
+      "en": "The woman talking to the doctor is my mother.",
+      "zh": "在跟醫師講話的那位女士是我媽媽。"
+     }
+    ]
+   },
+   {
+    "t": "自己在做的（主動）用動詞 ing",
+    "p": "名詞自己在做這個動作。",
+    "ex": [
+     {
+      "en": "The man sitting by the window is my uncle.",
+      "zh": "坐在窗邊的男人是我叔叔。"
+     },
+     {
+      "en": "Students living far away take the bus.",
+      "zh": "住得遠的學生搭公車。"
+     }
+    ]
+   },
+   {
+    "t": "被做的（被動）用過去分詞",
+    "p": "名詞是被做的那一方。",
+    "ex": [
+     {
+      "en": "The medicine given at eight was aspirin.",
+      "zh": "八點給的藥是阿斯匹靈。"
+     },
+     {
+      "en": "The book written by her is popular.",
+      "zh": "她寫的那本書很受歡迎。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The man sit over there is my teacher.",
+    "good": "The man sitting over there is my teacher.",
+    "why": "說明名詞要用 sitting，不能用原形。"
+   },
+   {
+    "bad": "The letter writing by him was long.",
+    "good": "The letter written by him was long.",
+    "why": "信是「被寫」，用過去分詞 written。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The girl ___ next to me is my sister.",
+    "options": [
+     "sit",
+     "sitting",
+     "sat"
+    ],
+    "answer": 1,
+    "why": "女孩自己坐著（主動），用 sitting。"
+   },
+   {
+    "k": "choose",
+    "q": "The medicine ___ by the doctor is expensive.",
+    "options": [
+     "prescribing",
+     "prescribed",
+     "prescribe"
+    ],
+    "answer": 1,
+    "why": "藥是「被開立」，用過去分詞。"
+   },
+   {
+    "k": "fill",
+    "q": "The patients ___ (wait) outside are tired.",
+    "accept": [
+     "waiting"
+    ],
+    "why": "病人自己在等（主動），用 waiting。"
+   },
+   {
+    "k": "choose",
+    "q": "The window ___ yesterday has been fixed.",
+    "options": [
+     "breaking",
+     "broken",
+     "break"
+    ],
+    "answer": 1,
+    "why": "窗戶是「被打破」，用過去分詞 broken。"
+   },
+   {
+    "k": "fill",
+    "q": "The report ___ (write) last week was very long.",
+    "accept": [
+     "written"
+    ],
+    "why": "報告是「被寫」，用過去分詞 written。"
+   },
+   {
+    "k": "fix",
+    "q": "The nurse stand at the door is new.",
+    "accept": [
+     "The nurse standing at the door is new."
+    ],
+    "why": "護理師自己站著，用 standing。"
+   },
+   {
+    "k": "fix",
+    "q": "The food cooking by my mother is delicious.",
+    "accept": [
+     "The food cooked by my mother is delicious."
+    ],
+    "why": "食物是「被煮」，用過去分詞 cooked。"
+   }
+  ],
+  "table": {
+   "title": "完整的說法和縮短的說法",
+   "head": [
+    "完整的關係子句",
+    "縮短後"
+   ],
+   "rows": [
+    [
+     "the nurse who is standing there",
+     "the nurse standing there"
+    ],
+    [
+     "the patients who are waiting outside",
+     "the patients waiting outside"
+    ],
+    [
+     "the drug that was given at eight",
+     "the drug given at eight"
+    ],
+    [
+     "the tests that were done yesterday",
+     "the tests done yesterday"
+    ]
+   ]
+  }
+ },
+ {
+  "unit": 44,
   "steps": [
    {
     "t": "上升、下降、不變",
@@ -6103,7 +6927,7 @@
   }
  },
  {
-  "unit": 40,
+  "unit": 45,
   "steps": [
    {
     "t": "第一步：先說意見",
@@ -6261,7 +7085,7 @@
   }
  },
  {
-  "unit": 41,
+  "unit": 46,
   "steps": [
    {
     "t": "泛指的時候，不可數名詞和複數名詞不加冠詞",
@@ -6422,7 +7246,7 @@
   }
  },
  {
-  "unit": 42,
+  "unit": 47,
   "steps": [
    {
     "t": "有些字習慣一起用，要整組背",
@@ -6593,7 +7417,7 @@
   }
  },
  {
-  "unit": 43,
+  "unit": 48,
   "steps": [
    {
     "t": "故事的主線用過去式，背景用過去進行式",
@@ -6749,7 +7573,7 @@
   }
  },
  {
-  "unit": 44,
+  "unit": 49,
   "steps": [
    {
     "t": "已經約好的安排：現在進行式",
@@ -6900,7 +7724,7 @@
   }
  },
  {
-  "unit": 45,
+  "unit": 50,
   "steps": [
    {
     "t": "推測現在：must be、might be、can't be",
@@ -7052,7 +7876,7 @@
   }
  },
  {
-  "unit": 46,
+  "unit": 51,
   "steps": [
    {
     "t": "跟過去事實相反：If + had + 過去分詞，主要句 would have + 過去分詞",
@@ -7203,7 +8027,7 @@
   }
  },
  {
-  "unit": 47,
+  "unit": 52,
   "steps": [
    {
     "t": "對現在的願望（事實不是這樣）：wish + 過去式",
@@ -7360,7 +8184,7 @@
   }
  },
  {
-  "unit": 48,
+  "unit": 53,
   "steps": [
    {
     "t": "補充說明，前後加逗號",

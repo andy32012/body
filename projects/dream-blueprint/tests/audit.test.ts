@@ -31,9 +31,9 @@ test('縮寫：學生的縮寫兩種讀法都試；參考句照後面的字決�
   assert.ok(matchesReference("You'd better rest.", ['You had better rest.']))
   assert.ok(matchesReference('I met her at a cafe.', ['I met her at a café.']), '重音字母不算錯')
   assert.ok(matchesReference('Could you take a picture of me?', sentences.find(s => s.id === 's-053')!.reference), '拍我、替我拍兩種都收')
-  const u42 = curriculum.units[41].backup.find(s => s.id === 'u42-r1')!
-  assert.match(u42.zh, /你的照片/)
-  assert.ok(matchesReference("I'll take a photo of you.", u42.reference))
+  const u47 = curriculum.units[46].backup.find(s => s.id === 'u47-r1')!
+  assert.match(u47.zh, /你的照片/)
+  assert.ok(matchesReference("I'll take a photo of you.", u47.reference))
 })
 
 test('複習卡：自評的「對了」先停在原地，確認過才往上升；錯或看答案往下', () => {

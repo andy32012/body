@@ -61,13 +61,13 @@ test('一級的單元上完的那個月要報名那張證照；中高級等 7000
   assert.match(plan.years.find(y => y.year === +year)!.english, /報名全民英檢中高級/)
 })
 
-test('48 個單元上完以後沒有升級關卡擋著（沒有下一段的課要開），日曆寫「都上完了」', () => {
+test('全部單元上完以後沒有升級關卡擋著（沒有下一段的課要開），日曆寫「都上完了」', () => {
   assert.equal(unitGate({}, schedule.preparedThroughUnit + 1), null)
   assert.equal(firstLockedUnit({}, schedule.preparedThroughUnit + 1), null)
-  assert.equal(unitGate({}, 17)?.to, 'A2', '單元 17 還是要先報名初級')
-  assert.equal(unitGate({}, 31)?.to, 'B1', '單元 31 還是要先報名中級')
+  assert.equal(unitGate({}, 29)?.to, 'A2', '單元 29 還是要先報名初級')
+  assert.equal(unitGate({}, 41)?.to, 'B1', '單元 41 還是要先報名中級')
   const after = days.filter(d => d.day > days.find(x => x.gate === 'B2')!.day && d.kind !== 'rest' && d.period === 'semester')
-  assert.ok(after.length && after.every(d => d.kind === 'future' && d.label.startsWith('48 個單元都上完了')))
+  assert.ok(after.length && after.every(d => d.kind === 'future' && d.label.startsWith(schedule.preparedThroughUnit + ' 個單元都上完了')))
 })
 
 test('預設的考週、寒假、實習和國考期，就是計畫用的那幾段', () => {

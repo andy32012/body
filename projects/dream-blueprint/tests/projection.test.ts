@@ -70,11 +70,11 @@ test('每個單元都有教材，單元 7 之後接著排單元 8；全部做完
   assert.deepEqual([ready[1].unit,ready[1].lessonDay],[8,1])
   const finished = projectCalendar({...base,cursor:curriculum.units.length*6,today:'2027-03-01',from:'2027-03-01',to:'2027-03-06',ranges:[]})
   assert.ok(finished.every(d=>d.kind!=='lesson'))
-  assert.ok(finished.filter(d=>d.kind==='future').every(d=>d.label.startsWith('48 個單元都上完了')))
+  assert.ok(finished.filter(d=>d.kind==='future').every(d=>d.label.startsWith(schedule.preparedThroughUnit+' 個單元都上完了')))
   assert.equal(curriculum.units.length,schedule.preparedThroughUnit)
-  // 42 個主線單元之後接 B1→B2 橋接單元。
-  const bridge = projectCalendar({...base,cursor:42*6,today:'2027-03-01',from:'2027-03-01',to:'2027-03-06',ranges:[]})
-  assert.equal(bridge.find(d=>d.kind==='lesson')?.unit,43)
+  // 47 個主線單元之後接 B1→B2 橋接單元。
+  const bridge = projectCalendar({...base,cursor:47*6,today:'2027-03-01',from:'2027-03-01',to:'2027-03-06',ranges:[]})
+  assert.equal(bridge.find(d=>d.kind==='lesson')?.unit,48)
   assert.ok(curriculum.units.every(u=>u.days.length===6&&u.checkpoint.length===3&&u.backup.length===5))
 })
 test('全年實習與國考共 547 天：實習 20–30 分鐘、國考衝刺 15 分鐘護理英文，沒有新課', () => {

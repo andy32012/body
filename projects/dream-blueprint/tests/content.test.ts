@@ -54,10 +54,10 @@ test('文法課：小關卡考新句子，同一句中文不會有兩套答案',
 
 test('文法規則：講太死的地方改掉了', () => {
   const rule = (id: number) => curriculum.units.find(u => u.id === id)!.rule
-  assert.match(rule(18), /before eating/)
+  assert.match(rule(22), /before eating/)
   assert.match(rule(8), /stopped/)
-  assert.match(rule(24), /Sometimes she is late/)
-  const u38 = curriculum.units.find(u => u.id === 38)!.days[4]
+  assert.match(rule(18), /Sometimes she is late/)
+  const u38 = curriculum.units.find(u => u.id === 40)!.days[4]
   assert.ok(!u38.zh.includes('按時') || u38.reference.every(r => /on time/.test(r)), 'u38-d5 的中文和答案要說同一件事')
   const start05 = (starters as { id: string; hints: string[] }[]).find(s => s.id === 'start-05')!
   assert.notEqual(start05.hints[0], '單數可數名詞前面要加 a。')

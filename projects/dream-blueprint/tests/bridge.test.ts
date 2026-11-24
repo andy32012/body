@@ -24,7 +24,7 @@ test('橋接單元：每個 BR 單元都有一包讀聽說寫，反過來也一�
   assert.equal(packFor(10), br[0], '還沒到橋接單元：先看第一包')
   assert.equal(packFor(br[2]), br[2])
   assert.equal(packFor(999), br[br.length - 1])
-  assert.equal(hasPack(42), false)
+  assert.equal(hasPack(47), false)
 })
 
 test('橋接單元：每一包的閱讀、回測、聽力、寫作、口說、詞塊都對得上', () => {
@@ -83,18 +83,18 @@ test('橋接寫作：不搶寫作階梯的建議，第一個評分項目寫出�
 })
 
 test('回測：第 6 天或上完單元才開，只記第一次', () => {
-  assert.equal(heldOpen({ unit: 43, day: 5 }, 43), false)
-  assert.equal(heldOpen({ unit: 43, day: 6 }, 43), true)
-  assert.equal(heldOpen({ unit: 44, day: 1 }, 43), true)
-  assert.equal(heldOpen({ unit: 40, day: 6 }, 43), false)
+  assert.equal(heldOpen({ unit: 48, day: 5 }, 48), false)
+  assert.equal(heldOpen({ unit: 48, day: 6 }, 48), true)
+  assert.equal(heldOpen({ unit: 49, day: 1 }, 48), true)
+  assert.equal(heldOpen({ unit: 45, day: 6 }, 48), false)
   let notes: Record<string, string> = {}
-  notes = saveHeld(notes, 43, 'reading', { day: '2026-11-22', correct: 3, total: 5, picks: [0, 1, 0, 0, 1] })
-  notes = saveHeld(notes, 43, 'reading', { day: '2026-11-23', correct: 5, total: 5, picks: [0, 1, 0, 0, 1] })
-  assert.equal(readHeld(notes, 43).reading?.correct, 3, '第二次不會蓋掉第一次')
-  notes = saveHeld(notes, 43, 'listening', { day: '2026-11-22', correct: 4, total: 4, picks: [1, 0, 1, 0], heard: true })
-  assert.equal(readHeld(notes, 43).reading?.correct, 3)
-  assert.equal(readHeld(notes, 43).listening?.heard, true)
-  assert.deepEqual(readHeld({ 'bridge.held.44': 'oops' }, 44), {})
+  notes = saveHeld(notes, 48, 'reading', { day: '2026-11-22', correct: 3, total: 5, picks: [0, 1, 0, 0, 1] })
+  notes = saveHeld(notes, 48, 'reading', { day: '2026-11-23', correct: 5, total: 5, picks: [0, 1, 0, 0, 1] })
+  assert.equal(readHeld(notes, 48).reading?.correct, 3, '第二次不會蓋掉第一次')
+  notes = saveHeld(notes, 48, 'listening', { day: '2026-11-22', correct: 4, total: 4, picks: [1, 0, 1, 0], heard: true })
+  assert.equal(readHeld(notes, 48).reading?.correct, 3)
+  assert.equal(readHeld(notes, 48).listening?.heard, true)
+  assert.deepEqual(readHeld({ 'bridge.held.49': 'oops' }, 49), {})
 })
 
 test('四技能平衡：這週每種技能做了幾天（週一開始）', () => {
@@ -118,11 +118,11 @@ test('四技能平衡：這週每種技能做了幾天（週一開始）', () =>
 
 test('Emma 的程度跟著每日課的階段走；口說任務告訴她這一課的文法', () => {
   assert.match(emmaLevel(5).speak, /A1–A2/)
-  assert.match(emmaLevel(20).speak, /A2–B1/)
+  assert.match(emmaLevel(30).speak, /A2–B1/)
   assert.match(emmaLevel(45).speak, /B1–B2/)
   assert.match(emmaLevel(45).speak, /why/)
-  assert.match(emmaLevel(49).speak, /B2–C1/)
-  const p = packs.find(x => x.unit === 45)!
+  assert.match(emmaLevel(54).speak, /B2–C1/)
+  const p = packs.find(x => x.unit === 50)!
   const text = packInstructions(p, 0)
   assert.ok(text.includes(p.speak[0].en) && text.includes(p.focus))
 })
@@ -131,9 +131,9 @@ test('交接內容：橋接單元寫出讀聽說寫包和回測的第一次成�
   const { createInitialState } = await import('../src/lib/store.ts')
   const { handoffText } = await import('../src/lib/handoff.ts')
   const state = createInitialState('2026-11-20')
-  state.curriculum = { ...state.curriculum, unit: 45, day: 6 }
+  state.curriculum = { ...state.curriculum, unit: 50, day: 6 }
   assert.match(handoffText(state, '2026-11-20'), /橋接單元.*（第 6 天開放）/)
-  state.notes = saveHeld(state.notes, 45, 'reading', { day: '2026-11-20', correct: 3, total: 5, picks: [] })
+  state.notes = saveHeld(state.notes, 50, 'reading', { day: '2026-11-20', correct: 3, total: 5, picks: [] })
   assert.match(handoffText(state, '2026-11-20'), /回測第一次成績：閱讀 3\/5/)
   state.curriculum = { ...state.curriculum, unit: 12, day: 1 }
   assert.doesNotMatch(handoffText(state, '2026-11-20'), /橋接單元，另有/)

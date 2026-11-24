@@ -2,7 +2,7 @@
   "source": "單元順序依玄燁提供的英文課表；每天多久依 2026-11 的計畫：週一到週六每天 1.5 小時、寒假 3–4 小時，2028-02 起實習、2029-02 至 07 國考衝刺只做護理英文。",
   "about": "整份課表只有這一個來源：從 start（第一堂課）開始，照預設的上課日每天一堂（文法課和生活主題輪流），每一級的單元上完就報名那一級的證照。月計畫（plan.json）、年度目標和日曆上的「原課表安排」都照它用 projection.ts 算，tests/plan.test.ts 會檢查三個地方說的一樣。",
   "start": "2026-11-24",
-  "preparedThroughUnit": 48,
+  "preparedThroughUnit": 53,
   "daysPerUnit": 6,
   "regularDays": [
     1,
