@@ -131,7 +131,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       session.current = await startVoice({
         // Everything but the IELTS test knows what his course has taught and corrects him by his rule.
         instructions: emmaInstructions(memory.notes, extra, emmaLevel(state.curriculum.unit), {
-          longTurn: !!card, ...(card ? {} : { study: emmaStudy(state.curriculum.unit, weakLinesEn(state.notes, today, 5)) }),
+          // Role-plays (life topic, unit task, nursing scene) keep their own rule for mistakes.
+          longTurn: !!card, ...(card ? {} : { study: emmaStudy(state.curriculum.unit, weakLinesEn(state.notes, today, 5), !(topic || packTask || nurse)) }),
         }),
         opening: emmaOpening(!!extra),
         // In IELTS Part 2 he talks alone for a minute or two and may stop to think: nobody hurries him there.

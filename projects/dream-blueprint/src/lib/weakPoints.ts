@@ -85,15 +85,26 @@ export function readWeak(notes: Record<string, string>): WeakItem[] {
       .map(x => ({ ...x, first: typeof x.first === 'string' ? x.first : x.last, ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [] }))
   } catch { return [] }
 }
-const write = (notes: Record<string, string>, list: WeakItem[]) => ({ ...notes, [weakKey]: JSON.stringify(list) })
+/** Saved notes are capped at 50,000 characters each (store.ts); the list stays well under that by dropping the
+ *  examples of the weakest points first, then those points. */
+function write(notes: Record<string, string>, list: WeakItem[]) {
+  let kept = list
+  let json = JSON.stringify(kept)
+  for (let i = kept.length - 1; json.length > 30000 && i >= 0; i--) {
+    kept = kept.map((item, j) => j === i ? { ...item, ex: item.ex.slice(0, 1) } : item)
+    json = JSON.stringify(kept)
+  }
+  while (json.length > 30000 && kept.length) { kept = kept.slice(0, -1); json = JSON.stringify(kept) }
+  return { ...notes, [weakKey]: json }
+}
 
 /** How weak a point is today: each miss counts, and the count halves every three weeks without a new miss. */
 export function weakScore(item: WeakItem, today: string) {
   const age = Math.max(0, daysBetween(item.last, today))
   return item.n * Math.pow(0.5, age / 21)
 }
-const MAX_ITEMS = 40
-const clip = (s: string, n = 160) => s.trim().replace(/\s+/g, ' ').slice(0, n)
+const MAX_ITEMS = 30
+const clip = (s: string, n = 140) => s.trim().replace(/\s+/g, ' ').slice(0, n)
 
 /** Records a mistake. Labels outside the list are ignored, so a teacher cannot fill the list with free text. */
 export function addWeak(notes: Record<string, string>, rawLabel: string, day: string, example?: { w: string; r: string }, src: WeakSource = 'tutor') {

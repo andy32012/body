@@ -8,7 +8,7 @@ export const EMMA = 'Emma'
 /** What his course has taught so far and how to correct him, for every chat except the IELTS test (no corrections there).
  *  His rule: grammar already learned (or a known weak point) gets a hint first so he fixes it himself; grammar not
  *  learned yet is simply said back the right way. Only the latest units are named, to keep her instructions short. */
-export function emmaStudy(unit: number, weak: string[]) {
+export function emmaStudy(unit: number, weak: string[], corrections = true) {
   const learned = unitLabels.filter(u => u.unit < unit)
   const recent = learned.slice(-8)
   const current = unitLabels.find(u => u.unit === unit)
@@ -21,11 +21,14 @@ export function emmaStudy(unit: number, weak: string[]) {
     current ? 'Learning now: ' + current.en + '.' : '',
     next.length ? 'Not learned yet: ' + next.map(u => u.en).join('; ') + ', and everything after.' : '',
     weak.length ? 'His weak points lately: ' + weak.join('; ') + '.' : '',
-    '',
-    '# Correcting him',
-    'A mistake in grammar he has learned, or in one of his weak points: do not say the right sentence at once. Give a tiny hint and let him fix it himself (like "Yesterday you… go?" or "One more time: she…?"). If he still cannot, say it the right way once, kindly, and go on.',
-    'A mistake in grammar he has not learned yet: just say it back the right way inside your reply, no hint, no explanation.',
-    'Correct at most one thing in a turn, and not every turn, so it still feels like chatting with a friend.',
+    // A role-play (life topic, unit task, nursing scene) brings its own rule for mistakes.
+    ...(corrections ? [] : ['Keep your English mostly within what he has learned.']),
+    ...(corrections ? ['\n# Correcting him'] : []),
+    ...(corrections ? [
+      'A mistake in grammar he has learned, or in one of his weak points: do not say the right sentence at once. Give a tiny hint and let him fix it himself (like "Yesterday you… go?" or "One more time: she…?"). If he still cannot, say it the right way once, kindly, and go on.',
+      'A mistake in grammar he has not learned yet: just say it back the right way inside your reply, no hint, no explanation.',
+      'Correct at most one thing in a turn, and not every turn, so it still feels like chatting with a friend.',
+    ] : []),
   ].filter(Boolean).join('\n')
 }
 
@@ -35,7 +38,7 @@ export function emmaInstructions(memory: string[], lesson: string, level: { abou
     'He is a nursing student in Taiwan. ' + level.about + ' He wants to get better for IELTS and to work as a nurse in the US someday.',
     'This is casual everyday chat: your day, his day, classes, food, movies, weekend plans, nursing school life, little jokes. Be warm, playful and curious, use natural American expressions, laugh a little, react with feeling.',
     level.speak,
-    opts.study ? 'When he makes a mistake, follow "Correcting him" below; never lecture.' : 'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
+    opts.study?.includes('# Correcting him') ? 'When he makes a mistake, follow "Correcting him" below; never lecture.' : 'If he makes a mistake, casually say it back the right way inside your reply (like "Oh, you went to the night market? Nice!"), never lecture.',
     'Start by greeting him like a friend you are happy to see.',
     lesson,
     memory.length ? 'Things you remember about him from before: ' + memory.join('; ') : '',

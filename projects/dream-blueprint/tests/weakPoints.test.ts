@@ -126,3 +126,18 @@ test('口說錯句自動加進複習、可以拿掉；卡片帶弱點名稱，�
   assert.deepEqual(s.notes, {})
   assert.equal(fixToCard({ wrong: 'goed', right: 'went', tag: '過去式（不規則動詞）' })?.tag, '過去式（不規則動詞）')
 })
+
+test('角色扮演（生活主題、單元任務、護理情境）保留自己的糾正規則，只帶學過什麼', () => {
+  const play = emmaStudy(12, ['the'], false)
+  assert.doesNotMatch(play, /Correcting him/)
+  assert.match(play, /Keep your English mostly within what he has learned/)
+  assert.match(emmaInstructions([], 'Role-play', emmaLevel(12), { study: play }), /casually say it back/)
+})
+
+test('弱點清單再多也不會超過一則筆記的長度上限', () => {
+  let notes: Record<string, string> = {}
+  const long = 'x'.repeat(400)
+  for (let i = 0; i < 60; i++) for (const label of unitLabels.slice(0, 40).map(u => u.label)) notes = addWeak(notes, label, day, { w: long + i, r: long })
+  assert.ok(notes[weakKey].length <= 30000, String(notes[weakKey].length))
+  assert.ok(readWeak(notes).length >= 20)
+})
