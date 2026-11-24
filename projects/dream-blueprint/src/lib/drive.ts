@@ -104,6 +104,29 @@ export function clearConflict() { try { localStorage.removeItem(CONFLICT) } catc
 function markCas() { try { localStorage.setItem(CAS, '1') } catch { /* optional */ } }
 /** Whether the deployed script refuses stale saves by itself (the updated version does). */
 export function cloudCas() { try { return localStorage.getItem(CAS) === '1' } catch { return false } }
+/** Whether the deployed script keeps history versions (v3). */
+const HISTORY = 'dream-blueprint.cloud-history'
+function markHistory() { try { localStorage.setItem(HISTORY, '1') } catch { /* optional */ } }
+export function cloudHistory() { try { return localStorage.getItem(HISTORY) === '1' } catch { return false } }
+
+export type HistoryEntry = { id: string; name: string; at: number; size: number }
+/** The saved versions (newest first), or null when the deployed script is older than v3 and keeps none. */
+export async function loadHistory(): Promise<HistoryEntry[] | null> {
+  const json = await post({ type: 'history-list' })
+  if (!json || !Array.isArray(json.history)) return null
+  markHistory()
+  return (json.history as HistoryEntry[]).filter(h => h && typeof h.id === 'string')
+}
+export async function loadHistoryVersion(id: string): Promise<{ state: string; savedAt: number }> {
+  let json: { state?: unknown; savedAt?: unknown } | null
+  try { json = await post({ type: 'history-get', id }) } catch { json = null }
+  if (!json || typeof json.state !== 'string' || !json.state) throw new Error('這個版本讀不到了，換另一份試試。')
+  return { state: json.state, savedAt: Number(json.savedAt) || 0 }
+}
+/** Puts a copy into the history without changing the current cloud progress. False when the script cannot. */
+export async function addHistory(state: string, savedAt: number, label: string) {
+  try { const json = await post({ type: 'history-add', state, savedAt, label }); return json?.added === true } catch { return false }
+}
 
 /** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
 export function syncDecision(remoteAt: number | null, base: number, localAt: number): 'pull' | 'push' | 'conflict' | 'none' {
@@ -127,7 +150,9 @@ export async function saveDriveState(state: string, savedAt: number, base = clou
       const remote = await loadDriveState()
       if (remote?.state && remote.savedAt > base) { markConflict(remote.savedAt); return }
     }
-    const json = await post({ type: 'state', state, savedAt, ...(force ? {} : { base }) })
+    // A chosen overwrite asks the script to keep the cloud copy in its history first (v3; older scripts ignore it).
+    const json = await post({ type: 'state', state, savedAt, ...(force ? { snapshot: true } : { base }) })
+    if (json?.history === true) markHistory()
     if (json?.error === 'stale') { markConflict(Number(json.savedAt) || 0); return }
     if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
     setCloudBase(savedAt)
@@ -182,8 +207,10 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶 v2（貼到 script.google.com 的專案，部署成網頁應用程式）
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v3（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
+// v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
+// 第一次換成 v3：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
   var id=props().getProperty('SHEET');
@@ -210,6 +237,36 @@ function readState(){
   return {ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0};
 }
 function readMemory(){return {ok:true,notes:column('記憶'),deleted:column('已刪除的記憶'),url:book().getUrl()}}
+function historyFolder(){
+  var id=props().getProperty('HISTORY');
+  if(id){try{var f=DriveApp.getFolderById(id);if(!f.isTrashed())return f}catch(e){}}
+  var folder=DriveApp.createFolder('夢想藍圖・歷史版本');
+  props().setProperty('HISTORY',folder.getId());
+  return folder;
+}
+function setupHistory(){historyFolder()}
+function stampName(prefix,at){return prefix+'-'+Utilities.formatDate(new Date(at||Date.now()),Session.getScriptTimeZone(),'yyyy-MM-dd-HHmmss')+'.json'}
+function keepVersion(prefix,state,savedAt){
+  var folder=historyFolder();
+  folder.createFile(stampName(prefix,Date.now()),JSON.stringify({savedAt:savedAt||0,state:state}),MimeType.PLAIN_TEXT);
+  var files=[],it=folder.getFiles();while(it.hasNext())files.push(it.next());
+  files.sort(function(a,b){return b.getDateCreated().getTime()-a.getDateCreated().getTime()});
+  for(var i=30;i<files.length;i++)files[i].setTrashed(true);
+}
+function listHistory(){
+  var folder=historyFolder(),list=[],it=folder.getFiles();
+  while(it.hasNext()){var f=it.next();list.push({id:f.getId(),name:f.getName(),at:f.getDateCreated().getTime(),size:f.getSize()})}
+  list.sort(function(a,b){return b.at-a.at});
+  return {ok:true,history:list.slice(0,30)};
+}
+function readVersion(id){
+  var folder=historyFolder(),f;
+  try{f=DriveApp.getFileById(String(id))}catch(e){return {ok:false,error:'missing'}}
+  var inside=false,ps=f.getParents();while(ps.hasNext())if(ps.next().getId()===folder.getId())inside=true;
+  if(!inside)return {ok:false,error:'missing'};
+  var d=JSON.parse(f.getBlob().getDataAsString());
+  return {ok:true,state:String(d.state||''),savedAt:Number(d.savedAt)||0};
+}
 function doGet(e){
   if(!allowed(e.parameter.token))return out({ok:false,error:'token'});
   return out(e.parameter.type==='state'?readState():readMemory());
@@ -222,6 +279,9 @@ function doPost(e){
     var ss=book();
     if(d.type==='state-get')return out(readState());
     if(d.type==='memory-get')return out(readMemory());
+    if(d.type==='history-list')return out(listHistory());
+    if(d.type==='history-get')return out(readVersion(d.id));
+    if(d.type==='history-add'&&typeof d.state==='string'&&d.state){keepVersion(String(d.label||'saved').replace(/[^a-z-]/g,''),d.state,Number(d.savedAt)||0);return out({ok:true,added:true})}
     if(d.type==='log'&&d.rows&&d.rows.length){
       var sh=ss.getSheetByName('對話紀錄'),now=new Date();
       sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));
@@ -230,11 +290,16 @@ function doPost(e){
     if(d.type==='state'&&typeof d.state==='string'){
       var p=tab('進度'),current=Number(p.getRange(1,2).getValue())||0;
       if(typeof d.base==='number'&&current>d.base)return out({ok:false,error:'stale',savedAt:current});
+      // The copy about to be replaced goes into the history first (at most once an hour, always when asked).
+      var old=readState(),last=Number(props().getProperty('LAST_VERSION'))||0;
+      if(old.state&&old.state!==d.state&&(d.snapshot===true||Date.now()-last>3600000)){
+        try{keepVersion('progress',old.state,old.savedAt);props().setProperty('LAST_VERSION',String(Date.now()))}catch(err){}
+      }
       p.clear();
       p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
       var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push(['~'+d.state.slice(i,i+45000)]);
       if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
-      return out({ok:true,state:true,url:ss.getUrl()});
+      return out({ok:true,state:true,history:true,url:ss.getUrl()});
     }
     return out({ok:true,url:ss.getUrl()});
   }finally{lock.releaseLock()}

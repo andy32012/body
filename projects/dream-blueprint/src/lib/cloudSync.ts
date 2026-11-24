@@ -2,9 +2,9 @@
  * Which progress a device uses after connecting to Google Drive, shared by Settings and the scan-to-connect dialog.
  * Nothing is thrown away: when one copy replaces the other, the replaced copy is downloaded as a backup file first.
  */
-import { exportBackup, getSnapshot, localModified, restoreBackup, setLocalModified } from './store'
+import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified } from './store'
 import {
-  clearConflict, cloudBase, cloudStatus, driveReadyEvent, loadDriveState, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
+  addHistory, clearConflict, cloudBase, cloudStatus, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
 } from './drive'
 
 export const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -72,4 +72,21 @@ export async function keepThisCopy() {
   await saveDriveState(JSON.stringify(getSnapshot().state), localModified() || since, remote?.savedAt ?? 0, true)
   failedSince(since)
   return '已用這台裝置的進度蓋掉雲端那份。雲端原本的進度下載成備份檔了。'
+}
+
+/** Go back to a version kept in the cloud history. This device's progress goes into the history first (or, with a
+ *  script that cannot, is downloaded), so going back can itself be undone; the cloud copy is kept by the script too. */
+export async function restoreVersion(id: string) {
+  const version = await loadHistoryVersion(id)
+  // Checked before anything changes: a version that does not read as progress is not restored.
+  const state = importBackup(version.state)
+  const mine = JSON.stringify(getSnapshot().state)
+  if (!(await addHistory(mine, localModified() || Date.now(), 'before-restore'))) download(backupName('this-device'), exportBackup(getSnapshot().state))
+  const now = Date.now()
+  restoreBackup(version.state, now)
+  clearConflict()
+  const since = Date.now()
+  await saveDriveState(JSON.stringify(state), now, cloudBase(), true)
+  failedSince(since)
+  return '已經還原到 ' + stamp(version.savedAt || now) + ' 那份進度。還原前的進度存進了歷史版本，想反悔可以再還原回去。'
 }

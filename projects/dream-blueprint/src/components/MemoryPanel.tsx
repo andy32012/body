@@ -3,10 +3,10 @@ import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
 import { applyMemory, useMemory } from '../lib/memory'
 import {
-  appsScriptCode, cloudCas, cloudConflict, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
-  importSyncCode, setDriveLogs, syncCode, syncLink, type DriveMemory,
+  appsScriptCode, cloudCas, cloudConflict, cloudHistory, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
+  importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type DriveMemory, type HistoryEntry,
 } from '../lib/drive'
-import { keepThisCopy, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
+import { keepThisCopy, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
 import './pair.css'
 
 /** On a connected device: a QR code that connects a phone or iPad in one scan. */
@@ -27,6 +27,39 @@ function SyncQr() {
       <div className="set-actions"><button type="button" onClick={() => setQr('')}>關掉</button></div>
     </>}
   </div>
+}
+
+/** The versions the cloud script keeps (v3): up to 30, newest first, each one can be restored. */
+function CloudHistory({ onStatus }: { onStatus: (message: string) => void }) {
+  // undefined: not asked yet; null: the script is older than v3.
+  const [list, setList] = useState<HistoryEntry[] | null | undefined>(undefined)
+  const [busy, setBusy] = useState(false)
+  const [pick, setPick] = useState<string | null>(null)
+  async function load() {
+    setBusy(true)
+    try { setList(await loadHistory()) } catch (e) { onStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+  }
+  async function restore(id: string) {
+    setBusy(true)
+    try { onStatus(await restoreVersion(id)); setPick(null); setList(await loadHistory()) }
+    catch (e) { onStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+  }
+  const label = (h: HistoryEntry) => stamp(h.at) + (h.name.startsWith('before-restore') ? '（還原前自動留的）' : '')
+  return <details className="set-details" onToggle={e => { if ((e.currentTarget as HTMLDetailsElement).open && list === undefined) void load() }}>
+    <summary>雲端歷史版本（最多留 30 份，可以還原）</summary>
+    <p>雲端的進度要被蓋掉之前，雲端小程式會先把舊的那份留下來（最多每小時一份，兩台選版本或還原時一定會留）。不小心選錯、資料怪怪的，就從這裡回到之前的某一份。</p>
+    {busy && <p>處理中……</p>}
+    {list === null && <p className="set-warn">你的雲端小程式還是舊版，換成 v3 才會開始留歷史版本：照下面「更新雲端小程式」的步驟做一次。</p>}
+    {list && !list.length && <p>還沒有歷史版本：下次雲端的進度被更新時，會開始留。</p>}
+    {list && list.length > 0 && <div className="set-list">{list.map(h => <div key={h.id}>
+      <span>{label(h)}<small> · {Math.max(1, Math.round(h.size / 1024))} KB</small></span>
+      {pick === h.id
+        ? <span className="set-actions"><button type="button" disabled={busy} onClick={() => void restore(h.id)}>確定還原</button><button type="button" disabled={busy} onClick={() => setPick(null)}>取消</button></span>
+        : <button type="button" disabled={busy} onClick={() => setPick(h.id)}>還原這一份</button>}
+    </div>)}</div>}
+    {pick && <small>還原會把這台裝置和雲端都換成那一份；換之前，現在的進度會先存進歷史版本。</small>}
+    {list !== undefined && <div className="set-actions"><button type="button" disabled={busy} onClick={() => void load()}>重新整理</button></div>}
+  </details>
 }
 
 export default function MemoryPanel() {
@@ -105,10 +138,12 @@ export default function MemoryPanel() {
         <button type="button" onClick={() => { disconnectDrive(); setDrive(null); setStatus('這台裝置已中斷雲端硬碟。') }}>這台裝置中斷連線</button>
       </div>
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
+      <CloudHistory onStatus={setStatus} />
       <details className="set-details">
-        <summary>{cloudCas() ? '雲端小程式是新版（存檔前會先檢查，兩台不會互相蓋掉）' : '更新雲端小程式（建議：新版存檔前會先檢查，兩台不會互相蓋掉）'}</summary>
+        <summary>{cloudHistory() ? '雲端小程式是最新的 v3（會檢查兩台的進度，也會留歷史版本）' : cloudCas() ? '更新雲端小程式到 v3（新增：歷史版本，可以還原）' : '更新雲端小程式到 v3（建議：兩台不會互相蓋掉，還會留歷史版本）'}</summary>
         <ol>
           <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
+          <li>上面的函式選單選「setupHistory」，按「執行」。第一次會要你允許存取雲端硬碟（v3 要在雲端硬碟開「夢想藍圖・歷史版本」資料夾）：選你的帳號 →「進階」→「前往（不安全）」→「允許」。</li>
           <li>右上「部署」→「管理部署作業」→ 鉛筆圖示 → 版本選「新版本」→「部署」。網址不會變，不用重新連接。</li>
         </ol>
         <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
@@ -124,6 +159,7 @@ export default function MemoryPanel() {
         <summary>還沒有雲端小程式？</summary>
         <ol>
           <li>到 script.google.com 開一個新專案，把下面的程式碼全部貼上，按儲存。</li>
+          <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟（選你的帳號 →「進階」→「前往（不安全）」→「允許」）。</li>
           <li>「部署」→「新增部署作業」→ 類型選「網頁應用程式」，執行身分選自己、存取權選「所有人」→ 部署，把網址貼到上面。</li>
         </ol>
         <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
