@@ -111,6 +111,8 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     setListen([]); setRead([]); setWriting(''); setAudio(null); setSeconds(0); setPlays(0)
   }
 
+  // The record and the retest stay out of the way until the retest is due (every 12 weeks).
+  if (results.length && !open && !retest.due) return null
   if (results.length && !open) {
     const shown = results.length <= 4 ? results : [results[0], ...results.slice(-3)]
     const first = results[0], last = results[results.length - 1]

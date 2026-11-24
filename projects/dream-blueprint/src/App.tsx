@@ -5,6 +5,7 @@ import {
   Check, ChevronRight, Compass, Route as RouteIcon,
   Map as MapIcon, Moon, Orbit, Settings2, Star, Sun,
   Telescope, Mic, House, BookA, SpellCheck, AudioLines, Stethoscope,
+  BookOpenText, Headphones, Languages, Layers, ListChecks, Newspaper, PenLine,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
@@ -33,7 +34,8 @@ import { localModified, restoreBackup, setLocalModified } from './lib/store'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
-import { librarySections, modeFromHash, sectionHash, sectionInfo, sectionOf, type LibrarySection } from './lib/library'
+import { menuSections, modeFromHash, sectionHash, sectionInfo, sectionOf, type LibrarySection } from './lib/library'
+import { hasPack, packUnits } from './lib/bridge'
 
 type View = Page | 'library' | 'cosmos' | 'speaking'
 type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:string}
@@ -45,7 +47,7 @@ const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'plan', title:'夢想星圖', mobile:'計畫', icon:MapIcon},
 ]
 /** The sections of the practice library that have their own entry in the main menu, under 英文練習. */
-const sectionIcons: Record<Exclude<LibrarySection,'practice'>, LucideIcon> = {words:BookA, grammar:SpellCheck, sound:AudioLines, nursing:Stethoscope}
+const sectionIcons: Record<Exclude<LibrarySection,'practice'>, LucideIcon> = {listen:Headphones, translate:Languages, story:BookOpenText, reading:Newspaper, writing:PenLine, unit:Layers, quiz:ListChecks, words:BookA, grammar:SpellCheck, sound:AudioLines, nursing:Stethoscope}
 const extraTitles: Partial<Record<View, string>> = {rivals:'星際排行榜', settings:'設定', cosmos:'宇宙圖鑑', practice:'英文練習'}
 const phases = {semester:'一般學期', exam:'考週模式', internship:'實習模式', vacation:'寒暑假模式'}
 function readRoute():Route {
@@ -244,7 +246,8 @@ function App() {
   // In the sidebar 英文練習 is current only for its own section; on a phone 練習 stands for the whole library.
   const isCurrent=(l:typeof links[number],mobile:boolean)=>active===l.id&&(mobile||l.id!=='library'||!section||section==='practice')
   const titleNav=(l:typeof links[number],mobile=false)=><button type="button" key={l.id} className={(isCurrent(l,mobile)?'nav-link current':'nav-link')} aria-current={isCurrent(l,mobile)?'page':undefined} onClick={()=>setView(l.id)}><l.icon size={mobile?20:19}/><span>{mobile?l.mobile:l.title}</span>{!mobile&&isCurrent(l,mobile)&&<i/>}</button>
-  const sectionNav=librarySections.filter(s=>s.id!=='practice').map(s=>{const Icon=sectionIcons[s.id as keyof typeof sectionIcons]
+  const packOpen=hasPack(state.curriculum.unit)||state.curriculum.unit>packUnits[0]
+  const sectionNav=menuSections({periodQuiet,packOpen,current:section}).filter(s=>s.id!=='practice').map(s=>{const Icon=sectionIcons[s.id as keyof typeof sectionIcons]
     return <button type="button" key={s.id} className={'nav-link nav-sub'+(section===s.id?' current':'')} aria-current={section===s.id?'page':undefined} onClick={()=>{location.hash=sectionHash(s.id,periodQuiet)}}><Icon size={16}/><span>{s.menu}</span>{section===s.id&&<i/>}</button>})
   return <MemoryContext.Provider value={memory}><SceneFeatureContext.Provider value={sky?.feature}><div className="application" data-theme={state.settings.theme} data-view={page}>
     <UniverseBackground photo={sky?.background}/>

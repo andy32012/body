@@ -62,7 +62,7 @@ import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/Grammar
 import StoryLibrary from "../components/StoryLibrary";
 import Pronunciation from "../components/Pronunciation";
 import { grammarFor } from "../lib/grammar";
-import { librarySections, modeFromHash, modeLabel, sectionHash, sectionInfo, sectionModes, sectionOf, type LibraryMode } from "../lib/library";
+import { menuSections, modeFromHash, modeLabel, sectionHash, sectionInfo, sectionModes, sectionOf, type LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
 import { useTaskContext } from "../lib/taskContext";
@@ -1422,14 +1422,14 @@ function Extras({
     <section className="pr-pane pr-extras">
       {/* On a phone there is no sidebar: the sections of the library are a row of chips here. */}
       <nav className="pr-sections" aria-label="練習分類">
-        {librarySections.map((s) => (
+        {menuSections({ periodQuiet, packOpen: hasPack(state.curriculum.unit) || state.curriculum.unit > packUnits[0], current: section }).map((s) => (
           <button key={s.id} type="button" aria-current={s.id === section ? "page" : undefined}
             aria-label={s.menu} onClick={() => { location.hash = sectionHash(s.id, periodQuiet); }}>
             {s.chip}
           </button>
         ))}
       </nav>
-      <h2>{sectionInfo(section).heading}</h2>
+      {mode !== "home" && <h2>{sectionInfo(section).heading}</h2>}
       {shownModes.length > 1 && (
         <div className="pr-options">
           {shownModes.map((key) => (
