@@ -30,8 +30,9 @@ import Speaking from './pages/Speaking'
 import GeptSpeaking from './components/GeptSpeaking'
 import Baseline from './components/Baseline'
 import { MemoryContext, applyMemory, readMemory, writeMemory, replaceMemory, mergeMemory, readDeleted, memoryDeletedKey, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent } from './lib/drive'
-import { localModified, restoreBackup, setLocalModified } from './lib/store'
+import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive } from './lib/drive'
+import { getSnapshot, localModified, restoreBackup, setLocalModified, updateStore } from './lib/store'
+import { applyBatch, archiveOld } from './lib/compact'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import { seenKey } from './lib/dailyWords'
@@ -60,6 +61,13 @@ function readRoute():Route {
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
   if (location.hash !== '#' + hash) location.hash = hash
+}
+/** Old records go into the Drive archive first (cloud script v4), and only the ones that arrived leave this device. */
+async function archiveOldRecords() {
+  if(!driveConnected()||!cloudArchive()||cloudConflict())return
+  const today=dayKey()
+  const batch=await archiveOld(getSnapshot().state,today,archiveToDrive)
+  if(batch)updateStore(prev=>applyBatch(prev,batch,today))
 }
 function nextAction(state:AppState) {
   const unresolved=state.school.requirements.find(r=>!r.done)
@@ -206,7 +214,7 @@ function App() {
         const at=localModified()||Date.now(); setLocalModified(at)
         void saveDriveState(JSON.stringify(state),at)
       }
-    }).catch(()=>{}).finally(()=>{cloudReady.current=true})
+    }).catch(()=>{}).finally(()=>{cloudReady.current=true;void archiveOldRecords()})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   useEffect(()=>{

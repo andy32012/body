@@ -31,6 +31,7 @@ async function post(body: object) {
   if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
   if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
   if (json.cas) markCas()
+  if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
   return json
 }
 /** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
@@ -127,6 +128,18 @@ export async function loadHistoryVersion(id: string): Promise<{ state: string; s
 export async function addHistory(state: string, savedAt: number, label: string) {
   try { const json = await post({ type: 'history-add', state, savedAt, label }); return json?.added === true } catch { return false }
 }
+/** Whether the deployed script keeps old records in the Drive archive folder (v4); the value is that folder's link once known. */
+const ARCHIVE = 'dream-blueprint.cloud-archive'
+function markArchive(folder: string) {
+  try { if (folder || localStorage.getItem(ARCHIVE) === null) localStorage.setItem(ARCHIVE, folder || '1') } catch { /* optional */ }
+}
+export function cloudArchive() { try { return !!localStorage.getItem(ARCHIVE) } catch { return false } }
+export function archiveFolderUrl() { try { const v = localStorage.getItem(ARCHIVE) || ''; return v.startsWith('https://') ? v : '' } catch { return '' } }
+/** Saves old records as a file in the Drive archive folder. True only when the script confirms it kept them
+ *  (an older script answers ok without keeping anything). */
+export async function archiveToDrive(file: string) {
+  try { const json = await post({ type: 'archive-add', data: file }); return json?.archived === true } catch { return false }
+}
 
 /** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
 export function syncDecision(remoteAt: number | null, base: number, localAt: number): 'pull' | 'push' | 'conflict' | 'none' {
@@ -207,10 +220,11 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶 v3（貼到 script.google.com 的專案，部署成網頁應用程式）
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v4（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 // v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
-// 第一次換成 v3：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
+// v4：手機要整理掉的舊紀錄（兩個月前的複習紀錄、幾週前的每日小紀錄、四個月前上完的課的批改全文）先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了手機才拿掉；封存的檔案不會被刪。
+// 換成 v3 或 v4：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
   var id=props().getProperty('SHEET');
@@ -227,7 +241,7 @@ function allowed(t){
   if(!saved){props().setProperty('TOKEN',t);return true}
   return saved===t;
 }
-function out(o){o.cas=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function out(o){o.cas=true;o.archive=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
 function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
 function column(name){var sh=tab(name),n=sh.getLastRow()-1;return n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[]}
 function setColumn(name,head,list){var sh=tab(name);sh.clear();sh.getRange(1,1).setValue(head);var rows=(list||[]).map(function(x){return [String(x)]});if(rows.length)sh.getRange(2,1,rows.length,1).setValues(rows)}
@@ -244,7 +258,14 @@ function historyFolder(){
   props().setProperty('HISTORY',folder.getId());
   return folder;
 }
-function setupHistory(){historyFolder()}
+function archiveFolder(){
+  var id=props().getProperty('ARCHIVE');
+  if(id){try{var f=DriveApp.getFolderById(id);if(!f.isTrashed())return f}catch(e){}}
+  var folder=DriveApp.createFolder('夢想藍圖・封存');
+  props().setProperty('ARCHIVE',folder.getId());
+  return folder;
+}
+function setupHistory(){historyFolder();archiveFolder()}
 function stampName(prefix,at){return prefix+'-'+Utilities.formatDate(new Date(at||Date.now()),Session.getScriptTimeZone(),'yyyy-MM-dd-HHmmss')+'.json'}
 function keepVersion(prefix,state,savedAt){
   var folder=historyFolder();
@@ -282,6 +303,8 @@ function doPost(e){
     if(d.type==='history-list')return out(listHistory());
     if(d.type==='history-get')return out(readVersion(d.id));
     if(d.type==='history-add'&&typeof d.state==='string'&&d.state){keepVersion(String(d.label||'saved').replace(/[^a-z-]/g,''),d.state,Number(d.savedAt)||0);return out({ok:true,added:true})}
+    // Old records the phone is about to tidy away: kept as a file in the archive folder, never trashed.
+    if(d.type==='archive-add'&&typeof d.data==='string'&&d.data){var af=archiveFolder();af.createFile(stampName('舊紀錄',Date.now()),d.data,MimeType.PLAIN_TEXT);return out({ok:true,archived:true,folder:af.getUrl()})}
     if(d.type==='log'&&d.rows&&d.rows.length){
       var sh=ss.getSheetByName('對話紀錄'),now=new Date();
       sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));

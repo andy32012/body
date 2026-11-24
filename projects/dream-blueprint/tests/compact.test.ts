@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { archiveKey, bonusOn, compactState, delayedRecall, readArchive, windows } from '../src/lib/compact.ts'
+import { applyBatch, archiveKey, archiveOld, bonusOn, compactState, delayedRecall, lastArchiveKey, oldDetails, readArchive, windows } from '../src/lib/compact.ts'
 import { addDays, dayKey, newCard, reviewBonus, reviewCard, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
 import { createInitialState, exportBackup, importBackup, type AppState } from '../src/lib/store.ts'
 import { seasonHistory } from '../src/lib/rivals.ts'
@@ -137,4 +137,54 @@ test('用很多年：每天 20 個新字、上一課、複習到上限，三年�
   t.diagnostic('進度檔大小（第 1、2、3 年）：' + mb.join(' → ') + ' MB')
   assert.ok(mb[2] < 2.5, '三年後 ' + mb.join(' → ') + ' MB')
   assert.ok(mb[2] - mb[1] < 0.6, '每年只多一點點：' + mb.join(' → ') + ' MB')
+})
+
+// ── With Google Drive connected: nothing is thrown away. Old details go to the Drive archive first.
+const sample = () => ({
+  reviewEvents: [ev('word:a', '2027-01-10', 5, true), ev('word:b', '2027-01-10', 6, false), ev('word:c', '2027-05-20', 9, true)],
+  notes: {
+    'hints.2027-03-01': '{}', 'daily-word.done.2027-05-30': '20', 'say.say-1': '{"zh":"x","en":"y"}',
+    'lesson.2027-01-05': JSON.stringify({ unit: 3, day: 2, steps: ['write', 'done'], express: { first: 'I go.', last: { corrected: 'x'.repeat(500) }, corrections: 1, help: [] } }),
+  } as Record<string, string>,
+})
+
+test('連著雲端硬碟：舊紀錄先留在手機等封存；超過 3.5 MB 才不等', () => {
+  const s = sample()
+  assert.equal(compactState(s, today, 100_000, true), s, '一筆都沒拿掉')
+  const tidy = compactState(s, today, 3_600_000, true)
+  assert.notEqual(tidy, s)
+  assert.deepEqual(tidy.reviewEvents.map(e => e.id), ['word:c'], '太大了就先整理，讓存檔不會失敗')
+})
+
+test('封存的內容就是會從手機拿掉的那些；存好之後只拿掉一模一樣的', () => {
+  const s = sample()
+  const batch = oldDetails(s, today)
+  assert.deepEqual(batch.events.map(e => e.id), ['word:a', 'word:b'])
+  assert.deepEqual(Object.keys(batch.notes), ['hints.2027-03-01'])
+  assert.deepEqual(Object.keys(batch.lessons), ['lesson.2027-01-05'])
+  assert.equal(batch.lessons['lesson.2027-01-05'], s.notes['lesson.2027-01-05'], '封存的是整份，含批改全文')
+  assert.deepEqual(applyBatch(s, batch), compactState(s, today), '跟直接整理的結果一樣')
+  // Something changed after the batch was taken: that one stays.
+  const later = { ...s, notes: { ...s.notes, 'hints.2027-03-01': '{"changed":1}' } }
+  const after = applyBatch(later, batch, today)
+  assert.equal(after.notes['hints.2027-03-01'], '{"changed":1}')
+  assert.equal(after.notes[lastArchiveKey], today)
+  assert.deepEqual(delayedRecall(after), delayedRecall(s), '紀錄頁的數字一樣')
+  assert.equal(bonusOn(after, '2027-01-10'), bonusOn(s, '2027-01-10'))
+})
+
+test('大約一週封存一次：雲端確認收到才從手機拿掉；沒收到就留著下次再試', async () => {
+  const s = sample()
+  const sent: string[] = []
+  const ok = async (file: string) => { sent.push(file); return true }
+  const batch = await archiveOld(s, today, ok)
+  assert.ok(batch)
+  const file = JSON.parse(sent[0])
+  assert.deepEqual([file.app, file.kind, file.savedOn, file.events.length, Object.keys(file.lessons)], ['夢想藍圖', '舊紀錄', today, 2, ['lesson.2027-01-05']])
+  const done = applyBatch(s, batch!, today)
+  assert.equal(await archiveOld(done, addDays(today, 3), ok), null, '三天後不用再封存')
+  assert.equal(sent.length, 1)
+  assert.equal(await archiveOld(done, addDays(today, 8), ok), null, '一週後也沒有新的舊紀錄就不送')
+  assert.equal(await archiveOld(s, today, async () => false), null, '雲端沒說收到：不拿掉')
+  assert.equal(await archiveOld({ ...s, notes: { ...s.notes, [lastArchiveKey]: addDays(today, -2) } }, today, ok, 3_200_000) !== null, true, '進度很大時不等一週')
 })

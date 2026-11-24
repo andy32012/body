@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 // The cloud script runs on Google's servers; here it runs against small stand-ins for the Google services it uses.
 const store = new Map<string, string>()
 Object.assign(globalThis, { localStorage: { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => { store.set(k, v) }, removeItem: (k: string) => { store.delete(k) } } })
-const { appsScriptCode } = await import('../src/lib/drive')
+const { appsScriptCode, archiveFolderUrl, archiveToDrive, cloudArchive } = await import('../src/lib/drive')
 
 type Cell = string | number
 function google() {
@@ -33,23 +33,28 @@ function google() {
     getSheetByName: (n: string) => sheets.find(s => s.name === n) ?? null,
     insertSheet: (n: string) => { const s = new Sheet(n); sheets.push(s); return s },
   }
-  type File = { id: string; name: string; created: number; content: string; trashed: boolean }
+  type File = { id: string; name: string; created: number; content: string; trashed: boolean; folder: string }
   const files: File[] = []
-  const folder = {
-    getId: () => 'folder1', isTrashed: () => false,
-    createFile: (name: string, content: string) => { files.push({ id: 'f' + files.length, name, created: clock, content, trashed: false }) },
-    getFiles: () => { const live = files.filter(f => !f.trashed); let i = 0; return { hasNext: () => i < live.length, next: () => fileApi(live[i++]) } },
+  type Folder = ReturnType<typeof makeFolder>
+  const folders = new Map<string, Folder>()
+  function makeFolder(id: string, name: string) {
+    return {
+      getId: () => id, getName: () => name, isTrashed: () => false, getUrl: () => 'https://drive.google.com/drive/folders/' + id,
+      createFile: (fileName: string, content: string) => { files.push({ id: 'f' + files.length, name: fileName, created: clock, content, trashed: false, folder: id }) },
+      getFiles: () => { const live = files.filter(f => !f.trashed && f.folder === id); let i = 0; return { hasNext: () => i < live.length, next: () => fileApi(live[i++]) } },
+    }
   }
   const fileApi = (f: File) => ({
     getId: () => f.id, getName: () => f.name, getDateCreated: () => new Date(f.created), getSize: () => f.content.length,
     setTrashed: (t: boolean) => { f.trashed = t }, getBlob: () => ({ getDataAsString: () => f.content }),
-    getParents: () => { let done = false; return { hasNext: () => !done, next: () => { done = true; return folder } } },
+    getParents: () => { let done = false; return { hasNext: () => !done, next: () => { done = true; return folders.get(f.folder)! } } },
   })
   const services = {
     PropertiesService: { getScriptProperties: () => ({ getProperty: (k: string) => props.get(k) ?? null, setProperty: (k: string, v: string) => { props.set(k, v) } }) },
     SpreadsheetApp: { create: () => book, openById: () => book },
     DriveApp: {
-      createFolder: () => folder, getFolderById: () => folder,
+      createFolder: (name: string) => { const f = makeFolder('folder' + (folders.size + 1), name); folders.set(f.getId(), f); return f },
+      getFolderById: (id: string) => { const f = folders.get(id); if (!f) throw new Error('missing'); return f },
       getFileById: (id: string) => { const f = files.find(x => x.id === id && !x.trashed); if (!f) throw new Error('missing'); return fileApi(f) },
     },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
@@ -64,7 +69,8 @@ function google() {
   }
   const run = new Function(...Object.keys(services), 'Date', appsScriptCode + '\nreturn { doPost, setupHistory }')(...Object.values(services), Date_)
   const post = (body: object) => run.doPost({ postData: { contents: JSON.stringify({ token: 't', ...body }) } })
-  return { post, files, tick: (ms: number) => { clock += ms }, live: () => files.filter(f => !f.trashed) }
+  const inFolder = (name: string) => files.filter(f => !f.trashed && folders.get(f.folder)?.getName() === name)
+  return { post, files, setup: run.setupHistory as () => void, folders, inFolder, tick: (ms: number) => { clock += ms }, live: () => files.filter(f => !f.trashed) }
 }
 
 test('雲端小程式 v3：蓋掉舊進度前先留一份，最多每小時一份；選版本時一定留', () => {
@@ -83,7 +89,7 @@ test('雲端小程式 v3：蓋掉舊進度前先留一份，最多每小時一�
   g.tick(3_700_000)
   g.post({ type: 'state', state: '{"v":5}', savedAt: 500, base: 400 })
   assert.equal(g.live().length, 3, '過了一小時又會留')
-  assert.deepEqual(g.post({ type: 'state', state: '{"v":6}', savedAt: 600, base: 100 }), { ok: false, error: 'stale', savedAt: 500, cas: true }, '舊的出發點還是會被擋')
+  assert.deepEqual(g.post({ type: 'state', state: '{"v":6}', savedAt: 600, base: 100 }), { ok: false, error: 'stale', savedAt: 500, cas: true, archive: true }, '舊的出發點還是會被擋')
 })
 
 test('雲端小程式 v3：列出歷史版本、讀回某一份、另外加一份；最多留 30 份', () => {
@@ -101,4 +107,37 @@ test('雲端小程式 v3：列出歷史版本、讀回某一份、另外加一�
   assert.equal(after.length, 30)
   assert.match(after[0].name, /^before-restore-/)
   assert.equal(g.post({ type: 'state-get' }).state, '{"v":35}', '另外加的那份不會改到現在的進度')
+})
+
+test('雲端小程式 v4：舊紀錄存進「夢想藍圖・封存」，回答 archived；封存永遠不會被歷史版本的 30 份上限刪掉', () => {
+  const g = google()
+  g.setup()
+  assert.deepEqual([...g.folders.values()].map(f => f.getName()).sort(), ['夢想藍圖・封存', '夢想藍圖・歷史版本'], 'setupHistory 兩個資料夾都開好')
+  const r = g.post({ type: 'archive-add', data: '{"events":[1]}' })
+  assert.deepEqual([r.ok, r.archived, r.archive], [true, true, true])
+  assert.match(r.folder, /^https:\/\/drive\.google\.com\//)
+  for (let i = 1; i <= 35; i++) { g.tick(3_700_000); g.post({ type: 'state', state: '{"v":' + i + '}', savedAt: i, ...(i > 1 ? { base: i - 1 } : {}) }) }
+  for (let i = 0; i < 40; i++) g.post({ type: 'archive-add', data: '{"n":' + i + '}' })
+  assert.equal(g.inFolder('夢想藍圖・歷史版本').length, 30)
+  assert.equal(g.inFolder('夢想藍圖・封存').length, 41, '封存一份都沒少')
+  assert.equal(g.inFolder('夢想藍圖・封存')[0].content, '{"events":[1]}')
+  assert.match(g.inFolder('夢想藍圖・封存')[0].name, /^舊紀錄-/)
+  assert.equal(g.post({ type: 'archive-add', data: '' }).archived, undefined, '空的不存')
+  assert.equal(g.post({ type: 'state-get' }).archive, true, '每個回答都說自己是 v4')
+})
+
+test('網站這邊：v4 確認收到才算封存好；舊版小程式回 ok 但沒存，就不算', async () => {
+  const g = google()
+  store.set('dream-blueprint.drive', JSON.stringify({ url: 'https://script.google.com/macros/s/x/exec', token: 't' }))
+  let reply = (body: Record<string, unknown>) => g.post(body)
+  Object.assign(globalThis, { fetch: async (_url: string, init: { body: string }) => ({ json: async () => reply(JSON.parse(init.body)) }) })
+  assert.equal(cloudArchive(), false)
+  assert.equal(await archiveToDrive('{"old":1}'), true)
+  assert.equal(cloudArchive(), true)
+  assert.match(archiveFolderUrl(), /^https:\/\/drive\.google\.com\//)
+  assert.equal(g.inFolder('夢想藍圖・封存').length, 1)
+  reply = () => ({ ok: true, cas: true, url: 'https://docs.google.com/book1' })
+  assert.equal(await archiveToDrive('{"old":2}'), false, 'v3 不認得 archive-add')
+  reply = () => { throw new Error('offline') }
+  assert.equal(await archiveToDrive('{"old":3}'), false, '沒連上也不算')
 })
