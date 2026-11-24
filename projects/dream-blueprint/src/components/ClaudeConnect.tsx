@@ -13,7 +13,7 @@ export default function ClaudeConnect() {
     setStatus('測試中……')
     try {
       const reply = await askTutor('只回一個字：好', [{ role: 'user', content: '測試' }])
-      setStatus('連接成功（' + reply.slice(0, 20) + '）。之後中翻英按「我寫好了」，就會出現「請老師批改」。')
+      setStatus('連接成功（' + reply.slice(0, 20) + '）。之後中翻英、寫作和短文都可以按「請 Claude 批改」，照官方評分表給分。')
     } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
   }
   return <>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Camera, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
-import {
+import { speakRubric,
   answerSeconds, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
   type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord,
 } from '../lib/gept'
@@ -14,6 +14,8 @@ import { addWeak, normalizeLabel } from '../lib/weakPoints'
 import { logSkill } from '../lib/bridge'
 import { dayKey } from '../lib/progress'
 import ReadAloudCheck from './ReadAloudCheck'
+import { RubricTable } from './RubricTable'
+import { levelText, rubrics, type RubricId } from '../lib/rubrics'
 import GeptScene from './GeptScene'
 import './gept.css'
 
@@ -213,7 +215,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
     {phase === 'scoring' && <p className="gp-live">Claude 在看你的回答……</p>}
     {phase === 'done' && <>
       {error && <p className="gp-warn" role="alert">{error}</p>}
-      {fb ? <FeedbackView fb={fb} items={questions} answers={answers} /> : <Transcripts items={questions} answers={answers} />}
+      {fb ? <FeedbackView fb={fb} items={questions} answers={answers} rubric={speakRubric[level]} /> : <Transcripts items={questions} answers={answers} />}
       <button type="button" className="gp-link" onClick={() => { kept.current = []; setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
     </>}
   </div>
@@ -291,7 +293,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     {error && <p className="gp-warn" role="alert">{error}</p>}
     {phase === 'done' && <>
       <p className="gp-said"><small>你說的（語音辨識）：</small><span lang="en">{said || '（沒有聽到聲音）'}</span></p>
-      {fb && <FeedbackView fb={fb} items={questions} />}
+      {fb && <FeedbackView fb={fb} items={questions} rubric={speakRubric.intermediate} />}
       <div className="gp-row">
         <button type="button" className="gp-link" onClick={() => setPhase('ready')}>再說一次</button>
         <button type="button" className="gp-link" onClick={() => void speakEnglish(describe, rate)}><Volume2 size={14} />聽一段示範描述</button>
@@ -300,9 +302,11 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
   </div>
 }
 
-function FeedbackView({ fb, items, answers }: { fb: GeptFeedback; items: string[]; answers?: string[] }) {
+function FeedbackView({ fb, items, answers, rubric }: { fb: GeptFeedback; items: string[]; answers?: string[]; rubric: RubricId }) {
   return <div className="gp-feedback" role="status">
-    {fb.score !== undefined && <p className="gp-score"><b>{fb.score}</b><span>/ 5</span><small>Claude 參考分（只看內容和語言，聽不到發音；不是官方分數）· 官方 4 級分通過</small></p>}
+    {fb.score !== undefined && <p className="gp-score"><b>{fb.score}</b><span>/ 5</span><small>Claude 照官方評分表給的參考分（只看內容和語言，聽不到發音；不是官方分數）· 官方 4 級分通過</small></p>}
+    {fb.score !== undefined && <small className="gp-small">表上第 {fb.score} 級：{levelText(rubrics[rubric], fb.score)}</small>}
+    <RubricTable rubric={rubrics[rubric]} label="對照的評分表" />
     {fb.why && <p>{fb.why}</p>}
     <ol className="gp-items">{items.map((q, i) => {
       const note = fb.items.find(x => x.n === i + 1)

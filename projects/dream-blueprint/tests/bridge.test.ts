@@ -8,7 +8,7 @@ import {
   hasPack, heldOpen, logSkill, packFor, packInstructions, packUnits, readHeld, saveHeld, skillDays, weekCounts, type Pack,
 } from '../src/lib/bridge.ts'
 import { emmaLevel } from '../src/lib/cefr.ts'
-import { criteriaFor, parseFeedback, suggestedStage, wordCount, type WriteStage } from '../src/lib/writing.ts'
+import { checksFor, criteriaFor, parseGrade, rubricFor, scoredParts, suggestedStage, wordCount, type WriteStage } from '../src/lib/writing.ts'
 import type { ReadPassage } from '../src/lib/reading.ts'
 
 const packs = bridge as Pack[]
@@ -77,9 +77,13 @@ test('橋接寫作：不搶寫作階梯的建議，第一個評分項目寫出�
   const task = bridgeStage.tasks[0]
   const crit = criteriaFor(bridgeStage, task)
   assert.match(crit[0], /用到這一課的文法（敘事時態/)
-  // Claude may answer with the short name before the brackets.
-  const reply = JSON.stringify({ criteria: [{ name: '用到這一課的文法', score: 4 }, { name: '內容回答了題目每一點', score: 4 }, { name: '句子之間接得順', score: 3 }, { name: '文法和用字正確', score: 3 }], next: '' })
-  assert.equal(parseFeedback(reply, crit)?.criteria[0].name, crit[0])
+  // 橋接段落照全民英檢中級英文作文給分；這一課的文法是要求之一，Claude 可以只寫括號前的簡稱。
+  assert.equal(rubricFor(bridgeStage).id, 'gept-essay')
+  assert.deepEqual(checksFor(bridgeStage, task), crit)
+  const reply = JSON.stringify({ scores: [{ name: '整篇', score: 4, reason: '符合第 4 級' }], checks: [{ name: '用到這一課的文法', ok: true }, { name: '內容回答了題目每一點', ok: true }, { name: '句子之間接得順', ok: false }, { name: '文法和用字正確', ok: false }], next: '' })
+  const graded = parseGrade(reply, rubricFor(bridgeStage), scoredParts(bridgeStage, task), crit)
+  assert.equal(graded?.checks?.[0].name, crit[0])
+  assert.deepEqual(graded?.checks?.map(c => c.ok), [true, true, false, false])
 })
 
 test('回測：第 6 天或上完單元才開，只記第一次', () => {

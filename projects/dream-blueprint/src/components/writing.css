@@ -28,3 +28,18 @@
 .wl-next { padding: .5rem .7rem; border-radius: 10px; background: color-mix(in srgb, currentColor 6%, transparent); }
 .wl-note { opacity: .7; }
 .wl-count { display: block; opacity: .75; font-size: .82rem; line-height: 1.5; }
+/* Graded by a published table: the total, each score with its level, and the stage's own requirements. */
+.wl-parts { margin: 0; font-size: .9rem; opacity: .9; }
+.wl-pass { margin: 0; font-size: .88rem; }
+.wl-pass[data-ok="true"] { color: #3fbf8a; }
+.wl-scores { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.wl-scores li { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); gap: .6rem; align-items: start; }
+.wl-scores li div { display: grid; gap: .15rem; }
+.wl-scores small { opacity: .88; line-height: 1.55; }
+.wl-scores .wl-level { opacity: 1; font-weight: 560; }
+.wl-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; font-size: .9rem; }
+.wl-checks li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr); gap: .4rem; }
+.wl-checks li span { font-weight: 700; }
+.wl-checks li[data-ok="true"] span { color: #3fbf8a; }
+.wl-checks li[data-ok="false"] span { color: #e06a5a; }
+.wl-checks small { display: block; opacity: .85; }

@@ -102,7 +102,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       <textarea id="passage-answer" rows={5} lang="en" value={answer} placeholder="一句一句翻，寫不出來的先空著"
         onChange={event => { setAnswer(event.target.value); writeDraft('passage.' + passage.id, event.target.value) }} />
       <div className="pr-actions">
-        {keyed && <button className={passed ? undefined : 'pr-main'} disabled={!answer.trim()} onClick={() => { setPrevious(last); setUnreachable(false); setRun(n => n + 1) }}>{run ? '改好了，再批一次' : '請 Claude 批改'}</button>}
+        {keyed && <button className={passed ? undefined : 'pr-main'} disabled={!answer.trim()} onClick={() => { setPrevious(last); setUnreachable(false); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
         {keyed && <button className="passage-ask" onClick={openClaude}><MessageCircleQuestion size={16} aria-hidden="true" />問問 Claude</button>}
         {passage.words && passage.words.length > 0 &&
           <button className="pr-link" onClick={() => setShow(show === 'words' ? 'none' : 'words')}>這段會用到的單字</button>}
@@ -110,7 +110,7 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       </div>
       {keyed && !run && <p className="passage-note">寫不出來的地方先空著，按「請 Claude 批改」；卡住或想知道某個字怎麼說，按「問問 Claude」。</p>}
       {!keyed && <p className="passage-note">這一頁是請 Claude 批改的：到 <a href="#settings">設定 → 連接 Claude</a> 貼上金鑰就能用。{!byHand && <> <button className="pr-link" onClick={() => setByHand(true)}>先自己對答案</button></>}</p>}
-      <CorrectBox key={passage.id} run={run} zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
+      <CorrectBox key={passage.id} run={run} rubric="gept-translation" zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
         selfFix previous={previous} onResult={(_, __, r) => setLast(r)} onError={() => setUnreachable(true)}
         onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
       {last && <div className="pr-actions passage-next">

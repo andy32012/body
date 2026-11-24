@@ -1,4 +1,5 @@
 import { weakLabelPrompt } from './weakPoints'
+import { rubricPrompt, rubrics, type RubricId } from './rubrics'
 
 /**
  * 全民英檢口說練習. The formats follow LTTC's published descriptions (中級: 朗讀短文 2 篇、回答問題 10 題、看圖敘述;
@@ -42,26 +43,16 @@ export function saveGept(notes: Record<string, string>, level: GeptLevel, id: st
   return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...readGept(notes, level, id), ...patch }) }
 }
 
+/** The official 全民英檢 speaking tables (see rubrics.ts), with what a transcript can and can't show. */
+export const speakRubric: Record<GeptLevel, RubricId> = { elementary: 'gept-speak-elementary', intermediate: 'gept-speak-intermediate' }
 const rubric: Record<GeptLevel, string[]> = {
   elementary: [
-    '官方初級口說：5 級分，4 級分通過。官方評「發音、語調、流暢」（三部分都算）和「回答問題的語法、字彙」兩半。',
-    '你聽不到聲音，只評「回答問題時的語法和字彙、有沒有回答到題目」這一半，給 0–5 的參考分：',
-    '5：都有回答到題目，能掌握基本語法和字彙，只有小錯',
-    '4：大致回答到題目，有錯但不影響理解',
-    '3：回答很短或不太完整，錯誤多，有時聽不懂',
-    '2：常答非所問，只會零星的字詞',
-    '1：幾乎沒辦法回答',
-    '0：沒有回答',
+    '官方初級口說：5 級分，4 級分通過。官方評「發音、語調、流暢」（三部分都算）和「回答問題的語法、字彙」兩半。你聽不到聲音，只評「回答問題時的語法和字彙、有沒有回答到題目」這一半，給參考分。',
+    rubricPrompt(rubrics[speakRubric.elementary]),
   ],
   intermediate: [
-    '官方中級口說：整體 5 級分，4 級分通過；官方評發音與語調、字彙與語法、別人聽不聽得懂、有沒有切題。',
-    '你聽不到聲音，只評逐字稿看得出來的「字彙與語法」和「切題、內容」，給 0–5 的參考分：',
-    '5：切題、內容充實，語法和字彙用得自如，只有少許錯誤',
-    '4：大致切題，意思講得清楚，有錯但不影響理解',
-    '3：回答簡短或部分離題，錯誤會影響理解，字彙有限',
-    '2：只說得出片段的句子，錯誤很多，常聽不懂',
-    '1：幾乎沒辦法回答',
-    '0：沒有回答',
+    '官方中級口說：整體 5 級分，4 級分通過；官方同時評發音與語調、字彙與語法、別人聽不聽得懂、有沒有切題。你聽不到聲音，只評逐字稿看得出來的「字彙與語法」和「切題、內容」，給參考分。',
+    rubricPrompt(rubrics[speakRubric.intermediate]),
   ],
 }
 

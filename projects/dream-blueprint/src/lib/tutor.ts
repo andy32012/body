@@ -1,6 +1,7 @@
 import curriculum from '../data/curriculum.json'
 import { teachingRules } from './handoff'
 import { weakLabelPrompt } from './weakPoints'
+import { rubrics } from './rubrics'
 
 /** The key stays in this browser only; it is never part of the backup file or the repo. */
 const KEY = 'dream-blueprint.claude-key'
@@ -55,7 +56,8 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
     '- 只錯標點或大小寫，算小錯，直接指出就好。',
     '- 講解用繁體中文，口氣像很熟的朋友，可以吐槽一下但要清楚。要有規則、一兩個例句、常見錯誤。不要用 Markdown 標題，段落短一點。',
     '- 判定不是「對了」時，在最後一行的前一行寫「弱點：名稱」，記下這次錯在哪一種文法，名稱照抄下面清單裡最符合的一個；同時錯兩種就用「；」隔開寫兩個，最多兩個。只錯標點或大小寫不用寫。' + weakLabelPrompt(),
-    '- 每次回覆最後一行固定寫：「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
+    '- 另外照「' + rubrics['gept-sentence'].title + '」的官方評分表給他這一句分數（' + rubrics['gept-sentence'].scales[0].levels.map(l => l.score + '＝' + l.text).join('；') + '）。分數和判定要一致：「對了」才是 2；「小錯」是 1；「再試一次」「意思不同」是 0 或 1（這題要練的句型對、只是有錯給 1，錯太多或沒寫給 0）。',
+    '- 每次回覆最後兩行固定寫：先一行「得分：0、1 或 2」，最後一行「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
   ].filter(Boolean).join('\n')
 }
 
@@ -93,6 +95,11 @@ async function callClaude(system: string, turns: { role: 'user' | 'assistant'; c
   return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
 }
 
+/** The 單句寫作 score (0–2) on the 「得分：」 line, if Claude wrote one. */
+export function sentenceScoreOf(text: string): number | null {
+  const m = text.match(/得分[：:]\s*([012])(?![0-9.])/)
+  return m ? Number(m[1]) : null
+}
 export function verdictOf(text: string): 'good' | 'small' | 'again' | 'changed' | null {
   const m = text.match(/判定：\s*(對了|小錯|再試一次|意思不同)/)
   return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' }) as const)[m[1] as '對了' | '小錯' | '再試一次' | '意思不同'] : null

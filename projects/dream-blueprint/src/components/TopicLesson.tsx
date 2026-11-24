@@ -385,8 +385,8 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{L.retellSample}</p></section>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>請 Claude 看</button></div>}
-    <CorrectBox run={run} mode="open" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
+    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
       onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)} />
     <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { clearDraft(key); onDone(judgeExpress({ answered: true, help: open.help, firstVerdict: open.verdictFor(text) })) }}>完成聽力</button>
@@ -550,8 +550,8 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     </div>
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points[0]}</p>}
     {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{task.sample}</p></section>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，再看一次' : '請 Claude 看文字稿'}</button></div>}
-    <CorrectBox run={run} mode="open" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表看文字稿'}</button></div>}
+    <CorrectBox run={run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
       reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
       onReveal={() => open.addHelp('sample')}
       onResult={(v, _n, r) => { open.setVerdict(v); setResult(r) }}
@@ -610,8 +610,8 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
     {open.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     {open.help.includes('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{W.sample}</p></section>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，再批一次' : '請 Claude 批改'}</button></div>}
-    <CorrectBox run={run} mode="open" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
+    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
       onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>寫完勾一下：我有寫到</legend>

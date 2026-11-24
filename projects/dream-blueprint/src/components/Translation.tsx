@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import TutorChat from "./TutorChat";
+import { tutorKey } from "../lib/tutor";
 import { clearDraft, readDraft, writeDraft } from "../lib/drafts";
 import { AskWord } from "./AIChat";
 import { updateStore } from "../lib/store";
@@ -47,6 +48,11 @@ export function Translation({
   // The exact text Claude's first verdict was about: editing the answer afterwards makes that verdict stale.
   const [checkedText, setCheckedText] = useState<string | undefined>(() => saved?.vt);
   const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
+  // With Claude connected, 「請 Claude 批改」 sends the answer at once and there is no reference sentence to open:
+  // Claude checks and, when asked (「直接告訴我」), gives the answer. The reference opens only if Claude can't be reached.
+  const keyed = !!tutorKey();
+  const [sendNow, setSendNow] = useState(false);
+  const [claudeDown, setClaudeDown] = useState(false);
   function record(h: number, r: boolean, v = firstVerdict, c = askedHelp, vt = checkedText) {
     setHintLevel(h);
     setSeen(r);
@@ -115,8 +121,8 @@ export function Translation({
       </label>
       {hint === 0 && (
         <div className="pr-actions">
-          <button className="pr-main" onClick={() => setHint(1)}>
-            我寫好了
+          <button className="pr-main" onClick={() => { setSendNow(keyed); setHint(1); }}>
+            {keyed ? "請 Claude 批改" : "我寫好了"}
           </button>
           <button
             className="pr-link"
@@ -127,7 +133,7 @@ export function Translation({
           <StuckButton onUse={() => { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }} />
         </div>
       )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)}
         onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
@@ -147,9 +153,11 @@ export function Translation({
                   給我句架
                 </button>
               )}
-              <button className="pr-link" onClick={() => setHint(4)}>
-                看參考句
-              </button>
+              {(!keyed || claudeDown) && (
+                <button className="pr-link" onClick={() => setHint(4)}>
+                  看參考句
+                </button>
+              )}
             </div>
           )}
         </section>

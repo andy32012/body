@@ -34,12 +34,12 @@ export default function UseWord({ en, zh, example, onGood, onSave }: {
     {answer.trim() && !used && <small className="use-word-warn">句子裡好像還沒有用到 {en}。</small>}
     <div className="pr-actions">
       {keyed
-        ? <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{run ? '改好了，再批一次' : '請 Claude 看看'}</button>
+        ? <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>
         : <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setChecked(true)}>寫好了</button>}
       <button type="button" className="pr-link" onClick={() => setOpen(false)}>收起來</button>
     </div>
     {!keyed && checked && <p className="ls-help">{example ? <>對照例句：<span lang="en">{example}</span>。</> : ''}檢查：主詞和動詞有沒有對上？{en} 的用法跟例句一樣嗎？</p>}
-    <CorrectBox run={run} mode="open" zh={'用單字 ' + en + (zh ? '（' + zh + '）' : '') + ' 自己造一個句子'} reference={example} words={[en]} answer={answer} selfFix
+    <CorrectBox run={run} mode="open" rubric="gept-sentence" zh={'用單字 ' + en + (zh ? '（' + zh + '）' : '') + ' 自己造一個句子'} reference={example} words={[en]} answer={answer} selfFix
       onSave={onSave} onResult={v => { if (v === 'good' && used) onGood?.() }} />
   </section>
 }
