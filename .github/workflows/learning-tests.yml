@@ -22,3 +22,32 @@ jobs:
       - run: npm test
       - name: Check local-calendar behavior across DST
         run: TZ=America/New_York node --test tests/store.test.mjs
+
+  # 夢想藍圖 (projects/dream-blueprint, published at dream/): every test, the type check and build,
+  # the offline check, and that the published dream/ folder really is the build of this source.
+  dream-blueprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/dream-blueprint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: projects/dream-blueprint/package-lock.json
+      - run: npm ci --ignore-scripts --no-fund
+      - run: npm test
+      - name: Tests in Taipei time (dates are local days)
+        run: TZ=Asia/Taipei npm test
+      - run: npm run build
+      - run: npm run check:offline
+      - name: Published dream/ is this build
+        run: |
+          if ! diff -r dist ../../dream > /dev/null; then
+            diff -rq dist ../../dream || true
+            echo "::error::dream/ is not the current build of projects/dream-blueprint. Build it and copy dist/ into dream/ (see projects/dream-blueprint/AGENTS.md)."
+            exit 1
+          fi

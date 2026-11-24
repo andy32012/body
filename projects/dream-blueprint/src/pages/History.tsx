@@ -2,6 +2,7 @@ import ScenePhoto from "../components/ScenePhoto";
 import { useState } from "react";
 import { addDays, attendance, dayKey, intervals, weekKey } from "../lib/progress";
 import { seasonHistory } from "../lib/rivals";
+import { delayedRecall } from "../lib/compact";
 import type { PageProps } from "../lib/store";
 import { getRetentionStatus } from "../lib/grammarRetention";
 import EvidencePanel from "../components/EvidencePanel";
@@ -152,14 +153,14 @@ function TopicHistory({ state }: { state: PageProps["state"] }) {
 
 export default function History({ state, update }: PageProps) {
   const today = dayKey();
-  const { sessions, cards, reviewEvents, settings } = state;
+  const { sessions, cards, settings } = state;
   const days = new Set(sessions.map(s => s.day)).size;
   const words = new Set(sessions.flatMap(session => session.words).map(word => word.trim().toLowerCase()).filter(Boolean)).size;
   const spoken = sessions.reduce((total, s) => total + (s.spokenIds?.length ?? 0), 0);
   const translated = sessions.reduce((total, s) => total + (s.translations?.length ?? 0), 0);
   const wordCards = cards.filter(card => card.id.startsWith("word:"));
-  const delayed = reviewEvents.filter(e => e.gap >= 4 && !e.shownAnswer);
-  const recalled = delayed.filter(e => e.remembered && !e.shownAnswer).length;
+  // Older review lines are folded into totals (compact.ts); the numbers include them.
+  const { delayed: delayedCount, recalled } = delayedRecall(state);
   const continuity = attendance(sessions, today, settings.restDays, settings.periods);
   const pastSeason = seasonHistory(state)[0];
   return <div className="history-page">
@@ -184,8 +185,8 @@ export default function History({ state, update }: PageProps) {
     {state.curriculum.stableUnits.length>0 && <section className="history-section"><h2>單元回想</h2><p className="history-note">隔三個單元回想舊句。連續兩次想不起來的單元會優先複習。</p>{state.curriculum.stableUnits.map(id=><span key={id} className="history-chip">單元 {id} · {getRetentionStatus(state.notes,id)}</span>)}</section>}
     <section className="history-section history-recall">
       <h2>隔幾天，還記得嗎？</h2>
-      <p>{delayed.length ? "相隔至少四天再複習且未看答案，共 " + delayed.length + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
-        {delayed.length > 0 && <strong> {Math.round(recalled / delayed.length * 100)}%</strong>}</p>
+      <p>{delayedCount ? "相隔至少四天再複習且未看答案，共 " + delayedCount + " 次，其中 " + recalled + " 次能自己想起來。" : "第一次隔四天再複習後，這裡會記下你自己想起來的比例。"}
+        {delayedCount > 0 && <strong> {Math.round(recalled / delayedCount * 100)}%</strong>}</p>
       <h3>單字卡現在隔幾天複習</h3><p className="history-note">用 FSRS 依每張卡的記憶狀態排：記得越穩，隔得越久（最長一年）；忘了就縮短，不會從頭來。</p><div className="history-boxes">{intervals.map((interval, index) =>
         <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval === 1 ? '1 天' : '≥' + interval + ' 天'}</small></div>)}</div>
       <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 快篩已認得 {state.knownWords.length} 個字</p>

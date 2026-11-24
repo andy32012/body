@@ -227,6 +227,7 @@ export default function Settings(props: PageProps) {
     <Panel icon={Flag} title="我標記的題目" hint={'共 '+state.flagged.length+' 題'}>{state.flagged.length?<div className="set-list">{state.flagged.map(id=><div key={id}><span>題號 {id}<small>{quizBank.find(q=>q.id===id)?.en}</small></span><button type="button" onClick={()=>update(prev=>({...prev,flagged:prev.flagged.filter(item=>item!==id)}))}>取消標記</button></div>)}</div>:<p>練習時按「這題怪怪的」，題號就會留在這裡。</p>}</Panel>
     <Panel icon={DatabaseBackup} title="備份與還原" hint="把進度存成檔案，換手機也帶得走">
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
+      {(()=>{const mb=JSON.stringify(state).length/1e6; return <p className={mb>3.5?'set-warn':undefined}>進度檔大小：{mb<0.1?'不到 0.1':mb.toFixed(1)} MB（瀏覽器大約能存 5 MB）。兩個月以前的複習紀錄會自動整理成統計，每天的小紀錄幾週後清掉，所以會一直維持在安全範圍。{mb>3.5?'現在偏大了，請跟 Claude 說要把進度改存到 IndexedDB。':''}</p>})()}
       <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void readFile(e.target.files?.[0],'backup');e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
       {backup && <div className="set-restore"><b>用這份備份取代目前進度？</b><p>還原會包含原本的課表、學習紀錄和設定。</p>

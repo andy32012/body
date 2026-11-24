@@ -2,7 +2,8 @@ import config from '../data/rivals.json' with { type: 'json' };
 
 type Rival = typeof config.rivals[number];
 import type { AppState } from './store';
-import { dayKey, activePeriod, addDays as offset, weekKey as monday, daysBetween, reviewBonus, type Period } from './progress.ts';
+import { dayKey, activePeriod, addDays as offset, weekKey as monday, daysBetween, type Period } from './progress.ts';
+import { bonusOn } from './compact.ts';
 type WeekData = { score: number; paused: boolean; vacation: boolean };
 export type RankedEntry = { id: string; name: string; score: number; rank: number; rival?: Rival };
 type StandingInput = { week: string; day: number; score: number; average: number; beginner: boolean; vacation: boolean };
@@ -56,7 +57,8 @@ function weekData(state:AppState,start:string,end:string):WeekData {
     paused ||= inTruce(session.period);
   }
   let score=0;
-  for(const [day,base] of energies) score+=base+reviewBonus(state.reviewEvents,day);
+  // Days whose review lines were folded keep their bonus in the archive (compact.ts).
+  for(const [day,base] of energies) score+=base+bonusOn(state,day);
   paused ||= state.settings.periods.some(range=>inTruce(range.type)&&range.start<=end&&(!range.end||range.end>=start));
   return {score,paused,vacation:activePeriod(end,state.settings.periods)==='vacation'};
 }

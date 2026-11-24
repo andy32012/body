@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { addDays, dayKey, type PeriodRange } from './progress'
 import { defaultSchool } from './school'
 import contentUpdates from '../data/content-updates.json'
+import { compactState } from './compact'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
@@ -153,7 +154,8 @@ export function importBackup(raw:string):AppState {
   applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
-  return state
+  // Old details are folded or dropped so the saved progress stays well under the browser's ~5 MB (compact.ts).
+  return compactState(state,dayKey())
 }
 
 /** Teaching material corrected after it was learned: the review cards of those words and sentences come due today,

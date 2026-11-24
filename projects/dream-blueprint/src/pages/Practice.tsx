@@ -1,21 +1,17 @@
-import ScenePhoto from "../components/ScenePhoto";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { PracticeCover } from "../components/PracticeCover";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Headphones, Check, PenLine } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
 import ClinicalCase from "../components/ClinicalCase";
-import TutorChat from "../components/TutorChat";
-import { clearDraft, readDraft, writeDraft } from "../lib/drafts";
+import { Translation, type Mark } from "../components/Translation";
 import { AskWord } from "../components/AIChat";
-import curriculum from "../data/curriculum.json";
 import sentences from "../data/sentences.json";
 import words from "../data/words.json";
-import starters from "../data/starters.json";
 import SpeechPractice from "../components/SpeechPractice";
 import NursingListen from "../components/NursingListen";
 import NursingWords from "../components/NursingWords";
-import { updateStore, type AppState, type PageProps, type Session } from "../lib/store";
-import { addWeak, easeWeak, normalizeLabel } from "../lib/weakPoints";
+import type { PageProps, Session } from "../lib/store";
 import {
   activePeriod,
   dayKey,
@@ -28,18 +24,15 @@ import {
   reviewLoad,
   sentenceReviewKey,
   SENTENCE_QUOTA,
+  type Energy,
 } from "../lib/progress";
-import { isKnownWord, wordKey, officialWords, spellingTargets } from "../lib/vocab";
+import { wordKey, officialWords, spellingTargets } from "../lib/vocab";
 import VocabScreen from "../components/VocabScreen";
-import { workloadWords } from "../lib/workloadWords";
-import { addSayCard, readSayCard, sayCardSentence } from "../lib/sayCards";
+import { addSayCard } from "../lib/sayCards";
 import WordSkills from "../components/WordSkills";
 import {
   addEvidence,
   answered,
-  compareWithReference,
-  matchesReference,
-  sameEnglish,
   judgeCheckpoint,
   judgeExpress,
   judgeVariation,
@@ -52,9 +45,7 @@ import {
   type Verdict,
 } from "../lib/evidence";
 import { markSkill, skillSummary, skills, type Skill } from "../lib/wordSkills";
-import { unitGate } from "../lib/cefr";
 import { LessonExpress, LessonListen, LessonVariation, StepBar } from "../components/LessonParts";
-import StuckButton from "../components/StuckButton";
 import UseWord from "../components/UseWord";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
@@ -66,10 +57,8 @@ import { grammarFor } from "../lib/grammar";
 import { librarySections, modeFromHash, modeLabel, sectionHash, sectionInfo, sectionModes, sectionOf, type LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
 import { hasPack, packUnits } from "../lib/bridge";
-import { useTaskContext } from "../lib/taskContext";
 import {
   heardKey,
-  lessonFinished,
   moveLesson,
   readHeard,
   readHints,
@@ -77,7 +66,6 @@ import {
   writeHint,
   resumePhase,
   resumeTarget,
-  sentenceFrame,
   updateLesson,
   variationsFor,
   promptFor,
@@ -98,360 +86,13 @@ import {
   recordRetention,
   retentionDrawCount,
 } from "../lib/grammarRetention";
-import { dueTopic, topics } from "../lib/topics";
+import { dueTopic } from "../lib/topics";
+import { allSentences, lesson, sentenceById, syncCustom, units, type Word } from "../lib/todayLesson";
 import TopicLesson from "../components/TopicLesson";
 import "./practice.css";
 
-type Word = { en: string; zh: string; example?: string; exampleZh?: string };
-type Sentence = {
-  id: string;
-  zh: string;
-  grammar: string[];
-  hints: string[];
-  reference: string[];
-  why: string;
-  newWords: Word[];
-};
-type LessonDay = Sentence & { bonusWords?: Word[]; listening?: Word[] };
-type Unit = {
-  id: number;
-  title: string;
-  rule?: string;
-  examples?: string[];
-  examplesZh?: string[];
-  cando?: string;
-  days: LessonDay[];
-  checkpoint: Sentence[];
-  backup: Sentence[];
-};
-type Energy = "low" | "normal" | "high";
-type Mark = "good" | "small" | "again";
-const units: Unit[] = curriculum.units;
-const allSentences: Sentence[] = units
-  .flatMap((unit) => [...unit.days, ...unit.checkpoint, ...unit.backup])
-  .concat(sentences)
-  .concat(starters)
-  .concat(topics.flatMap((t) => [...t.practice, ...t.review.practice]));
-const sentenceById = new Map(allSentences.map((s) => [s.id, s]));
-/** Sentences saved from Emma, passages or lessons live in state.notes as "say.<id>". */
-function syncCustom(notes: Record<string, string>) {
-  for (const [k, v] of Object.entries(notes)) {
-    if (!k.startsWith("say.")) continue;
-    const d = readSayCard(v);
-    if (d) sentenceById.set(k.slice(4), sayCardSentence(k.slice(4), d));
-  }
-}
-const marks: [Mark, string][] = [
-  ["good", "對了"],
-  ["small", "小錯"],
-  ["again", "不會"],
-];
 const levels = { low: "累爆", normal: "普通", high: "有電" };
-const anchor = sentences[0];
 
-export function PracticeCover({ title, children }: { title: string; children?: ReactNode }) {
-  return (
-    <header className="pr-cover">
-      <ScenePhoto className="pr-cover-photo" />
-      <div className="pr-cover-copy">{children}<h1>{title}</h1></div>
-    </header>
-  );
-}
-
-/** Hint levels: 1 self-check after writing, 2 a clearer hint, 3 a sentence frame, 4 the model answer.
- *  With saved/onHint the level survives a reload, so a hint once seen is never forgotten. */
-export function Translation({
-  sentence,
-  onMark,
-  checkpoint,
-  preparation,
-  saved,
-  onHint,
-  label,
-}: {
-  preparation?: ReactNode;
-  label?: string;
-  sentence: Sentence;
-  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) => void;
-  checkpoint: boolean;
-  saved?: HintUse;
-  onHint?: (use: HintUse) => void;
-}) {
-  const [answer, setAnswer] = useState(() => readDraft(sentence.id));
-  const [hint, setHintLevel] = useState(() => saved?.h ?? 0);
-  const [copied, setCopied] = useState("");
-  const [manualCopy, setManualCopy] = useState("");
-  const [seenHint, setSeen] = useState(() => !!saved?.r || (saved?.h ?? 0) >= 2);
-  const [firstVerdict, setFirstVerdict] = useState<Verdict | undefined>(() => saved?.v);
-  // The exact text Claude's first verdict was about: editing the answer afterwards makes that verdict stale.
-  const [checkedText, setCheckedText] = useState<string | undefined>(() => saved?.vt);
-  const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
-  function record(h: number, r: boolean, v = firstVerdict, c = askedHelp, vt = checkedText) {
-    setHintLevel(h);
-    setSeen(r);
-    onHint?.({ h, r, ...(v ? { v } : {}), ...(v && vt !== undefined ? { vt } : {}), ...(c ? { c } : {}) });
-  }
-  const verdictStale = !!firstVerdict && checkedText !== undefined && !sameEnglish(checkedText, answer);
-  useTaskContext({
-    label: (checkpoint ? "小關卡" : "中翻英") + "：" + sentence.zh,
-    detail: ["題目（中翻英）：" + sentence.zh, "這題練的文法：" + sentence.grammar.join("、"), "課本提示：" + sentence.hints.join(" ／ "),
-      "參考答案（只供你判斷，他沒說要看答案前不要說出來）：" + sentence.reference.join(" / ")].join("\n"),
-    draft: answer,
-  });
-  const mountedAt = useRef(Date.now());
-  const ready = () => Date.now() - mountedAt.current > 450;
-  const setHint = (h: number) => { if (ready()) record(h, seenHint || h >= 2); };
-  /** The shared weak-point list, when no Claude verdict did it already: a self-marked miss counts against the
-   *  sentence's grammar; written right alone (and matching a reference) takes one miss off it. */
-  function noteWeak(mark: Mark, revealed: boolean) {
-    if (firstVerdict) return;
-    const label = sentence.grammar.map((g) => normalizeLabel(g)).find(Boolean);
-    if (!label) return;
-    const day = dayKey();
-    if (mark === "again" || mark === "small")
-      updateStore((prev) => ({ ...prev, notes: addWeak(prev.notes, label, day, { w: answer, r: sentence.reference[0] ?? "" }, "self") }));
-    else if (!revealed && matchesReference(answer, sentence.reference))
-      updateStore((prev) => ({ ...prev, notes: easeWeak(prev.notes, label) }));
-  }
-  const setSeenHint = (r: boolean) => record(hint, r);
-  async function copyAnswer() {
-    const value =
-      sentence.zh +
-      "\n我的答案：" +
-      answer +
-      "\n參考句：" +
-      sentence.reference.join(" / ");
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied("已複製");
-    } catch {
-      setManualCopy(value);
-      setCopied("請長按選取並複製下方文字。");
-    }
-  }
-  return (
-    <>
-      <div className="pr-label">{label ?? (checkpoint ? "單元小關卡" : "一句中翻英")}</div>
-      <h2 className="pr-question">{sentence.zh}</h2>
-      <div className="pr-tags">
-        {sentence.grammar.map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
-      </div>
-      {preparation}
-      <label className="pr-field">
-        我的英文
-        <textarea
-          lang="en"
-          autoCapitalize="sentences"
-          autoComplete="off"
-          spellCheck={false}
-          rows={3}
-          value={answer}
-          onChange={(e) => { setAnswer(e.target.value); writeDraft(sentence.id, e.target.value); }}
-          placeholder="把想到的英文寫在這裡"
-        />
-      </label>
-      {hint === 0 && (
-        <div className="pr-actions">
-          <button className="pr-main" onClick={() => setHint(1)}>
-            我寫好了
-          </button>
-          <button
-            className="pr-link"
-            onClick={() => setHint(2)}
-          >
-            我想看提示
-          </button>
-          <StuckButton onUse={() => { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }} />
-        </div>
-      )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} onReveal={() => setSeenHint(true)}
-        onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
-      {hint >= 1 && (
-        <section className="pr-hint">
-          <strong>自己檢查看看</strong>
-          <p>{sentence.hints[0]}</p>
-          {hint >= 2 && <p>{sentence.hints[1] || sentence.why}</p>}
-          {hint >= 3 && <p className="pr-frame" lang="en">{sentenceFrame(sentence.reference[0])}</p>}
-          {hint < 4 && (
-            <div className="pr-actions">
-              {hint === 1 && (
-                <button className="pr-link" onClick={() => setHint(2)}>
-                  再清楚一點
-                </button>
-              )}
-              {hint === 2 && (
-                <button className="pr-link" onClick={() => setHint(3)}>
-                  給我句架
-                </button>
-              )}
-              <button className="pr-link" onClick={() => setHint(4)}>
-                看參考句
-              </button>
-            </div>
-          )}
-        </section>
-      )}
-      {hint === 4 && (
-        <section className="pr-reference">
-          <small>參考句</small>
-          {sentence.reference.map((en) => (
-            <p lang="en" key={en}>
-              {en}
-            </p>
-          ))}
-          <span>{sentence.why}</span>
-          {answered(answer) && (() => {
-            const diff = compareWithReference(answer, sentence.reference);
-            return diff && !diff.same && (
-              <p className="pr-compare">
-                <small>跟最接近的參考句比：</small>{" "}
-                <span lang="en">{diff.words.map((t, i) => <span key={i} className={t.extra ? "pr-diff-extra" : undefined}>{t.w} </span>)}</span>
-                {diff.missing.length > 0 && <><br /><small>參考句有、你沒寫到的字：</small> <span lang="en" className="pr-diff-missing">{diff.missing.join(" ")}</span></>}
-                <br /><small>畫波浪線的字跟參考句不一樣。寫法不同也可能是對的，重點是意思有沒有變：時間、人物、動作或否定換了，就是意思不一樣。</small>
-              </p>
-            );
-          })()}
-          {sentence.newWords.length > 0 && (
-            <div className="pr-tags">
-              {sentence.newWords.map((word) => (
-                <span key={word.en}>
-                  {word.en} · {word.zh} <AskWord en={word.en} zh={word.zh} />
-                </span>
-              ))}
-            </div>
-          )}
-          <button className="pr-link" onClick={copyAnswer}>
-            複製這句和我的答案
-          </button>
-          <small role="status">{copied}</small>
-          {manualCopy && (
-            <textarea
-              aria-label="可複製的答案"
-              readOnly
-              value={manualCopy}
-              onFocus={(e) => e.target.select()}
-            />
-          )}
-        </section>
-      )}
-      {hint >= 1 && (
-        <fieldset className="pr-marks">
-          <legend>我的自評</legend>
-          {marks.map(([mark, label]) => (
-            <button
-              key={mark}
-              disabled={mark !== "again" && !answered(answer)}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); noteWeak(mark, seenHint || hint >= 2 || askedHelp); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}
-            >
-              {label}
-            </button>
-          ))}
-          {!answered(answer) && <p className="pr-blank-note">還沒寫答案：寫下來才能按「對了」或「小錯」。真的不會就按「不會」，沒寫的題目不算作答。</p>}
-          {answered(answer) && (
-            <p className="pr-mark-note">
-              {firstVerdict === "good" && verdictStale ? (matchesReference(answer, sentence.reference) ? "你在 Claude 確認之後改了答案，改過的跟參考答案一樣：按「對了」仍記成當次獨立完成。" : "你在 Claude 確認之後又改了答案：改過的這一版還沒人確認，按「對了」會記成「自評完成・待確認」。")
-                : firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
-                : firstVerdict === "changed" ? "Claude 說意思跟題目不一樣：改好之後也只算有提示完成。"
-                : firstVerdict ? "Claude 指出要改的地方：照著改好，這次記成有提示完成。"
-                : matchesReference(answer, sentence.reference) ? "跟參考答案一樣，已確認：按「對了」會記成當次獨立完成。"
-                : "寫法跟參考答案不完全一樣，可能也對。沒有人確認前，按「對了」會先記成「自評完成・待確認」，之後可以請 Claude 看。意思如果變了，請按「小錯」。"}
-            </p>
-          )}
-        </fieldset>
-      )}
-    </>
-  );
-}
-
-/** `at` continues a lesson that was already started (its core may be saved and the curriculum moved on). */
-function lesson(state: AppState, energy: Energy, date: string, at?: { unit: number; day: number }) {
-  syncCustom(state.notes);
-  const cursor = at ? { ...state.curriculum, unit: at.unit, day: at.day } : state.curriculum;
-  const unit =
-    units.find((u) => u.id === cursor.unit) ?? units[units.length - 1];
-  const index = Math.min(6, Math.max(1, cursor.day));
-  const entry = unit.days[index - 1];
-  const retry = cursor.retry > 0;
-  const advancedToday = state.sessions.some(
-    (s) => s.day === date && (s.advanced ?? s.energy !== "low"),
-  );
-  const period = activePeriod(date, state.settings.periods);
-  const quiet = period === "exam" || period === "internship";
-  // The next level's units wait for the certificate before them (passed, or at least booked).
-  const gate = at ? null : unitGate(state.notes, cursor.unit);
-  const review =
-    !at && (quiet || energy==="low" || cursor.unit > units.length || advancedToday || !!gate);
-  const checkpoint = index === 6 && !review;
-  const completed = state.sessions
-    .flatMap((s) => s.translations?.map((t) => t.sentenceId) ?? [s.sentenceId])
-    .filter(Boolean);
-  const due = dueCards(
-    state.cards.filter((card) => sentenceById.has(card.id)),
-    date,
-    energy,
-  )[0];
-  // With nothing to review yet, hand over a ready everyday sentence instead of asking for one.
-  const starter = starters[Number(date.replace(/-/g, "")) % starters.length] as Sentence;
-  const previous = sentenceById.get(due?.id ?? completed.at(-1) ?? "") ?? (review ? starter : undefined);
-  const items = review
-    ? [previous ?? anchor]
-    : checkpoint
-      ? retry
-        ? unit.backup.slice(-3)
-        : unit.checkpoint
-      : retry && index >= 4
-        ? [unit.backup[index - 4] ?? entry]
-        : [entry];
-  const previousPair = [...new Set(completed)]
-    .reverse()
-    .flatMap((id) => sentenceById.get(id) ?? [])
-    .slice(0, 2);
-  const vacation = activePeriod(date, state.settings.periods) === "vacation";
-  const proposed =
-    vacation && energy === "high"
-      ? [...entry.newWords, ...(entry.bonusWords ?? [])]
-      : entry.newWords;
-  const base = proposed.filter((w) => !isKnownWord(w.en, state.knownWords));
-  // Same brake as the daily words: only word cards piling up past today's review hold back the extra words.
-  const busyReview = reviewLoad(state, date, reviewEnergy(date, state.settings.periods)).backlog > 30;
-  const added = review || checkpoint || busyReview ? [] : workloadWords(state, base);
-  const vocabulary = review || checkpoint ? [] : [...base, ...added];
-  return {
-    unit: unit.id,
-    day: index,
-    title: review ? "今天只練這一句" : unit.title,
-    zh: review && !previous ? "用自己記得的一句英文複習。" : items[0].zh,
-    newWords: vocabulary,
-    review,
-    checkpoint,
-    items,
-    added,
-    rule: unit.rule,
-    examples: unit.examples ?? [],
-    examplesZh: unit.examplesZh ?? [],
-    listening: entry.listening ?? [],
-    earlier: unit.days.slice(0, 2),
-    previousDay: index > 1 ? unit.days[index - 2] : undefined,
-    cando: unit.cando ?? "",
-    previousPair,
-    vacation,
-    freshReview: review && !previous,
-    gate,
-    /** Every written unit is done: the days go to review, words and the four skills (see the month plan). */
-    done: !at && cursor.unit > units.length,
-  };
-}
-
-export function getLessonPreview(
-  state: AppState,
-  energy: Energy,
-  date = dayKey(),
-  at?: { unit: number; day: number },
-) {
-  return lesson(state, energy, date, at);
-}
 
 type TranslationRecord = NonNullable<Session["translations"]>[number];
 const ratingOf = { good: "correct", small: "minor", again: "again" } as const;

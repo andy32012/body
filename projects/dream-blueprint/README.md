@@ -328,6 +328,7 @@
 - `public/` 保存 56 張實際使用的 WebP、App 圖示、安裝資訊、離線註冊程式與字典授權。需要觀測機構提供的高解析版本時，可依影像清單所列網址前往官方圖庫。
 - `scripts/` 有 Windows 預覽工具、離線程式範本與建置後測試。`tests/` 保存學習、排程與資料遷移測試。
 - `index.html`、`vite.config.ts`、`tsconfig.json`、`package.json`、`package-lock.json`、`.gitignore`、本說明和 `開啟夢想藍圖.cmd` 隨原始專案一起保存。
+- `AGENTS.md`（`CLAUDE.md` 會讀它）是給寫程式的助手看的維護規則：怎麼測試和發佈、哪些 ID 和儲存位置不能改、教材只能變多。請 Codex 或 Claude 改網站時，它們會先讀這份。
 
 ## 維護與更新
 
