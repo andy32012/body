@@ -79,7 +79,10 @@ try {
   assert.equal(await a.page.locator('.wl-grammar').evaluate(e => e.open), true)
   assert.equal(await a.page.locator('.wl-grammar .gm-ex li').count(), stages[0].grammar.examples.length)
   await a.page.locator('.wl-grammar .gm-say').first().click()
-  assert.deepEqual(await a.page.evaluate(() => window.__spoken.at(-1)), { text: stages[0].grammar.examples[0].en, rate: 0.65, lang: 'en-US' })
+  const spoken = await a.page.evaluate(() => window.__spoken.at(-1))
+  assert.equal(spoken.text, stages[0].grammar.examples[0].en)
+  assert.equal(spoken.lang, 'en-US')
+  assert.ok(Math.abs(spoken.rate - 0.65) < 1e-6, 'spoken rate matches the preference within browser float precision')
   await geometry(a.page, 'fresh-dark')
   await a.page.locator('.wl-stages').scrollIntoViewIfNeeded()
   await a.page.screenshot({ path: out + '/fresh-dark.png', fullPage: true })
@@ -149,7 +152,7 @@ try {
     assert.equal(await c.page.locator('.wl-grammar .gm-explain > h4').innerText(), stages[i].grammar.title)
     await geometry(c.page, 'stage-' + stages[i].id)
   }
-  results.push({ label: 'speech', verifiedRate: 0.65, firstExample: stages[0].grammar.examples[0].en }, { label: 'runtime-errors', fresh: a.errors, legacy: b.errors, advanced: c.errors }, { label: 'initial-page-scroll', value: y })
+  results.push({ label: 'speech', verifiedRate: 0.65, observedRate: spoken.rate, firstExample: stages[0].grammar.examples[0].en }, { label: 'runtime-errors', fresh: a.errors, legacy: b.errors, advanced: c.errors }, { label: 'initial-page-scroll', value: y })
   assert.deepEqual(c.errors, [])
   await c.context.close()
 } catch (error) {
