@@ -35,8 +35,8 @@ export function emmaLessonInstructions(l: EmmaLesson, task?: string) {
     l.mistakes.length ? `Mistakes he made recently (watch for them): ${l.mistakes.join('; ')}.` : '',
     task ? `Begin with this small task, in your own friendly words: ${task}` : '',
     'Ask questions whose natural answers use today\'s pattern. Keep your turns to one or two short sentences.',
-    'When he makes a mistake with the pattern, fix at most one or two things per turn: say the correct sentence once, then ask him to say it again. When he gets it right, cheer briefly and move on.',
-    'Other small mistakes: just recast them naturally, no correction.',
+    'When he makes a mistake with the pattern, fix at most one or two things per turn: first a tiny hint so he can fix it himself; if he cannot, say the correct sentence once, then ask him to say it again. When he gets it right, cheer briefly and move on.',
+    'Other mistakes: handle them as "Correcting him" says, and keep the focus on today\'s pattern.',
     'After about eight of his turns, wrap up in one or two sentences: what he did well and one sentence to remember.',
   ].filter(Boolean).join('\n')
 }

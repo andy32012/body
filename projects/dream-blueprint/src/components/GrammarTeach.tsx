@@ -4,6 +4,7 @@ import curriculum from '../data/curriculum.json'
 import type { PageProps } from '../lib/store'
 import { useTaskContext } from '../lib/taskContext'
 import { checkDrill, drillAnswer, drillNames, drillSummary, drillsForDay, grammarFor, grammarUnits, saveDrill, type Drill } from '../lib/grammar'
+import { addWeak, labelOfUnit } from '../lib/weakPoints'
 import './grammar.css'
 
 type SaveNotes = (apply: (notes: Record<string, string>) => Record<string, string>) => void
@@ -52,7 +53,7 @@ export function GrammarExplain({ unit, rate }: { unit: number; rate: number }) {
   </div>
 }
 
-function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean) => void }) {
+function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean, said: string) => void }) {
   // A fix drill starts from the wrong sentence, so only the wrong part needs retyping on a phone.
   const [text, setText] = useState(drill.k === 'fix' ? drill.q : '')
   const [picked, setPicked] = useState<number | null>(null)
@@ -62,7 +63,7 @@ function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean) =
     if (result !== null) return
     const right = checkDrill(drill, answer)
     setResult(right)
-    onDone(right)
+    onDone(right, typeof answer === 'number' ? (drill.k === 'choose' ? drill.options[answer] ?? '' : '') : answer)
   }
   return <div className="gm-drill" data-kind={drill.k}>
     {drill.k === 'fix'
@@ -113,9 +114,14 @@ export function GrammarDrills({ unit, indices, onSave, date, done }: { unit: num
   }
   return <div className="gm-drills">
     <div className="gm-drills-head"><strong>小練習：先認得，再寫</strong><small>{drillNames[drill.k]} · 第 {at + 1} / {indices.length} 題</small></div>
-    <DrillCard key={indices[at]} drill={drill} onDone={right => {
+    <DrillCard key={indices[at]} drill={drill} onDone={(right, said) => {
       setAnswered(true); setRights(r => [...r, right])
-      onSave(notes => saveDrill(notes, unit, indices[at], right, date))
+      // A miss also goes on the shared weak-point list, under this unit's grammar.
+      onSave(notes => {
+        const saved = saveDrill(notes, unit, indices[at], right, date)
+        const label = labelOfUnit(unit)
+        return right || !label ? saved : addWeak(saved, label, date, { w: said, r: drillAnswer(drill) }, 'drill')
+      })
     }} />
     {answered && <button type="button" className="pr-main gm-next" onClick={() => { setAt(at + 1); setAnswered(false) }}>{at + 1 < indices.length ? '下一題' : '看結果'}</button>}
   </div>

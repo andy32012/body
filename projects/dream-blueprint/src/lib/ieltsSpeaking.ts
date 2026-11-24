@@ -1,3 +1,5 @@
+import { weakLabelPrompt } from './weakPoints'
+
 /** IELTS Speaking Part 2 (long turn) and Part 3 with Emma as a friendly practice partner. */
 export interface CueCard { id: string; topic: string; bullets: string[]; explain: string; part3: string[] }
 export const cueKey = (id: string) => 'ielts.p2.' + id
@@ -30,5 +32,6 @@ export const part2FeedbackPrompt = [
   '用繁體中文給回饋，只評逐字稿看得出來的：內容和連貫（有沒有回答到題目、有沒有講長）、詞彙、文法範圍與正確度，各一行，每行寫一句做得好的和一句要改的。',
   '接著一行固定寫：「流暢度和發音：只看逐字稿沒辦法評估，要聽錄音。」',
   '不要寫任何分數或等級（不要 band、不要估計整體分數、不要 CEFR）。不要用 Markdown 標題。',
-  '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因',
+  '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因 ||| 弱點名稱',
+  '弱點名稱照抄這份清單裡最符合的一個：' + weakLabelPrompt(),
 ].join('\n')

@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { Mic, Square, Settings2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { echoGuard, openaiKey, setEchoGuard, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
-import { EMMA, emmaInstructions, emmaOpening, quietNudge } from '../lib/emmaPrompt'
+import { EMMA, emmaInstructions, emmaOpening, emmaStudy, quietNudge } from '../lib/emmaPrompt'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { dayKey } from '../lib/progress'
-import { addSayCard } from '../lib/sayCards'
+import { addSayCard, hasSayCard, removeSayCard } from '../lib/sayCards'
+import { addWeak, easeWeak, labelOfUnit, normalizeLabel, weakLinesEn } from '../lib/weakPoints'
+import { parseSpeakFeedback, speakFeedbackPrompt, type SpeakFeedback, type SpeakFix } from '../lib/speakFeedback'
+import { speakEnglish } from '../lib/tts'
+import curriculum from '../data/curriculum.json'
 import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
 import { topicById, topicInstructions, type TopicPart } from '../lib/topics'
 import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCard } from '../lib/ieltsSpeaking'
@@ -22,7 +26,8 @@ import './speaking.css'
 
 const NAME = EMMA
 
-type Fix = { wrong: string; en: string; zh: string; why: string; added?: boolean }
+/** added: put into review by itself; already: the same sentence was in review before; removed: taken out again. */
+type Fix = SpeakFix & { status: 'added' | 'already' | 'removed' }
 const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
 
 export default function Speaking({ state, update, lessonMode = false, ieltsMode = false, topicMode, packMode, nurseMode }: PageProps & { lessonMode?: boolean; ieltsMode?: boolean; topicMode?: string; packMode?: string; nurseMode?: string }) {
@@ -82,9 +87,16 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const [lines, setLines] = useState<Line[]>([])
   const levels = useRef<Levels>({ her: 0, you: 0 })
   const [who, setWho] = useState<'' | 'her' | 'you'>('')
-  const [notes, setNotes] = useState('')
+  const [feedback, setFeedback] = useState<SpeakFeedback | null>(null)
   const [noting, setNoting] = useState(false)
   const [fixes, setFixes] = useState<Fix[]>([])
+  // The latest notes, for checking which corrections are already in review when the call ends.
+  const notesRef = useRef(state.notes)
+  notesRef.current = state.notes
+  // The grammar this chat looks at: today's lesson in lesson mode, otherwise the unit he is on.
+  const focusUnit = lesson?.unit ?? state.curriculum.unit
+  const focusInfo = curriculum.units.find(u => u.unit === focusUnit)
+  const focus = { label: labelOfUnit(focusUnit) ?? focusInfo?.title ?? '', rule: lesson?.rule ?? focusInfo?.rule ?? '' }
   const session = useRef<VoiceSession | null>(null)
   const log = useRef<HTMLDivElement>(null)
   const linesRef = useRef<Line[]>([])
@@ -113,11 +125,14 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (!openaiKey()) { setSettings(true); return }
     if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
-    setError(''); setLines([]); setNotes(''); setFixes([]); setYouMs(0); setYouFrom(undefined)
+    setError(''); setLines([]); setFeedback(null); setFixes([]); setYouMs(0); setYouFrom(undefined)
     const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : ''
     try {
       session.current = await startVoice({
-        instructions: emmaInstructions(memory.notes, extra, emmaLevel(state.curriculum.unit), { longTurn: !!card }),
+        // Everything but the IELTS test knows what his course has taught and corrects him by his rule.
+        instructions: emmaInstructions(memory.notes, extra, emmaLevel(state.curriculum.unit), {
+          longTurn: !!card, ...(card ? {} : { study: emmaStudy(state.curriculum.unit, weakLinesEn(state.notes, today, 5)) }),
+        }),
         opening: emmaOpening(!!extra),
         // In IELTS Part 2 he talks alone for a minute or two and may stop to think: nobody hurries him there.
         quiet: card ? undefined : { afterMs: 10000, times: 2, say: quietNudge },
@@ -163,30 +178,34 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     setNoting(true)
     try {
       const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
-      const raw = await askTutor(card ? part2FeedbackPrompt + '\n題目卡：' + card.topic + '\n' + memoryPrompt(memory.notes) : [
-        `你是 ${NAME} 的口說小幫手。下面是玄燁剛剛跟美國朋友 ${NAME} 用英文聊天的逐字稿（語音辨識，可能有小錯字）。`,
-        '用繁體中文、輕鬆的語氣給他很短的回饋，最多 3 行：一句鼓勵＋一個下次聊天可以用的句子。不要用 Markdown 標題。',
-        '另外，把他說錯或不自然的句子（最多 3 句，沒有就不要寫）各寫成一行，格式固定為：[卡] 他說的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因',
-        memoryPrompt(memory.notes),
-      ].join('\n'), [{ role: 'user', content: transcript }])
+      const raw = await askTutor((card ? part2FeedbackPrompt + '\n題目卡：' + card.topic : speakFeedbackPrompt(focus, NAME)) + '\n' + memoryPrompt(memory.notes),
+        [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
       if (remember.length || forget.length) memory.update(remember, forget)
-      const found: Fix[] = []
-      const text = clean.split('\n').filter(line => {
-        const m = line.trim().match(/^\[卡\]\s*(.+?)\s*\|\|\|\s*(.+?)\s*\|\|\|\s*(.+?)\s*\|\|\|\s*(.+)$/)
-        if (m) found.push({ wrong: m[1], en: m[2], zh: m[3], why: m[4] })
-        return !m
-      }).join('\n').trim()
-      setFixes(found)
-      setNotes(text)
-    } catch { /* notes are optional */ }
+      const fb = parseSpeakFeedback(clean)
+      const day = dayKey()
+      // The corrections go into review by themselves (each can be taken out again), and onto the weak-point list.
+      setFixes(fb.fixes.map(f => ({ ...f, status: hasSayCard(notesRef.current, f.en) ? 'already' : 'added' })))
+      if (fb.fixes.length) update(prev => fb.fixes.reduce((next, f, i) => keepFix(next, f, day, i), prev))
+      setFeedback(fb)
+    } catch { /* feedback is optional */ }
     finally { setNoting(false) }
   }
 
-  function addCard(i: number) {
+  function keepFix<S extends Parameters<typeof addSayCard>[0]>(prev: S, f: SpeakFix, day: string, salt: number): S {
+    const tag = f.tag ? normalizeLabel(f.tag) : null
+    const next = addSayCard(prev, { zh: f.zh, en: f.en, wrong: f.wrong, why: f.why, from: 'emma', ...(tag ? { tag } : {}) }, day, String(salt))
+    return tag ? { ...next, notes: addWeak(next.notes, tag, day, { w: f.wrong, r: f.en }, 'speak') } : next
+  }
+  function removeFix(i: number) {
     const f = fixes[i]
-    update(prev => addSayCard(prev, { zh: f.zh, en: f.en, wrong: f.wrong, why: f.why, from: 'emma' }, dayKey(), String(i)))
-    setFixes(list => list.map((x, j) => j === i ? { ...x, added: true } : x))
+    const tag = f.tag ? normalizeLabel(f.tag) : null
+    update(prev => { const next = removeSayCard(prev, f.en); return tag ? { ...next, notes: easeWeak(next.notes, tag) } : next })
+    setFixes(list => list.map((x, j) => j === i ? { ...x, status: 'removed' } : x))
+  }
+  function restoreFix(i: number) {
+    update(prev => keepFix(prev, fixes[i], dayKey(), i))
+    setFixes(list => list.map((x, j) => j === i ? { ...x, status: 'added' } : x))
   }
 
   const live = status === 'live' || status === 'connecting'
@@ -285,16 +304,30 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       </footer>
     </section>
 
-    {(noting || notes) && <section className="sp-notes">
-      <strong>這次聊天的小筆記</strong>
-      {noting ? <p>整理中……</p> : notes.split('\n').map((line, i) => line.trim() ? <p key={i}>{line}</p> : null)}
-      {fixes.length > 0 && <div className="sp-fixes">
-        <small>要把這些句子加入明天的複習嗎？</small>
-        {fixes.map((f, i) => <div key={i} className="sp-fix">
-          <div><s lang="en">{f.wrong}</s><b lang="en">{f.en}</b><span>{f.zh}・{f.why}</span></div>
-          <button type="button" disabled={f.added} onClick={() => addCard(i)}>{f.added ? '已加入' : '加入複習'}</button>
-        </div>)}
-      </div>}
+    {(noting || feedback) && <section className="sp-notes sp-feedback" aria-live="polite">
+      <strong>這次聊天的回饋</strong>
+      {noting ? <p>整理中……</p> : feedback && <>
+        {feedback.used && focus.label && <div className="sp-fb-row">
+          <small>這次的文法 · {focus.label}</small>
+          <p>{feedback.used.n > 0 ? '你說對了 ' + feedback.used.n + ' 次' : '這次還沒用到，下次試著用一次看看'}{feedback.used.example && <> · <span lang="en">{feedback.used.example}</span></>}</p>
+        </div>}
+        {fixes.length > 0 && <div className="sp-fixes">
+          <small>{fixes.filter(f => f.status !== 'removed').length} 句修正已經自動加進複習。語音辨識聽錯造成的「錯」，按移除就好。</small>
+          {fixes.map((f, i) => <div key={i} className={'sp-fix' + (f.status === 'removed' ? ' removed' : '')}>
+            <div><s lang="en">{f.wrong}</s><b lang="en">{f.en}</b><span>{f.zh}・{f.why}{f.tag && normalizeLabel(f.tag) ? '（' + normalizeLabel(f.tag) + '）' : ''}</span></div>
+            {f.status === 'already' ? <small className="sp-fix-note">本來就在複習裡</small>
+              : f.status === 'removed' ? <button type="button" className="sp-fix-undo" onClick={() => restoreFix(i)}>加回去</button>
+              : <button type="button" className="sp-fix-remove" onClick={() => removeFix(i)}>移除</button>}
+          </div>)}
+        </div>}
+        {feedback.next && <div className="sp-fb-row">
+          <small>下次可以用這句</small>
+          <p><b lang="en">{feedback.next.en}</b>{feedback.next.zh && <span>{feedback.next.zh}</span>}</p>
+          <button type="button" className="sp-fb-say" onClick={() => void speakEnglish(feedback.next!.en, state.settings.speechRate)}>念給我聽</button>
+        </div>}
+        {feedback.cheer && <p className="sp-cheer">{feedback.cheer}</p>}
+        {feedback.rest && feedback.rest.split('\n').map((line, i) => line.trim() ? <p key={i}>{line}</p> : null)}
+      </>}
     </section>}
   </div>
 }

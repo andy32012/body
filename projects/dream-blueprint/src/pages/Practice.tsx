@@ -14,7 +14,8 @@ import starters from "../data/starters.json";
 import SpeechPractice from "../components/SpeechPractice";
 import NursingListen from "../components/NursingListen";
 import NursingWords from "../components/NursingWords";
-import type { AppState, PageProps, Session } from "../lib/store";
+import { updateStore, type AppState, type PageProps, type Session } from "../lib/store";
+import { addWeak, easeWeak, normalizeLabel } from "../lib/weakPoints";
 import {
   activePeriod,
   dayKey,
@@ -200,6 +201,18 @@ export function Translation({
   const mountedAt = useRef(Date.now());
   const ready = () => Date.now() - mountedAt.current > 450;
   const setHint = (h: number) => { if (ready()) record(h, seenHint || h >= 2); };
+  /** The shared weak-point list, when no Claude verdict did it already: a self-marked miss counts against the
+   *  sentence's grammar; written right alone (and matching a reference) takes one miss off it. */
+  function noteWeak(mark: Mark, revealed: boolean) {
+    if (firstVerdict) return;
+    const label = sentence.grammar.map((g) => normalizeLabel(g)).find(Boolean);
+    if (!label) return;
+    const day = dayKey();
+    if (mark === "again" || mark === "small")
+      updateStore((prev) => ({ ...prev, notes: addWeak(prev.notes, label, day, { w: answer, r: sentence.reference[0] ?? "" }, "self") }));
+    else if (!revealed && matchesReference(answer, sentence.reference))
+      updateStore((prev) => ({ ...prev, notes: easeWeak(prev.notes, label) }));
+  }
   const setSeenHint = (r: boolean) => record(hint, r);
   async function copyAnswer() {
     const value =
@@ -330,7 +343,7 @@ export function Translation({
             <button
               key={mark}
               disabled={mark !== "again" && !answered(answer)}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}
+              onClick={() => { if (!ready()) return; clearDraft(sentence.id); noteWeak(mark, seenHint || hint >= 2 || askedHelp); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}
             >
               {label}
             </button>

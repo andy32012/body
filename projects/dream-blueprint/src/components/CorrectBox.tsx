@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { askTutor, tutorKey, type TutorTurn } from '../lib/tutor'
 import { fixToCard, type SayCard } from '../lib/sayCards'
+import { updateStore } from '../lib/store'
+import { dayKey } from '../lib/progress'
+import { addWeak, weakLabelPrompt } from '../lib/weakPoints'
 import './tutor.css'
 
-type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string }
+type Fix = { wrong: string; right: string; why: string; zh?: string; en?: string; tag?: string }
 export type Result = { verdict: 'good' | 'small' | 'again' | 'changed'; corrected: string; fixes: Fix[]; note?: string; resolved?: number[]; still?: number[] }
 const verdictNames = { good: '全對', small: '小錯', again: '要再練', changed: '意思不一樣' }
 
 function system(zh: string, reference?: string, words?: string[], mode: 'translate' | 'open' = 'translate', previous?: Result) {
   const tail = previous?.fixes.length ? ',"resolved":[上次問題中這次已改好的編號],"still":[上次問題中這次還沒改好的編號]' : ''
   const json = mode === 'open'
-    ? '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
-    : '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文"}],"note":"一句整體建議（可省略）"' + tail + '}'
+    ? '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這一句改好後的中文意思","en":"這一句改好後的完整英文","tag":"錯在哪一種文法"}],"note":"一句整體建議（可省略）"' + tail + '}'
+    : '{"verdict":"good|small|again|changed","corrected":"整段修改後的英文","fixes":[{"wrong":"原本的片段","right":"改成","why":"原因","zh":"這個錯誤所在那一句的中文（照題目原文抄）","en":"那一句改好後的完整英文","tag":"錯在哪一種文法"}],"note":"一句整體建議（可省略）"' + tail + '}'
   return [
     mode === 'open'
       ? '你是英文老師，批改台灣護理系學生（英文國中程度）的英文短寫作。這是開放題，內容是他自己想的。'
@@ -31,6 +34,7 @@ function system(zh: string, reference?: string, words?: string[], mode: 'transla
     '- 第一次回覆只輸出 JSON，不要其他文字：' + json,
     '- 同一句有好幾個錯，合成一個 fix 就好；只是標點或大小寫的小問題不用列。',
     '- 全對時 fixes 是空陣列。',
+    '- 每個 fix 的 tag 照抄這份清單裡最符合的一個名稱：' + weakLabelPrompt(),
     previous?.fixes.length ? '- 這是他改過後的第二版。上次批改指出的問題（編號從 0 開始）：' + previous.fixes.map((f, i) => i + '. ' + (f.wrong || '漏寫') + ' → ' + f.right).join('；') + '。逐一判斷這次有沒有改好，放進 resolved 或 still；新的問題照樣放 fixes。' : '',
     '- 之後他追問時，用繁體中文正常回答，講清楚規則和例句，段落短一點，不要 JSON、不要 Markdown 標題。',
   ].filter(Boolean).join('\n')
@@ -78,6 +82,11 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
         const parsed = parse(reply)
         setResult(parsed)
         if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed)
+        // Each kind of mistake also goes on the shared weak-point list (a second try does not count the same ones again).
+        if (parsed?.fixes.length && !previous) {
+          const day = dayKey()
+          updateStore(prev => ({ ...prev, notes: parsed.fixes.reduce((n, f) => typeof f.tag === 'string' ? addWeak(n, f.tag, day, { w: f.wrong || '（漏寫）', r: f.right }, 'write') : n, prev.notes) }))
+        }
         setTurns([...next, { role: 'assistant', content: reply }])
         if (!parsed) setError('老師回得格式怪怪的，下面是原文：\n' + reply)
       } else setTurns([...next, { role: 'assistant', content: reply }])

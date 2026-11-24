@@ -1,11 +1,13 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { BookA, BookOpen, Bot, CalendarDays, ChevronDown, DatabaseBackup, Flag, GraduationCap, KeyRound, Brain, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
+import { BookA, BookOpen, Bot, CalendarDays, ChevronDown, Crosshair, DatabaseBackup, Flag, GraduationCap, KeyRound, Brain, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
 import ScenePhoto from '../components/ScenePhoto'
 import SchoolSettings from '../components/SchoolSettings'
 import VocabScreen from '../components/VocabScreen'
 import AIHandoff from '../components/AIHandoff'
 import ClaudeConnect from '../components/ClaudeConnect'
 import MemoryPanel from '../components/MemoryPanel'
+import WeakPanel from '../components/WeakPanel'
+import { topWeak } from '../lib/weakPoints'
 import { useMemory } from '../lib/memory'
 import quizBank from '../data/quiz.json'
 import './settings.css'
@@ -92,6 +94,7 @@ const sourceLinks = [
 export default function Settings(props: PageProps) {
   const memoryCount = useMemory().notes.length
   const { state, update } = props
+  const weakTop = topWeak(state.notes, dayKey(), 3)
   const s = state.settings
   const set = <K extends keyof SettingsData,>(key: K, value: SettingsData[K]) => update(prev => ({...prev, settings: {...prev.settings, [key]: value}}))
   const today = dayKey()
@@ -204,6 +207,7 @@ export default function Settings(props: PageProps) {
       <button type="button" onClick={()=>{update(prev=>({...prev,settings:{...prev.settings,officeReply:reply.trim(),officeAsked:prev.settings.officeAsked||!!reply.trim()}})); announce('office','已儲存系辦回覆。')}}>儲存系辦回覆</button>{status('office')}
     </Panel>
     <Panel icon={KeyRound} title="連接 Claude" hint="用自己的 API 金鑰，讓 Claude 批改中翻英"><ClaudeConnect /></Panel>
+    <Panel icon={Crosshair} title="我的弱點" hint={weakTop.length ? '最常錯：'+weakTop.map(w=>w.k).join('、') : '批改和口說找到的錯會記在這裡'}><WeakPanel /></Panel>
     <Panel icon={Brain} title="她記得的事" hint={'共 '+memoryCount+' 條'}><MemoryPanel /></Panel>
     <Panel icon={Bot} title="交給其他 AI" hint="複製進度和教法，讓別的 AI 接著教">
       <AIHandoff state={state} update={update} />

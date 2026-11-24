@@ -4,6 +4,7 @@ import { activePeriod } from './progress'
 import { assistedUnits } from './grammarRetention'
 import { certStatus, courseProgress, exams, officialLevel, unitGate } from './cefr'
 import { hasPack, readHeld, type HeldPart } from './bridge'
+import { topWeak, weakLines } from './weakPoints'
 
 type Sentence = { id: string; zh: string; reference: string[]; grammar: string[] }
 const units = curriculum.units
@@ -68,8 +69,11 @@ export function handoffText(state: AppState, today: string) {
     }) : ['- 這台裝置還沒有作答紀錄。']),
     '',
     '## 文法狀態',
-    '- 比較穩：' + ([...solid.keys()].filter(g => !weak.has(g)).join('、') || '還沒有足夠紀錄'),
-    '- 還常錯：' + ([...weak.keys()].join('、') || '還沒有足夠紀錄'),
+    '- 比較穩：' + ([...solid.keys()].filter(g => !weak.has(g) && !topWeak(state.notes, today, 10).some(w => w.k === g)).join('、') || '還沒有足夠紀錄'),
+    // The shared weak-point list (Claude's corrections, drills, speaking); before it has anything, the misses in the answers.
+    weakLines(state.notes, today, 5).length
+      ? '- 最近常錯（網站的弱點清單，越前面越常錯）：' + weakLines(state.notes, today, 5).join('；')
+      : '- 還常錯：' + ([...weak.keys()].join('、') || '還沒有足夠紀錄'),
     '',
     '## 教我的規則（請照做）',
     ...teachingRules.map((rule, i) => (i + 1) + '. ' + rule),

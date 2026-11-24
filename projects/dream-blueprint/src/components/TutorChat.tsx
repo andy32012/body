@@ -1,13 +1,16 @@
 import { useRef, useState } from 'react'
 import { askTutor, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { sameEnglish } from '../lib/evidence'
-import { useAppStore } from '../lib/store'
+import { updateStore, useAppStore } from '../lib/store'
+import { dayKey } from '../lib/progress'
+import { addWeak, easeWeak, takeWeakLines, weakLines } from '../lib/weakPoints'
 import curriculum from '../data/curriculum.json'
 import './tutor.css'
 
 const verdictNames = { good: '對了', small: '小錯', again: '再試一次', changed: '意思不一樣' }
 
 const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
+const isTry = (t: TutorTurn) => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))
 
 /** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
 export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
@@ -19,6 +22,8 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [question, setQuestion] = useState('')
+  // The weak points this sentence has added (each kind once per sentence, however many tries it takes).
+  const [noted, setNoted] = useState<string[]>([])
   const abort = useRef<AbortController | null>(null)
   // The units before the current one are the rules he has learned: those get layered hints, the rest are taught directly.
   const { state } = useAppStore()
@@ -31,11 +36,24 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
     setTurns(next); setBusy(true); setError('')
     abort.current = new AbortController()
     try {
-      const reply = await askTutor(tutorSystem(sentence, learned), next, abort.current.signal)
+      const today = dayKey()
+      const reply = await askTutor(tutorSystem(sentence, learned, weakLines(state.notes, today)), next, abort.current.signal)
       setTurns([...next, { role: 'assistant', content: reply }])
-      const tries = next.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
+      const tries = next.filter(isTry).length
       const v = verdictOf(reply)
-      if (v && (content.startsWith('我的翻譯') || content.startsWith('我改成'))) onVerdict?.(v, tries, content.replace(/^(我的翻譯|我改成)：/, ''))
+      const attempt = content.startsWith('我的翻譯') || content.startsWith('我改成')
+      const text = content.replace(/^(我的翻譯|我改成)：/, '')
+      if (v && attempt) onVerdict?.(v, tries, text)
+      // The shared weak-point list: what this try got wrong, or — written right the first time — one miss lighter.
+      if (v && attempt) {
+        const fresh = v === 'good' ? [] : takeWeakLines(reply).labels.filter(k => !noted.includes(k))
+        if (fresh.length) {
+          setNoted(n => [...n, ...fresh])
+          updateStore(prev => ({ ...prev, notes: fresh.reduce((notes, k) => addWeak(notes, k, today, { w: text, r: sentence.reference[0] ?? '' }, 'tutor'), prev.notes) }))
+        } else if (v === 'good' && tries === 1) {
+          updateStore(prev => ({ ...prev, notes: sentence.grammar.reduce((notes, g) => easeWeak(notes, g), prev.notes) }))
+        }
+      }
       if (verdictOf(reply) !== 'good' && sentence.reference.some(r => squash(r).length > 6 && squash(reply).includes(squash(r)))) onReveal?.()
     } catch (e) {
       setTurns(turns)
@@ -43,21 +61,22 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict }: {
     } finally { setBusy(false) }
   }
 
-  const attempts = turns.filter(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))).length
+  const attempts = turns.filter(isTry).length
   const last = [...turns].reverse().find(t => t.role === 'assistant')
   const verdict = last ? verdictOf(last.content) : null
-  const lastSent = [...turns].reverse().find(t => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成')))
+  const lastSent = [...turns].reverse().find(isTry)
   const sentText = lastSent?.content.replace(/^(我的翻譯|我改成)：/, '') ?? ''
   const edited = !!verdict && !!sentText && !sameEnglish(sentText, answer)
 
   return <section className="tu-box" aria-live="polite">
     <strong>Claude 老師</strong>
     {turns.map((t, i) => <div key={i} className={'tu-turn tu-' + t.role}>
-      {t.content.split('\n').map((line, j) => line.trim() && !/^判定：/.test(line.trim()) ? <p key={j}>{line}</p> : null)}
+      {t.content.split('\n').map((line, j) => line.trim() && !/^(判定|弱點)[：:]/.test(line.trim()) ? <p key={j}>{line}</p> : null)}
     </div>)}
     {busy && <p className="tu-wait">老師在看你寫的……</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
     {verdict && <p className="tu-verdict">判定：<b>{verdictNames[verdict]}</b>{edited && <small>（這是你改之前那一版的判定；改過的答案還沒批改）</small>}</p>}
+    {noted.length > 0 && <p className="tu-weak">記進「我的弱點」：{noted.join('、')}<small>（Emma 和之後的批改都會特別注意）</small></p>}
     <div className="pr-actions">
       {attempts === 0
         ? <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim())}>請老師批改</button>

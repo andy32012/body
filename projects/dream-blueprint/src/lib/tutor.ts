@@ -1,5 +1,6 @@
 import curriculum from '../data/curriculum.json'
 import { teachingRules } from './handoff'
+import { weakLabelPrompt } from './weakPoints'
 
 /** The key stays in this browser only; it is never part of the backup file or the repo. */
 const KEY = 'dream-blueprint.claude-key'
@@ -28,7 +29,7 @@ export type TutorSentence = { id: string; zh: string; reference: string[]; gramm
 const unitOf = new Map<string, { title: string; rule?: string }>()
 for (const unit of curriculum.units) for (const s of [...unit.days, ...unit.checkpoint, ...unit.backup]) unitOf.set(s.id, unit)
 
-export function tutorSystem(sentence: TutorSentence, learned: string[]) {
+export function tutorSystem(sentence: TutorSentence, learned: string[], weak: string[] = []) {
   const unit = unitOf.get(sentence.id)
   return [
     '你是玄燁的英文家教。他是台灣護理系學生，英文約國中程度，目標是考雅思、去美國當註冊護理師。他正在用「一次一句中翻英」的方法學文法。',
@@ -41,6 +42,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
     '說明：' + sentence.why,
     sentence.newWords.length ? '這題的新字（沒學過，可以直接教）：' + sentence.newWords.map(w => w.en + ' ' + w.zh).join('、') : '',
     learned.length ? '他已經學過的單元（這些規則寫錯，照分層提示）：' + learned.join('、') + '。後面還沒教到的文法，照「沒學過」直接教。' : '',
+    weak.length ? '他最近常錯的地方（這題剛好碰到時特別注意，照分層提示；沒碰到就不要提）：' + weak.join('；') : '',
     '',
     '教法（一定要照做）：',
     ...teachingRules.map((r, i) => (i + 1) + '. ' + r),
@@ -52,6 +54,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[]) {
     '- 錯的地方照規則分層提示：他第一次錯只說錯的類型和大概位置；同一個錯第二次再錯，說清楚一點；第三次還錯或他說不會，才給答案並完整講原因。',
     '- 只錯標點或大小寫，算小錯，直接指出就好。',
     '- 講解用繁體中文，口氣像很熟的朋友，可以吐槽一下但要清楚。要有規則、一兩個例句、常見錯誤。不要用 Markdown 標題，段落短一點。',
+    '- 判定不是「對了」時，在最後一行的前一行寫「弱點：名稱」，記下這次錯在哪一種文法，名稱照抄下面清單裡最符合的一個；同時錯兩種就用「；」隔開寫兩個，最多兩個。只錯標點或大小寫不用寫。' + weakLabelPrompt(),
     '- 每次回覆最後一行固定寫：「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
   ].filter(Boolean).join('\n')
 }

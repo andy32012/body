@@ -102,3 +102,15 @@
 /* With the settings open on a small screen the wave has no room left: its hint would sit on top of the settings. */
 .sp-settings + .sp-wavebox .sp-hint, .sp-settings + .sp-wavebox .sp-tag { display: none; }
 .sp-settings + .sp-wavebox { min-height: 28px; }
+.sp-feedback { gap: 10px; }
+.sp-fb-row { display: grid; gap: 3px; }
+.sp-fb-row small { color: var(--muted); font-size: 12.5px; }
+.sp-fb-row p { display: grid; gap: 2px; }
+.sp-fb-row p span { color: var(--muted); font-size: 13.5px; }
+.sp-fb-say { justify-self: start; border: 1px solid var(--glass-line, var(--line)); border-radius: 10px; padding: 6px 12px; background: transparent; color: inherit; font-size: 13px; cursor: pointer; }
+.sp-cheer { color: var(--mint); }
+.sp-fix.removed { opacity: .5; }
+.sp-fix.removed b, .sp-fix.removed span { text-decoration: line-through; }
+.sp-fix .sp-fix-remove { background: transparent; color: var(--muted); border: 1px solid var(--glass-line, var(--line)); }
+.sp-fix .sp-fix-undo { background: transparent; color: var(--lav); border: 1px solid var(--lav); }
+.sp-fix-note { flex: none; color: var(--muted); font-size: 12px; }
