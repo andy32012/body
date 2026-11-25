@@ -32,12 +32,13 @@ import Baseline, { TestPrompt } from './components/Baseline'
 import PracticeMenu, { menuIcons } from './components/PracticeMenu'
 import { showTestPrompt } from './lib/baseline'
 import { MemoryContext, applyMemory, readMemory, writeMemory, replaceMemory, mergeMemory, readDeleted, memoryDeletedKey, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory, loadDriveState, saveDriveState, noteSynced, cloudBase, setCloudBase, cloudConflict, markConflict, syncDecision, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive } from './lib/drive'
-import { getSnapshot, localModified, restoreBackup, setLocalModified, updateStore } from './lib/store'
+import { driveConnected, loadDriveMemory, saveDriveMemory, saveDriveState, cloudConflict, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive } from './lib/drive'
+import { getSnapshot, localModified, updateStore } from './lib/store'
 import { applyBatch, archiveOld } from './lib/compact'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import SyncPaused from './components/SyncPaused'
+import { autoSettle } from './lib/cloudSync'
 import { seenKey } from './lib/dailyWords'
 import { libraryPage, menuGroups, modeLabel, type MenuId } from './lib/library'
 
@@ -221,18 +222,24 @@ function App() {
   useEffect(()=>{
     if(!driveConnected()||openedBySync.current)return
     // Compare with the snapshot this device last synced, not just clocks: if both sides changed, keep both and ask.
-    loadDriveState().then(remote=>{
-      const decision=syncDecision(remote?.state?remote.savedAt:null,cloudBase(),localModified())
-      if(decision==='pull'&&remote?.state){
-        restoreBackup(remote.state,remote.savedAt); setCloudBase(remote.savedAt)
-        noteSynced('已從雲端硬碟載入最新的學習進度')
-      } else if(decision==='conflict'&&remote) markConflict(remote.savedAt)
-      else if(decision==='push'){
-        const at=localModified()||Date.now(); setLocalModified(at)
-        void saveDriveState(JSON.stringify(state),at)
-      }
-    }).catch(()=>{}).finally(()=>{cloudReady.current=true;void archiveOldRecords()})
+    // Take the cloud copy, save this one, or — both changed — merge them by itself (the banner only if merging fails).
+    autoSettle().catch(()=>{}).finally(()=>{cloudReady.current=true;void archiveOldRecords()})
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+  // Coming back to the app (another tab, another app, the screen locked): catch up with what other devices saved.
+  useEffect(()=>{
+    let last=Date.now()
+    const back=()=>{
+      if(document.visibilityState!=='visible'||!driveConnected()||!cloudReady.current||Date.now()-last<30000)return
+      last=Date.now()
+      autoSettle().catch(()=>{})
+    }
+    // A save refused because another device saved meanwhile: merge right away instead of staying paused.
+    const refused=()=>{if(cloudConflict()&&cloudReady.current&&Date.now()-last>=30000){last=Date.now();autoSettle().catch(()=>{})}}
+    document.addEventListener('visibilitychange',back)
+    window.addEventListener('focus',back)
+    window.addEventListener('dream-blueprint:cloud',refused)
+    return ()=>{document.removeEventListener('visibilitychange',back);window.removeEventListener('focus',back);window.removeEventListener('dream-blueprint:cloud',refused)}
   },[])
   useEffect(()=>{
     if(!cloudReady.current||!driveConnected()||cloudConflict())return

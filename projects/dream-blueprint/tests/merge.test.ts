@@ -62,3 +62,12 @@ test('同一張卡、同一筆紀錄兩邊都有：留比較新的，不重複',
   assert.equal(m.cards[0].due, '2026-11-30', '複習過的那張比較新')
   assert.equal(m.reviewEvents.length, 2, '複習紀錄不重複')
 })
+
+test('打開或切回來時自己處理：只有雲端變了就拿雲端的，兩邊都變了就自己合併，不用按按鈕', async () => {
+  const { settleAction } = await import('../src/lib/cloudSync.ts')
+  assert.equal(settleAction('pull', false), 'pull')
+  assert.equal(settleAction('push', false), 'push')
+  assert.equal(settleAction('none', false), 'none')
+  assert.equal(settleAction('conflict', false), 'merge', '兩邊都改了：合併，不再暫停')
+  assert.equal(settleAction('none', true), 'merge', '以前留下的暫停也一起合併掉')
+})

@@ -5,7 +5,7 @@
 import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified } from './store'
 import { mergeStates } from './merge'
 import {
-  addHistory, clearConflict, cloudBase, cloudStatus, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
+  addHistory, clearConflict, cloudBase, cloudConflict, cloudStatus, driveConnected, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
 } from './drive'
 
 export const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -66,12 +66,14 @@ export async function takeCloudCopy() {
 }
 /** Keep both: this device's progress and the cloud copy merged into one, saved here and to the cloud. This device's copy
  *  is downloaded first and the cloud copy goes into the cloud history, so nothing can be lost. */
-export async function mergeWithCloud() {
+export async function mergeWithCloud(quiet = false) {
   const remote = await loadDriveState()
   if (!remote?.state) throw new Error('雲端硬碟裡沒有進度可以合併。')
   const theirs = importBackup(remote.state)
   const mine = getSnapshot().state
-  download(backupName('this-device'), exportBackup(mine))
+  // A merge done by itself keeps this device's copy in the cloud history instead of a download (a download only when
+  // the script cannot keep history).
+  if (!quiet || !(await addHistory(JSON.stringify(mine), localModified() || Date.now(), 'before-merge'))) download(backupName('this-device'), exportBackup(mine))
   // Checked as a progress file before anything changes. The store applies a restore a moment later, so the merged copy
   // itself (not the store's snapshot) is what goes to the cloud.
   const merged = importBackup(JSON.stringify(mergeStates(mine, theirs, localModified() >= remote.savedAt)))
@@ -83,7 +85,7 @@ export async function mergeWithCloud() {
   failedSince(since)
   noteSynced('兩份進度已合併，也存到雲端硬碟了')
   const c = merged.curriculum
-  return '兩份合併好了：兩台做過的都留著，課表接在單元 ' + c.unit + ' 第 ' + c.day + ' 天。這台原本的進度也下載成備份檔了。'
+  return '兩份合併好了：兩台做過的都留著，課表接在單元 ' + c.unit + ' 第 ' + c.day + ' 天。' + (quiet ? '' : '這台原本的進度也下載成備份檔了。')
 }
 /** Keep this device's copy; the cloud copy is downloaded first, then overwritten on purpose. */
 export async function keepThisCopy() {
@@ -111,4 +113,28 @@ export async function restoreVersion(id: string) {
   await saveDriveState(JSON.stringify(state), now, cloudBase(), true)
   failedSince(since)
   return '已經還原到 ' + stamp(version.savedAt || now) + ' 那份進度。還原前的進度存進了歷史版本，想反悔可以再還原回去。'
+}
+
+/** What to do when the app opens or comes back to the screen: take the cloud copy when only the cloud changed, merge
+ *  when both changed (or a pause is still recorded), save when only this device changed. Pure, for testing. */
+export function settleAction(decision: ReturnType<typeof syncDecision>, paused: boolean): 'pull' | 'merge' | 'push' | 'none' {
+  if (paused || decision === 'conflict') return 'merge'
+  return decision
+}
+/** Keeps the devices in step without a button: run on opening and whenever the app comes back to the screen, so a
+ *  device left open sees what another device did, and two devices that both changed are merged by themselves. */
+export async function autoSettle(): Promise<'pull' | 'merge' | 'push' | 'none'> {
+  if (!driveConnected()) return 'none'
+  const remote = await loadDriveState()
+  const action = settleAction(syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), localModified()), !!cloudConflict())
+  if (action === 'pull' && remote?.state) {
+    restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt)
+    noteSynced('已從雲端硬碟載入最新的學習進度')
+  } else if (action === 'merge' && remote?.state) {
+    await mergeWithCloud(true)
+  } else if (action === 'push') {
+    const at = localModified() || Date.now(); setLocalModified(at)
+    await saveDriveState(JSON.stringify(getSnapshot().state), at)
+  }
+  return action
 }
