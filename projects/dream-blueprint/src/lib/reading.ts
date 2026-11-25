@@ -107,9 +107,11 @@ function readingPosition(all: readonly ReadPassage[], notes: Record<string, stri
       lastPreserved = i
     }
   }
-  return { frontier: Math.max(recorded, lastPreserved), suggestedFrom: Math.max(recorded, firstPreserved, 0) }
+  // The suggestion starts at the first band not yet passed (step by step from the easiest), skipping only levels the
+  // previous edition had already unlocked. Bands he has read stay open either way (frontier).
+  return { frontier: Math.max(recorded, lastPreserved), suggestedFrom: Math.max(firstPreserved, 0) }
 }
-/** Continue at the furthest band already tried, or the first band of a level unlocked in the previous edition. */
+/** The first band not yet passed, from the easiest, or from the first band of a level unlocked in the previous edition. */
 export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadStep {
   const { suggestedFrom } = readingPosition(all, notes)
   for (const s of readSteps.slice(suggestedFrom)) {

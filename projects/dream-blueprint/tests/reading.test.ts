@@ -104,17 +104,17 @@ test('閱讀新題：三選一、答案有效且分散、題目不重複、證�
 const makePassages = (step: ReadStep, count = 12): ReadPassage[] => Array.from({ length: count }, (_, i) => ({ id: 'test-' + readStepKey(step) + '-' + i, ...step, title: 'Example', topic: '測試', paras: ['A nurse is here.'], words: 4, zh: '有一位護理師。', qs: [{ type: 'detail', q: 'Who is here?', options: ['A nurse', 'A student', 'A cook'], answer: 0, why: '文章寫有護理師。', evidence: 'A nurse is here.' }] }))
 const attempt = (correct = 4, total = 4) => ({ day: '2026-11-24', picks: [0, 1, 2, 0], correct, total, tries: 1 })
 
-test('讀過後面小級不鎖回去，建議不倒退；達標後繼續升下一小級', () => {
+test('讀過後面小級不鎖回去；建議從最簡單、還沒過關的小級開始；達標後繼續打開下一小級', () => {
   const all = readSteps.flatMap(s => makePassages(s))
   const band = { level: 'A2', band: 'mid' } as const
   const here = all.filter(p => p.level === band.level && p.band === band.band)
   let notes = { [readKey(here[0].id)]: JSON.stringify(attempt(0)) }
-  assert.deepEqual(suggestedLevel(all, notes), band)
+  assert.deepEqual(suggestedLevel(all, notes), { level: 'A1', band: 'easy' }, '只讀過一篇後面的，建議還是從最簡單的開始，一步一步來')
   for (const s of readSteps.slice(0, 5)) assert.equal(readLevelsOpen(all, notes)[readStepKey(s)], true, '曾讀過的位置和它前面都開著')
   assert.equal(readLevelsOpen(all, notes)['A2-hard'], false, '讀過不等於過關')
   for (const p of here.slice(0, 10)) notes = { ...notes, [readKey(p.id)]: JSON.stringify(attempt()) }
   assert.equal(readLevelsOpen(all, notes)['A2-hard'], true, '以前沒做過新增的前面小級，也能繼續往前')
-  assert.deepEqual(suggestedLevel(all, notes), { level: 'A2', band: 'hard' })
+  assert.deepEqual(suggestedLevel(all, notes), { level: 'A1', band: 'easy' }, '開著的可以自己選，建議仍是最前面還沒過關的')
   assert.equal(nextReading(all, band, {}, [here[0].id])?.id, here[1].id)
   assert.equal(nextReading(all, band, {}, here.map(p => p.id)), null, '跳過整個小級不偷換到其他小級')
   assert.equal(nextReading([here[0], all[0]], null, {}, [here[0].id])?.id, all[0].id, '單元 only 模式可選整包，不受小級限制')
