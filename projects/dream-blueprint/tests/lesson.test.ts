@@ -202,15 +202,16 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
     if (q.evidence) assert.ok(p.paras.join(' ').includes(q.evidence), p.id + ' 證據要在文章裡')
   }
   let notes: Record<string, string> = {}
-  assert.equal(suggestedLevel(all, notes), 'A1')
-  const a1 = all.filter(p => p.level === 'A1')
+  const first = { level: 'A1', band: 'easy' } as const
+  assert.deepEqual(suggestedLevel(all, notes), first)
+  const a1 = all.filter(p => p.level === first.level && p.band === first.band)
   for (const p of a1.slice(0, 3)) notes = saveRead(notes, p.id, { day: '2026-11-21', picks: p.qs.map(q => q.answer), correct: p.qs.length, total: p.qs.length })
-  assert.equal(suggestedLevel(all, notes), 'A1', '篇數多的級別，過關三篇還不往上')
-  assert.equal(nextReading(all, 'A1', notes)?.id, a1[3].id, '先讀沒讀過的')
+  assert.deepEqual(suggestedLevel(all, notes), first, '篇數多的小級，過關三篇還不往上')
+  assert.equal(nextReading(all, first, notes)?.id, a1[3].id, '先讀同一小級裡沒讀過的')
   let many = notes
-  for (const p of a1.slice(0, 12)) many = saveRead(many, p.id, { day: '2026-11-21', picks: p.qs.map(q => q.answer), correct: p.qs.length, total: p.qs.length })
-  assert.equal(suggestedLevel(all, many), 'A2', '十五篇裡過關十二篇（八成）才往上')
   const { levelTarget } = await import('../src/lib/reading.ts')
+  for (const p of a1.slice(0, levelTarget(a1.length))) many = saveRead(many, p.id, { day: '2026-11-21', picks: p.qs.map(q => q.answer), correct: p.qs.length, total: p.qs.length })
+  assert.deepEqual(suggestedLevel(all, many), { level: 'A1', band: 'mid' }, '簡單過關八成才建議中等')
   assert.deepEqual([1, 4, 5, 8, 15].map(levelTarget), [1, 3, 3, 7, 12], '五篇以下的級別維持三篇')
   notes = saveRead(notes, a1[3].id, { day: '2026-11-21', picks: [9, 9, 9, 9], correct: 0, total: 4, causes: { 0: '單字不認得' }, zh: true })
   assert.equal(passed({ day: '', picks: [], correct: 4, total: 4, zh: true, tries: 1 }), false, '看過中文不算過關')

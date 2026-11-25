@@ -4,18 +4,30 @@ export { levelTarget } from './unlock'
 /** Graded reading from A1 up to IELTS-style passages. Each wrong answer asks why, so word, sentence,
  *  locating and question-type problems can be told apart. */
 export type ReadLevel = 'A1' | 'A2' | 'B1' | 'B2'
+export type ReadBand = 'easy' | 'mid' | 'hard'
+export interface ReadStep { level: ReadLevel; band: ReadBand }
+export type ReadStepKey = `${ReadLevel}-${ReadBand}`
 export type QType = 'main' | 'detail' | 'reference' | 'vocab' | 'evidence' | 'tfng' | 'heading'
 export interface ReadQuestion { type: QType; q: string; options: string[]; answer: number; why: string; evidence?: string }
-export interface ReadPassage { id: string; level: ReadLevel; title: string; topic: string; words: number; paras: string[]; zh: string; qs: ReadQuestion[]; ielts?: boolean
+export interface ReadPassage { id: string; level: ReadLevel; band: ReadBand; title: string; topic: string; words: number; paras: string[]; zh: string; qs: ReadQuestion[]; ielts?: boolean
   /** Bridge-unit passages: the unit they belong to; held = the unseen test passage, never shown for browsing. */
   unit?: number; held?: boolean }
 
 export const readLevels: { id: ReadLevel; name: string; note: string }[] = [
-  { id: 'A1', name: 'A1 入門', note: '短文 70 字左右，現在式：日常、便條、公告和看診' },
-  { id: 'A2', name: 'A2 基礎', note: '120 字左右，過去式：故事、信件、廣告、訊息和衛教' },
-  { id: 'B1', name: 'B1 進階', note: '150–200 字，需要推論和找證據' },
-  { id: 'B2', name: 'B2 雅思題型', note: '200 字以上，段落標題、是非不知（T/F/NG）' },
+  { id: 'A1', name: 'A1 入門', note: '40–100 字，從短短的現在式，慢慢讀到日常小短文' },
+  { id: 'A2', name: 'A2 基礎', note: '100–160 字，從過去的事情，讀到計畫、比較和條件' },
+  { id: 'B1', name: 'B1 進階', note: '160–260 字，練習推論、找證據和比較不同意見' },
+  { id: 'B2', name: 'B2 雅思題型', note: '250–600 字，練習段落標題、細節和是非沒提到（T/F/NG）' },
 ]
+export const readBands: { id: ReadBand; name: string; note: string }[] = [
+  { id: 'easy', name: '簡單', note: '短一點，先抓主題和明確的線索' },
+  { id: 'mid', name: '中等', note: '句子多一點，練習連起前後的意思' },
+  { id: 'hard', name: '難', note: '文章更完整，練習整合線索再作答' },
+]
+export const readSteps: ReadStep[] = readLevels.flatMap(l => readBands.map(b => ({ level: l.id, band: b.id })))
+export const readStepKey = (s: ReadStep): ReadStepKey => `${s.level}-${s.band}`
+export const readStepName = (s: ReadStep) => s.level + ' ' + readBands.find(b => b.id === s.band)!.name
+const atStep = (p: ReadPassage, s: ReadStep) => p.level === s.level && p.band === s.band
 export const typeNames: Record<QType, string> = {
   main: '主旨', detail: '細節', reference: '代名詞指什麼', vocab: '猜字義', evidence: '找證據', tfng: '是／非／沒提到', heading: '段落標題',
 }
@@ -24,11 +36,14 @@ export const readCauses = ['單字不認得', '句子看不懂', '找不到答�
 /** The latest attempt, plus `best`: the best attempt that counts. A redo on the same day comes right after seeing the
  *  answers, so it is practice and never replaces the record; a lower score later never erases a pass. */
 export interface ReadAttempt { day: string; correct: number; total: number; zh?: boolean }
-export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean }
+export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean
+  /** New attempts identify the band edition. Retakes keep the earlier edition's best grade as evidence of access
+   *  already earned; original records remain readable without converting or replacing any storage keys. */
+  bandVersion?: 1; legacyBest?: ReadAttempt }
 export const readKey = (id: string) => 'read.' + id
 /** The general passages below B2 that come with comprehension questions (A1, A2, B1 in reading.json; a test keeps this number true).
  *  Today's list sends reading there until they have all been read, then to the graded passages. */
-export const QUESTION_PASSAGES = 34
+export const QUESTION_PASSAGES = 105
 /** How many of those have been read: their ids start with the level (read.a1-…, read.a2-…, read.b1-…). */
 export const plainReadCount = (notes: Record<string, string>) => Object.keys(notes).filter(k => /^read\.(a1|a2|b1)-/.test(k)).length
 
@@ -37,39 +52,89 @@ export function readRecord(notes: Record<string, string>, id: string): ReadRecor
 }
 const clean = (a: ReadAttempt) => !a.zh && a.correct / Math.max(1, a.total) >= 0.7
 const better = (a: ReadAttempt, b?: ReadAttempt) => !b || (clean(a) && !clean(b)) || (clean(a) === clean(b) && a.correct / Math.max(1, a.total) > b.correct / Math.max(1, b.total))
-export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries' | 'best' | 'practice'>) {
+export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries' | 'best' | 'practice' | 'bandVersion' | 'legacyBest'>) {
   const old = readRecord(notes, id)
   const oldBest: ReadAttempt | undefined = old?.best ?? (old ? { day: old.day, correct: old.correct, total: old.total, ...(old.zh ? { zh: true } : {}) } : undefined)
   const practice = !!old && old.day === rec.day
   const attempt: ReadAttempt = { day: rec.day, correct: rec.correct, total: rec.total, ...(rec.zh ? { zh: true } : {}) }
   const best = !practice && better(attempt, oldBest) ? attempt : oldBest ?? attempt
-  return { ...notes, [readKey(id)]: JSON.stringify({ ...rec, tries: (old?.tries ?? 0) + 1, best, ...(practice ? { practice: true } : {}) }) }
+  const legacyBest = old?.bandVersion === 1 ? old.legacyBest : oldBest
+  return { ...notes, [readKey(id)]: JSON.stringify({ ...rec, tries: (old?.tries ?? 0) + 1, best, bandVersion: 1, ...(legacyBest ? { legacyBest } : {}), ...(practice ? { practice: true } : {}) }) }
 }
 /** A passage is passed at 70% or better without opening the Chinese, on an attempt that counts. */
 export const passed = (r: ReadRecord | null) => !!r && clean(r.best ?? r)
 
-/** How many passed passages finish a level (levelTarget): a level with more than five passages is read almost in full
- *  (80%) before moving up — reading a lot at an easy level is the point of having that many; small levels need three. */
-/** The level to work on: the lowest one that has not reached its target of passed passages. */
-export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadLevel {
-  for (const l of readLevels) {
-    const here = all.filter(p => p.level === l.id)
-    if (here.filter(p => passed(readRecord(notes, p.id))).length < levelTarget(here.length)) return l.id
+/** Frozen pre-band passage IDs: only grades from that edition can preserve the old level thresholds. Newly earned
+ *  grades never qualify for this shortcut, even when they belong to an old passage. */
+const legacyGroups: { level: ReadLevel; ids: readonly string[] }[][] = [
+  [
+    { level: 'A1', ids: ['a1-lin', 'a1-clinic', 'a1-water', 'a1-grandma', 'a1-hospital', 'a1-family', 'a1-weekend', 'a1-room', 'a1-breakfast', 'a1-weather', 'a1-dog', 'a1-note', 'a1-market', 'a1-library', 'a1-teeth'] },
+    { level: 'A2', ids: ['a2-first-shift', 'a2-sleep', 'a2-handwash', 'a2-walk', 'a2-message', 'a2-tainan', 'a2-wallet', 'a2-cafe', 'a2-class-ad', 'a2-typhoon', 'a2-cooking', 'a2-eyes', 'a2-grandpa', 'a2-plans', 'a2-flu-notice'] },
+    { level: 'B1', ids: ['b1-night', 'b1-sugar', 'b1-interpreter', 'b1-falls'] },
+    { level: 'B2', ids: ['b2-semmelweis', 'b2-telehealth', 'b2-shortage', 'br43-r1', 'br43-r2', 'br43-held', 'br44-r1', 'br44-r2', 'br44-held', 'br45-r1', 'br45-r2', 'br45-held', 'br46-r1', 'br46-r2', 'br46-held', 'br47-r1', 'br47-r2', 'br47-held', 'br48-r1', 'br48-r2', 'br48-held'] }
+  ],
+  [
+    { level: 'A2', ids: ['n-a2-clean-hands', 'n-a2-falls', 'n-a2-visiting', 'n-a2-pain', 'n-a2-fasting', 'n-a2-night-shift', 'n-a2-patient-id', 'n-a2-sleep'] },
+    { level: 'B1', ids: ['n-b1-isolation', 'n-b1-heart-failure', 'n-b1-hypoglycemia', 'n-b1-pressure-injury', 'n-b1-sbar', 'n-b1-delirium', 'n-b1-iv-line', 'n-b1-wound-home', 'n-b1-med-rights', 'n-b1-stroke', 'n-b1-cpr', 'n-b1-chemo-food', 'n-b1-bedside-handoff', 'n-b1-job-interview', 'n-b1-patient-rights'] },
+    { level: 'B2', ids: ['n-b2-nclex'] }
+  ]
+]
+function preservedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadLevel | undefined {
+  const ids = new Set(all.map(p => p.id))
+  const groups = legacyGroups.find(gs => gs.some(g => g.ids.some(id => ids.has(id))))
+  if (!groups) return undefined
+  const earlier = (id: string) => {
+    const r = readRecord(notes, id)
+    return r?.bandVersion === 1 ? r.legacyBest : r?.best ?? r ?? undefined
   }
-  return 'B2'
+  const recorded = groups.map(g => g.ids.some(id => earlier(id)))
+  if (!recorded.some(Boolean)) return undefined
+  const open = openSteps(groups.map(g => g.ids.filter(id => { const a = earlier(id); return !!a && clean(a) }).length >= levelTarget(g.ids.length)))
+  return groups.filter((_, i) => open[i] || recorded[i]).at(-1)?.level
 }
-/** Which levels are open: A2 once A1 has its target of passed passages, B1 after A2, and so on. A level with no
- *  passages in this set (the nursing passages have no A1) holds nothing back. */
-export function readLevelsOpen(all: readonly ReadPassage[], notes: Record<string, string>): Record<ReadLevel, boolean> {
-  const open = openSteps(readLevels.map(l => {
-    const here = all.filter(p => p.level === l.id)
-    return here.filter(p => passed(readRecord(notes, p.id))).length >= levelTarget(here.length)
+export function readStepProgress(all: readonly ReadPassage[], step: ReadStep, notes: Record<string, string>) {
+  const here = all.filter(p => atStep(p, step))
+  return { total: here.length, ok: here.filter(p => passed(readRecord(notes, p.id))).length, target: levelTarget(here.length) }
+}
+function readingPosition(all: readonly ReadPassage[], notes: Record<string, string>) {
+  const level = preservedLevel(all, notes)
+  let recorded = -1, firstPreserved = -1, lastPreserved = -1
+  for (const [i, s] of readSteps.entries()) {
+    const here = all.filter(p => atStep(p, s))
+    if (here.some(p => readRecord(notes, p.id) !== null)) recorded = i
+    if (here.length && s.level === level) {
+      if (firstPreserved < 0) firstPreserved = i
+      lastPreserved = i
+    }
+  }
+  return { frontier: Math.max(recorded, lastPreserved), suggestedFrom: Math.max(recorded, firstPreserved, 0) }
+}
+/** Continue at the furthest band already tried, or the first band of a level unlocked in the previous edition. */
+export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadStep {
+  const { suggestedFrom } = readingPosition(all, notes)
+  for (const s of readSteps.slice(suggestedFrom)) {
+    const progress = readStepProgress(all, s, notes)
+    if (progress.total && progress.ok < progress.target) return s
+  }
+  return readSteps.filter(s => all.some(p => atStep(p, s))).at(-1) ?? readSteps[0]
+}
+/** Open one band at a time. Empty bands do not block the next one. Recorded or previously unlocked bands keep their
+ *  whole prefix open, and completing that position can open the next band without repeating the new earlier work. */
+export function readLevelsOpen(all: readonly ReadPassage[], notes: Record<string, string>): Record<ReadStepKey, boolean> {
+  const { frontier } = readingPosition(all, notes)
+  const open = openSteps(readSteps.map((s, i) => {
+    const { ok, target } = readStepProgress(all, s, notes)
+    return i < frontier || ok >= target
   }))
-  return Object.fromEntries(readLevels.map((l, i) => [l.id, open[i]])) as Record<ReadLevel, boolean>
+  return Object.fromEntries(readSteps.map((s, i) => [readStepKey(s), open[i]])) as Record<ReadStepKey, boolean>
+}
+/** The preceding nonempty band, for the lock's concrete requirement. */
+export function previousReadStep(all: readonly ReadPassage[], step: ReadStep) {
+  return readSteps.slice(0, readSteps.findIndex(s => readStepKey(s) === readStepKey(step))).filter(s => all.some(p => atStep(p, s))).at(-1)
 }
 /** Unread passages first, then ones not yet passed (oldest first), then the rest. */
-export function nextReading(all: readonly ReadPassage[], level: ReadLevel, notes: Record<string, string>, skip: readonly string[] = []) {
-  const pool = all.filter(p => p.level === level && !skip.includes(p.id))
+export function nextReading(all: readonly ReadPassage[], step: ReadStep | null, notes: Record<string, string>, skip: readonly string[] = []) {
+  const pool = all.filter(p => (!step || atStep(p, step)) && !skip.includes(p.id))
   const fresh = pool.find(p => !readRecord(notes, p.id))
   if (fresh) return fresh
   const redo = pool.filter(p => !passed(readRecord(notes, p.id))).sort((a, b) => readRecord(notes, a.id)!.day.localeCompare(readRecord(notes, b.id)!.day))
@@ -85,6 +150,7 @@ export function readSummary(all: readonly ReadPassage[], notes: Record<string, s
     if (!r) continue
     done++
     p.qs.forEach((q, i) => {
+      if (i >= r.picks.length) return // Added questions were never answered in an older record.
       const t = types[q.type] ??= { right: 0, total: 0 }
       t.total++
       if (r.picks[i] === q.answer) t.right++

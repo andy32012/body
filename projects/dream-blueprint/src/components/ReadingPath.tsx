@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { levelTarget, readLevelsOpen,
+import { readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
   nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
-  type ReadLevel, type ReadPassage,
+  type ReadLevel, type ReadPassage, type ReadStep,
 } from '../lib/reading'
 import { LockLine } from './Locked'
 import { useTaskContext } from '../lib/taskContext'
@@ -10,6 +10,7 @@ import { AskWord } from './AIChat'
 import './reading.css'
 
 const letters = 'ABCDEFGH'
+const sameStep = (a: ReadStep, b: ReadStep) => readStepKey(a) === readStepKey(b)
 
 function Highlight({ text, marks }: { text: string; marks: string[] }) {
   const hits = marks.filter(m => m && text.includes(m))
@@ -32,35 +33,46 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     return () => { alive = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const suggested = all ? suggestedLevel(all, state.notes) : 'A1'
+  const suggested = all ? suggestedLevel(all, state.notes) : readSteps[0]
   // The level and the passage only change when he moves on (or picks a level): a new score changing the suggestion
   // must not swap the passage while its feedback is still on screen.
-  const [level, setLevel] = useState<ReadLevel | null>(null)
+  const [step, setStep] = useState<ReadStep | null>(null)
   const [manual, setManual] = useState(!!only)
-  const lvl = level ?? suggested
+  const selected = step ?? suggested
   const [skip, setSkip] = useState<string[]>([])
   const [currentId, setCurrentId] = useState<string | null | undefined>(undefined)
-  const [moved, setMoved] = useState<ReadLevel | null>(null)
+  const [moved, setMoved] = useState<ReadStep | null>(null)
   useEffect(() => {
     if (!all || currentId !== undefined) return
-    setLevel(suggested)
-    setCurrentId(nextReading(all, suggested, state.notes, [])?.id ?? null)
+    setStep(suggested)
+    setCurrentId(nextReading(all, only ? null : suggested, state.notes, [])?.id ?? null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all])
   const passage = all && currentId ? all.find(p => p.id === currentId) ?? null : null
   function moveOn(nextSkip: string[]) {
     if (!all) return
     // The suggestion applies here, when moving on — unless a level was picked by hand.
-    const target = manual ? lvl : suggestedLevel(all, state.notes)
-    const list = target === lvl ? nextSkip : []
-    setMoved(target !== lvl ? target : null)
-    setLevel(target); setSkip(list)
-    setCurrentId(nextReading(all, target, state.notes, list)?.id ?? null)
+    const target = manual ? selected : suggestedLevel(all, state.notes)
+    const list = sameStep(target, selected) ? nextSkip : []
+    setMoved(!only && !sameStep(target, selected) ? target : null)
+    setStep(target); setSkip(list)
+    setCurrentId(nextReading(all, only ? null : target, state.notes, list)?.id ?? null)
   }
-  function chooseLevel(l: ReadLevel) {
+  function chooseStep(target: ReadStep) {
     if (!all) return
-    setLevel(l); setManual(true); setSkip([]); setMoved(null)
-    setCurrentId(nextReading(all, l, state.notes, [])?.id ?? null)
+    if (!only && !readLevelsOpen(all, state.notes)[readStepKey(target)]) return
+    setStep(target); setManual(true); setSkip([]); setMoved(null)
+    setCurrentId(nextReading(all, only ? null : target, state.notes, [])?.id ?? null)
+  }
+  function chooseLevel(level: ReadLevel) {
+    if (!all) return
+    const opened = readLevelsOpen(all, state.notes)
+    const candidates = readSteps.filter(s => s.level === level && opened[readStepKey(s)] && all.some(p => p.level === level && p.band === s.band))
+    const target = candidates.find(s => sameStep(s, suggested)) ?? candidates.find(s => {
+      const { ok, target } = readStepProgress(all, s, state.notes)
+      return ok < target
+    }) ?? candidates[0]
+    if (target) chooseStep(target)
   }
   const [picks, setPicks] = useState<number[]>([])
   const [causes, setCauses] = useState<Record<number, string>>({})
@@ -79,29 +91,53 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
 
   if (failed) return <p>閱讀教材載入失敗，重新整理再試一次。</p>
   if (!all) return <p>載入中……</p>
-  // A level opens once the level before it has its target of passed passages (A1 12 of 15 before A2, and so on).
   const opened = readLevelsOpen(all, state.notes)
-  const shownLevels = readLevels.filter(l => !set || all.some(p => p.level === l.id))
-  const levelButtons = only ? null : <div className="pr-options rd-levels" role="group" aria-label="閱讀程度">
-    {shownLevels.map((l, i) => {
+  const shownLevels = readLevels.filter(l => all.some(p => p.level === l.id))
+  function lockText(target: ReadStep) {
+    const before = previousReadStep(all!, target)
+    if (!before) return '先從第一篇開始'
+    const progress = readStepProgress(all!, before, state.notes)
+    return readStepName(before) + '過關 ' + progress.target + ' 篇才打開（現在 ' + progress.ok + '）'
+  }
+  const levelButtons = only ? null : <>
+    <div className="pr-options rd-levels" role="group" aria-label="閱讀程度" style={{ gridTemplateColumns: `repeat(${shownLevels.length}, minmax(0, 1fr))` }}>
+    {shownLevels.map(l => {
       const here = all.filter(p => p.level === l.id)
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length
-      const before = shownLevels[i - 1], beforeHere = before ? all.filter(p => p.level === before.id) : []
-      const beforeOk = beforeHere.filter(p => passed(readRecord(state.notes, p.id))).length
-      return <button key={l.id} type="button" aria-pressed={l.id === lvl} disabled={!opened[l.id]} data-locked={!opened[l.id]} onClick={() => chooseLevel(l.id)}>
-        {l.name}{opened[l.id] ? <small>過關 {ok} / {here.length}{l.id === suggested ? ' · 建議' : ''}</small>
-          : <LockLine text={(before ? before.name.split(' ')[0] : '前一級') + ' 過關 ' + levelTarget(beforeHere.length) + ' 篇才打開（現在 ' + beforeOk + '）'} />}</button>
+      const available = readSteps.filter(s => s.level === l.id && here.some(p => p.band === s.band))
+      const isOpen = available.some(s => opened[readStepKey(s)])
+      return <button key={l.id} type="button" aria-pressed={l.id === selected.level} disabled={!isOpen} data-locked={!isOpen} onClick={() => chooseLevel(l.id)}>
+        <span>{l.id}</span><small>{l.name.slice(3)}</small>
+        <small>過關 {ok} / {here.length}</small>
+        {!isOpen && <LockLine text={lockText(available[0])} />}
+      </button>
     })}
-  </div>
+    </div>
+    <div className="pr-options rd-bands" role="group" aria-label={selected.level + ' 小級'}>
+      {readBands.map(b => {
+        const target = { level: selected.level, band: b.id }
+        const progress = readStepProgress(all, target, state.notes)
+        const isOpen = opened[readStepKey(target)] && progress.total > 0
+        return <button key={b.id} type="button" aria-pressed={b.id === selected.band} disabled={!isOpen} data-locked={!isOpen} onClick={() => chooseStep(target)}>
+          <span>{b.name}</span><small>過關 {progress.ok} / {progress.total}{sameStep(target, suggested) ? ' · 建議' : ''}</small>
+          {!isOpen && <LockLine text={progress.total ? lockText(target) : '這一小級還沒有文章'} />}
+        </button>
+      })}
+    </div>
+    <p className="rd-band-note">{readStepName(selected)}：{readBands.find(b => b.id === selected.band)!.note}。{(() => {
+      const progress = readStepProgress(all, selected, state.notes)
+      return '這一小級的目標：過關 ' + progress.target + ' 篇。'
+    })()}</p>
+  </>
   if (!passage) {
-    const nextLevel = readLevels[readLevels.findIndex(l => l.id === lvl) + 1]
+    const nextStep = readSteps.slice(readSteps.findIndex(s => sameStep(s, selected)) + 1).find(s => all.some(p => p.level === s.level && p.band === s.band))
     return <div className="pr-stack rd">
       {levelButtons}
       <div className="pr-hint">
-        <strong>{currentId === undefined ? '準備文章中……' : only ? '這個單元的文章都看過或略過了' : readLevels.find(l => l.id === lvl)!.name + '這一輪的文章都看過或略過了'}</strong>
+        <strong>{currentId === undefined ? '準備文章中……' : only ? '這個單元的文章都看過或略過了' : readStepName(selected) + '這一輪的文章都看過或略過了'}</strong>
         {currentId !== undefined && <div className="pr-actions">
-          <button type="button" className="pr-main" onClick={() => chooseLevel(lvl)}>{only ? '從第一篇再來' : '這一級從頭再來'}</button>
-          {nextLevel && !only && opened[nextLevel.id] && <button type="button" className="pr-link" onClick={() => chooseLevel(nextLevel.id)}>換到 {nextLevel.name}</button>}
+          <button type="button" className="pr-main" onClick={() => chooseStep(selected)}>{only ? '從第一篇再來' : '這一小級再來一輪'}</button>
+          {nextStep && !only && opened[readStepKey(nextStep)] && <button type="button" className="pr-link" onClick={() => chooseStep(nextStep)}>換到 {readStepName(nextStep)}</button>}
         </div>}
       </div>
     </div>
@@ -136,9 +172,9 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const prevRec = readRecord(state.notes, passage.id)
   return <div className="pr-stack rd">
     {levelButtons}
-    {moved && <p className="rd-moved" role="status">前面這一級過關的篇數夠了，升到 {readLevels.find(l => l.id === moved)!.name}。想留在原本那一級多讀幾篇，按上面的程度就好。</p>}
+    {moved && <p className="rd-moved" role="status">前面這一小級過關的篇數夠了，升到 {readStepName(moved)}。想留在原本的小級多讀幾篇，按上面的按鈕就好。</p>}
     <p className="qz-meta">
-      {!only && <span>{readLevels.find(l => l.id === lvl)!.note}</span>}
+      {!only && <span>{readLevels.find(l => l.id === selected.level)!.note}</span>}
       <span>{only ? '這個單元' : ''}讀過 {summary.done} / {summary.total} 篇</span>
       {summary.weakest && <span>最弱題型：{typeNames[summary.weakest]}</span>}
       {summary.topCause && <span>最常卡在：{summary.topCause}</span>}

@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { levelDone, levelTarget, openAt, openSteps, reached } from '../src/lib/unlock.ts'
-import { readKey, readLevelsOpen, type ReadPassage } from '../src/lib/reading.ts'
+import { readKey, readLevelsOpen, readSteps, readStepKey, type ReadPassage, type ReadStep } from '../src/lib/reading.ts'
 import { readWrite, stagesOpen, writeTaskOpen, writeKey, type WriteStage } from '../src/lib/writing.ts'
 import { pronKey, pronLessons, pronOpen } from '../src/lib/pronunciation.ts'
 import { geptKey, geptLevelsOpen } from '../src/lib/gept.ts'
@@ -24,20 +24,27 @@ test('一級一級打開：第一級一定開，前面每一級都完成，下�
   assert.equal(reached(6, 5), false)
 })
 
-const reading = (level: ReadPassage['level'], n: number): ReadPassage[] => Array.from({ length: n }, (_, i) => ({ id: level.toLowerCase() + '-' + i, level, title: '', topic: '', words: 0, paras: [], zh: '', qs: [] }))
+const reading = (step: ReadStep, n: number): ReadPassage[] => Array.from({ length: n }, (_, i) => ({ id: readStepKey(step).toLowerCase() + '-' + i, ...step, title: '', topic: '', words: 0, paras: [], zh: '', qs: [] }))
 const pass = (ids: string[]) => Object.fromEntries(ids.map(id => [readKey(id), JSON.stringify({ day: '2026-11-24', picks: [], correct: 4, total: 4, tries: 1 })]))
 
-test('閱讀理解：A1 過關 12 篇才開 A2，A2 達成才開 B1，B1 達成才開 B2', () => {
-  const all = [...reading('A1', 15), ...reading('A2', 15), ...reading('B1', 4), ...reading('B2', 15)]
-  assert.deepEqual(readLevelsOpen(all, {}), { A1: true, A2: false, B1: false, B2: false })
-  const eleven = pass(all.filter(p => p.level === 'A1').slice(0, 11).map(p => p.id))
-  assert.equal(readLevelsOpen(all, eleven).A2, false)
-  const twelve = pass(all.filter(p => p.level === 'A1').slice(0, 12).map(p => p.id))
-  assert.deepEqual(readLevelsOpen(all, twelve), { A1: true, A2: true, B1: false, B2: false })
-  const zhOnly = Object.fromEntries(all.filter(p => p.level === 'A1').map(p => [readKey(p.id), JSON.stringify({ day: '2026-11-24', picks: [], correct: 4, total: 4, zh: true, tries: 1 })]))
-  assert.equal(readLevelsOpen(all, zhOnly).A2, false, '看過中文不算過關')
-  const nursing = [...reading('A2', 8), ...reading('B1', 15)]
-  assert.deepEqual(readLevelsOpen(nursing, {}), { A1: true, A2: true, B1: false, B2: false }, '護理閱讀沒有 A1，從 A2 開始')
+test('閱讀理解：十二小級依序打開，差一篇不開，看過中文不算過關', () => {
+  const all = readSteps.flatMap(s => reading(s, 12))
+  let notes: Record<string, string> = {}
+  assert.deepEqual(readSteps.map(s => readLevelsOpen(all, notes)[readStepKey(s)]), readSteps.map((_, i) => i === 0))
+  for (let i = 0; i < readSteps.length - 1; i++) {
+    const step = readSteps[i], next = readSteps[i + 1]
+    const ids = all.filter(p => p.level === step.level && p.band === step.band).map(p => p.id)
+    notes = { ...notes, ...pass(ids.slice(0, 9)) }
+    assert.equal(readLevelsOpen(all, notes)[readStepKey(next)], false, readStepKey(step) + ' 差一篇不開')
+    const withChinese = { ...notes, [readKey(ids[9])]: JSON.stringify({ day: '2026-11-24', picks: [], correct: 4, total: 4, zh: true, tries: 1 }) }
+    assert.equal(readLevelsOpen(all, withChinese)[readStepKey(next)], false, '看過中文不算過關')
+    notes = { ...notes, ...pass([ids[9]]) }
+    assert.equal(readLevelsOpen(all, notes)[readStepKey(next)], true, readStepKey(step) + ' 過關十篇才開下一小級')
+  }
+  const nursing = [...reading({ level: 'A2', band: 'easy' }, 8), ...reading({ level: 'B1', band: 'mid' }, 15)]
+  assert.equal(readLevelsOpen(nursing, {})['A2-easy'], true, '護理閱讀沒有 A1，從 A2 開始')
+  assert.equal(readLevelsOpen(nursing, {})['B1-mid'], false)
+  assert.equal(readLevelsOpen(nursing, pass(nursing.slice(0, 7).map(p => p.id)))['B1-mid'], true, '中間沒有文章的小級不擋後面')
 })
 
 test('寫作階梯：前一階做完兩題才打開下一階；橋接段落跟著單元開', () => {

@@ -1,0 +1,841 @@
+{
+  "reading": [
+    {
+      "id": "a1-lin",
+      "content": "387a93334f9149fd3d77cf8c27306da5b1fb570d24d5db42e47eab05615de50c",
+      "questions": [
+        "69ce80002d5fe487d920f195392d51822399f5192d3cc79d8a94d7e76d94f33e",
+        "786c5a0cbcc54990e9a836ae144cd9ed51cf36c149ff9019e45e114aba466ef2",
+        "8de64291276e0d60d7f83b50bd1766fd11afca14fb18f229db954130592d0b0c",
+        "d260f8d5853c752f73f1b7b48e675c7d97951ef4e7151a8ca002fe9a30052a23"
+      ]
+    },
+    {
+      "id": "a1-clinic",
+      "content": "903387b47897d9b55b58616a1d6d59460e3389d2f62dbd1aeee8d2e908be8362",
+      "questions": [
+        "9c0755659a12e0aaa14ddb5b5cafe66b16bd1f5c71368392fae39bea6724c918",
+        "4ea36257109a2d0d5ee9f89c49fe1c299b00f1c978223df8b0ca9ae0f751903b",
+        "4c123e83087852d92df36cca3fe0517f9a8042ccca374275d1ddfc4ec2e8ae34",
+        "b9d8092b4d4c5dc64a5da3fcba669c901f0d3f8a2180aaa1f33035e8680043ca"
+      ]
+    },
+    {
+      "id": "a1-water",
+      "content": "d730f3ad535c00d48546981f3ac91adecc7804b28dd957983f77be38d9f8d7bc",
+      "questions": [
+        "1007ce66e07031ccccbbf5acbdc849daa2145849c6857f3555c72089573f6c7b",
+        "ff02daed40afacb077c53992a0f795671499a6d2775fbdf1734fb9fc3e08d93f",
+        "ed0170752b7e1161817722006d65cdddef871e41cfca6c826ba147b4b6ee592d",
+        "a6e4b0b6253f29ba7666f7c346c93353987a4363ba7c45eb80c96ab36c4a13a8"
+      ]
+    },
+    {
+      "id": "a1-grandma",
+      "content": "51bf9ab5bb25bf3afe777202614a804317b8feb4196bc44fcb252d642933a084",
+      "questions": [
+        "78612bb351d8ec9321c778b9549a35c45102b5787f14761515beb8895fd33572",
+        "8629512e66a5f2b246eaf2469e139b545fa9c63d8d4c50e417c6fabe0ffabf1a",
+        "c7e8a6711801ceaf83720e99cdc1b71a764a36d8de62d0878b915bd89dea9838",
+        "cbd39cfc586d94295b2b77ac3f0607341df188f1980cd890dc3c7e287046b687"
+      ]
+    },
+    {
+      "id": "a1-hospital",
+      "content": "7f58dc65285c7d7ce7ff1327ca8c27f8cf8825bf4a7b7751bd62207c7f0adbaf",
+      "questions": [
+        "574ce1c8e55aa795d73b5a603b253148c89d10e5046c2937a2fc69f71672f44a",
+        "791e1e99e09a8b1030d45d813554479ec8c1a3ecd6a24bcdf91a98e0e13466a4",
+        "73813e0024aaa9ae46995866efed7b23be1093ad67dddc8d3277bf67275438eb",
+        "fc6fc9a74335866deacb0bc5c335de2b6462e5ffbacc3055d9b3a1a52e09d1fe"
+      ]
+    },
+    {
+      "id": "a1-family",
+      "content": "d7fc4aa7415698cc034364e828e604754684890875f7ed2beeecd40689612960",
+      "questions": [
+        "a0ea19ab1b69384bc9689b51963dcefed335c0e98cf811ecf1b74705cfae6a00",
+        "9d248186d10e1ddd1bcd4c001d3463d544937319f5c79e97a4540d8310f31cbd",
+        "3cf8cf6677cdc0f1a3f179a3d97e8ff08bfe03ac6e494ebba797c3d31734959d",
+        "f891c28f5ffd8bf582288ff3fd93db5e8faf22236d8fe68cee14678c04585025"
+      ]
+    },
+    {
+      "id": "a1-weekend",
+      "content": "5b10cfca385fae5f1f3b65aaa93d35d52c082eb05a34039aa67225aa3ad6b2c6",
+      "questions": [
+        "027565588948c021ccc91724d328b75c33fd328651dcffced7468a6393aeabc9",
+        "dac48fb2531b2f4366718709008b575d86381a7a027801e38d3d0468d9ba4e3b",
+        "10619548db5ff458a379e5db36615f7c1f1517bff267da69eec1dc4649e27689",
+        "156a85d11f6ebe0beae725406ae6603a7ca482a88660fd25751e20a88c405721"
+      ]
+    },
+    {
+      "id": "a1-room",
+      "content": "bde364fa2d50112617d473310615c32f2d5e02d5107284e409055a5a61f5b0ed",
+      "questions": [
+        "7ea6989306c2b57d5b6a70a70a0e05186f17f0eb45976cfc1cb690131a1d10fe",
+        "2083b83644128858025347c3f7621b3c56f30b137bbd48bd3f40c75b77a3d73c",
+        "8598ddf096ff66fb069d9925256486f7870523cabd14863f1f53f7a02a687d62",
+        "be12fc767a24ddd3458202552c2669fd5f59139850de414488f507e04aea90cc"
+      ]
+    },
+    {
+      "id": "a1-breakfast",
+      "content": "01be341f98db15410fbb77bd3f086705721d2433394500a60a4593e81aacac62",
+      "questions": [
+        "7ac3a0e5fe1a825f4df444be60639de0f627aff750e78b6153090f3f5ba6d209",
+        "484a78d761063a5797c861595fb94de2356097ddcc3643512f4632459e229c30",
+        "a78232a935192722222e4db2a6cab7036cf616633f80d87a651cdfef23baf150",
+        "836861b13f83e3e4baa3818f42b1393f0783d4d7062a10e5b46c6a6685e32223"
+      ]
+    },
+    {
+      "id": "a1-weather",
+      "content": "b4bb0c4f8c3fbf108725a24f5729c39f4b12c1b4b380c0f6851edc5457ef3240",
+      "questions": [
+        "581e5809ea7d854d80ab58dcad4cdf6465dc841657b29ed2237743012c9559d1",
+        "e5c2bd9f2b99baef4e881eda0d05089b0055b045b1cd19c7c6274d9212a41024",
+        "f08bfe6249913ab1f28953a25fb53fbc185962a5deaebde1446e7655d54e699a",
+        "e237cac855dfb5fbebad86b470e78d3e34a08d48a0721f2b5605dd62f445d628"
+      ]
+    },
+    {
+      "id": "a1-dog",
+      "content": "f80a4670634c46a1842f5ba6080cc51591ef07295899b5f44b6e210dc9ed1592",
+      "questions": [
+        "f10791056b8aaf9bf5907ab0967c42d762cf76a176bd0261f0e7e31011fca427",
+        "12cd8e437981f291b7a7be559768cba5e5f199f1f91fd02a85fc6ed8320401b2",
+        "5a47971af3385b36d216357bc4679e0ee7a09b590b912afa6c2123ee05f327ef",
+        "b22e3ade31cd1dcf75e6ee88f7a8da8c30f1f0e99631b9248474f5e5ed0acddf"
+      ]
+    },
+    {
+      "id": "a1-note",
+      "content": "57aefec8b345cd8b9c6e6afb9af3865291530e09c513038eadac3c98ea2a61b3",
+      "questions": [
+        "f4738a7029441c8428cdf80c8577807952263963290a1d9dcba07d7291f42854",
+        "9838e7807d1431c684a6db63760fe2e307453e6a9ac5be79c9a76abf9b98d611",
+        "8c545ef50453b5b8e7b42274674c0027e48b1e113ea753558b69b398a1273587",
+        "25caa9257791978c4b397141cb7962a3c23e8bb0ba0765a89067c3ee3e83031a"
+      ]
+    },
+    {
+      "id": "a1-market",
+      "content": "0b39c9175fbaaf26075d21acc38e9747d93a7d7aef7b07ecdb30c4abc023c339",
+      "questions": [
+        "39ed82d6fed55a1a809b78348dc3b5238f8f2cda6ea569cd96d776a1c2b27806",
+        "49eb133d6e09d5dccf14418b00134f22d81bd22d7aa2e455ef20d850b6183fcc",
+        "93ed9ed6c7757639fa3de10125a9b68453c74f0ee7677ce57e292eadb9d88acb",
+        "b0795ef23de4efe406659fa4ef61306ade7fdf5e85228a93457613fb0eaf7ffc"
+      ]
+    },
+    {
+      "id": "a1-library",
+      "content": "1a6fdb1f66d28f0bb4e6736ece8e77e243c8bf5acbe12e043aea5b00be7c857c",
+      "questions": [
+        "49e8fb8f2713cd4dc6da97b188814bbf89dee8d10969d35a36ec83bcac783293",
+        "94593d21e2838c011e081ee65e7eaeafb82cd285483c219864adbd09384e72cb",
+        "bd01cc01c07d0b3c55373d3e025a9e5e70ab63e9b95031aab75b8e2094795ca6",
+        "2109a750c0f3a103dc42ed546cf20aa5e395cb98d70f522ebe72e86328567917"
+      ]
+    },
+    {
+      "id": "a1-teeth",
+      "content": "b016aae1c29c8d7e6d3e29982a45e3ed445da297c5a670b87773e2dd8a6526ff",
+      "questions": [
+        "82ce8a05f481179dafbeab30e8c1c144dabaf3e01dccc34c7dc6926afd6979da",
+        "321cd87d30460f7aa11a31a3d5beca123ba3034d19107aec00c4419294b9ae9d",
+        "4b3a3e469fa78ead77610f002c0c487396925e9a0f75a07e4c3f27c5a95694e0",
+        "0f431488a3a82f5761358ffffc830188ed61c2687f5f7c7157f38a1928b74524"
+      ]
+    },
+    {
+      "id": "a2-first-shift",
+      "content": "395297725c170a3ec7db6005efa908120addc84c0f7926245b2f312c775ccce4",
+      "questions": [
+        "2de6feb06743812eb0a327800a719c54cc40a2af873210ee44e1a8cc6c7da273",
+        "f8002d4102a0d34076336fc565a51c588ce9766e09cfe83098726ba0e75c7a12",
+        "09736e1969cd4478bb07c73758456685e574482428916d476221a41dd6f1f7ba",
+        "825962f3b7f850120d1b4e35fdcf2ac2358eb9fb3bf4d2dbb0736329f2a648e9",
+        "504fe2802e09a4881f5cccba4216dd93d6c2cc3429248856d3a97ce0c0ee87d8"
+      ]
+    },
+    {
+      "id": "a2-sleep",
+      "content": "c0ee56c9a893ca748daaeb4b5dc10035e3e5c773632accbf67b105d846175249",
+      "questions": [
+        "fbfa2a36748d2979d10cb851889492c032b02b2390c7e7ac211dd8dacc4fd6d2",
+        "ca2e41f819fc6572c110b20543bd5378a913abad54703f832ad98cda993b1c8c",
+        "7459ed1b637b8b37a9c2e69723dea442606ac42033781be7404ff5c083a60e05",
+        "24214aeb8cebcf0642196fe00a4b5b23dc6bb90efe23fe9e79274dc608599db3",
+        "9797139d0fc51bbbe8393b09ae1c09e9854ad8d953351bd0f2c4e12b8896c914"
+      ]
+    },
+    {
+      "id": "a2-handwash",
+      "content": "f1a92c613d4469061387746104e179cb7e008c2bbf2cb4b211c63b58c58406cc",
+      "questions": [
+        "84f657e976be7f0cdca7e0a869f4bb74006a4e308a5645c661be4df541aaeed9",
+        "90104b1229ffdfe5a2d7c3241f6ace5436c608d58e363109d661d9d927c7fc78",
+        "346180432a28d614efe1d96188dd88ba5d9f7ac029b947c7aa28cbc00c68a929",
+        "5177497ecaa7d45f4e840a994303327ca02606051df85e789668a3a21a2e7478",
+        "983d630381434d6f62fd45c0dc369bfa2404d576532db618c0aba3ca06c0856e"
+      ]
+    },
+    {
+      "id": "a2-walk",
+      "content": "0aa100a60f64f4e69d1c79f3651318a6b2d0a7835a01787208c450e6fd1c7dfc",
+      "questions": [
+        "39682a1f3d13b03f68f89bafec6e8a68dfc43d69d4af58dd16e0413f944666cf",
+        "386e04ace95ef0c826a0e6151f0feb3417624062417480b938a3ca2a5ef698c3",
+        "9549c9922460ca2694096562d096a41b909dde5cc6af43171485ef11b443f7c1",
+        "0a60d619630a64e9393dd6ef02eeaaa1894c4ba44c300ae7e660dc8aa730f507",
+        "714d8777ab6d9217f142537f3fe5ad32ba9b0f8568188c90f7bb9670138f2959"
+      ]
+    },
+    {
+      "id": "a2-message",
+      "content": "bd92a0081ed3926f9d2a5487b0639d395d732203b84b443dad3f91f6f56cdb86",
+      "questions": [
+        "c1107151bc754c3ca0e01523ee57021e32b18fb03abd294fe46f3c32400f9405",
+        "94b04afcdacbab4d1c5fbcf5852ae9e7cd9a14f72f70498139ece9ace04be173",
+        "9520bf3789052950b2a07f861dd6ed7effb93588220825d5aeefa5c61dfeffc0",
+        "d07e6faec466894b70c1d8c7c8ac7df9a5d4b6118d90648463621bc1debc6dcf",
+        "ea474cf2ce132beaac8ef172631539c2b0be7a36d679e6e4a40ea387f8e53853"
+      ]
+    },
+    {
+      "id": "a2-tainan",
+      "content": "6ea5ba02c8ebe534394aeeec4bab88549d22f681c2c1ebff1988b47e348a65bb",
+      "questions": [
+        "8b35a11a94da5c4a31e5413d46a0c4f15971a2ac157779bd1075900f090193be",
+        "606acb54feb0469636af61423534fda192b7f638f0b49b6e633f399a5c303f80",
+        "448835945867b5d23f3afa3c9fae59dfd61976755796cb6a6d4dedb48b7fa943",
+        "1abdd3abaa2ff83d12c5d69dc0bdaf87958ba958dc416c311365b9dfa26582bc",
+        "19dccde1709e5a5974b22f493319e2305eaa882a65f83d1f335e363fa4e306d5"
+      ]
+    },
+    {
+      "id": "a2-wallet",
+      "content": "f58018c1d8cd06b4a844de30827f617dbf9dc65a39e6b821c1a7309c095b7eb4",
+      "questions": [
+        "e0be55273db047b59ebedcb47fcc5f38d642c3ceca581339ac828cc3cd0408b4",
+        "a96199408c39fae967bff06e12dcbe750445abedfc4d36b11ef4fd35b4192ed1",
+        "9d5ab57d33230e38c4691d55f0cc8d343f3ad4511ddbc2ba51d5a351c5cd6a3f",
+        "ec19b1422278944f0e10eb457fa2c0c6e7b01db6d5bc3e9b574cbd1953915b43",
+        "e4387fc25551326a7dc45c55549f16ad28abad7c5da02d7a961d3847089b7611"
+      ]
+    },
+    {
+      "id": "a2-cafe",
+      "content": "d84714a6cc175ab727d1e9c98dcffb5f5685f77334af4cad46858e46ed380cda",
+      "questions": [
+        "5f6b669b76e0de507602c9b5170c502810cd892ea1caec56f6352ea31af3aa35",
+        "02b166062bbdba46e029fc5b2f1da2be7e76cd6a06cb90d8a03801a426b07f2e",
+        "e455c34b4bd80546a005eb1fe42deb647a21289ea658e21c5255db83309c49f9",
+        "a4f400b9e18613785eb52f25d68dc5e12c7796faf7234f3d4f9e16b4a4ec64f5",
+        "ac29aaabb49cfd49e09dc3c170fe947d20875c53dd16bb6751abf0d4292d492e"
+      ]
+    },
+    {
+      "id": "a2-class-ad",
+      "content": "40085746b00d285e033fe83e6faa1a60b608925637620547e8b39bb2cf6a9842",
+      "questions": [
+        "903e94e245b3cd33a9c8ca78ca93317bb3a443c7a966030adcd6cee83a363a6a",
+        "9d70c5cf2a12075f6bbfcfc55d9dfa7e9af3ac3ddbae49d2e77fbd72bbb9fcfa",
+        "048e1fb1fdf598b92a10af6c24f76e7ce548de2b88b662b52ac395f3ba24aaf2",
+        "83cef3e57a28aedf0b1e429c83e9129a10f79e71faa64add39b8bd81503b4d4d",
+        "4464911056de202e3d2fe48a3bdfc687dcebfac96e47a1987cb6a02258f6a431"
+      ]
+    },
+    {
+      "id": "a2-typhoon",
+      "content": "716479ae2c4e7dcaabc6f7c481a9426e8728c18156f61dd0d4e73edeaad0dd74",
+      "questions": [
+        "5d6b6131ff0d5eae809174466d7c082cc186b6d8f029531b1925d0eddd7e9434",
+        "f22d004db9caf8f6cc8cf92d6894582ce1275f8342c904d7375d81e1bae55d33",
+        "bb2cc1504fbd6d3afcd08ea6e52c01c4e5ae3e6c6aabc2d0ec65f23d220a3afb",
+        "e716577156cd3e59a83621e062f2434dfde6aade8e9b13a7e81173c7df5c12a2",
+        "6772ed7eb6e99dda4eed21dca851ae1d8e050561ba9bb46d57d6ff578b09eb73"
+      ]
+    },
+    {
+      "id": "a2-cooking",
+      "content": "c9d02d88d540b46a43e3e377b0a74314e577480af7a64b9a04fa779eb97eaa77",
+      "questions": [
+        "b223688ba4071005486e0ecc6c543ccd3c3bb4df73b9c4f44c0945b16b8601b7",
+        "9673bae3f4a9b27a617cdbc802e316d8f57f488c1c0815343dee6b3e3dec0968",
+        "287d325dbea63cbcbb60901e2c71dee533843d78461ea2792bec073cbb2b9731",
+        "926cd36e50ea0be029455fbaae4d6ace06285ee54758b70c3533c52498b6c00f",
+        "fec1265cf4a7cdcff40d121497fed032b36bcd5cbc22ac28b0b813e4e074dd02"
+      ]
+    },
+    {
+      "id": "a2-eyes",
+      "content": "994383a27adb494fe92d604455d3ef8717062c665cfd897da2e2ff0454c4e627",
+      "questions": [
+        "b32822556884a3ac38a2478b4caad0ee381ff753f0383568db9fdaa8db6e1cf3",
+        "3af58061adf9ab0158015585472d45d463d4639e0038f47b15cca22e41925469",
+        "e5cc262e9faf3b7d1bd9c8127b63540f6925d5464faba8ed5a9453356bc946e5",
+        "7435936a0251b35c005ad0340d036c420df06e6212a705e095afab3092082d19",
+        "788fd9f3afa1c1e634d938cc3727a434d869028f0aa31e2d13798bc43ecc1cbf"
+      ]
+    },
+    {
+      "id": "a2-grandpa",
+      "content": "85b06e075e1d7c5a575a00957d728a7e5b1084ee0237bf0add52afba64698d4c",
+      "questions": [
+        "e55dba6c319f57ee5e4adc755a8932983dfd1fcaa97648933308a41070ee833e",
+        "144a9d0d106abead6496388dd3fbff8c1fe2806658250468c08401d11bfe94ba",
+        "bee02744aa321cb40b51fcddff3429ebd8774faeef51c020963a478b160ebb55",
+        "0ae5bcc4caa81b376194b43563e2b077047452e2fc8d40f76ed27373e31af47c",
+        "b4fb6ad1ef1826c47302f4e3e1df54516246ce752a08adb936506274f94b144c"
+      ]
+    },
+    {
+      "id": "a2-plans",
+      "content": "246d90023215ac7df245054a1052666120ca042d70fcef44931eb82f83e9b7b9",
+      "questions": [
+        "2707c554cfd48ab58483849414c3bbacc8bdd16a27fc1ea8473dfc9e3325bcdc",
+        "10f58fd06087fb5b3734fefeb10db923dc9660560210f87544627d16d0c1d42a",
+        "1e91181b8f26e53bf7c9b554caeb85f0d2ae1ed064ef79ee202bbfa53a33dca0",
+        "4964f8d556966288b38347028fbca1e57ae811a4d90cb3624b7e3b2f660661ab",
+        "75b1bb3223fddb24075ef7b49dfe3a5ba8f6fe0546148cb5bb2dc6160214120c"
+      ]
+    },
+    {
+      "id": "a2-flu-notice",
+      "content": "64b70680d584d91cb6e3706651ffbb4af6b63df0918577c500566347198ffdf5",
+      "questions": [
+        "252565d4dd9495f950500bc6bd4f9139fb02326655c09af2df3263d64739de19",
+        "5528f952654f78482287030d4c65a1df6d3923e5c282466cd6795695f6696518",
+        "29f860f026958c3e6c63387459f29acc57f8ba014cdb125f502d3bb0f84fb4f1",
+        "3b9570748b691803c8b6769b8df747754d78a03480789a48930655018d0cca7e",
+        "b645fbc8df3cf2a54556e02768a5c0b59f5fea3a1a680766e0d282f115465a78"
+      ]
+    },
+    {
+      "id": "b1-night",
+      "content": "e1f8b515628cf83fcad5134f8823bd618b8398931fad6f7878320afa9fe69162",
+      "questions": [
+        "b77272f74719162a8551c0c164d845292efad8199a21137145e3defe4291e648",
+        "26116cec7f58a6e7b6653b07c1f4368da1a716eeffa61b7eb30625856364a771",
+        "8abbfb8f925ce080b3af0dbc4e3bdf2139bdfe1b6761690836f6e5f50cb6c8d1",
+        "8966a957beea6a7248063317194017ed3d8808ce99fee73aa27630dc990099fd",
+        "635d762370e7ff1b938e80315644820c0078b9271a887841244aefacb5583b64",
+        "de5f6ef6393d018d67b68c12c2562bd6b85bfc2f302c624ade97303f766520f6"
+      ]
+    },
+    {
+      "id": "b1-sugar",
+      "content": "9d3d2ddb2f984b1ef0bfca1a710e64f6a908e1b80c5bf42c1a759549a0a6c62a",
+      "questions": [
+        "0a60a4575a372d61830d82f4de6109b05c9942372c304e0417fadd85a28d8bbe",
+        "4a61c46b2f3c1c07ae22ac6d8ec106b0a815173d185a0222a91aa497722c1e41",
+        "f432f7ff6a03884116df121703188093bca0379dae8d5b2b23d6bb9927bb7d39",
+        "24269a5328e50f9a093e5845ed3ce5afdd47047d3ef0d6b61b4d5895c4ac47ec",
+        "2316f16666f890f321d9e9ecc9a9d856b0e5f6ffa93c35a958dd53b1940a9669"
+      ]
+    },
+    {
+      "id": "b1-interpreter",
+      "content": "670a74a3a2b1af25c50337939f639fbb1b3e672986151e5860970ab73f5c8af9",
+      "questions": [
+        "62aa841b4d97b187b5e33c7452ad31fb096ce8d26e24d8cfd7a8b63ed2086641",
+        "855c4afe62a26661ba7a0fa8b55b13aa5920351b93525253dda845eefdb32c0b",
+        "19ddcf9da39406197e62b14c45477cc67c619cf4b8c7142c7c5af83ed33beb5c",
+        "5118f7cc8ebe2f223e06a5cb2cb17c76fbbfa8305ed1c614228f87a09042a7a4",
+        "c49427b4fa6a62b24641434a7b25ae93dbc1cf0e157288e6d5cee14f32d993d8"
+      ]
+    },
+    {
+      "id": "b1-falls",
+      "content": "e0c97b868771ae0c08c3b37800fe6eea1785892e9121c703b4d68c1795eaa135",
+      "questions": [
+        "6f892aba2579d9c74ea7b92974e5614359dfaa655d063215bcad35e1e9d9a840",
+        "c4b1c66464b6d3b3af1be5c9cb0fbd282af409d4ccb185e4df55891967b7cd1f",
+        "2a5a9265f4aa8a7c4ef9fc8654e2da99bbbeb2892a56807bbe0f48c4d07b0406",
+        "7eb9a4b91685efbac15638eb49844e8216a008db4f46bd622cd18d17ff0d965a",
+        "7a19321e2daf05dd5ac6edc1b391e89ad776178540cb09db4c0380002055649a"
+      ]
+    },
+    {
+      "id": "b2-semmelweis",
+      "content": "84500d4425fe43fc5d50ac7ea3c7cca9cd29d81814d3d7f47b3a48750f8cd2d0",
+      "questions": [
+        "1e1d9c6fe35b62ca661c0a63e5f754104d5036e29a4bd49f5b31b56d21bc991b",
+        "ce2b39254e8b86e44b992b4567f8e35a3778223a580241938997c68f3b9db18a",
+        "8eb536af9852a42c840dbcd825480f965adda0292bf7caef72eb67bb192fcb6e",
+        "5a533a8b752f69d9a65240d26493646bc00db0bf1f2deb8c17fdb7bd2ec1278e",
+        "7d4bf0d5df0c5aa02c7168a3630d69da4891c0c5e3f572295f927e64b770cee2",
+        "4a282c6e8e27316b0626641370a8bb4c0baa0ab2cf7d0016a51b8f3cc773731c",
+        "efa920049e4db5e27b93e20359baea159a445ff284dc514c4426e9121f3ee0e3"
+      ]
+    },
+    {
+      "id": "b2-telehealth",
+      "content": "bb38c53032ebd7ed7d96272d5a0b98f655e49032c2ed1062dafcd063c912427b",
+      "questions": [
+        "f6f4149a2cf0c9fac47b3aeb36c152e9c7b4cbf8e8765b9079abf7fed1e44fdd",
+        "d6b65fd6219a05c0d66dd0e6994f88bb174c271347e3cf6cfbd19be2df0fcea4",
+        "30ec8ddd8bcc7f7b112aa13796a4448a467a2d7148d2c50e8b822bcd2e214ecb",
+        "23f8eb89b677efe6b4ab65fcbd824986d0a74e47ef3112f0a7e4823b224f1fa0",
+        "6a5b45832e9bf6e543c90978a5c1f8a96d38cb3695ec8b60987e8a67ea2599e3",
+        "dfd8a12cfc48dccec6bcf5f5e42f753a706a38ef7234a9cf7b8acff9fd975353",
+        "4fefd15210750ea31815428b1e4b770e6aa9ca767ee3c1da547ef48586307e86"
+      ]
+    },
+    {
+      "id": "b2-shortage",
+      "content": "8c6f56fe1174db5a502a5280c43d2acac2575ed3c0fee2c6961b74e554fc1ef4",
+      "questions": [
+        "bf410716305409e8b57af17bd12f34346c7d63da1d4735e7f3bb942c3df01993",
+        "c16bdfc058e41741a65d3b4744c3fe0e237cd990b3c522e9ca2fbe6ed784030e",
+        "2ccc675e71629f757a0f6a39f545b989a40d5cce6f76a898cb5871f93956fa85",
+        "77fdbb309deac509bc2b274c772b9a60fcd1bf8d3de1035198e0a826a77049c9",
+        "c30cff901130c60f130580a6aac99af57770897448e87cc852ea21def15289e6",
+        "634b16f54c379f3162c0fe07ce7e81abc8a2b2cda278769235e06a4fbb61963a",
+        "2604b6392287f17e1c562fd9f311a2bbfbf34a1df287829c5fc16f89d5811835"
+      ]
+    },
+    {
+      "id": "br43-r1",
+      "content": "9bd63b54de12d41e225db89628011e0fc207932a71d2d17d80dbfb3203e9ea10",
+      "questions": [
+        "93df3f973b4de39b9122c86d6b30da273526175ada157feeced763e3bc2b5dad",
+        "9dde466c5f3ff6fdf9bf34798d7f6fbcc0bc37b582e0e804d7ec839b49892f82",
+        "1065f186ae849ea911ee13470f86c554d2697386046cf3c2d3d1ade5cc79904b",
+        "e1e595966435153f16ec0c6dc78fa9011daccbcf384ce5ac70214d9072b61197",
+        "8f19ff663afea714595834f0f7811154a693d66289cb2af75abc1056ca21b815"
+      ]
+    },
+    {
+      "id": "br43-r2",
+      "content": "2a84dbeab65c65340a64eb50c749bbeb4a9299f2a0305eb82d66ba238751868d",
+      "questions": [
+        "8ced4d3a07963ef8b1df695011ea387093ee51eea10c1e4100c021af5e69d906",
+        "92b907f3ebf1947ae84114bc6496aebdbd4419ac38b6e2090e65074aba876676",
+        "8ba3e0b3d49dd106cefc9c78ba39e4d9ea2f55e03f47f4891fff106936e98dcf",
+        "e3f957b83323f48f639e56bcd35ff580fb5282941042213f27c830d20b84bafa",
+        "ab20386a13fb50fc4a9abbe7a629f65545c8a36b3324dd2062b1b561a62c8434"
+      ]
+    },
+    {
+      "id": "br43-held",
+      "content": "c0a764f71aad7c4a04db6fca5966a8233f91233345e02eacb6ca645ff19004bd",
+      "questions": [
+        "b7dd7e54af5362d0254fe5e489711ac267c12cc997063a1e622f639eb028093e",
+        "78eb4d339e28c470c6f08474f8e9691072137a58720c1d67134bfd1a00e52c6f",
+        "3ab08240ac05cdcb1f5b7d70ca8ed40f059ef8e37c461472879b3a5d39346fee",
+        "1dce2982c1fdbcebb99cc3316d2559ebe47188425a1e2c59aa8813d494f51407",
+        "03c2c56a5912c01d237b3d9b6e0e80dae2bf5f6c057700a0b7fe949e9be5c5a0"
+      ]
+    },
+    {
+      "id": "br44-r1",
+      "content": "8ca686075d21f12fee17dad8bec06dd17b1df34c5e9420203e7d4d10cf0e54c7",
+      "questions": [
+        "7ae4e2112ed338b5c51b112450ea12c92d31feaf36ecc1a7bd2d193e45c22711",
+        "5f70b8ee40b73bbdb04f0c3e46883eaf7aa4082c9f9ed5fc1dd4519899fb5008",
+        "5cb30030f2c5136fd3ddc8dd40c6ba4b6897d715b9c6617bae9d1462dc96f185",
+        "9f93076836ee1989c8b7e7edb2e36421c2817eb4d6d8b52d763156615daf8222",
+        "7cc47a9b4a5634f99d7be6bac4fbe90755439da8e77c2539758f2662194c5096"
+      ]
+    },
+    {
+      "id": "br44-r2",
+      "content": "9f2b628d0be5c904740ae1b867f0e7dde36695b1794ff956e1c86322cc9198d5",
+      "questions": [
+        "1257aa535ea7ac1c2c9b61e9449dc03251ac0084003acada24025e28d6b48507",
+        "cf68f5e30415f1687424c0347844b972ed500e667b5acc8f814c4957d5c4dac8",
+        "796b2f49d812496e0a002f86fad1b8518d1290be4f6ee4717b5edf111397b90f",
+        "acfbc304260ace6475ae9d53e50019b10d1784dc027c19641583e230b97e21c3",
+        "f040f73b5ec4f6bcfd2032c9965a28f230b48df25f910fb20e201da823028ff9"
+      ]
+    },
+    {
+      "id": "br44-held",
+      "content": "0a4f93cbad107ebd0a39d1e374197d88bb622c920cff4320f967841a31006053",
+      "questions": [
+        "998bca880f8812c4d78cef7c623f976ce5b5745f120906be44c8cb9e9a2c79e9",
+        "c515b69bcdc179d67d0ae2ddb2663cde854dd0b5395831cca0d710c94d2f3dbb",
+        "ae59c348616ec5248bfc70d9bc6ca0a411878946cd0252799add3d68e0c7b464",
+        "1797881dee759253c9be57eb9e5292e0f4ac5c752d3f9c6fd84fe8602b8056a0",
+        "cc300d7d125c04c54709e454889770141a214d2f808de9f1f825657c585719f6"
+      ]
+    },
+    {
+      "id": "br45-r1",
+      "content": "fc4d7a7e74154f9847676031bb26d433a1955c096bab765c771bea1f3b32ad4b",
+      "questions": [
+        "e7e6c0043f02ad7f93a97e89c9ffa574a3dd09299d10c32757b78b385198967a",
+        "56cd624f7b9af6cb8732390857492520b5926e5e72624c7ee616c73413b7d763",
+        "e3f4383fa2c18f208a87b7a6a28801d2e3fb804992037ffe6404ca4972dbee61",
+        "0c78ac68a9c2f507d0650df24d046dbde52fb2c7751ed1e0382b32f32f11ecb1",
+        "ef3d69982aa19260f92c48897e97469349a9f4bbeff788e7eccac4f355925041"
+      ]
+    },
+    {
+      "id": "br45-r2",
+      "content": "8e7a2cd622144a2e624042f91fef6922731b6f5f2b509a0cc8ce76e633a0bd7a",
+      "questions": [
+        "d11a815884fa510d15976862d685cffab9483183969618e9b2b99a1acff977fb",
+        "73a9e0cd282c23ae091163492329a7b94c65161c01939bdffa51057eec4ffb13",
+        "7b023958b9cdb71a119d6c6b8bda10bf836583e0cdb66a3193c25bdef4717b97",
+        "1f9f5749db33592669958df10615ea3b00eb5cf6f1c52f21be142ca21a7aa107",
+        "d31dae5e3b6b07d53d6962b2c81d65cb662b85245c97bb967ec4a39ad15d205f"
+      ]
+    },
+    {
+      "id": "br45-held",
+      "content": "3563696449713b80129e2450adfbc73e6b3085ab06956d7af194147db3e2957f",
+      "questions": [
+        "5942a61ab63dceb248d1283531f09af03ce5c6583a5d6a47b0cfe5d894b412c4",
+        "38dc6a1a8c4666c29258d7eec2d24bf6c13e3652a4541e4db427045ef1614f6f",
+        "06b39a4c42159ac81e170b54b48355100a41e4e90c58bdf6d3cfad2c6374ba58",
+        "9a6d2ccc47352dfa9b8fddc9e94a7ebaa5659c1044e6e2472c2689cebfcd8f84",
+        "1ddba64cd1b9b5de13ad481fe4adbb8bd4adbd90730bbd38a64f456ecdd5fd27"
+      ]
+    },
+    {
+      "id": "br46-r1",
+      "content": "b93518407fad0d4732bf4d11109280a1bd899ff557df61dd30945d8339488df2",
+      "questions": [
+        "4b81824dec928bf7e68a77ff42aa0bff25e3a2a28ea7c2b94d80b8163021f3da",
+        "47492e58a606559cba770eba5b710fb5f6dc6b63b61a200a602835073e406527",
+        "6f58ad8afcf92734b221afa506a02b10e9d4f41ca0048ea37d8856367d257b3d",
+        "c71e5e5b9458c26faf85f607dc63ce27cdfc1d17dcd0148befa26c93174acb5f",
+        "eaf46332628fe556335de31b161a280256c37f10e67f1e0f520086e501f0f784"
+      ]
+    },
+    {
+      "id": "br46-r2",
+      "content": "4357ca446a007bb1238b13bca475e5691aebc3d37b9a2178eae163324ff68f78",
+      "questions": [
+        "cc9d1f93ae356b63463427d01ca293efb58b63877e80eff68aa1ab8f6e0fb33e",
+        "39331f9de948d74fa8cba141cea9c91daea097ea0f85081227f5a9f2e65df5fc",
+        "1c1049e01ae7d4108950e2b56657d34f55cbf3cd791617ef29852f76832f11c3",
+        "e396cdc06490ab244b67996c21ba21e6dd282b7010ab1fae516e97ba95d8cc31",
+        "7e348b65c726622d9c6cc96007e5424b088d4394560c57978bdc8bc3aa78b7c4"
+      ]
+    },
+    {
+      "id": "br46-held",
+      "content": "0d44e2cbbec832d4f5d40c394108cf7113b4b2d6ae10b20f6bea181b3ec1384f",
+      "questions": [
+        "d7b3b609cb6c302235de7f90a29403412d761aaa37da3a3b49b341fa681c9f67",
+        "64f6f9eb31ee9301559ead92bb477d8d736bb9fca0292736af2b3d5a78b69e3a",
+        "59a283ae0158290284b18dabdf7624609943961e89ae36af3a95e25ee3126d16",
+        "960b20d8709c60192f213bb4dbc235b6c343a3cd93baca5fec1264798f66d5e9",
+        "4dae996f80bbb899fa089ee34ad5b92702fdbc03ac4793b2cb24777da68f42f1"
+      ]
+    },
+    {
+      "id": "br47-r1",
+      "content": "af7188d1e121474e08df91e2e74707aa575f56dc21636c2fa9b640b8146ada9e",
+      "questions": [
+        "f09ddd939a77bb806b3683063a5bba2684b2bcfa17b6fb26f4528c57bac8e30e",
+        "1136562bd500c1c0c479ed0ee7febfbd4e136c4b8cf61086b1e52df2054be294",
+        "d48417c7a142bbfd134a23f8da6b544e0490303837db1d5a4c3989596bd63bd4",
+        "ae7de69b35c7afdb7818eb9156f026ec47cdc7ba15ab845b055a015657a2414c",
+        "ad52fba0c07c9a32198a6e811521040d2197064685ab224bc52b2ba678145b45"
+      ]
+    },
+    {
+      "id": "br47-r2",
+      "content": "6345acb789f6f5fa299a2d7763a5a7959cb6750779912031e2abccc31353ac74",
+      "questions": [
+        "ac8bb79dce1acaea0fcbef03bc0df9651373000870e03463521748e5251f0a3e",
+        "8de7d475d6a207ff3c90d564b6865b2242a51205f1cb316b33c12ccaf1989afe",
+        "1657e7c2b086f25e2a815ed417128e6d2e056663413f492792f4ce429cdd07dc",
+        "e98a1674c044c76c68c9d1162b9e9f65a02889c2dcd33f588fa79b942a5dab68",
+        "ab901ed752bfa2b36190001fddc73c959e1dbca2c6a7673919c872d9f0f19425"
+      ]
+    },
+    {
+      "id": "br47-held",
+      "content": "e743e0b623c8387b099eeae338ae0ea15fce3e4e8be08d9d1b0f0ff07e7e8b75",
+      "questions": [
+        "02d5946bb4f821a7ba04329263484533ef7f3d8ab1c8bb959e629c9f204922e8",
+        "952c9f2a8e0f1e1052303ffb79320d8c8166e2ae8cb58b44a98bd17614c5311f",
+        "58209a36778aba487d2ea1bbecad0697c874c3de7fb16e40660e0dae4f6f9d20",
+        "62915266abc3fab5c1f0b1f68b272bc2733d4f35e2857d41bf25f4b17830a339",
+        "13b702000c9792994e4c86ad06d9b62ff1912a162592becdb37b23e402f5c128"
+      ]
+    },
+    {
+      "id": "br48-r1",
+      "content": "33641ef79b01abfd0f239341d40aabb633b74c8b883c85f87e603a471cee8d9f",
+      "questions": [
+        "920eb9e4af4ec7b5d2d70b8b43ec427a69d0ea1f721b8f43f473536cd0706238",
+        "962724b70f16e0625c67f31da391c4f8b4a50021e052d64f41fc2861ad82c284",
+        "cc13735c3c755d88d5937893c8504e6614a2c7f08cd5a146c82032294c36f29c",
+        "16e29a84ba4fd2f884521025f4dc0301dd6cc6af501f906f36697ad736a657c3",
+        "08fff1a3b4c8413cbef8239fa8d048075cd15baf7aa3f2a9241ae67f3a875d4d"
+      ]
+    },
+    {
+      "id": "br48-r2",
+      "content": "0d9a9716e638fe371d579ce1de449da6c4e6445b2585daa221373ac5b8a17515",
+      "questions": [
+        "7533b1bf3f55cdae660dfb6a7fa25184fe943894c7503496bf1ff17612bf68e6",
+        "53b87eb71a7f42bd8a2d022cca1238f8b3dcebeef83e074900c1dca68d9ed26b",
+        "42017bfabc2ee8a861956eefa40f46c9b4e82e24297859485e36025bbc52d372",
+        "ad0af2709f713397f6c1c31daf2f699a76289a917b8302387b888a7df904be4f",
+        "2c1b4ffd66d290b5b96bfdbe779dda514eb2114e8a026e0f7be67e97d25b666c"
+      ]
+    },
+    {
+      "id": "br48-held",
+      "content": "30f0f91851628f58d29bc3da51e40321bfdd36be0198d7e974ae0efd0b0fcdd9",
+      "questions": [
+        "9287a46168f515d3fa40e5a3725f1288a12fbc978c8615266b497dca67aab334",
+        "4b2d4c41d86b914dee06f232ebd9e3c5bb9bdfc60c78effdef205cce6660d771",
+        "3e8d250e2c03aa7e14cca7b617700adc791a570b329c37830f4e92d9f64f4ae2",
+        "712821679c7c37ddde15e8d737c5328c4d461714f66b399d7887b0d26a7971c0",
+        "71b7d0ad252db2568e353c9a9448b10ab819d5851c76aa731a6f9b958e09247b"
+      ]
+    }
+  ],
+  "nursing": [
+    {
+      "id": "n-a2-clean-hands",
+      "content": "a33d573b66bc0e36e00ea61c5f7ede633756d94c677cfc3f5e66d8a1405d49dc",
+      "questions": [
+        "945b530b47f362b4d5d5c07cd0c563a191f6aa06cb4a8839cb22e96d43302b1d",
+        "cf67ccfbcda54f88794987dd0322c2de9d8bdb0d69b1ec71c5820dcd144bed71",
+        "29d07659fa206ccf8dd3e15fc30cf5475fefccdc4254f8e604fe5e34e91f151d",
+        "72c5ceb158098e3584b863ff2ddd0a5453b9bfa659694c854d59aca48e300614"
+      ]
+    },
+    {
+      "id": "n-a2-falls",
+      "content": "f2aa6ef5449a612d8ad1f6a02ec1e5bf99ccd4b338a49be378bb8f89fa43f682",
+      "questions": [
+        "73e5d349df31a4c0913789038db6965e8ca5807c5eae6ec602a092dc6dbb3ecb",
+        "358c10856329f595d038798d61d69c2e79e9b4fd683449bfbcd7ff6b4c57c136",
+        "827f6a166052db7d8cfa56b3306e3e80c3dc753bdb9f2bd89d510def0cd21118",
+        "c5a6dfc43cf19b2ee1511c193adab3b0f6873a094907e8e2ccbde326c3b6b7d8"
+      ]
+    },
+    {
+      "id": "n-a2-visiting",
+      "content": "92cc77a426a739d4db396d29d1f67a096317700f409650487f75cc52543be3f8",
+      "questions": [
+        "ebed0954c6243b340db1fe0f91947225b44ac1cdcf16ab53dbcf0df3b7b50846",
+        "ba4518c8445e8cd6ba9ac3b3d9435293afbff3f5ed1be71805ecc98253caba09",
+        "ecc6fa9c628049f181f4b1ea9616de31fb3b42013738a980971487128d4da7a5",
+        "aac51e9a488c3c4710e98443a2cce8e48f3704c6f4e598ce6bf60950e335f24e"
+      ]
+    },
+    {
+      "id": "n-a2-pain",
+      "content": "447a50aaae3092ecfa8934277d854638f4f41513fffc86ad548140e18beb230d",
+      "questions": [
+        "5ccad4aae299d1bb97abb738e03260fd52e259d2dc457b2cc0cc4776fda03f16",
+        "277f0c516621b98c0f035589c581117ab8a65dfba0b24a2a89e53feaf135b47b",
+        "a52b1ee6036a74147889778f9afff01be0c2e997cd6c1f5b2574687056dc7039",
+        "1684c443ba62ac7e5aa7a7c5733a9aac07d4b4d1f3b9f22a91e3e16e1c711f31"
+      ]
+    },
+    {
+      "id": "n-a2-fasting",
+      "content": "d1b0c4ed607097fc387a8ac1aa4e2753fb2e8f0559b3ffada591b77b066f7fc0",
+      "questions": [
+        "f98a1ea5b8f4187a293fd9bf7b357a162437549c411a6595f14a1b0a626861ce",
+        "7d900fc3401dc1725ace4266acdd91ccd5efaa6a65b182ad4cc6d7277188b18f",
+        "cd4d2f96c497b2d73eae55be11bfd979948f43d71a75a33a5fd1d48078638722",
+        "dc28afc041972c8d3968652e81fd0fceddfaab35fb3501d889dae677c395f3e5"
+      ]
+    },
+    {
+      "id": "n-a2-night-shift",
+      "content": "d6a33cafba9eda058291abbfd0dca4cca9a59610d5083c32bf5c025acb8015f7",
+      "questions": [
+        "99cb842a488bfb4383da4a323eb586d76b41938b880e817b5d82985dfe707fb4",
+        "454ef1e2a5004272de45f7b962d043298767c26ab58d9575e6cc204421dedbe8",
+        "b8d9f99e5e79b6457c5035bfdcabc54c2ba097e63a8ebd977c40328e68d04f13",
+        "aff96a53ce29248e7e53a0d732a3775c30554c6b2e51d2195cedc97c21b0c9b8"
+      ]
+    },
+    {
+      "id": "n-a2-patient-id",
+      "content": "a541420aa1afdf471debd405b90917d06cc28a6251ad06d8e5cd732cc2fdf200",
+      "questions": [
+        "75578d015e80d53e1ef973a1a50df1f88ca50eb28d649f19da8fb0224b23a2e6",
+        "7e8a7d192bc971f04df38830fc090f6d934a0ac17ef266aae2020eafa38f9acb",
+        "f4973c0f5268dc7d22d9f6a7698d8bede8f29efac98f597cd97b7b0516997482"
+      ]
+    },
+    {
+      "id": "n-a2-sleep",
+      "content": "8ebaf253490cc331104d065bfff78558a4351973ba056e3f530d1e1c71732758",
+      "questions": [
+        "c2d16fb213b9ee7e536804b6f087e34c9b05ad5f9b903d4d9089b12332a9d4fa",
+        "aef7c341c2251b4c21f87c6611d9b93a11fd0c9a9e82f0706a7c8d4bec4b1c16",
+        "35cbc54af6d955eceee9e10cc8ec60a2131de34820de5304c220297f61105b91"
+      ]
+    },
+    {
+      "id": "n-b1-isolation",
+      "content": "3887a0b4b312376a182771116924166dcaf440e09950e51e073845a35f39d53f",
+      "questions": [
+        "6ba8fd78ad15cf6d985322a43acf1fde802c688fbd45fbd96630f096481fbf92",
+        "71abf6ab797e756898019dd03e5d7cd6ec5a694ed1b23a3d009d5d96cd00720b",
+        "3937385d8f2cd2a0a12518cad73f0dbff2e8041063da312dc0aa0e5d81ae060c",
+        "af29f5737584db8a25a72f50495d38ea891f4f4196919fd7c851404d80f57e60"
+      ]
+    },
+    {
+      "id": "n-b1-heart-failure",
+      "content": "6efc97749663663d021aa206321a333d06eb4fd737743260cb8790e6ba2e5a46",
+      "questions": [
+        "ddd9759218cf91686797c4e1a34f6e5e9d450a0c87f5891efa0cc6b9d9bfe1ad",
+        "4ec2f6165e848fe2a4c055546c5f082592268eeb37598d87bcedb9f865da7893",
+        "4062e6bf90c3b00bcc15b15f2dc7bb923ac54fae6873930b22fa97523d5c5be9",
+        "512ba0ae52ec8896e812f23a375210ed564fadbb499364648830aee99e527f71"
+      ]
+    },
+    {
+      "id": "n-b1-hypoglycemia",
+      "content": "0f86a22a6c86f438a38ffb7fdff1d026c9c7e6b965b23f1444c047fc9696648c",
+      "questions": [
+        "accd776a6403e2f934557376e9401a0a9a0c3ac81a24cb7ac0f00900e3df95f0",
+        "1b0baa43ca9f018594b09e46a0638fe350e9fba1da804a61748d50f7c694ed36",
+        "6bfbd616f5d5fb473612e9d7c328dab46eee25e08ec06759d8ae576ea46b0b9a",
+        "128a77528e971009a92a750f9fd764bd9235259290de6f119651f94f835e5747"
+      ]
+    },
+    {
+      "id": "n-b1-pressure-injury",
+      "content": "39657a78ec6e48e184d713cfda2e36fd47c1441893565fe682b870ca23b1c4da",
+      "questions": [
+        "affdca20ae4264ce221b57d7ee90e3afc2cbc182ef9979a6f1b416a7d4b16b06",
+        "730eb7fd5fe50a59494aa64c663ed48bb52f399df95163818d80899e6415cefe",
+        "9da448d776f3fc33699c7fb6b8dce28dea4b881dc0ad706cbab3361dc91bb8ef",
+        "93c503a356fec9554fcf6d0bae14aceddb75382920f9d2650d02b12ac03c3dba"
+      ]
+    },
+    {
+      "id": "n-b1-sbar",
+      "content": "0754ade7b4612724f5a0ba06062f4476df20871e4171bad377137ac3d3970beb",
+      "questions": [
+        "546d54e5ca68457defdda47970fef9bd6f0d2916d7ed5b16c42ed25f81698ee5",
+        "3013b60dca88900fc90fca8fa8deab097487155c3876737e1e42f1c8a955fa32",
+        "fccd1ecf6b5af741a23f0d043fa8c9c02c4e605adf3f35010ba4095ce276f38d",
+        "c5da07159546f652a4a3739e963ccde3435c6a4a500edb1be39caacef039afb2"
+      ]
+    },
+    {
+      "id": "n-b1-delirium",
+      "content": "6e83fe5534362315a5e79b261820bd0f644fee22135ed90c8714f73638a3b11d",
+      "questions": [
+        "46594db98add5be37618fc05adc8ea74461221d0c42a93fec0b8a92344aef272",
+        "f274b921a928c6b4fc1dfbe6cc93171812846494c269f83948912af5ee789059",
+        "f42ed4e8516e39586f0be7f27a422867dbd1866c2fa388cf2f8e34c1af95fbef",
+        "69b11423288d41c0c98d35527b8a9a0b04051ee5b90ec7fbf75414ff17032a23"
+      ]
+    },
+    {
+      "id": "n-b1-iv-line",
+      "content": "6f327f6d1c9e9055f31bb17b7810d233fac5df816d452e9640b88c129a20face",
+      "questions": [
+        "7d6a05f63c92cb4091a24c4279e14e8e7ccc7400e83bfee99a163950c41f2d78",
+        "f3e31fee2da233bac0e51445c4602016a8afa73cd9c0b1362b215b6d489abfcc",
+        "5dc10630267acf1499690691b6e6175ac5e939a6c9da1a23f8e6d483e9d42fdf",
+        "7f16e862e24343e97f3ffdde9663662c1161d4c3efff1d1304768d7fdc4f4f19"
+      ]
+    },
+    {
+      "id": "n-b1-wound-home",
+      "content": "5d1f393b9241cd48fbe3357dde5da4fa59db60cc98f2ccc7b5e839af23c8c6d4",
+      "questions": [
+        "0feb6a3601be08b89986051ed880d49b059fa72e88b2105f56a431a4f362c50c",
+        "c87ff5f6e0556cae35727909794fcced7e2cfa837f55b51a6d75c336c0f94aec",
+        "d8a4a50a19d6fd838a51a7878c5ca409648e3bccbe7ecae7898870c2a6562b4c",
+        "ce5cd8339ee26fde05506f34ac7ff01209473394138a81a684f43bc123b45e8e"
+      ]
+    },
+    {
+      "id": "n-b1-med-rights",
+      "content": "5e515091f28a8d60affff85ed0313c8d08372a88ed106c172bc321db99099792",
+      "questions": [
+        "f41d94a82656efd6a0395457a032b8f95954dfbb4015a6ef3d5f401948d2ceb6",
+        "a06b106f0227eb699d41384efd089ef1ee6f38efbf339d5d4df8b0733ac7cc2d",
+        "28755cae443bb36e5900802adbca7ab1add6cc69f2dff7b5eb9f5abfff04705c",
+        "ccd895c10219d1ad8d5361bb58e42d652b2db9bc62dee5f4e6be71de5f563e1e"
+      ]
+    },
+    {
+      "id": "n-b1-stroke",
+      "content": "603a8b5aced67f72077312dd53ca03318f3a3faeb070c482744cf19137b2e5bb",
+      "questions": [
+        "ad3b550e62b950397a947daafd4a303fed28ee33625ebb11c31bc74cd76f4766",
+        "30c3991d500ded54bf8c84827c0a33172506b95864e46d292308d5bb01926ac0",
+        "9ebd9384d332bab9834568ac3a4cacba1b5bb8d943958f9ac005c8b7676e3b7c",
+        "ed4d4c5b24f5775a7c267d61109282363cc5b896fc84ff3e71210ced522bef2c"
+      ]
+    },
+    {
+      "id": "n-b1-cpr",
+      "content": "3ea84de6065981ec5ca3e1c20a980b98d83782da6a7bf8ca0f30ea7eaafd5038",
+      "questions": [
+        "715491ec73ce454155f4e17f86c0d2e42856e45f09535f7849d6cfdb167f3fac",
+        "908c83893256eace30169e3ab1c6532daac60dcc3fe7181e6652ffdde69fb9dd",
+        "cda0e75b37ec0a3941ff5b7cff9b0cbe8c770fded3a5421271aa5bf48d39103d",
+        "d74611dae22d223d888382ed4476a664f91fa5df2f654adf80e8e9887a1ceacb"
+      ]
+    },
+    {
+      "id": "n-b1-chemo-food",
+      "content": "11555b23f7901b39a4e4bfeb6f90effdef731caa7108e0549860c13033bc5a48",
+      "questions": [
+        "1dae80901280f96290cb41a2e62a3c448e44cb56c244865d5c248ccd3a822c4b",
+        "071b384dda760374feabca43038facf4025b28fe6e5c1e54be467cbf5d5c5526",
+        "064d7efa2c4ea5a5540038189f0c24e89e53e1300fde215941064b01541fa736",
+        "0b27338f93721095224a6d73e3ba49dfea3035a04c90914d9ebb1c901e4032b9"
+      ]
+    },
+    {
+      "id": "n-b1-bedside-handoff",
+      "content": "dd13aec8a813d2cc954b8893775ac23a829365db3b12a90311558881f49daee2",
+      "questions": [
+        "8dc89e579d351d61338e9fc793d956070ca7ce87781b62501922ba6fa5365a80",
+        "71f5a2f67967050e1e5a24af452ca9b33195ad4027adc8b8d3f8a31e69499a99",
+        "c5cc92857c54df3e481a94cd7269f893229aeab83fa14edd98d49de297f1be4e",
+        "64d449ea759a03607e299b0a8fd4698b455200405cb88206db0c185a2404c7a9"
+      ]
+    },
+    {
+      "id": "n-b1-job-interview",
+      "content": "aa637972c22fbe35e50b735392e72352ec8a5a865ae1f8a2673420cfce3f066a",
+      "questions": [
+        "6eb1eddd31824563409eeb3df7cd96a10d2c77c2ce695c819d87145bf0de7ee5",
+        "32a32c923cadd0a84eeaa864edcecf76103716915b684d6c79311c9ccb4ff8f6",
+        "af2c4828292f0dad9a1de26bbde54c85d0b33ad4dea13b30f76eb45481671486",
+        "c33036360a25eeb78159a9fdb4bbd4162077507e5a48f0bb6f253dbcb3619430"
+      ]
+    },
+    {
+      "id": "n-b1-patient-rights",
+      "content": "02ce9ace154558fb9e9d1b1fafc49d2419e74071526fe8fb4593b8ff323d43db",
+      "questions": [
+        "c9753878b084ab97ce946e0b0fa1ece83e534fcb2eda08bb81c5235535ffaee4",
+        "258baa17e75646b995706dd06eda961503363c5365637162d6cc5bd7e4dfae48",
+        "9dd360a41234d954fd5c3b126630e76422dba70b96eb2b2c490873793a7cc569"
+      ]
+    },
+    {
+      "id": "n-b2-nclex",
+      "content": "eb66bdd9e5187e74c4b92ed131cedc071d43108df33baddaa4c7ed7d01119a19",
+      "questions": [
+        "74c88a43cbcce3de2a8f454fd26396fbfcac5eb7d2b5ef61f86d829b06c6083e",
+        "ba65616101c17a56be7e7ffe866549502ec5643787f812c7a78ff9dcfa0f91b2",
+        "e4193102b832cbae2c6b7de1de3b8ccb282a96c36f7117185d0f1ebcf6b91ec9",
+        "309d6790b85fa7be47d8ae8b128e8ce9c0c854aba685de8f7c5cf6c3ef541cbf",
+        "f3c29931c5cdd6c74af6dd4a9590c786630ebe72685b1d85fa804d05ed0ca4d3"
+      ]
+    }
+  ]
+}

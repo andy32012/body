@@ -7,6 +7,7 @@ import { doneKey } from '../src/lib/passages.ts'
 import { baseForms, dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyOrder, storyProgress } from '../src/lib/story.ts'
 import { logSkill, practisedOn } from '../src/lib/bridge.ts'
 import { plainReadCount, QUESTION_PASSAGES, type ReadPassage } from '../src/lib/reading.ts'
+import { wordCount } from '../src/lib/writing.ts'
 
 const all = passageData as Passage[]
 
@@ -115,14 +116,14 @@ test('有題目的一般閱讀（A1–B1）篇數和 QUESTION_PASSAGES 一致，
   assert.equal(plainReadCount(notes), 3, '護理閱讀、單元閱讀和 B2 不算在內')
 })
 
-test('閱讀理解：A1、A2 各 15 篇，字數標示正確，每題三個不重複選項，證據句在同一段裡', () => {
+test('閱讀理解：A1、A2 各至少 36 篇，字數標示正確，每題不重複選項，證據句在同一段裡', () => {
   const all = reading as ReadPassage[]
-  for (const level of ['A1', 'A2'] as const) assert.ok(all.filter(p => p.level === level && !p.unit).length >= 15, level + ' 至少 15 篇')
+  for (const level of ['A1', 'A2'] as const) assert.ok(all.filter(p => p.level === level && !p.unit).length >= 36, level + ' 三小級各至少 12 篇')
   assert.equal(new Set(all.map(p => p.id)).size, all.length, 'id 不重複')
   for (const p of all.filter(x => x.level === 'A1' || x.level === 'A2')) {
-    const count = p.paras.join(' ').split(/\s+/).filter(Boolean).length
-    assert.ok(Math.abs(count - p.words) <= 2, p.id + ' 標的字數 ' + p.words + '，實際 ' + count)
-    assert.ok(p.level === 'A1' ? count <= 90 : count <= 140, p.id + ' 太長：' + count)
+    const count = wordCount(p.paras.join(' '))
+    assert.ok(Math.abs(count - p.words) <= 5, p.id + ' 標的字數 ' + p.words + '，實際 ' + count)
+    assert.ok(p.level === 'A1' ? count <= 100 : count <= 160, p.id + ' 超過這個級別最長的小級：' + count)
     assert.ok(p.zh.length > 30 && p.title && p.topic, p.id + ' 有標題、主題和中文大意')
     assert.ok(p.qs.length >= 4, p.id + ' 至少四題')
     for (const q of p.qs) {
