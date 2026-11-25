@@ -211,3 +211,18 @@ test('舊版更後面的已解鎖階段也保留；一次性匯入不改任何�
   assert.deepEqual(readWrite(upgraded.notes, 's1'), JSON.parse(original['write.s1']))
   assert.equal(migrateWritingProgress(stages, upgraded.notes), upgraded.notes, '已遷移時不改 notes')
 })
+
+test('開 App 時的一次性轉換只用原本的題目清單，不用載入整個 1,400 題的題庫，結果跟用完整題庫一樣', async () => {
+  const { legacyLadder, migrateWritingProgress, writingMigrationKey } = await import('../src/lib/writing.ts')
+  const { default: bank } = await import('../src/data/writing.json', { with: { type: 'json' } })
+  const full = bank.stages as import('../src/lib/writing.ts').WriteStage[]
+  for (const s of legacyLadder) {
+    const real = full.find(x => x.id === s.id)!
+    assert.ok(s.tasks.every(t => real.tasks.some(r => r.id === t.id)), s.id + ' 的原本題目都還在題庫裡')
+    assert.equal(!!s.ielts, !!real.ielts)
+  }
+  const rec = (best: number) => JSON.stringify({ day: '2026-11-20', words: 30, tries: 1, best })
+  const cases: Record<string, string>[] = [{}, { 'write.s1': rec(6) }, { 'write.s1': rec(6), 'write.s2': rec(6), 'write.p1': rec(4) },
+    { 'write.s1': rec(6), 'write.s2': rec(6), 'write.p1': rec(5), 'write.p2': rec(4), 'write.m1': rec(4) }]
+  for (const notes of cases) assert.equal(migrateWritingProgress(legacyLadder, notes)[writingMigrationKey], migrateWritingProgress(full, notes)[writingMigrationKey], JSON.stringify(notes))
+})

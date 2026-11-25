@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
-import data from '../data/writing.json'
 import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
@@ -16,7 +15,6 @@ import { RubricTable } from './RubricTable'
 import './grammar.css'
 import './writing.css'
 
-const stages = data.stages as WriteStage[]
 const outlines: Record<string, string[]> = {
   paragraph: ['Topic sentence：一句說整段要講什麼', 'First, …', 'Also / Second, …', 'Finally, …', 'Conclusion：For these reasons, …'],
   multi: ['第一段：開頭（打招呼／說出主題或立場）', '第二段：內容（理由、例子、經過）', '第三段：結尾（總結／請求／祝福）'],
@@ -54,7 +52,22 @@ function Graded({ fb }: { fb: WriteFeedback }) {
 }
 
 /** 寫作階梯: Claude grades each piece by the published table for its stage (全民英檢 or IELTS); IELTS tasks get a timer and a word target. */
-export default function WritingLadder({ state, onActivity, date, initialTask }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }) {
+type LadderProps = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }
+/** The bank (1,400 tasks) loads only when this page opens, so it does not slow down every start of the app. */
+export default function WritingLadder(props: LadderProps) {
+  const [stages, setStages] = useState<WriteStage[] | null>(null)
+  const [failed, setFailed] = useState(false)
+  useEffect(() => {
+    let alive = true
+    import('../data/writing.json').then(f => { if (alive) setStages(f.default.stages as WriteStage[]) }).catch(() => { if (alive) setFailed(true) })
+    return () => { alive = false }
+  }, [])
+  if (failed) return <p>寫作題目載入失敗，重新整理再試一次。</p>
+  if (!stages) return <p>載入中……</p>
+  return <Ladder {...props} stages={stages} />
+}
+
+function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & { stages: WriteStage[] }) {
   const suggested = suggestedStage(stages, state.notes)
   const unit = state.curriculum.unit
   // A stage opens once the one before it has two tasks done; the bridge stage and its tasks open with their units.
@@ -138,7 +151,7 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
     } catch (e) { if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(true) } }
     finally { if (mine === request.current) setBusy(false) }
   }
-  const stageDone = useMemo(() => Object.fromEntries(stages.map(s => [s.id, s.tasks.filter(t => taskDone(readWrite(state.notes, t.id), !!s.ielts)).length])), [state.notes])
+  const stageDone = useMemo(() => Object.fromEntries(stages.map(s => [s.id, s.tasks.filter(t => taskDone(readWrite(state.notes, t.id), !!s.ielts)).length])), [state.notes, stages])
   const bestText = rec?.best === undefined || rec.best > (stage.ielts ? 9 : 5) ? ''
     : stage.ielts ? '練習估計 ' + rec.best : sentencePoints ? Math.round(rec.best / 5 * sentencePoints) + ' / ' + sentencePoints + ' 分' : (Number.isInteger(rec.best) ? rec.best : rec.best.toFixed(1)) + ' / 5 級分'
 

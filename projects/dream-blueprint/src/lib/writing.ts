@@ -204,6 +204,15 @@ const stageComplete = (stage: WriteStage, notes: Record<string, string>) =>
  *  bypass the new intermediate stages. Existing write.<id> records and all storage keys stay untouched. */
 export const writingMigrationKey = 'migrate.writing-ladder-14'
 const legacyStageIds = ['sentence', 'paragraph', 'multi', 'task1', 'task2']
+/** The old ladder as it was before the extra steps (its 59 tasks minus the bridge), enough for the one-time snapshot,
+ *  so the app's start-up does not need the whole 1,400-task bank. Records from before the change can only be these. */
+const legacyTasks: Record<string, string[]> = {
+  sentence: ['s1', 's2', 's3', 's4'], paragraph: ['p1', 'p2', 'p3'], multi: ['m1', 'm2', 'm3'], task1: ['t1a', 't1b'], task2: ['t2a', 't2b', 't2c'],
+}
+export const legacyLadder: WriteStage[] = legacyStageIds.map(id => ({
+  id, name: id, goal: '', criteria: [], ...(id.startsWith('task') ? { ielts: true } : {}),
+  tasks: legacyTasks[id].map(t => ({ id: t, prompt: '', zh: '', min: 0, sample: '' })),
+}))
 function preservedWritingStages(stages: readonly WriteStage[], notes: Record<string, string>): string[] {
   if (notes[writingMigrationKey] !== undefined) {
     try {

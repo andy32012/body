@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import writing from '../data/writing.json'
 import {
   accentNames, hasPack, heldOpen, listenKey, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
   type HeldPart, type ListenRecord, type Pack, type PackListening,
@@ -15,7 +14,6 @@ import './unit-pack.css'
 
 type Tab = 'chunks' | 'read' | 'listen' | 'write' | 'speak' | 'test'
 const tabs: [Tab, string][] = [['chunks', '詞塊'], ['read', '閱讀'], ['listen', '聽力'], ['write', '寫作'], ['speak', '口說'], ['test', '回測']]
-const bridgeTasks = ((writing.stages as WriteStage[]).find(s => s.pack)?.tasks ?? []) as WriteTask[]
 const md = (d: string) => d.slice(5).replace('-', '/')
 const pct = (c: number, t: number) => Math.round(c / Math.max(1, t) * 100) + '%'
 
@@ -203,10 +201,13 @@ function HeldTest({ pack, state, onActivity, date }: { pack: Pack; state: PagePr
 /** 單元讀聽說寫：a bridge unit's skills pack — chunks, readings, a listening, writing and speaking tasks, and the held-out test. */
 export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
   const [packs, setPacks] = useState<Pack[] | null>(null)
+  const [bridgeTasks, setBridgeTasks] = useState<WriteTask[] | null>(null)
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     let alive = true
     import('../data/bridge.json').then(f => { if (alive) setPacks(f.default as Pack[]) }).catch(() => { if (alive) setFailed(true) })
+    // The writing bank is large: loaded here, only when a pack opens.
+    import('../data/writing.json').then(f => { if (alive) setBridgeTasks(((f.default.stages as WriteStage[]).find(s => s.pack)?.tasks ?? []) as WriteTask[]) }).catch(() => { if (alive) setFailed(true) })
     return () => { alive = false }
   }, [])
   const [tab, setTab] = useState<Tab>(() => fromHash().tab ?? 'chunks')
@@ -227,7 +228,7 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
   if (failed) return <p>單元教材載入失敗，重新整理再試一次。</p>
   if (unit === null) return <p className="ls-help">單元讀聽說寫從單元 {packUnits[0]} 開始，課程上到那裡才會打開。</p>
   const pack = packs?.find(p => p.unit === unit)
-  if (!pack) return <p>載入中……</p>
+  if (!pack || !bridgeTasks) return <p>載入中……</p>
   const cur = state.curriculum
   const notes = state.notes
   const rate = state.settings.speechRate

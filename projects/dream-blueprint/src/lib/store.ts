@@ -3,8 +3,7 @@ import { z } from 'zod'
 import { addDays, dayKey, type PeriodRange } from './progress'
 import { defaultSchool } from './school'
 import contentUpdates from '../data/content-updates.json'
-import writing from '../data/writing.json'
-import { migrateWritingProgress, writingMigrationKey, type WriteStage } from './writing'
+import { legacyLadder, migrateWritingProgress, writingMigrationKey } from './writing'
 import { compactState } from './compact'
 import { driveConnected } from './drive'
 
@@ -154,7 +153,7 @@ export function importBackup(raw:string):AppState {
       state.school.study=state.school.study.map(s=>({...s,minutes:s.weekday===0?0:90}))
     state.notes={...state.notes,'migrate.daily90':'1'}
   }
-  state.notes=migrateWritingProgress(writing.stages as WriteStage[],state.notes)
+  state.notes=migrateWritingProgress(legacyLadder,state.notes)
   applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
