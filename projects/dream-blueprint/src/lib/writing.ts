@@ -238,3 +238,25 @@ export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, 
 /** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
 export const writeTaskOpen = (task: Pick<WriteTask, 'unit'>, unit: number) => task.unit === undefined || reached(task.unit, unit)
 
+export interface WriteTaskPage {
+  label: string
+  tasks: { task: WriteTask; label: string }[]
+}
+/** Keep a large bank usable on a phone. Bridge pages stay within one unit; numbering never depends on task IDs.
+ *  These are display-only groups: original task order, IDs, saved answers and unit locks stay unchanged. */
+export function writingTaskPages(stage: WriteStage): WriteTaskPage[] {
+  const groups = stage.pack
+    ? [...new Set(stage.tasks.map(t => t.unit))].sort((a, b) => (a ?? 0) - (b ?? 0)).map(unit => stage.tasks.filter(t => t.unit === unit))
+    : [stage.tasks]
+  return groups.flatMap(tasks => {
+    const prefix = stage.pack && tasks[0]?.unit !== undefined ? '單元 ' + tasks[0].unit + '・' : ''
+    return Array.from({ length: Math.ceil(tasks.length / 10) }, (_, page) => {
+      const start = page * 10
+      return {
+        label: prefix + '第 ' + (start + 1) + '–' + Math.min(start + 10, tasks.length) + ' 題',
+        tasks: tasks.slice(start, start + 10).map((task, i) => ({ task, label: prefix + '題 ' + (start + i + 1) })),
+      }
+    })
+  })
+}
+

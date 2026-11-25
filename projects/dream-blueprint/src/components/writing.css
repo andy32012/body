@@ -8,9 +8,19 @@
 .wl-grammar h4 { margin: 0; font-size: 1rem; line-height: 1.6; }
 .wl-grammar-points { margin: 0; padding-inline-start: 1.25rem; display: grid; gap: .35rem; line-height: 1.7; }
 .practice-page .wl-grammar button.gm-say { width: 44px; min-height: 44px; }
+.wl-picker { display: grid; gap: .6rem; min-width: 0; }
+.wl-bank { margin: 0; font-size: .9rem; line-height: 1.65; }
+.wl-bank small { display: block; color: var(--practice-secondary); }
+.wl-pages { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: .4rem; }
+.wl-pages label { display: grid; gap: .2rem; min-width: 0; }
+.wl-range-label { font-size: .75rem; color: var(--practice-secondary); }
+.wl-pages select { width: 100%; min-width: 0; border: 1px solid var(--practice-line); border-radius: 10px; padding: .4rem; }
+.wl-pages button { min-height: 44px; padding: .4rem .6rem; font-size: .82rem; }
 .wl-tasks { display: flex; flex-wrap: wrap; gap: 6px; }
-.wl-tasks button { padding: 4px 12px; border-radius: 999px; font-size: .85rem; }
+.wl-tasks button { padding: 4px 12px; min-height: 44px; border-radius: 999px; font-size: .85rem; }
+.wl-tasks button[aria-pressed="true"] { background: var(--practice-accent-wash); border-color: var(--practice-accent); box-shadow: inset 0 0 0 1px var(--practice-accent); font-weight: 650; }
 .wl-task { display: grid; gap: .45rem; min-width: 0; }
+.wl-current { color: var(--practice-secondary); font-size: .82rem; }
 .wl-task h3 { margin: 0; font-size: 1.05rem; line-height: 1.5; }
 .wl-zh { margin: 0; opacity: .8; font-size: .92rem; }
 .wl-outline ol, .wl-criteria ul { margin: .35rem 0 0; padding-inline-start: 1.2rem; display: grid; gap: .2rem; font-size: .9rem; }

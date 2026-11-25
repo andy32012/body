@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import writing from '../src/data/writing.json' with { type: 'json' }
-import { checksFor, gradePrompt, migrateWritingProgress, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writingMigrationKey, type WriteStage } from '../src/lib/writing.ts'
+import { checksFor, essayKind, gradePrompt, migrateWritingProgress, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writeTaskOpen, writingMigrationKey, writingTaskPages, type WriteStage } from '../src/lib/writing.ts'
 import { createInitialState, exportBackup, importBackup } from '../src/lib/store.ts'
 import { packUnits } from '../src/lib/bridge.ts'
 
@@ -12,19 +12,19 @@ const notesFor = (ids: string[], best?: number) => Object.fromEntries(ids.map(id
 
 test('十四階從完整句逐步到雅思：題數、最低字數與官方評分表對應', () => {
   const expected = [
-    ['basic', 'gept-sentence', 5, 10], ['longer', 'gept-sentence', 5, 15],
-    ['negq', 'gept-sentence', 4, 15], ['yesterday', 'gept-sentence', 4, 20],
-    ['sentence', 'gept-sentence', 4], ['steps', 'gept-paragraph', 4, 40],
-    ['paragraph', 'gept-paragraph', 3], ['opinion', 'gept-paragraph', 4, 80],
-    ['multi', 'gept-essay', 3], ['numbers', 'gept-essay', 3, 80],
-    ['task1', 'ielts-task1', 2], ['twosides', 'gept-essay', 3, 150],
-    ['task2', 'ielts-task2', 3], ['bridge', 'gept-essay', 12],
+    ['basic', 'gept-sentence', 10], ['longer', 'gept-sentence', 15],
+    ['negq', 'gept-sentence', 15], ['yesterday', 'gept-sentence', 20],
+    ['sentence', 'gept-sentence'], ['steps', 'gept-paragraph', 40],
+    ['paragraph', 'gept-paragraph'], ['opinion', 'gept-paragraph', 80],
+    ['multi', 'gept-essay'], ['numbers', 'gept-essay', 80],
+    ['task1', 'ielts-task1'], ['twosides', 'gept-essay', 150],
+    ['task2', 'ielts-task2'], ['bridge', 'gept-essay'],
   ] as const
   assert.deepEqual(stages.map(s => s.id), expected.map(s => s[0]))
-  for (const [id, rubric, count, min] of expected) {
+  for (const [id, rubric, min] of expected) {
     const s = by(id)
     assert.equal(rubricFor(s).id, rubric, id)
-    assert.equal(s.tasks.length, count, id)
+    assert.ok(s.tasks.length >= 100, id + ' 至少 100 題')
     if (min !== undefined) assert.ok(s.tasks.every(t => t.min === min), id + ' 最低字數')
     assert.ok(s.goal.trim())
     if (min !== undefined) assert.ok(s.criteria.length >= 3 && s.criteria.length <= 5, id + ' 要求')
@@ -32,7 +32,7 @@ test('十四階從完整句逐步到雅思：題數、最低字數與官方評�
   assert.equal(stages.filter(s => s.pack).length, 1)
   assert.equal(by('bridge').pack, true)
   assert.deepEqual(stages.map(s => s.name[0]), [...'①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭'])
-  assert.equal(stages.reduce((total, s) => total + s.tasks.length, 0), 59)
+  assert.ok(stages.reduce((total, s) => total + s.tasks.length, 0) >= 1400)
 })
 
 test('每一階（含橋接）有文法重點、例句及可理解的改錯說明', () => {
@@ -53,12 +53,54 @@ test('題目 id 不重複、範文達字數；數字暖身有可畫的小圖表'
   for (const t of tasks) {
     assert.ok(t.prompt.trim() && t.zh.trim() && t.sample.trim(), t.id)
     assert.ok(wordCount(t.sample) >= t.min, t.id + ' 範文未達最低字數')
+    assert.doesNotMatch(t.sample, /\b(?:i|english)\b/, t.id + ' I 和 English 不可誤寫成小寫')
   }
-  for (const t of by('numbers').tasks) {
+  for (const s of stages) {
+    assert.equal(new Set(s.tasks.map(t => t.prompt.trim())).size, s.tasks.length, s.id + ' 題目不可重複')
+    assert.equal(new Set(s.tasks.map(t => t.sample.trim())).size, s.tasks.length, s.id + ' 範文要對應各題，不可整篇重複')
+  }
+  for (const t of [...by('numbers').tasks, ...by('task1').tasks]) {
     assert.ok(t.chart?.title.trim(), t.id + ' 圖表標題')
     assert.ok(t.chart.points.length >= 3, t.id + ' 圖表數據')
     assert.ok(t.chart.points.every(p => p.label.trim() && Number.isFinite(p.value)), t.id)
+    assert.equal(new Set(t.chart.points.map(p => p.label)).size, t.chart.points.length, t.id + ' 圖表標籤不能重複')
   }
+})
+
+test('小短文維持三至五句；雅思議論包含四種題型；橋接題量平均分配', () => {
+  for (const t of by('steps').tasks) {
+    const sentences = t.sample.split(/[.!?]+/).filter(s => s.trim()).length
+    assert.ok(sentences >= 3 && sentences <= 5, t.id + ' 用三至五句練習順序')
+  }
+  for (const kind of ['discuss', 'problem', 'advantages', 'extent']) {
+    assert.ok(by('task2').tasks.filter(t => essayKind(t.prompt) === kind).length >= 20, kind + ' 題型要有足夠練習')
+  }
+  for (const t of by('task2').tasks) assert.ok(essayKind(t.prompt), t.id + ' 題型要能提供正確結構提示')
+  for (const unit of packUnits) assert.ok(by('bridge').tasks.filter(t => t.unit === unit).length >= 16, '單元 ' + unit + ' 有足夠橋接加練')
+})
+
+test('百題選題分頁：每題都找得到、每頁最多十題、原始資料及作答 ID 不動', () => {
+  for (const s of stages) {
+    const before = JSON.stringify(s)
+    const pages = writingTaskPages(s)
+    const visible = pages.flatMap(p => p.tasks)
+    assert.ok(pages.every(p => p.tasks.length > 0 && p.tasks.length <= 10), s.id)
+    assert.equal(new Set(pages.map(p => p.label)).size, pages.length, s.id + ' 範圍名稱唯一')
+    assert.equal(new Set(visible.map(t => t.label)).size, s.tasks.length, s.id + ' 題號唯一')
+    assert.deepEqual(visible.map(t => t.task.id).sort(), s.tasks.map(t => t.id).sort(), s.id + ' 不少題也不重複')
+    for (const item of visible) assert.equal(item.task, s.tasks.find(t => t.id === item.task.id), '使用原題，不複製新 ID')
+    assert.equal(JSON.stringify(s), before, '分頁不改資料順序')
+    if (!s.pack) assert.deepEqual(visible.map(t => t.task.id), s.tasks.map(t => t.id))
+  }
+  const pages = writingTaskPages(by('bridge'))
+  for (const p of pages) {
+    assert.equal(new Set(p.tasks.map(t => t.task.unit)).size, 1, p.label + ' 不跨單元')
+    for (const { task } of p.tasks) {
+      assert.equal(writeTaskOpen(task, task.unit! - 1), false, task.id + ' 提前不能開')
+      assert.equal(writeTaskOpen(task, task.unit!), true, task.id + ' 上到當課可開')
+    }
+  }
+  assert.equal(pages[0].tasks[0].task.id, 'br43a', '舊橋接連結仍對到原題')
 })
 
 test('單句階段逐句評分：未指定項目就固定三句，指定項目與範文句數相符', () => {
@@ -73,7 +115,12 @@ test('單句階段逐句評分：未指定項目就固定三句，指定項目�
       assert.ok(parts.every(p => p.startsWith('用 ') && p.endsWith(' 的句子')), t.id)
       assert.equal(new Set(parts).size, parts.length, t.id + ' 指定項目不可重複')
     }
-    assert.equal(t.sample.split(/[.!?]+/).filter(s => s.trim()).length, parts.length, t.id + ' 範文示範每個指定句子')
+    const sentences = t.sample.split(/[.!?]+/).filter(s => s.trim())
+    assert.equal(sentences.length, parts.length, t.id + ' 範文示範每個指定句子')
+    if (specified) for (const [i, part] of parts.entries()) {
+      const target = part.match(/^用 (.+) 的句子$/)![1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      assert.match(sentences[i], new RegExp("(?:^|[^a-z'’])" + target + "(?=$|[^a-z'’])", 'i'), t.id + ' 範文第 ' + (i + 1) + ' 句要示範指定項目')
+    }
   }
   assert.deepEqual(sentenceParts({ prompt: 'Write three sentences. Use am, is, and are.' }), ['用 am 的句子', '用 is 的句子', '用 are 的句子'])
   assert.deepEqual(sentenceParts({ prompt: 'Write four sentences. Use am, is, are, and likes.' }), ['用 am 的句子', '用 is 的句子', '用 are 的句子', '用 likes 的句子'])

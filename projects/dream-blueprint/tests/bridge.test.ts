@@ -65,9 +65,14 @@ test('橋接單元：每一包的閱讀、回測、聽力、寫作、口說、�
     assert.equal(p.speak.length, 2)
     assert.ok(p.speak.every(s => s.title && s.zh && s.en), tag + ' 口說任務')
   }
-  // Every bridge passage and task belongs to a pack: nothing is left over.
+  // Every bridge passage and task belongs to a pack. The two assigned writing tasks stay in each pack;
+  // the expanded writing ladder also offers extra practice with that same unit and grammar focus.
   assert.deepEqual(passages.filter(p => p.unit).map(p => p.id).sort(), packs.flatMap(p => [...p.reading, p.heldReading]).sort())
-  assert.deepEqual(bridgeStage.tasks.map(t => t.id).sort(), packs.flatMap(p => p.write).sort())
+  for (const task of bridgeStage.tasks) {
+    const pack = packs.find(p => p.unit === task.unit)
+    assert.ok(pack, task.id + ' 必須屬於既有橋接單元')
+    assert.equal(task.focus, pack.focus, task.id + ' 文法必須與該單元一致')
+  }
 })
 
 test('橋接寫作：不搶寫作階梯的建議，第一個評分項目寫出這一課的文法', () => {

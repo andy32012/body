@@ -7,6 +7,7 @@ import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
+import { chartBounds } from '../lib/chart'
 import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
@@ -222,9 +223,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
 }
 
 export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']> }) {
-  const values = chart.points.map(p => p.value)
-  const min = Math.min(...values), max = Math.max(...values)
-  const lo = Math.floor((min - (max - min) * 0.25) / 5) * 5, hi = Math.ceil((max + (max - min) * 0.25) / 5) * 5
+  const { lo, hi } = chartBounds(chart.points.map(p => p.value))
   const W = 320, H = 150, L = 34, R = 12, T = 14, B = 26
   const x = (i: number) => L + (W - L - R) * (chart.points.length === 1 ? 0.5 : i / (chart.points.length - 1))
   const y = (v: number) => T + (H - T - B) * (1 - (v - lo) / Math.max(1, hi - lo))

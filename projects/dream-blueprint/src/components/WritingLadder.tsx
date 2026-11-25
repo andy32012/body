@@ -5,7 +5,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
@@ -67,6 +67,10 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
   const firstOpen = firstOpenTask(stage)
   const [taskId, setTaskId] = useState(() => fromPack && initialTask && fromPack.id === stage.id ? initialTask : firstOpen.id)
   const task = stage.tasks.find(t => t.id === taskId && writeTaskOpen(t, unit)) ?? firstOpen
+  const pages = useMemo(() => writingTaskPages(stage), [stage])
+  const [pageIndex, setPageIndex] = useState(() => pages.findIndex(p => p.tasks.some(t => t.task.id === task.id)))
+  const taskPage = pages[pageIndex] ?? pages[0]
+  useEffect(() => { setPageIndex(pages.findIndex(p => p.tasks.some(t => t.task.id === task.id))) }, [pages, task.id])
   const draftKey = 'write.' + task.id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [busy, setBusy] = useState(false)
@@ -167,12 +171,24 @@ export default function WritingLadder({ state, onActivity, date, initialTask }: 
         </section>}
       </div>
     </details>}
-    {stage.tasks.length > 1 && <div className="wl-tasks" role="group" aria-label="題目">{stage.tasks.map((t, i) => {
-      const open = writeTaskOpen(t, unit)
-      return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} data-locked={!open} title={open ? undefined : '上到單元 ' + t.unit + ' 才打開'} onClick={() => setTaskId(t.id)}>
-        {!open && '🔒 '}{stage.pack && t.unit ? '單元 ' + t.unit + (t.id.endsWith('a') ? '-1' : '-2') : '題 ' + (i + 1)}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
-    })}</div>}
+    {stage.tasks.length > 1 && <section className="wl-picker" aria-label="選擇寫作題目">
+      <p className="wl-bank">這一階共 {stage.tasks.length} 題・已過關 {stageDone[stage.id]} 題
+        <small>{stage.pack ? '依單元選題，上到該單元才打開。' : '通過 ' + stageTarget(stage) + ' 題就能往下一階，其餘可以慢慢加練。'}</small></p>
+      {pages.length > 1 && <div className="wl-pages">
+        <button type="button" aria-label="前一組題目" disabled={pageIndex <= 0} onClick={() => setPageIndex(i => i - 1)}>上一組</button>
+        <label><span className="wl-range-label">選題範圍</span><select aria-label="選題範圍" value={Math.max(0, pageIndex)} onChange={e => setPageIndex(Number(e.target.value))}>
+          {pages.map((p, i) => <option key={p.label} value={i}>{p.label}{p.tasks.every(t => !writeTaskOpen(t.task, unit)) ? '（未解鎖）' : ''}</option>)}
+        </select></label>
+        <button type="button" aria-label="下一組題目" disabled={pageIndex >= pages.length - 1} onClick={() => setPageIndex(i => i + 1)}>下一組</button>
+      </div>}
+      <div className="wl-tasks" role="group" aria-label="題目">{taskPage?.tasks.map(({ task: t, label }) => {
+        const open = writeTaskOpen(t, unit)
+        return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} data-locked={!open} title={open ? t.zh : '上到單元 ' + t.unit + ' 才打開'} onClick={() => setTaskId(t.id)}>
+          {!open && '🔒 '}{label}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
+      })}</div>
+    </section>}
     <section className="wl-task">
+      <small className="wl-current">目前作答：{pages.flatMap(p => p.tasks).find(t => t.task.id === task.id)?.label}</small>
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>
       {task.chart && <MiniChart chart={task.chart} />}

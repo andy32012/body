@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "tsx --test tests/*.test.*",
+    "test": "node --import tsx --test tests/*.test.*",
     "check:offline": "node scripts/check-offline.mjs",
     "words:pace": "tsx scripts/words-pace.ts"
   },

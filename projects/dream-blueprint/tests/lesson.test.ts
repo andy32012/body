@@ -274,11 +274,12 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   assert.equal(readWrite({ 'write.t1a': JSON.stringify({ day: '', words: 0, tries: 1, best: 99 }) }, 't1a')?.best, undefined)
   assert.equal(taskDone({ day: '', words: 0, tries: 1, best: 7 }, false), false, '1–5 分的階段，7 分是壞紀錄')
   assert.equal(readWrite({ 'write.s1': JSON.stringify({ day: '', words: 0, tries: 1, last: { criteria: 'oops' } }) }, 's1')?.last, undefined)
-  // Task 2 三種題目各有自己的結構：問題＋解決方法題不用表態。
+  // Task 2 保留原本三題，擴充後涵蓋四種題型：問題＋解決方法題不用表態。
   const { essayKind, criteriaFor } = await import('../src/lib/writing.ts')
   const t2 = (w.stages as Parameters<typeof suggestedStage>[0]).find(s => s.id === 'task2')!
-  assert.deepEqual(t2.tasks.map(t => essayKind(t.prompt)), ['discuss', 'problem', 'extent'])
-  const t2b = criteriaFor(t2, t2.tasks[1])[0]
+  assert.deepEqual(['t2a', 't2b', 't2c'].map(id => essayKind(t2.tasks.find(t => t.id === id)!.prompt)), ['discuss', 'problem', 'extent'])
+  assert.deepEqual(new Set(t2.tasks.map(t => essayKind(t.prompt))), new Set(['discuss', 'problem', 'extent', 'advantages']))
+  const t2b = criteriaFor(t2, t2.tasks.find(t => t.id === 't2b')!)[0]
   assert.match(t2b, /問題和解決方法/)
   assert.doesNotMatch(t2b, /立場/)
   assert.equal(wordCount('Résumé café 37.5 well-known'), 4)
