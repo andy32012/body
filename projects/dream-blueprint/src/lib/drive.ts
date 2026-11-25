@@ -153,8 +153,17 @@ export async function loadDriveState(): Promise<{ state: string | null; savedAt:
   if (!json) return null
   return { state: typeof json.state === 'string' && json.state ? json.state : null, savedAt: Number(json.savedAt) || 0 }
 }
-/** Saves only if the cloud still holds the snapshot this device started from (`base`), unless `force` (a chosen overwrite). */
-export async function saveDriveState(state: string, savedAt: number, base = cloudBase(), force = false) {
+/** Saves run one at a time. Two saves in flight together used to send the same `base`: the second was refused as stale
+ *  by the cloud holding the first one — this device's own save — and syncing paused as a "conflict" with itself. */
+let saving: Promise<void> = Promise.resolve()
+/** Saves only if the cloud still holds the snapshot this device started from (`base`, read when the save runs), unless
+ *  `force` (a chosen overwrite). */
+export function saveDriveState(state: string, savedAt: number, base?: number, force = false): Promise<void> {
+  const run = saving.then(() => saveNow(state, savedAt, base ?? cloudBase(), force))
+  saving = run.catch(() => {})
+  return run
+}
+async function saveNow(state: string, savedAt: number, base: number, force: boolean) {
   if (!read()) return
   if (cloudConflict() && !force) return
   try {
@@ -166,15 +175,22 @@ export async function saveDriveState(state: string, savedAt: number, base = clou
     // A chosen overwrite asks the script to keep the cloud copy in its history first (v3; older scripts ignore it).
     const json = await post({ type: 'state', state, savedAt, ...(force ? { snapshot: true } : { base }) })
     if (json?.history === true) markHistory()
+    // Refused because the cloud holds a copy this device saved itself (an older tab or a save that raced): not a conflict.
+    if (json?.error === 'stale' && ownSaves().includes(Number(json.savedAt)) && !force) return saveNow(state, savedAt, Number(json.savedAt), true)
     if (json?.error === 'stale') { markConflict(Number(json.savedAt) || 0); return }
     if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
     setCloudBase(savedAt)
+    rememberOwnSave(savedAt)
     setStatus(true, '學習進度已存到雲端硬碟')
   } catch (e) {
     setStatus(false, '同步失敗：' + (e instanceof Error ? e.message : String(e)) + '，下次有變動會再試')
   }
 }
 export function noteSynced(message: string) { setStatus(true, message) }
+/** The last few save times this device wrote to the cloud, to tell its own saves from another device's. */
+const OWN = 'dream-blueprint.cloud-own'
+export function ownSaves(): number[] { try { const v = JSON.parse(localStorage.getItem(OWN) || '[]'); return Array.isArray(v) ? v.filter((n): n is number => typeof n === 'number') : [] } catch { return [] } }
+function rememberOwnSave(at: number) { try { localStorage.setItem(OWN, JSON.stringify([...ownSaves().filter(n => n !== at), at].slice(-20))) } catch { /* optional */ } }
 
 /** One string to copy to another device. */
 export function syncCode() {

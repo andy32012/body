@@ -59,3 +59,29 @@ test('連上後要用哪一份：新裝置直接載入雲端，兩邊都改過�
   assert.equal(syncDecision(1000, 1000, 1000), 'none')
   assert.equal(syncDecision(1000, 1000, 2000), 'push')
 })
+
+test('連續存兩次（第一次還沒回來就又改了）：不會把自己存的那份當成另一台，同步不會暫停', async () => {
+  const { saveDriveState, cloudConflict, cloudBase } = await import('../src/lib/drive')
+  store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
+  store.set('dream-blueprint.cloud-cas', '1')
+  store.set('dream-blueprint.cloud-base', '1000')
+  store.delete('dream-blueprint.cloud-conflict')
+  // The script: refuses a save whose base is not what the cloud holds now (unless it is a chosen overwrite), slowly.
+  let cloudAt = 1000
+  const realFetch = globalThis.fetch
+  globalThis.fetch = (async (_u: string, init?: { body?: string }) => {
+    const b = JSON.parse(init?.body ?? '{}')
+    await new Promise(r => setTimeout(r, 20))
+    if (b.type !== 'state') return { json: async () => ({ ok: true }) }
+    if (!b.snapshot && b.base !== cloudAt) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloudAt }) }
+    cloudAt = b.savedAt
+    return { json: async () => ({ ok: true, state: true }) }
+  }) as typeof fetch
+  Object.assign(globalThis, { window: { dispatchEvent() {} } })
+  try {
+    await Promise.all([saveDriveState('{"a":1}', 2000), saveDriveState('{"a":2}', 3000)])
+    assert.equal(cloudConflict(), null, '沒有暫停同步')
+    assert.equal(cloudAt, 3000, '最後那份存上去了')
+    assert.equal(cloudBase(), 3000)
+  } finally { globalThis.fetch = realFetch }
+})
