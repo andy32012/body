@@ -5,14 +5,36 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
     // the learner has chosen to leave the current view, never during an answer.
     const entry = document.querySelector('script[type="module"][src]')?.src;
     let nextRelease = false;
+    // A new release is ready: a small button says so on any page, and one tap switches to it. It also switches by itself
+    // on leaving the current view, or on coming back to the app after five minutes away (drafts are saved as he types).
+    const showUpdate = () => {
+      try {
+        if (!document.body || document.getElementById("dream-update")) return;
+        const button = document.createElement("button");
+        button.id = "dream-update";
+        button.type = "button";
+        button.textContent = "新版本好了，點一下更新";
+        button.setAttribute("style", "position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top));z-index:9999;white-space:nowrap;" +
+          "border:0;border-radius:999px;padding:11px 20px;font:600 15px/1.3 system-ui,sans-serif;color:#1d1440;background:#d9ccff;" +
+          "box-shadow:0 6px 24px rgba(0,0,0,.35);cursor:pointer;max-width:calc(100vw - 32px)");
+        button.addEventListener("click", () => window.location.reload());
+        document.body.appendChild(button);
+      } catch { /* Not a page that can show it. */ }
+    };
     navigator.serviceWorker.addEventListener("message", event => {
       if (event.source !== navigator.serviceWorker.controller || event.data?.type !== "APP_SHELL") return;
       const nextEntry = event.data.script;
       nextRelease = Boolean(entry && nextEntry && new URL(nextEntry, scriptUrl).href !== entry);
+      if (nextRelease) showUpdate();
     });
     const view = url => new URL(url).hash.slice(1).split("/")[0] || "today";
     window.addEventListener("hashchange", event => {
       if (nextRelease && view(event.oldURL) !== view(event.newURL)) window.location.reload();
+    });
+    let hiddenAt = 0;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
+      if (nextRelease && hiddenAt && Date.now() - hiddenAt >= 5 * 60000) window.location.reload();
     });
     const primeCover = () => {
       const controller = navigator.serviceWorker.controller;
@@ -36,6 +58,7 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
     document.addEventListener("visibilitychange", check);
     window.addEventListener("online", () => registration.update().catch(() => {}));
     window.setInterval(check, 30 * 60000);
+    window.setTimeout(() => registration.update().catch(() => {}), 15000);
   }).catch(() => {
     // Private browsing can block offline storage. Online practice stays available.
   });

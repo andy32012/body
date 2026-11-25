@@ -137,19 +137,25 @@ test("切換版本會等到離開目前頁面，讓進行中的練習保留原�
     addEventListener: (name, handler) => workerEvents.set(name, handler)
   };
   let reloads = 0;
+  const shown = [];
   vm.runInNewContext((await read("register-sw.js")).toString(), {
+    Date,
     URL,
     navigator: { serviceWorker: worker },
     window: {
       isSecureContext: true,
       addEventListener: (name, handler) => windowEvents.set(name, handler),
       setInterval() {},
+      setTimeout() {},
       location: { reload() { reloads++; } }
     },
     document: {
       currentScript: { src: scope + "register-sw.js" },
       querySelector: () => ({ src: scope + installed }),
-      addEventListener() {}
+      addEventListener() {},
+      body: { appendChild: node => shown.push(node) },
+      getElementById: () => shown[0] ?? null,
+      createElement: () => ({ setAttribute() {}, addEventListener() {} })
     },
     performance: { getEntriesByType: () => [] }
   });
@@ -158,7 +164,11 @@ test("切換版本會等到離開目前頁面，讓進行中的練習保留原�
   const navigate = (from, to) => windowEvents.get("hashchange")({oldURL: scope + from, newURL: scope + to});
   announce(installed);
   navigate("#today", "#practice/normal");
+  assert.equal(shown.length, 0, "同一版不出現更新按鈕");
   announce("assets/index-next.js");
+  assert.equal(shown.length, 1, "新版本好了：出現「點一下更新」");
+  announce("assets/index-next.js");
+  assert.equal(shown.length, 1, "按鈕只出現一個");
   workerEvents.get("controllerchange")();
   navigate("#practice/normal", "#practice/high");
   assert.equal(reloads, 0);
