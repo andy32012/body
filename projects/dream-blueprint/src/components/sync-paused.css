@@ -1,0 +1,13 @@
+/* The page-wide notice while cloud syncing is paused (two devices changed the progress). */
+.sync-paused { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; padding: 12px 14px; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, #f2b36b 55%, transparent); background: color-mix(in srgb, #f2b36b 14%, var(--space-card, var(--panel))); color: var(--text); }
+.sync-paused > svg { flex: none; color: #f2b36b; }
+.sync-paused > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.sync-paused b { font-size: 15px; }
+.sync-paused small { font-size: 13px; line-height: 1.5; color: var(--muted); }
+.sync-paused button { flex: none; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 0; font-weight: 650; font-size: 14px; cursor: pointer;
+  background: #f2c48d; color: #2a1a05; }
+.sync-paused button:disabled { opacity: .6; cursor: default; }
+.sync-done { border-color: color-mix(in srgb, var(--mint) 50%, transparent); background: color-mix(in srgb, var(--mint) 12%, var(--space-card, var(--panel))); font-size: 14px; line-height: 1.5; }
+.sync-done button { background: var(--mint); color: #0c2a20; }
+@media (max-width: 600px) { .sync-paused { flex-wrap: wrap; } .sync-paused > div { flex-basis: calc(100% - 32px); } .sync-paused button { margin-left: 32px; } }

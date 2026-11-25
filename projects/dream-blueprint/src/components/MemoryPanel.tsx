@@ -6,7 +6,7 @@ import {
   appsScriptCode, archiveFolderUrl, cloudArchive, cloudCas, cloudConflict, cloudHistory, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
   importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type DriveMemory, type HistoryEntry,
 } from '../lib/drive'
-import { keepThisCopy, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
+import { keepThisCopy, mergeWithCloud, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
 import './pair.css'
 
 /** On a connected device: a QR code that connects a phone or iPad in one scan. */
@@ -122,8 +122,9 @@ export default function MemoryPanel() {
       <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存：「記憶」是她們記住的事、「進度」是整份學習進度（課表、單字、複習卡、勾選、作答紀錄），有變動 5 秒後自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>
       <p>手機只留最近的紀錄：太舊的複習紀錄、每天的小紀錄、舊課的批改全文，會先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了才從手機拿掉，封存的檔案不會被刪{cloudArchive() ? '。' : '（雲端小程式要 v4，照下面「更新雲端小程式」做一次）。'}{archiveFolderUrl() && <> <a href={archiveFolderUrl()} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</p>
       {conflict && <div className="set-warn" role="alert">
-        <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。為了不互相蓋掉，兩份都先留著，請選一份：</p>
+        <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。按「兩份合併」兩台做過的都會留下（課表接在比較後面那一天）；也可以只留一份：</p>
         <div className="set-actions">
+          <button type="button" disabled={busy} onClick={() => choose(mergeWithCloud)}>兩份合併（建議）</button>
           <button type="button" disabled={busy} onClick={() => choose(takeCloudCopy)}>用雲端那份（這台的先下載成備份）</button>
           <button type="button" disabled={busy} onClick={() => choose(keepThisCopy)}>用這台這份（雲端的先下載成備份）</button>
         </div>

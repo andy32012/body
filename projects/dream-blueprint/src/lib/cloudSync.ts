@@ -3,6 +3,7 @@
  * Nothing is thrown away: when one copy replaces the other, the replaced copy is downloaded as a backup file first.
  */
 import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified } from './store'
+import { mergeStates } from './merge'
 import {
   addHistory, clearConflict, cloudBase, cloudStatus, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
 } from './drive'
@@ -62,6 +63,27 @@ export async function takeCloudCopy() {
   restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt); clearConflict()
   noteSynced('已換成雲端硬碟的進度（這台原本的進度已下載成備份檔）')
   return '已換成雲端硬碟的進度。這台原本的進度下載成備份檔了，需要時可以到「備份」匯入。'
+}
+/** Keep both: this device's progress and the cloud copy merged into one, saved here and to the cloud. This device's copy
+ *  is downloaded first and the cloud copy goes into the cloud history, so nothing can be lost. */
+export async function mergeWithCloud() {
+  const remote = await loadDriveState()
+  if (!remote?.state) throw new Error('雲端硬碟裡沒有進度可以合併。')
+  const theirs = importBackup(remote.state)
+  const mine = getSnapshot().state
+  download(backupName('this-device'), exportBackup(mine))
+  // Checked as a progress file before anything changes. The store applies a restore a moment later, so the merged copy
+  // itself (not the store's snapshot) is what goes to the cloud.
+  const merged = importBackup(JSON.stringify(mergeStates(mine, theirs, localModified() >= remote.savedAt)))
+  const now = Date.now()
+  restoreBackup(JSON.stringify(merged), now)
+  clearConflict()
+  const since = Date.now()
+  await saveDriveState(JSON.stringify(merged), now, remote.savedAt, true)
+  failedSince(since)
+  noteSynced('兩份進度已合併，也存到雲端硬碟了')
+  const c = merged.curriculum
+  return '兩份合併好了：兩台做過的都留著，課表接在單元 ' + c.unit + ' 第 ' + c.day + ' 天。這台原本的進度也下載成備份檔了。'
 }
 /** Keep this device's copy; the cloud copy is downloaded first, then overwritten on purpose. */
 export async function keepThisCopy() {
