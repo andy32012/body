@@ -166,8 +166,10 @@ test("切換版本會等到離開目前頁面，讓進行中的練習保留原�
   navigate("#today", "#practice/normal");
   assert.equal(shown.length, 0, "同一版不出現更新按鈕");
   announce("assets/index-next.js");
+  await new Promise(resolve => setImmediate(resolve));
   assert.equal(shown.length, 1, "新版本好了：出現「點一下更新」");
   announce("assets/index-next.js");
+  await new Promise(resolve => setImmediate(resolve));
   assert.equal(shown.length, 1, "按鈕只出現一個");
   workerEvents.get("controllerchange")();
   navigate("#practice/normal", "#practice/high");

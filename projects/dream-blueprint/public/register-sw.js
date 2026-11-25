@@ -24,8 +24,13 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
     navigator.serviceWorker.addEventListener("message", event => {
       if (event.source !== navigator.serviceWorker.controller || event.data?.type !== "APP_SHELL") return;
       const nextEntry = event.data.script;
-      nextRelease = Boolean(entry && nextEntry && new URL(nextEntry, scriptUrl).href !== entry);
-      if (nextRelease) showUpdate();
+      const differs = Boolean(entry && nextEntry && new URL(nextEntry, scriptUrl).href !== entry);
+      if (!differs) { nextRelease = false; document.getElementById?.("dream-update")?.remove?.(); return; }
+      // A worker installed before this page was published reports an older entry: ask the site which one is current, so
+      // the page that is already the newest never offers an "update". Offline, trust the worker.
+      Promise.resolve(window.fetch ? window.fetch(new URL("./index.html", scriptUrl), { cache: "no-store" }).then(r => r.text()) : "")
+        .then(html => !html.includes(new URL(entry).pathname.split("/").pop()), () => true)
+        .then(newer => { nextRelease = newer; if (newer) showUpdate(); });
     });
     const view = url => new URL(url).hash.slice(1).split("/")[0] || "today";
     window.addEventListener("hashchange", event => {
