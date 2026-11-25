@@ -2,8 +2,9 @@
 .pr-pane .pr-options.rd-levels, .pr-pane .pr-options.rd-bands { display: grid; gap: .45rem; min-width: 0; max-width: 100%; align-items: stretch; }
 .pr-pane .pr-options.rd-bands { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .pr-pane .rd-levels button, .pr-pane .rd-bands button { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: .2rem; min-width: 0; padding: .65rem .3rem; white-space: normal; overflow-wrap: anywhere; }
+.pr-pane .rd-levels button[data-locked="true"], .pr-pane .rd-bands button[data-locked="true"] { opacity: 1; color: var(--practice-secondary); }
 .pr-pane .rd-levels small, .pr-pane .rd-bands small { font-size: .75rem; font-weight: 500; letter-spacing: 0; line-height: 1.5; }
-.rd-levels .lock-line, .rd-bands .lock-line { display: block; margin-top: .15rem; }
+.rd-levels .lock-line, .rd-bands .lock-line { display: block; margin-top: .15rem; opacity: 1; }
 .rd-levels .lock-line svg, .rd-bands .lock-line svg { display: inline; margin-inline-end: .2rem; vertical-align: -.1em; }
 .rd-band-note { margin: 0; font-size: .85rem; line-height: 1.65; color: var(--practice-secondary); }
 .rd-passage { display: grid; gap: .55rem; padding: .9rem 1rem; border-radius: 12px; background: var(--practice-inset, rgba(127,127,127,.08)); min-width: 0; }
