@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121216">
+  <meta name="description" content="打一個英文單字或句子，馬上聽它怎麼念：男生女生、美式英式、慢慢念、一個字母一個字母拼，還能錄自己的聲音跟它比。">
+  <title>發音模擬器 · Body</title>
+  <link rel="stylesheet" href="pronounce.css?v=1">
+  <script type="module" src="app.js?v=1"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <div class="page">
+    <header class="top">
+      <a class="back" href="../"><span aria-hidden="true">←</span> Body</a>
+      <span class="kicker" lang="en">SAY IT</span>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="title">
+        <div class="hero-art" aria-hidden="true"><b lang="en">Aa</b><i></i><i></i><i></i></div>
+        <div>
+          <h1 id="title">發音模擬器</h1>
+          <p class="lead">打英文單字或句子，按一下就念給你聽。</p>
+        </div>
+      </section>
+
+      <form id="say-form" class="say-box" autocomplete="off">
+        <label for="say-input" class="visually-hidden">要念的英文</label>
+        <input id="say-input" name="text" lang="en" type="text" inputmode="text" enterkeyhint="go"
+               autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="200"
+               placeholder="例如 beautiful">
+        <button id="clear-btn" class="clear" type="button" aria-label="清除" hidden>×</button>
+        <button id="say-btn" class="say-btn" type="submit"><span class="play" aria-hidden="true"></span>念給我聽</button>
+      </form>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <section id="stage" class="stage" aria-label="正在念的內容" hidden>
+        <p id="words" class="words" lang="en"></p>
+        <p class="hint">點任何一個字，可以只聽那個字。</p>
+        <div class="actions">
+          <button id="again-btn" type="button">再念一次</button>
+          <button id="slow-btn" type="button">慢慢念</button>
+          <button id="spell-btn" type="button">拼字念</button>
+          <button id="repeat-btn" type="button">連念 3 遍</button>
+          <button id="stop-btn" type="button" class="ghost">停</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="settings-title">
+        <h2 id="settings-title">聲音設定</h2>
+        <div class="setting">
+          <span class="setting-name" id="gender-label">誰來念</span>
+          <div class="seg" role="radiogroup" aria-labelledby="gender-label" data-setting="gender">
+            <button type="button" role="radio" data-value="female">女生</button>
+            <button type="button" role="radio" data-value="male">男生</button>
+          </div>
+        </div>
+        <div class="setting">
+          <span class="setting-name" id="accent-label">口音</span>
+          <div class="seg" role="radiogroup" aria-labelledby="accent-label" data-setting="accent">
+            <button type="button" role="radio" data-value="us">美式</button>
+            <button type="button" role="radio" data-value="uk">英式</button>
+          </div>
+        </div>
+        <div class="setting">
+          <span class="setting-name" id="speed-label">速度</span>
+          <div class="seg" role="radiogroup" aria-labelledby="speed-label" data-setting="speed">
+            <button type="button" role="radio" data-value="normal">正常</button>
+            <button type="button" role="radio" data-value="slow">慢慢念</button>
+            <button type="button" role="radio" data-value="slower">超慢</button>
+          </div>
+        </div>
+        <p id="voice-note" class="voice-note"></p>
+        <details class="more-voices">
+          <summary>自己挑聲音</summary>
+          <label for="voice-select" class="visually-hidden">英文聲音</label>
+          <select id="voice-select"><option value="">自動幫我挑</option></select>
+        </details>
+      </section>
+
+      <section class="panel" aria-labelledby="record-title">
+        <h2 id="record-title">跟著念，錄下來比比看</h2>
+        <p class="panel-lead">先聽它念，再錄你自己念一次，聽聽哪裡不一樣。錄音只存在這台手機，不會上傳。</p>
+        <div class="actions">
+          <button id="rec-btn" type="button" class="rec"><span class="dot" aria-hidden="true"></span><span id="rec-label">開始錄我的聲音</span></button>
+          <button id="mine-btn" type="button" disabled>聽我念的</button>
+          <button id="compare-btn" type="button" disabled>先聽它、再聽我</button>
+        </div>
+        <audio id="mine-audio" hidden></audio>
+      </section>
+
+      <section class="panel" aria-labelledby="list-title">
+        <h2 id="list-title">最近念過</h2>
+        <div id="history" class="chips" lang="en"><span class="empty" lang="zh-Hant">念過的字會出現在這裡。</span></div>
+        <h2 class="sub">先從這些開始</h2>
+        <div id="starters" class="chips" lang="en"></div>
+      </section>
+
+      <noscript><p class="status">請開啟 JavaScript 才能使用發音模擬器。</p></noscript>
+    </main>
+  </div>
+</body>
+</html>

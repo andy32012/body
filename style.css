@@ -32,7 +32,7 @@ nav a:hover { color: white; text-decoration: underline; text-underline-offset: 5
     "discover discover discover discover discover discover"
     "lang lang lang comic comic vocab"
     "lang lang lang comic comic progress"
-    "nursing nursing nursing nursing nursing practice";
+    "nursing nursing nursing nursing say practice";
   gap: var(--gap);
 }
 .tile, .hello-panel { position: relative; isolation: isolate; overflow: hidden; border-radius: var(--radius); }
@@ -117,6 +117,15 @@ section[id], a[id] { scroll-margin-top: 10px; }
 .steps i:nth-child(1) { height: 36%; }
 .steps i:nth-child(2) { height: 65%; }
 .steps i:nth-child(3) { height: 96%; }
+.say { grid-area: say; aspect-ratio: 1; align-self: center; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; padding: clamp(14px, 1.65vw, 23px); color: #3e2208; background: radial-gradient(ellipse at 85% 10%, #fff3dc, transparent 55%), linear-gradient(150deg, #ffe2b8, #ffb867); }
+.say h2 { font-size: clamp(16px, 1.55vw, 22px); line-height: 1.3; letter-spacing: -.035em; }
+.say p { margin-top: 3px; font-size: clamp(12px, .99vw, 14px); line-height: 1.45; color: #6b3d12; }
+.say-art { position: relative; display: grid; place-items: center; width: 74%; aspect-ratio: 1.55; margin: auto; border-radius: 26%; background: #3e2208; color: #ffd9a5; }
+.say-art b { font: 800 clamp(22px, 2.6cqw, 34px)/1 Inter, "Segoe UI", Arial, sans-serif; letter-spacing: -.06em; margin-right: 26%; }
+.say-art i { position: absolute; top: 50%; right: 13%; aspect-ratio: 1; border: 3px solid transparent; border-right-color: #ffb867; border-radius: 50%; transform: translateY(-50%); }
+.say-art i:nth-of-type(1) { height: 22%; }
+.say-art i:nth-of-type(2) { height: 42%; right: 8%; opacity: .7; }
+.say-art i:nth-of-type(3) { height: 62%; right: 3%; opacity: .4; }
 .dream, .nursing { display: flex; color: #fff; padding: var(--pad); }
 .dream {
   grid-area: dream;
@@ -180,7 +189,7 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .frame { max-width: 730px; }
   .board {
     grid-template-columns: repeat(3,minmax(0,1fr));
-    grid-template-areas: "dream dream dream" "discover discover discover" "lang lang lang" "comic comic vocab" "comic comic progress" "nursing nursing practice";
+    grid-template-areas: "dream dream dream" "discover discover discover" "lang lang lang" "comic comic vocab" "comic comic progress" "nursing nursing practice" "say say say";
   }
   .discovery-row { grid-template-columns: 180px minmax(0, 1fr); }
   .america-card-copy { gap: 13px; }
@@ -199,6 +208,11 @@ section[id], a[id] { scroll-margin-top: 10px; }
   .dream img { width: 77%; min-width: 310px; right: -12%; }
   .nursing { min-height: clamp(143px, 29cqw, 195px); align-items: flex-end; }
   .pulse { width: 85%; height: 43%; top: 12%; }
+  .say { aspect-ratio: auto; flex-direction: row; align-items: center; justify-content: flex-start; gap: clamp(14px, 4cqw, 26px); min-height: clamp(104px, 20cqw, 140px); }
+  .say-art { flex: none; width: clamp(92px, 22cqw, 140px); margin: 0; }
+  .say-art b { font-size: clamp(26px, 6.5cqw, 40px); }
+  .say h2 { font-size: clamp(20px, 5cqw, 28px); }
+  .say p { font-size: clamp(13px, 3.4cqw, 16px); }
 }
 @media (max-width: 520px) {
   :root { --gap: 9px; --radius: 18px; --pad: 16px; }
