@@ -8,7 +8,7 @@ import { useModal } from '../lib/modal'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import './baseline.css'
 
-import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
+import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, setResultFeedback, speakingFeedbackOk, wordCount, writingFeedbackOk, type BaselineResult, type Form, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
 
 /** Pops up on the home page when the level test is due. Either button keeps it away for the rest of the day; while it is due,
@@ -50,6 +50,30 @@ const FEEDBACK ='你是英文老師，評一位台灣護理系學生（英文約
 // A transcript shows words and grammar only: no level, no pronunciation, no fluency estimate from it.
 const SPEAK_FEEDBACK = '你是英文老師。下面是一位台灣護理系學生（英文約國中程度）口說的語音辨識逐字稿，可能有辨識錯字。用繁體中文、口語、很短：第一行固定寫「只看逐字稿：發音、流暢度和停頓沒有評估」；接著兩個做得好的地方（內容、用字、文法）、兩個最該先改的地方（附正確說法）。不要寫 CEFR、雅思分數或任何等級。總共不超過 6 行，不要 Markdown 標題。'
 
+/** Claude's comment on the test's writing, only in the asked-for form (otherwise nothing is kept and he can ask again). */
+async function writingFeedback(form: Form, text: string) {
+  const reply = await askTutor(FEEDBACK, [{ role: 'user', content: '題目：' + form.write + '\n作品：' + text }])
+  if (!writingFeedbackOk(reply)) throw new Error('Claude 這次沒有照格式回（第一行要寫大約 CEFR 幾級，再列做得好和要改的地方），這次不存，再按一次。')
+  return reply.trim()
+}
+async function speakingFeedback(form: Form, transcript: string, seconds: number) {
+  const reply = await askTutor(SPEAK_FEEDBACK, [{ role: 'user', content: '題目：' + form.speak + '\n逐字稿（約 ' + seconds + ' 秒）：' + transcript }])
+  if (!speakingFeedbackOk(reply)) throw new Error('Claude 這次沒有照格式回（第一行要寫只看逐字稿，再列做得好和要改的地方），這次不存，再按一次。')
+  return reply.trim()
+}
+/** A comment that didn't come (Claude out of reach, a reply in the wrong form): asked for again on the saved work. */
+function AskAgain({ label, ask, onSave }: { label: string; ask: () => Promise<string>; onSave: (text: string) => void }) {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  return <div className="bl-again">
+    <button type="button" disabled={busy} onClick={async () => {
+      setBusy(true); setErr('')
+      try { onSave(await ask()) } catch (e) { setErr(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+    }}>{busy ? 'Claude 在看……' : label}</button>
+    {err && <small role="alert">{err}</small>}
+  </div>
+}
+
 function Quiz({ qs, answers, setAnswers }: { qs: Q[]; answers: number[]; setAnswers: (a: number[]) => void }) {
   return <ol className="bl-qs">{qs.map((q, i) => <li key={i}>
     <p lang="en">{q.q}</p>
@@ -70,6 +94,10 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   const [plays, setPlays] = useState(0)
   // Plays that were heard to the end: pressing 播放 alone is not having listened (a cut-off clip is not counted).
   const [heard, setHeard] = useState(0)
+  // Each test form gets its own listening count: a clip still playing from the last form never counts for the next one.
+  const playRun = useRef(0)
+  const resetListening = () => { playRun.current++; if ('speechSynthesis' in window) speechSynthesis.cancel(); setPlays(0); setHeard(0) }
+  const [notice, setNotice] = useState('')
   const [listen, setListen] = useState<number[]>([])
   const [read, setRead] = useState<number[]>([])
   // What he wrote stays on this device until the test is saved (leaving the page or closing the test keeps it).
@@ -99,7 +127,8 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     if (!('speechSynthesis' in window) || plays >= 2) return
     const u = new SpeechSynthesisUtterance(form.listen)
     u.lang = 'en-US'; u.rate = 0.9
-    u.onend = () => { if (alive.current) setHeard(n => n + 1) }
+    const run = playRun.current
+    u.onend = () => { if (alive.current && playRun.current === run) setHeard(n => n + 1) }
     speechSynthesis.cancel(); speechSynthesis.speak(u)
     setPlays(plays + 1)
   }
@@ -153,13 +182,16 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     }
     setSaving(true); setBusy('整理結果中……')
     let transcript = '', speakFeedback = '', writeFeedback = ''
-    try {
-      if (audio) transcript = await transcribe(audio)
-      if (tutorKey()) {
-        if (writing.trim()) writeFeedback = await askTutor(FEEDBACK, [{ role: 'user', content: '題目：' + form.write + '\n作品：' + writing }])
-        if (transcript) speakFeedback = await askTutor(SPEAK_FEEDBACK, [{ role: 'user', content: '題目：' + form.speak + '\n逐字稿（約 ' + seconds + ' 秒）：' + transcript }])
-      }
-    } catch { /* keep whatever we have */ }
+    // Each part on its own: a failed transcript or comment never takes the others with it, and the work is saved anyway.
+    const missed: string[] = []
+    if (audio) {
+      try { transcript = await transcribe(audio) } catch { /* below */ }
+      if (!transcript) missed.push(openaiKey() ? '口說沒有轉成文字（這次只記秒數）' : '沒有 OpenAI 金鑰，口說沒有轉成文字（這次只記秒數）')
+    }
+    if (tutorKey()) {
+      if (writing.trim()) { try { writeFeedback = await writingFeedback(form, writing) } catch { missed.push('寫作的 Claude 回饋') } }
+      if (transcript) { try { speakFeedback = await speakingFeedback(form, transcript, seconds) } catch { missed.push('口說的 Claude 回饋') } }
+    }
     const result: BaselineResult = {
       form: formId, date: dayKey(), listening, plays: heard, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
       writing: { text: writing, feedback: writeFeedback },
@@ -167,7 +199,8 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     }
     update(prev => ({ ...prev, notes: addResult(prev.notes, result) }))
     setBusy(''); setSaving(false); setOpen(false); setStep(0)
-    setListen([]); setRead([]); setWriting(''); clearDraft(draftKey); setAudio(null); setSeconds(0); setPlays(0)
+    setListen([]); setRead([]); setWriting(''); clearDraft(draftKey); setAudio(null); setSeconds(0); resetListening()
+    setNotice(missed.length ? '結果存好了，但這次沒拿到：' + missed.join('、') + '。Claude 的回饋可以在下面「看每次的聽力稿、作品和回饋」裡按「請 Claude 看」補上。' : '')
   }
 
   if (results.length && !open) {
@@ -176,6 +209,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     const sign = (n: number) => (n > 0 ? '+' : '') + n
     const name = (r: BaselineResult) => r === first ? '起點' : '第 ' + results.indexOf(r) + ' 次回測'
     return <section className="bl-card">
+      {notice && <p className="bl-note" role="status">{notice}</p>}
       <header><strong>英文程度紀錄</strong><span>{retest.due ? '可以回測了' : '下次回測：' + retest.date + '（還有 ' + retest.days + ' 天）'}</span></header>
       <div className="bl-table-wrap"><table className="bl-table">
         <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.date + r.form}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}{r.repeat ? '（做過）' : ''}</small></th>)}</tr></thead>
@@ -198,13 +232,17 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
           <ListenScript form={forms[r.form ?? 'A']} />
           <p className="bl-label">寫作</p><p lang="en" className="bl-work">{r.writing.text || '（沒寫）'}</p>
           {r.writing.feedback.split('\n').map((l, i) => l.trim() ? <p key={i}>{l}</p> : null)}
+          {r.writing.text.trim() && !r.writing.feedback && tutorKey() && <AskAgain label="請 Claude 看這篇寫作" ask={() => writingFeedback(forms[r.form ?? 'A'], r.writing.text)}
+            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r, 'writing', t) }))} />}
           <p className="bl-label">口說逐字稿</p><p lang="en" className="bl-work">{r.speaking.transcript || '（沒有逐字稿）'}</p>
           {r.speaking.feedback.split('\n').map((l, i) => l.trim() ? <p key={i}>{l}</p> : null)}
+          {r.speaking.transcript.trim() && !r.speaking.feedback && tutorKey() && <AskAgain label="請 Claude 看這段口說" ask={() => speakingFeedback(forms[r.form ?? 'A'], r.speaking.transcript, r.speaking.seconds)}
+            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r, 'speaking', t) }))} />}
         </div>)}
       </details>
       {retest.due
-        ? <button type="button" className="bl-main" onClick={() => setOpen(true)}>開始第 {results.length} 次回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}，約 15 分鐘）</button>
-        : <button type="button" className="bl-early" onClick={() => setOpen(true)}>想提早回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}）</button>}
+        ? <button type="button" className="bl-main" onClick={() => { resetListening(); setNotice(''); setOpen(true) }}>開始第 {results.length} 次回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}，約 15 分鐘）</button>
+        : <button type="button" className="bl-early" onClick={() => { resetListening(); setNotice(''); setOpen(true) }}>想提早回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}）</button>}
       <small>每次換一份新題本，題型、長度和作答條件都一樣（聽力最多聽 2 次、不看字；寫作和口說不查字典、不用翻譯）。題目不同，差一兩題可能只是題目難易，比較「寫得多不多、說得長不長、需要的幫忙有沒有變少」更準。只拿來和自己比，不代表正式程度或雅思分數。</small>
     </section>
   }
@@ -212,7 +250,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   if (!open) return <section className="bl-card">
     <header><strong>先做一次起點測驗</strong><span>約 15 分鐘</span></header>
     <p>聽力、閱讀各 3 題，再寫幾句、講一分鐘。結果會留下來，12 週後用新題目比較，看自己到底進步多少。</p>
-    <button type="button" className="bl-main" onClick={() => setOpen(true)}>開始</button>
+    <button type="button" className="bl-main" onClick={() => { resetListening(); setOpen(true) }}>開始</button>
   </section>
 
   const steps = ['聽力', '閱讀', '寫作', '口說']

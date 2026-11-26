@@ -9,7 +9,7 @@ import { dayKey } from "../lib/progress";
 import { answered, clauseCommaNote, compareWithReference, matchesReference, sameEnglish, type Verdict } from "../lib/evidence";
 import StuckButton from "./StuckButton";
 import { useTaskContext } from "../lib/taskContext";
-import { sentenceFrame, type HintUse } from "../lib/lesson";
+import { raiseHelp, sentenceFrame, type HintUse } from "../lib/lesson";
 import type { Sentence } from "../lib/todayLesson";
 
 /** How he marks his own answer (styles in pages/practice.css). */
@@ -59,10 +59,15 @@ export function Translation({
   const keyed = !!tutorKey();
   const [sendNow, setSendNow] = useState(false);
   const [claudeDown, setClaudeDown] = useState(false);
+  // The help used so far, always the latest: a check that comes back late carries the values from when it was sent,
+  // and raiseHelp keeps whatever was opened since (hints only go up).
+  const help = useRef<HintUse>(raiseHelp({ h: saved?.h ?? 0, r: !!saved?.r || (saved?.h ?? 0) >= 2 }, { v: saved?.v, vt: saved?.vt, c: saved?.c }));
   function record(h: number, r: boolean, v = firstVerdict, c = askedHelp, vt = checkedText) {
-    setHintLevel(h);
-    setSeen(r);
-    onHint?.({ h, r, ...(v ? { v } : {}), ...(v && vt !== undefined ? { vt } : {}), ...(c ? { c } : {}) });
+    const next = raiseHelp(help.current, { h, r, v, c, vt });
+    help.current = next;
+    setHintLevel(next.h);
+    setSeen(next.r);
+    onHint?.(next);
   }
   const verdictStale = !!firstVerdict && checkedText !== undefined && !sameEnglish(checkedText, answer);
   useTaskContext({

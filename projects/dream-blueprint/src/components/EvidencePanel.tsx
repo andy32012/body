@@ -2,11 +2,11 @@ import { useState } from 'react'
 import curriculum from '../data/curriculum.json'
 import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
-import { bestLevel, checkPending, levelNames, readEvidence, sourceNames, teacherVerdict, unitsWithEvidence, type Evidence } from '../lib/evidence'
+import { bestLevel, checkPending, levelNames, pendingRef, readEvidence, sourceNames, teacherReason, teacherVerdict, unitsWithEvidence, type Evidence, type PendingRef } from '../lib/evidence'
 
-const CHECK = '你是英文老師。判斷學生的英文是否正確表達了題目的意思（文法正確、意思對就算對，不必跟參考答案一樣）。第一個字只能是「對」或「錯」；錯的話，後面用繁體中文一句話說原因。'
+const CHECK = '你是英文老師。判斷學生的英文是否正確表達了題目的意思（文法正確、意思對就算對，不必跟參考答案一樣）。只回兩行：第一行「判定：對」或「判定：錯」；第二行「原因：」後面用繁體中文一句話說為什麼（對也要說為什麼對）。'
 
-function Pending({ e, onCheck }: { e: Evidence; onCheck: (reply: string, rewrite?: string) => void }) {
+function Pending({ e, onCheck }: { e: Evidence; onCheck: (ref: PendingRef, reply: string, rewrite?: string) => void }) {
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
   const [text, setText] = useState(e.answer ?? '')
@@ -14,13 +14,15 @@ function Pending({ e, onCheck }: { e: Evidence; onCheck: (reply: string, rewrite
   async function ask() {
     setBusy(true); setMsg('')
     const answer = rewriting ? text.trim() : e.answer ?? ''
+    // The check belongs to this answer as it is now; the list may move while Claude answers.
+    const ref = pendingRef(e)
     try {
       const reply = (await askTutor(CHECK, [{ role: 'user', content: '題目：' + (e.prompt ?? '') + '\n參考：' + (e.ref ?? '') + '\n學生：' + answer }])).trim()
       const verdict = teacherVerdict(reply)
-      setMsg(verdict === 'unclear' ? 'Claude 的回覆看不出對或錯，這題先不動，等一下再按一次。' : reply.split('\n')[0])
+      setMsg(verdict === 'unclear' ? 'Claude 這次沒有照格式回答（要先寫「判定：對／錯」，再寫原因），這題先不動，再按一次。' : 'Claude：' + (verdict === 'right' ? '對' : '要改') + '。' + teacherReason(reply))
       // One confirmed answer is 當次獨立完成; 延後換題 needs new sentences days later (the unit checkpoint). A wrong answer
       // stays here with the reason until he rewrites it right.
-      if (verdict !== 'unclear') setTimeout(() => onCheck(reply, rewriting ? answer : undefined), 1800)
+      if (verdict !== 'unclear') setTimeout(() => onCheck(ref, reply, rewriting ? answer : undefined), 1800)
     } catch { setMsg('沒連上 Claude，等一下再試。') } finally { setBusy(false) }
   }
   return <div className="ev-pending">
@@ -57,7 +59,7 @@ export default function EvidencePanel({ state, update }: Pick<PageProps, 'state'
           <span data-level={write ?? ''}>寫：{write ? levelNames[write] : '還沒有'}</span>
           <span data-level={listen ?? ''}>聽：{listen ? (listen === 'assisted' ? '只聽還沒全對' : '只聽也懂') : '還沒有'}</span>
         </div>
-        {pending.map(({ e, i }) => <Pending key={i + (e.wrong ?? '')} e={e} onCheck={(reply, rewrite) => update(prev => ({ ...prev, notes: checkPending(prev.notes, u, i, reply, rewrite) }))} />)}
+        {pending.map(({ e, i }) => <Pending key={i + (e.wrong ?? '')} e={e} onCheck={(ref, reply, rewrite) => update(prev => ({ ...prev, notes: checkPending(prev.notes, u, ref, reply, rewrite) }))} />)}
       </li>
     })}</ul>
   </section>

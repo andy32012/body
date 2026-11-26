@@ -36,24 +36,31 @@ export function setEvidenceLevel(notes: Record<string, string>, unit: number, in
   list[index] = { ...list[index], level, answer: undefined, prompt: undefined, ref: undefined }
   return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }
-/** How Claude's check of a 待確認 answer reads: it must start with 對 or 錯; anything else is not a verdict. */
+/** How Claude's check of a 待確認 answer reads: a 「判定：對」 or 「判定：錯」 line and a 「原因：」 line that says why.
+ *  Anything else (「對不起，…」, a bare 「對。」, no reason) is not a verdict. */
 export function teacherVerdict(reply: string): 'right' | 'wrong' | 'unclear' {
-  const t = reply.trim()
-  return /^對/.test(t) ? 'right' : /^錯/.test(t) ? 'wrong' : 'unclear'
+  const v = reply.match(/^\s*判定[：:]\s*(對|錯)\s*[。.]?\s*$/m)?.[1]
+  return v && teacherReason(reply) ? (v === '對' ? 'right' : 'wrong') : 'unclear'
 }
+/** The 原因 line of Claude's check. */
+export const teacherReason = (reply: string) => reply.match(/^\s*原因[：:]\s*(.+)$/m)?.[1].trim() ?? ''
+/** Which 待確認 answer a check was sent for: the item and the exact answer, so a reply never lands on another one. */
+export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer'>
+export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.source, item: e.item, answer: e.answer })
 /** A 待確認 answer after Claude's check. Right the first time → done alone; right after a rewrite (it was wrong before)
  *  → done with help. Wrong → still not done, with the reason, the question and his answer kept so he can rewrite it.
- *  Unclear → nothing changes. */
-export function checkPending(notes: Record<string, string>, unit: number, index: number, reply: string, rewrite?: string) {
+ *  Unclear → nothing changes. The check lands on the answer it was sent for, found by its item and answer (the list may
+ *  have moved while Claude was answering); if that answer is gone or was changed meanwhile, nothing changes. */
+export function checkPending(notes: Record<string, string>, unit: number, ref: PendingRef, reply: string, rewrite?: string) {
   const verdict = teacherVerdict(reply)
   const list = readEvidence(notes, unit)
+  const index = list.findIndex(e => e.level === 'pending' && e.day === ref.day && e.source === ref.source && e.item === ref.item && e.answer === ref.answer)
   const e = list[index]
   if (!e || verdict === 'unclear') return notes
   if (verdict === 'right') {
     list[index] = { ...e, level: e.wrong || rewrite !== undefined ? 'assisted' : 'independent', answer: undefined, prompt: undefined, ref: undefined, wrong: undefined }
   } else {
-    const reason = reply.trim().replace(/^錯[。，、：:\s]*/, '').split('\n')[0] || '還要再改'
-    list[index] = { ...e, level: 'pending', wrong: reason, ...(rewrite !== undefined ? { answer: rewrite } : {}) }
+    list[index] = { ...e, level: 'pending', wrong: teacherReason(reply) || '還要再改', ...(rewrite !== undefined ? { answer: rewrite } : {}) }
   }
   return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }

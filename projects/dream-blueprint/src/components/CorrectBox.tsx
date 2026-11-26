@@ -9,6 +9,7 @@ import { correctionPrompt, parseCorrection, verdictNames, type Result } from '..
 export type { Result } from '../lib/correction'
 import { RubricScore } from './RubricTable'
 import { checkSequence } from '../lib/checks'
+import { sameEnglish } from '../lib/evidence'
 import './tutor.css'
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
@@ -52,6 +53,10 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   const lastCheck = useRef(0)
   useEffect(() => { const c = checks.current; c.open(); return () => c.close() }, [])
   const setWaiting = (on: boolean) => { setBusy(on); onBusy?.(on) }
+  // One check at a time: pressing again while one is on its way sends nothing (each check is a paid request).
+  const inFlight = useRef(false)
+  // The text the shown check is about: a draft edited afterwards is marked as not checked yet.
+  const [graded, setGraded] = useState(() => restore?.answer ?? '')
   async function send(next: TutorTurn[], first: boolean, mine = lastCheck.current) {
     const current = () => checks.current.isCurrent(mine)
     setWaiting(true); setError(''); setRaw('')
@@ -77,15 +82,17 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
       // A reply cut off or declined is Claude answering badly once, not Claude out of reach: pressing again is the way on.
       if (!(e instanceof ClaudeIncomplete)) onError?.()
     }
-    finally { if (current()) setWaiting(false) }
+    finally { if (first) inFlight.current = false; if (current()) setWaiting(false) }
   }
 
   useEffect(() => {
-    if (!run) return
+    if (!run || inFlight.current) return
     setResult(null); setQuestion(''); setTurns([]); setError(''); setRaw(''); setSaved([]); setHints(selfFix ? 1 : -1)
     if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); return }
     if (!answer.trim()) { setError('先寫一點英文再按批改。'); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
+    inFlight.current = true
+    setGraded(answer.trim())
     lastCheck.current = checks.current.start()
     setTurns(first); void send(first, true, lastCheck.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,6 +104,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
     {busy && !result && <p className="tu-wait">{rubric ? 'Claude 照評分表批改中……' : 'Claude 批改中……'}</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
     {raw && <details className="tu-raw"><summary>看 Claude 這次回了什麼</summary><p>{raw}</p></details>}
+    {result && graded && !sameEnglish(graded, answer) && <p className="tu-help tu-stale">下面是你改之前那一版的批改（<span lang="en">{graded}</span>）；改過的這一版還沒批改，再按一次批改就會看新的。</p>}
     {result && previous?.fixes.length && (result.resolved || result.still) ? <ul className="tu-progress" aria-label="上次的問題">
       {previous.fixes.map((f, i) => {
         const ok = result.resolved?.includes(i) ?? false

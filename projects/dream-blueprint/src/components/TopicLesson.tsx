@@ -7,7 +7,7 @@ import { Translation } from './Translation'
 import CorrectBox, { type Result } from './CorrectBox'
 import StuckButton from './StuckButton'
 import { Transcript, useDialogueVoice } from './LessonParts'
-import { answered, judgeExpress, judgeWritten, levelNames, sameEnglish, type Level, type Verdict } from '../lib/evidence'
+import { answered, judgeExpress, judgeWritten, levelNames, type Level, type Verdict } from '../lib/evidence'
 import { readHints, sentenceFrame, writeHint } from '../lib/lesson'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { tutorKey } from '../lib/tutor'
@@ -15,8 +15,8 @@ import { openaiKey } from '../lib/voice'
 import { addSayCard } from '../lib/sayCards'
 import { useTaskContext } from '../lib/taskContext'
 import {
-  completePart, countSentences, judgeReview, judgeSpeak, partNames, partSteps, readTopic, reviewFrom, speakGoals, writeTopic,
-  type ItemResult, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence,
+  completePart, countSentences, judgeReview, judgeSpeak, openVerdict, partNames, partSteps, readTopic, reviewFrom, speakGoals, withCheck, writeTopic,
+  type ItemResult, type OpenCheck, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence,
 } from '../lib/topics'
 import './lesson.css'
 import './topic.css'
@@ -342,27 +342,22 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
 /** Help and Claude's first check for an open answer, kept in the record so a reload does not reset them.
  *  The check belongs to the exact text Claude saw: after a "good", an edited answer is unchecked again. */
 function useOpenTask(rec: TopicRecord, key: string, save: Save) {
-  const saved = rec.open?.[key] ?? { help: [] as string[] }
-  const [help, setHelp] = useState<string[]>(saved.help)
-  const [firstVerdict, setFirst] = useState<Verdict | undefined>(saved.firstVerdict)
-  const [checkedText, setChecked] = useState<string | undefined>(saved.checkedText)
+  const [check, setCheck] = useState<OpenCheck>(() => rec.open?.[key] ?? { help: [] })
   const sent = useRef('')
-  const persist = (next: { help: string[]; firstVerdict?: Verdict; checkedText?: string }) => save(r => ({ open: { ...r.open, [key]: next } }))
-  const stale = (text: string) => firstVerdict === 'good' && checkedText !== undefined && !sameEnglish(checkedText, text)
+  const keep = (next: OpenCheck) => { setCheck(next); save(r => ({ open: { ...r.open, [key]: next } })) }
   return {
-    help, firstVerdict, stale,
+    help: check.help, firstVerdict: check.firstVerdict,
+    /** The text was edited after Claude's 「good」 and nobody has checked the edited one. */
+    stale: (text: string) => check.firstVerdict === 'good' && openVerdict(check, text) === undefined,
     /** Remember what was sent, so the reply is tied to that text. */
     send(text: string) { sent.current = text },
-    /** The first verdict, if it still applies to this text. */
-    verdictFor: (text: string) => stale(text) ? undefined : firstVerdict,
+    /** The verdict that counts for this text (see openVerdict). */
+    verdictFor: (text: string) => openVerdict(check, text),
     addHelp(kind: string) {
-      if (help.includes(kind)) return
-      const next = [...help, kind]; setHelp(next); persist({ help: next, ...(firstVerdict ? { firstVerdict, checkedText } : {}) })
+      if (check.help.includes(kind)) return
+      keep({ ...check, help: [...check.help, kind] })
     },
-    setVerdict(v: Verdict) {
-      if (firstVerdict) return
-      setFirst(v); setChecked(sent.current); persist({ help, firstVerdict: v, checkedText: sent.current })
-    },
+    setVerdict(v: Verdict, text = sent.current) { keep(withCheck(check, v, text)) },
   }
 }
 
@@ -387,7 +382,7 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
     {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{L.retellSample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
     <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
-      onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)} />
+      onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)} />
     <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { clearDraft(key); onDone(judgeExpress({ answered: true, help: open.help, firstVerdict: open.verdictFor(text) })) }}>完成聽力</button>
       <button type="button" className="pr-link" onClick={() => onDone(null)}>先跳過重述</button>
@@ -554,7 +549,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <CorrectBox run={run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
       reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
       onReveal={() => open.addHelp('sample')}
-      onResult={(v, _n, r) => { open.setVerdict(v); setResult(r) }}
+      onResult={(v, _n, r, sentText) => { open.setVerdict(v, sentText); setResult(r) }}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>說完後勾一下：我有做到</legend>
       {task.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
@@ -612,7 +607,7 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
     {open.help.includes('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{W.sample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
     <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
-      onReveal={() => open.addHelp('sample')} onResult={v => open.setVerdict(v)}
+      onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>寫完勾一下：我有寫到</legend>
       {W.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}

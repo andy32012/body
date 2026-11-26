@@ -135,3 +135,24 @@ test('朗讀照官方時間：整個朗讀部分一起默讀 1 分鐘，初級 1
   assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4 }, 'intermediate', {}, 2), false, '中級還要看圖敘述')
   assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4, p: 3 }, 'intermediate', {}, 2), true)
 })
+
+test('英檢口說的批改要有分數和理由、每一題剛好一則回饋、好和改各一句才計分（審核 R012）', async () => {
+  const { parseGeptFeedback, geptFeedbackComplete } = await import('../src/lib/gept.ts')
+  const items = (n: number) => Array.from({ length: n }, (_, i) => '[題] ' + (i + 1) + ' ||| 回答到了').join('\n')
+  const full = '[分數] 4 ||| 大部分回答完整，文法小錯\n' + items(7) + '\n[好] 每題都有回答\n[改] 時態要統一'
+  assert.equal(geptFeedbackComplete(parseGeptFeedback(full), 7), true)
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4.5'), 7), false, '只有一個數字')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4\n' + items(7) + '\n[好] 好\n[改] 改'), 7), false, '分數沒有理由')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 6 ||| 很好\n' + items(7) + '\n[好] 好\n[改] 改'), 7), false, '分數超過 5')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4 ||| 理由\n' + items(6) + '\n[好] 好\n[改] 改'), 7), false, '少一題')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4 ||| 理由\n' + items(6) + '\n[題] 6 ||| 重複\n[好] 好\n[改] 改'), 7), false, '題號重複')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4 ||| 理由\n' + items(6) + '\n[題] 9 ||| 題號不對\n[好] 好\n[改] 改'), 7), false, '題號不在題目裡')
+  assert.equal(geptFeedbackComplete(parseGeptFeedback('[分數] 4 ||| 理由\n' + items(7) + '\n[改] 改'), 7), false, '少了做得好的地方')
+})
+
+test('自己的照片要有提示問題和描述才拿來練；不完整就留在原來的圖（審核 R013）', async () => {
+  const { parsePhotoQuestions, photoQuestionsComplete } = await import('../src/lib/gept.ts')
+  assert.equal(photoQuestionsComplete(parsePhotoQuestions('[問] Where is the book?')), false, '只有一題、沒有描述')
+  assert.equal(photoQuestionsComplete(parsePhotoQuestions('[問] Where are they?\n[問] What are they doing?\n[問] How do they feel?\n[問] Have you done this?')), false, '沒有描述')
+  assert.equal(photoQuestionsComplete(parsePhotoQuestions('[問] Where are they?\n[問] What are they doing?\n[問] How do they feel?\n[問] Have you done this?\n[描述] Two students study at a desk in a library.')), true)
+})

@@ -2,11 +2,11 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { correctionPrompt, parseCorrection } from '../src/lib/correction.ts'
 
-const reply = (o: object) => JSON.stringify({ corrected: 'I am a nurse.', fixes: [], ...o })
+const reply = (o: object) => JSON.stringify({ corrected: 'I am a nurse.', fixes: [], reason: '符合表上這一級的描述', ...o })
 
 test('批改照評分表：判定跟著分數，最高一級才算全對', () => {
   assert.deepEqual(parseCorrection(reply({ verdict: 'good', score: 4, reason: '符合第 4 級' }), 'gept-translation')?.verdict, 'small')
-  const top = parseCorrection(reply({ verdict: 'small', score: 5, reason: '幾乎沒錯' }), 'gept-translation')
+  const top = parseCorrection(reply({ verdict: 'good', score: 5, reason: '幾乎沒錯' }), 'gept-translation')
   assert.equal(top?.verdict, 'good')
   assert.equal(top?.score, 5)
   assert.equal(top?.reason, '幾乎沒錯')
@@ -26,13 +26,24 @@ test('分數不在表上、沒給分：那一次不算判定（不會留下「�
   assert.equal(parseCorrection('nope', 'gept-translation'), null)
 })
 
+test('有評分表的批改缺判定、缺理由、改寫是空的都不算；判定和分數打架時照比較嚴的（審核 R004）', () => {
+  assert.equal(parseCorrection(JSON.stringify({ corrected: 'I am a nurse.', score: 5, reason: '很好' }), 'gept-translation'), null, '沒有判定')
+  assert.equal(parseCorrection(reply({ verdict: 'good', score: 5, reason: '' }), 'gept-translation'), null, '理由是空的')
+  assert.equal(parseCorrection(reply({ verdict: 'good', score: 5, reason: undefined }), 'gept-translation'), null, '沒有理由')
+  assert.equal(parseCorrection(reply({ corrected: ' ', verdict: 'good', score: 5 }), 'gept-translation'), null, '改寫是空的')
+  assert.equal(parseCorrection(reply({ corrected: '', verdict: 'good' })), null, '沒有評分表也要有改寫')
+  assert.equal(parseCorrection(reply({ verdict: 'again', score: 5 }), 'gept-translation')?.verdict, 'again', '說要再練、分數卻滿分：照比較嚴的')
+  assert.equal(parseCorrection(reply({ verdict: 'small', score: 5 }), 'gept-translation')?.verdict, 'small')
+  assert.equal(parseCorrection(reply({ verdict: 'good', score: 5 }), 'gept-translation')?.verdict, 'good')
+})
+
 test('Claude 說意思不一樣，分數卻給最高：還是意思不一樣，不會變成全對（稽核 LIT-02）', () => {
   assert.equal(parseCorrection(reply({ verdict: 'changed', score: 5 }), 'gept-translation')?.verdict, 'changed')
   assert.equal(parseCorrection(reply({ verdict: 'changed', score: 2 }), 'gept-sentence')?.verdict, 'changed')
 })
 
 test('批改裡格式不對的修正（null、物件當原因）不會讓批改區壞掉：只留看得懂的（稽核 LIT-03）', () => {
-  const r = parseCorrection(JSON.stringify({ corrected: 'I am a nurse.', verdict: 'small', score: 4, fixes: [null, { right: 'a', why: {} }, { wrong: 'am nurse', right: 'am a nurse', why: '要加 a', zh: 7 }, { wrong: 'x' }, 'text'], note: { x: 1 }, resolved: [0, -1, 'a', 1.5] }), 'gept-translation')
+  const r = parseCorrection(JSON.stringify({ corrected: 'I am a nurse.', verdict: 'small', score: 4, reason: '符合第 4 級', fixes: [null, { right: 'a', why: {} }, { wrong: 'am nurse', right: 'am a nurse', why: '要加 a', zh: 7 }, { wrong: 'x' }, 'text'], note: { x: 1 }, resolved: [0, -1, 'a', 1.5] }), 'gept-translation')
   assert.ok(r)
   assert.deepEqual(r.fixes, [{ wrong: '', right: 'a', why: '' }, { wrong: 'am nurse', right: 'am a nurse', why: '要加 a' }])
   assert.equal(r.note, undefined)

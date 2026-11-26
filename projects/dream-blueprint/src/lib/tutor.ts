@@ -1,7 +1,7 @@
 import curriculum from '../data/curriculum.json'
 import { teachingRules } from './handoff'
 import { weakLabelPrompt } from './weakPoints'
-import { rubrics } from './rubrics'
+import { rubrics, settleSentence } from './rubrics'
 
 /** The key stays in this browser only; it is never part of the backup file or the repo. */
 const KEY = 'dream-blueprint.claude-key'
@@ -121,6 +121,17 @@ export function sentenceScoreOf(text: string): number | null {
 export function verdictOf(text: string): 'good' | 'small' | 'again' | 'changed' | null {
   const m = text.match(/判定：\s*(對了|小錯|再試一次|意思不同)/)
   return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' }) as const)[m[1] as '對了' | '小錯' | '再試一次' | '意思不同'] : null
+}
+/** A sentence check that counts: the 判定 line, a 0–2 score on the 單句寫作 table and something saying why. A reply missing
+ *  any of them (only 「判定：對了」, a score of 3, a chat reply) is no judgement: nothing is marked and he sends it again.
+ *  When the verdict and the score disagree, the stricter one counts (settleSentence). */
+export function sentenceJudgement(reply: string): { verdict: 'good' | 'small' | 'again' | 'changed'; score: number } | null {
+  const verdict = verdictOf(reply), score = sentenceScoreOf(reply)
+  if (!verdict || score === null) return null
+  const said = reply.split('\n').some(line => line.trim() && !/^(判定|弱點|得分)[：:]/.test(line.trim()))
+  if (!said) return null
+  const settled = settleSentence(verdict, score)
+  return { verdict: settled.verdict, score: settled.score ?? score }
 }
 
 /** Who "問問 Claude" speaks as. Stored per device like the key. */

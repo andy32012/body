@@ -254,14 +254,14 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
   assert.equal(taskDone({ day: '', words: 60, tries: 1, best: 3 }, false), false, '初級段落寫作 3 級分還沒到七成')
   assert.equal(parseGrade(JSON.stringify({ scores: [{ score: 3.5 }] }), pr, pParts), null, '全民英檢是整數級分')
   assert.equal(parseGrade(JSON.stringify({ scores: [{ score: 6 }] }), pr, pParts), null, '最高 5 級分')
-  assert.equal(parseGrade(JSON.stringify({ scores: [{ score: 0 }] }), pr, pParts)?.scores?.[0].score, 0, '0 級分是表上有的')
+  assert.equal(parseGrade(JSON.stringify({ scores: [{ name: '整篇', score: 0, reason: '幾乎沒寫' }] }), pr, pParts)?.scores?.[0].score, 0, '0 級分是表上有的')
   // 單句寫作：題目要的每一句 0–2，認得「and」「用 because 的句子」這些名字；6 分拿 5 分換算成 4.2（七成以上算過）。
   const st = by('sentence'), sr = rubricFor(st), sParts = scoredParts(st, st.tasks[0])
-  const sent = parseGrade(JSON.stringify({ scores: [{ name: 'because', score: 1 }, { name: '用 and 的句子', score: 2 }, { name: 'but', score: 2 }] }), sr, sParts)
+  const sent = parseGrade(JSON.stringify({ scores: [{ name: 'because', score: 1, reason: '少主詞' }, { name: '用 and 的句子', score: 2, reason: '正確' }, { name: 'but', score: 2, reason: '正確' }] }), sr, sParts)
   assert.deepEqual(sent?.scores?.map(x => x.score), [2, 2, 1])
   assert.equal(Math.round(scoreOf(sent!, false) * 100) / 100, 4.17)
   assert.equal(taskDone({ day: '', words: 30, tries: 1, best: scoreOf(sent!, false) }, false), true)
-  assert.equal(parseGrade(JSON.stringify({ scores: [{ name: 'and', score: 2 }, { name: 'and', score: 1 }, { name: 'but', score: 2 }] }), sr, sParts), null, '同一句兩次不算')
+  assert.equal(parseGrade(JSON.stringify({ scores: [{ name: 'and', score: 2, reason: '對' }, { name: 'and', score: 1, reason: '錯' }, { name: 'but', score: 2, reason: '對' }] }), sr, sParts), null, '同一句兩次不算')
   assert.equal(parseGrade(JSON.stringify({ scores: [{ score: 2 }, { score: 3 }, { score: 2 }] }), sr, sParts), null, '單句最高 2 分')
   // 存起來的批改：分數不在表上就丟掉，正常的讀得回來。
   const rec = (last: unknown) => ({ 'write.p1': JSON.stringify({ day: '', words: 60, tries: 1, best: 3, last }) })
@@ -366,4 +366,14 @@ test('閱讀裡打開「用它寫一句」再收起來：浮動 Claude 看到的
   assert.equal(currentTask()?.draft, 'B')
   hideTask(reading)
   assert.equal(currentTask(), null)
+})
+
+test('看過的提示只會變多：Claude 的回覆晚到，也不會把提示層級、看過答案或問過 Claude 退回去（審核 R008）', async () => {
+  const { raiseHelp } = await import('../src/lib/lesson.ts')
+  const seen = { h: 3, r: true, c: true }
+  assert.deepEqual(raiseHelp(seen, { h: 1, r: false, v: 'good', vt: 'This patient is awake.' }), { h: 3, r: true, c: true, v: 'good', vt: 'This patient is awake.' }, '舊的提示層級晚到，不會蓋掉後來看的')
+  assert.deepEqual(raiseHelp({ h: 1, r: false }, { h: 2 }), { h: 2, r: false })
+  assert.deepEqual(raiseHelp({ h: 4, r: true }, { h: 4, r: true }), { h: 4, r: true })
+  const first = raiseHelp({ h: 1, r: false }, { v: 'again', vt: 'I are wrong.' })
+  assert.deepEqual(raiseHelp(first, { v: 'good', vt: 'I am right.' }), { h: 1, r: false, v: 'again', vt: 'I are wrong.' }, '第一次的判定留著')
 })

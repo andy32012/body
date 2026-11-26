@@ -52,3 +52,6 @@
 .bl-pop-actions button { min-height: 42px; }
 .bl-pop-actions button:not(.bl-main) { border: 1px solid var(--line); border-radius: 10px; padding: 8px 16px; background: transparent; color: var(--text); }
 :root[data-theme=light] .bl-main { color: #fff; }
+.bl-note { margin: 0 0 .6rem; padding: .55rem .7rem; border-radius: 10px; background: color-mix(in srgb, currentColor 7%, transparent); font-size: .9rem; }
+.bl-again { display: grid; gap: .3rem; justify-items: start; margin: .3rem 0 .6rem; }
+.bl-again small { color: var(--practice-miss, #b54a3c); }

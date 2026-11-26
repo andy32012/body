@@ -19,20 +19,24 @@ function cleanFix(v: unknown): Fix | null {
   const zh = text(f.zh), en = text(f.en), tag = text(f.tag)
   return { wrong: text(f.wrong) ?? '', right, why: text(f.why) ?? '', ...(zh !== undefined ? { zh } : {}), ...(en !== undefined ? { en } : {}), ...(tag !== undefined ? { tag } : {}) }
 }
-/** Claude's JSON, or null when it is not a judgement — then nothing is marked and he can ask again. With a table the
- *  score must be one on the table (a missing or impossible score is no judgement, as the README says), and the verdict
- *  follows it (全對 only at the top level), so it can't be friendlier than the table. 意思不一樣 is never turned into
- *  全對 by a high score. Without a table the verdict must be one of the four. */
+const strictness: Record<Result['verdict'], number> = { good: 0, small: 1, again: 2, changed: 3 }
+/** Claude's JSON, or null when it is not a judgement — then nothing is marked and he can ask again. Every judgement
+ *  needs one of the four verdicts and a non-empty corrected text. With a table the score must be one on the table and
+ *  the reason must say why (a missing or impossible score, or no reason, is no judgement), and the verdict can't be
+ *  friendlier than either the table or what Claude said: 全對 only at the top level, and 「要再練」 with a full score
+ *  stays 要再練. 意思不一樣 is never turned into 全對 by a high score. */
 export function parseCorrection(reply: string, rubric?: RubricId): Result | null {
   try {
     const json = JSON.parse(reply.slice(reply.indexOf('{'), reply.lastIndexOf('}') + 1)) as Record<string, unknown>
-    if (!json || typeof json !== 'object' || typeof json.corrected !== 'string') return null
+    if (!json || typeof json !== 'object' || typeof json.corrected !== 'string' || !json.corrected.trim()) return null
     const nums = (v: unknown) => Array.isArray(v) ? v.filter((n): n is number => Number.isInteger(n) && n >= 0) : undefined
     const named = typeof json.verdict === 'string' && json.verdict in verdictNames ? json.verdict as Result['verdict'] : null
+    if (!named) return null
     const table = rubric ? rubrics[rubric] : null
     const scored = table && validRubricScore(table, json.score) ? json.score as number : undefined
-    if (table ? scored === undefined : !named) return null
-    const verdict: Result['verdict'] = table && scored !== undefined ? (named === 'changed' ? 'changed' : verdictFor(table, scored, named ?? 'again')) : named!
+    if (table && (scored === undefined || !text(json.reason)?.trim())) return null
+    const byTable = table && scored !== undefined ? verdictFor(table, scored, named) : named
+    const verdict: Result['verdict'] = strictness[byTable] >= strictness[named] ? byTable : named
     const fixes = Array.isArray(json.fixes) ? json.fixes.map(cleanFix).filter((f): f is Fix => !!f) : []
     const note = text(json.note)
     return { verdict, corrected: json.corrected, fixes, ...(note ? { note } : {}), resolved: nums(json.resolved), still: nums(json.still),

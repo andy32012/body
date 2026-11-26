@@ -64,17 +64,23 @@ test('中翻英回饋：意思變了是第四種判定；跟參考句比對只�
   assert.equal(compareWithReference("I'm a nursing student", ['I am a nursing student.'])!.same, true)
 })
 
-test('待確認的答案請 Claude 看：說對才升級；說錯留著原答和原因等重寫；看不出對錯就不動', async () => {
-  const { checkPending, teacherVerdict } = await import('../src/lib/evidence.ts')
+test('待確認的答案請 Claude 看：照「判定：對／錯」加「原因」才算；說錯留著原答和原因等重寫；看不出對錯就不動（審核 R005）', async () => {
+  const { checkPending, teacherVerdict, pendingRef } = await import('../src/lib/evidence.ts')
   const pending = { day: '2026-11-26', level: 'pending' as const, source: 'vary' as const, skill: 'write' as const, answer: 'I nurse.', prompt: '我是護理師。', ref: 'I am a nurse.' }
   const start = addEvidence({}, 1, pending)
-  assert.equal(teacherVerdict('對。'), 'right')
-  assert.equal(teacherVerdict('錯。缺少動詞。'), 'wrong')
+  const ref = pendingRef(pending)
+  const right = '判定：對\n原因：主詞和動詞都對，意思也對。'
+  const wrongBecause = (why: string) => '判定：錯\n原因：' + why
+  assert.equal(teacherVerdict(right), 'right')
+  assert.equal(teacherVerdict(wrongBecause('缺少動詞。')), 'wrong')
+  assert.equal(teacherVerdict('對不起，這句需要重寫。'), 'unclear', '「對不起」不是說對')
+  assert.equal(teacherVerdict('對。'), 'unclear', '沒照格式')
+  assert.equal(teacherVerdict('判定：對'), 'unclear', '沒說原因')
   assert.equal(teacherVerdict('嗯，這句可以再想想'), 'unclear')
   // Right the first time: done alone.
-  assert.equal(readEvidence(checkPending(start, 1, 0, '對'), 1)[0].level, 'independent')
+  assert.equal(readEvidence(checkPending(start, 1, ref, right), 1)[0].level, 'independent')
   // Wrong: nothing gained, the question, his answer and the reason stay.
-  const wrong = checkPending(start, 1, 0, '錯。缺少動詞。')
+  const wrong = checkPending(start, 1, ref, wrongBecause('缺少動詞。'))
   const e = readEvidence(wrong, 1)[0]
   assert.equal(e.level, 'pending')
   assert.equal(e.wrong, '缺少動詞。')
@@ -82,14 +88,31 @@ test('待確認的答案請 Claude 看：說對才升級；說錯留著原答和
   assert.equal(e.prompt, '我是護理師。')
   assert.equal(bestLevel(readEvidence(wrong, 1)), null, '說錯的不算任何完成')
   // Rewritten right: done with help. Rewritten wrong again: the new answer and reason replace the old.
-  const again = checkPending(wrong, 1, 0, '錯，少了 a', 'I am nurse.')
+  const again = checkPending(wrong, 1, ref, wrongBecause('少了 a'), 'I am nurse.')
   assert.deepEqual([readEvidence(again, 1)[0].answer, readEvidence(again, 1)[0].wrong], ['I am nurse.', '少了 a'])
-  const fixed = readEvidence(checkPending(again, 1, 0, '對', 'I am a nurse.'), 1)[0]
+  const fixed = readEvidence(checkPending(again, 1, { ...ref, answer: 'I am nurse.' }, right, 'I am a nurse.'), 1)[0]
   assert.equal(fixed.level, 'assisted')
   assert.equal(fixed.answer, undefined)
   assert.equal(fixed.wrong, undefined)
   // Unclear: unchanged.
-  assert.equal(checkPending(start, 1, 0, '這句不錯喔'), start)
+  assert.equal(checkPending(start, 1, ref, '這句不錯喔'), start)
+  assert.equal(checkPending(start, 1, ref, '對不起，這句需要重寫。'), start)
+})
+
+test('待確認的批改落在送出的那一題、那一版答案：清單順序變了也不會寫到別題，答案改過就不落地（審核 R006）', async () => {
+  const { checkPending, pendingRef } = await import('../src/lib/evidence.ts')
+  const base = { day: '2026-11-26', level: 'pending' as const, source: 'vary' as const, skill: 'write' as const, prompt: '題目', ref: '參考' }
+  const a = { ...base, item: 'a', answer: 'I nurse.' }, b = { ...base, item: 'b', answer: 'He doctor.' }
+  const right = '判定：對\n原因：沒問題。'
+  const sentA = pendingRef(a)
+  let notes = addEvidence(addEvidence({}, 1, a), 1, b)
+  notes = addEvidence(notes, 1, { ...a })
+  assert.deepEqual(readEvidence(notes, 1).map(x => x.item), ['b', 'a'], 'A 重新存過，排到後面去了')
+  const after = readEvidence(checkPending(notes, 1, sentA, right), 1)
+  assert.equal(after.find(x => x.item === 'b')!.level, 'pending', 'B 沒有被改到')
+  assert.equal(after.find(x => x.item === 'a')!.level, 'independent', '批改落在送出的 A')
+  const changed = addEvidence(notes, 1, { ...a, answer: 'I am nurse.' })
+  assert.equal(checkPending(changed, 1, sentA, right), changed, 'A 的答案已經改了：舊答案的批改不落地')
 })
 
 test('換個說法自己按「看答案」：用看答案前寫的判；還沒寫就看、看完照抄不算完成', () => {

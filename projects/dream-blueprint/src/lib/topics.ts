@@ -1,7 +1,7 @@
 import data from '../data/topics.json'
 import { addDays, applyAnswer, daysBetween, newCard, type Energy, type Period } from './progress'
 import type { AppState } from './store'
-import { judgeCheckpoint, judgeExpress, levelNames, type Level, type Verdict } from './evidence'
+import { judgeCheckpoint, judgeExpress, levelNames, sameEnglish, type Level, type Verdict } from './evidence'
 import { courseMovedOn, readLessonRecord } from './lesson'
 import { isKnownWord, levelEntry, wordKey } from './vocab'
 
@@ -82,7 +82,20 @@ export interface TopicRecord {
   write?: { level: Level | null; sentences: number; covered?: number; help: string[]; firstVerdict?: Verdict }
   review?: { level: Level | null; speak?: SpeakRecord }
   /** Help and Claude's first check while a speaking or writing task is still open (kept across a reload). */
-  open?: Record<string, { help: string[]; firstVerdict?: Verdict; checkedText?: string }>
+  open?: Record<string, OpenCheck>
+}
+/** An open task's help and checks: the first check (with the text it saw) and the latest one (with its text). */
+export interface OpenCheck { help: string[]; firstVerdict?: Verdict; checkedText?: string; latestVerdict?: Verdict; latestText?: string }
+/** The verdict that counts for the text in the box now. The first check stays the first (a wrong first try is fixed with
+ *  help, however good the rewrite). After a first 「good」, an edited text counts only once Claude has checked that very
+ *  text: then its own verdict counts; an edit nobody checked is unchecked (待確認). */
+export function openVerdict(o: OpenCheck, text: string): Verdict | undefined {
+  if (o.firstVerdict !== 'good' || o.checkedText === undefined || sameEnglish(o.checkedText, text)) return o.firstVerdict
+  return o.latestVerdict && o.latestText !== undefined && sameEnglish(o.latestText, text) ? o.latestVerdict : undefined
+}
+/** A new check of `text`: the first one stays the first, the latest one belongs to the text it saw. */
+export function withCheck(o: OpenCheck, v: Verdict, text: string): OpenCheck {
+  return { ...o, ...(o.firstVerdict ? {} : { firstVerdict: v, checkedText: text }), latestVerdict: v, latestText: text }
 }
 
 export const topicKey = (id: string) => 'topic.' + id

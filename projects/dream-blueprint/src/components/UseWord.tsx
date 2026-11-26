@@ -18,6 +18,8 @@ export default function UseWord({ en, zh, example, onGood, onSave }: {
   const [answer, setAnswer] = useState('')
   const [run, setRun] = useState(0)
   const [checked, setChecked] = useState(false)
+  // While Claude checks, the sentence and the button wait: the check belongs to the sentence that was sent.
+  const [checking, setChecking] = useState(false)
   const keyed = !!tutorKey()
   const used = wordUsed(answer, en)
   useTaskContext(open ? {
@@ -28,18 +30,18 @@ export default function UseWord({ en, zh, example, onGood, onSave }: {
   if (!open) return <button type="button" className="use-word-open" onClick={() => setOpen(true)}><PenLine size={14} aria-hidden="true" />用它寫一句</button>
   return <section className="use-word" aria-label={'用 ' + en + ' 寫一句'}>
     <label className="pr-field">用 <b lang="en">{en}</b> 寫一句自己的話
-      <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" placeholder="例如跟你今天、學校或醫院有關的事"
+      <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" placeholder="例如跟你今天、學校或醫院有關的事" readOnly={checking}
         onChange={e => { setAnswer(e.target.value); setChecked(false) }} />
     </label>
     {answer.trim() && !used && <small className="use-word-warn">句子裡好像還沒有用到 {en}。</small>}
     <div className="pr-actions">
       {keyed
-        ? <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setRun(n => n + 1)}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>
+        ? <button type="button" className="pr-main" disabled={!answer.trim() || checking} onClick={() => setRun(n => n + 1)}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>
         : <button type="button" className="pr-main" disabled={!answer.trim()} onClick={() => setChecked(true)}>寫好了</button>}
       <button type="button" className="pr-link" onClick={() => setOpen(false)}>收起來</button>
     </div>
     {!keyed && checked && <p className="ls-help">{example ? <>對照例句：<span lang="en">{example}</span>。</> : ''}檢查：主詞和動詞有沒有對上？{en} 的用法跟例句一樣嗎？</p>}
     <CorrectBox run={run} mode="open" rubric="gept-sentence" zh={'用單字 ' + en + (zh ? '（' + zh + '）' : '') + ' 自己造一個句子'} reference={example} words={[en]} answer={answer} selfFix
-      onSave={onSave} onResult={v => { if (v === 'good' && used) onGood?.() }} />
+      onSave={onSave} onBusy={setChecking} onResult={(v, _, __, sent) => { if (v === 'good' && wordUsed(sent, en)) onGood?.() }} />
   </section>
 }

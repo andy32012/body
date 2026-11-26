@@ -43,6 +43,10 @@ export interface WriteFeedback {
   band?: number; next: string; fixes: { wrong: string; right: string; why: string }[]; revised?: string; summary?: string
   /** The published table this check used, its scores and the stage requirements. */
   rubric?: RubricId; scores?: ScoreLine[]; checks?: CheckLine[]
+  /** Stage requirements Claude didn't answer (shown as no feedback, never guessed from their position). */
+  unchecked?: string[]
+  /** The text that was graded: a later draft is never shown under this check's scores. */
+  answer?: string
 }
 export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number }
 export const writeKey = (id: string) => 'write.' + id
@@ -51,8 +55,22 @@ export const writeKey = (id: string) => 'write.' + id
  *  and hyphen / apostrophe joins (well-known, don't). Punctuation alone is not a word. Close to, not the same as, an exam counter. */
 export const wordCount = (text: string) => (text.match(/\p{L}+(?:['’-]\p{L}+)*|\d+(?:[.,]\d+)*/gu) ?? []).length
 
+const str = (v: unknown) => typeof v === 'string' ? v : undefined
+/** Fixes as the page can show them: text only; one without the corrected part says nothing and is left out. */
+function cleanFixes(v: unknown): WriteFeedback['fixes'] {
+  if (!Array.isArray(v)) return []
+  return v.flatMap(f => {
+    if (!f || typeof f !== 'object' || Array.isArray(f)) return []
+    const x = f as Record<string, unknown>, right = str(x.right)
+    return right?.trim() ? [{ wrong: str(x.wrong) ?? '', right, why: str(x.why) ?? '' }] : []
+  })
+}
+/** The requirements' lines as the page can show them: a name, a yes / no and a comment in words. */
+const cleanChecks = (v: unknown): CheckLine[] => Array.isArray(v) ? v.flatMap(c => c && typeof c === 'object' && typeof c.name === 'string' && typeof c.ok === 'boolean'
+  ? [{ name: c.name, ok: c.ok, comment: str(c.comment) ?? '' }] : []) : []
 /** Saved records from before scores were checked may hold an impossible best (e.g. band 99) or a broken last
- *  feedback: they are dropped, never counted or shown. A best above 5 on a 1–5 stage is dropped by taskDone. */
+ *  feedback: they are dropped, never counted or shown. A best above 5 on a 1–5 stage is dropped by taskDone. Text a
+ *  check saved in another shape (an object where words belong) is dropped too, so the page can always show it. */
 export function readWrite(notes: Record<string, string>, id: string): WriteRecord | null {
   try {
     const v = notes[writeKey(id)]
@@ -62,7 +80,15 @@ export function readWrite(notes: Record<string, string>, id: string): WriteRecor
     if (r.last && !(Array.isArray(r.last.criteria) && r.last.criteria.every(c => c && typeof c.name === 'string' && typeof c.score === 'number'))) r.last = undefined
     if (r.last?.scores !== undefined && !(r.last.rubric && r.last.rubric in rubrics && Array.isArray(r.last.scores) && r.last.scores.length
       && r.last.scores.every(x => x && typeof x.name === 'string' && validRubricScore(rubrics[r.last!.rubric!], x.score)))) r.last = undefined
-    if (r.last && !Array.isArray(r.last.fixes)) r.last = { ...r.last, fixes: [] }
+    if (r.last) {
+      const l = r.last
+      r.last = { ...l, fixes: cleanFixes(l.fixes), next: str(l.next) ?? '', summary: str(l.summary), revised: str(l.revised),
+        ...(l.scores ? { scores: l.scores.map(x => ({ ...x, reason: str(x.reason) ?? '' })) } : {}),
+        ...(l.checks !== undefined ? { checks: cleanChecks(l.checks) } : {}),
+        ...(l.unchecked !== undefined ? { unchecked: Array.isArray(l.unchecked) ? l.unchecked.filter((x): x is string => typeof x === 'string') : [] } : {}),
+        ...(l.answer !== undefined ? { answer: str(l.answer) } : {}),
+        criteria: l.criteria.map(c => ({ ...c, comment: str(c.comment) ?? '' })) }
+    }
     return r
   } catch { return null }
 }
@@ -87,6 +113,11 @@ export function scoreOf(f: WriteFeedback, ielts: boolean) {
   }
   if (ielts && typeof f.band === 'number') return f.band
   return f.criteria.length ? f.criteria.reduce((a, c) => a + c.score, 0) / f.criteria.length : 0
+}
+/** The score a check counts toward 過關 with: none when the piece is shorter than the task asks (the scores still show,
+ *  but a too-short piece never passes). */
+export function countedBest(f: WriteFeedback, ielts: boolean, words: number, task: WriteTask): number | undefined {
+  return words >= task.min ? scoreOf(f, ielts) : undefined
 }
 /** A task counts as done when checked feedback reached 3.5 / 5 (or IELTS 5.5): 全民英檢 4 級分, or seven tenths of the
  *  單句寫作 points. Ticking every point yourself is 自評完成, not done. */
@@ -164,6 +195,8 @@ export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) 
   return [
     '你是英文寫作老師，批改台灣護理系學生玄燁（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
+    ...(task.zh ? ['畫面上給他的中文要求（他照這些寫，批改也照這些看；有指定的步驟、數字或條件，漏了就在 fixes 或 next 指出是哪一項）：' + task.zh] : []),
+    ...(task.min ? ['這題要求至少 ' + task.min + ' 字。字數不夠時照評分表給分，並在 next 提醒他要寫到幾個字。'] : []),
     ...(stage.grammar ? ['這一階教過的文法：' + stage.grammar.title + '；' + stage.grammar.points.join('；') + '。他是照這個程度寫的，不要因為沒用到更難的文法扣分；分數仍只照下面的官方評分表，不能另加要求，也不能放寬官方標準。'] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，回應題目要照這種題目該有的結構：' + essays[kind].outline.join('；')] : []),
     ...(task.chart && isProcessChart(task.chart) ? ['這題是流程圖：總覽要說一共幾個步驟、從哪裡開始到哪裡結束；Task Achievement 看主要步驟有沒有都寫到、順序對不對，流程圖沒有數字，不需要數據比較。'] : []),
@@ -194,29 +227,37 @@ function matchPart(name: string, parts: readonly string[]) {
   return matchCriterion(n, parts)
 }
 
-/** Reads Claude's grade against the stage's table. Anything that is not a usable grade — a score that is not on the table
- *  (band 7.5 for one criterion, 6 on a 0–5 scale, "4"), the wrong number of parts, a name that is not one of the parts or
- *  the same one twice — returns null: it is shown as a failed check and never counted. With a single part (全民英檢 scores
- *  the whole piece) or no names, parts are taken in order. The IELTS band is worked out here from the four criteria. */
+/** Reads Claude's grade against the stage's table. Anything that is not a usable grade returns null: it is shown as a
+ *  failed check and never counted. That is a score not on the table (band 7.5 for one criterion, 6 on a 0–5 scale, "4"),
+ *  the wrong number of parts, a part without a name or with a name that is not one of the parts (never matched by its
+ *  position), the same part twice, or a score without its reason. A whole-piece table (全民英檢 整篇) takes its usual
+ *  wording (整篇、整體…) but not another table's criterion (Task Response means the wrong table was used). The
+ *  stage's requirements are matched by name only; those Claude didn't answer are listed in `unchecked`. Only text is kept
+ *  where the page shows words. The IELTS band is worked out here from the four criteria. */
 export function parseGrade(text: string, rubric: Rubric, parts: readonly string[], checks: readonly string[] = []): WriteFeedback | null {
   try {
     const j = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1))
     if (!Array.isArray(j.scores) || j.scores.length !== parts.length) return null
-    if (!j.scores.every((x: { score?: unknown }) => x && validRubricScore(rubric, x.score))) return null
-    const named = parts.length > 1 && j.scores.some((x: { name?: unknown }) => typeof x.name === 'string' && x.name.trim())
-    const order: number[] = j.scores.map((x: { name?: unknown }, i: number) => named ? matchPart(typeof x.name === 'string' ? x.name : '', parts) : i)
-    if (order.some(i => i < 0) || new Set(order).size !== parts.length) return null
-    const scores: ScoreLine[] = order.map((at, i) => ({ at, name: parts[at], score: j.scores[i].score as number, reason: String(j.scores[i].reason ?? '') }))
-      .sort((a, b) => a.at - b.at).map(({ name, score, reason }) => ({ name, score, reason }))
-    const said: { name?: unknown; ok?: unknown; comment?: unknown }[] = Array.isArray(j.checks) ? j.checks.filter((c: unknown) => c && typeof c === 'object') : []
-    const checkLines = checks.flatMap((name, i): CheckLine[] => {
-      const hit = said.find(c => typeof c.name === 'string' && matchCriterion(c.name, [name]) === 0) ?? (said.length === checks.length ? said[i] : undefined)
-      return hit && typeof hit.ok === 'boolean' ? [{ name, ok: hit.ok, comment: String(hit.comment ?? '') }] : []
+    const lines = j.scores as { name?: unknown; score?: unknown; reason?: unknown }[]
+    if (!lines.every(x => x && typeof x === 'object' && validRubricScore(rubric, x.score) && str(x.reason)?.trim() && str(x.name)?.trim())) return null
+    const otherTables = Object.values(rubrics).filter(r => r.id !== rubric.id).flatMap(r => r.scales.map(sc => sc.name)).filter(n => !parts.includes(n))
+    const order: number[] = lines.map(x => {
+      const name = str(x.name)!
+      if (parts.length === 1) return matchPart(name, parts) === 0 || matchCriterion(name, otherTables) < 0 ? 0 : -1
+      return matchPart(name, parts)
     })
-    return { rubric: rubric.id, scores, checks: checkLines, criteria: [], band: rubric.id.startsWith('ielts') ? ieltsOverall(scores.map(x => x.score)) : undefined,
-      next: String(j.next ?? ''), summary: j.summary ? String(j.summary) : undefined,
-      fixes: Array.isArray(j.fixes) ? j.fixes.filter((f: { wrong?: unknown; right?: unknown }) => f && typeof f.right === 'string').slice(0, 8) : [],
-      revised: typeof j.revised === 'string' ? j.revised : undefined }
+    if (order.some(i => i < 0) || new Set(order).size !== parts.length) return null
+    const scores: ScoreLine[] = order.map((at, i) => ({ at, name: parts[at], score: lines[i].score as number, reason: str(lines[i].reason)! }))
+      .sort((a, b) => a.at - b.at).map(({ name, score, reason }) => ({ name, score, reason }))
+    const said = cleanChecks(j.checks)
+    const checkLines = checks.flatMap((name): CheckLine[] => {
+      const hit = said.find(c => matchCriterion(c.name, [name]) === 0)
+      return hit ? [{ name, ok: hit.ok, comment: hit.comment }] : []
+    })
+    const unchecked = checks.filter(name => !checkLines.some(c => c.name === name))
+    return { rubric: rubric.id, scores, checks: checkLines, ...(unchecked.length ? { unchecked } : {}), criteria: [],
+      band: rubric.id.startsWith('ielts') ? ieltsOverall(scores.map(x => x.score)) : undefined,
+      next: str(j.next) ?? '', summary: str(j.summary), fixes: cleanFixes(j.fixes).slice(0, 8), revised: str(j.revised) }
   } catch { return null }
 }
 

@@ -13,7 +13,9 @@ export default function ClaudeConnect() {
     setStatus('測試中……')
     try {
       const reply = await askTutor('只回一個字：好', [{ role: 'user', content: '測試' }])
-      setStatus('連接成功（' + reply.slice(0, 20) + '）。之後中翻英、寫作和短文都可以按「請 Claude 批改」，照官方評分表給分。')
+      // Connected means Claude really wrote something back: an empty reply is a failed test, not 連接成功.
+      setStatus(reply.trim() ? '連接成功（' + reply.slice(0, 20) + '）。之後中翻英、寫作和短文都可以按「請 Claude 批改」，照官方評分表給分。'
+        : '金鑰收到了，但 Claude 這次沒有回任何文字，還不算連接成功。等一下再按一次「儲存並測試」；一直這樣的話換一個模型試試。')
     } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
   }
   return <>

@@ -89,6 +89,19 @@ export function readResults(notes: Record<string, string>): BaselineResult[] {
 export function addResult(notes: Record<string, string>, result: BaselineResult) {
   return { ...notes, [resultsKey]: JSON.stringify([...readResults(notes), result]) }
 }
+/** Claude's comment on the test's writing is kept only in the form asked for: the CEFR line first, then its points. */
+export const writingFeedbackOk = (text: string) => /CEFR/.test(text.trim().split('\n')[0] ?? '') && text.split('\n').filter(l => l.trim()).length >= 3
+/** …and on the speaking transcript only with its fixed first line (a transcript gives no level) and its points. */
+export const speakingFeedbackOk = (text: string) => /^只看逐字稿/.test(text.trim()) && text.split('\n').filter(l => l.trim()).length >= 3
+/** Claude's comment added later to a saved check (asked again after it failed): the check is found by its date and form;
+ *  his work and the scores stay as they are. */
+export function setResultFeedback(notes: Record<string, string>, at: { date: string; form?: FormId }, part: 'writing' | 'speaking', feedback: string) {
+  const list = readResults(notes)
+  const i = list.findIndex(r => r.date === at.date && (r.form ?? 'A') === (at.form ?? 'A'))
+  if (i < 0) return notes
+  list[i] = { ...list[i], [part]: { ...list[i][part], feedback } }
+  return { ...notes, [resultsKey]: JSON.stringify(list) }
+}
 export const nextForm = (results: readonly BaselineResult[]): FormId => order[results.length % order.length]
 /** Whether the next form has already been done (there are only three, so the fourth check reuses A). */
 export const formSeen = (results: readonly BaselineResult[], form: FormId) => results.some(r => (r.form ?? 'A') === form)

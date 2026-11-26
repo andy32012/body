@@ -297,3 +297,58 @@ test('寫作做完一題，下面就有「下一題」：先去還沒寫過的�
   const pack = { ...stage, tasks: [{ id: 'p1', prompt: '', zh: '', min: 1, sample: '', unit: 43 }, { id: 'p2', prompt: '', zh: '', min: 1, sample: '', unit: 44 }] }
   assert.equal(nextWritingTask(pack, 'p1', {}, 43), null, '單元 44 還沒上到')
 })
+
+test('寫作批改：每一項要有對得上的名稱和理由；修正、評語只留文字；要求沒回答到的另外列出（審核 R001、R009）', async () => {
+  const { parseGrade, scoredParts, checksFor } = await import('../src/lib/writing.ts')
+  const st = by('sentence'), sr = rubricFor(st), sParts = scoredParts(st, st.tasks[0])
+  const line = (name: unknown, score: unknown, reason: unknown) => ({ name, score, reason })
+  const ok = JSON.stringify({ scores: [line('用 and 的句子', 2, '完全正確'), line('用 but 的句子', 2, '完全正確'), line('用 because 的句子', 1, '少了主詞')],
+    next: '補上主詞', fixes: [{ wrong: 'because tired', right: 'because I was tired', why: '少了主詞' }, { right: 'I am a student.', wrong: { invalid: true }, why: '測試' }, { right: 'x', why: ['a'] }] })
+  const g = parseGrade(ok, sr, sParts)
+  assert.ok(g)
+  assert.deepEqual(g.fixes, [{ wrong: 'because tired', right: 'because I was tired', why: '少了主詞' }, { wrong: '', right: 'I am a student.', why: '測試' }, { wrong: '', right: 'x', why: '' }], '物件和陣列不會進到畫面')
+  assert.equal(parseGrade(JSON.stringify({ scores: [{ score: 2 }, { score: 2 }, { score: 2 }] }), sr, sParts), null, '只回數字：沒有名稱也沒有理由')
+  assert.equal(parseGrade(JSON.stringify({ scores: [line('用 and 的句子', 2, ''), line('用 but 的句子', 2, '對'), line('用 because 的句子', 2, '對')] }), sr, sParts), null, '有一項理由是空的')
+  assert.equal(parseGrade(JSON.stringify({ scores: [line('', 2, '對'), line('用 but 的句子', 2, '對'), line('用 because 的句子', 2, '對')] }), sr, sParts), null, '有一項沒有名稱，不靠位置猜')
+  assert.equal(parseGrade(JSON.stringify({ scores: [line('am', 2, '對'), line('is', 2, '對'), line('are', 2, '對')] }), sr, sParts), null, '名稱是別題的項目')
+  const pp = by('paragraph'), pr = rubricFor(pp), pParts = scoredParts(pp, pp.tasks[0]), pChecks = checksFor(pp, pp.tasks[0])
+  assert.equal(parseGrade(JSON.stringify({ scores: [line('Task Response', 4, '符合第 4 級')] }), pr, pParts, pChecks), null, '整篇題拿到雅思的項目名稱，是用錯評分表')
+  assert.equal(parseGrade(JSON.stringify({ scores: [line(undefined, 4, '符合第 4 級')] }), pr, pParts, pChecks), null, '整篇題也要寫是哪一項')
+  const para = parseGrade(JSON.stringify({ scores: [line('整篇', 4, '符合第 4 級')], summary: { x: 1 }, next: 7,
+    checks: [{ name: '主題句', ok: true, comment: '有' }, { name: '亂寫的名字', ok: false }, { name: '文法正確', ok: 'yes' }] }), pr, pParts, pChecks)
+  assert.ok(para)
+  assert.equal(para.summary, undefined)
+  assert.equal(para.next, '')
+  assert.deepEqual(para.checks?.map(c => c.name), [pChecks[0]], '只認名字對得上、ok 是真假值的要求，不照位置套')
+  assert.deepEqual(para.unchecked, pChecks.slice(1), '其他要求列成「Claude 沒有回答到」')
+})
+
+test('存起來的壞批改讀回來不會讓寫作頁壞掉：修正、評語、要求只留文字（審核 R001）', () => {
+  const bad = { criteria: [], rubric: 'gept-paragraph', scores: [{ name: '整篇', score: 4, reason: { x: 1 } }], next: { y: 2 }, summary: ['z'], revised: 5,
+    fixes: [{ right: 'I am a student.', wrong: { invalid: true }, why: '測試' }, { wrong: 'a' }], checks: [{ name: '主題句', ok: true, comment: 3 }, { name: 4, ok: true }] }
+  const r = readWrite({ 'write.p1': JSON.stringify({ day: '2026-11-26', words: 60, tries: 1, best: 5, last: bad }) }, 'p1')
+  assert.ok(r?.last)
+  assert.deepEqual(r.last.fixes, [{ wrong: '', right: 'I am a student.', why: '測試' }])
+  assert.equal(r.last.scores?.[0].reason, '')
+  assert.equal(r.last.next, '')
+  assert.equal(r.last.summary, undefined)
+  assert.equal(r.last.revised, undefined)
+  assert.deepEqual(r.last.checks, [{ name: '主題句', ok: true, comment: '' }])
+})
+
+test('畫面上的中文要求和最少字數也交給 Claude；字數不到就不算過關，分數照樣給他看（審核 R020）', async () => {
+  const { gradePrompt, countedBest, parseGrade, scoredParts } = await import('../src/lib/writing.ts')
+  const basic = by('basic'), b6 = basic.tasks.find(t => t.id === 'b6')!
+  const steps = by('steps'), st3 = steps.tasks.find(t => t.id === 'st3')!
+  const p6 = gradePrompt(basic, b6, b6.prompt)
+  assert.ok(p6.includes(b6.zh), '畫面上的中文要求也在批改說明裡')
+  assert.ok(p6.includes('至少 10 字'), '最少字數也在')
+  const p3 = gradePrompt(steps, st3, st3.prompt)
+  assert.ok(p3.includes('至少 5 分鐘') && p3.includes('至少 1 分鐘'), '量血壓的必要步驟（休息 5 分鐘、間隔 1 分鐘）也交給 Claude')
+  const parts = scoredParts(basic, b6)
+  const three = JSON.stringify({ scores: parts.map(name => ({ name, score: 2, reason: '完全正確' })) })
+  const f = parseGrade(three, rubricFor(basic), parts)!
+  assert.ok(f, '三個 2 分的批改本身讀得出來')
+  assert.equal(countedBest(f, false, wordCount('I am Amy. We study. We are here.'), b6), undefined, '8 個字不到 10 字：不算過關')
+  assert.equal(countedBest(f, false, 10, b6), 5, '到 10 字就照分數算')
+})

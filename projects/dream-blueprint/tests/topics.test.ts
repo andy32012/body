@@ -130,3 +130,18 @@ test('sentence count for 3–5 sentence messages', () => {
   assert.equal(countSentences('Hi!\nOK.\nYes.'), 0)
   assert.equal(countSentences('   '), 0)
 })
+
+test('生活主題的開放題：改稿後再請 Claude 確認是對的，就算確認過；改了沒送還是待確認；第一次有錯的不會被洗掉（審核 R016）', async () => {
+  const { openVerdict, withCheck } = await import('../src/lib/topics.ts')
+  let o = withCheck({ help: [] }, 'good', 'I like tea. I drink it every day. It is warm.')
+  assert.equal(openVerdict(o, 'I like tea. I drink it every day. It is warm.'), 'good')
+  assert.equal(openVerdict(o, 'I like tea. I drink it every morning. It is warm.'), undefined, '5 分以後改了沒送：待確認')
+  o = withCheck(o, 'good', 'I like tea. I drink it every morning. It is warm.')
+  assert.equal(openVerdict(o, 'I like tea. I drink it every morning. It is warm.'), 'good', '改過的這一版也確認是對的')
+  assert.equal(o.firstVerdict, 'good')
+  assert.equal(o.checkedText, 'I like tea. I drink it every day. It is warm.', '第一次的紀錄留著')
+  let w = withCheck({ help: ['cue'] }, 'again', 'I likes tea.')
+  w = withCheck(w, 'good', 'I like tea.')
+  assert.equal(openVerdict(w, 'I like tea.'), 'again', '第一次有錯、改對了：還是照第一次算（有提示完成），不會變成獨立完成')
+  assert.deepEqual(w.help, ['cue'])
+})

@@ -71,3 +71,15 @@ test('Claude 回答前會先想，想的部分也算在回覆上限裡：上限�
   reply = { content: [{ type: 'text', text: '好～' }] }
   assert.equal(await ask(), '好～')
 })
+
+test('中翻英的批改要有判定、0–2 分和說明才算數：只回判定、分數不在表上、只有兩行都不算（審核 R003）', async () => {
+  const { sentenceJudgement } = await import('../src/lib/tutor.ts')
+  assert.deepEqual(sentenceJudgement('主詞 the patient 是單數，用 is，寫對了。\n得分：2\n判定：對了'), { verdict: 'good', score: 2 })
+  assert.deepEqual(sentenceJudgement('be 動詞用錯了，再看一下主詞。\n弱點：be 動詞\n得分：1\n判定：再試一次'), { verdict: 'again', score: 1 })
+  assert.equal(sentenceJudgement('判定：對了'), null, '只回判定，沒有分數')
+  assert.equal(sentenceJudgement('寫得不錯。\n判定：對了'), null, '沒有得分那一行')
+  assert.equal(sentenceJudgement('寫得不錯。\n得分：3\n判定：對了'), null, '3 分不在 0–2 的表上')
+  assert.equal(sentenceJudgement('得分：2\n判定：對了'), null, '只有分數和判定，沒有說明為什麼')
+  assert.equal(sentenceJudgement('請再讀一次題目。'), null, '純聊天不是批改')
+  assert.deepEqual(sentenceJudgement('意思大致對，但 is 和 are 混用。\n得分：2\n判定：小錯'), { verdict: 'small', score: 1 }, '分數和判定不一致時照比較嚴的')
+})

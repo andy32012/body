@@ -147,6 +147,17 @@ export function parseGeptFeedback(text: string): GeptFeedback {
   return out
 }
 
+/** A speaking check that counts: a score on the table with its reason, one note for each question (numbers 1…count, each
+ *  once), and what went well and what to fix. Anything less is shown with the transcript but never scored, so it can't
+ *  open 中級; he can ask again with the same answers. */
+export function geptFeedbackComplete(fb: GeptFeedback, count: number) {
+  const ns = fb.items.map(x => x.n)
+  return fb.score !== undefined && !!fb.why.trim() && ns.length === count && new Set(ns).size === count && ns.every(n => n >= 1 && n <= count)
+    && !!fb.good.trim() && !!fb.fix.trim()
+}
+/** Questions Claude wrote for his own photo are used only together with its description (3–5 questions). */
+export const photoQuestionsComplete = (p: { questions: string[]; describe: string }) => p.questions.length >= 3 && !!p.describe.trim()
+
 export function parsePhotoQuestions(text: string) {
   const questions: string[] = []
   let describe = ''

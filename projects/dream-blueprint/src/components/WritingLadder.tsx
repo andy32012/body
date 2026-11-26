@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, countedBest, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
@@ -28,7 +28,7 @@ const levelOf = (score: number, max: number) =>
       : (score >= 7 ? 'hi' : score >= 6 ? 'mid' : 'lo')
 
 /** A check graded by a published table: the total, each score with the level it matches and why, and the stage's own requirements. */
-function Graded({ fb }: { fb: WriteFeedback }) {
+function Graded({ fb, short }: { fb: WriteFeedback; short?: { words: number; min: number } }) {
   const r = rubrics[fb.rubric!]
   const scores = fb.scores ?? []
   const ielts = r.id.startsWith('ielts')
@@ -36,7 +36,8 @@ function Graded({ fb }: { fb: WriteFeedback }) {
   const ok = passes(r, scores.length ? got / scores.length : 0)
   return <>
     <div className="wl-fb-head"><strong>Claude 批改</strong><span className="wl-band">{ielts ? 'IELTS 練習估計 ' + fb.band : r.id === 'gept-sentence' ? got + ' / ' + full + ' 分' : got + ' / 5 級分'}</span></div>
-    <p className="wl-pass" data-ok={ok}>照「{r.title}」官方評分表給分{r.pass ? (ok ? '：✓ 達到這裡的練習目標（' + r.pass.note + '）' : '：還沒到這裡的練習目標（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>
+    <p className="wl-pass" data-ok={ok && !short}>照「{r.title}」官方評分表給分{r.pass ? (ok ? (short ? '：分數有到練習目標（' + r.pass.note + '）' : '：✓ 達到這裡的練習目標（' + r.pass.note + '）') : '：還沒到這裡的練習目標（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>
+    {short && <p className="wl-pass" data-ok={false}>這一版只有 {short.words} 字，題目要至少 {short.min} 字：分數照常給你看，但這次不算過關。</p>}
     {fb.summary && <p>{fb.summary}</p>}
     <ul className="wl-scores">{scores.map((s, i) => <li key={s.name}>
       <span className="wl-score" data-level={levelOf(s.score, r.max)}>{s.score}{ielts ? '' : ' / ' + r.max}</span>
@@ -46,6 +47,7 @@ function Graded({ fb }: { fb: WriteFeedback }) {
     </li>)}</ul>
     {fb.checks && fb.checks.length > 0 && <ul className="wl-checks" aria-label="這一階的要求">{fb.checks.map(c => <li key={c.name} data-ok={c.ok}>
       <span>{c.ok ? '✓' : '✗'}</span><div>{c.name}{c.comment && <small>{c.comment}</small>}</div></li>)}</ul>}
+    {fb.unchecked && fb.unchecked.length > 0 && <p className="ls-help">這幾項要求 Claude 這次沒有回答到：{fb.unchecked.join('；')}（想知道的話再按一次批改）</p>}
     <RubricTable rubric={r} label="對照的評分表" />
   </>
 }
@@ -140,16 +142,18 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   async function check() {
     if (!text.trim() || busy) return
     const mine = ++request.current
-    const asked = { id: task.id, words, ielts: !!stage.ielts, rubric, parts, checks }
+    const asked = { id: task.id, words, ielts: !!stage.ielts, rubric, parts, checks, task, text: text.trim() }
     setBusy(true); setError(''); setShowRevised(false)
     try {
       const reply = await askTutor(gradePrompt(stage, task, prompt), [{ role: 'user', content: text.trim() }])
       if (mine !== request.current) return
       setClaudeDown(false)
       const f = parseGrade(reply, asked.rubric, asked.parts, asked.checks)
-      if (!f) { setError('評分失敗：回傳的分數不在評分表上（' + (asked.ielts ? '每項是 1–9 的整數 band' : '0–' + asked.rubric.max + ' 的整數') + '），或項目對不上。這次不算數，也不會記成過關，再按一次批改。'); return }
-      setFb(f)
-      save({ last: f, best: scoreOf(f, asked.ielts) }, asked.id, asked.words)
+      if (!f) { setError('評分失敗：回傳的批改缺了項目名稱或理由，或分數不在評分表上（' + (asked.ielts ? '每項是 1–9 的整數 band' : '0–' + asked.rubric.max + ' 的整數') + '）。這次不算數，也不會記成過關，再按一次批改。'); return }
+      // The check belongs to the text that was sent: it is saved with it, and a later draft is never shown under its scores.
+      const graded: WriteFeedback = { ...f, answer: asked.text }
+      setFb(graded)
+      save({ last: graded, best: countedBest(graded, asked.ielts, asked.words, asked.task) }, asked.id, asked.words)
     } catch (e) {
       // A reply cut off or declined is not Claude out of reach: the sample essay stays hidden, pressing again is the way on.
       if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(!(e instanceof ClaudeIncomplete)) }
@@ -230,7 +234,7 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       <RubricTable rubric={rubric} />
     </section>
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={rubric.id === 'gept-sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off"
+      <textarea lang="en" rows={rubric.id === 'gept-sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off" readOnly={busy}
         onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
     </label>
     <div className="wl-bar">
@@ -257,7 +261,8 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 照評分表批改過才算。</small>
     </section>}
     {fb && <section className="wl-fb" aria-live="polite">
-      {fb.rubric && fb.scores ? <Graded fb={fb} /> : <>
+      {fb.answer !== undefined && fb.answer.trim() !== text.trim() && <details className="wl-old"><summary>這是你改之前那一版的批改；改過的這一版還沒批改</summary><p lang="en">{fb.answer}</p></details>}
+      {fb.rubric && fb.scores ? <Graded fb={fb} short={fb.answer !== undefined && wordCount(fb.answer) < task.min ? { words: wordCount(fb.answer), min: task.min } : undefined} /> : <>
         {/* Feedback saved before the published tables. */}
         <div className="wl-fb-head"><strong>批改</strong>{stage.ielts && fb.band !== undefined && <span className="wl-band">IELTS 練習估計分數 {fb.band}</span>}</div>
         {fb.summary && <p>{fb.summary}</p>}

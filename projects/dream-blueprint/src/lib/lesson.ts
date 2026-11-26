@@ -45,6 +45,16 @@ export interface Attempt { sentenceId: string; rating: 'correct' | 'minor' | 'ag
 /** h hint level, r answer seen, v Claude's verdict on the first try and vt the exact text it judged, c asked Claude for help. */
 export interface HintUse { h: number; r: boolean; v?: 'good' | 'small' | 'again' | 'changed'; vt?: string; c?: boolean }
 
+/** Help used on one sentence only ever grows: the hint level goes up, an answer seen or Claude asked stays seen or asked,
+ *  and the first verdict (with the text it judged) stays the first. A reply that arrives late with older values can't
+ *  take any of it back. */
+export function raiseHelp(cur: HintUse, patch: Partial<HintUse>): HintUse {
+  const v = cur.v ?? patch.v
+  const vt = cur.v ? cur.vt : patch.vt ?? cur.vt
+  const c = !!(cur.c || patch.c)
+  return { h: Math.max(cur.h, patch.h ?? 0), r: cur.r || !!patch.r, ...(v ? { v } : {}), ...(v && vt !== undefined ? { vt } : {}), ...(c ? { c } : {}) }
+}
+
 /** Hints used outside the guided lesson (checkpoint, review, extra drills) live in "hints.<date>". */
 export const hintsKey = (day: string) => 'hints.' + day
 export function readHints(notes: Record<string, string>, day: string): Record<string, HintUse> {

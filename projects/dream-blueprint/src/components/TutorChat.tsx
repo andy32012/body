@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { askTutor, ClaudeIncomplete, looksLikeTry, sentenceScoreOf, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
-import { settleSentence } from '../lib/rubrics'
+import { askTutor, ClaudeIncomplete, looksLikeTry, sentenceJudgement, tutorKey, tutorSystem, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { RubricScore } from './RubricTable'
 import { sameEnglish } from '../lib/evidence'
 import { updateStore, useAppStore } from '../lib/store'
@@ -13,8 +12,8 @@ const verdictNames = { good: '對了', small: '小錯', again: '再試一次', c
 
 const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
 const isTry = (t: TutorTurn) => t.role === 'user' && (t.content.startsWith('我的翻譯') || t.content.startsWith('我改成'))
-/** Claude's verdict and 單句寫作 score on one reply, made to agree (the stricter one wins). */
-const judged = (reply: string) => { const v = verdictOf(reply); return v ? settleSentence(v, sentenceScoreOf(reply)) : null }
+/** Claude's verdict and 單句寫作 score on one reply, made to agree (the stricter one wins); null when the reply is no real check. */
+const judged = sentenceJudgement
 
 /** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
 export default function TutorChat({ sentence, answer, onReveal, onVerdict, onError, onRevise, autoSend = false }: {
@@ -35,6 +34,8 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
   // The weak points this sentence has added (each kind once per sentence, however many tries it takes).
   const [noted, setNoted] = useState<string[]>([])
   const abort = useRef<AbortController | null>(null)
+  // One check at a time: a second press while one is on its way sends nothing (each one is a paid request).
+  const sending = useRef(false)
   const sentOnOpen = useRef(false)
   // The units before the current one are the rules he has learned: those get layered hints, the rest are taught directly.
   const { state } = useAppStore()
@@ -44,21 +45,32 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
     void send('我的翻譯：' + answer.trim())
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  // Leaving the sentence cancels a check still on its way, so a late reply never lands after he has moved on.
+  useEffect(() => () => abort.current?.abort(), [])
   if (!tutorKey()) return null
   const learned = curriculum.units.filter(u => u.unit < state.curriculum.unit).map(u => u.unit + '. ' + u.title)
 
   async function send(content: string) {
-    if (!content.trim() || busy) return
+    if (!content.trim() || busy || sending.current) return
+    sending.current = true
     const next: TutorTurn[] = [...turns, { role: 'user', content }]
     setTurns(next); setBusy(true); setError('')
     abort.current = new AbortController()
     try {
       const today = dayKey()
       const reply = await askTutor(tutorSystem(sentence, learned, weakLines(state.notes, today)), next, abort.current.signal)
+      const attempt = content.startsWith('我的翻譯') || content.startsWith('我改成')
+      const judgement = judged(reply)
+      // A try has to come back as a real check (判定, a 0–2 score and why). Anything else is not counted or kept, and the
+      // same sentence goes again; the first check that does count is the first try.
+      if (attempt && !judgement) {
+        setTurns(turns)
+        setError('Claude 這次沒有照格式給「得分」和「判定」，這次不算，也不會記錄。按下面的按鈕，把同一句再送一次。')
+        return
+      }
       setTurns([...next, { role: 'assistant', content: reply }])
       const tries = next.filter(isTry).length
-      const v = judged(reply)?.verdict ?? null
-      const attempt = content.startsWith('我的翻譯') || content.startsWith('我改成')
+      const v = judgement?.verdict ?? null
       const text = content.replace(/^(我的翻譯|我改成)：/, '')
       if (v && attempt) onVerdict?.(v, tries, text)
       // The shared weak-point list: what this try got wrong, or — written right the first time — one miss lighter.
@@ -73,11 +85,12 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
       }
       if (v !== 'good' && sentence.reference.some(r => squash(r).length > 6 && squash(reply).includes(squash(r)))) onReveal?.()
     } catch (e) {
+      if (abort.current?.signal.aborted) return
       setTurns(turns)
       setError(e instanceof Error ? e.message : String(e))
       // A reply cut off or declined is not Claude out of reach: asking again is the way on, the reference stays hidden.
       if (!(e instanceof ClaudeIncomplete)) onError?.()
-    } finally { setBusy(false) }
+    } finally { sending.current = false; setBusy(false) }
   }
 
   const attempts = turns.filter(isTry).length

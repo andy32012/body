@@ -3,7 +3,7 @@ import { Camera, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
 import { geptLevelsOpen, geptPass, geptRoundDone, readSeconds, speakRubric,
-  answerSeconds, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
+  answerSeconds, geptFeedbackComplete, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsComplete, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
   type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord,
 } from '../lib/gept'
 import { engineNames, listen, listenEngine, type Listening } from '../lib/speech'
@@ -211,7 +211,9 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       const sent = questions.map((q, j) => (j + 1) + '. 題目：' + q + '\n他說：' + (kept.current[j] || '（沒有說話）')).join('\n')
       const result = parseGeptFeedback(await askTutor(questionsPrompt(level), [{ role: 'user', content: sent }]))
       if (!alive.current) return
-      setFb(result); onScore(result.score, result)
+      // Only a complete check is scored (and can open 中級); otherwise his answers stay and the same ones can go again.
+      if (geptFeedbackComplete(result, questions.length)) { setFb(result); onScore(result.score, result) }
+      else { setFb(null); setError(incomplete); onScore(undefined) }
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); onScore(undefined) }
     setPhase('done')
   }
@@ -246,6 +248,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
     {phase === 'done' && <>
       {error && <p className="gp-warn" role="alert">{error}</p>}
       {fb ? <FeedbackView fb={fb} items={questions} answers={answers} rubric={speakRubric[level]} /> : <Transcripts items={questions} answers={answers} />}
+      {!fb && tutorKey() && <button type="button" className="gp-open" onClick={() => void score()}>用同樣的回答，請 Claude 再批一次</button>}
       <button type="button" className="gp-link" onClick={() => { kept.current = []; setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
     </>}
   </div>
@@ -273,7 +276,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       const shot = await shrink(f)
       const text = await askTutorImage('你是英文老師，幫台灣學生準備全民英檢中級口說。', photoQuestionsPrompt, { media: shot.media, data: shot.data })
       const got = parsePhotoQuestions(text)
-      if (!got.questions.length) throw new Error('Claude 沒有回提示問題，換一張照片試試。')
+      if (!photoQuestionsComplete(got)) throw new Error('Claude 這次沒有把提示問題和照片描述都寫好，先用原來的圖；可以再選一次照片。')
       if (!alive.current) return
       setPhoto(shot); setCustom(got); setPhase('ready')
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); setPhase('ready') }
@@ -293,12 +296,22 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       if (!alive.current) return
       setSaid(text)
       if (!tutorKey()) { setPhase('done'); onScore(undefined); return }
-      setPhase('scoring')
-      const result = parseGeptFeedback(await askTutor(picturePrompt({ describe, questions }), [{ role: 'user', content: '他說：' + (text || '（沒有說話）') }]))
-      if (!alive.current) return
-      setFb(result); onScore(result.score, result); setPhase('done')
+      await grade(text)
     } catch (e) { if (alive.current) { setError(e instanceof Error ? e.message : String(e)); setPhase('done') } }
     finally { clearInterval(timer); session.current = null }
+  }
+  /** Claude grades what he said against the same picture he looked at: his own photo goes along with its description. */
+  async function grade(text: string) {
+    setError(''); setPhase('scoring')
+    try {
+      const system = picturePrompt({ describe, questions }), said = '他說：' + (text || '（沒有說話）')
+      const reply = photo ? await askTutorImage(system, said + '\n（附上的照片就是他看的那一張）', { media: photo.media, data: photo.data }) : await askTutor(system, [{ role: 'user', content: said }])
+      const result = parseGeptFeedback(reply)
+      if (!alive.current) return
+      if (geptFeedbackComplete(result, questions.length)) { setFb(result); onScore(result.score, result) }
+      else { setFb(null); setError(incomplete); onScore(undefined) }
+    } catch (e) { if (alive.current) setError(e instanceof Error ? e.message : String(e)) }
+    if (alive.current) setPhase('done')
   }
 
   return <div className="gp-run">
@@ -324,6 +337,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     {phase === 'done' && <>
       <p className="gp-said"><small>你說的（語音辨識）：</small><span lang="en">{said || '（沒有聽到聲音）'}</span></p>
       {fb && <FeedbackView fb={fb} items={questions} rubric={speakRubric.intermediate} />}
+      {!fb && tutorKey() && <button type="button" className="gp-open" onClick={() => void grade(said)}>用同樣的描述，請 Claude 再批一次</button>}
       <div className="gp-row">
         <button type="button" className="gp-link" onClick={() => setPhase('ready')}>再說一次</button>
         <button type="button" className="gp-link" onClick={() => void speakEnglish(describe, rate)}><Volume2 size={14} />聽一段示範描述</button>
@@ -331,6 +345,8 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     </>}
   </div>
 }
+
+const incomplete = 'Claude 這次的批改不完整（缺分數的理由、某一題的回饋，或做得好／要改的地方），這次不計分。你說的都留著，可以請 Claude 再批一次。'
 
 function FeedbackView({ fb, items, answers, rubric }: { fb: GeptFeedback; items: string[]; answers?: string[]; rubric: RubricId }) {
   return <div className="gp-feedback" role="status">
