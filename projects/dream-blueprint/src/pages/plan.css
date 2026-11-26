@@ -385,3 +385,14 @@
 .pl-switch { flex-wrap: wrap; }
 .pl-switch button { min-width: 0; }
 @media (max-width: 520px) { .pl-switch { width: 100%; } .pl-switch button { flex: 1 1 30%; padding-inline: 8px; } }
+.pl-mock { margin: .5rem 0; padding: .6rem .8rem; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.pl-mock summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.pl-mock-note { font-size: .85rem; color: var(--muted); margin: .45rem 0; line-height: 1.55; }
+.pl-mock-links { flex-wrap: wrap; }
+.pl-mock-links .pr-link { overflow-wrap: anywhere; text-align: start; }
+.pl-mock-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: .5rem; align-items: end; margin-top: .5rem; min-width: 0; }
+.pl-mock-form label { display: grid; gap: .2rem; font-size: .85rem; min-width: 0; }
+.pl-mock-form select, .pl-mock-form input[type=date] { min-width: 0; max-width: 100%; }
+.pl-mock-form .pl-mock-check { display: flex; align-items: center; gap: .35rem; grid-column: 1 / -1; }
+.pl-mock-form .pr-main { grid-column: 1 / -1; justify-self: start; }
+.pl-mock-list { margin: .6rem 0 0; padding-left: 1.2rem; font-size: .88rem; display: grid; gap: .25rem; }

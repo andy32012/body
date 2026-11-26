@@ -12,6 +12,8 @@ import ExamMap from "../components/ExamMap";
 import LevelLadder from "../components/LevelLadder";
 import { firstLockedUnit } from "../lib/cefr";
 import Rivals from "./Rivals";
+import IeltsMockLog from "../components/IeltsMockLog";
+import { mockGoal } from "../lib/ieltsMock";
 import "./plan.css";
 
 const tracks = ["school", "english", "dream"] as const;
@@ -398,6 +400,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
             {goals
               .filter((g) => where(g) === month)
               .map((g) => goalRow(g.id, g.track, g.text))}
+            {goals.some((g) => where(g) === month && g.track === "english" && mockGoal(g.text)) && <IeltsMockLog state={state} update={update} />}
             <details className="pl-add">
               <summary>新增這個月的目標</summary>
               <form
