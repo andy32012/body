@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useState } from 'react'
 import data from '../data/scenarios.json'
 import type { PageProps } from '../lib/store'
@@ -91,6 +92,7 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
       {picked !== undefined && <div className="pr-hint">
         <strong>{wrong ? '這一步的答案是：' : '答對了'}{wrong && <span lang="en"> {s.options[s.answer]}</span>}</strong>
         <p>{s.why}</p>
+        {!wrong && <AskWhy q={{ source: '臨床情境', passage: current.case, stem: s.q, options: s.options, picked: s.options[picked], answer: s.options[s.answer], right: true }} />}
         {s.whyOptions && <ol className="dg-why cc-why" aria-label="每個選項為什麼對或錯">{s.options.map((o, i) => <li key={o} data-ok={i === s.answer}>
           <span lang="en">{o}</span><small>{s.whyOptions![i]}</small></li>)}</ol>}
         {wrong && <div className="qz-cause"><small>卡在哪？英文看不懂和護理觀念不熟會分開記。</small>

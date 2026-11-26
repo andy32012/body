@@ -3,6 +3,7 @@ import HomographNote from "../components/HomographNote";
 import { useTapGuard } from "../lib/tapGuard";
 import examSubjects from "../data/exam-subjects.json";
 import { useEffect, useRef, useState } from "react";
+import { writeDraft } from "../lib/drafts";
 import { ChevronLeft, Headphones, Check, PenLine, Volume2 } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
@@ -452,8 +453,7 @@ function PracticeSession({
               : current.examples.map((en, i) => <p key={en}><span lang="en">{en}</span><br/>{current.examplesZh[i]}</p>)}
             {current.items.filter((it) => records.some((r) => r.sentenceId === it.id)).map((it) => (
               <p key={it.id} className="ls-review-sentence">
-                <small>今天寫的句子：{it.zh}</small>
-                <b lang="en">{it.reference[0]}</b>
+                <small>今天寫過的句子（答案不在這裡顯示，複習時再自己寫一次）：{it.zh}</small>
               </p>
             ))}
             <button type="button" className="pr-main" onClick={() => look(null)}>回到{hereName}</button>
@@ -521,7 +521,12 @@ function PracticeSession({
           const todays = variationsFor(lessonData, current.day);
           const at = Math.min(varied, todays.length - 1);
           const v = todays[at];
-          return (
+          // A variation already marked (going back to it with 「回上一句」) keeps its first record: marking it again only
+          // moves on, so nothing is counted twice.
+          const already = (lessonRecord?.varied ?? 0) > at;
+          return (<>
+            {at > 0 && <button type="button" className="pr-link ls-back" onClick={() => { changedAt.current = Date.now(); setVaried(at - 1); }}>← 回上一句（換個說法 {at}，你寫的還在）</button>}
+            {already && <p className="ls-help">這句之前已經記過了：可以再改、再請 Claude 看，紀錄照第一次的算。</p>}
             <LessonVariation
               key={at}
               item={v}
@@ -543,6 +548,12 @@ function PracticeSession({
               })}
               onDone={(m, answer, check) => {
                 if (!settled()) return;
+                if (already) {
+                  changedAt.current = Date.now();
+                  setVaried(at + 1);
+                  requestAnimationFrame(() => pane.current?.scrollIntoView({ block: "start" }));
+                  return;
+                }
                 const level = judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check);
                 // Each variation has its own record (two on one day used to share one), judged on what he wrote before looking.
                 evidence(current.unit, level, { source: "vary", skill: "write", item: item.id + "-v" + at, answer: check.before ?? answer, prompt: v.zh, ref: v.en });
@@ -560,7 +571,7 @@ function PracticeSession({
                 step("pattern", { phase: "express", varied: todays.length });
               }}
             />
-          );
+          </>);
         })()}
         {live && lessonData && phase === "express" && (
           <LessonExpress
@@ -979,6 +990,17 @@ function Extras({
       ? allSentences.filter((s) => familiar.includes(s.id))
       : sentences;
   const [repeatIndex, setRepeatIndex] = useState(0);
+  // 「← 上一句」: a sentence marked in this round keeps what he wrote (put back into its box), and marking it again only
+  // moves on — its first record stands.
+  const repeatAnswers = useRef(new Map<string, string>());
+  const repeatMarked = useRef(new Set<string>());
+  function backRepeat() {
+    const prev = translationPool[repeatIndex - 1];
+    if (!prev) return;
+    const said = repeatAnswers.current.get(prev.id);
+    if (said) writeDraft(prev.id, said);
+    setRepeatIndex(repeatIndex - 1); setRepeatDone(false);
+  }
   const [repeatDone, setRepeatDone] = useState(false);
   // Due sentence cards come first (oldest first), then familiar sentences, then new ones.
   const [{ pool: translationPool, due: dueSentenceIds }] = useState(() => {
@@ -1187,6 +1209,7 @@ function Extras({
               repeatIndex + 1 < translationPool.length ? (
                 <div className="pr-actions">
                   <p className="ls-help">這一句已記下（第 {repeatIndex + 1} / {translationPool.length} 句）。</p>
+                  {repeatIndex > 0 && <button className="pr-link" onClick={backRepeat}>← 上一句</button>}
                   <button
                     className="pr-main"
                     onClick={() => {
@@ -1207,16 +1230,22 @@ function Extras({
                   </div>
                 </div>
               )
-            ) : (
+            ) : (<>
+              {repeatIndex > 0 && <button className="pr-link" onClick={backRepeat}>← 上一句（你寫的會放回去）</button>}
               <Translation
                 key={repeat.id}
                 sentence={repeat}
                 checkpoint={false}
                 saved={readHints(state.notes, date)[repeat.id]}
                 onHint={(use) => onActivity((prev) => ({ ...prev, notes: writeHint(prev.notes, date, repeat.id, use) }))}
-                onMark={logRepeat}
+                onMark={(mark, revealed, info) => {
+                  repeatAnswers.current.set(repeat.id, info.answer);
+                  if (repeatMarked.current.has(repeat.id)) { setRepeatDone(true); return; }
+                  repeatMarked.current.add(repeat.id);
+                  logRepeat(mark, revealed, info);
+                }}
               />
-            )
+            </>)
           ) : (
             <p>第一次完成句子練習後，就能回來複習。</p>
           )}

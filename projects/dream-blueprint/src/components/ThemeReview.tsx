@@ -155,11 +155,10 @@ function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain 
         </li>)}</ul>
       </div>)}
     {wrong.length > 0 && <details className="tr-wrong">
-      <summary>錯的 {wrong.length} 題和答案</summary>
+      <summary>錯的 {wrong.length} 題（答案不直接列出：看講解，下一輪自己再做一次）</summary>
       <ol>{wrong.map(x => <li key={x.unit + '.' + x.index}>
         <span lang="en">{x.drill.q}</span>
-        <b lang="en">{drillAnswer(x.drill)}</b>
-        <small>單元 {x.unit} · {x.drill.why}</small>
+        <small>單元 {x.unit} · <a href={'#library/grammar/' + x.unit}>看講解</a></small>
       </li>)}</ol>
     </details>}
     {sentences.length > 0 && <div className="tr-sentences">

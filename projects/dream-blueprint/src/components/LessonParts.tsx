@@ -1,3 +1,5 @@
+import OwnCheck from './OwnCheck'
+import AskWhy from './AskWhy'
 import { useEffect, useRef, useState } from 'react'
 import { Check, Pause, Play, Volume2 } from 'lucide-react'
 import CorrectBox from './CorrectBox'
@@ -152,6 +154,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
     {firstTime && checked && !noVoice && <ul className="ls-results">
       {lesson.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}>
         <span lang="en">{q.q}</span><b lang="en">{answers[i] === q.answer ? '✓ ' : '✗ '}{q.options[q.answer]}</b>
+        <AskWhy q={{ source: '每日課的聽力', passage: lesson.dialogue.map(d => d.en).join(' / '), stem: q.q, options: q.options, picked: answers[i] === undefined ? '' : q.options[answers[i]], answer: q.options[q.answer], right: answers[i] === q.answer }} />
       </li>)}
     </ul>}
     {checked && <>
@@ -198,7 +201,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [check])
   const [selfMark, setSelfMark] = useState(false)
-  // With Claude connected there is no 看答案: Claude checks first and gives the answer on 「直接告訴我」. If Claude can't be reached, 看答案 comes back.
+  // With Claude connected there is no 看答案: Claude checks first and gives clearer hints on 「再給我一個提示」, never the whole answer. If Claude can't be reached, a comparison with the answer comes back (his own words marked).
   const keyed = !!tutorKey()
   const [claudeDown, setClaudeDown] = useState(false)
   const mountedAt = useRef(Date.now())
@@ -231,11 +234,13 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
         if (v === 'good') setShown(true)
       }} />
     {!shown ? <>
-      {(!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div>}
+      {(!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>跟答案對照</button></div>}
       {/* A way on from the very first screen: a blank answer cannot be sent to Claude, and he may not know where to start. */}
-      {keyed && !claudeDown && <div className="pr-actions ls-skip"><span className="ls-help">{check.firstVerdict ? '照 Claude 的提示改好再批一次；真的不會，按「直接告訴我」，或' : answer.trim() ? '寫好就請 Claude 批改；想不出來也可以' : '連第一個字都想不到？可以'}</span><button type="button" className="pr-link" onClick={() => done('again')}>{check.firstVerdict ? '先跳過這題（加入複習）→' : '不會，先跳過（加入複習）→'}</button></div>}
+      {keyed && !claudeDown && <div className="pr-actions ls-skip"><span className="ls-help">{check.firstVerdict ? '照 Claude 的提示改好再批一次；真的不會，按「再給我一個提示」，或' : answer.trim() ? '寫好就請 Claude 批改；想不出來也可以' : '連第一個字都想不到？可以'}</span><button type="button" className="pr-link" onClick={() => done('again')}>{check.firstVerdict ? '先跳過這題（加入複習）→' : '不會，先跳過（加入複習）→'}</button></div>}
     </> : <>
-      <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
+      {latest?.v === 'good' && sameEnglish(latest.text, answer)
+        ? <section className="pr-reference"><small>你的答案（Claude 確認過）</small><p lang="en">{answer}</p></section>
+        : <section className="pr-reference"><small>跟答案對照（不顯示答案）</small><OwnCheck answer={answer} references={[item.en, ...(item.alt ?? [])]} /></section>}
       {latest?.v === 'good' && sameEnglish(latest.text, answer) && !selfMark ? <div className="pr-actions pr-next-step">
         <button type="button" className="pr-main" onClick={() => done('good')}>Claude 說對了，{count && count[0] < count[1] ? '下一題' : '下一步'} →</button>
         <button type="button" className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
@@ -245,8 +250,8 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
       </fieldset>}
       {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
-      {answer.trim() && check.before !== undefined && !check.before.trim() && <p className="ls-help">還沒寫就先看了答案：照抄的這題不算完成，會加入複習；明天再自己寫一次。</p>}
-      {answer.trim() && check.before?.trim() && !sameEnglish(check.before, answer) && <p className="ls-help">看了答案以後改過：記成有提示完成（看答案前寫對的話，還是算你自己完成）。</p>}
+      {answer.trim() && check.before !== undefined && !check.before.trim() && <p className="ls-help">還沒寫就先按了對照：這題不算完成，會加入複習；明天再自己寫一次。</p>}
+      {answer.trim() && check.before?.trim() && !sameEnglish(check.before, answer) && <p className="ls-help">對照以後改過：記成有提示完成（對照前就寫對的話，還是算你自己完成）。</p>}
       {answer.trim() && check.firstVerdict && <p className="ls-help">
         {check.revealed ? '老師已經把答案告訴你了：按「對了」會記成有提示完成。'
           : check.firstVerdict !== 'good' ? '老師指出過要改的地方：改好後按「對了」，這次記成有提示完成。'
@@ -373,18 +378,16 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
       <button type="button" aria-pressed={sees('zh')} onClick={() => help('zh')}>① 要做什麼</button>
       <button type="button" aria-pressed={sees('cue')} onClick={() => help('cue')}>② 用哪個句型</button>
       <button type="button" aria-pressed={sees('frame')} onClick={() => help('frame')}>③ 句架</button>
-      <button type="button" aria-pressed={sees('sample')} onClick={() => help('sample')}>④ 參考寫法</button>
       <StuckButton onUse={() => help('claude')} />
     </div>
     {sees('zh') && <p className="ls-help">{p.zh}</p>}
     {sees('cue') && <p className="ls-help">這課的句型：<b>{pattern}</b>{lesson.cando ? '。目標：' + lesson.cando : ''}</p>}
     {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
-    {sees('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{p.sample}</p></section>}
     <div className="pr-actions">
       {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim() || checking} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
-    {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
+    {!keyed && <p className="ls-help">還沒連接 Claude，先自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
     <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
       previous={previous} selfFix={!corrected || !rec.revealed}

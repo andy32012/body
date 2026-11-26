@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUp, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
-import { askEvent, askedAbout, currentTask, useCurrentTask } from '../lib/taskContext'
+import { askDetail, askEvent, askedAbout, currentTask, useCurrentTask } from '../lib/taskContext'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { useModal } from '../lib/modal'
@@ -194,7 +194,14 @@ export function AIAssistant({ progress }: { progress: string }) {
   const pet = usePet(typing)
   const task = useCurrentTask()
   useEffect(() => {
-    const on = (e: Event) => { setOpen(true); setAsk(a => ({ text: String((e as CustomEvent).detail), n: (a?.n ?? 0) + 1 })) }
+    const on = (e: Event) => {
+      const d = askDetail((e as CustomEvent).detail)
+      // Each message says whether it is about the task on screen; 「問 Claude 為什麼」 carries its own question.
+      setOpen(true); setGeneral(!!d.general)
+      // What only Claude sees about that question (its right answer, while he has not found it): kept for the follow-ups.
+      if (d.text) hiddenNow.current = d.hidden ?? ''
+      setAsk(a => ({ text: d.text, n: (a?.n ?? 0) + 1 }))
+    }
     window.addEventListener(askEvent, on)
     return () => window.removeEventListener(askEvent, on)
   }, [])
@@ -210,20 +217,21 @@ export function AIAssistant({ progress }: { progress: string }) {
   // 「只問單字或別的」: the task on screen stays out of the question and its record (back on for the next task).
   const [general, setGeneral] = useState(false)
   const generalNow = useRef(general)
+  const hiddenNow = useRef('')
   generalNow.current = general
-  useEffect(() => { setGeneral(false) }, [task?.label])
+  useEffect(() => { setGeneral(false); hiddenNow.current = '' }, [task?.label])
   // Read at send time, so the latest draft goes along with the question; asking about the task records the help.
-  const system = () => base + '\n' + askedAbout(currentTask(), generalNow.current).prompt
+  const system = () => base + '\n' + (hiddenNow.current ? hiddenNow.current + '\n' : '') + askedAbout(currentTask(), generalNow.current).prompt
   return <>
     <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
       <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
         onPointerEnter={e => { if (e.pointerType === 'mouse' && !typing) pet.show(true) }}
         onPointerLeave={e => { if (e.pointerType === 'mouse') pet.hide() }}
-        onClick={e => { if (typing) setOpen(true); else if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') pet.show(false) }}>
+        onClick={e => { if (typing) { setGeneral(false); hiddenNow.current = ''; setOpen(true) } else if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') pet.show(false) }}>
         <span className="ai-pet-stage"><PixelPet action={pet.action} size={30} /></span>
         {pet.label && <span className="ai-pet-bubble" aria-live="polite">{pet.label}</span>}
       </button>
-      <button type="button" className="ai-fab-label" onClick={() => setOpen(true)}>問問 Claude</button>
+      <button type="button" className="ai-fab-label" onClick={() => { setGeneral(false); hiddenNow.current = ''; setOpen(true) }}>問問 Claude</button>
     </div>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
       {task && <p className="ai-task"><b>{general ? '先不帶這題' : '正在協助'}</b><span>{task.label}</span></p>}

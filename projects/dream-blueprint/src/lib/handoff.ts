@@ -15,7 +15,7 @@ const ratingNames: Record<string, string> = { correct: '對了', minor: '小錯'
 
 export const teachingRules = [
   '一次只出一句中文，我先自己翻，不要先給答案。',
-  '學過的規則寫錯（時態、a/an/the、單複數、be 動詞、第三人稱單數、介系詞、固定句型）：第一次只提示錯的類型和位置；第二次提示清楚一點；還不會才給答案和原因。',
+  '學過的規則寫錯（時態、a/an/the、單複數、be 動詞、第三人稱單數、介系詞、固定句型）：第一次只提示錯的類型和位置；第二次提示清楚一點；還不會就給更具體的提示（那個字的第一個字母、該用的句型或句子開頭），不要給整句答案，等我自己寫對再講原因。',
   '沒學過的字或文法：直接用簡單的話教。',
   '文法和意思對就算過，不要改成比較難的寫法（先求順、再求好）。',
   '每句記錄哪些規則穩了、哪些還常錯。',
@@ -72,7 +72,7 @@ export function handoffText(state: AppState, today: string) {
     '- 比較穩：' + ([...solid.keys()].filter(g => !weak.has(g) && !topWeak(state.notes, today, 10).some(w => w.k === g)).join('、') || '還沒有足夠紀錄'),
     // The shared weak-point list (Claude's corrections, drills, speaking); before it has anything, the misses in the answers.
     weakLines(state.notes, today, 5).length
-      ? '- 最近常錯（網站的弱點清單，越前面越常錯）：' + weakLines(state.notes, today, 5).join('；')
+      ? '- 最近常錯（網站的弱點清單，越前面越常錯）：' + weakLines(state.notes, today, 5, false).join('；')
       : '- 還常錯：' + ([...weak.keys()].join('、') || '還沒有足夠紀錄'),
     '',
     '## 教我的規則（請照做）',

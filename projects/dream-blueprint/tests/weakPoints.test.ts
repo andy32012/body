@@ -174,3 +174,21 @@ test('Emma feedback counts only when every required line came back', async () =>
   assert.equal(speakFeedbackOk(part2, true), true)
   assert.equal(speakFeedbackOk(parseSpeakFeedback('內容和連貫：有回答到題目。'), true), false)
 })
+
+// R019: a weak point's example from a textbook item (the sentence will be practised again) shows only what he wrote;
+// corrections of his own free speaking and writing still show. The handoff text he copies leaves the answers out too.
+test('weak points do not show the textbook answer of items still being practised', async () => {
+  const { addWeak, fixShown, readWeak, weakLines } = await import('../src/lib/weakPoints.ts')
+  let notes: Record<string, string> = {}
+  notes = addWeak(notes, 'be 動詞現在式', '2026-11-20', { w: 'I is a nurse.', r: 'I am a nurse.' }, 'self')
+  notes = addWeak(notes, '用字', '2026-11-21', { w: 'I go yesterday.', r: 'I went yesterday.' }, 'speak')
+  const [be] = readWeak(notes).filter(i => i.k === 'be 動詞現在式')
+  const [past] = readWeak(notes).filter(i => i.k === '用字')
+  assert.equal(fixShown(be.ex[0]), false)
+  assert.equal(fixShown(past.ex[0]), true)
+  // Claude's own prompts keep the answer; the copied handoff does not.
+  assert.match(weakLines(notes, '2026-11-26', 5).join('；'), /I am a nurse\./)
+  assert.doesNotMatch(weakLines(notes, '2026-11-26', 5, false).join('；'), /I am a nurse\./)
+  assert.match(weakLines(notes, '2026-11-26', 5, false).join('；'), /I went yesterday\./)
+  assert.match(weakLines(notes, '2026-11-26', 5, false).join('；'), /I is a nurse\./)
+})

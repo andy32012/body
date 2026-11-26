@@ -1,3 +1,4 @@
+import OwnCheck from "./OwnCheck";
 import { useRef, useState, type ReactNode } from "react";
 import TutorChat from "./TutorChat";
 import { tutorKey } from "../lib/tutor";
@@ -54,8 +55,9 @@ export function Translation({
   // Claude's latest verdict and the text it judged: 「對了」 on what is in the box now means one tap goes on.
   const [latest, setLatest] = useState<{ v: Verdict; text: string } | null>(null);
   const [selfMark, setSelfMark] = useState(false);
-  // With Claude connected, 「請 Claude 批改」 sends the answer at once and there is no reference sentence to open:
-  // Claude checks and, when asked (「直接告訴我」), gives the answer. The reference opens only if Claude can't be reached.
+  // With Claude connected, 「請 Claude 批改」 sends the answer at once and Claude checks, with hints that get more exact
+  // (「再給我一個提示」), never the whole answer. Only when Claude can't be reached does the comparison with the reference
+  // open — and it shows his own words marked, never the reference itself.
   const keyed = !!tutorKey();
   const [sendNow, setSendNow] = useState(false);
   const [claudeDown, setClaudeDown] = useState(false);
@@ -99,9 +101,7 @@ export function Translation({
     const value =
       sentence.zh +
       "\n我的答案：" +
-      answer +
-      "\n參考句：" +
-      sentence.reference.join(" / ");
+      answer;
     try {
       await navigator.clipboard.writeText(value);
       setCopied("已複製");
@@ -156,7 +156,8 @@ export function Translation({
         <section className="pr-hint">
           <strong>自己檢查看看</strong>
           <p>{sentence.hints[0]}</p>
-          {hint >= 2 && <p>{sentence.hints[1] || sentence.why}</p>}
+          {/* The explanation (why) names the answer's words, so it is not a hint; it comes with Claude's feedback. */}
+          {hint >= 2 && <p>{sentence.hints[1] || "再對一次主詞、動詞和時間，還有這題的句型：" + sentence.grammar.join("、") + "。"}</p>}
           {hint >= 3 && <p className="pr-frame" lang="en">{sentenceFrame(sentence.reference[0])}</p>}
           {hint < 4 && (
             <div className="pr-actions">
@@ -172,7 +173,7 @@ export function Translation({
               )}
               {(!keyed || claudeDown) && (
                 <button className="pr-link" onClick={() => setHint(4)}>
-                  看參考句
+                  跟參考句對照（不顯示答案）
                 </button>
               )}
             </div>
@@ -181,26 +182,8 @@ export function Translation({
       )}
       {hint === 4 && (
         <section className="pr-reference">
-          <small>參考句</small>
-          {sentence.reference.map((en) => (
-            <p lang="en" key={en}>
-              {en}
-            </p>
-          ))}
-          <span>{sentence.why}</span>
-          {answered(answer) && (() => {
-            const diff = compareWithReference(answer, sentence.reference);
-            const commas = clauseCommaNote(answer, sentence.reference);
-            if (commas) return <p className="pr-compare"><small>{commas}</small></p>;
-            return diff && !diff.same && (
-              <p className="pr-compare">
-                <small>跟最接近的參考句比：</small>{" "}
-                <span lang="en">{diff.words.map((t, i) => <span key={i} className={t.extra ? "pr-diff-extra" : undefined}>{t.w} </span>)}</span>
-                {diff.missing.length > 0 && <><br /><small>參考句有、你沒寫到的字：</small> <span lang="en" className="pr-diff-missing">{diff.missing.join(" ")}</span></>}
-                <br /><small>畫波浪線的字跟參考句不一樣。寫法不同也可能是對的，重點是意思有沒有變：時間、人物、動作或否定換了，就是意思不一樣。</small>
-              </p>
-            );
-          })()}
+          <small>跟參考句對照（不會直接給答案）</small>
+          <OwnCheck answer={answer} references={sentence.reference} />
           {sentence.newWords.length > 0 && (
             <div className="pr-tags">
               {sentence.newWords.map((word) => (

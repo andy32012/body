@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useState } from 'react'
 import quizData from '../data/quiz.json'
 import type { PageProps } from '../lib/store'
@@ -95,6 +96,8 @@ export default function QuizPractice({ state, update, onActivity = update, date,
     {picked !== undefined && <div className="pr-hint">
       <strong>{wrong ? '這題的答案是「' + question.options[question.answerIndex] + '」' : '答對了'}</strong>
       <p>{question.explanation}</p>
+      {/* Nursing misses get the diagnosis box below; every other answer can ask Claude why. */}
+      {!(wrong && nursing) && <AskWhy q={{ source: nursing ? '護理英文選擇題' : '英文選擇題', stem: question.en, options: question.options, picked: question.options[picked!] ?? '', answer: question.options[question.answerIndex], right: !wrong }} />}
       {question.source && <a href={question.source} target="_blank" rel="noreferrer">查看資料來源</a>}
       {wrong && <div className="qz-cause">
         <small>卡在哪？選一個，之後會看哪一種最常出現。這題明天會再出現。</small>

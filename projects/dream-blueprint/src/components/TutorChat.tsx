@@ -15,7 +15,7 @@ const isTry = (t: TutorTurn) => t.role === 'user' && (t.content.startsWith('我�
 /** Claude's verdict and 單句寫作 score on one reply, made to agree (the stricter one wins); null when the reply is no real check. */
 const judged = sentenceJudgement
 
-/** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
+/** onReveal fires when he asks for a clearer hint (or Claude's reply gives the answer away anyway): it counts as help. */
 export default function TutorChat({ sentence, answer, onReveal, onVerdict, onError, onRevise, autoSend = false }: {
   sentence: TutorSentence; answer: string; onReveal?: () => void
   /** Claude's verdict on each submitted try (1 = the first try, before any feedback), with the exact text it judged. */
@@ -115,7 +115,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
       {attempts === 0
         ? <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim())}>請 Claude 批改</button>
         : <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我改成：' + answer.trim())}>改好了，請 Claude 再批一次</button>}
-      {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => { onReveal?.(); void send('我還是不會，請直接給答案並完整講原因。') }}>直接告訴我</button>}
+      {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => { onReveal?.(); void send('我還是不會，再給我一個更清楚的提示（不要給整句答案）。') }}>再給我一個提示</button>}
     </div>
     {attempts > 0 && <form className="tu-ask" onSubmit={e => {
       e.preventDefault()

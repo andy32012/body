@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { readReadingProgress, saveReadingProgress, savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
@@ -254,6 +255,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       <strong>{lastWrong ? '第 ' + at + ' 題答案是「' + last.options[last.answer] + '」' : '第 ' + at + ' 題答對了'}</strong>
       <p>{last.why}</p>
       {last.evidence && <small>文章裡標起來的那一句就是證據。</small>}
+      <AskWhy q={{ source: '閱讀', passage: passage.paras.join(' '), stem: last.q, options: last.options, picked: picks[at - 1] === undefined ? '' : last.options[picks[at - 1]], answer: last.options[last.answer], right: !lastWrong }} />
       {lastWrong && <div className="qz-cause"><small>卡在哪？選一個，之後會看哪一種最常出現。</small>
         <div className="pr-options">{readCauses.map(c => <button key={c} type="button" aria-pressed={causes[at - 1] === c} disabled={!!causes[at - 1] && causes[at - 1] !== c} onClick={() => cause(at - 1, c)}>{c}</button>)}</div>
       </div>}

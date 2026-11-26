@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useMemo, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import { orderForSkill, spellingMatches, type Skill } from '../lib/wordSkills'
@@ -127,6 +128,8 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
     {answered && <HomographNote en={word.en} side={side} />}
     {/* After answering, so the chat never gives the answer away. */}
     {answered && <div className="ws-tools"><EmmaWordLink en={word.en} zh={word.zh} where={where} part={skill} seen
-      others={order.slice(i + 1, i + 6).map(w => w.en)} /></div>}
+      others={order.slice(i + 1, i + 6).map(w => w.en)} />
+      {skill === 'write' ? <AskWhy q={{ source: '單字拼寫', stem: '看中文拼出英文：' + word.zh, picked: answer, answer: word.en, right: spellingMatches(answer, word.en) }} />
+        : skill !== 'say' && picked !== undefined && <AskWhy q={{ source: skill === 'listen' ? '單字（聽發音選意思）' : '單字（看英文選意思）', stem: word.en, options: options.map(o => o.zh), picked: options[picked]?.zh ?? '', answer: word.zh, right }} />}</div>}
   </div>
 }

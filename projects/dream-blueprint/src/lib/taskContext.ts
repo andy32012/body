@@ -78,10 +78,35 @@ export function askedAbout(t: TaskContext | null, general: boolean) {
   return { prompt: taskPrompt(t) }
 }
 
-/** Ask the floating Claude chat to open and send a message (used by 「我卡住了」). */
+/** Ask the floating Claude chat to open and send a message (used by 「我卡住了」). `general`: the message carries what
+ *  Claude needs by itself and is not help on the task on screen (「問 Claude 為什麼」 after answering). */
 export const askEvent = 'dream-blueprint:ask-claude'
-export function askClaude(text: string) {
-  window.dispatchEvent(new CustomEvent(askEvent, { detail: text }))
+export interface AskDetail { text: string; general?: boolean; hidden?: string }
+export function askClaude(text: string, opts: { general?: boolean; hidden?: string } = {}) {
+  window.dispatchEvent(new CustomEvent<AskDetail>(askEvent, { detail: { text, ...(opts.general ? { general: true } : {}), ...(opts.hidden ? { hidden: opts.hidden } : {}) } }))
+}
+/** The event's message (older callers sent the text alone). */
+export const askDetail = (d: unknown): AskDetail => typeof d === 'string' ? { text: d }
+  : d && typeof d === 'object' && typeof (d as AskDetail).text === 'string' ? d as AskDetail : { text: '' }
+
+/** One answered question, for 「問 Claude 為什麼」: the question, his answer and the right one. */
+export interface WhyQuestion { source?: string; stem: string; options?: readonly string[]; picked?: string; answer: string; right: boolean; passage?: string }
+/** What 「問 Claude 為什麼」 sends after a question was answered (the first result is already kept). `text` is what he
+ *  sees in the chat; `hidden` goes to Claude only. Answered right: Claude explains why. Not right yet: the right answer
+ *  stays out of his view, and Claude says what went wrong and gives one hint so he can find it himself. */
+export function whyQuestion(q: WhyQuestion): { text: string; hidden: string } {
+  const text = [
+    (q.source ? q.source + '：' : '') + (q.right ? '我答對了這一題，想知道為什麼。' : '我這題還沒答對。'),
+    q.passage ? '原文：' + q.passage : '',
+    '題目：' + q.stem,
+    q.options?.length ? '選項：' + q.options.join(' / ') : '',
+    q.picked === undefined ? '' : q.picked.trim() ? '我的答案：' + q.picked : '我沒有作答',
+    q.right ? '正確答案：' + q.answer : '',
+    q.right ? '請用中文說明為什麼這個對、其他的為什麼不對（有原文就指出線索），短短的就好。'
+      : '請用中文說我錯在哪裡，再給我一個提示讓我自己再試一次（先不要給答案）。',
+  ].filter(Boolean).join('\n')
+  const hidden = q.right ? '' : '【只給你看】這一題的正確答案：' + q.answer + '。他還沒答對：不要說出這個答案，也不要說到只差照抄；說他錯在哪、給一個提示，等他再試。他答對了才完整說明。'
+  return { text, hidden }
 }
 /** What 「問 Claude 老師」 on a tapped word sends: the teacher asks first whether he knows what it means here, then explains. */
 export const wordQuestion = (form: string) => '我想問這篇文章裡的「' + form + '」。你先問我知不知道它在這裡是什麼意思，等我回答了再跟我說對不對、怎麼用。'

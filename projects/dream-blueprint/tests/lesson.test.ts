@@ -387,6 +387,24 @@ test('浮動 Claude 問這一題就記成有提示；改成「只問單字或別
   assert.equal(helped, 1)
 })
 
+test('「問 Claude 為什麼」帶著題目和他的答案；答錯時正解只給 Claude、要它給提示不給答案（審核 R017、R019）', async () => {
+  const { whyQuestion } = await import('../src/lib/taskContext.ts')
+  const wrong = whyQuestion({ source: '文法小練習', stem: 'She ___ a nurse.', options: ['am', 'is', 'are'], picked: 'am', answer: 'is', right: false })
+  assert.match(wrong.text, /文法小練習/)
+  assert.match(wrong.text, /She ___ a nurse\./)
+  assert.match(wrong.text, /選項：am \/ is \/ are/)
+  assert.match(wrong.text, /我的答案：am/)
+  // The right answer is not in what he sees in the chat; Claude gets it and is told to hint, not tell.
+  assert.doesNotMatch(wrong.text, /正確答案/)
+  assert.match(wrong.hidden, /正確答案：is/)
+  assert.match(wrong.hidden, /不要說出/)
+  assert.match(wrong.text, /提示/)
+  const right = whyQuestion({ stem: 'She ___ a nurse.', picked: 'is', answer: 'is', right: true })
+  assert.match(right.text, /我答對了/)
+  assert.match(right.text, /正確答案：is/)
+  assert.match(whyQuestion({ stem: 'Fix: He go home.', picked: '', answer: 'He goes home.', right: false }).text, /我沒有作答/)
+})
+
 test('看過的提示只會變多：Claude 的回覆晚到，也不會把提示層級、看過答案或問過 Claude 退回去（審核 R008）', async () => {
   const { raiseHelp } = await import('../src/lib/lesson.ts')
   const seen = { h: 3, r: true, c: true }

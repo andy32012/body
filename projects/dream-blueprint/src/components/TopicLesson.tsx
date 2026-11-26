@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, ChevronLeft, Mic, Pause, Play, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
@@ -122,7 +123,9 @@ function GoalStep({ topic, onNext }: { topic: Topic; onNext: () => void }) {
 }
 
 type Choice = { q: string; options: string[]; answer: number; lead?: string; tag?: string; en?: boolean }
-function Questions({ items, picks, onPick, checked, disabled }: { items: Choice[]; picks: (number | undefined)[]; onPick: (i: number, j: number) => void; checked: boolean; disabled?: boolean }) {
+function Questions({ items, picks, onPick, checked, disabled, source, passage }: { items: Choice[]; picks: (number | undefined)[]; onPick: (i: number, j: number) => void; checked: boolean; disabled?: boolean
+  /** For 「問 Claude 為什麼」 once checked: what kind of question, and the dialogue or text it is about. */
+  source?: string; passage?: string }) {
   return <ol className="ls-qs tl-qs">
     {items.map((q, i) => <li key={i}>
       {q.tag && <small className="tl-tag">{q.tag}</small>}
@@ -132,6 +135,7 @@ function Questions({ items, picks, onPick, checked, disabled }: { items: Choice[
         aria-pressed={picks[i] === j} disabled={checked || disabled}
         data-result={checked ? (j === q.answer ? 'right' : picks[i] === j ? 'wrong' : undefined) : undefined}
         onClick={() => onPick(i, j)}>{o}</button>)}</div>
+      {checked && source && <AskWhy q={{ source, passage, stem: (q.lead ? q.lead + ' ' : '') + q.q, options: q.options, picked: picks[i] === undefined ? '' : q.options[picks[i]!], answer: q.options[q.answer], right: picks[i] === q.answer }} />}
     </li>)}
   </ol>
 }
@@ -163,7 +167,7 @@ function WordsStep({ topic, rec, save, onNext, rate }: StepProps) {
       </li>)}
     </ul>
     <h3 className="tl-h">在這句裡是什麼意思？</h3>
-    <Questions items={qs} picks={picks} checked={checked} onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
+    <Questions items={qs} picks={picks} checked={checked} source="生活主題的單字" onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
     {!checked ? <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!allPicked(picks, qs.length)}
         onClick={() => save(r => r.words ? {} : { words: { correct: qs.filter((q, i) => picks[i] === q.answer).length, total: qs.length } })}>對答案</button>
@@ -275,7 +279,7 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <h2 className="pr-question">先只聽，不看字</h2>
       <p className="ls-help">完整聽一到兩次，先抓他們在做什麼。聽不懂的字先猜。</p>
       {play}
-      <Questions items={[{ ...L.gist, en: true }]} picks={[gistPick]} checked={saved.gist !== undefined} disabled={!open}
+      <Questions items={[{ ...L.gist, en: true }]} picks={[gistPick]} checked={saved.gist !== undefined} disabled={!open} source="生活主題的聽力（大意）" passage={L.dialogue.map(d => d.en).join(' / ')}
         onPick={(_, j) => { if (ready() && open) setGistPick(j) }} />
       {!open && <p className="ls-help ls-need">先按「播放對話」完整聽一次，題目才能作答。中途停掉不算聽完。</p>}
       {unsureLink}
@@ -295,7 +299,7 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <h2 className="pr-question">再聽一次，回答細節</h2>
       <p className="ls-help">還是不看字。可以用剛剛聽到的回答，也可以再完整聽一次，再聽的次數會另外記。</p>
       {play}
-      <Questions items={L.details.map(q => ({ ...q, en: true }))} picks={picks} checked={saved.details !== undefined}
+      <Questions items={L.details.map(q => ({ ...q, en: true }))} picks={picks} checked={saved.details !== undefined} source="生活主題的聽力（細節）" passage={L.dialogue.map(d => d.en).join(' / ')}
         onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
       {saved.details === undefined
         ? <button type="button" className="pr-main" disabled={!allPicked(picks, L.details.length)} onClick={() => {
@@ -376,10 +380,8 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
       <textarea lang="en" rows={3} value={text} spellCheck={false} autoComplete="off" onChange={e => { setText(e.target.value); writeDraft(key, e.target.value) }} />
     </label>
     <div className="ls-helps" role="group" aria-label="需要幫忙時打開">
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>看參考說法</button>
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
-    {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{L.retellSample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
     <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
       onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)} />
@@ -411,7 +413,7 @@ function ReadStep({ topic, rec, save, onNext }: StepProps) {
       <strong lang="en">{R.title}</strong>
       {R.lines.map(l => <p key={l.en}><span lang="en">{l.en}</span>{checked && showZh && <span className="ls-zh">{l.zh}</span>}</p>)}
     </article>
-    <Questions items={R.questions.map(q => ({ ...q, tag: q.skill, en: true }))} picks={picks} checked={checked}
+    <Questions items={R.questions.map(q => ({ ...q, tag: q.skill, en: true }))} picks={picks} checked={checked} source="生活主題的閱讀" passage={R.title + '：' + R.lines.map(l => l.en).join(' ')}
       onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
     {!checked ? <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!allPicked(picks, R.questions.length)} onClick={() => {
@@ -590,11 +592,9 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <div className="ls-helps" role="group" aria-label="卡住了再打開">
       <span>卡住了？</span>
       <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>句型提示</button>
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>參考說法</button>
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points[0]}</p>}
-    {open.help.includes('sample') && <section className="pr-reference"><small>參考說法（看過就記成有提示完成）</small><p lang="en">{task.sample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表看文字稿'}</button></div>}
     <CorrectBox run={run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
       reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
@@ -650,12 +650,10 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
       <span>卡住了？一層一層打開：</span>
       <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>① 用哪個句型</button>
       <button type="button" aria-pressed={open.help.includes('frame')} onClick={() => { if (ready()) open.addHelp('frame') }}>② 句架</button>
-      <button type="button" aria-pressed={open.help.includes('sample')} onClick={() => { if (ready()) open.addHelp('sample') }}>③ 參考寫法</button>
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
     {open.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
-    {open.help.includes('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{W.sample}</p></section>}
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
     <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
       onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)}

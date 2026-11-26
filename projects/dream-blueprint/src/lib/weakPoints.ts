@@ -154,9 +154,14 @@ export function topWeak(notes: Record<string, string>, today: string, count = 5)
     .slice(0, count)
 }
 
-/** One line per weak point, for a Chinese prompt (the tutor, 問問 Claude, another assistant). */
-export function weakLines(notes: Record<string, string>, today: string, count = 5) {
-  return topWeak(notes, today, count).map(i => i.k + '（錯 ' + i.n + ' 次' + (i.ex[0] ? '，例如他寫「' + i.ex[0].w + '」，應該是「' + i.ex[0].r + '」' : '') + '）')
+/** Whether an example's correction may be shown to him: corrections of his own free speaking and writing yes; the
+ *  answer of a textbook item (a translation, a drill, a review sentence) no — that item comes round again for him to
+ *  write himself. */
+export const fixShown = (e: { src: WeakSource }) => !(['self', 'drill', 'review', 'tutor'] as WeakSource[]).includes(e.src)
+/** One line per weak point, for a Chinese prompt (the tutor, 問問 Claude). `answers: false` (the handoff text he copies
+ *  and reads) leaves the textbook answers out, as on his own screen. */
+export function weakLines(notes: Record<string, string>, today: string, count = 5, answers = true) {
+  return topWeak(notes, today, count).map(i => i.k + '（錯 ' + i.n + ' 次' + (i.ex[0] ? '，例如他寫「' + i.ex[0].w + '」' + (answers || fixShown(i.ex[0]) ? '，應該是「' + i.ex[0].r + '」' : '') : '') + '）')
 }
 /** The same, in English, for Emma. */
 export function weakLinesEn(notes: Record<string, string>, today: string, count = 5) {

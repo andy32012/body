@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useEffect, useMemo, useState } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
@@ -97,7 +98,8 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
     {!checked && !open && started > 0 && voice.playing === null && <button type="button" className="pr-link" onClick={() => setUnsure(true)}>播完了，但題目沒有打開？</button>}
     {!checked && <button type="button" className="pr-main" disabled={!open || answers.filter(a => a !== undefined).length < l.questions.length} onClick={check}>對答案、看全文</button>}
     {checked && <ul className="ls-results">
-      {l.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}><span lang="en">{q.q}</span><b lang="en">{answers[i] === q.answer ? '✓ ' : '✗ '}{q.options[q.answer]}</b></li>)}
+      {l.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}><span lang="en">{q.q}</span><b lang="en">{answers[i] === q.answer ? '✓ ' : '✗ '}{q.options[q.answer]}</b>
+        <AskWhy q={{ source: '聽力', passage: l.dialogue.map(d => d.who + ': ' + d.en).join(' / '), stem: q.q, options: q.options, picked: answers[i] === undefined ? '' : q.options[answers[i]], answer: q.options[q.answer], right: answers[i] === q.answer }} /></li>)}
     </ul>}
     {(checked || noVoice) && <>
       <Transcript lines={l.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(l.dialogue, i, true)} />
@@ -124,6 +126,7 @@ function HeldReading({ passage: data, done, onSubmit }: { passage: ReadPassage; 
         <div className="pr-options rd-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={picks[i] === j} disabled={finished}
           onClick={() => { const n = [...picks]; n[i] = j; setPicks(n) }}>{o}</button>)}</div>
         {finished && <p className="up-why" data-ok={picks[i] === q.answer}>{picks[i] === q.answer ? '✓ 對。' : '✗ 答案是「' + q.options[q.answer] + '」。'}{q.why}</p>}
+        {finished && <AskWhy q={{ source: '單元閱讀', passage: passage.paras.join(' '), stem: q.q, options: q.options, picked: picks[i] === undefined ? '' : q.options[picks[i]], answer: q.options[q.answer], right: picks[i] === q.answer }} />}
       </li>)}
     </ol>
     {!finished && <button type="button" className="pr-main" disabled={!ready} onClick={() => onSubmit(savedPicks(passage.qs, picks), passage.qs.filter((q, i) => picks[i] === q.answer).length)}>交卷（只有這一次）</button>}
@@ -166,6 +169,7 @@ function HeldListening({ l, rate, done, onSubmit }: { l: PackListening; rate: nu
         <div className="pr-options rd-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={picks[i] === j} disabled={finished || !open}
           onClick={() => { const n = [...picks]; n[i] = j; setPicks(n) }}>{o}</button>)}</div>
         {finished && <p className="up-why" data-ok={picks[i] === q.answer}>{picks[i] === q.answer ? '✓ 對' : '✗ 答案是「' + q.options[q.answer] + '」'}</p>}
+        {finished && <AskWhy q={{ source: '單元聽力', passage: l.dialogue.map(d => d.who + ': ' + d.en).join(' / '), stem: q.q, options: q.options, picked: picks[i] === undefined ? '' : q.options[picks[i]], answer: q.options[q.answer], right: picks[i] === q.answer }} />}
       </li>)}
     </ol>
     {!finished && <button type="button" className="pr-main" disabled={!open || !ready} onClick={() => { voice.stop(); onSubmit(picks, l.questions.filter((q, i) => picks[i] === q.answer).length, voice.completed > 0 && !unsure && !noVoice) }}>交卷（只有這一次）</button>}

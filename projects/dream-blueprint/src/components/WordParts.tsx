@@ -57,7 +57,7 @@ function Review({ checks }: Pick<PageProps['state'], 'checks'>) {
     <p><b className="vocab-term" lang="en">{part.part}</b>是什麼意思？</p>
     <Choices key={part.id + round} quiz={meaningQuiz(part, round)} onRight={first => { setAnswered(true); if (first) setFirstTries(n => n + 1) }} />
     {answered && <>
-      <p className="wp-ok" role="status">{part.examples.slice(0, 2).map(e => e.en + '（' + e.zh + '）').join('、')}</p>
+      <p className="wp-ok" role="status">{part.examples.slice(0, 2).map(e => e.en + '（' + e.zh + '）').join('、')} <AskWord en={part.part} zh={part.type + '：' + part.meaning} /></p>
       <button type="button" className="wp-next" onClick={() => { setAt(at + 1); setAnswered(false) }}>{at + 1 < items.length ? '下一題' : '看結果'}</button>
     </>}
   </article>

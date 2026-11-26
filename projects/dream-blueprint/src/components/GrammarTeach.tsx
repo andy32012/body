@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useEffect, useState, type ReactNode } from 'react'
 import { reached } from '../lib/unlock'
 import { Volume2 } from 'lucide-react'
@@ -58,48 +59,63 @@ export function ExplainBody({ steps, table, mistakes, rate }: { steps: GrammarSt
   </div>
 }
 
-/** One drill (choose, fill or fix) with its feedback; also used by 主題總複習. */
+/** One drill (choose, fill or fix) with its feedback; also used by 主題總複習. The first try is what counts (onDone).
+ *  A wrong answer does not show the right one: he can try again (a wrong choice is crossed out), ask Claude for a hint,
+ *  or move on — the drill comes back later. The answer and the reason show once he has found it himself. */
 export function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boolean, said: string) => void }) {
   // A fix drill starts from the wrong sentence, so only the wrong part needs retyping on a phone.
   const [text, setText] = useState(drill.k === 'fix' ? drill.q : '')
-  const [picked, setPicked] = useState<number | null>(null)
+  const [missed, setMissed] = useState<number[]>([])
   const [result, setResult] = useState<boolean | null>(null)
+  const [solved, setSolved] = useState(false)
+  const [said, setSaid] = useState('')
   const untouched = drill.k === 'fix' ? text.trim() === drill.q : !text.trim()
   function check(answer: string | number) {
-    if (result !== null) return
+    if (solved) return
     const right = checkDrill(drill, answer)
-    setResult(right)
-    onDone(right, typeof answer === 'number' ? (drill.k === 'choose' ? drill.options[answer] ?? '' : '') : answer)
+    const typed = typeof answer === 'number' ? (drill.k === 'choose' ? drill.options[answer] ?? '' : '') : answer
+    if (result === null) { setResult(right); onDone(right, typed) }
+    setSaid(typed)
+    if (right) setSolved(true)
+    else if (typeof answer === 'number') setMissed(m => [...m, answer])
   }
+  const gaveUp = result === false && !said.trim() || (drill.k === 'fix' && said.trim() === drill.q)
   return <div className="gm-drill" data-kind={drill.k}>
     {drill.k === 'fix'
       ? <><p className="gm-ask">這句有一個地方錯了，改成正確的句子。</p><p className="gm-q gm-wrong" lang="en">{drill.q}</p></>
       : <p className="gm-q" lang="en">{drill.q}</p>}
     {drill.k === 'choose' && <div className="pr-options gm-options">
-      {drill.options.map((o, i) => <button key={o} type="button" lang="en" disabled={result !== null}
-        className={result === null ? undefined : i === drill.answer ? 'gm-right' : i === picked ? 'gm-miss' : undefined}
-        aria-pressed={picked === i} onClick={() => { setPicked(i); check(i) }}>{o}</button>)}
+      {drill.options.map((o, i) => <button key={o} type="button" lang="en" disabled={solved || missed.includes(i)}
+        className={solved && i === drill.answer ? 'gm-right' : missed.includes(i) ? 'gm-miss' : undefined}
+        aria-pressed={missed.includes(i) || (solved && i === drill.answer)} onClick={() => check(i)}>{o}</button>)}
     </div>}
     {drill.k !== 'choose' && <form className="gm-type" onSubmit={e => { e.preventDefault(); if (!untouched) check(text) }}>
       <label className="pr-field">{drill.k === 'fill' ? '空格裡填' : '改好的句子'}
         {drill.k === 'fill'
-          ? <input lang="en" value={text} readOnly={result !== null} autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck={false}
+          ? <input lang="en" value={text} readOnly={solved} autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck={false}
               onChange={e => setText(e.target.value)} placeholder="寫在這裡" />
-          : <textarea lang="en" rows={2} value={text} readOnly={result !== null} autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck={false}
+          : <textarea lang="en" rows={2} value={text} readOnly={solved} autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck={false}
               onChange={e => setText(e.target.value)} />}
       </label>
-      {result === null && <div className="pr-actions">
-        <button type="submit" className="pr-main" disabled={untouched}>對答案</button>
+      {!solved && <div className="pr-actions">
+        <button type="submit" className="pr-main" disabled={untouched}>{result === null ? '對答案' : '改好了，再對一次'}</button>
         {/* A way on without an answer: it counts as missed and comes back later, like any wrong answer. */}
-        <button type="button" className="pr-link" onClick={() => check(drill.k === 'fix' ? drill.q : '')}>不會，看答案</button>
+        {result === null && <button type="button" className="pr-link" onClick={() => check(drill.k === 'fix' ? drill.q : '')}>不會，先跳過</button>}
       </div>}
     </form>}
-    {result !== null && <div className="gm-feedback" data-ok={result} role="status">
-      <strong>{result ? '對了' : '還沒對'}</strong>
+    {result !== null && (solved ? <div className="gm-feedback" data-ok={result} role="status">
+      <strong>{result ? '對了' : '這次改對了（第一次的錯照樣記，之後會再出現）'}</strong>
       <p lang="en">{drillAnswer(drill)}</p>
       {drill.k === 'fix' && drill.accept.length > 1 && <small>也可以寫：<span lang="en">{drill.accept.slice(1).join('／')}</span></small>}
       <small>{drill.why}</small>
-    </div>}
+      <AskWhy q={{ source: '文法小練習', stem: (drill.k === 'fix' ? '這句有一個地方錯了，改成正確的句子：' : drill.k === 'fill' ? '填空：' : '') + drill.q,
+        options: drill.k === 'choose' ? drill.options : undefined, picked: said, answer: drillAnswer(drill), right: true }} />
+    </div> : <div className="gm-feedback" data-ok={false} role="status">
+      <strong>{gaveUp ? '先跳過了，這題之後會再出現' : '還沒對'}</strong>
+      {!gaveUp && <small>{drill.k === 'choose' ? '劃掉的不是答案，再選一次。' : '看看上面的講解，找出哪裡不一樣再改一次。'}</small>}
+      <AskWhy label="問 Claude 提示（不會直接給答案）" q={{ source: '文法小練習', stem: (drill.k === 'fix' ? '這句有一個地方錯了，改成正確的句子：' : drill.k === 'fill' ? '填空：' : '') + drill.q,
+        options: drill.k === 'choose' ? drill.options : undefined, picked: gaveUp ? '' : said, answer: drillAnswer(drill), right: false }} />
+    </div>)}
   </div>
 }
 

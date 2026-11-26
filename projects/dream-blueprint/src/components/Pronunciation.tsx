@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import ReadAloudCheck from './ReadAloudCheck'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronLeft, Mic, Square, Volume2 } from 'lucide-react'
@@ -287,6 +288,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     {answered && <div className="gm-feedback" data-ok={picked === q.answer} role="status">
       <strong>{picked === q.answer ? '對了' : '這次是 ' + q.options[q.answer]}</strong>
       {q.why && <small>{q.why}</small>}
+      {picked !== q.answer && <AskWhy label="問 Claude 這兩個音怎麼分" q={{ source: '發音課聽辨（電腦語音念的，他用聽的選）', stem: q.prompt + (q.show ? '：' + q.show : ''), options: q.options, picked: picked === null ? '' : q.options[picked], answer: q.options[q.answer], right: false }} />}
       {q.compare && <div className="pn-compare"><small>再比一次：</small>
         {q.compare.map(t => <Word key={t} text={t} on={player.now?.text === t} onSay={() => player.play([{ text: t, voice }], rate)} />)}
       </div>}

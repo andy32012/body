@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
@@ -147,7 +148,8 @@ function StoryRead({ passage, all, state, onActivity, date, onNext }: PartProps 
     </section>}
     {phase === 'done' && <div className="pr-hint">
       <strong>{qs.length ? '字義 ' + qs.length + ' 題對 ' + right + ' 題' : '這段讀完了'}</strong>
-      {qs.length > 0 && <ul className="rd-review">{qs.map((x, j) => <li key={x.form} data-ok={picks[j] === x.answer}><span lang="en">{x.form}</span>：{x.zh}{picks[j] === x.answer ? '' : '（你選了「' + x.options[picks[j]] + '」）'}</li>)}</ul>}
+      {qs.length > 0 && <ul className="rd-review">{qs.map((x, j) => <li key={x.form} data-ok={picks[j] === x.answer}><span lang="en">{x.form}</span>：{x.zh}{picks[j] === x.answer ? '' : '（你選了「' + x.options[picks[j]] + '」）'}
+        {picks[j] !== x.answer && <AskWhy label="問 Claude" q={{ source: '短文字義', passage: passage.en, stem: '這段裡的 ' + x.form + ' 是什麼意思？', options: x.options, picked: x.options[picks[j]] ?? '', answer: x.options[x.answer], right: false }} />}</li>)}</ul>}
       <p className="st-note">再看一次英文和下面的中文，確認每一句都對得起來。</p>
       <div className="pr-actions"><button type="button" className="pr-main" onClick={onNext}>下一段</button></div>
     </div>}
@@ -278,6 +280,7 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
       {checked.extra > 0 && <p className="pr-compare"><small>多寫了 {checked.extra} 個原句沒有的字（畫波浪線的），也算錯：多一個字意思可能就反了。</small></p>}
       <strong>{checked.total} 個字寫對 {checked.right} 個{checked.right === checked.total ? ' ✓' : ''}</strong>
       <small>大小寫和標點不算錯；畫波浪線的字原句沒有。</small>
+      {checked.right !== checked.total && <AskWhy label="問 Claude 我聽錯在哪" q={{ source: '聽寫', stem: '聽一句英文，把聽到的寫下來', picked: text, answer: sentence, right: false }} />}
       <div className="pr-actions">
         {at + 1 < sentences.length
           ? <button type="button" className="pr-main" onClick={() => { setAt(at + 1); setText(''); setPlays(0) }}>下一句</button>

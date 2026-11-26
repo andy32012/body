@@ -1,3 +1,4 @@
+import AskWhy from './AskWhy'
 import { useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { readBands, readReadingProgress, saveReadingProgress, type ReadBand } from '../lib/reading'
@@ -158,6 +159,7 @@ function ExamWords({ passage, state, onActivity, date }: Base & { passage: ExamP
         <button type="button" className="pr-link" onClick={() => check(true)}>不會，看答案</button>
       </div> : <div className="pr-actions">
         <p className="ex-result" data-ok={checked}>{checked ? '對了：' : '答案：'}<b lang="en">{w.en}</b></p>
+        {!checked && <AskWhy label="問 Claude" q={{ source: '歷屆考題的單字（看中文寫英文）', stem: '寫出「' + w.zh + '」的英文', picked: typed, answer: w.en, right: false }} />}
         <button type="button" className="pr-main" onClick={next}>{step! + 1 < words.length ? '下一個 →' : '看結果'}</button>
       </div>}
     </div>}
