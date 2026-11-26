@@ -265,9 +265,20 @@ function PracticeSession({
     else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
   };
   const item = current.items[pos];
+  // What he wrote for each sentence of a checkpoint or review day, put back into the box by 「← 上一句」.
+  const runAnswers = useRef(new Map<string, string>());
+  function backSentence() {
+    const prev = current.items[pos - 1];
+    if (!prev || !settled()) return;
+    const said = runAnswers.current.get(prev.id);
+    if (said) writeDraft(prev.id, said);
+    setPos(pos - 1); setPhase("write");
+  }
   function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
-    // Each sentence counts once, even if the button is pressed twice.
-    if (!settled() || records.some((r) => r.sentenceId === item.id)) return;
+    if (!settled()) return;
+    if (info?.answer) runAnswers.current.set(item.id, info.answer);
+    // Each sentence counts once: one already marked (gone back to with 「← 上一句」) only moves on.
+    if (records.some((r) => r.sentenceId === item.id)) { go("sound", { records }); return; }
     // Nothing written: marking it "correct" cannot count as done alone, so it is kept as done with help.
     if (!info?.answer?.trim()) revealed = true;
     const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict, checkedText: info?.checkedText });
@@ -600,6 +611,9 @@ function PracticeSession({
         )}
         {phase === "write" && !(guided && lessonData === undefined) && (
           <>
+            {!guided && pos > 0 && !current.freshReview && (
+              <button className="pr-link" onClick={backSentence}>← 上一句（你寫的會放回去，紀錄照第一次的算）</button>
+            )}
             {energy === "low" && state.settings.why && (
               <p>{state.settings.why}</p>
             )}
@@ -1189,7 +1203,10 @@ function Extras({
               }
             />
             {listeningPool.length > 1 && (
-              <button onClick={() => setListen(listen + 1)}>換一句</button>
+              <div className="pr-actions">
+                {listen > 0 && <button className="pr-link" onClick={() => setListen(listen - 1)}>← 上一句</button>}
+                <button onClick={() => setListen(listen + 1)}>換一句</button>
+              </div>
             )}
           </div>
         ) : (
