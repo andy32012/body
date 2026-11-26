@@ -136,7 +136,7 @@ function ExamPassageView({ passage, state, onActivity, date, where, onList, onNe
   const [picks, setPicks] = useState<number[]>(() => half && half.id === passage.id && half.picks.length < passage.qs.length ? half.picks : [])
   const [saved, setSaved] = useState(false)
   const [redo, setRedo] = useState(false)
-  const look = useLookup(useMemo(() => ({ words: passage.gloss }), [passage]))
+  const look = useLookup(useMemo(() => ({ words: passage.gloss }), [passage]), { rate: state.settings.speechRate })
   const at = picks.length
   const done = at >= passage.qs.length
   const q = passage.qs[at]

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { askTutor, tutorKey } from '../lib/tutor'
+import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
 import { chartKind, chartText, checksFor, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
@@ -150,7 +150,10 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       if (!f) { setError('評分失敗：回傳的分數不在評分表上（' + (asked.ielts ? '每項是 1–9 的整數 band' : '0–' + asked.rubric.max + ' 的整數') + '），或項目對不上。這次不算數，也不會記成過關，再按一次批改。'); return }
       setFb(f)
       save({ last: f, best: scoreOf(f, asked.ielts) }, asked.id, asked.words)
-    } catch (e) { if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(true) } }
+    } catch (e) {
+      // A reply cut off or declined is not Claude out of reach: the sample essay stays hidden, pressing again is the way on.
+      if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(!(e instanceof ClaudeIncomplete)) }
+    }
     finally { if (mine === request.current) setBusy(false) }
   }
   /** Another task: the page scrolls back up to its question (the essay box below follows the chosen task). */

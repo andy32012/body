@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { askTutor, tutorKey, type TutorTurn } from '../lib/tutor'
+import { askTutor, ClaudeIncomplete, tutorKey, type TutorTurn } from '../lib/tutor'
 import { fixToCard, type SayCard } from '../lib/sayCards'
 import { updateStore } from '../lib/store'
 import { dayKey } from '../lib/progress'
@@ -39,6 +39,8 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   const [restored, setRestored] = useState(!!restore)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  // A reply that could not be read: kept folded away under the message, never shown as the feedback itself.
+  const [raw, setRaw] = useState('')
   const [question, setQuestion] = useState('')
   const sys = correctionPrompt(zh, reference, words, mode, previous, rubric)
   // In self-fix mode the corrected text stays hidden until asked for; a restored result is shown in full.
@@ -52,7 +54,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   const setWaiting = (on: boolean) => { setBusy(on); onBusy?.(on) }
   async function send(next: TutorTurn[], first: boolean, mine = lastCheck.current) {
     const current = () => checks.current.isCurrent(mine)
-    setWaiting(true); setError('')
+    setWaiting(true); setError(''); setRaw('')
     try {
       const reply = await askTutor(sys, next)
       if (!current()) return
@@ -67,15 +69,20 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
           updateStore(prev => ({ ...prev, notes: parsed.fixes.reduce((n, f) => typeof f.tag === 'string' ? addWeak(n, f.tag, day, { w: f.wrong || '（漏寫）', r: f.right }, 'write') : n, prev.notes) }))
         }
         setTurns([...next, { role: 'assistant', content: reply }])
-        if (!parsed) setError((rubric ? '這次 Claude 沒有照評分表給分（格式不對），這一次不算，再按一次批改就好。' : '老師回得格式怪怪的，這一次不算，再按一次批改就好。') + '下面是原文：\n' + reply)
+        if (!parsed) { setError(rubric ? '這次 Claude 沒有照評分表給分（格式不對），這一次不算，再按一次批改就好。' : '這次 Claude 回的格式不對，這一次不算，再按一次批改就好。'); setRaw(reply) }
       } else setTurns([...next, { role: 'assistant', content: reply }])
-    } catch (e) { if (current()) { setError(e instanceof Error ? e.message : String(e)); onError?.() } }
+    } catch (e) {
+      if (!current()) return
+      setError(e instanceof Error ? e.message : String(e))
+      // A reply cut off or declined is Claude answering badly once, not Claude out of reach: pressing again is the way on.
+      if (!(e instanceof ClaudeIncomplete)) onError?.()
+    }
     finally { if (current()) setWaiting(false) }
   }
 
   useEffect(() => {
     if (!run) return
-    setResult(null); setQuestion(''); setTurns([]); setError(''); setSaved([]); setHints(selfFix ? 1 : -1)
+    setResult(null); setQuestion(''); setTurns([]); setError(''); setRaw(''); setSaved([]); setHints(selfFix ? 1 : -1)
     if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); return }
     if (!answer.trim()) { setError('先寫一點英文再按批改。'); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
@@ -89,6 +96,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   return <section className="tu-box" aria-live="polite">
     {busy && !result && <p className="tu-wait">{rubric ? 'Claude 照評分表批改中……' : 'Claude 批改中……'}</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
+    {raw && <details className="tu-raw"><summary>看 Claude 這次回了什麼</summary><p>{raw}</p></details>}
     {result && previous?.fixes.length && (result.resolved || result.still) ? <ul className="tu-progress" aria-label="上次的問題">
       {previous.fixes.map((f, i) => {
         const ok = result.resolved?.includes(i) ?? false

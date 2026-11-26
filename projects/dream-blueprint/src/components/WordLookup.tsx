@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import type { Passage } from '../lib/passages'
 import { addWordsToReview } from '../lib/dailyWords'
 import { levelEntry, wordKey } from '../lib/vocab'
 import { lookupWord, type Lookup } from '../lib/story'
+import { speakEnglish } from '../lib/tts'
 import HomographNote from './HomographNote'
 import './story.css'
 
@@ -13,8 +15,10 @@ import './story.css'
 /** The first spelling of a word-table entry: "it (its, itself)" → it, "airplane/plane" → airplane. */
 export const headword = (en: string) => en.split(/[\s(/]/)[0].toLowerCase()
 
-/** `tap(word, at)` looks a word up; `box` is its meaning, to show right under line `line`; `seen` lists every word looked up. */
-export function useLookup(passage: Pick<Passage, 'words'>) {
+/** `tap(word, at)` looks a word up; `box` is its meaning, to show right under line `line`; `seen` lists every word looked up.
+ *  The box has a speaker that says the word as it is written in the text, with the device's voice at `voice.rate` (his
+ *  朗讀速度); `voice.onSay` runs first, so a passage that is being read aloud stops instead of talking over it. */
+export function useLookup(passage: Pick<Passage, 'words'>, voice: { rate?: number; onSay?: () => void } = {}) {
   const [picked, setPicked] = useState<Lookup | { form: string; miss: true }>()
   const [seen, setSeen] = useState<Lookup[]>([])
   const [line, setLine] = useState<number>()
@@ -25,8 +29,11 @@ export function useLookup(passage: Pick<Passage, 'words'>) {
     setPicked(found)
     setSeen(list => list.some(l => l.form.toLowerCase() === found.form.toLowerCase()) ? list : [...list, found])
   }
+  const canSay = typeof window !== 'undefined' && 'speechSynthesis' in window
   const box = picked && <p className="st-lookup" role="status">
-    <b lang="en">{picked.form}</b>
+    <span className="st-lookup-word"><b lang="en">{picked.form}</b>
+      {canSay && <button type="button" className="st-lookup-say" aria-label="聽發音" title="聽發音"
+        onClick={() => { voice.onSay?.(); void speakEnglish(picked.form, voice.rate) }}><Volume2 size={15} /></button>}</span>
     {'miss' in picked ? <span>字表裡沒有這個字（可能是名字、數字或字表以外的字），可以按「問問 Claude」。</span>
       : <><span>{picked.zh}</span><HomographNote en={picked.en} side="everyday" /><small>{picked.from === 'passage' ? '這段裡的意思' : picked.from === 'extra' ? '常用字的說明（不在 7000 單字表裡）' : '字表的意思' + (picked.form.toLowerCase() !== headword(picked.en) ? '（原形 ' + headword(picked.en) + '）' : '')}</small></>}
   </p>

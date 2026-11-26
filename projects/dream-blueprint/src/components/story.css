@@ -18,6 +18,10 @@
 .st-lookup { grid-column: 1 / -1; margin: 0 0 .25rem; display: grid; gap: 2px; padding: .55rem .8rem; border-radius: 12px;
   background: var(--practice-inset); border: 1px solid var(--practice-accent); line-height: 1.55; }
 .st-lookup b { font-size: 1.08rem; }
+/* The tapped word and a speaker to hear it, like the speakers in front of each sentence. */
+.st-lookup-word { display: flex; align-items: center; gap: .45rem; min-width: 0; }
+.st-lookup-word b { overflow-wrap: anywhere; }
+.practice-page button.st-lookup-say { width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .st-lookup small { color: var(--practice-secondary); font-size: .8rem; }
 .st-looked { display: grid; gap: .4rem; padding: .7rem .9rem; border-radius: 12px; border: 1px dashed var(--practice-line); }
 .st-looked ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; font-size: .92rem; line-height: 1.6; }

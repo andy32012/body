@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { askTutor, looksLikeTry, sentenceScoreOf, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
+import { askTutor, ClaudeIncomplete, looksLikeTry, sentenceScoreOf, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { settleSentence } from '../lib/rubrics'
 import { RubricScore } from './RubricTable'
 import { sameEnglish } from '../lib/evidence'
@@ -75,7 +75,8 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
     } catch (e) {
       setTurns(turns)
       setError(e instanceof Error ? e.message : String(e))
-      onError?.()
+      // A reply cut off or declined is not Claude out of reach: asking again is the way on, the reference stays hidden.
+      if (!(e instanceof ClaudeIncomplete)) onError?.()
     } finally { setBusy(false) }
   }
 

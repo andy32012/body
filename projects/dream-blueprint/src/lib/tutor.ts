@@ -64,6 +64,17 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
 
 type Block = { type: 'text'; text: string } | { type: 'image'; source: { type: 'base64'; media_type: string; data: string } }
 
+/** The most a reply may use. Claude 5.5 thinks before it answers (on Opus 5.5 thinking can't be turned off; Sonnet 5.5 and
+ *  Haiku 5.5 think by default), and the thinking counts toward this limit together with the answer. 1,200 was sized for the answer alone, so a grading reply
+ *  ran out of room halfway through its JSON. Only what Claude really writes is billed: the room costs nothing unused. */
+export const replyLimit = 16000
+
+/** Claude answered, but the answer can't be used this time: it stopped at the limit before it was finished, or its safety
+ *  check declined. Asking again is the way on — this is not the "Claude can't be reached" fallback. */
+export class ClaudeIncomplete extends Error {
+  name = 'ClaudeIncomplete'
+}
+
 export async function askTutor(system: string, turns: TutorTurn[], signal?: AbortSignal) {
   return callClaude(system, turns, signal)
 }
@@ -84,7 +95,7 @@ async function callClaude(system: string, turns: { role: 'user' | 'assistant'; c
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true',
     },
-    body: JSON.stringify({ model: tutorModel(), max_tokens: 1200, system, messages: turns }),
+    body: JSON.stringify({ model: tutorModel(), max_tokens: replyLimit, system, messages: turns }),
   })
   const data = await res.json().catch(() => null)
   if (!res.ok) {
@@ -93,6 +104,12 @@ async function callClaude(system: string, turns: { role: 'user' | 'assistant'; c
     if (res.status === 429) throw new Error('打太快或額度用完了，等一下再試。（' + msg + '）')
     throw new Error('連線失敗：' + msg)
   }
+  // A reply that stopped before its end is never handed on as if it were the answer (a half-written grading would show
+  // up as broken text, or a chat answer would end mid-sentence).
+  const stop: unknown = data?.stop_reason
+  if (stop === 'refusal') throw new ClaudeIncomplete('Claude 這次沒有回答（被它的安全檢查擋下來了），換個說法再試一次。')
+  if (stop === 'max_tokens' || stop === 'model_context_window_exceeded') throw new ClaudeIncomplete('Claude 這次想太久，回答還沒寫完就停了，這一次不算，再試一次就好。')
+  // Thinking blocks come first (empty by default); only the text blocks are the answer.
   return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
 }
 

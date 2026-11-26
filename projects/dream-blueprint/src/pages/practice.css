@@ -316,9 +316,11 @@
   .library-page > .pr-cover { min-height: 110px; }
   .library-page .dock-preview { padding: .8rem; }
 }
-.passage-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: .9rem; color: var(--practice-secondary); }
-.passage-head label { display: inline-flex; align-items: center; gap: .45rem; }
-.passage-head select { min-height: 40px; }
+/* The level picker is as wide as its longest option (「🔒 第 6 級（第 5 級閱讀完成八成才打開）」): on a phone it shrinks to the
+   card instead of pushing the whole page past the card's edge. */
+.passage-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; font-size: .9rem; color: var(--practice-secondary); min-width: 0; }
+.passage-head label { display: inline-flex; align-items: center; gap: .45rem; min-width: 0; max-width: 100%; white-space: nowrap; }
+.passage-head select { min-height: 40px; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
 .passage-count { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
 .passage-count b { color: var(--practice-accent); font-size: 1.1rem; }
 .passage-text { font-size: clamp(1.15rem, 2.2vw, 1.45rem); line-height: 1.85; margin: .3rem 0 0; overflow-wrap: anywhere; }

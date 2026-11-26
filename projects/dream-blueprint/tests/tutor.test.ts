@@ -41,3 +41,33 @@ test('在「問 Claude」那格打改好的英文句子，算是再寫一次（�
   const sys = tutorSystem({ id: 'u1-d3', zh: '你餓了嗎？', reference: ['Are you hungry?'], grammar: [], hints: [], why: '', newWords: [] }, [])
   assert.match(sys, /不要自己出下一句/)
 })
+
+test('Claude 回答前會先想，想的部分也算在回覆上限裡：上限留得夠，回覆被切斷或拒答時說清楚，半截的回覆不會被當成答案', async () => {
+  const { askTutor, ClaudeIncomplete } = await import('../src/lib/tutor.ts')
+  const storage = new Map<string, string>([['dream-blueprint.claude-key', 'sk-ant-test']])
+  Object.assign(globalThis, { localStorage: { getItem: (k: string) => storage.get(k) ?? null, setItem: (k: string, v: string) => storage.set(k, v), removeItem: (k: string) => storage.delete(k) } })
+  const sent: { max_tokens: number }[] = []
+  let reply: unknown = {}
+  globalThis.fetch = (async (_url: string, init?: { body?: string }) => {
+    sent.push(JSON.parse(init?.body ?? '{}'))
+    return { ok: true, status: 200, statusText: 'OK', json: async () => reply }
+  }) as unknown as typeof fetch
+  const ask = () => askTutor('批改', [{ role: 'user', content: '我的翻譯：Are you OK? where pain? Is this your patient' }])
+
+  // The thinking comes first (its text is empty by default); only the text blocks are the answer.
+  reply = { stop_reason: 'end_turn', content: [{ type: 'thinking', thinking: '', signature: 'abc' }, { type: 'text', text: '{"verdict":"good"}' }] }
+  assert.equal(await ask(), '{"verdict":"good"}')
+  assert.ok(sent[0].max_tokens >= 8000, '上限 ' + sent[0].max_tokens + ' 太小：Claude 想的部分就會用掉大半，批改只寫到一半')
+
+  // Cut off at the limit: the half-written reply (稽核截圖那種「Is this」停住的) is not handed on as if it were the answer.
+  reply = { stop_reason: 'max_tokens', content: [{ type: 'thinking', thinking: '' }, { type: 'text', text: '{"verdict":"again","note":"第三句文法沒錯，但我不確定你的意思：「Is this' }] }
+  await assert.rejects(ask(), (e: Error) => e instanceof ClaudeIncomplete && /沒寫完/.test(e.message) && /這一次不算/.test(e.message) && !e.message.includes('Is this'))
+
+  // Declined by the safety check: no text at all, said plainly.
+  reply = { stop_reason: 'refusal', content: [] }
+  await assert.rejects(ask(), (e: Error) => e instanceof ClaudeIncomplete && /沒有回答/.test(e.message))
+
+  // A finished reply is still taken as it is, also from a mock without stop_reason.
+  reply = { content: [{ type: 'text', text: '好～' }] }
+  assert.equal(await ask(), '好～')
+})
