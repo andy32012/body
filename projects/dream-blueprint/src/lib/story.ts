@@ -138,13 +138,17 @@ export function baseForms(word: string): string[] {
 export interface Lookup { form: string; en: string; zh: string; from: 'passage' | 'table' | 'extra' }
 /** A tapped word: the passage's own hint first (its meaning in this passage), then the 7000-word table
  *  (the general meaning, by base form). Null when neither has it — names, numbers, words outside the list. */
+/** A passage line cut into text and words (odd positions are words). Letters with accents (Café, naïvely, Röckel) stay
+ *  inside their word, so a tap, a lookup and reading aloud get the whole word. */
+export const wordParts = (text: string) => text.split(/(\p{Script=Latin}[\p{Script=Latin}\p{M}'’-]*)/u)
 export function lookupWord(raw: string, passage: Pick<Passage, 'words'>): Lookup | null {
-  const form = raw.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '')
+  const form = raw.replace(/^[^\p{Script=Latin}]+|[^\p{Script=Latin}\p{M}]+$/gu, '')
   if (!form) return null
   const low = form.toLowerCase()
   const hint = passage.words?.find(w => (w.form ?? w.en).toLowerCase() === low) ?? passage.words?.find(w => w.en.toLowerCase() === low)
   if (hint) return { form, en: hint.en, zh: hint.zh, from: 'passage' }
-  const exact = levelEntry(low)
+  // café → cafe: the word table spells words without accents.
+  const exact = levelEntry(low) ?? levelEntry(low.normalize('NFD').replace(/\p{M}/gu, ''))
   // "left" is a word of its own and also the past of "leave": show both, the table cannot tell which one the sentence means.
   const other = irregular[low] ? levelEntry(irregular[low]) : undefined
   if (exact) return { form, en: exact.en, from: 'table',

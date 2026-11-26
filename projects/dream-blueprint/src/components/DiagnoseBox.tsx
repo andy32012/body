@@ -42,6 +42,8 @@ export default function DiagnoseBox({ id, context, question, options, answer, pi
   return <section className="dg" aria-live="polite">
     {busy && <p className="tu-wait">翻成中文中……</p>}
     {error && <p className="tu-error" role="alert">{error}</p>}
+    {/* A failed or broken reply keeps this question and his answer: the same request can go again right here. */}
+    {error && !busy && !diag && <button type="button" className="pr-link dg-open" onClick={() => void load()}>再請 Claude 拆解一次</button>}
     {diag && <>
       <strong>這題的中文</strong>
       <p>{diag.questionZh}</p>

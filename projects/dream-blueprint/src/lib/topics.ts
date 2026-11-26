@@ -244,3 +244,12 @@ export function topicGoal(due: DueTopic) {
   if (due.part === 'B') return '用英文完成「' + due.topic.title + '」的情境，再寫一則短訊息'
   return '隔了幾天，換個情境再用一次：' + due.topic.review.situation.replace(/^換個情境：/, '')
 }
+
+/** What the retell check is told: the retell task and the whole dialogue he heard. Content is judged against the
+ *  dialogue — a different way of saying it, or a right detail the sample leaves out, is fine; a detail that does not
+ *  match the dialogue is wrong, and the reply quotes the line it comes from. */
+export function retellTask(topic: Topic): string {
+  return '重述對話重點：' + topic.listen.retell
+    + '。原對話（他聽過的，內容以這段為準）：' + topic.listen.dialogue.map(l => l.who + ': ' + l.en).join(' / ')
+    + '。用不一樣的說法、或提到參考說法沒寫但原對話有的正確細節，都算對；跟原對話不符的細節（例如人、地方、時間換了），要引原對話那一句指出來，算內容錯。'
+}

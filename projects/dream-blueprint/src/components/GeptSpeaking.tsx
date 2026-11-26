@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Camera, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
-import { geptLevelsOpen, geptPass, geptRoundDone, readSeconds, speakRubric,
-  answerSeconds, geptFeedbackComplete, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsComplete, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
-  type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord,
-} from '../lib/gept'
+import { geptLevelsOpen, geptPass, geptRoundDone, readSeconds, speakRubric, answerSeconds, geptFeedbackComplete, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsComplete, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept, type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord, repeatCounts } from '../lib/gept'
 import { engineNames, listen, listenEngine, type Listening } from '../lib/speech'
 import { speakEnglish, stopSpeaking } from '../lib/tts'
 import { askTutor, askTutorImage, tutorKey } from '../lib/tutor'
@@ -111,7 +108,7 @@ function RepeatItem({ n, text, rate, onSaid }: { n: number; text: string; rate: 
   }
   return <li>
     <button type="button" className="gp-play" disabled={playing} onClick={() => void play()}><Volume2 size={14} />{playing ? '播放中……' : played ? '再聽兩次' : '第 ' + n + ' 句：聽兩次'}</button>
-    {played && <ReadAloudCheck text={text} rate={rate} maxMs={15000} hideText compact onResult={onSaid} />}
+    {played && <ReadAloudCheck text={text} rate={rate} maxMs={15000} hideText compact onResult={r => { if (repeatCounts(r)) onSaid() }} />}
   </li>
 }
 

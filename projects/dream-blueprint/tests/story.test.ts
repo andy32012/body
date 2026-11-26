@@ -200,3 +200,12 @@ test('added、adding 查到 add（加），不是 ad（廣告）；hopping、pla
   assert.equal(en('stopped'), 'stop')
   assert.equal(en('caring'), 'care')
 })
+
+// R054: accented letters stay inside their word, for tapping, looking up and reading aloud.
+test('words with accented letters are one word each, and café finds cafe', async () => {
+  const { lookupWord, wordParts } = await import('../src/lib/story.ts')
+  const parts = wordParts('Flora Café, naïvely said Röckel.')
+  assert.deepEqual(parts.filter((_, i) => i % 2 === 1), ['Flora', 'Café', 'naïvely', 'said', 'Röckel'])
+  assert.equal(parts.join(''), 'Flora Café, naïvely said Röckel.')
+  assert.equal(lookupWord('Café,', { words: [] })?.form, 'Café')
+})

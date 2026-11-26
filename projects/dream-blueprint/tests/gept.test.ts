@@ -156,3 +156,12 @@ test('自己的照片要有提示問題和描述才拿來練；不完整就留�
   assert.equal(photoQuestionsComplete(parsePhotoQuestions('[問] Where are they?\n[問] What are they doing?\n[問] How do they feel?\n[問] Have you done this?')), false, '沒有描述')
   assert.equal(photoQuestionsComplete(parsePhotoQuestions('[問] Where are they?\n[問] What are they doing?\n[問] How do they feel?\n[問] Have you done this?\n[描述] Two students study at a desk in a library.')), true)
 })
+
+// R061: a repeat counts only when the target sentence came through, not for any words at all.
+test('a repeat counts only when at least half of the sentence was heard', async () => {
+  const { repeatCounts } = await import('../src/lib/gept.ts')
+  const target = 'My sister works at a hospital near our home.'
+  assert.equal(repeatCounts(compareReading(target, 'Zanzibar Zanzibar Zanzibar.')), false)
+  assert.equal(repeatCounts(compareReading(target, 'my sister works at a hospital')), true)
+  assert.equal(repeatCounts(compareReading(target, 'my sister')), false)
+})

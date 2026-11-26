@@ -170,3 +170,7 @@ export function parsePhotoQuestions(text: string) {
   }
   return { questions, describe }
 }
+
+/** 複誦 counts as done only when the sentence itself came through: at least half of its words heard. Anything else
+ *  (other words, a few words) was recorded, but asks for another try. */
+export const repeatCounts = (r: { ratio: number }) => r.ratio >= 0.5

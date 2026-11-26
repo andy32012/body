@@ -145,3 +145,13 @@ test('生活主題的開放題：改稿後再請 Claude 確認是對的，就算
   assert.equal(openVerdict(w, 'I like tea.'), 'again', '第一次有錯、改對了：還是照第一次算（有提示完成），不會變成獨立完成')
   assert.deepEqual(w.help, ['cue'])
 })
+
+// R043: the retell check gets the whole dialogue, so a right detail the sample left out counts and a wrong one is caught.
+test('the retell check carries the original dialogue and judges content against it', async () => {
+  const { retellTask, topics } = await import('../src/lib/topics.ts')
+  const t1 = topics.find(t => t.id === 't1')!
+  const task = retellTask(t1)
+  assert.match(task, /I just moved to Taichung\./)
+  assert.match(task, /原對話/)
+  assert.match(task, /不一樣的說法/)
+})

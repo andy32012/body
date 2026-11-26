@@ -15,10 +15,7 @@ import { tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import { addSayCard } from '../lib/sayCards'
 import { useTaskContext } from '../lib/taskContext'
-import {
-  completePart, countSentences, judgeReview, judgeSpeak, openVerdict, partNames, partSteps, readTopic, reviewFrom, speakGoals, withCheck, writeTopic,
-  type ItemResult, type OpenCheck, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence,
-} from '../lib/topics'
+import { completePart, countSentences, judgeReview, judgeSpeak, openVerdict, partNames, partSteps, readTopic, reviewFrom, speakGoals, withCheck, writeTopic, type ItemResult, type OpenCheck, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence, retellTask } from '../lib/topics'
 import './lesson.css'
 import './topic.css'
 
@@ -383,7 +380,7 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
-    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={'重述對話重點：' + L.retell} reference={L.retellSample} answer={text} selfFix
+    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={retellTask(topic)} reference={L.retellSample} answer={text} selfFix
       onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)} />
     <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { clearDraft(key); onDone(judgeExpress({ answered: true, help: open.help, firstVerdict: open.verdictFor(text) })) }}>完成聽力</button>

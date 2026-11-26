@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import type { Passage } from '../lib/passages'
 import { addWordsToReview } from '../lib/dailyWords'
 import { levelEntry, wordKey } from '../lib/vocab'
-import { lookupWord, type Lookup } from '../lib/story'
+import { lookupWord, type Lookup, wordParts } from '../lib/story'
 import { speakEnglish } from '../lib/tts'
 import { askClaude, wordQuestion } from '../lib/taskContext'
 import HomographNote from './HomographNote'
@@ -58,7 +58,7 @@ export function TapWords({ text, line, onWord, picked, pickedLine, marks = [] }:
     const same = { line, onWord, picked, pickedLine }
     return <><TapWords text={text.slice(0, at)} {...same} marks={rest} /><mark><TapWords text={hit} {...same} /></mark><TapWords text={text.slice(at + hit.length)} {...same} marks={rest} /></>
   }
-  return <>{text.split(/([A-Za-z][A-Za-z'’-]*)/).map((t, j) => j % 2 && onWord
+  return <>{wordParts(text).map((t, j) => j % 2 && onWord
     ? <button key={j} type="button" className="st-w" data-on={pickedLine === line && picked === t.toLowerCase()} onClick={() => onWord(t, line)}>{t}</button> : t)}</>
 }
 
