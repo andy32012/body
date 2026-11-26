@@ -138,7 +138,7 @@ function useLookup(passage: Passage) {
   const box = picked && <p className="st-lookup" role="status">
     <b lang="en">{picked.form}</b>
     {'miss' in picked ? <span>字表裡沒有這個字（可能是名字、數字或字表以外的字），可以按「問問 Claude」。</span>
-      : <><span>{picked.zh}</span><small>{picked.from === 'passage' ? '這段裡的意思' : '字表的意思' + (picked.form.toLowerCase() !== headword(picked.en) ? '（原形 ' + headword(picked.en) + '）' : '')}</small></>}
+      : <><span>{picked.zh}</span><small>{picked.from === 'passage' ? '這段裡的意思' : picked.from === 'extra' ? '常用字的說明（不在 7000 單字表裡）' : '字表的意思' + (picked.form.toLowerCase() !== headword(picked.en) ? '（原形 ' + headword(picked.en) + '）' : '')}</small></>}
   </p>
   return { tap, box, line, seen, pickedForm: picked?.form.toLowerCase() }
 }

@@ -95,3 +95,13 @@ test('拼字與造句判定：點號拼字不算對，不規則變化算有用�
   assert.equal(wordUsed('I am looking for a job.', 'look for'), true)
   assert.equal(wordUsed('She stopped.', 'stop'), true)
 })
+
+test('造句檢查：T-shirt、a.m.、p.m.、O.K.、acknowledgment 這些字表裡的寫法，寫了就算用到', async () => {
+  const { wordUsed } = await import('../src/lib/wordSkills.ts')
+  assert.equal(wordUsed('I wear a T-shirt.', 'T-shirt'), true)
+  assert.equal(wordUsed('We meet at 8 a.m.', 'am/a.m.'), true)
+  assert.equal(wordUsed('It is 3 p.m. now', 'pm/p.m.'), true)
+  assert.equal(wordUsed('That is O.K. with me', 'O.K./OK/okay'), true)
+  assert.equal(wordUsed('I sent an acknowledgment.', 'acknowledge(ment)'), true)
+  assert.equal(wordUsed('I like cats.', 'T-shirt'), false)
+})

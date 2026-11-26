@@ -78,6 +78,20 @@ export function nextQuizItem(items: readonly QuizItem[], section: QuizSection, n
   return { item: list[index], retry: false, index, total: list.length }
 }
 
+/** Questions of one licensing-exam subject (from the 國考科目 page): one answered wrong and due again first, then one
+ *  never answered, then the one answered longest ago. The shared order of the whole bank is not moved. */
+export function nextSubjectQuiz(items: readonly (QuizItem & { subjects?: string[] })[], subject: string, notes: Record<string, string>, today: string):
+  { item: QuizItem; retry: boolean; index: number; total: number } | null {
+  const list = items.filter(q => sectionOf(q) === 'nursing' && q.subjects?.includes(subject))
+  if (!list.length) return null
+  const yesterday = addDays(today, -1)
+  const at = (item: QuizItem, retry = false) => ({ item, retry, index: list.indexOf(item), total: list.length })
+  const retry = list.find(q => { const r = readQuizRecord(notes, q.id); return !!r && !r.correct && r.day <= yesterday })
+  if (retry) return at(retry, true)
+  const fresh = list.find(q => !readQuizRecord(notes, q.id))
+  if (fresh) return at(fresh)
+  return at([...list].sort((a, b) => readQuizRecord(notes, a.id)!.day.localeCompare(readQuizRecord(notes, b.id)!.day))[0])
+}
 export function quizSummary(items: readonly QuizItem[], section: QuizSection, notes: Record<string, string>) {
   const list = items.filter(q => sectionOf(q) === section)
   const recs = list.map(q => readQuizRecord(notes, q.id)).filter((r): r is QuizRecord => !!r)

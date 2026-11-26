@@ -143,3 +143,21 @@ test('護理聽力重做：看過全文後重做不算只聽就懂；以前過�
   notes[nurseListenKey(a2[0].id)] = JSON.stringify(redo)
   assert.equal(nurseLevelsOpen(list, notes).B1, true, '重做一段看了字，B1 還是開著')
 })
+
+test('實習清單：一般短文、發音課不會把「護理英文：聽或讀」「口說：演一段」自動打勾', async () => {
+  const { nurseListenedOn, nurseReadOn, nurseSpokeOn, nurseListenKey, nurseSpeakKey } = await import('../src/lib/nursing.ts')
+  const { logSkill } = await import('../src/lib/bridge.ts')
+  const day = '2026-11-26'
+  // An everyday passage read and a pronunciation lesson spoken: general practice only.
+  let notes = logSkill(logSkill({ 'read.a1-lin': JSON.stringify({ day, picks: [], correct: 3, total: 4 }) }, 'read', day), 'speak', day)
+  assert.equal(nurseReadOn(notes, day), false)
+  assert.equal(nurseListenedOn(notes, day), false)
+  assert.equal(nurseSpokeOn(notes, day), false)
+  notes = { ...notes, 'read.n-b1-hypoglycemia': JSON.stringify({ day, picks: [], correct: 5, total: 6 }) }
+  assert.equal(nurseReadOn(notes, day), true, '護理閱讀才算')
+  notes = { ...notes, [nurseListenKey('nl-01')]: JSON.stringify({ day, correct: 3, total: 3, heard: true, plays: 1 }) }
+  assert.equal(nurseListenedOn(notes, day), true)
+  assert.equal(nurseListenedOn(notes, '2026-11-27'), false)
+  notes = { ...notes, [nurseSpeakKey('nl-01')]: day }
+  assert.equal(nurseSpokeOn(notes, day), true)
+})

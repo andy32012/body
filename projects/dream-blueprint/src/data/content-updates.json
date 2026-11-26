@@ -143,5 +143,23 @@
    "t4-r1",
    "t4-r2"
   ]
+ },
+ {
+  "id": "2026-11-26-clinical",
+  "date": "2026-11-26",
+  "note": "修正護理教材的臨床內容：低血糖數字加上單位 mg/dL、壓力性損傷的翻身頻率依個案調整和深膚色的早期徵象、點滴滲漏先確認輸的是什麼、吸入器分清楚哪一種要搖。依據：CDC 低血糖說明、NPIAP/EPUAP 2019 國際指引、NICE CG179、各吸入器的使用說明。",
+  "words": [],
+  "sentences": [],
+  "passages": [
+   "n-b1-hypoglycemia",
+   "n-b1-pressure-injury"
+  ],
+  "listening": [
+   "nl-12",
+   "nl-27"
+  ],
+  "nursingWords": [
+   "inhaler"
+  ]
  }
 ]

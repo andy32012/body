@@ -22,25 +22,33 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
     return () => { alive = false }
   }, [])
   useEffect(() => {
-    const on = () => { const id = idFromHash(); if (id) setCurrentId(id) }
+    // A link or bookmark to another dialogue on the same page: show that one (the title follows the address).
+    const on = () => { const id = idFromHash(); if (id) { setCurrentId(id); setShownId(null); setRoundDone(false) } }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
   // Settled once per dialogue: a new record must not swap the dialogue while its transcript is on screen.
   const [shownId, setShownId] = useState<string | null>(null)
+  // Every open dialogue was passed over with 下一段: say so and offer a new round, instead of waiting forever.
+  const [roundDone, setRoundDone] = useState(false)
   // B1 opens once A2 has its target of dialogues passed by ear, B2 after B1; dialogues of a locked level aren't offered.
   const levelOpen = all ? nurseLevelsOpen(all, state.notes) : {}
   useEffect(() => {
     if (!all || shownId) return
     const open = all.filter(x => levelOpen[x.level])
-    setShownId((open.find(x => x.id === currentId) ?? nextNurseListening(open, state.notes, skip))?.id ?? null)
+    const next = open.find(x => x.id === currentId) ?? nextNurseListening(open, state.notes, skip)
+    if (next) setShownId(next.id)
+    else if (skip.length) setRoundDone(true)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all, currentId, skip, shownId, state.notes])
 
   if (failed) return <p>護理聽力載入失敗，連上網路再試一次。</p>
   if (!all) return <p className="ls-help">載入護理聽力……</p>
   const l = all.find(x => x.id === shownId)
-  if (!l) return <p className="ls-help">準備對話中……</p>
+  if (!l) return roundDone ? <div className="pr-hint">
+    <strong>這一輪開放的對話都看過或略過了</strong>
+    <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { setRoundDone(false); setSkip([]); setCurrentId(undefined); setShownId(null) }}>從第一段再來一輪</button></div>
+  </div> : <p className="ls-help">準備對話中……</p>
   const heard = all.filter(x => readNurseListen(state.notes, x.id)).length
   const good = all.filter(x => heardWell(readNurseListen(state.notes, x.id))).length
   const spoke = state.notes[nurseSpeakKey(l.id)]

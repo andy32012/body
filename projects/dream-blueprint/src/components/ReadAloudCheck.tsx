@@ -39,7 +39,8 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
         const secs = Math.round((Date.now() - started.current) / 1000)
         const r = compareReading(text, words)
         setHeard(words); setResult(r); setSeconds(secs); setPhase('done')
-        onResult?.(r, words, secs)
+        // Nothing heard is not a reading: it is not reported as practice (he is asked to read again).
+        if (words.trim()) onResult?.(r, words, secs)
       }, e => { setError(e instanceof Error ? e.message : String(e)); setPhase('idle') })
         .finally(() => { session.current = null })
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); setPhase('idle') }
@@ -48,7 +49,7 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
 
   const missed = result ? missedWords(result) : []
   return <div className={'ra-box' + (compact ? ' compact' : '')}>
-    {phase === 'idle' && <button type="button" className="ra-start" onClick={() => void start()}><Mic size={15} />{result ? '再念一次' : '念念看，幫我比對'}</button>}
+    {(phase === 'idle' || phase === 'done') && <button type="button" className="ra-start" onClick={() => void start()}><Mic size={15} />{result ? '再念一次' : '念念看，幫我比對'}</button>}
     {phase === 'listening' && <>
       <button type="button" className="ra-stop" onClick={stop}><Square size={13} fill="currentColor" />念完了</button>
       <small className="ra-live">錄音中 {Math.max(0, Math.round((tick - started.current) / 1000))} 秒{engine === 'browser' && partial ? '：' + partial : ''}</small>

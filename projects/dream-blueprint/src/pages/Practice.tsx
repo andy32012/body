@@ -1,4 +1,5 @@
 import { PracticeCover } from "../components/PracticeCover";
+import examSubjects from "../data/exam-subjects.json";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Headphones, Check, PenLine, Volume2 } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
@@ -901,6 +902,12 @@ function Extras({
   // #library/grammar/<unit> opens that unit's teaching (from 主題總複習).
   const grammarFromHash = () => { const n = Number(location.hash.split("/")[2]); return location.hash.startsWith("#library/grammar/") && Number.isInteger(n) && n > 0 ? n : undefined; };
   const [grammarUnit, setGrammarUnit] = useState<number | undefined>(grammarFromHash);
+  // #library/case/<subject id> and #library/quiz/<subject id>: only that licensing-exam subject (from 國考科目).
+  const subjectFromHash = () => {
+    const [, page, id] = location.hash.replace(/^#/, "").split("/");
+    return page === "case" || page === "quiz" ? examSubjects.subjects.find((x) => x.id === id)?.name : undefined;
+  };
+  const [examSubject, setExamSubject] = useState<string | undefined>(subjectFromHash);
   // Another address of the same page (#library/words/listen, #library/writing/<id>, #library/story/listen) opens that part.
   // A different kind of practice is a different page: the app opens it fresh.
   useEffect(() => {
@@ -909,6 +916,7 @@ function Extras({
       if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
       if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
       if (location.hash.startsWith("#library/grammar")) setGrammarUnit(grammarFromHash());
+      if (location.hash.startsWith("#library/case") || location.hash.startsWith("#library/quiz")) setExamSubject(subjectFromHash());
     };
     onHash();
     window.addEventListener("hashchange", onHash);
@@ -1173,7 +1181,7 @@ function Extras({
       {mode === "grammar" && <GrammarBook key={grammarUnit ?? "book"} initialUnit={grammarUnit} state={state} onActivity={onActivity} date={date} />}
       {mode === "theme" && <ThemeReview state={state} onActivity={onActivity} date={date} sessionId={sessionId} />}
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
-      {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} date={date} />}
+      {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
@@ -1181,11 +1189,11 @@ function Extras({
       {mode === "writing" && <WritingLadder key={writingTask ?? "ladder"} initialTask={writingTask} state={state} onActivity={onActivity} date={date} />}
       {mode === "unit" && <UnitPack state={state} onActivity={onActivity} date={date} />}
       {mode === "quiz" && (!quiet || periodQuiet) && (
-        <QuizPractice state={state} update={update} onActivity={onActivity} date={date}
-          sections={periodQuiet ? ["nursing"] : undefined} />
+        <QuizPractice key={examSubject ?? "all"} state={state} update={update} onActivity={onActivity} date={date}
+          sections={periodQuiet ? ["nursing"] : undefined} subject={examSubject} />
       )}
       {mode === "case" && (!quiet || periodQuiet) && (
-        <ClinicalCase state={state} onActivity={onActivity} date={date} />
+        <ClinicalCase key={examSubject ?? "all"} state={state} onActivity={onActivity} date={date} subject={examSubject} />
       )}
       {mode === "screen" && (quiet ? (
         <p>考週和實習期間單字快篩先暫停，到期的單字卡在「單字複習」。</p>

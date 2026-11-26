@@ -99,3 +99,15 @@ test('移除個人維持期不會由原始月曆偷偷加回', () => {
   assert.equal(entry.kind,'lesson')
   assert.equal(entry.unit,1)
 })
+test('照課表天天上課、其中幾天是生活主題：主題那天也算有上課，日曆不會把下週改成「照最近的節奏預估」', () => {
+  // Monday to Saturday for three weeks, every fifth lesson a life topic (saved with advanced:false).
+  const sessions: { day: string; energy: 'normal'; advanced?: boolean; sentenceId?: string }[] = []
+  let n = 0
+  for (let day = '2026-11-23'; day < '2026-12-14'; day = new Date(Date.parse(day + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10)) {
+    if (new Date(day + 'T12:00:00Z').getUTCDay() === 0) continue
+    n++
+    sessions.push(n % 5 === 0 ? { day, energy: 'normal', advanced: false, sentenceId: 'topic:t1:understand' } : { day, energy: 'normal' })
+  }
+  const days = projectCalendar({...base,today:'2026-12-14',from:'2026-12-14',to:'2026-12-19',ranges:[],startedDay:'2026-11-23',cursor:14,sessions:sessions as never})
+  assert.ok(days.every(d=>d.kind==='lesson'||d.kind==='topic'),'下週照常每天上課：'+days.map(d=>d.kind).join(','))
+})

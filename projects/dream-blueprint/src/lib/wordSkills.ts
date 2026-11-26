@@ -1,3 +1,4 @@
+import { levelEntry } from './vocab'
 /** Four ways of knowing a word. A word you can read may still be one you cannot hear, say or spell. */
 export const skills = [['read', '看懂'], ['listen', '聽懂'], ['say', '說出（自評）'], ['write', '寫出']] as const
 export type Skill = typeof skills[number][0]
@@ -90,8 +91,11 @@ function inflections(word: string): string[] {
 }
 /** Whether a sentence uses the word (or one of its listed forms), counting inflected and irregular forms. */
 export function wordUsed(answer: string, en: string) {
-  const tokens = plain(answer).match(/[a-z']+/g) ?? []
-  return spellingForms(en).some(form => {
+  // Words keep their hyphen (T-shirt) and abbreviation dots (a.m., O.K.); the dots are then dropped, as in spelling.
+  const tokens = (plain(answer).match(/[a-z0-9']+(?:[-.][a-z0-9']+)*\.?/g) ?? []).map(t => t.replace(/\./g, ''))
+  // The spellings the word table lists (acknowledgment as well as acknowledgement) count too.
+  const listed = levelEntry(en)?.forms?.flatMap(f => f.forms).map(f => spelled(f)) ?? []
+  return [...new Set([...spellingForms(en), ...listed])].map(f => f.replace(/\./g, '')).some(form => {
     const words = form.split(' ').filter(Boolean)
     if (!words.length) return false
     const first = new Set(inflections(words[0]))

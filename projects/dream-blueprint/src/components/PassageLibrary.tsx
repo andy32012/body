@@ -7,7 +7,7 @@ import { tutorKey } from '../lib/tutor'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
 import ContextMeaning from './ContextMeaning'
-import { passageLevelsOpen, doneKey, levelKey, levelProgress, nextPassage, redoDue, redoKey, type Passage } from '../lib/passages'
+import { passageLevelsOpen, doneKey, levelKey, levelProgress, nextPassage, passageRound, redoDue, redoKey, type Passage } from '../lib/passages'
 import { openAt } from '../lib/unlock'
 import { dayKey } from '../lib/progress'
 import { addSayCard } from '../lib/sayCards'
@@ -98,7 +98,17 @@ export default function PassageLibrary({ state, onActivity }: Props) {
       </select></label>
       <span className="passage-count">已完成 <b>{progress.done}</b> / {progress.total}</span>
     </div>
-    {!passage ? <p>{letter ? '這個字母的短文都做完了，換一個字母或回到照順序。' : '第 ' + level + ' 級的短文都做完了' + (levelOpen[level] ? '，可以換下一級。' : '。')}</p> : <>
+    {!passage ? (() => {
+      const round = passageRound(all, level, state.checks, state.notes, skipped, letter)
+      const where = letter ? '字母 ' + letter + ' ' : '第 ' + level + ' 級'
+      if (!round.left) return <p>{letter ? '這個字母的短文都做完了，換一個字母或回到照順序。' : '第 ' + level + ' 級的短文都做完了' + (levelOpen[level] ? '，可以換下一級。' : '。')}</p>
+      return <div className="pr-hint">
+        <strong>{where}還有 {round.left} 段沒完成</strong>
+        {round.skipped > 0 && <p>這一輪按「換一段」略過了 {round.skipped} 段。</p>}
+        {round.waiting > 0 && <p>{round.waiting} 段今天按了「不會」，明天再出現。</p>}
+        {round.skipped > 0 && <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { setSkipped([]); reset() }}>把略過的拿回來</button></div>}
+      </div>
+    })() : <>
       <div className="pr-label">7000 單短文 · 第 {passage.level} 級 · {passage.letter} {String(passage.n).padStart(2, '0')}</div>
       {redoDue(state.notes, passage.id) && <p className="passage-again">這段之前按了「不會」，隔一天再試一次。寫不出來的地方先空著，批改後把錯的加入複習。</p>}
       <p className="passage-text">{passage.zh}</p>

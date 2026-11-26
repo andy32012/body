@@ -63,11 +63,15 @@ export function usePronPlayer(lessonId: string) {
   }
   useEffect(() => stop, [])
 
-  /** Plays the takes one after another. Returns false when nothing on this device can make sound. */
-  function play(queue: Take[], rate = 1): boolean {
+  /** Plays the takes one after another. Returns false when nothing on this device can make sound. `onSound` is called
+   *  once sound really comes out (a recording starts playing, or the device voice starts or reaches the end), so a
+   *  listening question can wait for it instead of opening on a play that failed. */
+  function play(queue: Take[], rate = 1, onSound?: () => void): boolean {
     stop()
     if (!queue.length) return true
     const id = ++run.current
+    let sounded = false
+    const sound = () => { if (id === run.current && !sounded) { sounded = true; onSound?.() } }
     const audio = player.current ?? (player.current = new Audio())
     const step = (i: number) => {
       if (id !== run.current) return
@@ -79,6 +83,7 @@ export function usePronPlayer(lessonId: string) {
       if (url) {
         audio.onended = next
         audio.onerror = next
+        audio.onplaying = sound
         audio.src = url
         audio.defaultPlaybackRate = rate
         audio.playbackRate = rate
@@ -93,7 +98,9 @@ export function usePronPlayer(lessonId: string) {
       const u = new SpeechSynthesisUtterance(take.text)
       u.lang = 'en-US'
       u.rate = 0.85 * rate
-      u.onend = next
+      u.onstart = sound
+      // Some engines never report the start; one that reached its end was heard.
+      u.onend = () => { sound(); next() }
       u.onerror = next
       window.speechSynthesis.speak(u)
     }

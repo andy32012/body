@@ -4,6 +4,7 @@ import type { PageProps } from '../lib/store'
 import { dayKey, daysBetween } from '../lib/progress'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
+import { useModal } from '../lib/modal'
 import './baseline.css'
 
 import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
@@ -14,9 +15,11 @@ export type { BaselineResult } from '../lib/baseline'
 export function TestPrompt({ state, update, today }: Pick<PageProps, 'state' | 'update'> & { today: string }) {
   const last = readResults(state.notes).at(-1)
   const start = useRef<HTMLButtonElement>(null)
+  const box = useRef<HTMLDivElement>(null)
   const later = () => update(prev => ({ ...prev, notes: { ...prev.notes, [laterKey]: today } }))
-  useEffect(() => { start.current?.focus() }, [])
-  return <div className="bl-pop" role="dialog" aria-modal="true" aria-labelledby="bl-pop-title" onKeyDown={e => { if (e.key === 'Escape') later() }}>
+  // The shared dialog handling: the page behind goes inert, Tab stays in the dialog, Escape closes it.
+  useModal(box, later, { initial: () => start.current, fallback: () => document.getElementById('content') })
+  return <div className="bl-pop" ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="bl-pop-title">
     <section className="bl-pop-card">
       <span className="bl-pop-icon" aria-hidden="true"><Gauge size={22} /></span>
       <strong id="bl-pop-title">{last ? '英文程度回測的時間到了' : '先做一次起點測驗'}</strong>
@@ -70,9 +73,18 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   const [recording, setRecording] = useState(false)
   const [audio, setAudio] = useState<Blob | null>(null)
   const [seconds, setSeconds] = useState(0)
+  // A message (skipped everything, microphone blocked) and saving are kept apart: a message never locks the button.
   const [busy, setBusy] = useState('')
+  const [saving, setSaving] = useState(false)
   const recorder = useRef<MediaRecorder | null>(null)
+  const stream = useRef<MediaStream | null>(null)
   const started = useRef(0)
+  const alive = useRef(true)
+  // Leaving the page (or closing the test) turns the microphone off, also when permission comes back after leaving.
+  useEffect(() => {
+    alive.current = true
+    return () => { alive.current = false; try { if (recorder.current?.state === 'recording') recorder.current.stop() } catch { /* already stopped */ } stream.current?.getTracks().forEach(t => t.stop()) }
+  }, [])
 
   function play() {
     if (!('speechSynthesis' in window) || plays >= 2) return
@@ -84,12 +96,16 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   async function record() {
     if (recording) { recorder.current?.stop(); return }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const media = await navigator.mediaDevices.getUserMedia({ audio: true })
+      if (!alive.current) { media.getTracks().forEach(t => t.stop()); return }
+      stream.current = media
       const chunks: Blob[] = []
-      const r = new MediaRecorder(stream)
+      const r = new MediaRecorder(media)
       r.ondataavailable = e => chunks.push(e.data)
       r.onstop = () => {
-        stream.getTracks().forEach(t => t.stop())
+        media.getTracks().forEach(t => t.stop())
+        stream.current = null
+        if (!alive.current) return
         setAudio(new Blob(chunks, { type: r.mimeType }))
         setSeconds(Math.round((Date.now() - started.current) / 1000))
         setRecording(false)
@@ -112,9 +128,9 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     const listening = plays ? sectionScore(form.listenQs, listen) : null
     const reading = sectionScore(form.readQs, read)
     if (emptyCheck({ listening, reading, writing: { text: writing, feedback: '' }, speaking: { transcript: '', feedback: '', seconds: audio ? seconds : 0 } })) {
-      setBusy('這次每一項都跳過了：沒有存結果，題本也沒有用掉。'); return
+      setBusy('這次每一項都跳過了：沒有存結果，題本也沒有用掉。回上一步補做一項，就可以存。'); return
     }
-    setBusy('整理結果中……')
+    setSaving(true); setBusy('整理結果中……')
     let transcript = '', speakFeedback = '', writeFeedback = ''
     try {
       if (audio) transcript = await transcribe(audio)
@@ -129,7 +145,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
     update(prev => ({ ...prev, notes: addResult(prev.notes, result) }))
-    setBusy(''); setOpen(false); setStep(0)
+    setBusy(''); setSaving(false); setOpen(false); setStep(0)
     setListen([]); setRead([]); setWriting(''); setAudio(null); setSeconds(0); setPlays(0)
   }
 
@@ -201,13 +217,14 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       <p>按下錄音直接講，講完按停止。{openaiKey() ? '會用 OpenAI 轉成文字再請 Claude 給回饋。' : '（沒有 OpenAI 金鑰，只會記下長度。）'}</p>
       <button type="button" className={'bl-rec' + (recording ? ' on' : '')} onClick={record}>{recording ? <><Square size={15} fill="currentColor" />停止</> : <><Mic size={16} />{audio ? '重錄' : '錄音'}</>}</button>
       {audio && !recording && <p>錄好了，約 {seconds} 秒。</p>}
+      {recording && <p>講完先按「停止」，再按完成。</p>}
     </>}
     {busy && <p role="status">{busy}</p>}
     <div className="bl-nav">
-      <button type="button" onClick={() => step ? setStep(step - 1) : setOpen(false)}>{step ? '上一步' : '取消'}</button>
+      <button type="button" disabled={saving} onClick={() => { if (recording) recorder.current?.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
       {step < 3
-        ? <button type="button" className="bl-main" onClick={() => setStep(step + 1)}>下一步</button>
-        : <button type="button" className="bl-main" disabled={!!busy && busy !== '麥克風被擋住了，可以先略過口說。'} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}
+        ? <button type="button" className="bl-main" onClick={() => { setBusy(''); setStep(step + 1) }}>下一步</button>
+        : <button type="button" className="bl-main" disabled={saving || recording} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}
     </div>
   </section>
 }

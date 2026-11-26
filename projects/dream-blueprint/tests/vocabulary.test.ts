@@ -108,3 +108,14 @@ test('今日單字往回看：記下今天的順序，改選擇時單字表和�
   assert.equal(card.due, '2026-11-23')
   assert.deepEqual(readSorted(back.notes, day).map(e => e.k), ['apple', 'green'], '順序不變')
 })
+
+test('分級找字：打完整的字，那個字一定在結果裡、而且排第一（in 不會只找到 win、meeting）', async () => {
+  const { lookupWords, officialWords } = await import('../src/lib/vocab.ts')
+  for (const w of ['at', 'in', 'or', 'the']) {
+    const found = lookupWords(officialWords, 1, w)
+    assert.equal(found[0]?.en.toLowerCase(), w, w + ' 排第一')
+  }
+  // Every word of every level is found by typing it.
+  for (const w of officialWords) assert.ok(lookupWords(officialWords, w.level, w.en).some(x => x.en === w.en), w.en + ' 找得到自己')
+  assert.ok(lookupWords(officialWords, 1, 'in').length <= 12)
+})

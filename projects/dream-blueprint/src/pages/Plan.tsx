@@ -193,7 +193,9 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
           <button
             key={key}
             aria-pressed={tab === key}
-            onClick={() => setTab(key)}
+            // The address follows the tab (#plan/map…), so a reload, a bookmark or 上一頁 comes back to it. pushState
+            // does not reload the page; going back changes the address and the app opens that tab.
+            onClick={() => { setTab(key); const hash = "#plan/" + key; if (location.hash !== hash) history.pushState(null, "", hash); }}
           >
             {label}
           </button>

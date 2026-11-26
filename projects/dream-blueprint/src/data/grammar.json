@@ -3378,7 +3378,7 @@
    },
    {
     "t": "講未來：這幾個字後面用現在式，主要句才用 will",
-    "p": "不能說 when you will come。",
+    "p": "說「……的時候」「如果……」的未來：when、if 後面用現在式（不說 I'll call you when you will come）。但 when 當「什麼時候」、if 當「是不是」時，後面可以用 will：Tell me when you will arrive.（告訴我你什麼時候會到）",
     "ex": [
      {
       "en": "I will call you when I arrive.",
@@ -3387,6 +3387,10 @@
      {
       "en": "If it rains, we will stay home.",
       "zh": "如果下雨，我們就待在家。"
+     },
+     {
+      "en": "Tell me when you will arrive.",
+      "zh": "告訴我你什麼時候會到。（when＝什麼時候，可以用 will）"
      }
     ]
    }
@@ -3459,7 +3463,7 @@
     "accept": [
      "Call me if you need help."
     ],
-    "why": "if 後面用現在式，不用 will。"
+    "why": "這裡的 if 是「如果」，後面用現在式，不用 will。（if 當「是不是」時才可能接 will：I don't know if he will come.）"
    },
    {
     "k": "fix",

@@ -31,8 +31,8 @@ export default function ExamMap({ state, update }: Pick<PageProps, 'state' | 'up
           <ul>{s.words.map(w => <li key={w.en}><b lang="en">{w.en}</b> {w.zh} <AskWord en={w.en} zh={w.zh} label="問" /></li>)}</ul>
         </details>
         <div className="ex-go">
-          {myCases.length > 0 && <a href="#library/case">練情境</a>}
-          {myQs.length > 0 && <a href="#library/quiz" onClick={() => update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } }))}>練護理英文題</a>}
+          {myCases.length > 0 && <a href={'#library/case/' + s.id}>練這科的情境</a>}
+          {myQs.length > 0 && <a href={'#library/quiz/' + s.id} onClick={() => update(prev => ({ ...prev, notes: { ...prev.notes, [quizSectionKey]: 'nursing' } }))}>練這科的護理英文題</a>}
         </div>
       </article>
     })}

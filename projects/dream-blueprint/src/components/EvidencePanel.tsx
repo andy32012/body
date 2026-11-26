@@ -29,7 +29,7 @@ function Pending({ e, onCheck }: { e: Evidence; onCheck: (reply: string, rewrite
     <p lang="en">{e.answer}</p>
     {rewriting && <>
       <small>Claude 說要改：{e.wrong}</small>
-      <label className="pr-field">改寫
+      <label className="ev-rewrite">改寫成：
         <textarea lang="en" rows={2} value={text} spellCheck={false} autoComplete="off" onChange={ev => setText(ev.target.value)} />
       </label>
     </>}

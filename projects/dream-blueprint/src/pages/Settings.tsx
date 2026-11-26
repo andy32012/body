@@ -180,8 +180,10 @@ export default function Settings(props: PageProps) {
           const choice=e.target.value
           update(prev=>({...prev,school:{...prev.school,study:prev.school.study.map(slot=>{
             if (slot.weekday!==i) return slot
-            const defaultMinutes=prev.settings.regularDays.includes(i)?8:prev.settings.restDays.includes(i)?0:2
-            return slot.minutes===defaultMinutes ? {...slot,minutes:choice==='normal'?8:choice==='rest'?0:2} : slot
+            // Minutes still at a default (today's 90 / 15 / 0, or an older default) follow the new choice; minutes typed
+            // by hand stay. The defaults match the day plan: 普通 1.5 hours, 累爆 15 minutes of review, 休息 0.
+            const was=prev.settings.regularDays.includes(i)?[90,30,8]:prev.settings.restDays.includes(i)?[0]:[15,2]
+            return was.includes(slot.minutes) ? {...slot,minutes:choice==='normal'?90:choice==='rest'?0:15} : slot
           })},settings:{...prev.settings,
             regularDays:[...prev.settings.regularDays.filter(n=>n!==i), ...(choice==='normal'?[i]:[])].sort(),
             restDays:[...prev.settings.restDays.filter(n=>n!==i), ...(choice==='rest'?[i]:[])].sort()

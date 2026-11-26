@@ -34,7 +34,7 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
   /** Which list this is, for Emma when he opens a chat about the word. */
   where?: string
 }) {
-  const [order] = useState(() => orderForSkill(words, keyOf, notes, skill).slice(0, 10))
+  const [order, setOrder] = useState(() => orderForSkill(words, keyOf, notes, skill).slice(0, 10))
   const [i, setI] = useState(0)
   const [picked, setPicked] = useState<number>()
   const [answer, setAnswer] = useState('')
@@ -56,10 +56,15 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
     return unique.sort((a, b) => ((a.en.length * 31 + seed) % 7) - ((b.en.length * 31 + seed) % 7))
   }, [word, distractors, i])
 
+  function restart() { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false); setHelped(false) }
   if (!words.length) return <p>先在每天的課或今日單字學幾個字，這裡就會有字可以練。</p>
   if (!word) return <div className="pr-stack">
     <p>這一輪 {order.length} 個字練完了，{passed} 個過關。</p>
-    <button type="button" onClick={() => { setI(0); setPassed(0); setPicked(undefined); setAnswer(''); setShown(false); setHeard(false); setHelped(false) }}>再一輪</button>
+    <div className="pr-actions">
+      {/* The next ten are picked from the records just saved: words still missing this skill first, so the round moves on. */}
+      <button type="button" className="pr-main" onClick={() => { setOrder(orderForSkill(words, keyOf, notes, skill).slice(0, 10)); restart() }}>再一輪（換下一批字）</button>
+      <button type="button" className="pr-link" onClick={restart}>這十個重做一次</button>
+    </div>
   </div>
   const next = (ok: boolean) => {
     // Spelled after 「給我第一個字母」 is done with help: it does not count as 寫出.

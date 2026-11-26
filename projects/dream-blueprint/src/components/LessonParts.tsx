@@ -7,7 +7,7 @@ import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
-import { chartBounds } from '../lib/chart'
+import { chartBounds, isTimeSeries } from '../lib/chart'
 import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
@@ -245,17 +245,22 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
 }
 
 export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']> }) {
-  const { lo, hi } = chartBounds(chart.points.map(p => p.value))
+  // Points in time are joined by a line (a trend); separate things (centres A–F) are bars from zero (a comparison).
+  const bars = !isTimeSeries(chart.points.map(p => p.label))
+  const bounds = chartBounds(chart.points.map(p => p.value))
+  const lo = bars ? Math.min(0, bounds.lo) : bounds.lo, hi = bounds.hi
   const W = 320, H = 150, L = 34, R = 12, T = 14, B = 26
-  const x = (i: number) => L + (W - L - R) * (chart.points.length === 1 ? 0.5 : i / (chart.points.length - 1))
+  const slot = (W - L - R) / Math.max(1, chart.points.length)
+  const x = (i: number) => bars ? L + slot * (i + 0.5) : L + (W - L - R) * (chart.points.length === 1 ? 0.5 : i / (chart.points.length - 1))
   const y = (v: number) => T + (H - T - B) * (1 - (v - lo) / Math.max(1, hi - lo))
   return <figure className="ls-chart">
     <figcaption lang="en">{chart.title}</figcaption>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={chart.title + '：' + chart.points.map(p => p.label + ' ' + p.value).join('、')}>
       {[lo, (lo + hi) / 2, hi].map(v => <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="ls-grid" /><text x={L - 6} y={y(v) + 4} textAnchor="end">{Math.round(v)}</text></g>)}
-      <polyline points={chart.points.map((p, i) => x(i) + ',' + y(p.value)).join(' ')} className="ls-lineplot" />
+      {!bars && <polyline points={chart.points.map((p, i) => x(i) + ',' + y(p.value)).join(' ')} className="ls-lineplot" />}
       {chart.points.map((p, i) => <g key={p.label}>
-        <circle cx={x(i)} cy={y(p.value)} r={3.5} className="ls-dot" />
+        {bars ? <rect x={x(i) - slot * 0.28} width={slot * 0.56} y={y(Math.max(p.value, lo))} height={Math.max(0, y(lo) - y(Math.max(p.value, lo)))} className="ls-bar" />
+          : <circle cx={x(i)} cy={y(p.value)} r={3.5} className="ls-dot" />}
         <text x={x(i)} y={y(p.value) - 8} textAnchor="middle" className="ls-val">{p.value}</text>
         <text x={x(i)} y={H - 8} textAnchor="middle">{p.label}</text>
       </g>)}

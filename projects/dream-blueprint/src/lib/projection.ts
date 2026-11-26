@@ -58,7 +58,9 @@ export type PlannedDay = Omit<ProjectedDay, 'original'>
 
 // Count eligible days only. A period of rest has no weight in the next term's forecast.
 function recentPace(input: CalendarInput, weekdays: readonly number[]) {
-  const practiced = new Set(input.sessions.filter(s => s.advanced ?? s.energy !== 'low').map(s => s.day))
+  // A day's main lesson done counts as attending, a life-topic lesson too: it is saved with advanced:false only so that
+  // it does not move the grammar course on.
+  const practiced = new Set(input.sessions.filter(s => (s.advanced ?? s.energy !== 'low') || s.sentenceId?.startsWith('topic:')).map(s => s.day))
   // Count from the first lesson actually done: days after opening the app but before the course began are not
   // missed lessons (they made the calendar show two review days after every lesson for a learner on day 2).
   const first = [...practiced].sort()[0]

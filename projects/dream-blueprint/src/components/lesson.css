@@ -54,6 +54,7 @@
 .ls-chart .ls-val { fill: var(--practice-ink); font-weight: 650; }
 .ls-grid { stroke: var(--practice-line); stroke-width: .7; stroke-dasharray: 3 3; }
 .ls-lineplot { fill: none; stroke: var(--practice-accent); stroke-width: 2; }
+.ls-bar { fill: var(--practice-accent); opacity: .8; }
 .ls-dot { fill: var(--practice-accent); }
 .ls-scaffold { margin: 0; padding: .6rem .8rem .6rem 2rem; display: grid; gap: .3rem; border-radius: 12px; background: var(--practice-inset); }
 .ls-fixnote { padding: .55rem .8rem; border-left: 3px solid var(--practice-accent); background: var(--practice-accent-wash); color: var(--practice-ink); border-radius: 8px; }

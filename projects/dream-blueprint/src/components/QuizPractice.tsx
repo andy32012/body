@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import DiagnoseBox from './DiagnoseBox'
 import { useTaskContext } from '../lib/taskContext'
 import {
-  advanceQuiz, causeOptions, nextQuizItem, quizSectionKey, quizSummary, recordQuizAnswer, recordQuizCause,
+  advanceQuiz, causeOptions, nextQuizItem, nextSubjectQuiz, quizSectionKey, quizSummary, recordQuizAnswer, recordQuizCause,
   sectionNames, sectionOf, type QuizItem, type QuizSection,
 } from '../lib/quiz'
 
@@ -12,11 +12,14 @@ const items = quizData as QuizItem[]
 
 /** Multiple choice in two sections. Every answer is saved, misses come back a day later,
  *  and a miss asks what went wrong so English problems and nursing problems can be told apart. */
-export default function QuizPractice({ state, update, onActivity = update, date, sections = ['english', 'nursing'] }:
-  Pick<PageProps, 'state' | 'update'> & { onActivity?: PageProps['update']; date: string; sections?: QuizSection[] }) {
+export default function QuizPractice({ state, update, onActivity = update, date, sections = ['english', 'nursing'], subject }:
+  Pick<PageProps, 'state' | 'update'> & { onActivity?: PageProps['update']; date: string; sections?: QuizSection[]
+    /** Only this licensing-exam subject's nursing questions (opened from the 國考科目 page). */
+    subject?: string }) {
   const stored = state.notes[quizSectionKey] as QuizSection
-  const [section, setSection] = useState<QuizSection>(sections.includes(stored) ? stored : sections[0])
-  const [current, setCurrent] = useState(() => nextQuizItem(items, section, state.notes, date))
+  const [section, setSection] = useState<QuizSection>(subject ? 'nursing' : sections.includes(stored) ? stored : sections[0])
+  const pickNext = (s: QuizSection, notes: Record<string, string>) => subject ? nextSubjectQuiz(items, subject, notes, date) : nextQuizItem(items, s, notes, date)
+  const [current, setCurrent] = useState(() => pickNext(section, state.notes))
   const [picked, setPicked] = useState<number>()
   const [showZh, setShowZh] = useState(false)
   const [cause, setCause] = useState('')
@@ -37,7 +40,7 @@ export default function QuizPractice({ state, update, onActivity = update, date,
     const usedZh = showZh && sectionOf(item) === 'nursing'
     onActivity(prev => {
       let notes = recordQuizAnswer(prev.notes, item, i, date, usedZh)
-      if (!retry) notes = advanceQuiz(notes, section)
+      if (!retry && !subject) notes = advanceQuiz(notes, section)
       return { ...prev, notes }
     })
   }
@@ -48,7 +51,7 @@ export default function QuizPractice({ state, update, onActivity = update, date,
     onActivity(prev => ({ ...prev, notes: recordQuizCause(prev.notes, id, c) }))
   }
   function next() {
-    setCurrent(nextQuizItem(items, section, state.notes, date))
+    setCurrent(pickNext(section, state.notes))
     reset()
   }
 
@@ -58,12 +61,13 @@ export default function QuizPractice({ state, update, onActivity = update, date,
       picked === undefined ? '他還沒作答；正確答案是第 ' + (current.item.answerIndex + 1) + ' 個，他作答前不要說出來，只幫他看懂題目。'
         : '他選了第 ' + (picked + 1) + ' 個，正確答案是第 ' + (current.item.answerIndex + 1) + ' 個。說明：' + current.item.explanation].join('\n'),
   } : null)
-  if (!current) return <p>這一區還沒有題目。</p>
+  if (!current) return <p>{subject ? '「' + subject + '」還沒有護理英文題。' : '這一區還沒有題目。'}</p>
   const { item: question, retry } = current
   const nursing = sectionOf(question) === 'nursing'
   const wrong = picked !== undefined && picked !== question.answerIndex
   return <div className="pr-stack qz">
-    {sections.length > 1 && <div className="pr-options qz-tabs" role="group" aria-label="題目分區">
+    {subject && <p className="qz-meta"><span>只出「{subject}」的護理英文題</span><a href="#library/quiz">改練全部題目</a></p>}
+    {!subject && sections.length > 1 && <div className="pr-options qz-tabs" role="group" aria-label="題目分區">
       {sections.map(s => <button key={s} aria-pressed={s === section} onClick={() => choose(s)}>{sectionNames[s]}</button>)}
     </div>}
     <p className="qz-meta">

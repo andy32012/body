@@ -2,7 +2,7 @@ import type { AppState } from './store'
 import curriculum from '../data/curriculum.json'
 import { activePeriod } from './progress'
 import { assistedUnits } from './grammarRetention'
-import { certStatus, courseProgress, exams, officialLevel, unitGate } from './cefr'
+import { certStatus, certifiedLevel, courseProgress, exams, unitGate } from './cefr'
 import { hasPack, readHeld, type HeldPart } from './bridge'
 import { topWeak, weakLines } from './weakPoints'
 
@@ -87,11 +87,11 @@ export function handoffText(state: AppState, today: string) {
 }
 /** The CEFR ladder for whoever takes over: the level a certificate shows, the step being studied and its exam. */
 function levelLine(state: AppState) {
-  const level = officialLevel(state.notes)
+  const level = certifiedLevel(state.notes)
   const { step } = courseProgress(state.curriculum.unit)
   const status = certStatus(state.notes, step.to)
   const gate = unitGate(state.notes, state.curriculum.unit)
-  return '- 程度：證照上是 ' + level + '；課程在 ' + step.from + '→' + step.to + '，這一段結束要考' + exams[step.exams[0]].name
+  return '- 程度：' + (level ? '證照上是 ' + level : '還沒有考過英文證照（課程從 A1 起步）') + '；課程在 ' + step.from + '→' + step.to + '，這一段結束要考' + exams[step.exams[0]].name
     + (status.state === 'waiting' && status.next ? '（已報名，' + status.next.date + ' 考）' : '')
     + (gate ? '。單元 ' + state.curriculum.unit + ' 要等' + exams[gate.exams[0]].name + '報名或考過才開。' : '。')
     + '每天 1.5 小時（週一到六），寒假 3–4 小時。'

@@ -52,11 +52,23 @@ test('閱讀教材分十二小級：各小級篇數、題數、字數與欄位�
   }
 })
 
-test('舊文章與原題逐題原封不動，新題只能接在最後，舊答案位置不會改掉', () => {
+test('舊文章與原題逐題原封不動，新題只能接在最後，舊答案位置不會改掉', async () => {
   const byId = new Map([...general, ...nurses].map(p => [p.id, p]))
+  // A passage whose content had to be corrected is listed in content-updates.json (the home page says 教材修正了): it
+  // keeps its id, every old question in its place with the same answer position, and no question is removed.
+  const updates = (await import('../src/data/content-updates.json', { with: { type: 'json' } })).default as { passages?: string[] }[]
+  const corrected = new Set(updates.flatMap(u => u.passages ?? []))
   for (const entry of old.values()) {
     const p = byId.get(entry.id)!
     assert.ok(p, entry.id + ' 不能刪掉')
+    if (corrected.has(p.id)) {
+      assert.ok(p.qs.length >= entry.questions.length, p.id + ' 修正後題目不能變少')
+      // The answer positions of the old questions, as they were before the correction (old picks stay readable).
+      const answers: Record<string, number[]> = { 'n-b1-hypoglycemia': [0, 1, 0, 2, 1, 2], 'n-b1-pressure-injury': [1, 2, 0, 1, 0, 2] }
+      assert.ok(answers[p.id], p.id + ' 修正的文章要在這裡記下原本的答案位置')
+      assert.deepEqual(p.qs.slice(0, answers[p.id].length).map(q => q.answer), answers[p.id], p.id + ' 修正後答案位置不變')
+      continue
+    }
     const { band: _band, words: _words, qs, ...content } = p
     assert.equal(sha(content), entry.content, p.id + ' 原文章內容不改')
     assert.deepEqual(qs.slice(0, entry.questions.length).map(sha), entry.questions, p.id + ' 原題、順序、選項、答案和解析不改')

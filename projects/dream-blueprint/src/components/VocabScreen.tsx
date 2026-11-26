@@ -4,7 +4,7 @@ import { markSkill } from '../lib/wordSkills'
 import { useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, dayKey, newCard, weekKey } from '../lib/progress'
-import { formLines, getScreeningQueue, levelEntry, meaningLine, officialWords, wordKey } from '../lib/vocab'
+import { formLines, getScreeningQueue, levelEntry, lookupWords, meaningLine, officialWords, wordKey } from '../lib/vocab'
 import wordParts from '../data/medical-parts.json'
 import WordParts from './WordParts'
 import { learnedParts, wordParts as everydayParts } from '../lib/wordParts'
@@ -37,8 +37,7 @@ export default function VocabScreen({state, update}: PageProps) {
   const term = searchTerm.trim().toLowerCase()
   const lookup = useMemo(() => {
     if (lookupLevel >= 5 && !term) return []
-    return officialWords.filter(w => w.level === lookupLevel &&
-      (!term || w.en.toLowerCase().includes(term) || w.zh.includes(term))).slice(0, 12)
+    return lookupWords(officialWords, lookupLevel, term)
   }, [lookupLevel,term])
   const classified = useMemo(() => new Set([...state.knownWords,...state.learningWords].map(wordKey)),
     [state.knownWords,state.learningWords])

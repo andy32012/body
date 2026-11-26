@@ -69,7 +69,8 @@ export default function GeptSpeaking({ state, update }: PageProps) {
         {sets.map((s, i) => {
           const rec = readGept(state.notes, level, s.id)
           return <button key={s.id} type="button" aria-pressed={s.id === setId} onClick={() => { setSetId(s.id); setOpen([]) }}>
-            第 {i + 1} 回{rec.d ? ' ✓' : ''}{rec.q !== undefined ? <small>問答 {rec.q}</small> : null}
+            {/* ✓ only when every scored part was done; one part started is said as such. */}
+            第 {i + 1} 回{rec.r !== undefined && rec.q !== undefined && (level === 'elementary' || rec.p !== undefined) ? ' ✓' : rec.d ? <small>做過一部分</small> : ''}{rec.q !== undefined ? <small>問答 {rec.q}</small> : null}
           </button>
         })}
       </div>
@@ -211,8 +212,11 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
         <p className="gp-said"><small>你說的（語音辨識）：</small><span lang="en">{answers[at] || '（沒有聽到聲音）'}</span></p>
         {error && <p className="gp-warn" role="alert">{error}</p>}
         <div className="gp-row">
-          <button type="button" className="gp-open" onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
-          <button type="button" className="gp-link" onClick={() => void ask(at)}>這題重答</button>
+          {/* After the last question (when its recording failed) there is no next one: answer it again, or see the result. */}
+          {at + 1 < questions.length
+            ? <button type="button" className="gp-open" onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
+            : <button type="button" className="gp-open" onClick={() => void score()}>看結果</button>}
+          <button type="button" className={at + 1 < questions.length ? 'gp-link' : 'gp-link gp-retry'} onClick={() => void ask(at)}>這題重答</button>
         </div>
       </>}
     </div>}

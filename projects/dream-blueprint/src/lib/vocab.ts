@@ -81,3 +81,13 @@ export function getScreeningQueue(known: string[], learning: string[], custom: V
     return true
   })
 }
+
+/** 分級找字: words of one level matching what he typed. The word spelt exactly comes first (typing "in" shows in, not
+ *  win and meeting), then words starting with it, then the rest; only then are the first `limit` kept. */
+export function lookupWords<T extends { en: string; zh: string; level: number }>(words: readonly T[], level: number, term: string, limit = 12): T[] {
+  const t = term.trim().toLowerCase()
+  const here = words.filter(w => w.level === level)
+  if (!t) return here.slice(0, limit)
+  const rank = (w: T) => { const en = w.en.toLowerCase(); return en === t ? 0 : en.startsWith(t) ? 1 : en.includes(t) ? 2 : w.zh.includes(t) ? 3 : -1 }
+  return here.map(w => ({ w, r: rank(w) })).filter(x => x.r >= 0).sort((a, b) => a.r - b.r).slice(0, limit).map(x => x.w)
+}

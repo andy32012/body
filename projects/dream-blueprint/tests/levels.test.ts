@@ -89,3 +89,30 @@ test('舊的預設（週二、四、六 30 分鐘）換成週一到六 1.5 小�
   const mine = importBackup(JSON.stringify({ ...old, settings: { ...old.settings, regularDays: [1, 3, 5] } }))
   assert.deepEqual(mine.settings.regularDays, [1, 3, 5], '自己設的上課日不動')
 })
+
+test('全民英檢一日考不溯及既往：不會跟之前考過的聽讀合成一張通過；一日考沒過的那半，之後補考可以合併', () => {
+  // Staged 聽讀 85/85 first; later a one-day test with 聽讀 60/60 and 說寫 90/90: no certificate (LTTC).
+  let notes = saveAttempt({}, 'B1', { id: 'lr', exam: 'gept-b1', date: '2027-03-01', parts: 'lr', lr: [85, 85] })
+  notes = saveAttempt(notes, 'B1', { id: 'day', exam: 'gept-b1', date: '2027-09-01', parts: 'both', lr: [60, 60], sw: [90, 90] })
+  assert.notEqual(certStatus(notes, 'B1').state, 'passed', '一日考的說寫不能跟之前的聽讀合併')
+  // One-day test passing both halves on its own: passed.
+  assert.equal(certStatus(saveAttempt({}, 'B1', { id: 'd', exam: 'gept-b1', date: '2027-09-01', parts: 'both', lr: [88, 90], sw: [82, 80] }), 'B1').state, 'passed')
+  // One-day 聽讀 passed, 說寫 missed; 說寫 taken again later: passed on the later date.
+  let later = saveAttempt({}, 'B1', { id: 'd', exam: 'gept-b1', date: '2027-09-01', parts: 'both', lr: [88, 90], sw: [70, 80] })
+  later = saveAttempt(later, 'B1', { id: 's', exam: 'gept-b1', date: '2027-12-01', parts: 'sw', sw: [85, 82] })
+  assert.deepEqual([certStatus(later, 'B1').state, certStatus(later, 'B1').passedOn], ['passed', '2027-12-01'])
+})
+
+test('證照：沒登錄成績不說「證照上是 A1」；雅思超過兩年就不再打勾', async () => {
+  const { certifiedLevel, visaCurrent } = await import('../src/lib/cefr.ts')
+  assert.equal(certifiedLevel({}), null, '還沒有證照')
+  assert.equal(certifiedLevel(saveAttempt({}, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both' })), null, '只有報名也還沒有')
+  assert.equal(certifiedLevel(saveAttempt({}, 'B1', { id: 'm', exam: 'gept-b1', date: '2027-08-15', parts: 'both', lr: [88, 90], sw: [82, 80] })), 'B1')
+  const v = visaScreen(saveAttempt({}, 'C1', { id: 'j', exam: 'ielts', date: '2024-11-26', band: { overall: 6.5, speaking: 7 } }))!
+  assert.equal(v.until, '2026-11-26')
+  assert.equal(visaCurrent(v, '2026-11-25'), true, '期限前一天')
+  assert.equal(visaCurrent(v, '2026-11-26'), true, '期限當天')
+  assert.equal(visaCurrent(v, '2026-11-27'), false, '隔天就不算')
+  assert.equal(visaScreen(saveAttempt({}, 'C1', { id: 'k', exam: 'ielts', date: '2024-02-29', band: { overall: 7, speaking: 7 } }))?.until, '2026-02-28', '閏年 2/29 算到 2/28')
+  assert.equal(visaCurrent(null, '2026-11-26'), false)
+})

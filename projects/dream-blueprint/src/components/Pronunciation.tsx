@@ -10,7 +10,9 @@ import { saveAllPacks, usePronPlayer, type Take } from '../lib/pronAudio'
 import { LockLine } from './Locked'
 import './pron.css'
 
-type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }
+type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string
+  /** Saves a setting without counting the day as practice (choosing a voice is not practising). */
+  update?: PageProps['update'] }
 type Player = ReturnType<typeof usePronPlayer>
 const SAVED = 'dream-blueprint.pron-saved'
 /** Size of all the sound packs together (pack.py prints it). */
@@ -22,7 +24,7 @@ const voicesOf = (choice: VoiceChoice): PronVoice[] => choice === 'both' ? ['f',
 const takes = (texts: string[], choice: VoiceChoice): Take[] => voicesOf(choice).flatMap(voice => texts.map(text => ({ text, voice })))
 
 /** The pronunciation course in the practice library: the list of lessons, or one lesson. */
-export default function Pronunciation({ state, onActivity, date }: Props) {
+export default function Pronunciation({ state, onActivity, update, date }: Props) {
   const [openId, setOpenId] = useState<string | null>(null)
   const lesson = pronLessons.find(l => l.id === openId)
   const top = useRef<HTMLDivElement>(null)
@@ -34,7 +36,7 @@ export default function Pronunciation({ state, onActivity, date }: Props) {
   }
   return <div className="pr-stack pn" ref={top}>
     {lesson
-      ? <Lesson key={lesson.id} lesson={lesson} state={state} onActivity={onActivity} date={date} onBack={() => open(null)} onOpen={open} />
+      ? <Lesson key={lesson.id} lesson={lesson} state={state} onActivity={onActivity} update={update} date={date} onBack={() => open(null)} onOpen={open} />
       : <Index state={state} onOpen={open} />}
   </div>
 }
@@ -93,7 +95,7 @@ function SaveAll() {
   </p>
 }
 
-function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { lesson: PronLesson; onBack: () => void; onOpen: (id: string) => void }) {
+function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Props & { lesson: PronLesson; onBack: () => void; onOpen: (id: string) => void }) {
   const player = usePronPlayer(lesson.id)
   const choice = readVoice(state.notes)
   const [slow, setSlow] = useState(false)
@@ -108,7 +110,7 @@ function Lesson({ lesson, state, onActivity, date, onBack, onOpen }: Props & { l
       lesson.pairs ? '這堂的對比字：' + lesson.pairs.map(p => p.join(' / ')).join('、') : '', '你聽不到他的聲音，不要評他的發音；可以解釋嘴型、舌頭位置和中文裡最接近的音。'].filter(Boolean).join('\n'),
   })
   const say = (texts: string[], voice: VoiceChoice = choice) => player.play(takes(texts, voice), rate)
-  const setVoice = (v: VoiceChoice) => onActivity(prev => ({ ...prev, notes: { ...prev.notes, [voiceKey]: v } }))
+  const setVoice = (v: VoiceChoice) => (update ?? onActivity)(prev => ({ ...prev, notes: { ...prev.notes, [voiceKey]: v } }))
   const speaking = (text: string) => player.now?.text === text
   const finish = (patch: { d?: string; q?: [number, number]; s?: string }, spoke = false) =>
     onActivity(prev => { const notes = savePron(prev.notes, lesson.id, patch); return { ...prev, notes: spoke ? logSkill(notes, 'speak', date) : notes } })
@@ -229,15 +231,19 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
   const [picked, setPicked] = useState<number | null>(null)
   const [rights, setRights] = useState<boolean[]>([])
   const [plays, setPlays] = useState(0)
+  // The question whose sound really played: its choices open only then (a play that failed is not a listening answer).
+  const [heardQ, setHeardQ] = useState(-1)
+  const [noSound, setNoSound] = useState(false)
   const q = questions?.[at]
+  const playQ = (n: number, text: string, v: PronVoice) => { if (!player.play([{ text, voice: v }], rate, () => setHeardQ(n))) setNoSound(true) }
   // With both voices chosen the questions take turns, so the ear is tested on each.
   const voiceAt = (i: number): PronVoice => choice === 'both' ? (i % 2 ? 'm' : 'f') : choice
-  function hear(question: PronQuestion, v: PronVoice) { player.play([{ text: question.audio, voice: v }], rate); setPlays(n => n + 1) }
+  function hear(question: PronQuestion, v: PronVoice) { playQ(at, question.audio, v); setPlays(n => n + 1) }
   // Starting and moving on happen inside a tap, so the clip of the new question can play at once.
   function start() {
     const list = quizFor(lesson, Date.now())
-    setQuestions(list); setAt(0); setPicked(null); setRights([]); setPlays(1)
-    player.play([{ text: list[0].audio, voice: voiceAt(0) }], rate)
+    setQuestions(list); setAt(0); setPicked(null); setRights([]); setPlays(1); setHeardQ(-1); setNoSound(false)
+    playQ(0, list[0].audio, voiceAt(0))
   }
   function choose(i: number) {
     if (!q || picked !== null) return
@@ -248,7 +254,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     if (!questions) return
     if (at + 1 < questions.length) {
       setAt(at + 1); setPicked(null); setPlays(1)
-      player.play([{ text: questions[at + 1].audio, voice: voiceAt(at + 1) }], rate)
+      playQ(at + 1, questions[at + 1].audio, voiceAt(at + 1))
     } else {
       onDone(rights.filter(Boolean).length, rights.length)
       setAt(questions.length)
@@ -274,9 +280,10 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     {q.show && <p className="pn-show" lang="en">{q.show}</p>}
     <button type="button" className="ls-play" onClick={() => hear(q, voice)}><Volume2 size={16} />{plays ? '再聽一次' : '播放'}</button>
     <div className="pr-options gm-options pn-options" data-count={q.options.length}>
-      {q.options.map((o, i) => <button key={i + o} type="button" lang="en" disabled={answered}
+      {q.options.map((o, i) => <button key={i + o} type="button" lang="en" disabled={answered || heardQ !== at}
         className={!answered ? undefined : i === q.answer ? 'gm-right' : i === picked ? 'gm-miss' : undefined} onClick={() => choose(i)}>{o}</button>)}
     </div>
+    {!answered && heardQ !== at && <p className="ls-help">{noSound ? '這台裝置現在放不出聲音：測驗要聽得到才算，先看上面的講解和比一比，換個有聲音的地方再測。' : '聽到聲音才能選；沒有聲音的話按「再聽一次」。'}</p>}
     {answered && <div className="gm-feedback" data-ok={picked === q.answer} role="status">
       <strong>{picked === q.answer ? '對了' : '這次是 ' + q.options[q.answer]}</strong>
       {q.why && <small>{q.why}</small>}

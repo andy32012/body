@@ -28,7 +28,16 @@ export function nextPassage(all: readonly Passage[], level: number, checks: Reco
   notes: Record<string, string>, skipped: readonly string[] = [], letter = '', today = dayKey()) {
   const pool = all.filter(p => p.level === level && (!letter || p.letter === letter))
   const open = pool.filter(p => !checks[doneKey(p.id)] && !skipped.includes(p.id))
-  return open.find(p => redoDue(notes, p.id, today)) ?? open.find(p => !notes[redoKey(p.id)]) ?? open[0]
+  // A passage marked 「不會」 today waits for tomorrow, even when nothing else is left (it used to come straight back).
+  return open.find(p => redoDue(notes, p.id, today)) ?? open.find(p => !notes[redoKey(p.id)])
+}
+/** Why no passage is offered: the passages of the level (or letter) not done yet, split into those passed over this
+ *  round (換一段) and those waiting for tomorrow (「不會」 today). All zero means everything is really done. */
+export function passageRound(all: readonly Passage[], level: number, checks: Record<string, boolean>,
+  notes: Record<string, string>, skipped: readonly string[] = [], letter = '', today = dayKey()) {
+  const left = all.filter(p => p.level === level && (!letter || p.letter === letter) && !checks[doneKey(p.id)])
+  const waiting = left.filter(p => notes[redoKey(p.id)] && !redoDue(notes, p.id, today))
+  return { left: left.length, skipped: left.filter(p => skipped.includes(p.id) && !waiting.includes(p)).length, waiting: waiting.length }
 }
 export const levelProgress = (all: readonly Passage[], level: number, checks: Record<string, boolean>) => {
   const pool = all.filter(p => p.level === level)

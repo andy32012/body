@@ -66,6 +66,20 @@ export function nurseSlot(day: string): NurseSlot {
   return slots[((days % 3) + 3) % 3]
 }
 
+/** Nursing work done on a day, for the nursing checklist: a general passage or pronunciation lesson is practice too, but
+ *  it does not tick 護理英文：聽或讀 or 口說：演一段. */
+export function nurseListenedOn(notes: Record<string, string>, day: string) {
+  return Object.keys(notes).some(k => k.startsWith('nurse.listen.') && readNurseListen(notes, k.slice(13))?.day === day)
+}
+export function nurseReadOn(notes: Record<string, string>, day: string) {
+  return Object.entries(notes).some(([k, v]) => {
+    if (!k.startsWith('read.n-')) return false
+    try { return (JSON.parse(v) as { day?: string }).day === day } catch { return false }
+  })
+}
+export const nurseSpokeOn = (notes: Record<string, string>, day: string) =>
+  Object.entries(notes).some(([k, v]) => k.startsWith('nurse.speak.') && v === day)
+
 /** Counts a nursing word passed in a drill today. */
 export const countNurseWord = (notes: Record<string, string>, day: string) =>
   ({ ...notes, [nurseWordsKey(day)]: String((Number(notes[nurseWordsKey(day)]) || 0) + 1) })

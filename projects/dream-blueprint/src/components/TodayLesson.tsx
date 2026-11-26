@@ -3,7 +3,7 @@ import { ArrowRight, BookOpen, ChevronRight, Compass, GraduationCap, ListChecks,
 import type { AppState, PageProps } from '../lib/store'
 import type { Energy } from '../lib/progress'
 import { dayBudget } from '../lib/dailyPlan'
-import { courseProgress, exams, officialLevel } from '../lib/cefr'
+import { certifiedLevel, courseProgress, exams } from '../lib/cefr'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
 import { activeLesson, coreSaved, mainLessonDone, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
@@ -92,7 +92,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
     : lesson.review ? (energy === 'low' ? short : lesson.done ? '複習舊句，其他時間背 7000 單、練讀聽說寫和準備證照（照月計畫）' : '今天複習舊句，課表明天繼續')
     : lesson.checkpoint ? '不看提示，自己寫出這個單元的句子' : lesson.cando || lesson.title
   const progress = courseProgress(state.curriculum.unit)
-  const level = officialLevel(state.notes)
+  const certified = certifiedLevel(state.notes)
   return <>
     <section className="flight-deck lesson-deck" aria-labelledby="lesson-goal">
       <ScenePhoto className="flight-photo" />
@@ -125,7 +125,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
         </details>}
         <p className="lesson-stats">{topicDone ? '今天的生活主題完成了 ✓ · ' : ''}{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
         <button type="button" className="lesson-level" onClick={() => { location.hash = 'plan/levels' }}>
-          英文程度 <b>{level}</b> · 正在上 {progress.step.from}→{progress.step.to}{progress.total ? '（單元 ' + Math.min(progress.done + 1, progress.total) + ' / ' + progress.total + '）' : ''} · 升級要考{exams[progress.step.exams[0]].name}
+          {certified ? <>證照 <b>{certified}</b></> : '還沒考證照'} · 正在上 {progress.step.from}→{progress.step.to}{progress.total ? '（單元 ' + Math.min(progress.done + 1, progress.total) + ' / ' + progress.total + '）' : ''} · 升級要考{exams[progress.step.exams[0]].name}
         </button>
       </div>
     </section>

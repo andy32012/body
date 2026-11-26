@@ -14,10 +14,14 @@ function readProgress(notes: Record<string, string>): Progress | null {
   try { const p = JSON.parse(notes[progressKey] ?? 'null') as Progress | null; return p && all.some(c => c.id === p.id) && p.step < all.find(c => c.id === p.id)!.steps.length ? p : null } catch { return null }
 }
 
-export default function ClinicalCase({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
-  const [saved] = useState(() => readProgress(state.notes))
+export default function ClinicalCase({ state, onActivity, date, subject }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string
+  /** Only this licensing-exam subject's cases (opened from the 國考科目 page). */
+  subject?: string }) {
+  const pool = subject ? all.filter(c => c.subjects?.includes(subject)) : all
+  // A case left halfway is resumed, unless a subject was chosen and the case belongs to another one.
+  const [saved] = useState(() => { const p = readProgress(state.notes); return p && pool.some(c => c.id === p.id) ? p : null })
   const [skip, setSkip] = useState<string[]>([])
-  const [current, setCurrent] = useState(() => saved ? all.find(c => c.id === saved.id)! : nextScenario(all, state.notes))
+  const [current, setCurrent] = useState(() => saved ? all.find(c => c.id === saved.id)! : nextScenario(pool.length ? pool : all, state.notes))
   const [step, setStep] = useState(saved?.step ?? 0)
   const [picked, setPicked] = useState<number | undefined>(saved?.picked)
   const [results, setResults] = useState<StepResult[]>(saved?.results ?? [])
@@ -56,7 +60,8 @@ export default function ClinicalCase({ state, onActivity, date }: Pick<PageProps
   function another() {
     const nextSkip = [...skip, current.id]
     setSkip(nextSkip)
-    setCurrent(nextScenario(all, state.notes, nextSkip.length >= all.length ? [current.id] : nextSkip))
+    const list = pool.length ? pool : all
+    setCurrent(nextScenario(list, state.notes, nextSkip.filter(id => list.some(c => c.id === id)).length >= list.length ? [current.id] : nextSkip))
     setStep(0); setPicked(undefined); setResults([]); setZh(false); keep(null)
   }
   const lastCause = results.at(-1)?.cause
@@ -68,6 +73,7 @@ export default function ClinicalCase({ state, onActivity, date }: Pick<PageProps
   } : null)
   const top = Object.entries(summary.count).sort((a, b) => b[1] - a[1])[0]
   return <div className="pr-stack cc">
+    {subject && <p className="qz-meta"><span>只出「{subject}」的情境（{pool.length} 個）</span><a href="#library/case">改練全部情境</a></p>}
     <p className="qz-meta"><span>臨床情境 · {current.topic}</span><span>做過 {summary.done} / {summary.total}</span>{top && <span>最常卡在：{top[0]}</span>}</p>
     <ol className="cc-steps" aria-label="四個步驟">{current.steps.map((x, i) => <li key={x.kind} data-state={i < step ? 'done' : i === step ? 'now' : 'todo'}>{stepNames[x.kind]}</li>)}</ol>
     <section className="cc-case">

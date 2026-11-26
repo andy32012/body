@@ -31,6 +31,9 @@ export async function startVoice(opts: {
   onLine: (lines: (prev: Line[]) => Line[]) => void
   onState: (state: 'connecting' | 'live' | 'closed', detail?: string) => void
   onLevel?: (her: number, you: number) => void
+  /** Ending the call (or leaving the page) before it is connected: the setup stops and the microphone is released,
+   *  also when permission is granted only afterwards. */
+  signal?: AbortSignal
 }): Promise<VoiceSession> {
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
@@ -45,6 +48,7 @@ export async function startVoice(opts: {
   let mic: MediaStream
   try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
   catch (e) { ctx?.close().catch(() => {}); throw e }
+  if (opts.signal?.aborted) { mic.getTracks().forEach(t => t.stop()); ctx?.close().catch(() => {}); opts.onState('closed'); throw new DOMException('ended', 'AbortError') }
   const pc = new RTCPeerConnection()
   // Levels for the wave: "her" is Emma's voice, "you" is the microphone (both 0–1).
   let frame = 0
@@ -111,7 +115,9 @@ export async function startVoice(opts: {
     try { events.send(JSON.stringify({ type: 'session.instructions.append', event_id: 'nudge_' + ++nudges, delegation_id: null, content: opts.quiet.say })) }
     catch { nudging = false }
   }, 50)
-  const stop = () => {
+  // Ends the call once, however it ends (hang up, the service closing, an error, a lost connection): the page's
+  // wrap-up (feedback from Claude) runs once. `detail` is the reason when it ended by an error.
+  const stop = (detail?: string) => {
     if (closed) return
     closed = true
     try { if (events.readyState === 'open') events.send(JSON.stringify({ type: 'session.close' })) } catch { /* ignore */ }
@@ -122,8 +128,9 @@ export async function startVoice(opts: {
     clearInterval(watch)
     ctx?.close().catch(() => {})
     opts.onLevel?.(0, 0)
-    opts.onState('closed')
+    opts.onState('closed', detail)
   }
+  opts.signal?.addEventListener('abort', () => stop(), { once: true })
   const append = (role: Line['role'], delta: string) => opts.onLine(prev => {
     const last = prev[prev.length - 1]
     if (last && last.role === role) return [...prev.slice(0, -1), { role, text: last.text + delta }]
@@ -139,9 +146,10 @@ export async function startVoice(opts: {
     // The reminder to speak is an extra: if the service refuses it, the call goes on without reminders.
     else if (msg.type === 'error' && msg.error?.client_event_id?.startsWith('nudge_')) nudging = false
     // Any other provider error ends the session the same way as hanging up: microphone off, connection closed.
-    else if (msg.type === 'error') { stop(); opts.onState('closed', msg.error?.message || msg.message || '連線出錯了') }
+    else if (msg.type === 'error') stop(msg.error?.message || msg.message || '連線出錯了')
   }
   pc.onconnectionstatechange = () => { if (['failed', 'disconnected'].includes(pc.connectionState)) stop() }
+  const aborted = () => { if (opts.signal?.aborted) throw new DOMException('ended', 'AbortError') }
 
   // Every failure while connecting (no network, an HTTP error, a bad answer) goes through the same clean-up.
   try {
@@ -158,7 +166,9 @@ export async function startVoice(opts: {
         transport: { type: 'webrtc', sdp: offer.sdp },
       }),
     })
+    aborted()
     let res = await create(opts.opening)
+    aborted()
     let data = await res.json().catch(() => null)
     // The opening message is an extra: if the service does not take the request with it, the call starts without it.
     if (opts.opening && (res.status === 400 || res.status === 422)) {
@@ -172,6 +182,7 @@ export async function startVoice(opts: {
       throw new Error('OpenAI 連線失敗：' + msg)
     }
     if (!data?.transport?.sdp) throw new Error('OpenAI 回傳的連線資料不完整，等一下再試。')
+    aborted()
     await pc.setRemoteDescription({ type: 'answer', sdp: data.transport.sdp })
   } catch (e) {
     stop()

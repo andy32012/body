@@ -38,3 +38,18 @@ test('全部數字暖身與 Task 1 真實題目都能畫出不同刻度及有效
   }
   assert.ok(flatCharts > 0, '包含原先上下界相同的持平題目')
 })
+
+test('寫作 Task 1 的圖：時間（月份、星期）畫成折線，不同中心 A–F 畫成長條（比較，不是走勢）', async () => {
+  const { isTimeSeries } = await import('../src/lib/chart.ts')
+  assert.equal(isTimeSeries(['Jan', 'Feb', 'Mar']), true)
+  assert.equal(isTimeSeries(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']), true)
+  assert.equal(isTimeSeries(['2020', '2021', '2022']), true)
+  assert.equal(isTimeSeries(['A', 'B', 'C', 'D', 'E', 'F']), false)
+  assert.equal(isTimeSeries(['Ward 1', 'ICU', 'ER']), false)
+  const writing = (await import('../src/data/writing.json', { with: { type: 'json' } })).default
+  const charts: { title: string; points: { label: string }[] }[] = []
+  const walk = (o: unknown): void => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { const r = o as Record<string, unknown>; if (r.chart) charts.push(r.chart as typeof charts[number]); Object.values(r).forEach(walk) } }
+  walk(writing)
+  const centres = charts.filter(c => c.points.every(p => /^[A-F]$/.test(p.label)))
+  assert.ok(centres.length > 0 && centres.every(c => !isTimeSeries(c.points.map(p => p.label))), '中心比較的圖都畫成長條')
+})

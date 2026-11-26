@@ -133,11 +133,18 @@ export interface CertStatus { state: CertState; passedOn?: string; next?: CertAt
 export function certStatus(notes: Record<string, string>, to: LevelId): CertStatus {
   const attempts = readAttempts(notes, to)
   let passedOn: string | undefined
-  // GEPT halves can come from different sittings of the same level.
+  // GEPT halves can come from different sittings of the same level. A one-day test (both halves in one sitting) does not
+  // reach back: its scores never join a half passed at an earlier sitting (LTTC 一日考問與答). A half it missed can be
+  // taken again later, and that later sitting joins the half it passed.
   const geptExam = steps.find(s => s.to === to)?.exams.find(gept)
   const lrOk = attempts.filter(a => a.exam === geptExam && takesLr(a) && lrPass(a.lr))
   const swOk = attempts.filter(a => a.exam === geptExam && takesSw(a) && geptExam && swPass(geptExam, a.sw))
-  if (lrOk.length && swOk.length) passedOn = [lrOk[0].date, swOk[0].date].sort()[1]
+  for (const l of lrOk) for (const w of swOk) {
+    const later = l.date > w.date ? l : w.date > l.date ? w : l.parts === 'both' ? w : l
+    if (l.id !== w.id && later.parts === 'both') continue
+    const on = l.date > w.date ? l.date : w.date
+    if (!passedOn || on < passedOn) passedOn = on
+  }
   for (const a of attempts) if (attemptPasses(a, to) && (!passedOn || a.date < passedOn)) passedOn = a.date
   const next = attempts.find(waiting)
   if (passedOn) return { state: 'passed', passedOn, attempts }
@@ -151,6 +158,10 @@ export function officialLevel(notes: Record<string, string>): LevelId {
   let best: LevelId = 'A1'
   for (const s of steps) if (certStatus(notes, s.to).state === 'passed' && levelIndex(s.to) > levelIndex(best)) best = s.to
   return best
+}
+/** The level of a certificate actually passed, or null with none yet (the course starts at A1, which is not a certificate). */
+export function certifiedLevel(notes: Record<string, string>): LevelId | null {
+  return steps.some(s => certStatus(notes, s.to).state === 'passed') ? officialLevel(notes) : null
 }
 /** A level counts as open for moving on when it is reached, or its certificate is booked / waiting for results. */
 export function levelOpen(notes: Record<string, string>, to: LevelId) {
@@ -189,6 +200,9 @@ export function visaScreen(notes: Record<string, string>) {
   // Two calendar years on (a 29 February result ends on 28 February).
   return last ? { date: last.date, until: Number(last.date.slice(0, 4)) + 2 + (last.date.endsWith('-02-29') ? '-02-28' : last.date.slice(4)) } : null
 }
+/** Whether that IELTS result is still inside the two years the site goes by (up to and including `until`). Reaching the
+ *  score once is not the same as a result that can still be sent; acceptance is decided by the agency. */
+export const visaCurrent = (v: { until: string } | null, today: string) => !!v && today <= v.until
 /** The first unit from `unit` on whose lessons wait for a certificate (for the calendar), or null. */
 export function firstLockedUnit(notes: Record<string, string>, unit: number): number | null {
   const starts = [unit, ...steps.flatMap(s => s.units && s.units[0] > unit ? [s.units[0]] : [])]

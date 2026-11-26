@@ -13,7 +13,7 @@ import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
 import { plainReadCount, QUESTION_PASSAGES } from '../lib/reading'
 import { readSkills } from '../lib/wordSkills'
-import { nurseSlot, nurseWordsOn, readLastHeard } from '../lib/nursing'
+import { nurseListenedOn, nurseReadOn, nurseSlot, nurseSpokeOn, nurseWordsOn, readLastHeard } from '../lib/nursing'
 import { nextPron, pronLessons } from '../lib/pronunciation'
 import './today-plan.css'
 
@@ -146,7 +146,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       auto: left === 0, ...(left ? reviewGo : {}) }
     const third = Math.round(total / 3)
     const rest = total - 2 * third
-    const nInput: Task = { id: 'n-input', min: third, title: '護理英文：聽或讀', auto: listenedToday || readToday,
+    // Ticked by nursing listening or nursing reading only: an everyday passage does not count as nursing English.
+    const nInput: Task = { id: 'n-input', min: third, title: '護理英文：聽或讀', auto: nurseListenedOn(state.notes, today) || nurseReadOn(state.notes, today),
       detail: '這週聽 ' + week.listen + ' 天、讀 ' + week.read + ' 天 → 今天先' + (listenFirst
         ? '聽一段護理師和病人的對話：先不看字作答，再看聽力稿和中文'
         : '讀一篇護理短文，做完 3–4 題；錯的題目選「卡在哪」'),
@@ -159,7 +160,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
       ? { id: 'n-words', min: rest, title: '護理單字題', detail: '練一輪 10 個護理單字（看懂、聽懂或寫出），答完會出例句' + (wordsToday ? '（今天過關 ' + wordsToday + ' 個）' : ''),
         auto: wordsToday >= 5, go: to('library/nwords'), goLabel: '單字' }
       : slot === 'speak'
-      ? { id: 'n-speak', min: rest, title: '口說：演一段', auto: spokeToday,
+      ? { id: 'n-speak', min: rest, title: '口說：演一段', auto: heard ? nurseSpokeOn(state.notes, today) : spokeToday,
         detail: heard ? '跟 Emma 演你最近聽的「' + heard.title + '」，你演 ' + heard.you + '；沒有語音金鑰就自己唸你的台詞' : '跟 Emma 用英文說一件今天實習或讀書遇到的事，三句就好',
         go: to(heard ? 'speaking/nurse-' + heard.id : 'speaking'), goLabel: 'Emma' }
       : { id: 'n-quiz', min: rest, title: '護理英文題', detail: '做 3–5 題護理英文題，或做完一個臨床情境；先不看中文，答錯就選「卡在哪」' + (quizToday || casesToday ? '（今天' + [quizToday ? '護理題 ' + quizToday + ' 題' : '', casesToday ? '情境 ' + casesToday + ' 個' : ''].filter(Boolean).join('、') + '）' : ''),

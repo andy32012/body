@@ -63,7 +63,16 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const [wordChat] = useState(() => readWordChat(wordMode))
   const [task, setTask] = useState<string>()
   const [cardSkip, setCardSkip] = useState<string[]>([])
-  const card = ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
+  // The card is chosen once and kept: the call, the notes, the transcript and the feedback all belong to it. Saving
+  // the card as done must not swap the title above the feedback; only 換一張 / 下一張 moves on.
+  const [cardId, setCardId] = useState(() => ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, [])?.id : undefined)
+  const card = ieltsMode ? (cueCards as CueCard[]).find(c => c.id === cardId) ?? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
+  function nextCard() {
+    if (!card) return
+    const skip = [...cardSkip, card.id]
+    setCardSkip(skip); setCardId(nextCueCard(cueCards as CueCard[], state.notes, skip)?.id); setPrepEnd(undefined); setPrepNotes('')
+    setLines([]); setFeedback(null); setStatus('idle')
+  }
   const [prepEnd, setPrepEnd] = useState<number>()
   const [prepNotes, setPrepNotes] = useState('')
   const [liveAt, setLiveAt] = useState<number>()
@@ -105,7 +114,11 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const linesRef = useRef<Line[]>([])
   linesRef.current = lines
 
-  useEffect(() => () => session.current?.stop(), [])
+  // A call still being set up (permission dialog open, network not answered) is cancelled by 結束 or by leaving.
+  const setup = useRef<AbortController | null>(null)
+  useEffect(() => () => { setup.current?.abort(); session.current?.stop() }, [])
+  // One wrap-up per call, however the call ended.
+  const wrapped = useRef(false)
   // Keys that arrive from the computer (QR pairing) fill in here without a reload.
   useEffect(() => {
     const on = () => { setKey(openaiKey()); if (openaiKey()) setSettings(false) }
@@ -129,6 +142,10 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
     setError(''); setLines([]); setFeedback(null); setFixes([]); setYouMs(0); setYouFrom(undefined)
+    setup.current?.abort()
+    const controller = new AbortController()
+    setup.current = controller
+    wrapped.current = false
     const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : wordChat ? wordChatInstructions(wordChat) : ''
     try {
       session.current = await startVoice({
@@ -143,16 +160,19 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         // Not in Part 2 either: a "Mm-hm" from her would cut a hole in his long answer.
         guard: echoGuard() && !card,
         onLine: setLines,
+        signal: controller.signal,
         onLevel: (her, you) => { levels.current = { her, you } },
         onState: (s, detail) => {
           setStatus(s)
           if (s === 'live') setLiveAt(Date.now())
           if (detail) setError(detail)
-          if (s === 'closed') { session.current = null; void wrapUp() }
+          if (s === 'closed') { session.current = null; if (!wrapped.current) { wrapped.current = true; void wrapUp() } }
         },
       })
+      if (controller.signal.aborted) session.current?.stop()
     } catch (e) {
       setStatus('idle')
+      if (controller.signal.aborted) return
       const msg = e instanceof Error ? e.message : String(e)
       setError(/Permission|NotAllowed/i.test(msg) ? '麥克風被擋住了：按網址列左邊的圖示，把麥克風改成「允許」再試一次。' : msg)
     }
@@ -267,8 +287,9 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
           {prepEnd && <label className="sp-prep">準備筆記（選填，只寫關鍵字）
             <textarea lang="en" rows={3} value={prepNotes} onChange={e => setPrepNotes(e.target.value)} placeholder="例如：grandma / nurse / hospital / kind" />
           </label>}
-          <button type="button" className="sp-link" onClick={() => { setCardSkip(s => [...s, card.id]); setPrepEnd(undefined); setPrepNotes('') }}>換一張題目卡</button>
+          <button type="button" className="sp-link" onClick={nextCard}>換一張題目卡</button>
         </>}
+        {status === 'closed' && <button type="button" className="sp-link" onClick={nextCard}>下一張題目卡</button>}
         {status === 'live' && liveAt && <p className="sp-timer">{youFrom ? '從你開口算起 ' + clock(tick - youFrom) + ' · 實際出聲 ' + clock(youMs) : '等你開口才開始計時'} · 通話 {clock(tick - liveAt)}（Part 2 目標從開口算 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
@@ -312,7 +333,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       {error && <p className="sp-error" role="alert">{error}</p>}
       <footer className="sp-bar">
         <button type="button" className={'sp-mic' + (live ? ' on' : '')}
-          onClick={() => live ? session.current?.stop() : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
+          onClick={() => live ? (session.current ? session.current.stop() : setup.current?.abort()) : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
           {live ? <Square size={18} fill="currentColor" /> : <Mic size={22} />}
         </button>
       </footer>

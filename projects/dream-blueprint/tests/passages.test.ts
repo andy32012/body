@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { nextPassage, redoDue, redoKey, doneKey, type Passage } from '../src/lib/passages.ts'
+import { nextPassage, passageRound, redoDue, redoKey, doneKey, type Passage } from '../src/lib/passages.ts'
 
 const p = (n: number): Passage => ({ id: 'L1-A0' + n, level: 1, letter: 'A', n, zh: '第' + n + '段' })
 const all = [p(1), p(2), p(3)]
@@ -12,11 +12,16 @@ test('按了「不會」的短文隔一天才回來，而且排在新的前面',
   assert.equal(redoDue(notes, 'L1-A01', '2026-11-21'), true)
   assert.equal(nextPassage(all, 1, { [doneKey('L1-A02')]: true }, notes, [], '', '2026-11-21')?.id, 'L1-A01')
 })
-test('舊的「1」標記當作已經到期；全部做完只剩重做時還是會給', () => {
+test('舊的「1」標記當作已經到期；今天按了「不會」的，就算只剩它也等到明天（按鈕寫的是明天再來）', () => {
   assert.equal(redoDue({ [redoKey('L1-A03')]: '1' }, 'L1-A03', '2026-11-21'), true)
   const checks = { [doneKey('L1-A01')]: true, [doneKey('L1-A02')]: true }
   const notes = { [redoKey('L1-A03')]: '2026-11-21' }
-  assert.equal(nextPassage(all, 1, checks, notes, [], '', '2026-11-21')?.id, 'L1-A03')
+  assert.equal(nextPassage(all, 1, checks, notes, [], '', '2026-11-21'), undefined)
+  assert.deepEqual(passageRound(all, 1, checks, notes, [], '', '2026-11-21'), { left: 1, skipped: 0, waiting: 1 }, '畫面說明天再出現，不是「都做完了」')
+  assert.equal(nextPassage(all, 1, checks, notes, [], '', '2026-11-22')?.id, 'L1-A03', '隔天就回來')
+  // Only passed over with 換一段: not "all done", and the skipped ones can be brought back.
+  assert.deepEqual(passageRound(all, 1, {}, {}, ['L1-A01', 'L1-A02', 'L1-A03']), { left: 3, skipped: 3, waiting: 0 })
+  assert.deepEqual(passageRound(all, 1, { [doneKey('L1-A01')]: true, [doneKey('L1-A02')]: true, [doneKey('L1-A03')]: true }, {}), { left: 0, skipped: 0, waiting: 0 })
 })
 
 test('短文單字提示：每一個都指到文章裡真的出現的字，用的是這一段的意思', async () => {

@@ -86,20 +86,46 @@ const irregular: Record<string, string> = {
   broken: 'break', built: 'build', caught: 'catch', chose: 'choose', chosen: 'choose', became: 'become', rose: 'rise', risen: 'rise',
   children: 'child', men: 'man', women: 'woman', feet: 'foot', teeth: 'tooth', mice: 'mouse', people: 'person',
   better: 'good', best: 'good', worse: 'bad', worst: 'bad', me: 'i', him: 'he', her: 'she', us: 'we', them: 'they',
+  drew: 'draw', drawn: 'draw', led: 'lead', fed: 'feed', fought: 'fight', hid: 'hide', hidden: 'hide', laid: 'lay', lent: 'lend',
+  meant: 'mean', rode: 'ride', ridden: 'ride', shook: 'shake', shaken: 'shake', shot: 'shoot', spent: 'spend', stole: 'steal',
+  stolen: 'steal', struck: 'strike', swept: 'sweep', tore: 'tear', torn: 'tear', wept: 'weep', bit: 'bite', bitten: 'bite',
+  bled: 'bleed', blew: 'blow', blown: 'blow', bent: 'bend', dealt: 'deal', dug: 'dig', fled: 'flee', forgave: 'forgive',
+  forgiven: 'forgive', froze: 'freeze', frozen: 'freeze', hung: 'hang', lit: 'light', sank: 'sink', sought: 'seek', slid: 'slide',
+  stuck: 'stick', stung: 'sting', swore: 'swear', swung: 'swing', lay: 'lie', lain: 'lie', rang: 'ring',
+  shone: 'shine', sprang: 'spring', strove: 'strive', wound: 'wind', woven: 'weave', wove: 'weave', withdrew: 'withdraw',
 }
+/** Common words that are not entries of the 7000-word table, so a beginner tapping them offline still gets a meaning. */
+const extraWords: Record<string, string> = {
+  one: '一；一個；（代替前面說過的東西）那一個', ones: '（代替前面說過的東西）那些（the big ones 大的那些）',
+  two: '二；兩個', three: '三', four: '四', five: '五', six: '六', seven: '七', eight: '八', nine: '九', ten: '十',
+  eleven: '十一', twelve: '十二', thirteen: '十三', fourteen: '十四', fifteen: '十五', sixteen: '十六', seventeen: '十七',
+  eighteen: '十八', nineteen: '十九', twenty: '二十', thirty: '三十', forty: '四十', fifty: '五十', sixty: '六十',
+  seventy: '七十', eighty: '八十', ninety: '九十',
+  could: 'can 的過去式「能、可以」；也用來客氣地請求（Could you…? 可以請你…嗎）或表示「可能」',
+  would: 'will 的過去式「會、將」；也用來客氣地說（Would you like…? 你要不要…）或說假設的事',
+  should: '應該', might: '可能（比 may 更不確定）', ought: '應該（ought to）',
+}
+
 /** Base forms a written word might belong to, most likely first: walked → walk, studies → study, running → run. */
 export function baseForms(word: string): string[] {
   const w = word.toLowerCase().replace(/[’']s$/, '')
   const out = [w]
   if (irregular[w]) out.push(irregular[w])
-  const add = (stem: string) => { out.push(stem); if (/([b-df-hj-np-tv-z])\1$/.test(stem)) out.push(stem.slice(0, -1)); out.push(stem + 'e') }
+  // A stem ending in one vowel and one consonant comes from a word with -e (caring → care, hoping → hope, using → use);
+  // the doubled consonant is the other way round (hopping → hop). Only table words are taken, so a wrong guess is skipped.
+  const add = (stem: string) => {
+    if (/([b-df-hj-np-tv-z])\1$/.test(stem)) { out.push(stem.slice(0, -1)); out.push(stem); return }
+    if (/(^|[^aeiou])[aeiou][b-df-hj-np-tv-z]$/.test(stem)) { out.push(stem + 'e'); out.push(stem); return }
+    out.push(stem); out.push(stem + 'e')
+  }
   if (w.endsWith('ies')) out.push(w.slice(0, -3) + 'y')
   if (w.endsWith('ied')) out.push(w.slice(0, -3) + 'y')
   if (w.endsWith('ier')) out.push(w.slice(0, -3) + 'y')
   if (w.endsWith('iest')) out.push(w.slice(0, -4) + 'y')
   if (w.endsWith('ily')) out.push(w.slice(0, -3) + 'y')
-  if (w.endsWith('es')) out.push(w.slice(0, -2))
+  // -s before -es: ones → one (not on), notes → note, hopes → hope, bees → bee; boxes and goes still reach box and go.
   if (w.endsWith('s')) out.push(w.slice(0, -1))
+  if (w.endsWith('es')) out.push(w.slice(0, -2))
   if (w.endsWith('ed')) add(w.slice(0, -2))
   if (w.endsWith('ing')) add(w.slice(0, -3))
   if (w.endsWith('est')) add(w.slice(0, -3))
@@ -107,7 +133,7 @@ export function baseForms(word: string): string[] {
   if (w.endsWith('ly')) out.push(w.slice(0, -2))
   return [...new Set(out)].filter(x => x.length > 1 || x === 'a' || x === 'i')
 }
-export interface Lookup { form: string; en: string; zh: string; from: 'passage' | 'table' }
+export interface Lookup { form: string; en: string; zh: string; from: 'passage' | 'table' | 'extra' }
 /** A tapped word: the passage's own hint first (its meaning in this passage), then the 7000-word table
  *  (the general meaning, by base form). Null when neither has it — names, numbers, words outside the list. */
 export function lookupWord(raw: string, passage: Pick<Passage, 'words'>): Lookup | null {
@@ -121,6 +147,7 @@ export function lookupWord(raw: string, passage: Pick<Passage, 'words'>): Lookup
   const other = irregular[low] ? levelEntry(irregular[low]) : undefined
   if (exact) return { form, en: exact.en, from: 'table',
     zh: meaningLine(exact) + (other && other !== exact ? '；也可能是 ' + other.en + ' 的變化形：' + meaningLine(other) : '') }
+  if (extraWords[low]) return { form, en: low, zh: extraWords[low], from: 'extra' }
   for (const b of baseForms(form).slice(1)) {
     const entry = levelEntry(b)
     if (entry) return { form, en: entry.en, zh: meaningLine(entry), from: 'table' }

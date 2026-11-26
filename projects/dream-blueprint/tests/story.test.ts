@@ -169,3 +169,21 @@ test('短文聽力沒播完（播放失敗）：可以看文字學，但不算�
   assert.equal(storyProgress(all, 1, notes, 'listen').done, 0)
   assert.equal(storyProgress(all, 1, saveStory({}, p.id, { l: '2026-11-26', u: 2 }), 'listen').done, 1)
 })
+
+test('點字查意思：不會把字形猜錯（ones 不是 on、caring 不是 car），常用的 could、would、one 沒網路也查得到', () => {
+  const en = (w: string) => lookupWord(w, {})?.en
+  assert.equal(en('notes'), 'note')
+  assert.equal(en('hopes'), 'hope')
+  assert.equal(en('bees'), 'bee')
+  assert.equal(en('caring'), 'care')
+  assert.equal(en('hoping'), 'hope')
+  assert.equal(en('hopping'), 'hop', '雙寫子音還是原本那個字')
+  assert.equal(en('using'), 'use')
+  assert.equal(en('boxes'), 'box')
+  assert.equal(en('goes'), 'go')
+  assert.notEqual(en('ones'), 'on')
+  for (const w of ['could', 'would', 'one', 'two']) assert.ok(lookupWord(w, {})?.zh, w + ' 查得到')
+  assert.equal(lookupWord('could', {})?.from, 'extra', '不在字表裡的常用字標清楚，也不會變成單字卡')
+  assert.equal(en('drew'), 'draw')
+  assert.equal(en('led'), 'lead')
+})
