@@ -1,0 +1,1236 @@
+{
+ "6-1": {
+  "points": [
+   {
+    "t": "主格當主詞，受格當受詞",
+    "p": "主格：I、you、he、she、it、we、they，放在動詞前面當主詞。受格：me、you、him、her、it、us、them，放在動詞或介系詞後面。",
+    "ex": [
+     {
+      "en": "She helped me.",
+      "zh": "她幫了我。"
+     },
+     {
+      "en": "I talked to them yesterday.",
+      "zh": "我昨天跟他們談過。"
+     }
+    ]
+   },
+   {
+    "t": "介系詞後面一定用受格",
+    "p": "with me、for her、to us、about them：不能說 with I、for she。",
+    "ex": [
+     {
+      "en": "Can you come with me?",
+      "zh": "你可以跟我一起來嗎？"
+     },
+     {
+      "en": "This gift is for her.",
+      "zh": "這個禮物是給她的。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "人稱代名詞",
+   "head": [
+    "主格",
+    "受格",
+    "所有格",
+    "所有代名詞"
+   ],
+   "rows": [
+    [
+     "I",
+     "me",
+     "my",
+     "mine"
+    ],
+    [
+     "you",
+     "you",
+     "your",
+     "yours"
+    ],
+    [
+     "he",
+     "him",
+     "his",
+     "his"
+    ],
+    [
+     "she",
+     "her",
+     "her",
+     "hers"
+    ],
+    [
+     "it",
+     "it",
+     "its",
+     "—"
+    ],
+    [
+     "we",
+     "us",
+     "our",
+     "ours"
+    ],
+    [
+     "they",
+     "them",
+     "their",
+     "theirs"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "Him is my brother.",
+    "good": "He is my brother.",
+    "why": "當主詞用主格 he。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Please call ___ tomorrow.",
+    "options": [
+     "I",
+     "me",
+     "my"
+    ],
+    "answer": 1,
+    "why": "動詞後面的受詞用受格 me。"
+   },
+   {
+    "k": "choose",
+    "q": "___ are my classmates.",
+    "options": [
+     "They",
+     "Them",
+     "Their"
+    ],
+    "answer": 0,
+    "why": "主詞用主格 they。"
+   },
+   {
+    "k": "fix",
+    "q": "The doctor talked to we about the results.",
+    "accept": [
+     "The doctor talked to us about the results."
+    ],
+    "why": "介系詞 to 後面用受格 us。"
+   }
+  ]
+ },
+ "6-2": {
+  "points": [
+   {
+    "t": "所有代名詞＝所有格＋名詞",
+    "p": "mine、yours、his、hers、ours、theirs 後面不接名詞，自己就代表「…的東西」：This bag is mine.（＝my bag）",
+    "ex": [
+     {
+      "en": "This bag is mine.",
+      "zh": "這個包包是我的。"
+     },
+     {
+      "en": "Is this coat yours?",
+      "zh": "這件外套是你的嗎？"
+     }
+    ]
+   },
+   {
+    "t": "比較時很好用",
+    "p": "Your room is bigger than ours.（ours＝our room），避免重複名詞。",
+    "ex": [
+     {
+      "en": "Your room is bigger than ours.",
+      "zh": "你的房間比我們的大。"
+     },
+     {
+      "en": "My score is lower than hers.",
+      "zh": "我的分數比她的低。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "This seat is your's.",
+    "good": "This seat is yours.",
+    "why": "所有代名詞沒有 apostrophe：yours、hers、ours、theirs。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "That car isn't my car. It's ___.",
+    "options": [
+     "her",
+     "hers",
+     "she"
+    ],
+    "answer": 1,
+    "why": "單獨用、後面沒有名詞，用 hers。"
+   },
+   {
+    "k": "choose",
+    "q": "Their house is old, but ___ is new.",
+    "options": [
+     "our",
+     "ours",
+     "us"
+    ],
+    "answer": 1,
+    "why": "ours＝our house。"
+   },
+   {
+    "k": "fix",
+    "q": "The red pen is my and the blue one is yours.",
+    "accept": [
+     "The red pen is mine and the blue one is yours.",
+     "The red pen is mine, and the blue one is yours."
+    ],
+    "why": "單獨用要說 mine。"
+   }
+  ]
+ },
+ "6-3": {
+  "points": [
+   {
+    "t": "主詞和受詞是同一個人時用反身代名詞",
+    "p": "She hurt herself.（她傷到自己）／Help yourself.（請自便）。單數 -self，複數 -selves。",
+    "ex": [
+     {
+      "en": "Be careful. Don't cut yourself.",
+      "zh": "小心，別割到自己。"
+     },
+     {
+      "en": "The children dressed themselves.",
+      "zh": "孩子們自己穿衣服。"
+     }
+    ]
+   },
+   {
+    "t": "有些動詞不用反身代名詞",
+    "p": "relax、feel、meet、shower、wash（洗澡）通常不加：I feel tired.（不是 feel myself）、Let's meet at six.",
+    "ex": [
+     {
+      "en": "Sit down and relax.",
+      "zh": "坐下來放鬆。"
+     },
+     {
+      "en": "I feel much better today.",
+      "zh": "我今天感覺好多了。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "反身代名詞",
+   "head": [
+    "主格",
+    "反身代名詞"
+   ],
+   "rows": [
+    [
+     "I",
+     "myself"
+    ],
+    [
+     "you（一個人）",
+     "yourself"
+    ],
+    [
+     "you（好幾個人）",
+     "yourselves"
+    ],
+    [
+     "he",
+     "himself"
+    ],
+    [
+     "she",
+     "herself"
+    ],
+    [
+     "it",
+     "itself"
+    ],
+    [
+     "we",
+     "ourselves"
+    ],
+    [
+     "they",
+     "themselves"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "He looked at him in the mirror.（他看鏡子裡的自己）",
+    "good": "He looked at himself in the mirror.",
+    "why": "看的是自己，用反身代名詞 himself。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "We enjoyed ___ at the party.",
+    "options": [
+     "us",
+     "ourselves",
+     "ourself"
+    ],
+    "answer": 1,
+    "why": "主詞 we 和受詞是同一群人，用 ourselves。"
+   },
+   {
+    "k": "choose",
+    "q": "Please help ___ to some cake.",
+    "options": [
+     "you",
+     "yourself",
+     "your"
+    ],
+    "answer": 1,
+    "why": "help yourself 請自便。"
+   },
+   {
+    "k": "fix",
+    "q": "The old man fell and hurt him.（傷到自己）",
+    "accept": [
+     "The old man fell and hurt himself."
+    ],
+    "why": "傷到的是自己，用 himself。"
+   }
+  ]
+ },
+ "6-4": {
+  "points": [
+   {
+    "t": "強調：就是本人、親自",
+    "p": "反身代名詞放在主詞後或句尾，強調「親自、本人」：I made this cake myself.／The doctor herself called me.",
+    "ex": [
+     {
+      "en": "I made this cake myself.",
+      "zh": "這個蛋糕是我自己做的。"
+     },
+     {
+      "en": "The doctor herself called me.",
+      "zh": "醫師本人打電話給我。"
+     }
+    ]
+   },
+   {
+    "t": "by oneself：獨自、靠自己",
+    "p": "by myself＝alone 或 without help：She lives by herself.／Can you walk by yourself?",
+    "ex": [
+     {
+      "en": "She lives by herself.",
+      "zh": "她一個人住。"
+     },
+     {
+      "en": "Can you walk to the bathroom by yourself?",
+      "zh": "你可以自己走去廁所嗎？"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I did it by me.",
+    "good": "I did it by myself.",
+    "why": "「靠自己」是 by myself。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "He fixed the computer ___. Nobody helped him.",
+    "options": [
+     "him",
+     "himself",
+     "his"
+    ],
+    "answer": 1,
+    "why": "強調自己做，用 himself。"
+   },
+   {
+    "k": "choose",
+    "q": "My grandmother can't go out by ___.",
+    "options": [
+     "herself",
+     "her",
+     "she"
+    ],
+    "answer": 0,
+    "why": "by herself 獨自。"
+   },
+   {
+    "k": "fix",
+    "q": "The children cleaned the room by theirselves.",
+    "accept": [
+     "The children cleaned the room by themselves."
+    ],
+    "why": "they 的反身代名詞是 themselves。"
+   }
+  ]
+ },
+ "6-5": {
+  "points": [
+   {
+    "t": "each other：彼此",
+    "p": "兩個人或更多人互相做同一件事：Tom and Amy love each other.（湯姆愛艾美，艾美也愛湯姆）",
+    "ex": [
+     {
+      "en": "Tom and Amy love each other.",
+      "zh": "湯姆和艾美彼此相愛。"
+     },
+     {
+      "en": "The nurses help each other.",
+      "zh": "護理師們互相幫忙。"
+     }
+    ]
+   },
+   {
+    "t": "和 themselves 不一樣",
+    "p": "They looked at each other.（互看）／They looked at themselves.（各看自己）。one another 意思一樣，比較正式。",
+    "ex": [
+     {
+      "en": "They looked at each other and laughed.",
+      "zh": "他們互看一眼笑了。"
+     },
+     {
+      "en": "We should respect one another.",
+      "zh": "我們應該互相尊重。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "We talked each other on the phone.",
+    "good": "We talked to each other on the phone.",
+    "why": "talk to 某人，each other 前面要有 to。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The two sisters call ___ every day.",
+    "options": [
+     "themselves",
+     "each other",
+     "them"
+    ],
+    "answer": 1,
+    "why": "姊妹互相打電話，用 each other。"
+   },
+   {
+    "k": "choose",
+    "q": "Lisa and I have known ___ for ten years.",
+    "options": [
+     "each other",
+     "ourselves",
+     "us"
+    ],
+    "answer": 0,
+    "why": "互相認識，用 each other。"
+   },
+   {
+    "k": "fix",
+    "q": "The players shook hands with themselves after the game.",
+    "accept": [
+     "The players shook hands with each other after the game.",
+     "The players shook hands with one another after the game."
+    ],
+    "why": "握手是互相的，用 each other。"
+   }
+  ]
+ },
+ "6-6": {
+  "points": [
+   {
+    "t": "this／that／these／those 單獨當代名詞",
+    "p": "This is my mother.（介紹人）／Is that your car?／These are for you.",
+    "ex": [
+     {
+      "en": "This is my mother.",
+      "zh": "這是我媽媽。"
+     },
+     {
+      "en": "These are for you.",
+      "zh": "這些是給你的。"
+     }
+    ]
+   },
+   {
+    "t": "代替前面提過的事",
+    "p": "that 常代替剛剛說的話或事情：That's a good idea.／That's why I was late.",
+    "ex": [
+     {
+      "en": "You want to rest? That's a good idea.",
+      "zh": "你想休息？好主意。"
+     },
+     {
+      "en": "The bus was late. That's why I was late.",
+      "zh": "公車遲到了，所以我才遲到。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "This are my friends.",
+    "good": "These are my friends.",
+    "why": "複數用 these。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Hello, ___ is Amy speaking.（電話中）",
+    "options": [
+     "this",
+     "these",
+     "it"
+    ],
+    "answer": 0,
+    "why": "電話裡自稱用 this is ...。"
+   },
+   {
+    "k": "choose",
+    "q": "Look at ___ over there. They're so tall!",
+    "options": [
+     "that",
+     "those",
+     "this"
+    ],
+    "answer": 1,
+    "why": "遠的、複數，用 those。"
+   },
+   {
+    "k": "fix",
+    "q": "That are my glasses.",
+    "accept": [
+     "Those are my glasses."
+    ],
+    "why": "glasses 是複數，用 those。"
+   }
+  ]
+ },
+ "6-7": {
+  "points": [
+   {
+    "t": "some-、any-、no-、every- 加 one／body／thing",
+    "p": "someone（某人）、anything（任何事）、nobody（沒有人）、everything（所有事）。和 some／any 一樣，肯定句用 some-，否定和問句用 any-。",
+    "ex": [
+     {
+      "en": "Someone is at the door.",
+      "zh": "有人在門口。"
+     },
+     {
+      "en": "Do you need anything?",
+      "zh": "你需要什麼嗎？"
+     }
+    ]
+   },
+   {
+    "t": "動詞用單數",
+    "p": "Everyone is here.（不是 are）／Nobody knows. 形容詞放在後面：something hot、nothing special。",
+    "ex": [
+     {
+      "en": "Everyone is ready.",
+      "zh": "大家都準備好了。"
+     },
+     {
+      "en": "I want something hot to drink.",
+      "zh": "我想喝點熱的。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Everybody are tired.",
+    "good": "Everybody is tired.",
+    "why": "everybody 後面的動詞用單數。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I didn't see ___ in the hallway.",
+    "options": [
+     "someone",
+     "anyone",
+     "no one"
+    ],
+    "answer": 1,
+    "why": "否定句用 anyone。"
+   },
+   {
+    "k": "choose",
+    "q": "Is there ___ interesting on TV?",
+    "options": [
+     "something",
+     "interesting something",
+     "nothing"
+    ],
+    "answer": 0,
+    "why": "形容詞放在 something 後面：something interesting。"
+   },
+   {
+    "k": "fix",
+    "q": "Nobody know the answer.",
+    "accept": [
+     "Nobody knows the answer."
+    ],
+    "why": "nobody 配單數動詞 knows。"
+   }
+  ]
+ },
+ "6-8": {
+  "points": [
+   {
+    "t": "who、what、which",
+    "p": "who 問人（Who is your doctor?）、what 問東西或事情（What happened?）、which 問從幾個裡選哪一個（Which is yours?）。",
+    "ex": [
+     {
+      "en": "Who called you?",
+      "zh": "誰打給你？"
+     },
+     {
+      "en": "Which is your bag?",
+      "zh": "哪一個是你的包包？"
+     }
+    ]
+   },
+   {
+    "t": "whom 和 whose",
+    "p": "whom 問受詞，比較正式，口語多用 who：Whom did you meet?／Who did you meet? whose 問「誰的」：Whose is this?",
+    "ex": [
+     {
+      "en": "Who did you see at the clinic?",
+      "zh": "你在診所看到誰？"
+     },
+     {
+      "en": "Whose is this umbrella?",
+      "zh": "這把傘是誰的？"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Who's is this pen?",
+    "good": "Whose is this pen?",
+    "why": "「誰的」是 whose。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ is the capital of Japan?",
+    "options": [
+     "What",
+     "Who",
+     "Whose"
+    ],
+    "answer": 0,
+    "why": "問地方（東西）用 what。"
+   },
+   {
+    "k": "choose",
+    "q": "___ do you prefer, tea or coffee?",
+    "options": [
+     "What",
+     "Which",
+     "Who"
+    ],
+    "answer": 1,
+    "why": "從兩個裡選用 which。"
+   },
+   {
+    "k": "fix",
+    "q": "What is your favorite singer?",
+    "accept": [
+     "Who is your favorite singer?"
+    ],
+    "why": "問人用 who。"
+   }
+  ]
+ },
+ "6-9": {
+  "points": [
+   {
+    "t": "關係代名詞：把兩句接成一句",
+    "p": "I have a friend. She is a nurse. → I have a friend who is a nurse. who 代替前面的 a friend，同時把句子接起來。",
+    "ex": [
+     {
+      "en": "I have a friend who is a nurse.",
+      "zh": "我有一個當護理師的朋友。"
+     },
+     {
+      "en": "This is the book that I bought.",
+      "zh": "這是我買的書。"
+     }
+    ]
+   },
+   {
+    "t": "who 指人，which 指東西，that 兩種都可以",
+    "p": "the patient who fell、the medicine which (that) he takes。詳細用法在第 27 章。",
+    "ex": [
+     {
+      "en": "The patient who fell is now in bed.",
+      "zh": "跌倒的那位病人現在躺在床上。"
+     },
+     {
+      "en": "The pills that he takes are small.",
+      "zh": "他吃的藥丸很小。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The man which lives next door is a doctor.",
+    "good": "The man who lives next door is a doctor.",
+    "why": "指人用 who（或 that），不用 which。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The girl ___ sits next to me is Lisa.",
+    "options": [
+     "who",
+     "which",
+     "what"
+    ],
+    "answer": 0,
+    "why": "指人用 who。"
+   },
+   {
+    "k": "choose",
+    "q": "I lost the watch ___ my father gave me.",
+    "options": [
+     "who",
+     "which",
+     "whose"
+    ],
+    "answer": 1,
+    "why": "指東西用 which（或 that）。"
+   },
+   {
+    "k": "fix",
+    "q": "She is the nurse which helped my mother.",
+    "accept": [
+     "She is the nurse who helped my mother.",
+     "She is the nurse that helped my mother."
+    ],
+    "why": "指人用 who 或 that。"
+   }
+  ]
+ },
+ "6-10": {
+  "points": [
+   {
+    "t": "one 代替單數，ones 代替複數",
+    "p": "不想重複可數名詞時用 one／ones：This cup is dirty. Can I have a clean one?／I like the red ones.",
+    "ex": [
+     {
+      "en": "This cup is dirty. Can I have a clean one?",
+      "zh": "這個杯子髒了，可以給我一個乾淨的嗎？"
+     },
+     {
+      "en": "Which shoes? The black ones.",
+      "zh": "哪雙鞋？黑色那雙。"
+     }
+    ]
+   },
+   {
+    "t": "不可數名詞不能用 one",
+    "p": "I don't like cold water. I want warm water.（不說 warm one）",
+    "ex": [
+     {
+      "en": "I don't want cold milk. I want warm milk.",
+      "zh": "我不要冰牛奶，我要溫的。"
+     },
+     {
+      "en": "Do you want a big box or a small one?",
+      "zh": "你要大箱子還是小的？"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I need a new bag. My old is broken.",
+    "good": "I need a new bag. My old one is broken.",
+    "why": "形容詞 old 後面要接 one，不能單獨用。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "These gloves are too small. Do you have bigger ___?",
+    "options": [
+     "one",
+     "ones",
+     "it"
+    ],
+    "answer": 1,
+    "why": "代替複數 gloves 用 ones。"
+   },
+   {
+    "k": "choose",
+    "q": "My phone is old. I want a new ___.",
+    "options": [
+     "one",
+     "ones",
+     "it"
+    ],
+    "answer": 0,
+    "why": "代替單數 phone 用 one。"
+   },
+   {
+    "k": "fix",
+    "q": "I don't like this shirt. I prefer the blue.",
+    "accept": [
+     "I don't like this shirt. I prefer the blue one."
+    ],
+    "why": "the blue 後面要加 one。"
+   }
+  ]
+ },
+ "6-11": {
+  "points": [
+   {
+    "t": "you 和 we 泛指一般人",
+    "p": "口語常用 you 表示「任何人」：You should wash your hands often. we 包含說話的人：We all make mistakes.",
+    "ex": [
+     {
+      "en": "You should wash your hands often.",
+      "zh": "（大家）應該常洗手。"
+     },
+     {
+      "en": "We all make mistakes.",
+      "zh": "我們都會犯錯。"
+     }
+    ]
+   },
+   {
+    "t": "they 和 one",
+    "p": "they 指「別人、有關單位」：They say the new hospital is great. one 很正式：One should always be polite.",
+    "ex": [
+     {
+      "en": "They say it will rain tomorrow.",
+      "zh": "聽說明天會下雨。"
+     },
+     {
+      "en": "One should always be polite.",
+      "zh": "一個人應該永遠有禮貌。（正式）"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "One must do your best.",
+    "good": "One must do one's best.",
+    "why": "用 one 開頭就要一致用 one's；口語可改成 You must do your best."
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "In Taiwan, ___ drive on the right side of the road.",
+    "options": [
+     "you",
+     "one's",
+     "yours"
+    ],
+    "answer": 0,
+    "why": "泛指一般人用 you。"
+   },
+   {
+    "k": "choose",
+    "q": "___ say this restaurant is very good.",
+    "options": [
+     "They",
+     "Them",
+     "It"
+    ],
+    "answer": 0,
+    "why": "「聽說、大家說」用 they say。"
+   },
+   {
+    "k": "fix",
+    "q": "You should always do one's homework.",
+    "accept": [
+     "You should always do your homework."
+    ],
+    "why": "主詞是 you，後面也用 your。"
+   }
+  ]
+ },
+ "6-12": {
+  "points": [
+   {
+    "t": "it 指前面說過的東西或事情",
+    "p": "I bought a cake. It was delicious.（it＝the cake）／He failed the test. It made him sad.（it＝這件事）",
+    "ex": [
+     {
+      "en": "I bought a cake. It was delicious.",
+      "zh": "我買了一個蛋糕，很好吃。"
+     },
+     {
+      "en": "Who is it? It's me.",
+      "zh": "是誰？是我。"
+     }
+    ]
+   },
+   {
+    "t": "虛指 it：天氣、時間、距離",
+    "p": "沒有實際意思，只是佔主詞的位置：It's raining.／It's eight o'clock.／It's 5 km to the hospital.",
+    "ex": [
+     {
+      "en": "It's cold today.",
+      "zh": "今天很冷。"
+     },
+     {
+      "en": "It's three kilometers to the station.",
+      "zh": "到車站有三公里。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Is raining now.",
+    "good": "It is raining now.",
+    "why": "英文要有主詞，天氣用虛指 it。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "What time is ___?",
+    "options": [
+     "it",
+     "this",
+     "there"
+    ],
+    "answer": 0,
+    "why": "問時間用 it。"
+   },
+   {
+    "k": "choose",
+    "q": "___ is a long way to the hospital.",
+    "options": [
+     "It",
+     "There",
+     "This"
+    ],
+    "answer": 0,
+    "why": "距離用虛指 it。"
+   },
+   {
+    "k": "fix",
+    "q": "Is very windy today.",
+    "accept": [
+     "It is very windy today.",
+     "It's very windy today."
+    ],
+    "why": "天氣句子要用 it 當主詞。"
+   }
+  ]
+ },
+ "6-13": {
+  "points": [
+   {
+    "t": "不知道性別時用 they",
+    "p": "說「某一個人」但不知道或不需要說性別：If a patient needs help, they can press the button.／Someone left their phone.",
+    "ex": [
+     {
+      "en": "If a patient needs help, they can press the button.",
+      "zh": "病人需要幫忙時，可以按按鈕。"
+     },
+     {
+      "en": "Someone left their phone here.",
+      "zh": "有人把手機忘在這裡。"
+     }
+    ]
+   },
+   {
+    "t": "動詞還是用複數",
+    "p": "單數 they 的動詞用複數形：Ask the new nurse. They are in room 2.",
+    "ex": [
+     {
+      "en": "Ask the new nurse. They are in room 2.",
+      "zh": "問那位新護理師，他在二號房。"
+     },
+     {
+      "en": "Every student should bring their own lunch.",
+      "zh": "每個學生都要帶自己的午餐。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Someone forgot his or her umbrella.（不自然）",
+    "good": "Someone forgot their umbrella.",
+    "why": "現代英文常用 their 代替 his or her，比較自然。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Each nurse must wash ___ hands before entering.",
+    "options": [
+     "their",
+     "its",
+     "there"
+    ],
+    "answer": 0,
+    "why": "不指定性別用 their。"
+   },
+   {
+    "k": "choose",
+    "q": "A friend called, but ___ didn't leave a message.",
+    "options": [
+     "it",
+     "they",
+     "them"
+    ],
+    "answer": 1,
+    "why": "不知道性別的單一個人可以用 they。"
+   },
+   {
+    "k": "fix",
+    "q": "If anyone calls, tell it I'm busy.",
+    "accept": [
+     "If anyone calls, tell them I'm busy."
+    ],
+    "why": "指人不能用 it，用 them。"
+   }
+  ]
+ },
+ "6-14": {
+  "points": [
+   {
+    "t": "代名詞要跟它代替的名詞一致",
+    "p": "單數配單數、複數配複數、人配人：The nurses finished their work.／The hospital opened its new wing.",
+    "ex": [
+     {
+      "en": "The nurses finished their work.",
+      "zh": "護理師們完成了工作。"
+     },
+     {
+      "en": "The hospital opened its new wing.",
+      "zh": "醫院開了新大樓。"
+     }
+    ]
+   },
+   {
+    "t": "集合名詞和 each 要注意",
+    "p": "The team won its game.（美式當一個整體）／Each of the boys has his own room.",
+    "ex": [
+     {
+      "en": "The company changed its name.",
+      "zh": "公司改了名字。"
+     },
+     {
+      "en": "Each of the girls brought her own lunch.",
+      "zh": "每個女孩都帶了自己的午餐。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The students left his books here.",
+    "good": "The students left their books here.",
+    "why": "students 是複數，用 their。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The dog wagged ___ tail.",
+    "options": [
+     "it's",
+     "its",
+     "their"
+    ],
+    "answer": 1,
+    "why": "dog 單數，「牠的」用 its。"
+   },
+   {
+    "k": "choose",
+    "q": "My parents sold ___ old car.",
+    "options": [
+     "his",
+     "their",
+     "its"
+    ],
+    "answer": 1,
+    "why": "parents 是複數，用 their。"
+   },
+   {
+    "k": "fix",
+    "q": "The children washed his hands.",
+    "accept": [
+     "The children washed their hands."
+    ],
+    "why": "children 是複數，用 their。"
+   }
+  ]
+ },
+ "6-15": {
+  "points": [
+   {
+    "t": "and 連起來時，看位置決定主格或受格",
+    "p": "當主詞：My sister and I went shopping.（不是 me）。當受詞或在介系詞後：She invited my sister and me.／between you and me。",
+    "ex": [
+     {
+      "en": "My sister and I went shopping.",
+      "zh": "我和姊姊去逛街。"
+     },
+     {
+      "en": "This is between you and me.",
+      "zh": "這是我們之間的秘密。"
+     }
+    ]
+   },
+   {
+    "t": "比較和 be 後面",
+    "p": "She is taller than me.（口語）／taller than I am（完整）。電話裡 It's me. 很自然；It is I. 非常正式。",
+    "ex": [
+     {
+      "en": "She is taller than me.",
+      "zh": "她比我高。"
+     },
+     {
+      "en": "He runs faster than I do.",
+      "zh": "他跑得比我快。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Me and Tom are classmates.",
+    "good": "Tom and I are classmates.",
+    "why": "當主詞用 I，禮貌上把自己放後面。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The teacher gave Amy and ___ a prize.",
+    "options": [
+     "I",
+     "me",
+     "myself"
+    ],
+    "answer": 1,
+    "why": "當受詞用 me（去掉 Amy and：gave me）。"
+   },
+   {
+    "k": "choose",
+    "q": "Lisa and ___ are going to the movies.",
+    "options": [
+     "I",
+     "me",
+     "my"
+    ],
+    "answer": 0,
+    "why": "當主詞用 I。"
+   },
+   {
+    "k": "fix",
+    "q": "Please keep this between you and I.",
+    "accept": [
+     "Please keep this between you and me."
+    ],
+    "why": "介系詞 between 後面用受格 me。"
+   }
+  ]
+ },
+ "6-16": {
+  "points": [
+   {
+    "t": "不要重複主詞",
+    "p": "My brother he is a nurse. 錯在主詞說了兩次；說 My brother is a nurse. 就好。",
+    "ex": [
+     {
+      "en": "My brother is a nurse.",
+      "zh": "我哥哥是護理師。"
+     },
+     {
+      "en": "The man who called you is my uncle.",
+      "zh": "打給你的那個人是我叔叔。"
+     }
+    ]
+   },
+   {
+    "t": "代名詞要指得清楚",
+    "p": "Tom told Ben that he was late. he 是誰不清楚。改成 Tom told Ben, \"You are late.\" 或直接說名字。",
+    "ex": [
+     {
+      "en": "Tom told Ben, \"You are late.\"",
+      "zh": "湯姆對班說：「你遲到了。」"
+     },
+     {
+      "en": "When Amy met Lisa, Lisa was crying.",
+      "zh": "艾美遇到麗莎時，麗莎在哭。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The patient in room 5 he needs water.",
+    "good": "The patient in room 5 needs water.",
+    "why": "主詞已經是 the patient in room 5，不要再加 he。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "哪一句沒有重複主詞？___",
+    "options": [
+     "My mom she cooks well.",
+     "My mom cooks well.",
+     "My mom her cooks well."
+    ],
+    "answer": 1,
+    "why": "主詞只說一次。"
+   },
+   {
+    "k": "choose",
+    "q": "「Amy called Lisa because she was sick.」哪裡可能不清楚？___",
+    "options": [
+     "she 是誰",
+     "called 的時態",
+     "because 的用法"
+    ],
+    "answer": 0,
+    "why": "she 可能是 Amy 也可能是 Lisa。"
+   },
+   {
+    "k": "fix",
+    "q": "My best friend she lives in Japan.",
+    "accept": [
+     "My best friend lives in Japan."
+    ],
+    "why": "主詞 my best friend 已經有了，去掉 she。"
+   }
+  ]
+ }
+}

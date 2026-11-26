@@ -1,0 +1,1220 @@
+{
+ "11-1": {
+  "points": [
+   {
+    "t": "七個對等連接詞",
+    "p": "and（和）、but（但是）、or（或）、so（所以）、yet（然而）、for（因為，書面）、nor（也不）。連接地位一樣的字、片語或句子。",
+    "ex": [
+     {
+      "en": "I was sick, so I stayed home.",
+      "zh": "我生病了，所以待在家。"
+     },
+     {
+      "en": "Do you want tea or coffee?",
+      "zh": "你要茶還是咖啡？"
+     }
+    ]
+   },
+   {
+    "t": "連接兩個完整句子時加逗號",
+    "p": "兩邊都有主詞和動詞時，連接詞前面通常加逗號：I was tired, but I finished my work.",
+    "ex": [
+     {
+      "en": "I was tired, but I finished my work.",
+      "zh": "我很累，但還是把工作做完了。"
+     },
+     {
+      "en": "The test was hard, yet everyone passed.",
+      "zh": "考試很難，然而大家都過了。"
+     }
+    ]
+   },
+   {
+    "t": "前後要對等",
+    "p": "連接的東西形式要一樣：She likes swimming and running.（不說 swimming and to run）",
+    "ex": [
+     {
+      "en": "She likes swimming and running.",
+      "zh": "她喜歡游泳和跑步。"
+     },
+     {
+      "en": "The nurse was kind and patient.",
+      "zh": "那位護理師親切又有耐心。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "對等連接詞",
+   "head": [
+    "連接詞",
+    "意思"
+   ],
+   "rows": [
+    [
+     "and",
+     "和、而且"
+    ],
+    [
+     "but",
+     "但是"
+    ],
+    [
+     "or",
+     "或、還是"
+    ],
+    [
+     "so",
+     "所以"
+    ],
+    [
+     "yet",
+     "然而"
+    ],
+    [
+     "for",
+     "因為（書面）"
+    ],
+    [
+     "nor",
+     "也不"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "She likes reading and to swim.",
+    "good": "She likes reading and swimming.",
+    "why": "and 前後的形式要一樣。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "I was sick, ___ I stayed home.",
+    "options": [
+     "so",
+     "but",
+     "or"
+    ],
+    "answer": 0,
+    "why": "前面是原因、後面是結果，用 so。"
+   },
+   {
+    "k": "choose",
+    "q": "Do you want tea ___ coffee?",
+    "options": [
+     "or",
+     "and",
+     "so"
+    ],
+    "answer": 0,
+    "why": "二選一用 or。"
+   },
+   {
+    "k": "fix",
+    "q": "I like singing and to dance.",
+    "accept": [
+     "I like singing and dancing.",
+     "I like to sing and to dance.",
+     "I like to sing and dance."
+    ],
+    "why": "and 前後的形式要一樣：singing and dancing。"
+   }
+  ]
+ },
+ "11-2": {
+  "points": [
+   {
+    "t": "從屬連接詞帶出附屬的子句",
+    "p": "because、although、when、if、while、before、after、until、since、unless 帶出的子句不能自己成為一句，要接一個主要句子。",
+    "ex": [
+     {
+      "en": "I'll call you when I arrive.",
+      "zh": "我到了會打給你。"
+     },
+     {
+      "en": "If you feel dizzy, sit down.",
+      "zh": "如果覺得頭暈，就坐下來。"
+     }
+    ]
+   },
+   {
+    "t": "放前面加逗號，放後面不用",
+    "p": "When I got home, I took a shower.／I took a shower when I got home.",
+    "ex": [
+     {
+      "en": "When I got home, I took a shower.",
+      "zh": "我回到家就去洗澡。"
+     },
+     {
+      "en": "I took a shower when I got home.",
+      "zh": "我回到家就去洗澡。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Because it was raining. We stayed home.",
+    "good": "Because it was raining, we stayed home.",
+    "why": "because 帶出的子句不能單獨成句，要跟主要句子接在一起。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ I got home, I took a shower.",
+    "options": [
+     "When",
+     "So",
+     "And"
+    ],
+    "answer": 0,
+    "why": "說時間的子句，用 when。"
+   },
+   {
+    "k": "choose",
+    "q": "Don't leave ___ the doctor comes.",
+    "options": [
+     "until",
+     "so",
+     "and"
+    ],
+    "answer": 0,
+    "why": "「直到醫生來」用 until。"
+   },
+   {
+    "k": "fix",
+    "q": "I'll wait here until you will come back.",
+    "accept": [
+     "I'll wait here until you come back."
+    ],
+    "why": "until、when 這類時間子句用現在式表示未來，不用 will。"
+   }
+  ]
+ },
+ "11-3": {
+  "points": [
+   {
+    "t": "both A and B：兩個都",
+    "p": "Both my parents are nurses. 主詞是 both A and B 時，動詞用複數。",
+    "ex": [
+     {
+      "en": "Both my parents are nurses.",
+      "zh": "我爸媽都是護理師。"
+     },
+     {
+      "en": "She speaks both English and Japanese.",
+      "zh": "她英文和日文都會說。"
+     }
+    ]
+   },
+   {
+    "t": "either A or B、neither A nor B",
+    "p": "either ... or（兩個之一）、neither ... nor（兩個都不）。動詞跟比較近的 B 一致：Neither the doctor nor the nurses were there.",
+    "ex": [
+     {
+      "en": "You can have either tea or coffee.",
+      "zh": "你可以喝茶或咖啡（選一個）。"
+     },
+     {
+      "en": "Neither the doctor nor the nurses were there.",
+      "zh": "醫生和護理師都不在。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Neither my brother or my sister likes coffee.",
+    "good": "Neither my brother nor my sister likes coffee.",
+    "why": "neither 配 nor，either 才配 or。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ Tom and Amy are nurses.",
+    "options": [
+     "Both",
+     "Either",
+     "Neither"
+    ],
+    "answer": 0,
+    "why": "配 and 的是 both。"
+   },
+   {
+    "k": "choose",
+    "q": "You can have either tea ___ coffee.",
+    "options": [
+     "or",
+     "nor",
+     "and"
+    ],
+    "answer": 0,
+    "why": "either 配 or。"
+   },
+   {
+    "k": "fix",
+    "q": "Neither my mom or my dad can drive.",
+    "accept": [
+     "Neither my mom nor my dad can drive."
+    ],
+    "why": "neither 配 nor。"
+   }
+  ]
+ },
+ "11-4": {
+  "points": [
+   {
+    "t": "not only A but (also) B：不但……而且……",
+    "p": "A 和 B 形式要對等：She is not only smart but also kind.",
+    "ex": [
+     {
+      "en": "She is not only smart but also kind.",
+      "zh": "她不但聰明而且親切。"
+     },
+     {
+      "en": "She speaks not only English but also Japanese.",
+      "zh": "她不只會說英文，還會說日文。"
+     }
+    ]
+   },
+   {
+    "t": "動詞跟 B 一致",
+    "p": "Not only the students but also the teacher was late.",
+    "ex": [
+     {
+      "en": "Not only the students but also the teacher was late.",
+      "zh": "不只學生，連老師都遲到了。"
+     },
+     {
+      "en": "The patient as well as his parents was worried.",
+      "zh": "病人和他的父母都很擔心。"
+     }
+    ]
+   },
+   {
+    "t": "Not only 放句首要倒裝",
+    "p": "Not only did she pass, but she also got the highest score.",
+    "ex": [
+     {
+      "en": "Not only did she pass, but she also got the highest score.",
+      "zh": "她不但通過了，還拿到最高分。"
+     },
+     {
+      "en": "Not only is he a doctor, but he is also a writer.",
+      "zh": "他不但是醫生，還是作家。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "She not only speaks English but also Japanese.",
+    "good": "She speaks not only English but also Japanese.",
+    "why": "not only 和 but also 後面要放同樣形式的東西（English／Japanese）。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "He is not only a doctor ___ a writer.",
+    "options": [
+     "but also",
+     "and also",
+     "or also"
+    ],
+    "answer": 0,
+    "why": "not only 配 but also。"
+   },
+   {
+    "k": "choose",
+    "q": "Not only the students but also the teacher ___ late.",
+    "options": [
+     "was",
+     "were",
+     "are"
+    ],
+    "answer": 0,
+    "why": "動詞跟比較近的 the teacher 一致，用 was。"
+   },
+   {
+    "k": "fix",
+    "q": "Not only she is smart, but she is also kind.",
+    "accept": [
+     "Not only is she smart, but she is also kind."
+    ],
+    "why": "Not only 放句首要倒裝：is she。"
+   }
+  ]
+ },
+ "11-5": {
+  "points": [
+   {
+    "t": "連接詞可以用逗號接兩句",
+    "p": "and、but、so、because 是連接詞：It was late, but we kept working.",
+    "ex": [
+     {
+      "en": "It was late, but we kept working.",
+      "zh": "很晚了，但我們繼續工作。"
+     },
+     {
+      "en": "I was sick, so I stayed home.",
+      "zh": "我生病了，所以待在家。"
+     }
+    ]
+   },
+   {
+    "t": "連接副詞不行",
+    "p": "however、therefore、moreover 是副詞，兩句之間要用句號或分號：It was late; however, we kept working.",
+    "ex": [
+     {
+      "en": "It was late; however, we kept working.",
+      "zh": "很晚了，不過我們繼續工作。"
+     },
+     {
+      "en": "I was sick. Therefore, I stayed home.",
+      "zh": "我生病了，因此待在家。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "意思相近，用法不同：連接詞可以用逗號接兩句，連接副詞要用句號或分號",
+   "head": [
+    "意思",
+    "連接詞",
+    "連接副詞"
+   ],
+   "rows": [
+    [
+     "但是",
+     "but",
+     "however"
+    ],
+    [
+     "所以",
+     "so",
+     "therefore"
+    ],
+    [
+     "而且",
+     "and",
+     "moreover／in addition"
+    ],
+    [
+     "雖然",
+     "although",
+     "nevertheless"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "I was sick, therefore I stayed home.",
+    "good": "I was sick, so I stayed home.",
+    "why": "therefore 不能用逗號接兩句；改用 so，或寫成 I was sick; therefore, I stayed home."
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "It was raining, ___ we went out anyway.",
+    "options": [
+     "but",
+     "however",
+     "therefore"
+    ],
+    "answer": 0,
+    "why": "用逗號接兩句，只能用連接詞 but。"
+   },
+   {
+    "k": "choose",
+    "q": "The test was hard. ___, most students passed.",
+    "options": [
+     "However",
+     "But also",
+     "So that"
+    ],
+    "answer": 0,
+    "why": "句號後面接連接副詞 however。"
+   },
+   {
+    "k": "fix",
+    "q": "However it was raining, we went out.",
+    "accept": [
+     "Although it was raining, we went out.",
+     "Though it was raining, we went out.",
+     "Even though it was raining, we went out."
+    ],
+    "why": "however 不能帶出子句；「雖然」要用 although。"
+   }
+  ]
+ },
+ "11-6": {
+  "points": [
+   {
+    "t": "再加上一點",
+    "p": "and、also、too、as well、besides、in addition、moreover、furthermore，用來加更多資訊。",
+    "ex": [
+     {
+      "en": "The room is clean. Moreover, it's very quiet.",
+      "zh": "房間很乾淨，而且很安靜。"
+     },
+     {
+      "en": "She is kind, and she is also very patient.",
+      "zh": "她很親切，也很有耐心。"
+     }
+    ]
+   },
+   {
+    "t": "in addition to／besides＋名詞或 V-ing",
+    "p": "In addition to English, she speaks Korean.／Besides working, she takes care of her kids.",
+    "ex": [
+     {
+      "en": "In addition to English, she speaks Korean.",
+      "zh": "除了英文，她還會說韓文。"
+     },
+     {
+      "en": "Besides working, she takes care of her kids.",
+      "zh": "除了工作，她還要照顧小孩。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "In addition to speak English, she speaks Korean.",
+    "good": "In addition to speaking English, she speaks Korean.",
+    "why": "in addition to 的 to 是介系詞，後面用 V-ing。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The room is clean. ___, it's very quiet.",
+    "options": [
+     "Moreover",
+     "However",
+     "Otherwise"
+    ],
+    "answer": 0,
+    "why": "再加上一個優點，用 moreover。"
+   },
+   {
+    "k": "choose",
+    "q": "___ to English, she speaks Korean.",
+    "options": [
+     "In addition",
+     "Besides",
+     "Moreover"
+    ],
+    "answer": 0,
+    "why": "In addition to＋名詞；besides 後面不加 to。"
+   },
+   {
+    "k": "fix",
+    "q": "Besides to work, she takes care of her kids.",
+    "accept": [
+     "Besides working, she takes care of her kids.",
+     "Besides work, she takes care of her kids.",
+     "In addition to working, she takes care of her kids."
+    ],
+    "why": "besides 後面直接接名詞或 V-ing。"
+   }
+  ]
+ },
+ "11-7": {
+  "points": [
+   {
+    "t": "對比",
+    "p": "but、however、while、whereas、on the other hand：I like coffee, while my sister likes tea.",
+    "ex": [
+     {
+      "en": "I like coffee, while my sister likes tea.",
+      "zh": "我喜歡咖啡，而我妹妹喜歡茶。"
+     },
+     {
+      "en": "The job is hard. On the other hand, the pay is good.",
+      "zh": "工作很辛苦，但另一方面薪水不錯。"
+     }
+    ]
+   },
+   {
+    "t": "讓步：雖然……還是",
+    "p": "although／though／even though＋句子；despite／in spite of＋名詞或 V-ing。",
+    "ex": [
+     {
+      "en": "Although it was raining, we went out.",
+      "zh": "雖然在下雨，我們還是出門了。"
+     },
+     {
+      "en": "Despite the rain, we went out.",
+      "zh": "儘管下雨，我們還是出門了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Despite it was raining, we went out.",
+    "good": "Although it was raining, we went out.",
+    "why": "despite 後面接名詞；接句子要用 although。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ she was tired, she kept working.",
+    "options": [
+     "Although",
+     "Despite",
+     "However"
+    ],
+    "answer": 0,
+    "why": "後面是句子，用 although。"
+   },
+   {
+    "k": "choose",
+    "q": "We went out ___ the rain.",
+    "options": [
+     "despite",
+     "although",
+     "though"
+    ],
+    "answer": 0,
+    "why": "後面是名詞 the rain，用 despite。"
+   },
+   {
+    "k": "fix",
+    "q": "In spite of he was sick, he went to work.",
+    "accept": [
+     "Although he was sick, he went to work.",
+     "Though he was sick, he went to work.",
+     "Even though he was sick, he went to work.",
+     "In spite of being sick, he went to work.",
+     "Despite being sick, he went to work."
+    ],
+    "why": "in spite of 後面不接句子；改用 although，或說 in spite of being sick。"
+   }
+  ]
+ },
+ "11-8": {
+  "points": [
+   {
+    "t": "原因",
+    "p": "because、since、as＋句子；because of、due to＋名詞：I stayed home because I was sick.",
+    "ex": [
+     {
+      "en": "I stayed home because I was sick.",
+      "zh": "我因為生病待在家。"
+     },
+     {
+      "en": "The class was canceled due to the typhoon.",
+      "zh": "課因為颱風取消了。"
+     }
+    ]
+   },
+   {
+    "t": "結果",
+    "p": "so、therefore、as a result；so＋形容詞＋that、such＋名詞＋that：It was so cold that we stayed inside.",
+    "ex": [
+     {
+      "en": "It was so cold that we stayed inside.",
+      "zh": "冷到我們都待在室內。"
+     },
+     {
+      "en": "It was such a long day that I fell asleep at eight.",
+      "zh": "那天太累了，我八點就睡著了。"
+     }
+    ]
+   },
+   {
+    "t": "目的",
+    "p": "so that＋句子；to／in order to＋原形：I left early so that I could catch the bus.／I left early to catch the bus.",
+    "ex": [
+     {
+      "en": "I left early so that I could catch the bus.",
+      "zh": "我提早出門，好趕上公車。"
+     },
+     {
+      "en": "I left early to catch the bus.",
+      "zh": "我提早出門去趕公車。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I study hard so that pass the exam.",
+    "good": "I study hard so that I can pass the exam.",
+    "why": "so that 後面要接完整的句子；或說 to pass the exam。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "It was ___ cold that we stayed inside.",
+    "options": [
+     "so",
+     "such",
+     "very"
+    ],
+    "answer": 0,
+    "why": "so＋形容詞＋that。"
+   },
+   {
+    "k": "choose",
+    "q": "I left early ___ I could catch the first bus.",
+    "options": [
+     "so that",
+     "because",
+     "although"
+    ],
+    "answer": 0,
+    "why": "為了趕上公車，用 so that。"
+   },
+   {
+    "k": "fix",
+    "q": "It was such hot that I couldn't sleep.",
+    "accept": [
+     "It was so hot that I couldn't sleep."
+    ],
+    "why": "形容詞前面用 so；such 後面接名詞。"
+   }
+  ]
+ },
+ "11-9": {
+  "points": [
+   {
+    "t": "說時間先後",
+    "p": "when、while、before、after、as soon as、until、since、once：When she arrived, we started the meeting.",
+    "ex": [
+     {
+      "en": "When she arrived, we started the meeting.",
+      "zh": "她一到，我們就開始開會。"
+     },
+     {
+      "en": "Wash your hands before you eat.",
+      "zh": "吃東西前先洗手。"
+     }
+    ]
+   },
+   {
+    "t": "時間子句用現在式說未來",
+    "p": "I'll call you when I arrive.（不說 when I will arrive）",
+    "ex": [
+     {
+      "en": "I'll call you when I arrive.",
+      "zh": "我到了會打給你。"
+     },
+     {
+      "en": "As soon as the results come out, I'll let you know.",
+      "zh": "結果一出來我就通知你。"
+     }
+    ]
+   },
+   {
+    "t": "while＋進行中的動作",
+    "p": "While I was cooking, the phone rang.（煮飯的時候電話響了）",
+    "ex": [
+     {
+      "en": "While I was cooking, the phone rang.",
+      "zh": "我在煮飯的時候電話響了。"
+     },
+     {
+      "en": "She fell asleep while she was reading.",
+      "zh": "她看書看到睡著了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I'll call you when I will get home.",
+    "good": "I'll call you when I get home.",
+    "why": "時間子句用現在式表示未來。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ I was cooking, the phone rang.",
+    "options": [
+     "While",
+     "Until",
+     "Since"
+    ],
+    "answer": 0,
+    "why": "正在做某事的時候，用 while。"
+   },
+   {
+    "k": "choose",
+    "q": "Wait here ___ I come back.",
+    "options": [
+     "until",
+     "since",
+     "after"
+    ],
+    "answer": 0,
+    "why": "「等到我回來」用 until。"
+   },
+   {
+    "k": "fix",
+    "q": "As soon as I will finish, I'll call you.",
+    "accept": [
+     "As soon as I finish, I'll call you."
+    ],
+    "why": "時間子句用現在式，不用 will。"
+   }
+  ]
+ },
+ "11-10": {
+  "points": [
+   {
+    "t": "條件",
+    "p": "if（如果）、unless（除非）、as long as（只要）、in case（以防萬一）：You can go out as long as you finish your homework.",
+    "ex": [
+     {
+      "en": "You can go out as long as you finish your homework.",
+      "zh": "只要寫完功課，你就可以出去。"
+     },
+     {
+      "en": "Take an umbrella in case it rains.",
+      "zh": "帶把傘，以防下雨。"
+     }
+    ]
+   },
+   {
+    "t": "unless 已經有「不」的意思",
+    "p": "unless＝if ... not，後面不再加 not：Unless you hurry, you'll be late.",
+    "ex": [
+     {
+      "en": "Unless you hurry, you'll be late.",
+      "zh": "除非你快一點，不然會遲到。"
+     },
+     {
+      "en": "Don't take this medicine unless the doctor says so.",
+      "zh": "除非醫生說可以，不然不要吃這個藥。"
+     }
+    ]
+   },
+   {
+    "t": "選擇和否則",
+    "p": "or、either ... or、otherwise：Hurry up, or you'll miss the bus.",
+    "ex": [
+     {
+      "en": "Hurry up, or you'll miss the bus.",
+      "zh": "快一點，不然你會錯過公車。"
+     },
+     {
+      "en": "Rest well; otherwise, you won't recover.",
+      "zh": "好好休息，否則你不會康復。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Unless you don't hurry, you'll be late.",
+    "good": "Unless you hurry, you'll be late.",
+    "why": "unless 本身就有否定的意思，不再加 don't。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Take an umbrella ___ it rains.",
+    "options": [
+     "in case",
+     "unless",
+     "so that"
+    ],
+    "answer": 0,
+    "why": "以防下雨，用 in case。"
+   },
+   {
+    "k": "choose",
+    "q": "Hurry up, ___ you'll be late.",
+    "options": [
+     "or",
+     "and",
+     "so"
+    ],
+    "answer": 0,
+    "why": "「不然」用 or。"
+   },
+   {
+    "k": "fix",
+    "q": "You can't come in unless you don't have a ticket.",
+    "accept": [
+     "You can't come in unless you have a ticket."
+    ],
+    "why": "unless 後面不再加否定。"
+   }
+  ]
+ },
+ "11-11": {
+  "points": [
+   {
+    "t": "as 的三種意思",
+    "p": "因為：As it was late, we went home.；當……時：As I was leaving, it started to rain.；像：Do as I say.",
+    "ex": [
+     {
+      "en": "As it was late, we went home.",
+      "zh": "因為很晚了，我們就回家了。"
+     },
+     {
+      "en": "As I was leaving, it started to rain.",
+      "zh": "我要離開的時候開始下雨了。"
+     }
+    ]
+   },
+   {
+    "t": "since 的兩種意思",
+    "p": "自從（配完成式）：I have lived here since I was ten.；因為：Since you're here, let's start.",
+    "ex": [
+     {
+      "en": "I have lived here since I was ten.",
+      "zh": "我從十歲就住在這裡。"
+     },
+     {
+      "en": "Since you're here, let's start.",
+      "zh": "既然你來了，我們開始吧。"
+     }
+    ]
+   },
+   {
+    "t": "while 的兩種意思",
+    "p": "當……時：While I was cooking, ...；然而（對比）：I like tea, while my sister likes coffee.",
+    "ex": [
+     {
+      "en": "While I was cooking, the phone rang.",
+      "zh": "我在煮飯時電話響了。"
+     },
+     {
+      "en": "I like tea, while my sister likes coffee.",
+      "zh": "我喜歡茶，而我妹妹喜歡咖啡。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "一個字，好幾種意思",
+   "head": [
+    "字",
+    "意思",
+    "例子"
+   ],
+   "rows": [
+    [
+     "as",
+     "因為／當……時／像",
+     "As it was late, ..."
+    ],
+    [
+     "since",
+     "自從／因為",
+     "since 2020／Since you're here, ..."
+    ],
+    [
+     "while",
+     "當……時／然而",
+     "while I was cooking／while she likes coffee"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "Since I moved here, I lived alone.",
+    "good": "Since I moved here, I have lived alone.",
+    "why": "since 是「自從」時，主要的句子用現在完成式。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「Since you're busy, I'll come back later.」的 since 是 ___。",
+    "options": [
+     "因為",
+     "自從",
+     "雖然"
+    ],
+    "answer": 0,
+    "why": "你在忙，所以我晚點再來：since 是「因為」。"
+   },
+   {
+    "k": "choose",
+    "q": "「I like tea, while my sister likes coffee.」的 while 是 ___。",
+    "options": [
+     "然而",
+     "當……時",
+     "直到"
+    ],
+    "answer": 0,
+    "why": "前後在對比，while 是「然而」。"
+   },
+   {
+    "k": "fix",
+    "q": "I have known her since we are children.",
+    "accept": [
+     "I have known her since we were children."
+    ],
+    "why": "since 後面接過去的起點，用過去式 were。"
+   }
+  ]
+ },
+ "11-12": {
+  "points": [
+   {
+    "t": "接句子：because、although",
+    "p": "後面要有主詞和動詞：because it rained／although she was tired。",
+    "ex": [
+     {
+      "en": "We stayed home because it was raining.",
+      "zh": "因為下雨，我們待在家。"
+     },
+     {
+      "en": "Although she was tired, she kept working.",
+      "zh": "雖然很累，她還是繼續工作。"
+     }
+    ]
+   },
+   {
+    "t": "接名詞或 V-ing：because of、despite、in spite of",
+    "p": "because of the rain／despite the rain／despite being tired。",
+    "ex": [
+     {
+      "en": "We stayed home because of the rain.",
+      "zh": "因為下雨，我們待在家。"
+     },
+     {
+      "en": "Despite being tired, she kept working.",
+      "zh": "儘管很累，她還是繼續工作。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "後面接什麼",
+   "head": [
+    "意思",
+    "接句子",
+    "接名詞／V-ing"
+   ],
+   "rows": [
+    [
+     "因為",
+     "because, since, as",
+     "because of, due to"
+    ],
+    [
+     "雖然",
+     "although, though, even though",
+     "despite, in spite of"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "Because of it was raining, we stayed home.",
+    "good": "Because it was raining, we stayed home.",
+    "why": "後面是句子，用 because；because of 後面接名詞。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The game was canceled ___ the storm.",
+    "options": [
+     "because of",
+     "because",
+     "although"
+    ],
+    "answer": 0,
+    "why": "後面是名詞 the storm，用 because of。"
+   },
+   {
+    "k": "choose",
+    "q": "___ being tired, she finished the report.",
+    "options": [
+     "Despite",
+     "Although",
+     "Because"
+    ],
+    "answer": 0,
+    "why": "後面是 V-ing，用 despite。"
+   },
+   {
+    "k": "fix",
+    "q": "Although the bad weather, we went hiking.",
+    "accept": [
+     "Despite the bad weather, we went hiking.",
+     "In spite of the bad weather, we went hiking."
+    ],
+    "why": "後面是名詞，用 despite 或 in spite of。"
+   }
+  ]
+ },
+ "11-13": {
+  "points": [
+   {
+    "t": "主詞一樣時可以省略",
+    "p": "對等連接詞連兩句，主詞相同可以省略後面的主詞，也不用逗號：I finished my shift and went home.",
+    "ex": [
+     {
+      "en": "I finished my shift and went home.",
+      "zh": "我下班後就回家了。"
+     },
+     {
+      "en": "She called the doctor but didn't get an answer.",
+      "zh": "她打給醫生，但沒人接。"
+     }
+    ]
+   },
+   {
+    "t": "從屬子句的逗號",
+    "p": "放前面加逗號：If you need help, call me.；放後面通常不加：Call me if you need help.",
+    "ex": [
+     {
+      "en": "If you need help, call me.",
+      "zh": "需要幫忙就打給我。"
+     },
+     {
+      "en": "Call me if you need help.",
+      "zh": "需要幫忙就打給我。"
+     }
+    ]
+   },
+   {
+    "t": "主詞相同時子句可以縮短",
+    "p": "While (I was) waiting, I read a book. 縮短的前提是兩邊主詞一樣，不然意思會錯。",
+    "ex": [
+     {
+      "en": "While waiting for the bus, I read a book.",
+      "zh": "等公車的時候我看了一本書。"
+     },
+     {
+      "en": "When I was eating, the phone rang.",
+      "zh": "我在吃飯時電話響了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "When eating, the phone rang.（想說我吃飯時電話響了）",
+    "good": "When I was eating, the phone rang.",
+    "why": "縮短後主詞變成 the phone，好像是電話在吃飯；主詞不同時不能縮短。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "___ you need help, call me.",
+    "options": [
+     "If",
+     "And",
+     "So"
+    ],
+    "answer": 0,
+    "why": "條件子句放前面，用 if，後面加逗號。"
+   },
+   {
+    "k": "choose",
+    "q": "While ___ for the bus, I read a book.",
+    "options": [
+     "waiting",
+     "wait",
+     "waited"
+    ],
+    "answer": 0,
+    "why": "主詞相同時縮短成 while＋V-ing。"
+   },
+   {
+    "k": "fix",
+    "q": "While walking home, the rain started.",
+    "accept": [
+     "While I was walking home, the rain started.",
+     "While I was walking home, it started to rain.",
+     "While I was walking home, it started raining."
+    ],
+    "why": "主詞不同（我走路、雨開始下），不能縮短，要把 I was 補回來。"
+   }
+  ]
+ },
+ "11-14": {
+  "points": [
+   {
+    "t": "雖然……但是：英文只用一個",
+    "p": "中文說「雖然……但是」「因為……所以」，英文 although 和 but、because 和 so 只能選一個。",
+    "ex": [
+     {
+      "en": "Although it was late, we kept working.",
+      "zh": "雖然很晚了，我們還是繼續工作。"
+     },
+     {
+      "en": "Because I was sick, I stayed home.",
+      "zh": "因為生病，所以我待在家。"
+     }
+    ]
+   },
+   {
+    "t": "兩個句子不能只用逗號接",
+    "p": "中文常用逗號一路接下去，英文兩個完整句子之間要有連接詞，或用句號分開：I was tired, so I went to bed.／I was tired. I went to bed.",
+    "ex": [
+     {
+      "en": "I was tired, so I went to bed.",
+      "zh": "我很累，所以去睡了。"
+     },
+     {
+      "en": "I was tired. I went to bed early.",
+      "zh": "我很累，早早就去睡了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Although it was raining, but we went out.",
+    "good": "Although it was raining, we went out.",
+    "why": "although 和 but 只能用一個。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Because I was sick, ___ stayed home.",
+    "options": [
+     "I",
+     "so I",
+     "but I"
+    ],
+    "answer": 0,
+    "why": "前面已經有 because，後面不再加 so。"
+   },
+   {
+    "k": "choose",
+    "q": "I was tired, ___ I went to bed early.",
+    "options": [
+     "so",
+     "so that",
+     "because of"
+    ],
+    "answer": 0,
+    "why": "兩個句子要有連接詞，表示結果用 so。"
+   },
+   {
+    "k": "fix",
+    "q": "Although he is rich, but he is not happy.",
+    "accept": [
+     "Although he is rich, he is not happy.",
+     "He is rich, but he is not happy."
+    ],
+    "why": "although 和 but 只能用一個。"
+   }
+  ]
+ }
+}

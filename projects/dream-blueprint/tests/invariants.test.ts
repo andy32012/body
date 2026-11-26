@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import curriculum from '../src/data/curriculum.json' with { type: 'json' }
 import schedule from '../src/data/curriculumSchedule.json' with { type: 'json' }
 import lessons from '../src/data/lessons.json' with { type: 'json' }
@@ -36,6 +36,7 @@ import examA1 from '../src/data/exam-reading-a1.json' with { type: 'json' }
 import examA2 from '../src/data/exam-reading-a2.json' with { type: 'json' }
 import examB1 from '../src/data/exam-reading-b1.json' with { type: 'json' }
 import examB2 from '../src/data/exam-reading-b2.json' with { type: 'json' }
+import bookIndex from '../src/data/grammar-book/index.json' with { type: 'json' }
 
 /**
  * Content only grows, and IDs never change: review cards, history, evidence and notes point at them, so a renamed
@@ -51,6 +52,11 @@ const idsOf = (list: readonly { id: string | number }[]) => list.map(x => String
 const total = <T>(list: readonly T[], field: (x: T) => readonly unknown[] | undefined) => list.reduce((n, x) => n + (field(x)?.length ?? 0), 0)
 const exams = [...examA1, ...examA2, ...examB1, ...examB2] as { id: string; qs: unknown[] }[]
 const units = curriculum.units as { unit: number; days: { id: string }[]; checkpoint: { id: string }[]; backup: { id: string }[]; retrySentences: { id: string }[] }[]
+// 完整文法: the catalog's section IDs (records are gbook.<id>) and the written chapters, one file each.
+const bookDir = new URL('../src/data/grammar-book/', import.meta.url)
+type BookSection = { points: unknown[]; mistakes: unknown[]; drills: unknown[] }
+const bookSections = readdirSync(bookDir).filter(f => f !== 'index.json')
+  .flatMap(f => Object.values(JSON.parse(readFileSync(new URL(f, bookDir), 'utf8')) as Record<string, BookSection>))
 
 function current(): Baseline {
   return {
@@ -83,6 +89,7 @@ function current(): Baseline {
       rivals: idsOf(rivals.rivals),
       'content updates': idsOf(contentUpdates),
       'past exam reading': idsOf(exams),
+      'grammar book sections': [...bookIndex.parts.flatMap(p => p.chapters.flatMap(c => c.sections.map(s => s.id))), ...bookIndex.appendix.map(s => s.id)],
     },
     counts: {
       'lesson dialogue lines': total(lessons, l => l.dialogue),
@@ -105,6 +112,10 @@ function current(): Baseline {
       'GEPT speaking questions': total([...gept.elementary, ...gept.intermediate], s => s.questions),
       'GEPT read-aloud sentences': total([...gept.elementary, ...gept.intermediate], s => s.readSentences),
       'past exam reading questions': total(exams, e => e.qs),
+      'grammar book written sections': bookSections.length,
+      'grammar book points': total(bookSections, s => s.points),
+      'grammar book mistakes': total(bookSections, s => s.mistakes),
+      'grammar book drills': total(bookSections, s => s.drills),
     },
   }
 }

@@ -1,0 +1,1147 @@
+{
+ "2-1": {
+  "points": [
+   {
+    "t": "簡單主詞是主詞的核心字",
+    "p": "完整主詞是動詞前面「在說誰、說什麼」的整組字（the tall nurse in room 3）；簡單主詞是裡面最核心的名詞或代名詞（nurse）。動詞要跟簡單主詞的單複數一致。",
+    "ex": [
+     {
+      "en": "The tall nurse in room 3 is my cousin.",
+      "zh": "三號房那位高個子護理師是我表姊。"
+     },
+     {
+      "en": "My two little brothers love soccer.",
+      "zh": "我的兩個弟弟很愛足球。"
+     }
+    ]
+   },
+   {
+    "t": "簡單主詞不一定只有一個字",
+    "p": "專有名詞 New York、或用 and 連起來的 Tom and Amy，整組都是核心。and 連接的兩個人是複數。",
+    "ex": [
+     {
+      "en": "New York is a big city.",
+      "zh": "紐約是個大城市。"
+     },
+     {
+      "en": "Tom and Amy are classmates.",
+      "zh": "湯姆和艾美是同學。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The color of the flowers are beautiful.",
+    "good": "The color of the flowers is beautiful.",
+    "why": "簡單主詞是 color（單數），of the flowers 只是修飾，動詞用 is。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「The new students from Japan are friendly.」的簡單主詞是 ___。",
+    "options": [
+     "new",
+     "students",
+     "Japan"
+    ],
+    "answer": 1,
+    "why": "在說誰？學生們——students 是核心。"
+   },
+   {
+    "k": "choose",
+    "q": "The list of names ___ on the desk.",
+    "options": [
+     "is",
+     "are",
+     "be"
+    ],
+    "answer": 0,
+    "why": "簡單主詞是 list（單數），配 is。"
+   },
+   {
+    "k": "fix",
+    "q": "The cups on the table is clean.",
+    "accept": [
+     "The cups on the table are clean."
+    ],
+    "why": "簡單主詞是 cups（複數），配 are。"
+   }
+  ]
+ },
+ "2-2": {
+  "points": [
+   {
+    "t": "述語是主詞以外的部分",
+    "p": "一個句子可以分成「主詞」和「述語」兩半。述語從動詞開始，說主詞做什麼或是什麼：My mother｜works at a clinic.",
+    "ex": [
+     {
+      "en": "My mother works at a clinic.",
+      "zh": "我媽媽在診所工作。"
+     },
+     {
+      "en": "The baby is sleeping.",
+      "zh": "寶寶在睡覺。"
+     }
+    ]
+   },
+   {
+    "t": "主要動詞和動詞片語",
+    "p": "主要動詞是表達動作或狀態的那個動詞（works、sleeping）。前面可以加助動詞（is、has、will、can），一起組成動詞片語：is sleeping、has finished、can swim。",
+    "ex": [
+     {
+      "en": "She has finished her homework.",
+      "zh": "她寫完功課了。"
+     },
+     {
+      "en": "My grandfather can swim.",
+      "zh": "我爺爺會游泳。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "She can swims.",
+    "good": "She can swim.",
+    "why": "助動詞 can 後面的主要動詞用原形，不加 s。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「The doctor will see you soon.」的主要動詞是 ___。",
+    "options": [
+     "will",
+     "see",
+     "soon"
+    ],
+    "answer": 1,
+    "why": "will 是助動詞，真正的動作是 see。"
+   },
+   {
+    "k": "choose",
+    "q": "「They are watching TV.」的動詞片語是 ___。",
+    "options": [
+     "are watching",
+     "watching TV",
+     "They are"
+    ],
+    "answer": 0,
+    "why": "助動詞 are 加主要動詞 watching。"
+   },
+   {
+    "k": "fix",
+    "q": "He will goes to school tomorrow.",
+    "accept": [
+     "He will go to school tomorrow."
+    ],
+    "why": "will 後面接原形動詞 go。"
+   }
+  ]
+ },
+ "2-3": {
+  "points": [
+   {
+    "t": "直接受詞：動作直接作用的東西",
+    "p": "I bought a cake. 買的東西是 a cake，它是直接受詞。問「動詞＋什麼？」就找得到。",
+    "ex": [
+     {
+      "en": "I bought a cake.",
+      "zh": "我買了一個蛋糕。"
+     },
+     {
+      "en": "The nurse checked his blood pressure.",
+      "zh": "護理師幫他量了血壓。"
+     }
+    ]
+   },
+   {
+    "t": "間接受詞：收到東西的人",
+    "p": "I bought my mom a cake. 收到蛋糕的是 my mom，她是間接受詞，放在直接受詞前面。也可以改成 I bought a cake for my mom.",
+    "ex": [
+     {
+      "en": "I bought my mom a cake.",
+      "zh": "我買了一個蛋糕給媽媽。"
+     },
+     {
+      "en": "She gave the patient some water.",
+      "zh": "她給病人一些水。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "She gave to me a book.",
+    "good": "She gave me a book.",
+    "why": "間接受詞直接放在 gave 後面，不加 to；或改成 She gave a book to me."
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「He sent his friend a photo.」的直接受詞是 ___。",
+    "options": [
+     "He",
+     "his friend",
+     "a photo"
+    ],
+    "answer": 2,
+    "why": "寄出去的東西是 a photo，是直接受詞。"
+   },
+   {
+    "k": "choose",
+    "q": "「Please pass me the salt.」的間接受詞是 ___。",
+    "options": [
+     "me",
+     "the salt",
+     "pass"
+    ],
+    "answer": 0,
+    "why": "收到鹽的人是 me，是間接受詞。"
+   },
+   {
+    "k": "fix",
+    "q": "My father bought to me a bike.",
+    "accept": [
+     "My father bought me a bike.",
+     "My father bought a bike for me."
+    ],
+    "why": "間接受詞直接放在動詞後；要用介系詞就放後面：bought a bike for me。"
+   }
+  ]
+ },
+ "2-4": {
+  "points": [
+   {
+    "t": "主詞補語：說明主詞是什麼、怎麼樣",
+    "p": "be、look、feel、become 這類動詞後面的名詞或形容詞，在描述主詞：She is a nurse.／He looks tired. 這叫主詞補語。",
+    "ex": [
+     {
+      "en": "She is a nurse.",
+      "zh": "她是護理師。"
+     },
+     {
+      "en": "He looks tired.",
+      "zh": "他看起來很累。"
+     }
+    ]
+   },
+   {
+    "t": "受詞補語：說明受詞變成什麼、怎麼樣",
+    "p": "The news made her happy. 是 her 變得開心，happy 描述受詞 her，叫受詞補語。常見動詞：make、keep、find、call、name。",
+    "ex": [
+     {
+      "en": "The news made her happy.",
+      "zh": "這個消息讓她很開心。"
+     },
+     {
+      "en": "We call him Big Joe.",
+      "zh": "我們叫他大喬。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The soup smells well.",
+    "good": "The soup smells good.",
+    "why": "smell 在這裡描述主詞湯的狀態，後面用形容詞 good 當主詞補語。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「My sister became a teacher.」的 a teacher 是 ___。",
+    "options": [
+     "受詞",
+     "主詞補語",
+     "受詞補語"
+    ],
+    "answer": 1,
+    "why": "它說明主詞 my sister 成為什麼，是主詞補語。"
+   },
+   {
+    "k": "choose",
+    "q": "Please keep the room ___.",
+    "options": [
+     "clean",
+     "cleanly",
+     "cleaning"
+    ],
+    "answer": 0,
+    "why": "描述受詞 the room 的狀態，用形容詞 clean 當受詞補語。"
+   },
+   {
+    "k": "fix",
+    "q": "The music makes me happily.",
+    "accept": [
+     "The music makes me happy."
+    ],
+    "why": "受詞補語描述 me 的狀態，要用形容詞 happy。"
+   }
+  ]
+ },
+ "2-5": {
+  "points": [
+   {
+    "t": "必要成分少了，句子就不完整",
+    "p": "主詞、動詞、動詞需要的受詞或補語，是必要成分。She put the keys ___. put 一定要說放哪裡，所以地點也是必要的。",
+    "ex": [
+     {
+      "en": "She put the keys in her bag.",
+      "zh": "她把鑰匙放進包包。"
+     },
+     {
+      "en": "He is a doctor.",
+      "zh": "他是醫生。"
+     }
+    ]
+   },
+   {
+    "t": "修飾語、附加語可以多加，也可以拿掉",
+    "p": "yesterday、in the park、very carefully 這類說明時間、地點、方式的字，拿掉句子還成立，叫附加語或修飾語。",
+    "ex": [
+     {
+      "en": "We played basketball in the park yesterday.",
+      "zh": "我們昨天在公園打籃球。"
+     },
+     {
+      "en": "She checked the label very carefully.",
+      "zh": "她很仔細地檢查標籤。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The patient became.",
+    "good": "The patient became calm.",
+    "why": "become 後面一定要有補語說明變成怎樣。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「She cooked dinner at seven.」哪一部分拿掉句子還完整？___",
+    "options": [
+     "She",
+     "dinner",
+     "at seven"
+    ],
+    "answer": 2,
+    "why": "at seven 是說時間的附加語，可以拿掉。"
+   },
+   {
+    "k": "choose",
+    "q": "「He put the box ___.」空格需要什麼才完整？",
+    "options": [
+     "地點，例如 on the shelf",
+     "什麼都不用",
+     "時間，例如 yesterday"
+    ],
+    "answer": 0,
+    "why": "put 一定要說放在哪裡。"
+   },
+   {
+    "k": "fix",
+    "q": "The medicine made sleepy.",
+    "accept": [
+     "The medicine made me sleepy.",
+     "The medicine made him sleepy.",
+     "The medicine made her sleepy.",
+     "The medicine made them sleepy."
+    ],
+    "why": "make＋受詞＋補語，少了受詞（讓誰想睡）。"
+   }
+  ]
+ },
+ "2-6": {
+  "points": [
+   {
+    "t": "SV：主詞＋動詞就完整",
+    "p": "有些動詞後面不需要受詞或補語就有完整意思，像 sleep、arrive、cry、happen。可以再加附加語說時間地點。",
+    "ex": [
+     {
+      "en": "The baby cried.",
+      "zh": "寶寶哭了。"
+     },
+     {
+      "en": "The doctor arrived at nine.",
+      "zh": "醫師九點到。"
+     }
+    ]
+   },
+   {
+    "t": "不及物動詞不能直接接受詞",
+    "p": "arrive、go、come 後面要接地點時，常常要加介系詞：arrive at the hospital、go to school（home、here 例外）。",
+    "ex": [
+     {
+      "en": "We arrived at the hospital early.",
+      "zh": "我們很早就到醫院。"
+     },
+     {
+      "en": "She went home after work.",
+      "zh": "她下班後回家。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "We arrived the station at six.",
+    "good": "We arrived at the station at six.",
+    "why": "arrive 是不及物動詞，接地點要加 at 或 in。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "哪一句是 SV 句型？___",
+    "options": [
+     "The child laughed.",
+     "The child ate an apple.",
+     "The child is happy."
+    ],
+    "answer": 0,
+    "why": "laughed 後面不需要受詞或補語，是 SV。"
+   },
+   {
+    "k": "choose",
+    "q": "They arrived ___ the airport late.",
+    "options": [
+     "at",
+     "to",
+     "（不加）"
+    ],
+    "answer": 0,
+    "why": "arrive 接比較小的地點用 at。"
+   },
+   {
+    "k": "fix",
+    "q": "I went to home at eight.",
+    "accept": [
+     "I went home at eight."
+    ],
+    "why": "home 本身就有「回家」的意思，前面不加 to。"
+   }
+  ]
+ },
+ "2-7": {
+  "points": [
+   {
+    "t": "SVC：主詞＋連綴動詞＋補語",
+    "p": "連綴動詞像等號，把主詞和後面的描述連起來：be、become、look、seem、feel、sound、taste、smell、get。後面接形容詞或名詞。",
+    "ex": [
+     {
+      "en": "The patient seems nervous.",
+      "zh": "病人似乎很緊張。"
+     },
+     {
+      "en": "My brother became a pilot.",
+      "zh": "我哥哥成了機師。"
+     }
+    ]
+   },
+   {
+    "t": "連綴動詞後面用形容詞，不用副詞",
+    "p": "You look nice.（不是 nicely）、It tastes sweet.、I feel sick. 因為後面是在描述主詞，不是描述動作。",
+    "ex": [
+     {
+      "en": "You look nice today.",
+      "zh": "你今天看起來很好看。"
+     },
+     {
+      "en": "This cake tastes sweet.",
+      "zh": "這個蛋糕吃起來很甜。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I feel badly today.",
+    "good": "I feel bad today.",
+    "why": "feel 在說自己的狀態，後面用形容詞 bad。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "The room smells ___.",
+    "options": [
+     "fresh",
+     "freshly",
+     "freshness"
+    ],
+    "answer": 0,
+    "why": "smell 是連綴動詞，描述主詞 the room，用形容詞 fresh。"
+   },
+   {
+    "k": "choose",
+    "q": "哪一句是 SVC 句型？___",
+    "options": [
+     "She sounds happy.",
+     "She sang a song.",
+     "She sang."
+    ],
+    "answer": 0,
+    "why": "happy 描述主詞 she，是主詞補語。"
+   },
+   {
+    "k": "fix",
+    "q": "The nurse looks very kindly.",
+    "accept": [
+     "The nurse looks very kind."
+    ],
+    "why": "look 是連綴動詞，後面用形容詞 kind。"
+   }
+  ]
+ },
+ "2-8": {
+  "points": [
+   {
+    "t": "SVO：主詞＋動詞＋受詞",
+    "p": "及物動詞後面一定要接受詞，說動作做在誰或什麼上面：She drinks coffee.／I love my family.",
+    "ex": [
+     {
+      "en": "She drinks coffee every morning.",
+      "zh": "她每天早上喝咖啡。"
+     },
+     {
+      "en": "The nurse washed her hands.",
+      "zh": "護理師洗了手。"
+     }
+    ]
+   },
+   {
+    "t": "受詞可以是名詞、代名詞，也可以是一整組",
+    "p": "受詞可以是 me、the patient，也可以是 to go home（想做的事）、what he said（他說的話）。",
+    "ex": [
+     {
+      "en": "I want to go home.",
+      "zh": "我想回家。"
+     },
+     {
+      "en": "I understand what you mean.",
+      "zh": "我懂你的意思。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I like very much this song.",
+    "good": "I like this song very much.",
+    "why": "受詞 this song 要緊跟在 like 後面，very much 放最後。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「My dad fixed the door.」的受詞是 ___。",
+    "options": [
+     "My dad",
+     "fixed",
+     "the door"
+    ],
+    "answer": 2,
+    "why": "修的東西是 the door，是受詞。"
+   },
+   {
+    "k": "choose",
+    "q": "哪一句是 SVO 句型？___",
+    "options": [
+     "The bus is late.",
+     "Tom opened the window.",
+     "Tom smiled."
+    ],
+    "answer": 1,
+    "why": "opened 後面接受詞 the window。"
+   },
+   {
+    "k": "fix",
+    "q": "I enjoy very much reading.",
+    "accept": [
+     "I enjoy reading very much."
+    ],
+    "why": "受詞 reading 緊跟動詞，very much 放句尾。"
+   }
+  ]
+ },
+ "2-9": {
+  "points": [
+   {
+    "t": "SVOO：給誰（人）＋什麼（東西）",
+    "p": "give、send、show、tell、buy、make 可以接兩個受詞：先人（間接受詞），再東西（直接受詞）。",
+    "ex": [
+     {
+      "en": "The doctor showed me the X-ray.",
+      "zh": "醫師給我看 X 光片。"
+     },
+     {
+      "en": "Can you tell me the answer?",
+      "zh": "你可以告訴我答案嗎？"
+     }
+    ]
+   },
+   {
+    "t": "人是代名詞時用受格",
+    "p": "Give him the pills.（不是 he），Send them an email. 東西是代名詞時，通常改成 to 的寫法：Give it to him.",
+    "ex": [
+     {
+      "en": "Give him the pills after lunch.",
+      "zh": "午餐後給他吃藥。"
+     },
+     {
+      "en": "Give it to her, please.",
+      "zh": "請把它拿給她。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Give him it.",
+    "good": "Give it to him.",
+    "why": "東西是代名詞 it 時，通常說 give it to him。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "My aunt made ___ a sweater.",
+    "options": [
+     "I",
+     "me",
+     "my"
+    ],
+    "answer": 1,
+    "why": "間接受詞用受格 me。"
+   },
+   {
+    "k": "choose",
+    "q": "「She told the children a story.」的直接受詞是 ___。",
+    "options": [
+     "She",
+     "the children",
+     "a story"
+    ],
+    "answer": 2,
+    "why": "說的東西是 a story，是直接受詞。"
+   },
+   {
+    "k": "fix",
+    "q": "Please send she the report.",
+    "accept": [
+     "Please send her the report.",
+     "Please send the report to her."
+    ],
+    "why": "間接受詞用受格 her。"
+   }
+  ]
+ },
+ "2-10": {
+  "points": [
+   {
+    "t": "SVOC：受詞後面再補充說明",
+    "p": "make、keep、find、leave、call、name、elect 後面接「受詞＋補語」，補語說明受詞變成什麼或處在什麼狀態。",
+    "ex": [
+     {
+      "en": "The long shift made her tired.",
+      "zh": "長班讓她很累。"
+     },
+     {
+      "en": "They named the baby Lily.",
+      "zh": "他們幫寶寶取名莉莉。"
+     }
+    ]
+   },
+   {
+    "t": "補語可以是形容詞或名詞",
+    "p": "Please leave the door open.（形容詞）／We chose Amy our leader.（名詞）。中間不需要 to be。",
+    "ex": [
+     {
+      "en": "Please leave the door open.",
+      "zh": "請讓門開著。"
+     },
+     {
+      "en": "We chose Amy our class leader.",
+      "zh": "我們選艾美當班長。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The test made me nervously.",
+    "good": "The test made me nervous.",
+    "why": "補語描述 me 的狀態，用形容詞 nervous。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「I found the book easy.」的 easy 是 ___。",
+    "options": [
+     "受詞",
+     "受詞補語",
+     "主詞補語"
+    ],
+    "answer": 1,
+    "why": "easy 描述受詞 the book，是受詞補語。"
+   },
+   {
+    "k": "choose",
+    "q": "Please keep your hands ___.",
+    "options": [
+     "warm",
+     "warmly",
+     "warmth"
+    ],
+    "answer": 0,
+    "why": "描述受詞 your hands 的狀態，用形容詞。"
+   },
+   {
+    "k": "fix",
+    "q": "Everyone calls him as Big Ben.",
+    "accept": [
+     "Everyone calls him Big Ben."
+    ],
+    "why": "call＋人＋名字，中間不加 as。"
+   }
+  ]
+ },
+ "2-11": {
+  "points": [
+   {
+    "t": "SVA：動詞需要地點等說明",
+    "p": "be、live、stay 這類動詞常需要後面說地點或時間才完整：She lives in Taichung.／The meeting is at ten. 這個地點、時間是必要成分。",
+    "ex": [
+     {
+      "en": "She lives in Taichung.",
+      "zh": "她住在台中。"
+     },
+     {
+      "en": "The meeting is at ten.",
+      "zh": "會議在十點。"
+     }
+    ]
+   },
+   {
+    "t": "SVOA：受詞後面需要地點",
+    "p": "put、place、keep 後面接受詞，再接地點：Put the medicine in the fridge. 少了地點句子就不完整。",
+    "ex": [
+     {
+      "en": "Put the medicine in the fridge.",
+      "zh": "把藥放進冰箱。"
+     },
+     {
+      "en": "She placed the baby on the bed.",
+      "zh": "她把寶寶放在床上。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "My grandmother lives.",
+    "good": "My grandmother lives in Tainan.",
+    "why": "live 表示「住」時，要說住在哪裡。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「He put the cup on the table.」是 ___ 句型。",
+    "options": [
+     "SVO",
+     "SVOA",
+     "SVC"
+    ],
+    "answer": 1,
+    "why": "put＋受詞 the cup＋地點 on the table，是 SVOA。"
+   },
+   {
+    "k": "choose",
+    "q": "The clinic is ___ the second floor.",
+    "options": [
+     "on",
+     "at",
+     "in"
+    ],
+    "answer": 0,
+    "why": "樓層用 on：on the second floor。"
+   },
+   {
+    "k": "fix",
+    "q": "Please put the bag.",
+    "accept": [
+     "Please put the bag here.",
+     "Please put the bag there.",
+     "Please put the bag on the table.",
+     "Please put the bag on the floor."
+    ],
+    "why": "put 後面要說放在哪裡。"
+   }
+  ]
+ },
+ "2-12": {
+  "points": [
+   {
+    "t": "給人東西：to 的寫法",
+    "p": "give、send、show、lend、pass、tell 改寫時用 to：I gave the book to Tom. 東西移動到某人那裡。",
+    "ex": [
+     {
+      "en": "I gave the book to Tom.",
+      "zh": "我把書給湯姆。"
+     },
+     {
+      "en": "She sent an email to her teacher.",
+      "zh": "她寄電子郵件給老師。"
+     }
+    ]
+   },
+   {
+    "t": "為人做東西：for 的寫法",
+    "p": "buy、make、cook、get 改寫時用 for：She cooked dinner for us. 表示為了某人做。",
+    "ex": [
+     {
+      "en": "She cooked dinner for us.",
+      "zh": "她煮晚餐給我們吃。"
+     },
+     {
+      "en": "Can you get a chair for me?",
+      "zh": "可以幫我拿張椅子嗎？"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "He bought a gift to his mother.",
+    "good": "He bought a gift for his mother.",
+    "why": "buy 是「為某人買」，改寫用 for。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Please show your ID ___ the nurse.",
+    "options": [
+     "to",
+     "for",
+     "of"
+    ],
+    "answer": 0,
+    "why": "show 是把東西給人看，用 to。"
+   },
+   {
+    "k": "choose",
+    "q": "My dad made a kite ___ me.",
+    "options": [
+     "to",
+     "for",
+     "with"
+    ],
+    "answer": 1,
+    "why": "make 是為某人做，用 for。"
+   },
+   {
+    "k": "fill",
+    "q": "She lent her notes ___ her classmate.",
+    "accept": [
+     "to"
+    ],
+    "why": "lend 是把東西借出去給人，用 to。"
+   }
+  ]
+ },
+ "2-13": {
+  "points": [
+   {
+    "t": "there is／are：說「某處有某物」",
+    "p": "There is＋單數或不可數，There are＋複數。真正的主詞在 be 動詞後面，be 動詞跟它一致。",
+    "ex": [
+     {
+      "en": "There is a clock on the wall.",
+      "zh": "牆上有一個時鐘。"
+     },
+     {
+      "en": "There are three beds in this room.",
+      "zh": "這個房間有三張床。"
+     }
+    ]
+   },
+   {
+    "t": "虛主詞 it：天氣、時間、距離",
+    "p": "英文句子一定要有主詞，說天氣、時間、距離時用 it 當主詞，沒有實際意思：It is raining.／It's ten o'clock.",
+    "ex": [
+     {
+      "en": "It is raining outside.",
+      "zh": "外面在下雨。"
+     },
+     {
+      "en": "It takes ten minutes to walk there.",
+      "zh": "走路去那裡要十分鐘。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Have many people in the waiting room.",
+    "good": "There are many people in the waiting room.",
+    "why": "說「某處有」用 there are，不用 have。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "There ___ some milk in the fridge.",
+    "options": [
+     "is",
+     "are",
+     "have"
+    ],
+    "answer": 0,
+    "why": "milk 不可數，用 there is。"
+   },
+   {
+    "k": "choose",
+    "q": "___ is very hot today.",
+    "options": [
+     "It",
+     "There",
+     "This"
+    ],
+    "answer": 0,
+    "why": "說天氣用虛主詞 it。"
+   },
+   {
+    "k": "fix",
+    "q": "There is two patients in the hallway.",
+    "accept": [
+     "There are two patients in the hallway."
+    ],
+    "why": "two patients 是複數，用 there are。"
+   }
+  ]
+ },
+ "2-14": {
+  "points": [
+   {
+    "t": "加修飾：讓句子更清楚",
+    "p": "基本句子 The nurse helped the man. 可以加形容詞、副詞、介系詞片語：The young nurse quickly helped the old man at the door.",
+    "ex": [
+     {
+      "en": "The young nurse quickly helped the old man at the door.",
+      "zh": "那位年輕護理師很快地幫了門口的老先生。"
+     },
+     {
+      "en": "I drink warm water every morning.",
+      "zh": "我每天早上喝溫水。"
+     }
+    ]
+   },
+   {
+    "t": "並列和嵌入：把句子接起來",
+    "p": "用 and、but 把兩件事並排（並列）；用 because、when、who 把一句放進另一句裡（嵌入）：The man who called you is my uncle.",
+    "ex": [
+     {
+      "en": "I was tired, but I finished my work.",
+      "zh": "我很累，但我把工作做完了。"
+     },
+     {
+      "en": "The man who called you is my uncle.",
+      "zh": "打電話給你的那個人是我叔叔。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I was hungry, I ate a sandwich.",
+    "good": "I was hungry, so I ate a sandwich.",
+    "why": "兩個完整的句子不能只用逗號接，要加連接詞 so 或改用句點。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "把兩句接起來：It was late. We went home. → It was late, ___ we went home.",
+    "options": [
+     "so",
+     "because",
+     "who"
+    ],
+    "answer": 0,
+    "why": "前面是原因、後面是結果，用 so。"
+   },
+   {
+    "k": "choose",
+    "q": "「The girl who sits next to me is Amy.」裡嵌入的部分是 ___。",
+    "options": [
+     "The girl",
+     "who sits next to me",
+     "is Amy"
+    ],
+    "answer": 1,
+    "why": "who sits next to me 嵌在句子裡說明是哪個女孩。"
+   },
+   {
+    "k": "fix",
+    "q": "It was raining, we stayed inside.",
+    "accept": [
+     "It was raining, so we stayed inside.",
+     "Because it was raining, we stayed inside.",
+     "We stayed inside because it was raining."
+    ],
+    "why": "兩個完整句子之間要有連接詞，例如 so。"
+   }
+  ]
+ },
+ "2-15": {
+  "points": [
+   {
+    "t": "陳述句和疑問句",
+    "p": "陳述句說事情（She is a nurse.）。疑問句問問題，把 be 動詞或助動詞放到主詞前面（Is she a nurse?），或用 what、where 開頭（Where does she work?）。",
+    "ex": [
+     {
+      "en": "She is a nurse.",
+      "zh": "她是護理師。"
+     },
+     {
+      "en": "Where does she work?",
+      "zh": "她在哪裡工作？"
+     }
+    ]
+   },
+   {
+    "t": "祈使句和感嘆句",
+    "p": "祈使句叫人做事，用原形動詞開頭、通常沒有主詞（Sit down, please.）。感嘆句表達強烈情緒，用 What 或 How 開頭（What a cute baby!／How tall he is!）。",
+    "ex": [
+     {
+      "en": "Sit down, please.",
+      "zh": "請坐。"
+     },
+     {
+      "en": "What a cute baby!",
+      "zh": "好可愛的寶寶！"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Where she works?",
+    "good": "Where does she work?",
+    "why": "一般動詞的疑問句要加 does，動詞回到原形。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「Please close the door.」是 ___。",
+    "options": [
+     "陳述句",
+     "祈使句",
+     "感嘆句"
+    ],
+    "answer": 1,
+    "why": "原形動詞開頭叫人做事，是祈使句。"
+   },
+   {
+    "k": "choose",
+    "q": "___ a beautiful day!",
+    "options": [
+     "What",
+     "How",
+     "Which"
+    ],
+    "answer": 0,
+    "why": "What＋a＋形容詞＋名詞是感嘆句。"
+   },
+   {
+    "k": "fix",
+    "q": "What time it is?",
+    "accept": [
+     "What time is it?"
+    ],
+    "why": "疑問句要把 be 動詞放在主詞前面：is it。"
+   }
+  ]
+ },
+ "2-16": {
+  "points": [
+   {
+    "t": "肯定句：主詞＋動詞＋其他",
+    "p": "陳述句的基本順序是主詞在前、動詞在後：My brother plays the guitar.",
+    "ex": [
+     {
+      "en": "My brother plays the guitar.",
+      "zh": "我弟弟彈吉他。"
+     },
+     {
+      "en": "We are ready.",
+      "zh": "我們準備好了。"
+     }
+    ]
+   },
+   {
+    "t": "否定句：not 放在助動詞或 be 動詞後面",
+    "p": "be 動詞直接加 not（She is not tired.）。一般動詞要加 do／does／did＋not，動詞回原形（He does not eat meat.）。",
+    "ex": [
+     {
+      "en": "She is not tired.",
+      "zh": "她不累。"
+     },
+     {
+      "en": "He does not eat meat.",
+      "zh": "他不吃肉。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "He not likes coffee.",
+    "good": "He does not like coffee.",
+    "why": "一般動詞的否定要加 does not，動詞用原形 like。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "We ___ have class today.",
+    "options": [
+     "don't",
+     "doesn't",
+     "aren't"
+    ],
+    "answer": 0,
+    "why": "主詞 we，一般動詞否定用 don't。"
+   },
+   {
+    "k": "fill",
+    "q": "She ___ (not, like) spicy food.",
+    "accept": [
+     "does not like",
+     "doesn't like"
+    ],
+    "why": "she 第三人稱單數，用 does not＋原形 like。"
+   },
+   {
+    "k": "fix",
+    "q": "My mother don't work on Sundays.",
+    "accept": [
+     "My mother doesn't work on Sundays.",
+     "My mother does not work on Sundays."
+    ],
+    "why": "my mother 是第三人稱單數，用 doesn't。"
+   }
+  ]
+ }
+}

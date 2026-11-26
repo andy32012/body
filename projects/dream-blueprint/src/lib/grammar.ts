@@ -46,20 +46,23 @@ export function drillAnswer(d: Drill) {
 export type DrillMark = 0 | 1 | 2
 export interface GrammarRecord { marks: Record<string, DrillMark>; day?: string }
 export const grammarKey = (unit: number) => 'gram.' + unit
-export function readGrammar(notes: Record<string, string>, unit: number): GrammarRecord {
+/** The drill marks kept under a note key (gram.<unit> for a course unit, gbook.<section> for the grammar book). */
+export function readMarks(notes: Record<string, string>, key: string): GrammarRecord {
   try {
-    const v = notes[grammarKey(unit)] ? JSON.parse(notes[grammarKey(unit)]) as GrammarRecord : null
+    const v = notes[key] ? JSON.parse(notes[key]) as GrammarRecord : null
     return v && typeof v.marks === 'object' && v.marks ? v : { marks: {} }
   } catch { return { marks: {} } }
 }
 /** The first try is what counts; a later right answer only turns a miss into "fixed later". */
-export function saveDrill(notes: Record<string, string>, unit: number, index: number, right: boolean, day: string) {
-  const rec = readGrammar(notes, unit)
+export function saveMark(notes: Record<string, string>, key: string, index: number, right: boolean, day: string) {
+  const rec = readMarks(notes, key)
   const old = rec.marks[index]
   const next: DrillMark = old === undefined ? (right ? 1 : 0) : old === 0 && right ? 2 : old
   if (next === old) return notes
-  return { ...notes, [grammarKey(unit)]: JSON.stringify({ marks: { ...rec.marks, [index]: next }, day }) }
+  return { ...notes, [key]: JSON.stringify({ marks: { ...rec.marks, [index]: next }, day }) }
 }
+export const readGrammar = (notes: Record<string, string>, unit: number) => readMarks(notes, grammarKey(unit))
+export const saveDrill = (notes: Record<string, string>, unit: number, index: number, right: boolean, day: string) => saveMark(notes, grammarKey(unit), index, right, day)
 export function drillSummary(notes: Record<string, string>, unit: number) {
   const total = grammarFor(unit)?.drills.length ?? 0
   const marks = Object.values(readGrammar(notes, unit).marks)

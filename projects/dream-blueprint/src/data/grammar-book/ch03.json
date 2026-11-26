@@ -1,0 +1,1406 @@
+{
+ "3-1": {
+  "points": [
+   {
+    "t": "普通名詞和專有名詞",
+    "p": "普通名詞是一般的人事物：nurse、city、hospital。專有名詞是特定的名字：Amy、Taipei、Monday，第一個字母一定大寫。",
+    "ex": [
+     {
+      "en": "Amy is a nurse in Taipei.",
+      "zh": "艾美是台北的護理師。"
+     },
+     {
+      "en": "We have a meeting on Monday.",
+      "zh": "我們星期一有會議。"
+     }
+    ]
+   },
+   {
+    "t": "專有名詞通常不加 a／the",
+    "p": "人名、城市、星期、月份前面通常不加冠詞：in July、in Tainan、Dr. Lin。",
+    "ex": [
+     {
+      "en": "Dr. Lin works in Tainan.",
+      "zh": "林醫師在台南工作。"
+     },
+     {
+      "en": "My birthday is in July.",
+      "zh": "我的生日在七月。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I will see you on sunday.",
+    "good": "I will see you on Sunday.",
+    "why": "星期是專有名詞，第一個字母大寫。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "下面哪一個是專有名詞？___",
+    "options": [
+     "city",
+     "Kaohsiung",
+     "doctor"
+    ],
+    "answer": 1,
+    "why": "Kaohsiung 是特定城市的名字。"
+   },
+   {
+    "k": "choose",
+    "q": "My exam is in ___.",
+    "options": [
+     "June",
+     "the June",
+     "a June"
+    ],
+    "answer": 0,
+    "why": "月份前面不加冠詞。"
+   },
+   {
+    "k": "fix",
+    "q": "She lives in the Taichung.",
+    "accept": [
+     "She lives in Taichung."
+    ],
+    "why": "城市名稱前面不加 the。"
+   }
+  ]
+ },
+ "3-2": {
+  "points": [
+   {
+    "t": "具體名詞和抽象名詞",
+    "p": "具體名詞看得到、摸得到：bed、apple、nurse。抽象名詞是想法、感覺、狀態：love、health、pain、advice，大多不可數。",
+    "ex": [
+     {
+      "en": "Good health is important.",
+      "zh": "健康很重要。"
+     },
+     {
+      "en": "The patient has some pain in his back.",
+      "zh": "病人背部有點痛。"
+     }
+    ]
+   },
+   {
+    "t": "集合名詞和物質名詞",
+    "p": "集合名詞指一群人或東西：family、team、staff。物質名詞是材料或物質：water、rice、paper、blood，不能一個一個數。",
+    "ex": [
+     {
+      "en": "My family is very big.",
+      "zh": "我家人很多。"
+     },
+     {
+      "en": "He lost a lot of blood.",
+      "zh": "他失血很多。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Can you give me an advice?",
+    "good": "Can you give me some advice?",
+    "why": "advice 是抽象名詞，不可數，不能加 an。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "下面哪一個是抽象名詞？___",
+    "options": [
+     "chair",
+     "happiness",
+     "milk"
+    ],
+    "answer": 1,
+    "why": "happiness 是感覺，看不到摸不到。"
+   },
+   {
+    "k": "choose",
+    "q": "The doctor gave me some useful ___.",
+    "options": [
+     "advice",
+     "advices",
+     "an advice"
+    ],
+    "answer": 0,
+    "why": "advice 不可數，沒有複數。"
+   },
+   {
+    "k": "fix",
+    "q": "She needs a medical informations.",
+    "accept": [
+     "She needs some medical information.",
+     "She needs medical information."
+    ],
+    "why": "information 不可數，不加 a、不加 s。"
+   }
+  ]
+ },
+ "3-3": {
+  "points": [
+   {
+    "t": "可數名詞：可以一個、兩個數",
+    "p": "可數名詞有單數和複數：a bed／two beds、a patient／three patients。單數前面要有 a、the、my 這類字。",
+    "ex": [
+     {
+      "en": "There are two beds in the room.",
+      "zh": "房間裡有兩張床。"
+     },
+     {
+      "en": "I have a question.",
+      "zh": "我有一個問題。"
+     }
+    ]
+   },
+   {
+    "t": "不可數名詞：不能直接數",
+    "p": "water、rice、money、information、homework、furniture 不可數：沒有複數、不加 a。要表示多少，用 some、much、a little 或單位：a glass of water。",
+    "ex": [
+     {
+      "en": "I need some information.",
+      "zh": "我需要一些資訊。"
+     },
+     {
+      "en": "Drink a glass of water.",
+      "zh": "喝一杯水。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "常見的不可數名詞",
+   "head": [
+    "種類",
+    "例子"
+   ],
+   "rows": [
+    [
+     "液體、物質",
+     "water, milk, blood, rice, sugar"
+    ],
+    [
+     "抽象概念",
+     "advice, information, health, pain, news"
+    ],
+    [
+     "一類東西的總稱",
+     "furniture, luggage, equipment, money"
+    ],
+    [
+     "學科、活動",
+     "homework, work, research, music"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "I have many homeworks.",
+    "good": "I have a lot of homework.",
+    "why": "homework 不可數，不加 s，「很多」用 a lot of 或 much。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "We need some new ___ for the waiting room.",
+    "options": [
+     "furniture",
+     "furnitures",
+     "a furniture"
+    ],
+    "answer": 0,
+    "why": "furniture 不可數。"
+   },
+   {
+    "k": "choose",
+    "q": "How ___ water do you drink a day?",
+    "options": [
+     "many",
+     "much",
+     "few"
+    ],
+    "answer": 1,
+    "why": "water 不可數，問多少用 how much。"
+   },
+   {
+    "k": "fix",
+    "q": "He has a lot of moneys.",
+    "accept": [
+     "He has a lot of money."
+    ],
+    "why": "money 不可數，沒有複數。"
+   }
+  ]
+ },
+ "3-4": {
+  "points": [
+   {
+    "t": "同一個字，可數和不可數意思不同",
+    "p": "glass 不可數是「玻璃」，可數是「杯子」；paper 不可數是「紙」，a paper 是「報紙或報告」；hair 不可數是「頭髮（全部）」，a hair 是「一根頭髮」。",
+    "ex": [
+     {
+      "en": "The window is made of glass.",
+      "zh": "窗戶是玻璃做的。"
+     },
+     {
+      "en": "Can I have a glass of juice?",
+      "zh": "可以給我一杯果汁嗎？"
+     }
+    ]
+   },
+   {
+    "t": "點餐時可以數",
+    "p": "coffee、tea 本來不可數，但點餐時 two coffees 表示「兩杯咖啡」。work 不可數是「工作」，a work 是「作品」。",
+    "ex": [
+     {
+      "en": "Two coffees, please.",
+      "zh": "請給我兩杯咖啡。"
+     },
+     {
+      "en": "I have a lot of work today.",
+      "zh": "我今天有很多工作。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "She has long hairs.",
+    "good": "She has long hair.",
+    "why": "說一個人的頭髮整體用不可數的 hair。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "There is ___ in my soup!",
+    "options": [
+     "a hair",
+     "hair",
+     "hairs"
+    ],
+    "answer": 0,
+    "why": "湯裡的是一根頭髮，可數：a hair。"
+   },
+   {
+    "k": "choose",
+    "q": "I don't have much ___ today, so I can leave early.",
+    "options": [
+     "work",
+     "works",
+     "a work"
+    ],
+    "answer": 0,
+    "why": "「工作量」不可數。"
+   },
+   {
+    "k": "fix",
+    "q": "My grandmother has white hairs.",
+    "accept": [
+     "My grandmother has white hair."
+    ],
+    "why": "整頭頭髮用不可數的 hair。"
+   }
+  ]
+ },
+ "3-5": {
+  "points": [
+   {
+    "t": "大部分名詞加 -s",
+    "p": "nurse → nurses、bed → beds、day → days。字尾是 s、x、sh、ch 的加 -es：box → boxes、watch → watches。",
+    "ex": [
+     {
+      "en": "There are four nurses on duty.",
+      "zh": "有四位護理師值班。"
+     },
+     {
+      "en": "Put the boxes on the shelf.",
+      "zh": "把箱子放到架子上。"
+     }
+    ]
+   },
+   {
+    "t": "y 和 f 的變化",
+    "p": "子音＋y 改成 -ies：baby → babies、city → cities（母音＋y 直接加 s：day → days）。很多 f／fe 結尾改成 -ves：knife → knives、life → lives、leaf → leaves。",
+    "ex": [
+     {
+      "en": "The babies are sleeping.",
+      "zh": "寶寶們在睡覺。"
+     },
+     {
+      "en": "Nurses save lives.",
+      "zh": "護理師拯救生命。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "two babys",
+    "good": "two babies",
+    "why": "子音＋y 結尾，改 y 為 i 再加 es。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "fill",
+    "q": "There are many ___ (city) in Taiwan.",
+    "accept": [
+     "cities"
+    ],
+    "why": "子音＋y：city → cities。"
+   },
+   {
+    "k": "fill",
+    "q": "Please wash these ___ (dish).",
+    "accept": [
+     "dishes"
+    ],
+    "why": "sh 結尾加 es：dishes。"
+   },
+   {
+    "k": "fix",
+    "q": "I bought three knifes.",
+    "accept": [
+     "I bought three knives."
+    ],
+    "why": "knife 的複數是 knives。"
+   }
+  ]
+ },
+ "3-6": {
+  "points": [
+   {
+    "t": "不規則複數要背",
+    "p": "man → men、woman → women、child → children、person → people、tooth → teeth、foot → feet、mouse → mice。",
+    "ex": [
+     {
+      "en": "Three children are waiting outside.",
+      "zh": "外面有三個小孩在等。"
+     },
+     {
+      "en": "Brush your teeth twice a day.",
+      "zh": "一天刷兩次牙。"
+     }
+    ]
+   },
+   {
+    "t": "單複數同形和外來複數",
+    "p": "sheep、fish、deer 單複數一樣。有些字來自拉丁文或希臘文，醫學上常見：bacterium → bacteria、analysis → analyses、diagnosis → diagnoses、criterion → criteria。",
+    "ex": [
+     {
+      "en": "These bacteria can cause infections.",
+      "zh": "這些細菌會造成感染。"
+     },
+     {
+      "en": "We saw two sheep on the farm.",
+      "zh": "我們在農場看到兩隻羊。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "常見不規則複數",
+   "head": [
+    "單數",
+    "複數"
+   ],
+   "rows": [
+    [
+     "man",
+     "men"
+    ],
+    [
+     "woman",
+     "women"
+    ],
+    [
+     "child",
+     "children"
+    ],
+    [
+     "person",
+     "people"
+    ],
+    [
+     "tooth",
+     "teeth"
+    ],
+    [
+     "foot",
+     "feet"
+    ],
+    [
+     "mouse",
+     "mice"
+    ],
+    [
+     "bacterium",
+     "bacteria"
+    ],
+    [
+     "diagnosis",
+     "diagnoses"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "My foots hurt.",
+    "good": "My feet hurt.",
+    "why": "foot 的複數是 feet。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "fill",
+    "q": "There are five ___ (person) in the elevator.",
+    "accept": [
+     "people"
+    ],
+    "why": "person 的複數通常用 people。"
+   },
+   {
+    "k": "choose",
+    "q": "Two ___ are standing at the door.",
+    "options": [
+     "woman",
+     "womans",
+     "women"
+    ],
+    "answer": 2,
+    "why": "woman 的複數是 women。"
+   },
+   {
+    "k": "fix",
+    "q": "The childs are playing outside.",
+    "accept": [
+     "The children are playing outside."
+    ],
+    "why": "child 的複數是 children。"
+   }
+  ]
+ },
+ "3-7": {
+  "points": [
+   {
+    "t": "成對的東西只有複數",
+    "p": "glasses（眼鏡）、scissors、pants、jeans、clothes 總是複數，動詞用複數。要說一件，用 a pair of：a pair of glasses。",
+    "ex": [
+     {
+      "en": "My glasses are on the desk.",
+      "zh": "我的眼鏡在桌上。"
+     },
+     {
+      "en": "I need a pair of scissors.",
+      "zh": "我需要一把剪刀。"
+     }
+    ]
+   },
+   {
+    "t": "看起來是複數，其實是單數",
+    "p": "news、mathematics、physics、diabetes、measles 字尾有 s，但當單數用：The news is good.／Diabetes is a common disease.",
+    "ex": [
+     {
+      "en": "The news is good.",
+      "zh": "是好消息。"
+     },
+     {
+      "en": "Diabetes is a common disease.",
+      "zh": "糖尿病是常見的疾病。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The news are bad.",
+    "good": "The news is bad.",
+    "why": "news 是單數，動詞用 is。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Your jeans ___ dirty.",
+    "options": [
+     "is",
+     "are",
+     "be"
+    ],
+    "answer": 1,
+    "why": "jeans 總是複數，用 are。"
+   },
+   {
+    "k": "choose",
+    "q": "Mathematics ___ my favorite subject.",
+    "options": [
+     "is",
+     "are",
+     "were"
+    ],
+    "answer": 0,
+    "why": "mathematics 是單數。"
+   },
+   {
+    "k": "fix",
+    "q": "Where is my scissors?",
+    "accept": [
+     "Where are my scissors?"
+    ],
+    "why": "scissors 是複數，用 are。"
+   }
+  ]
+ },
+ "3-8": {
+  "points": [
+   {
+    "t": "集合名詞：看成一整個團體",
+    "p": "family、team、staff、class 指一群人。美式英文通常把它當一個整體，用單數動詞：My family is big.",
+    "ex": [
+     {
+      "en": "My family is very supportive.",
+      "zh": "我家人很支持我。"
+     },
+     {
+      "en": "The team has a new coach.",
+      "zh": "球隊有新教練。"
+     }
+    ]
+   },
+   {
+    "t": "強調裡面的每個人時",
+    "p": "英式英文常用複數動詞強調成員：The staff are tired. 另外 police、people 一定用複數：The police are coming.",
+    "ex": [
+     {
+      "en": "The police are on their way.",
+      "zh": "警察在路上了。"
+     },
+     {
+      "en": "Many people are waiting.",
+      "zh": "很多人在等。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The police is here.",
+    "good": "The police are here.",
+    "why": "police 一定用複數動詞。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Many people ___ the flu this winter.",
+    "options": [
+     "has",
+     "have",
+     "is having"
+    ],
+    "answer": 1,
+    "why": "people 是複數，用 have。"
+   },
+   {
+    "k": "choose",
+    "q": "（美式）Our class ___ thirty students.",
+    "options": [
+     "has",
+     "have",
+     "are"
+    ],
+    "answer": 0,
+    "why": "美式把 class 當一個整體，用 has。"
+   },
+   {
+    "k": "fix",
+    "q": "The police is looking for the driver.",
+    "accept": [
+     "The police are looking for the driver."
+    ],
+    "why": "police 用複數動詞 are。"
+   }
+  ]
+ },
+ "3-9": {
+  "points": [
+   {
+    "t": "複合名詞：兩個字合成一個意思",
+    "p": "toothbrush、bus stop、blood pressure、mother-in-law。可能寫成一個字、分開或用連字號，要查字典。",
+    "ex": [
+     {
+      "en": "Check his blood pressure, please.",
+      "zh": "請幫他量血壓。"
+     },
+     {
+      "en": "I bought a new toothbrush.",
+      "zh": "我買了一支新牙刷。"
+     }
+    ]
+   },
+   {
+    "t": "複數加在主要的那個名詞上",
+    "p": "通常加在最後一個字：bus stops、toothbrushes。但「人＋in-law」加在人身上：mothers-in-law、passers-by。",
+    "ex": [
+     {
+      "en": "There are two bus stops near the hospital.",
+      "zh": "醫院附近有兩個公車站。"
+     },
+     {
+      "en": "Both of my sisters-in-law are teachers.",
+      "zh": "我的兩位嫂嫂都是老師。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "two buses stop",
+    "good": "two bus stops",
+    "why": "複合名詞的複數加在後面的主要名詞 stop。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "fill",
+    "q": "We sell many kinds of ___ (toothbrush).",
+    "accept": [
+     "toothbrushes"
+    ],
+    "why": "sh 結尾加 es：toothbrushes。"
+   },
+   {
+    "k": "choose",
+    "q": "His two ___ live in Taichung.",
+    "options": [
+     "brother-in-laws",
+     "brothers-in-law",
+     "brothers-in-laws"
+    ],
+    "answer": 1,
+    "why": "複數加在主要的人 brother 上。"
+   },
+   {
+    "k": "fix",
+    "q": "There are three taxis stand near the station.",
+    "accept": [
+     "There are three taxi stands near the station."
+    ],
+    "why": "複數加在主要名詞 stand 上，前面的 taxi 不變。"
+   }
+  ]
+ },
+ "3-10": {
+  "points": [
+   {
+    "t": "名詞放在名詞前面當形容詞用",
+    "p": "a shoe store、a blood test、a hospital bed：前面的名詞說明是哪一種，通常用單數（不說 a shoes store）。",
+    "ex": [
+     {
+      "en": "The doctor ordered a blood test.",
+      "zh": "醫師安排了抽血檢查。"
+     },
+     {
+      "en": "She works at a shoe store.",
+      "zh": "她在鞋店工作。"
+     }
+    ]
+   },
+   {
+    "t": "數字＋名詞也用單數",
+    "p": "a ten-year-old boy、a two-hour meeting、a five-dollar bill：連字號連起來的修飾語裡，名詞不加 s。",
+    "ex": [
+     {
+      "en": "He is a ten-year-old boy.",
+      "zh": "他是一個十歲的男孩。"
+     },
+     {
+      "en": "We had a two-hour meeting.",
+      "zh": "我們開了兩小時的會。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "a three-days trip",
+    "good": "a three-day trip",
+    "why": "放在名詞前面的修飾語，day 不加 s。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "She has a ___ son.",
+    "options": [
+     "five-years-old",
+     "five-year-old",
+     "five-year-olds"
+    ],
+    "answer": 1,
+    "why": "名詞前的修飾語用單數 year。"
+   },
+   {
+    "k": "choose",
+    "q": "Where is the ___ room?",
+    "options": [
+     "meeting",
+     "meetings",
+     "meeting's"
+    ],
+    "answer": 0,
+    "why": "名詞當修飾語用單數：meeting room。"
+   },
+   {
+    "k": "fix",
+    "q": "It was a four-hours surgery.",
+    "accept": [
+     "It was a four-hour surgery."
+    ],
+    "why": "名詞前的修飾語 four-hour 不加 s。"
+   }
+  ]
+ },
+ "3-11": {
+  "points": [
+   {
+    "t": "名詞片語的三個部分",
+    "p": "前置修飾（放名詞前）＋中心語＋後置修飾（放名詞後）：the｜tall young｜nurse｜in the white coat。",
+    "ex": [
+     {
+      "en": "The tall young nurse in the white coat is Amy.",
+      "zh": "穿白袍的那位高個子年輕護理師是艾美。"
+     },
+     {
+      "en": "I want a cup of hot tea with lemon.",
+      "zh": "我想要一杯加檸檬的熱茶。"
+     }
+    ]
+   },
+   {
+    "t": "比較長的說明放在名詞後面",
+    "p": "介系詞片語、關係子句、分詞片語通常放在名詞後面：a man with a cane、the patient who fell、the woman sitting there。",
+    "ex": [
+     {
+      "en": "The man with a cane is my grandfather.",
+      "zh": "拿拐杖的那位男士是我爺爺。"
+     },
+     {
+      "en": "The woman sitting there is a doctor.",
+      "zh": "坐在那裡的女士是醫生。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "the in the corner man",
+    "good": "the man in the corner",
+    "why": "介系詞片語要放在名詞後面。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「the old house on the hill」的中心語是 ___。",
+    "options": [
+     "old",
+     "house",
+     "hill"
+    ],
+    "answer": 1,
+    "why": "整個片語在說一棟房子。"
+   },
+   {
+    "k": "choose",
+    "q": "正確的順序是 ___。",
+    "options": [
+     "a red big ball",
+     "a big red ball",
+     "a ball big red"
+    ],
+    "answer": 1,
+    "why": "大小在顏色前面：a big red ball。"
+   },
+   {
+    "k": "fix",
+    "q": "The with glasses girl is my sister.",
+    "accept": [
+     "The girl with glasses is my sister."
+    ],
+    "why": "介系詞片語 with glasses 放在名詞 girl 後面。"
+   }
+  ]
+ },
+ "3-12": {
+  "points": [
+   {
+    "t": "名詞後面接介系詞片語當補語",
+    "p": "有些名詞需要後面的介系詞片語把意思說完：a cause of the fire、an answer to the question、interest in music。",
+    "ex": [
+     {
+      "en": "What is the cause of the fever?",
+      "zh": "發燒的原因是什麼？"
+     },
+     {
+      "en": "I found the answer to his question.",
+      "zh": "我找到了他問題的答案。"
+     }
+    ]
+   },
+   {
+    "t": "接不定詞或 that 子句",
+    "p": "名詞後面可以接 to 不定詞（a chance to rest、a plan to travel）或 that 子句說明內容（the news that she passed）。",
+    "ex": [
+     {
+      "en": "This is a good chance to rest.",
+      "zh": "這是休息的好機會。"
+     },
+     {
+      "en": "We heard the news that she passed the exam.",
+      "zh": "我們聽到她考試通過的消息。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "the answer of the question",
+    "good": "the answer to the question",
+    "why": "answer 後面接 to。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Do you know the reason ___ his absence?",
+    "options": [
+     "for",
+     "to",
+     "at"
+    ],
+    "answer": 0,
+    "why": "reason 後面接 for。"
+   },
+   {
+    "k": "choose",
+    "q": "She has a plan ___ abroad.",
+    "options": [
+     "study",
+     "to study",
+     "studying"
+    ],
+    "answer": 1,
+    "why": "plan 後面接 to 不定詞說明內容。"
+   },
+   {
+    "k": "fix",
+    "q": "He has no interest on sports.",
+    "accept": [
+     "He has no interest in sports."
+    ],
+    "why": "interest 後面接 in。"
+   }
+  ]
+ },
+ "3-13": {
+  "points": [
+   {
+    "t": "同位語：換個說法說明同一個人",
+    "p": "名詞後面再放一個名詞片語說明它是誰：Dr. Chen, my family doctor, is very kind. 兩個指的是同一個人，中間常用逗號隔開。",
+    "ex": [
+     {
+      "en": "Dr. Chen, my family doctor, is very kind.",
+      "zh": "陳醫師，我的家庭醫師，人很好。"
+     },
+     {
+      "en": "I visited Hualien, a city on the east coast.",
+      "zh": "我去了花蓮，一個東海岸的城市。"
+     }
+    ]
+   },
+   {
+    "t": "只有一個可能的人，就不用逗號",
+    "p": "my friend Amy（我有好幾個朋友，是叫 Amy 的那個）不加逗號；如果只是補充說明就加逗號：my mother, Mary, ...",
+    "ex": [
+     {
+      "en": "My friend Amy is a pharmacist.",
+      "zh": "我朋友艾美是藥師。"
+     },
+     {
+      "en": "My mother, Mary, is a teacher.",
+      "zh": "我媽媽瑪麗是老師。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Taipei is the capital of Taiwan, it is a busy city.",
+    "good": "Taipei, the capital of Taiwan, is a busy city.",
+    "why": "兩個完整句子不能只用逗號接；可以把一句改成同位語。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「Mr. Wang, our new teacher, is from Tainan.」的同位語是 ___。",
+    "options": [
+     "Mr. Wang",
+     "our new teacher",
+     "from Tainan"
+    ],
+    "answer": 1,
+    "why": "our new teacher 在說明 Mr. Wang 是誰。"
+   },
+   {
+    "k": "choose",
+    "q": "Sun Moon Lake, ___, is in Nantou.",
+    "options": [
+     "a famous lake",
+     "is a famous lake",
+     "it is a famous lake"
+    ],
+    "answer": 0,
+    "why": "同位語是名詞片語，沒有動詞。"
+   },
+   {
+    "k": "fix",
+    "q": "My brother, he is a nurse, works at night.",
+    "accept": [
+     "My brother, a nurse, works at night.",
+     "My brother, who is a nurse, works at night."
+    ],
+    "why": "同位語是名詞片語，不能放完整句子 he is a nurse。"
+   }
+  ]
+ },
+ "3-14": {
+  "points": [
+   {
+    "t": "不可數名詞用單位來數",
+    "p": "a piece of paper、a cup of tea、a glass of water、a bottle of milk、a slice of bread、a piece of advice。複數加在單位上：two cups of tea。",
+    "ex": [
+     {
+      "en": "Can I have a piece of paper?",
+      "zh": "可以給我一張紙嗎？"
+     },
+     {
+      "en": "She drinks two cups of tea every day.",
+      "zh": "她每天喝兩杯茶。"
+     }
+    ]
+   },
+   {
+    "t": "成對的東西用 a pair of",
+    "p": "a pair of glasses、two pairs of socks。動詞跟著 pair：A pair of shoes is under the bed.",
+    "ex": [
+     {
+      "en": "I need a new pair of glasses.",
+      "zh": "我需要一副新眼鏡。"
+     },
+     {
+      "en": "He bought two pairs of socks.",
+      "zh": "他買了兩雙襪子。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "two breads",
+    "good": "two slices of bread",
+    "why": "bread 不可數，要用單位 slice 或 loaf 來數。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Please give the patient a ___ of water.",
+    "options": [
+     "glass",
+     "piece",
+     "pair"
+    ],
+    "answer": 0,
+    "why": "水用 a glass of。"
+   },
+   {
+    "k": "fill",
+    "q": "I bought three ___ (bottle) of juice.",
+    "accept": [
+     "bottles"
+    ],
+    "why": "複數加在單位上：three bottles of juice。"
+   },
+   {
+    "k": "fix",
+    "q": "She gave me two good advices.",
+    "accept": [
+     "She gave me two good pieces of advice."
+    ],
+    "why": "advice 不可數，用 pieces of advice 來數。"
+   }
+  ]
+ },
+ "3-15": {
+  "points": [
+   {
+    "t": "人和動物用 's",
+    "p": "單數名詞加 's：the nurse's bag。複數 -s 結尾只加 '：the nurses' room。不規則複數加 's：the children's ward、women's health。",
+    "ex": [
+     {
+      "en": "This is the nurses' station.",
+      "zh": "這是護理站。"
+     },
+     {
+      "en": "She works in the children's ward.",
+      "zh": "她在兒科病房工作。"
+     }
+    ]
+   },
+   {
+    "t": "東西常用 of",
+    "p": "沒有生命的東西多用 of：the leg of the table、the end of the street、the name of the medicine。",
+    "ex": [
+     {
+      "en": "What is the name of this medicine?",
+      "zh": "這個藥叫什麼名字？"
+     },
+     {
+      "en": "Turn left at the end of the street.",
+      "zh": "在街的盡頭左轉。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "the childrens' toys",
+    "good": "the children's toys",
+    "why": "children 已經是複數，直接加 's。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "This is my ___ car.（我爸媽的車）",
+    "options": [
+     "parent's",
+     "parents'",
+     "parents's"
+    ],
+    "answer": 1,
+    "why": "parents 是 -s 結尾的複數，只加 '。"
+   },
+   {
+    "k": "fill",
+    "q": "This is ___ (Amy) stethoscope.",
+    "accept": [
+     "Amy's"
+    ],
+    "why": "人名加 's。"
+   },
+   {
+    "k": "fix",
+    "q": "The womens' room is on the left.",
+    "accept": [
+     "The women's room is on the left."
+    ],
+    "why": "women 是不規則複數，加 's。"
+   }
+  ]
+ },
+ "3-16": {
+  "points": [
+   {
+    "t": "共同擁有：只在最後一個人加 's",
+    "p": "Tom and Amy's house 是兩個人一起擁有的同一間房子。",
+    "ex": [
+     {
+      "en": "Tom and Amy's house is near the park.",
+      "zh": "湯姆和艾美（兩人共有）的房子在公園附近。"
+     },
+     {
+      "en": "We went to Mom and Dad's room.",
+      "zh": "我們去了爸媽的房間。"
+     }
+    ]
+   },
+   {
+    "t": "各自擁有：每個人都加 's",
+    "p": "Tom's and Amy's phones 是兩個人各自的手機，名詞用複數。",
+    "ex": [
+     {
+      "en": "Tom's and Amy's phones are on the table.",
+      "zh": "湯姆的和艾美的手機（各一支）在桌上。"
+     },
+     {
+      "en": "The doctor checked Ben's and Leo's charts.",
+      "zh": "醫師看了班和李奧各自的病歷。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "John's and Mary's wedding",
+    "good": "John and Mary's wedding",
+    "why": "兩個人是同一場婚禮，只在最後加 's。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "（兩人共開一家店）This is ___ bakery.",
+    "options": [
+     "Ken and Lisa's",
+     "Ken's and Lisa's",
+     "Ken's and Lisa"
+    ],
+    "answer": 0,
+    "why": "共同擁有，只在最後一個人加 's。"
+   },
+   {
+    "k": "choose",
+    "q": "（兩人各有一台車）___ cars are both white.",
+    "options": [
+     "Sam and Joe's",
+     "Sam's and Joe's",
+     "Sam and Joe"
+    ],
+    "answer": 1,
+    "why": "各自擁有，每個人都加 's。"
+   },
+   {
+    "k": "fix",
+    "q": "My mom's and dad's anniversary is today.",
+    "accept": [
+     "My mom and dad's anniversary is today."
+    ],
+    "why": "同一個結婚紀念日是兩人共有的，只在最後加 's。"
+   }
+  ]
+ },
+ "3-17": {
+  "points": [
+   {
+    "t": "a friend of mine：我的朋友之一",
+    "p": "a／some／this＋名詞＋of＋所有代名詞（mine、yours、his、hers、ours、theirs）。不能說 a my friend。",
+    "ex": [
+     {
+      "en": "A friend of mine is a nurse in Canada.",
+      "zh": "我的一個朋友是加拿大的護理師。"
+     },
+     {
+      "en": "Those friends of yours are very funny.",
+      "zh": "你那些朋友很有趣。"
+     }
+    ]
+   },
+   {
+    "t": "名詞也可以用 of＋名詞's",
+    "p": "a cousin of Tom's（湯姆的一位表親）、a patient of Dr. Lin's（林醫師的一位病人）。",
+    "ex": [
+     {
+      "en": "She is a patient of Dr. Lin's.",
+      "zh": "她是林醫師的病人之一。"
+     },
+     {
+      "en": "He is a cousin of Amy's.",
+      "zh": "他是艾美的一位表哥。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "He is a my classmate.",
+    "good": "He is a classmate of mine.",
+    "why": "a 和 my 不能放在一起；用 a classmate of mine。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "She is an old friend of ___.",
+    "options": [
+     "my",
+     "me",
+     "mine"
+    ],
+    "answer": 2,
+    "why": "a friend of＋所有代名詞 mine。"
+   },
+   {
+    "k": "choose",
+    "q": "Is he a neighbor of ___?",
+    "options": [
+     "your",
+     "yours",
+     "you"
+    ],
+    "answer": 1,
+    "why": "of 後面用所有代名詞 yours。"
+   },
+   {
+    "k": "fix",
+    "q": "A my cousin works in Japan.",
+    "accept": [
+     "A cousin of mine works in Japan.",
+     "My cousin works in Japan."
+    ],
+    "why": "a 和 my 不能連用：a cousin of mine。"
+   }
+  ]
+ },
+ "3-18": {
+  "points": [
+   {
+    "t": "所有格後面的名詞可以省略",
+    "p": "上下文已經知道是什麼時，'s 後面的名詞可以不說：This bag is Amy's.（Amy's bag）。",
+    "ex": [
+     {
+      "en": "This bag is not mine. It's Amy's.",
+      "zh": "這個包包不是我的，是艾美的。"
+     },
+     {
+      "en": "My score is higher than Tom's.",
+      "zh": "我的分數比湯姆的高。"
+     }
+    ]
+   },
+   {
+    "t": "店、家、診所",
+    "p": "at the doctor's（在診所）、at the dentist's、at my aunt's（在阿姨家），省略了 office、house。",
+    "ex": [
+     {
+      "en": "I was at the dentist's this morning.",
+      "zh": "我今天早上在牙醫那裡。"
+     },
+     {
+      "en": "We stayed at my grandma's last night.",
+      "zh": "我們昨晚住在奶奶家。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "My phone is newer than Tom.",
+    "good": "My phone is newer than Tom's.",
+    "why": "比較的是手機，要說 Tom's（湯姆的手機），不是 Tom 這個人。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Whose coat is this? It's ___.",
+    "options": [
+     "Lisa",
+     "Lisa's",
+     "Lisas"
+    ],
+    "answer": 1,
+    "why": "Lisa's＝Lisa's coat。"
+   },
+   {
+    "k": "choose",
+    "q": "I have an appointment at the ___ tomorrow.",
+    "options": [
+     "doctor",
+     "doctor's",
+     "doctors"
+    ],
+    "answer": 1,
+    "why": "at the doctor's＝在醫師的診所。"
+   },
+   {
+    "k": "fix",
+    "q": "Her English is better than her brother.",
+    "accept": [
+     "Her English is better than her brother's."
+    ],
+    "why": "比較的是英文，要說 her brother's（他哥哥的英文）。"
+   }
+  ]
+ },
+ "3-19": {
+  "points": [
+   {
+    "t": "時間也可以用 's",
+    "p": "today's news、yesterday's meeting、a week's vacation、two weeks' notice（複數只加 '）。",
+    "ex": [
+     {
+      "en": "Did you read today's news?",
+      "zh": "你看了今天的新聞嗎？"
+     },
+     {
+      "en": "She took a week's vacation.",
+      "zh": "她休了一週的假。"
+     }
+    ]
+   },
+   {
+    "t": "距離、機構、城市",
+    "p": "ten minutes' walk（走十分鐘的距離，也可說 a ten-minute walk）、the hospital's policy、Taipei's population。",
+    "ex": [
+     {
+      "en": "The station is ten minutes' walk from here.",
+      "zh": "車站離這裡走路十分鐘。"
+     },
+     {
+      "en": "The hospital's visiting hours are from two to eight.",
+      "zh": "醫院的探病時間是兩點到八點。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "yesterdays meeting",
+    "good": "yesterday's meeting",
+    "why": "時間的所有格要加 's。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Did you finish ___ homework?",
+    "options": [
+     "today",
+     "today's",
+     "todays"
+    ],
+    "answer": 1,
+    "why": "時間所有格：today's homework。"
+   },
+   {
+    "k": "choose",
+    "q": "The beach is only five ___ drive from here.",
+    "options": [
+     "minute's",
+     "minutes'",
+     "minutes's"
+    ],
+    "answer": 1,
+    "why": "minutes 是複數，所有格只加 '。"
+   },
+   {
+    "k": "fix",
+    "q": "He needs two week's rest.",
+    "accept": [
+     "He needs two weeks' rest."
+    ],
+    "why": "two weeks 是複數，所有格是 weeks'。"
+   }
+  ]
+ }
+}

@@ -56,7 +56,8 @@ import { speakEnglish } from "../lib/tts";
 import ReadingPath from "../components/ReadingPath";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
-import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/GrammarTeach";
+import GrammarTeach, { GrammarExplain } from "../components/GrammarTeach";
+import GrammarHome from "../components/GrammarHome";
 import StoryLibrary from "../components/StoryLibrary";
 import ThemeReview from "../components/ThemeReview";
 import Pronunciation from "../components/Pronunciation";
@@ -933,9 +934,8 @@ function Extras({
   // #library/writing/<task id> opens that task (from a unit's pack).
   const taskFromHash = () => location.hash.startsWith("#library/writing/") ? location.hash.split("/")[2] : undefined;
   const [writingTask, setWritingTask] = useState<string | undefined>(taskFromHash);
-  // #library/grammar/<unit> opens that unit's teaching (from 主題總複習).
-  const grammarFromHash = () => { const n = Number(location.hash.split("/")[2]); return location.hash.startsWith("#library/grammar/") && Number.isInteger(n) && n > 0 ? n : undefined; };
-  const [grammarUnit, setGrammarUnit] = useState<number | undefined>(grammarFromHash);
+  // #library/grammar opens 完整文法; /<unit> a course unit's teaching (from 主題總複習), /<section> like 14-2 that section.
+  const [grammarHash, setGrammarHash] = useState(() => location.hash);
   // #library/case/<subject id> and #library/quiz/<subject id>: only that licensing-exam subject (from 國考科目).
   const subjectFromHash = () => {
     const [, page, id] = location.hash.replace(/^#/, "").split("/");
@@ -949,7 +949,7 @@ function Extras({
       if (location.hash.startsWith("#library/words/")) setWordSkill(skillFromHash());
       if (location.hash.startsWith("#library/writing")) setWritingTask(taskFromHash());
       if (location.hash.startsWith("#library/story")) setStoryTab(storyFromHash());
-      if (location.hash.startsWith("#library/grammar")) setGrammarUnit(grammarFromHash());
+      if (location.hash.startsWith("#library/grammar")) setGrammarHash(location.hash);
       if (location.hash.startsWith("#library/case") || location.hash.startsWith("#library/quiz")) setExamSubject(subjectFromHash());
     };
     onHash();
@@ -1225,7 +1225,7 @@ function Extras({
       {mode === "passage" && (
         <PassageLibrary state={state} onActivity={onActivity} />
       )}
-      {mode === "grammar" && <GrammarBook key={grammarUnit ?? "book"} initialUnit={grammarUnit} state={state} onActivity={onActivity} date={date} />}
+      {mode === "grammar" && <GrammarHome hash={grammarHash} state={state} onActivity={onActivity} date={date} />}
       {mode === "theme" && <ThemeReview state={state} onActivity={onActivity} date={date} sessionId={sessionId} />}
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}

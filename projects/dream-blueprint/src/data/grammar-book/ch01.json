@@ -1,0 +1,966 @@
+{
+ "1-1": {
+  "points": [
+   {
+    "t": "四種大小：單字、片語、子句、句子",
+    "p": "單字是一個字（nurse）。片語是幾個字一起用，但沒有「主詞＋動詞」（the new nurse、in the morning）。子句有主詞和動詞（the nurse came）。句子是意思完整的一句，開頭大寫，最後有句點、問號或驚嘆號。",
+    "ex": [
+     {
+      "en": "The new nurse came in the morning.",
+      "zh": "新來的護理師早上來了。"
+     },
+     {
+      "en": "Good morning!",
+      "zh": "早安！（打招呼的短句）"
+     }
+    ]
+   },
+   {
+    "t": "一個句子可以有好幾個子句",
+    "p": "because I worked late 有主詞 I 和動詞 worked，是一個子句；但它不能自己成為一句，要接在 I was tired 這種能自己站的子句後面。",
+    "ex": [
+     {
+      "en": "I was tired because I worked late.",
+      "zh": "我很累，因為我工作到很晚。"
+     },
+     {
+      "en": "She smiled when she saw her son.",
+      "zh": "她看到兒子時笑了。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Because I was sick.",
+    "good": "I stayed home because I was sick.",
+    "why": "because 開頭的子句不能自己當一句，要接一個能自己站的子句。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「in the morning」是 ___。",
+    "options": [
+     "片語",
+     "子句",
+     "句子"
+    ],
+    "answer": 0,
+    "why": "它沒有主詞和動詞，是片語。"
+   },
+   {
+    "k": "choose",
+    "q": "「she was hungry」有主詞 she 和動詞 was，是 ___。",
+    "options": [
+     "單字",
+     "片語",
+     "子句"
+    ],
+    "answer": 2,
+    "why": "有主詞＋動詞就是子句。"
+   },
+   {
+    "k": "choose",
+    "q": "下面哪一個是完整的句子？___",
+    "options": [
+     "Because I was late.",
+     "I was late.",
+     "In the morning."
+    ],
+    "answer": 1,
+    "why": "I was late. 有主詞和動詞，意思完整，可以自己成為一句。"
+   }
+  ]
+ },
+ "1-2": {
+  "points": [
+   {
+    "t": "八大詞類",
+    "p": "名詞（nurse）、代名詞（she）、動詞（help）、形容詞（kind）、副詞（quickly）、介系詞（in）、連接詞（and）、感嘆詞（oh）。看一個字在句子裡做什麼，就知道它是哪一類。",
+    "ex": [
+     {
+      "en": "She quickly helped the old man.",
+      "zh": "她很快地幫了那位老先生。"
+     },
+     {
+      "en": "Oh, the room is cold and dark.",
+      "zh": "噢，房間又冷又暗。"
+     }
+    ]
+   },
+   {
+    "t": "限定詞另外算一類",
+    "p": "a、the、this、my、some、every 放在名詞前面，告訴你「哪一個、多少、是誰的」。現在很多文法書把它們合成「限定詞」一類，不放在形容詞裡。",
+    "ex": [
+     {
+      "en": "This patient needs some water.",
+      "zh": "這位病人需要一些水。"
+     },
+     {
+      "en": "My brother has a cat.",
+      "zh": "我哥哥有一隻貓。"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "詞類一覽",
+   "head": [
+    "詞類",
+    "做什麼",
+    "例子"
+   ],
+   "rows": [
+    [
+     "名詞",
+     "人、事、物的名字",
+     "nurse, water, Taipei"
+    ],
+    [
+     "代名詞",
+     "代替名詞",
+     "she, it, them"
+    ],
+    [
+     "動詞",
+     "動作或狀態",
+     "help, is, have"
+    ],
+    [
+     "形容詞",
+     "描述名詞",
+     "kind, tired, new"
+    ],
+    [
+     "副詞",
+     "描述動詞、形容詞或整句",
+     "quickly, very, often"
+    ],
+    [
+     "介系詞",
+     "放在名詞前，表示地點、時間等關係",
+     "in, on, at, with"
+    ],
+    [
+     "連接詞",
+     "連接字詞或子句",
+     "and, but, because"
+    ],
+    [
+     "感嘆詞",
+     "表達情緒",
+     "oh, wow, ouch"
+    ],
+    [
+     "限定詞",
+     "放在名詞前，說哪一個、多少",
+     "a, the, my, some"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "He speaks English good.",
+    "good": "He speaks English well.",
+    "why": "描述動詞 speaks 要用副詞 well；good 是形容詞。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「quickly」是 ___。",
+    "options": [
+     "形容詞",
+     "副詞",
+     "動詞"
+    ],
+    "answer": 1,
+    "why": "quickly 描述動作做得怎麼樣，是副詞。"
+   },
+   {
+    "k": "choose",
+    "q": "「The patient is in bed.」裡的 in 是 ___。",
+    "options": [
+     "介系詞",
+     "連接詞",
+     "動詞"
+    ],
+    "answer": 0,
+    "why": "in 放在名詞 bed 前面，表示位置，是介系詞。"
+   },
+   {
+    "k": "choose",
+    "q": "a、the、this、my 都屬於 ___。",
+    "options": [
+     "限定詞",
+     "副詞",
+     "連接詞"
+    ],
+    "answer": 0,
+    "why": "它們放在名詞前面，說明哪一個、是誰的，是限定詞。"
+   }
+  ]
+ },
+ "1-3": {
+  "points": [
+   {
+    "t": "詞類看「是什麼字」，句子成分看「在句子裡當什麼」",
+    "p": "詞類是一個字本來的種類（nurse 是名詞）。句子成分是它在這一句裡的工作：主詞、動詞、受詞、補語、修飾語。同一個名詞可以當主詞，也可以當受詞。",
+    "ex": [
+     {
+      "en": "The nurse helped me.",
+      "zh": "那位護理師幫了我。（nurse 當主詞）"
+     },
+     {
+      "en": "I thanked the nurse.",
+      "zh": "我謝謝那位護理師。（nurse 當受詞）"
+     }
+    ]
+   },
+   {
+    "t": "同一個字可以有不同詞類",
+    "p": "water 可以是名詞（喝的水），也可以是動詞（澆水）。看它在句子裡的位置和工作來判斷。",
+    "ex": [
+     {
+      "en": "I need some water.",
+      "zh": "我需要一些水。（名詞）"
+     },
+     {
+      "en": "Please water the plants.",
+      "zh": "請幫植物澆水。（動詞）"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I very like tea.",
+    "good": "I like tea very much.",
+    "why": "very 是副詞，不能直接放在動詞 like 前面當「很」；要說 like ... very much。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「The doctor called me.」裡的 me 在句子裡當 ___。",
+    "options": [
+     "主詞",
+     "受詞",
+     "動詞"
+    ],
+    "answer": 1,
+    "why": "me 是動作 called 的對象，是受詞。"
+   },
+   {
+    "k": "choose",
+    "q": "「Please water the plants.」裡的 water 是 ___。",
+    "options": [
+     "名詞",
+     "動詞",
+     "形容詞"
+    ],
+    "answer": 1,
+    "why": "放在 please 後面、後面接受詞 the plants，是動詞「澆水」。"
+   },
+   {
+    "k": "choose",
+    "q": "「My sister is a nurse.」裡當主詞的是 ___。",
+    "options": [
+     "My sister",
+     "is",
+     "a nurse"
+    ],
+    "answer": 0,
+    "why": "句子在說誰——我姊姊，My sister 是主詞。"
+   }
+  ]
+ },
+ "1-4": {
+  "points": [
+   {
+    "t": "片語用它最重要的那個字命名",
+    "p": "名詞片語以名詞為主（a very kind nurse）；動詞片語以動詞為主（has been working）；形容詞片語以形容詞為主（very tired）；副詞片語以副詞為主（very slowly）；介系詞片語是介系詞加後面的名詞（in the hospital）。",
+    "ex": [
+     {
+      "en": "A very kind nurse works in the hospital.",
+      "zh": "一位很親切的護理師在醫院工作。"
+     },
+     {
+      "en": "He walked very slowly.",
+      "zh": "他走得很慢。"
+     }
+    ]
+   },
+   {
+    "t": "片語整組當一個成分用",
+    "p": "a very kind nurse 整組是主詞；in the hospital 整組說明地點。找句子成分時，先把片語框起來，句子就清楚了。",
+    "ex": [
+     {
+      "en": "The old man in room five is my grandfather.",
+      "zh": "五號房那位老先生是我爺爺。"
+     },
+     {
+      "en": "She is very tired today.",
+      "zh": "她今天很累。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The man in room five are my grandfather.",
+    "good": "The man in room five is my grandfather.",
+    "why": "主詞是整個片語 the man in room five，中心是單數的 man，配 is。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「in the hospital」是 ___。",
+    "options": [
+     "名詞片語",
+     "介系詞片語",
+     "動詞片語"
+    ],
+    "answer": 1,
+    "why": "介系詞 in 加名詞片語 the hospital，是介系詞片語。"
+   },
+   {
+    "k": "choose",
+    "q": "「a very kind nurse」是 ___。",
+    "options": [
+     "名詞片語",
+     "形容詞片語",
+     "副詞片語"
+    ],
+    "answer": 0,
+    "why": "最重要的字是名詞 nurse，所以是名詞片語。"
+   },
+   {
+    "k": "fix",
+    "q": "The box on the tables are heavy.",
+    "accept": [
+     "The box on the tables is heavy."
+    ],
+    "why": "主詞的中心是單數的 box，on the tables 只是修飾，動詞用 is。"
+   }
+  ]
+ },
+ "1-5": {
+  "points": [
+   {
+    "t": "中心語是片語的核心",
+    "p": "the tall nurse with glasses 這個片語，核心是 nurse，叫中心語；the、tall、with glasses 都是圍著它的依附成分。",
+    "ex": [
+     {
+      "en": "The tall nurse with glasses is my aunt.",
+      "zh": "戴眼鏡的那位高個子護理師是我阿姨。"
+     },
+     {
+      "en": "I bought a cup of hot tea.",
+      "zh": "我買了一杯熱茶。"
+     }
+    ]
+   },
+   {
+    "t": "修飾語可以拿掉，補語通常不能少",
+    "p": "修飾語只是多加說明（tall、with glasses 拿掉句子還成立）。補語是中心語需要的成分：afraid of dogs 的 of dogs、put it on the table 的 on the table，拿掉意思就不完整。",
+    "ex": [
+     {
+      "en": "She is afraid of dogs.",
+      "zh": "她怕狗。"
+     },
+     {
+      "en": "Put the cup on the table.",
+      "zh": "把杯子放在桌上。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Put the cup.",
+    "good": "Put the cup on the table.",
+    "why": "put 一定要說放在哪裡，地點是必要的補足成分，不能省。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「the old man in the wheelchair」的中心語是 ___。",
+    "options": [
+     "old",
+     "man",
+     "wheelchair"
+    ],
+    "answer": 1,
+    "why": "整個片語在說一個人，核心是 man。"
+   },
+   {
+    "k": "choose",
+    "q": "「She is afraid of dogs.」裡的 of dogs 是 ___，拿掉意思就不完整。",
+    "options": [
+     "修飾語",
+     "補語",
+     "主詞"
+    ],
+    "answer": 1,
+    "why": "afraid 需要說怕什麼，of dogs 是它的補語。"
+   },
+   {
+    "k": "fix",
+    "q": "Please put the medicine.",
+    "accept": [
+     "Please put the medicine on the table.",
+     "Please put the medicine in the box.",
+     "Please put the medicine here.",
+     "Please put the medicine there."
+    ],
+    "why": "put 後面要接放的東西，還要說放在哪裡。"
+   }
+  ]
+ },
+ "1-6": {
+  "points": [
+   {
+    "t": "主要子句能自己成為一句",
+    "p": "主要子句有主詞和動詞，意思完整（I went home）。",
+    "ex": [
+     {
+      "en": "I went home.",
+      "zh": "我回家了。"
+     },
+     {
+      "en": "The baby is sleeping.",
+      "zh": "寶寶在睡覺。"
+     }
+    ]
+   },
+   {
+    "t": "從屬子句要靠主要子句",
+    "p": "because、when、if、that 這類字開頭的子句是從屬子句（because I was tired），它有主詞和動詞，但要接在主要子句上才完整。",
+    "ex": [
+     {
+      "en": "I went home because I was tired.",
+      "zh": "我回家了，因為我很累。"
+     },
+     {
+      "en": "If it rains, we will stay inside.",
+      "zh": "如果下雨，我們就待在室內。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "When I got home. I took a shower.",
+    "good": "When I got home, I took a shower.",
+    "why": "when 子句不能自己成為一句，要用逗號接上主要子句。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「I stayed home because I was sick.」的主要子句是 ___。",
+    "options": [
+     "I stayed home",
+     "because I was sick",
+     "I was sick"
+    ],
+    "answer": 0,
+    "why": "I stayed home 能自己成為一句，是主要子句。"
+   },
+   {
+    "k": "choose",
+    "q": "下面哪一個是從屬子句？___",
+    "options": [
+     "she is a nurse",
+     "if you are hungry",
+     "we ate dinner"
+    ],
+    "answer": 1,
+    "why": "if 開頭的子句要接主要子句，是從屬子句。"
+   },
+   {
+    "k": "choose",
+    "q": "下面哪一個寫法正確？___",
+    "options": [
+     "If you feel dizzy. Sit down.",
+     "If you feel dizzy, sit down.",
+     "If you feel dizzy and sit down."
+    ],
+    "answer": 1,
+    "why": "if 子句不能自己成為一句，用逗號接上後面的主要子句。"
+   }
+  ]
+ },
+ "1-7": {
+  "points": [
+   {
+    "t": "限定動詞子句：動詞有時態",
+    "p": "動詞有現在、過去等時態，會跟著主詞變化（she works、he worked），這種子句叫限定動詞子句（finite）。一般句子都是這種。",
+    "ex": [
+     {
+      "en": "She works at night.",
+      "zh": "她晚上上班。"
+     },
+     {
+      "en": "He worked yesterday.",
+      "zh": "他昨天有上班。"
+     }
+    ]
+   },
+   {
+    "t": "非限定動詞子句：to V、V-ing、p.p.",
+    "p": "to take the medicine、taking a break、written in English 這些動詞不顯示時態，叫非限定動詞子句（non-finite），要跟著主要子句用。還有一種沒有動詞的「無動詞子句」，像 if possible、when in doubt。",
+    "ex": [
+     {
+      "en": "I forgot to take the medicine.",
+      "zh": "我忘了吃藥。"
+     },
+     {
+      "en": "Call me if possible.",
+      "zh": "可以的話打給我。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "I want go home.",
+    "good": "I want to go home.",
+    "why": "want 後面接 to 不定詞，go 前面要有 to。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「She plays the piano.」的 plays 是 ___ 動詞。",
+    "options": [
+     "限定",
+     "非限定",
+     "沒有"
+    ],
+    "answer": 0,
+    "why": "plays 有現在時態、跟著主詞 she 變化，是限定動詞。"
+   },
+   {
+    "k": "choose",
+    "q": "「I hope to see you soon.」裡的 to see you soon 是 ___ 子句。",
+    "options": [
+     "限定動詞",
+     "非限定動詞",
+     "無動詞"
+    ],
+    "answer": 1,
+    "why": "to see 不顯示時態，是非限定動詞子句。"
+   },
+   {
+    "k": "fill",
+    "q": "I want ___ (go) home now.",
+    "accept": [
+     "to go"
+    ],
+    "why": "want 後面接 to＋原形動詞。"
+   }
+  ]
+ },
+ "1-8": {
+  "points": [
+   {
+    "t": "人稱和數",
+    "p": "第一人稱是說話的人（I、we），第二人稱是聽話的人（you），第三人稱是其他人或東西（he、she、it、they）。數就是單數或複數（a nurse／two nurses）。動詞常跟著人稱和數變化：he works、they work。",
+    "ex": [
+     {
+      "en": "He works on Sundays.",
+      "zh": "他星期天上班。"
+     },
+     {
+      "en": "They work on Sundays.",
+      "zh": "他們星期天上班。"
+     }
+    ]
+   },
+   {
+    "t": "格和所有關係",
+    "p": "代名詞有主格（I、she）和受格（me、her）：主詞用主格，受詞和介系詞後面用受格。表示「誰的」用所有格：my、her，名詞加 's（Amy's bag）。",
+    "ex": [
+     {
+      "en": "She called me yesterday.",
+      "zh": "她昨天打給我。"
+     },
+     {
+      "en": "This is Amy's bag.",
+      "zh": "這是艾美的包包。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Me and my sister are nurses.",
+    "good": "My sister and I are nurses.",
+    "why": "當主詞要用主格 I；禮貌上通常把自己放後面。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "Please give the report to ___.",
+    "options": [
+     "I",
+     "me",
+     "my"
+    ],
+    "answer": 1,
+    "why": "介系詞 to 後面用受格 me。"
+   },
+   {
+    "k": "fill",
+    "q": "This is ___ (Tom 的) phone.",
+    "accept": [
+     "Tom's"
+    ],
+    "why": "名詞的所有格加 's：Tom's。"
+   },
+   {
+    "k": "fix",
+    "q": "Her is my sister.",
+    "accept": [
+     "She is my sister."
+    ],
+    "why": "當主詞要用主格 she，her 是受格或所有格。"
+   }
+  ]
+ },
+ "1-9": {
+  "points": [
+   {
+    "t": "時態和體貌：什麼時候、做到哪裡",
+    "p": "時態說時間：現在（I work）、過去（I worked）。體貌說動作的樣子：進行中（I am working）、已經完成（I have worked）。學「現在進行式」時，其實就是現在時態加進行體貌。",
+    "ex": [
+     {
+      "en": "I am working now.",
+      "zh": "我現在正在工作。"
+     },
+     {
+      "en": "I have finished my report.",
+      "zh": "我已經寫完報告了。"
+     }
+    ]
+   },
+   {
+    "t": "語態和語氣",
+    "p": "語態分主動（The nurse cleaned the room.）和被動（The room was cleaned.）。語氣分直述（陳述事實）、祈使（Sit down.）和假設（If I were you, ...）。",
+    "ex": [
+     {
+      "en": "The room was cleaned this morning.",
+      "zh": "房間今天早上被打掃過了。"
+     },
+     {
+      "en": "Please sit down.",
+      "zh": "請坐。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "The room cleaned yesterday.",
+    "good": "The room was cleaned yesterday.",
+    "why": "房間是被打掃的，要用被動 was cleaned。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「She is reading now.」表示動作 ___。",
+    "options": [
+     "正在進行",
+     "已經完成",
+     "每天都做"
+    ],
+    "answer": 0,
+    "why": "is reading 是進行體貌，表示現在正在讀。"
+   },
+   {
+    "k": "choose",
+    "q": "「The letter was written by Amy.」是 ___ 語態。",
+    "options": [
+     "主動",
+     "被動",
+     "祈使"
+    ],
+    "answer": 1,
+    "why": "be 動詞＋過去分詞 written，主詞 the letter 是被寫的，是被動。"
+   },
+   {
+    "k": "fill",
+    "q": "The window ___ (break) last night.（被動）",
+    "accept": [
+     "was broken"
+    ],
+    "why": "過去的被動：was＋過去分詞 broken。"
+   }
+  ]
+ },
+ "1-10": {
+  "points": [
+   {
+    "t": "英文靠語序決定意思",
+    "p": "The dog bit the man. 和 The man bit the dog. 字一樣，順序不同，意思就完全不同。一般順序是「主詞＋動詞＋受詞」。",
+    "ex": [
+     {
+      "en": "The dog bit the man.",
+      "zh": "狗咬了那個人。"
+     },
+     {
+      "en": "The man bit the dog.",
+      "zh": "那個人咬了狗。"
+     }
+    ]
+   },
+   {
+    "t": "詞形變化也會表示關係",
+    "p": "動詞加 -s、-ed，名詞加 -s，代名詞 I 變 me，這些詞形變化告訴你時間、單複數和誰是主詞、誰是受詞。中文常常不變形，英文一定要變。",
+    "ex": [
+     {
+      "en": "She helps him every day.",
+      "zh": "她每天幫他。"
+     },
+     {
+      "en": "He helped her yesterday.",
+      "zh": "他昨天幫了她。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Yesterday I go to the clinic.",
+    "good": "Yesterday I went to the clinic.",
+    "why": "中文用「昨天」就夠了，英文動詞也要改成過去式 went。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「The cat chased the mouse.」是誰在追？___",
+    "options": [
+     "the cat",
+     "the mouse",
+     "都有"
+    ],
+    "answer": 0,
+    "why": "動詞前面的 the cat 是主詞，是它在追。"
+   },
+   {
+    "k": "fill",
+    "q": "Last week she ___ (visit) her grandmother.",
+    "accept": [
+     "visited"
+    ],
+    "why": "last week 是過去，動詞要變成過去式 visited。"
+   },
+   {
+    "k": "fix",
+    "q": "She help him every day.",
+    "accept": [
+     "She helps him every day."
+    ],
+    "why": "主詞 she 是第三人稱單數，現在式動詞加 s。"
+   }
+  ]
+ },
+ "1-11": {
+  "points": [
+   {
+    "t": "同一個形式，可以有不同用途",
+    "p": "Can you open the window? 文法上是問句（問能不能），實際上是請對方開窗。看形式，也要看說話的人想做什麼。",
+    "ex": [
+     {
+      "en": "Can you open the window?",
+      "zh": "可以幫我開窗嗎？（請求）"
+     },
+     {
+      "en": "It's cold in here.",
+      "zh": "這裡好冷。（可能是想請你關窗）"
+     }
+    ]
+   },
+   {
+    "t": "不同形式，可以表達同一個意思",
+    "p": "要表示未來，可以用 will、be going to，也可以用現在進行式（I'm leaving tomorrow.）。學文法要知道每個形式「通常用來做什麼」。",
+    "ex": [
+     {
+      "en": "I'm meeting the doctor tomorrow.",
+      "zh": "我明天要跟醫師見面。"
+     },
+     {
+      "en": "I will call you later.",
+      "zh": "我晚點打給你。"
+     }
+    ]
+   }
+  ],
+  "mistakes": [
+   {
+    "bad": "Give me water.",
+    "good": "Could I have some water, please?",
+    "why": "文法沒錯，但對人說話太直接；用 Could I ... please? 比較有禮貌。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「Could you help me?」實際上通常是在 ___。",
+    "options": [
+     "請求幫忙",
+     "問能力",
+     "抱怨"
+    ],
+    "answer": 0,
+    "why": "形式是問句，功能是禮貌地請求。"
+   },
+   {
+    "k": "choose",
+    "q": "比較有禮貌的請求是 ___。",
+    "options": [
+     "Give me a pen.",
+     "Could I borrow a pen, please?",
+     "You give me a pen."
+    ],
+    "answer": 1,
+    "why": "Could I ..., please? 是禮貌的請求。"
+   },
+   {
+    "k": "choose",
+    "q": "「I'm flying to Tokyo next Monday.」的現在進行式在表示 ___。",
+    "options": [
+     "現在正在飛",
+     "已經安排好的未來",
+     "過去的習慣"
+    ],
+    "answer": 1,
+    "why": "加上 next Monday，現在進行式表示已經安排好的未來。"
+   }
+  ]
+ },
+ "1-12": {
+  "points": [
+   {
+    "t": "句子成分的符號",
+    "p": "S＝主詞（Subject）、V＝動詞（Verb）、O＝受詞（Object）、C＝補語（Complement）、A＝副詞性成分（Adverbial，說時間、地點、方式等）。She (S) gave (V) me (O) a book (O) yesterday (A).",
+    "ex": [
+     {
+      "en": "She gave me a book yesterday.",
+      "zh": "她昨天給我一本書。"
+     },
+     {
+      "en": "The patient looks tired.",
+      "zh": "病人看起來很累。（S＋V＋C）"
+     }
+    ]
+   },
+   {
+    "t": "動詞形式的符號",
+    "p": "V＝原形動詞（go）、V-ing＝現在分詞或動名詞（going）、p.p.＝過去分詞（gone）。看到「be＋p.p.」就是被動，「have＋p.p.」就是完成式。",
+    "ex": [
+     {
+      "en": "The report was written by the doctor.",
+      "zh": "報告是醫師寫的。（be＋p.p.）"
+     },
+     {
+      "en": "I have seen this movie.",
+      "zh": "我看過這部電影。（have＋p.p.）"
+     }
+    ]
+   }
+  ],
+  "table": {
+   "title": "常用符號",
+   "head": [
+    "符號",
+    "意思",
+    "例子"
+   ],
+   "rows": [
+    [
+     "S",
+     "主詞",
+     "She"
+    ],
+    [
+     "V",
+     "動詞",
+     "gave"
+    ],
+    [
+     "O",
+     "受詞",
+     "me, a book"
+    ],
+    [
+     "C",
+     "補語",
+     "tired"
+    ],
+    [
+     "A",
+     "副詞性成分",
+     "yesterday"
+    ],
+    [
+     "V-ing",
+     "現在分詞／動名詞",
+     "going"
+    ],
+    [
+     "p.p.",
+     "過去分詞",
+     "gone, written"
+    ]
+   ]
+  },
+  "mistakes": [
+   {
+    "bad": "The report was write by the doctor.",
+    "good": "The report was written by the doctor.",
+    "why": "被動是 be＋p.p.，write 的過去分詞是 written。"
+   }
+  ],
+  "drills": [
+   {
+    "k": "choose",
+    "q": "「The soup tastes good.」的句型是 ___。",
+    "options": [
+     "S＋V＋O",
+     "S＋V＋C",
+     "S＋V"
+    ],
+    "answer": 1,
+    "why": "good 描述主詞 the soup，是補語 C。"
+   },
+   {
+    "k": "choose",
+    "q": "「have＋p.p.」是 ___。",
+    "options": [
+     "完成式",
+     "被動語態",
+     "進行式"
+    ],
+    "answer": 0,
+    "why": "have／has＋過去分詞是完成式。"
+   },
+   {
+    "k": "fill",
+    "q": "The door was ___ (open) by the nurse.（填 p.p.）",
+    "accept": [
+     "opened"
+    ],
+    "why": "被動 be＋p.p.，open 的過去分詞是 opened。"
+   }
+  ]
+ }
+}
