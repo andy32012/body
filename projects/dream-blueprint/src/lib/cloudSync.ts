@@ -2,7 +2,7 @@
  * Which progress a device uses after connecting to Google Drive, shared by Settings and the scan-to-connect dialog.
  * Nothing is thrown away: when one copy replaces the other, the replaced copy is downloaded as a backup file first.
  */
-import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified } from './store'
+import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified, updateStoreNow } from './store'
 import { mergeStates } from './merge'
 import {
   addHistory, clearConflict, cloudBase, cloudConflict, cloudStatus, driveConnected, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
@@ -67,22 +67,31 @@ export async function takeCloudCopy() {
 /** Keep both: this device's progress and the cloud copy merged into one, saved here and to the cloud. This device's copy
  *  is downloaded first and the cloud copy goes into the cloud history, so nothing can be lost. */
 export async function mergeWithCloud(quiet = false) {
-  const remote = await loadDriveState()
-  if (!remote?.state) throw new Error('雲端硬碟裡沒有進度可以合併。')
-  const theirs = importBackup(remote.state)
+  const first = await loadDriveState()
+  if (!first?.state) throw new Error('雲端硬碟裡沒有進度可以合併。')
+  let remote = { state: first.state, savedAt: first.savedAt }
   const mine = getSnapshot().state
   // A merge done by itself keeps this device's copy in the cloud history instead of a download (a download only when
   // the script cannot keep history).
   if (!quiet || !(await addHistory(JSON.stringify(mine), localModified() || Date.now(), 'before-merge'))) download(backupName('this-device'), exportBackup(mine))
-  // Checked as a progress file before anything changes. The store applies a restore a moment later, so the merged copy
-  // itself (not the store's snapshot) is what goes to the cloud.
-  const merged = importBackup(JSON.stringify(mergeStates(mine, theirs, localModified() >= remote.savedAt)))
-  const now = Date.now()
-  restoreBackup(JSON.stringify(merged), now)
-  clearConflict()
-  const since = Date.now()
-  await saveDriveState(JSON.stringify(merged), now, remote.savedAt, true)
-  failedSince(since)
+  let merged = mine
+  for (let attempt = 0; ; attempt++) {
+    const theirs = importBackup(remote.state)
+    const mineNewer = localModified() >= remote.savedAt
+    const now = Date.now()
+    // Merged into the progress as it is when the store writes it, so a step finished while the cloud was being read
+    // stays; checked as a progress file before it replaces anything.
+    merged = await updateStoreNow(prev => importBackup(JSON.stringify(mergeStates(prev, theirs, mineNewer))), now)
+    clearConflict()
+    const since = Date.now()
+    // Saved only if the cloud still holds the copy just merged; when another device saved meanwhile, merge that too.
+    // After a few rounds the merged copy is saved anyway (the script keeps the cloud copy in its history).
+    const last = attempt >= 2
+    await saveDriveState(JSON.stringify(merged), now, remote.savedAt, last)
+    const again = !last && cloudConflict() ? await loadDriveState() : null
+    if (!again?.state) { failedSince(since); break }
+    remote = { state: again.state, savedAt: again.savedAt }
+  }
   noteSynced('兩份進度已合併，也存到雲端硬碟了')
   const c = merged.curriculum
   return '兩份合併好了：兩台做過的都留著，課表接在單元 ' + c.unit + ' 第 ' + c.day + ' 天。' + (quiet ? '' : '這台原本的進度也下載成備份檔了。')

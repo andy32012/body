@@ -500,10 +500,18 @@ function PracticeSession({
               tutorId={item.id}
               pattern={current.title}
               rule={current.rule}
+              peekedBefore={!!lessonRecord?.peeked?.includes(at)}
+              onPeek={() => update((prev) => {
+                const rec = readLessonRecord(prev.notes, lessonDate);
+                if (rec?.peeked?.includes(at)) return prev;
+                return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { peeked: [...(rec?.peeked ?? []), at] }) };
+              })}
               onDone={(m, answer, check) => {
                 if (!settled()) return;
-                evidence(current.unit, judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check), { source: "vary", skill: "write", answer, prompt: v.zh, ref: v.en });
-                if (m !== "good")
+                const level = judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check);
+                // Each variation has its own record (two on one day used to share one), judged on what he wrote before looking.
+                evidence(current.unit, level, { source: "vary", skill: "write", item: item.id + "-v" + at, answer: check.before ?? answer, prompt: v.zh, ref: v.en });
+                if (m !== "good" || !level)
                   update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
                 if (at + 1 < todays.length) {
                   // The next sentence is a new screen: a double tap must not mark it too.

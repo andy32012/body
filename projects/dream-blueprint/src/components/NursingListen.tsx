@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { logSkill } from '../lib/bridge'
+import { logSkill, withBestListen } from '../lib/bridge'
 import { listenPassed, nurseLevels, nurseLevelsOpen, heardWell, nextNurseListening, nurseLastKey, nurseListenKey, nurseSpeakKey, readNurseListen, type NurseListening } from '../lib/nursing'
 import { levelTarget } from '../lib/unlock'
 import { PackListen } from './UnitPack'
@@ -60,7 +60,7 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
     <PackListen key={l.id} l={l} rate={state.settings.speechRate} last={readNurseListen(state.notes, l.id)}
       onSave={r => onActivity(prev => ({ ...prev, notes: logSkill({
         ...prev.notes,
-        [nurseListenKey(l.id)]: JSON.stringify({ ...r, day: date }),
+        [nurseListenKey(l.id)]: JSON.stringify(withBestListen(readNurseListen(prev.notes, l.id), { ...r, day: date })),
         [nurseLastKey]: JSON.stringify({ id: l.id, title: l.title, you: l.you, day: date }),
       }, 'listen', date) }))} />
     <details className="nl-words"><summary>這段的重點字（{l.words.length} 個）</summary>

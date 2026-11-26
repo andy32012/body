@@ -5,7 +5,7 @@ import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
 import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, type WriteFeedback, type WriteStage } from '../lib/writing'
-import { packUnits } from '../lib/bridge'
+import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
 import { speakEnglish, stopSpeaking } from '../lib/tts'
@@ -132,7 +132,8 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       // The best score is worked out from the saved record, so two checks in a row cannot overwrite each other.
       const best = patch.best === undefined ? old?.best : Math.max(old?.best ?? 0, patch.best)
       const next = { ...old, ...patch, best, day: date, words: count, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0) }
-      return { ...prev, notes: { ...prev.notes, [writeKey(id)]: JSON.stringify(next) } }
+      // Every day he hands in writing counts as a writing day, even when the same task is redone on a later day.
+      return { ...prev, notes: logSkill({ ...prev.notes, [writeKey(id)]: JSON.stringify(next) }, 'write', date) }
     })
   }
   async function check() {

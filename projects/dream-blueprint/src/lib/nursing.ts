@@ -1,6 +1,6 @@
 /** Nursing English for the internship and licensing-exam months (and any day he wants it): listening dialogues with
  *  a transcript, reading passages in the reading format, and a nursing word list drilled like the 7000 words. */
-import type { Accent, ListenRecord, PackLine, PackQuestion } from './bridge'
+import { bestListen, type Accent, type ListenRecord, type PackLine, type PackQuestion } from './bridge'
 import { levelTarget, openSteps } from './unlock'
 
 export type NurseLevel = 'A2' | 'B1' | 'B2'
@@ -28,11 +28,12 @@ export function readLastHeard(notes: Record<string, string>): LastHeard | null {
 export function readNurseListen(notes: Record<string, string>, id: string): ListenRecord | null {
   try { return notes[nurseListenKey(id)] ? JSON.parse(notes[nurseListenKey(id)]) as ListenRecord : null } catch { return null }
 }
-/** Understood by ear: every answer right after a complete play, without the text. */
-export const heardWell = (r: ListenRecord | null) => !!r && r.heard && r.correct === r.total
+/** Understood by ear: every answer right after a complete play, without the text (on the best attempt so far). */
+export const heardWell = (r: ListenRecord | null) => { const b = bestListen(r); return !!b && b.heard && b.correct === b.total }
 
-/** Listened to without the text and at least 70% right: what counts toward finishing a level. */
-export const listenPassed = (r: ListenRecord | null) => !!r && r.heard && r.correct / Math.max(1, r.total) >= 0.7
+/** Listened to without the text and at least 70% right: what counts toward finishing a level. The best attempt counts,
+ *  so a redo done after reading the transcript does not lock a level that was already open. */
+export const listenPassed = (r: ListenRecord | null) => { const b = bestListen(r); return !!b && b.heard && b.correct / Math.max(1, b.total) >= 0.7 }
 export const nurseLevels = ['A2', 'B1', 'B2'] as const
 /** Which levels of nursing listening are open: B1 once A2 has its target of passed dialogues (levelTarget), B2 after B1. */
 export function nurseLevelsOpen(list: readonly { id: string; level: string }[], notes: Record<string, string>): Record<string, boolean> {

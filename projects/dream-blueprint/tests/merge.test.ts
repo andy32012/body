@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { mergeNote, mergeStates } from '../src/lib/merge.ts'
 import { createInitialState, importBackup } from '../src/lib/store.ts'
 import { newCard } from '../src/lib/progress.ts'
+import { removeWeak } from '../src/lib/weakPoints.ts'
 
 const session = (id: string, day: string, extra = {}) => ({ id, day, energy: 'normal' as const, period: 'semester' as const, sentenceId: '', words: [], translations: [], spokenIds: [], ...extra })
 
@@ -70,4 +71,64 @@ test('打開或切回來時自己處理：只有雲端變了就拿雲端的，�
   assert.equal(settleAction('none', false), 'none')
   assert.equal(settleAction('conflict', false), 'merge', '兩邊都改了：合併，不再暫停')
   assert.equal(settleAction('none', true), 'merge', '以前留下的暫停也一起合併掉')
+})
+
+test('兩台同一天都練習：同一天的練習紀錄、技能紀錄、單字四技都合起來，不會只留一台的', () => {
+  const day = '2026-11-26'
+  const a = createInitialState('2026-11-13'), b = structuredClone(a)
+  const t = (id: string) => ({ sentenceId: id, rating: 'correct' as const, grammar: [], revealed: false })
+  a.sessions = [session('library-' + day, day, { translations: [t('u1-r1')], words: ['cat'] })]
+  b.sessions = [session('library-' + day, day, { translations: [t('u2-r1')], words: ['dog'], spokenIds: ['say-1'] })]
+  a.notes['skills.log'] = JSON.stringify({ read: ['2026-11-25'], listen: ['2026-11-26'] })
+  b.notes['skills.log'] = JSON.stringify({ read: ['2026-11-26'], write: ['2026-11-26'] })
+  a.notes['skill.cat'] = JSON.stringify({ read: '2026-11-26', listen: '2026-11-20' })
+  b.notes['skill.cat'] = JSON.stringify({ listen: '2026-11-24', write: '2026-11-26' })
+  const m = mergeStates(a, b, false)
+  assert.equal(m.sessions.length, 1)
+  assert.deepEqual(m.sessions[0].translations?.map(x => x.sentenceId), ['u1-r1', 'u2-r1'], '兩台寫的句子都在')
+  assert.deepEqual(m.sessions[0].words, ['cat', 'dog'])
+  assert.deepEqual(m.sessions[0].spokenIds, ['say-1'])
+  assert.deepEqual(JSON.parse(m.notes['skills.log']), { read: ['2026-11-25', '2026-11-26'], listen: ['2026-11-26'], write: ['2026-11-26'] })
+  assert.deepEqual(JSON.parse(m.notes['skill.cat']), { read: '2026-11-26', listen: '2026-11-24', write: '2026-11-26' })
+})
+
+test('刪掉的、取消的、改過的設定，合併後不會跑回來', () => {
+  const a = createInitialState('2026-11-13')
+  a.notes['weak.v1'] = JSON.stringify([{ k: '冠詞', n: 3, first: '2026-11-20', last: '2026-11-24', ex: [] }, { k: '拼字', n: 1, first: '2026-11-24', last: '2026-11-24', ex: [] }])
+  a.notes['daily-word.count'] = '25'
+  a.checks = { 'roadmap.toefl': true, 'roadmap.ielts': true }
+  a.flagged = ['u3-d1', 'u4-d2']
+  const b = structuredClone(a)
+  // On the iPad, later: removed 冠詞 from 我的弱點, five words a day, unticked one box, cleared one flag.
+  b.notes = { ...b.notes, ...removeWeak(b.notes, '冠詞', '2026-11-25'), 'daily-word.count': '5' }
+  b.checks = { 'roadmap.toefl': false, 'roadmap.ielts': true }
+  b.flagged = ['u4-d2']
+  const m = mergeStates(a, b, false)
+  assert.deepEqual(JSON.parse(m.notes['weak.v1']).map((w: { k: string }) => w.k), ['拼字'], '刪掉的弱點不回來')
+  assert.equal(m.notes['daily-word.count'], '5', '一天幾個新字跟最後改的')
+  assert.equal(m.checks['roadmap.toefl'], false, '取消打勾的維持取消')
+  assert.deepEqual(m.flagged, ['u4-d2'])
+  assert.deepEqual(mergeStates(b, a, true).flagged, ['u4-d2'], '哪一邊叫 mine 都一樣')
+  // The same mistake made again after the removal comes back as a weak point.
+  const c = structuredClone(a)
+  c.notes['weak.v1'] = JSON.stringify([{ k: '冠詞', n: 4, first: '2026-11-20', last: '2026-11-26', ex: [] }])
+  const m2 = mergeStates(b, c, false)
+  assert.ok(JSON.parse(m2.notes['weak.v1']).some((w: { k: string }) => w.k === '冠詞'), '刪掉以後又錯了，才會回來')
+  assert.equal(mergeNote('review.sentences.2026-11-25', '2', '1'), '2', '某一天的次數還是取大的')
+})
+
+test('一台已經把舊的複習紀錄收進封存：合併後不會重複算', () => {
+  const a = createInitialState('2026-11-13')
+  const ev = (day: string) => ({ id: 'word:cat', day, gap: 2, remembered: true, shownAnswer: false })
+  a.reviewEvents = [ev('2026-08-01'), ev('2026-09-01'), ev('2026-11-20')]
+  const b = structuredClone(a)
+  // The iPad folded the lines before 2026-09-15 into its archive.
+  b.reviewEvents = [ev('2026-11-20'), ev('2026-11-25')]
+  b.notes['review.archive'] = JSON.stringify({ before: '2026-09-15', total: 2, delayed: 2, recalled: 2, bonus: 0 })
+  for (const m of [mergeStates(a, b, false), mergeStates(b, a, false)]) {
+    assert.deepEqual(m.reviewEvents.map(e => e.day), ['2026-11-20', '2026-11-25'], '收進封存的不再算一次')
+    assert.equal(JSON.parse(m.notes['review.archive']).before, '2026-09-15')
+  }
+  const older = JSON.stringify({ before: '2026-08-15', total: 1, delayed: 1, recalled: 1, bonus: 0 })
+  assert.equal(JSON.parse(mergeNote('review.archive', b.notes['review.archive'], older)).before, '2026-09-15', '留收得比較多的那份')
 })

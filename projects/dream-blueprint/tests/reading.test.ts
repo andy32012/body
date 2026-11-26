@@ -163,3 +163,35 @@ test('舊紀錄沒有回答後來新增的題，錯題統計不把那些題算�
   assert.equal(summary.done, 1)
   assert.equal(passed(readRecord(notes, p.id)), true, '原本 1/1 的過關不因現在多題而消失')
 })
+
+test('閱讀題的答案位置不會有規律：選項顯示時打散（每次打開一樣），存的還是原本的答案順序', async () => {
+  const { shownPassage, savedPicks, shownPicks, savedCauses } = await import('../src/lib/reading.ts')
+  const all = (await import('../src/data/reading.json')).default as import('../src/lib/reading.ts').ReadPassage[]
+  const cyclic = (answers: number[], sizes: number[]) => answers.length >= 3 && answers.every((a, i) => (a - answers[0] + sizes[i] * 9) % sizes[i] === i % sizes[i])
+  let before = 0, after = 0
+  const tfOrders = new Map<string, Set<string>>()
+  for (const p of all) {
+    const shown = shownPassage(p)
+    assert.deepEqual(shownPassage(p), shown, p.id + ' 每次打開順序一樣')
+    shown.qs.forEach(q => {
+      const orig = p.qs[q.from]
+      assert.deepEqual([...q.options].sort(), [...orig.options].sort(), p.id + ' 選項一個不少')
+      assert.equal(q.options[q.answer], orig.options[orig.answer], p.id + ' 正確答案還是同一個')
+      if (q.type === 'tfng') assert.deepEqual(q.options, orig.options, 'True / False / Not Given 的順序不變')
+    })
+    assert.deepEqual(shown.qs.map(q => q.from).sort((a, b) => a - b), p.qs.map((_, i) => i), p.id + ' 每一題都在')
+    // All right, saved in the data's order: exactly the data's answers; and read back as shown.
+    const right = shown.qs.map(q => q.answer)
+    assert.deepEqual(savedPicks(shown.qs, right), p.qs.map(q => q.answer))
+    assert.deepEqual(shownPicks(shown.qs, p.qs.map(q => q.answer)), right)
+    assert.deepEqual(Object.keys(savedCauses(shown.qs, { 0: '看太快' })), [String(shown.qs[0].from)])
+    const mc = (qs: readonly { type: string; answer: number; options: string[] }[]) => qs.filter(q => q.type !== 'tfng')
+    if (cyclic(mc(p.qs).map(q => q.answer), mc(p.qs).map(q => q.options.length))) before++
+    if (cyclic(mc(shown.qs).map(q => q.answer), mc(shown.qs).map(q => q.options.length))) after++
+    const tf = shown.qs.filter(q => q.type === 'tfng').map(q => q.options[q.answer])
+    if (tf.length === 3) { const k = p.level + '-' + p.band; tfOrders.set(k, (tfOrders.get(k) ?? new Set()).add(tf.join(','))) }
+  }
+  assert.ok(before > 60, '原本的資料有規律（這個測試量得到）')
+  assert.ok(after < all.length * 0.25, '打散後 A→B→C 輪流的篇數大幅減少：' + after)
+  for (const [k, orders] of tfOrders) assert.ok(orders.size > 1, k + ' 的是非題答案順序不再每篇都一樣')
+})

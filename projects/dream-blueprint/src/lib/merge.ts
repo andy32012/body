@@ -1,5 +1,7 @@
 import type { AppState } from './store'
 import { memoryDeletedKey, memoryNoteKey, mergeMemory, readDeleted, readMemory, writeMemory } from './memory'
+import { readRemoved, weakKey, weakRemovedKey } from './weakPoints'
+import { archiveKey } from './compact'
 
 /**
  * 「兩份合併」: when two devices both changed the progress since they last synced, keep everything from both instead of
@@ -18,9 +20,24 @@ const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 
 /** One note both sides wrote differently. `newer` is the value from the copy changed last. */
 export function mergeNote(key: string, older: string, newer: string): string {
   if (older === newer) return newer
-  // Counts (today's sentence review and the like): the larger one has everything done on either device.
-  if (/^\d+$/.test(older) && /^\d+$/.test(newer)) return String(Math.max(Number(older), Number(newer)))
+  // A day's count (today's sentence review and the like): the larger one has everything done on either device. Other
+  // numbers are settings (how many new words a day): the one changed last.
+  if (/\d{4}-\d{2}-\d{2}/.test(key) && /^\d+$/.test(older) && /^\d+$/.test(newer)) return String(Math.max(Number(older), Number(newer)))
   const a = parse(older), b = parse(newer)
+  // The days each skill was practised: every day from both devices.
+  if (key === 'skills.log' && isObj(a) && isObj(b)) {
+    const out: Record<string, unknown> = { ...a }
+    for (const [k, v] of Object.entries(b)) out[k] = Array.isArray(v) && Array.isArray(a[k]) ? [...new Set([...(a[k] as unknown[]), ...v])].sort().slice(-60) : v
+    return JSON.stringify(out)
+  }
+  // One word's four skills (the day each was shown): a skill shown on either device stays, with the later day.
+  if (key.startsWith('skill.') && isObj(a) && isObj(b)) {
+    const out: Record<string, unknown> = { ...a }
+    for (const [k, v] of Object.entries(b)) out[k] = typeof v === 'string' && typeof a[k] === 'string' && (a[k] as string) > v ? a[k] : v
+    return JSON.stringify(out)
+  }
+  // The folded old review lines: the archive folded further along (the lines before it are dropped from the merge).
+  if (key === 'review.archive' && isObj(a) && isObj(b)) return String(a.before ?? '') > String(b.before ?? '') ? older : newer
   // Weak points: one entry per label; keep the one seen more often, with both sides' examples.
   if (Array.isArray(a) && Array.isArray(b) && [...a, ...b].every(x => isObj(x) && typeof x.k === 'string' && typeof x.n === 'number')) {
     const items = new Map<string, Record<string, unknown>>()
@@ -45,11 +62,15 @@ export function mergeNote(key: string, older: string, newer: string): string {
 /** Both copies merged. `mineNewer`: this device's copy was changed after the cloud copy was saved. */
 export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean): AppState {
   const [older, newer] = mineNewer ? [theirs, mine] : [mine, theirs]
+  // The same session id on both (the practice library keeps one session a day): every answer and word from both.
   const sessions = new Map<string, AppState['sessions'][number]>()
   for (const s of [...older.sessions, ...newer.sessions]) {
     const had = sessions.get(s.id)
-    const size = (x: typeof s) => (x.translations?.length ?? 0) * 100 + x.words.length + (x.spokenIds?.length ?? 0)
-    if (!had || size(s) >= size(had)) sessions.set(s.id, s)
+    if (!had) { sessions.set(s.id, s); continue }
+    const translations = unionBy(had.translations ?? [], s.translations ?? [], t => JSON.stringify(t))
+    const spokenIds = unionBy(had.spokenIds ?? [], s.spokenIds ?? [], x => x)
+    sessions.set(s.id, { ...had, ...s, words: unionBy(had.words, s.words, x => x),
+      ...(translations.length ? { translations } : {}), ...(spokenIds.length ? { spokenIds } : {}), advanced: !!(had.advanced || s.advanced) })
   }
   const cards = new Map<string, AppState['cards'][number]>()
   for (const c of [...older.cards, ...newer.cards]) {
@@ -64,20 +85,33 @@ export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean
   const memory = mergeMemory(readMemory(newer.notes), readDeleted(newer.notes), readMemory(older.notes), readDeleted(older.notes))
   const merged: Notes = writeMemory(notes, memory.notes)
   if (memoryNoteKey in older.notes || memoryNoteKey in newer.notes || memory.deleted.length) merged[memoryDeletedKey] = JSON.stringify(memory.deleted)
-  const checks = { ...older.checks }
-  for (const [k, v] of Object.entries(newer.checks)) checks[k] = v || !!older.checks[k]
+  // A box ticked or unticked on the copy changed last keeps that state; boxes only the other copy has stay.
+  const checks = { ...older.checks, ...newer.checks }
+  // Weak points removed on either device stay removed, unless the mistake came back after the removal.
+  const removed = { ...readRemoved(older.notes) }
+  for (const [k, d] of Object.entries(readRemoved(newer.notes))) if (!removed[k] || d > removed[k]) removed[k] = d
+  if (Object.keys(removed).length) {
+    merged[weakRemovedKey] = JSON.stringify(removed)
+    try {
+      const list = JSON.parse(merged[weakKey] ?? '[]') as { k: string; last?: string }[]
+      if (Array.isArray(list)) merged[weakKey] = JSON.stringify(list.filter(i => !removed[i.k] || (i.last ?? '') > removed[i.k]))
+    } catch { /* leave it */ }
+  }
+  // Review lines from before the kept archive were folded into it: keeping them too would count them twice.
+  const before = (() => { try { return String(JSON.parse(merged[archiveKey] ?? 'null')?.before ?? '') } catch { return '' } })()
   return {
     ...newer,
     startedDay: [mine.startedDay, theirs.startedDay].sort()[0],
     sessions: [...sessions.values()].sort((a, b) => a.day.localeCompare(b.day)),
     cards: [...cards.values()],
     reviewEvents: unionBy(older.reviewEvents, newer.reviewEvents, e => [e.id, e.day, e.gap, e.remembered, e.shownAnswer].join('|'))
-      .sort((a, b) => a.day.localeCompare(b.day)),
+      .filter(e => !before || e.day >= before).sort((a, b) => a.day.localeCompare(b.day)),
     curriculum: { ...ahead.curriculum, stableUnits: [...new Set([...mine.curriculum.stableUnits, ...theirs.curriculum.stableUnits])].sort((a, b) => a - b) },
     knownWords: unionBy(older.knownWords, newer.knownWords, w => w),
     learningWords: unionBy(older.learningWords, newer.learningWords, w => w),
     customWords: unionBy(newer.customWords, older.customWords, w => w.en.toLowerCase()),
-    flagged: unionBy(older.flagged, newer.flagged, w => w),
+    // Flags are cleared one by one in Settings: the copy changed last decides.
+    flagged: newer.flagged,
     checks,
     notes: merged,
   }

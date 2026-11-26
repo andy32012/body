@@ -147,3 +147,15 @@ test('交接內容：橋接單元寫出讀聽說寫包和回測的第一次成�
   state.curriculum = { ...state.curriculum, unit: 12, day: 1 }
   assert.doesNotMatch(handoffText(state, '2026-11-20'), /橋接單元，另有/)
 })
+
+test('同一篇隔天再讀（或同一題隔天再寫）：兩天都算進這週的閱讀／寫作天數', async () => {
+  const { logSkill, weekCounts } = await import('../src/lib/bridge.ts')
+  const { saveRead } = await import('../src/lib/reading.ts')
+  // Monday 2/4, Tuesday the same passage 4/4: saved the way the reading page saves.
+  let notes: Record<string, string> = {}
+  notes = logSkill(saveRead(notes, 'a1-lin', { day: '2026-11-23', picks: [0, 1, 0, 0], correct: 2, total: 4 }), 'read', '2026-11-23')
+  notes = logSkill(saveRead(notes, 'a1-lin', { day: '2026-11-24', picks: [0, 0, 0, 0], correct: 4, total: 4 }), 'read', '2026-11-24')
+  assert.equal(weekCounts(notes, [], '2026-11-24').read, 2)
+  notes = logSkill(saveRead(notes, 'a1-lin', { day: '2026-11-24', picks: [0, 0, 0, 0], correct: 4, total: 4 }), 'read', '2026-11-24')
+  assert.equal(weekCounts(notes, [], '2026-11-24').read, 2, '同一天做兩次還是一天')
+})

@@ -1,5 +1,5 @@
 import curriculum from '../data/curriculum.json'
-import { daysBetween } from './progress'
+import { dayKey, daysBetween } from './progress'
 
 /**
  * One list of weak points, shared by every teacher in the app: the Claude tutor, Emma, 問問 Claude and the reviews.
@@ -133,9 +133,16 @@ export function easeWeak(notes: Record<string, string>, rawLabel: string) {
 }
 
 /** Deleted by the learner. A new mistake of the same kind starts it again from one. */
-export function removeWeak(notes: Record<string, string>, label: string) {
+export function removeWeak(notes: Record<string, string>, label: string, day = dayKey()) {
   const list = readWeak(notes)
-  return list.some(i => i.k === label) ? write(notes, list.filter(i => i.k !== label)) : notes
+  if (!list.some(i => i.k === label)) return notes
+  // Remembered with its day, so a copy merged from another device does not bring it back.
+  return { ...write(notes, list.filter(i => i.k !== label)), [weakRemovedKey]: JSON.stringify({ ...readRemoved(notes), [label]: day }) }
+}
+/** Weak points removed by hand, and the day: merging keeps them removed unless the mistake came back later. */
+export const weakRemovedKey = 'weak.removed'
+export function readRemoved(notes: Record<string, string>): Record<string, string> {
+  try { const v = JSON.parse(notes[weakRemovedKey] || '{}'); return v && typeof v === 'object' && !Array.isArray(v) ? v : {} } catch { return {} }
 }
 
 /** The strongest weak points now. Points that faded below half a miss are not shown. */

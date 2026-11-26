@@ -133,3 +133,39 @@ test('閱讀理解：A1、A2 各至少 36 篇，字數標示正確，每題不�
     }
   }
 })
+
+test('聽寫多寫了字（例如加了 never，意思反過來）不會是滿分；寫錯一個字只算錯一次', async () => {
+  const s = 'We recorded the number of penguins at the zoo.'
+  const never = dictationScore('We never recorded the number of penguins at the zoo.', s)
+  assert.equal(never.total, 9)
+  assert.equal(never.extra, 1)
+  assert.equal(never.right, 8, '多一個字就不是 9 / 9')
+  const swapped = dictationScore('We recorded a number of penguins at the zoo.', s)
+  assert.equal(swapped.right, 8, 'the 寫成 a：錯一個字')
+  assert.equal(dictationScore("we recorded the number of penguins at the zoo", s).right, 9, '大小寫和標點不算錯')
+})
+
+test('聽寫「今天寫到這裡」：這段還不算做完，下次從停下來的那一句接著寫；最後一句寫完才算整段', async () => {
+  const { dictationPatch } = await import('../src/lib/story.ts')
+  const day = '2026-11-26'
+  const stop = dictationPatch({}, 0, [{ right: 5, total: 6 }, { right: 4, total: 4 }], true, day)
+  assert.deepEqual(stop, { dn: 2, dqp: [9, 10] })
+  assert.equal(stop.d, undefined, '還沒做完')
+  const notes = saveStory({}, 'p1', stop)
+  const done = dictationPatch(readStory(notes, 'p1'), 2, [{ right: 3, total: 5 }], false, '2026-11-27')
+  const after = readStory(saveStory(notes, 'p1', done), 'p1')
+  assert.deepEqual(after, { d: '2026-11-27', dq: [12, 15] }, '三句都寫完才算，字數加起來')
+  // Next time on the dictation tab, the passage stopped halfway comes back first.
+  const all = (passageData as Passage[]).filter(p => p.level === 1 && p.en)
+  const half = all[5]
+  const n = saveStory({}, half.id, stop)
+  assert.equal(nextStory(all, 1, {}, n, 'dictate')?.id, half.id)
+})
+
+test('短文聽力沒播完（播放失敗）：可以看文字學，但不算聽過、不算進聽力進度', () => {
+  const all = (passageData as Passage[]).filter(p => p.en)
+  const p = all.find(x => x.level === 1)!
+  const notes = saveStory({}, p.id, { lt: '2026-11-26' })
+  assert.equal(storyProgress(all, 1, notes, 'listen').done, 0)
+  assert.equal(storyProgress(all, 1, saveStory({}, p.id, { l: '2026-11-26', u: 2 }), 'listen').done, 1)
+})

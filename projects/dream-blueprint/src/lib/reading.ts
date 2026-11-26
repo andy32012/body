@@ -142,6 +142,51 @@ export function nextReading(all: readonly ReadPassage[], step: ReadStep | null, 
   const redo = pool.filter(p => !passed(readRecord(notes, p.id))).sort((a, b) => readRecord(notes, a.id)!.day.localeCompare(readRecord(notes, b.id)!.day))
   return redo[0] ?? pool[0] ?? null
 }
+/** A fixed shuffle for one passage: the same order every time it opens (a reload does not change it). */
+function seeded(seed: string) {
+  let h = 2166136261
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619)
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16
+    return (h >>> 0) / 4294967296
+  }
+}
+function shuffled<T>(xs: readonly T[], rnd: () => number) {
+  const a = [...xs]
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] }
+  return a
+}
+/** A question as shown: options in their shown order, `answer` in that order; `from` is its place in the data and
+ *  `optionFrom[i]` the data index of shown option i. */
+export interface ShownQuestion extends ReadQuestion { from: number; optionFrom: number[] }
+/** The passage as shown. In the data the right answers of many passages go A, B, C… in turn and the True/False/Not
+ *  Given answers come in the same order, so the first answer gave the others away. Options are shuffled (True / False /
+ *  Not Given keep their order) and the True/False/Not Given statements swap places among themselves. Answers are still
+ *  saved by the data's own order, so old records read the same. */
+export function shownPassage(p: ReadPassage): Omit<ReadPassage, 'qs'> & { qs: ShownQuestion[] } {
+  const rnd = seeded(p.id)
+  const tf = p.qs.map((q, i) => q.type === 'tfng' ? i : -1).filter(i => i >= 0)
+  const tfOrder = shuffled(tf, rnd)
+  return { ...p, qs: p.qs.map((q0, i) => {
+    const from = q0.type === 'tfng' ? tfOrder[tf.indexOf(i)] : i
+    const q = p.qs[from]
+    const optionFrom = q.type === 'tfng' ? q.options.map((_, j) => j) : shuffled(q.options.map((_, j) => j), rnd)
+    return { ...q, options: optionFrom.map(j => q.options[j]), answer: optionFrom.indexOf(q.answer), from, optionFrom }
+  }) }
+}
+/** Shown answers (and the causes picked for wrong ones) back in the data's order, for saving. */
+export function savedPicks(shown: readonly ShownQuestion[], picks: readonly number[]) {
+  const out: number[] = new Array(shown.length).fill(-1)
+  picks.forEach((pick, k) => { if (shown[k]) out[shown[k].from] = shown[k].optionFrom[pick] ?? -1 })
+  return out
+}
+/** Saved answers (data order) as shown, to show an earlier attempt again. */
+export function shownPicks(shown: readonly ShownQuestion[], saved: readonly number[]) {
+  return shown.map(q => saved[q.from] === undefined || saved[q.from] < 0 ? undefined : q.optionFrom.indexOf(saved[q.from])) as number[]
+}
+export function savedCauses(shown: readonly ShownQuestion[], causes: Record<number, string>) {
+  return Object.fromEntries(Object.entries(causes).map(([k, c]) => [String(shown[Number(k)]?.from ?? k), c]))
+}
 /** Which question types and causes go wrong most, across everything read. */
 export function readSummary(all: readonly ReadPassage[], notes: Record<string, string>) {
   const types: Partial<Record<QType, { right: number; total: number }>> = {}

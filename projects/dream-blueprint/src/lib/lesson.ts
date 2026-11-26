@@ -80,6 +80,8 @@ export interface LessonRecord {
   express?: ExpressRecord
   /** How many of today's variations are done (the lesson continues at the next one). */
   varied?: number
+  /** Today's variations whose answer was shown (by 看答案 or by Claude), so opening the page again cannot hide it. */
+  peeked?: number[]
 }
 export function readLessonRecord(notes: Record<string, string>, day: string): LessonRecord | null {
   try {

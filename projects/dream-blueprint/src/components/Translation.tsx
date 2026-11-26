@@ -6,7 +6,7 @@ import { AskWord } from "./AIChat";
 import { updateStore } from "../lib/store";
 import { addWeak, easeWeak, normalizeLabel } from "../lib/weakPoints";
 import { dayKey } from "../lib/progress";
-import { answered, compareWithReference, matchesReference, sameEnglish, type Verdict } from "../lib/evidence";
+import { answered, clauseCommaNote, compareWithReference, matchesReference, sameEnglish, type Verdict } from "../lib/evidence";
 import StuckButton from "./StuckButton";
 import { useTaskContext } from "../lib/taskContext";
 import { sentenceFrame, type HintUse } from "../lib/lesson";
@@ -182,6 +182,8 @@ export function Translation({
           <span>{sentence.why}</span>
           {answered(answer) && (() => {
             const diff = compareWithReference(answer, sentence.reference);
+            const commas = clauseCommaNote(answer, sentence.reference);
+            if (commas) return <p className="pr-compare"><small>{commas}</small></p>;
             return diff && !diff.same && (
               <p className="pr-compare">
                 <small>跟最接近的參考句比：</small>{" "}
@@ -237,11 +239,14 @@ export function Translation({
           {!answered(answer) && <p className="pr-blank-note">還沒寫答案：寫下來才能按「對了」或「小錯」。真的不會就按「不會」，沒寫的題目不算作答。</p>}
           {answered(answer) && (
             <p className="pr-mark-note">
-              {firstVerdict === "good" && verdictStale ? (matchesReference(answer, sentence.reference) ? "你在 Claude 確認之後改了答案，改過的跟參考答案一樣：按「對了」仍記成當次獨立完成。" : "你在 Claude 確認之後又改了答案：改過的這一版還沒人確認，按「對了」會記成「自評完成・待確認」。")
+              {/* The same rule as the saved record (judgeWritten): any hint, frame, reference or 我卡住了 means help. */}
+              {seenHint || hint >= 2 || askedHelp ? "這題看過提示、句架或參考句（或問過 Claude 怎麼寫）：按「對了」會記成有提示完成。"
+                : firstVerdict === "good" && verdictStale ? (matchesReference(answer, sentence.reference) ? "你在 Claude 確認之後改了答案，改過的跟參考答案一樣：按「對了」仍記成當次獨立完成。" : "你在 Claude 確認之後又改了答案：改過的這一版還沒人確認，按「對了」會記成「自評完成・待確認」。")
                 : firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
                 : firstVerdict === "changed" ? "Claude 說意思跟題目不一樣：改好之後也只算有提示完成。"
                 : firstVerdict ? "Claude 指出要改的地方：照著改好，這次記成有提示完成。"
                 : matchesReference(answer, sentence.reference) ? "跟參考答案一樣，已確認：按「對了」會記成當次獨立完成。"
+                : clauseCommaNote(answer, sentence.reference) ? "逗號還沒加好（看上面的說明）：加好再按「對了」；不加的話先記成「自評完成・待確認」。"
                 : "寫法跟參考答案不完全一樣，可能也對。沒有人確認前，按「對了」會先記成「自評完成・待確認」，之後可以請 Claude 看。意思如果變了，請按「小錯」。"}
             </p>
           )}

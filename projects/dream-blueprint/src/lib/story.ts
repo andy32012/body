@@ -10,7 +10,12 @@ export type StoryTab = 'read' | 'listen' | 'dictate'
 export const storyTabs: [StoryTab, string][] = [['read', '閱讀'], ['listen', '聽力'], ['dictate', '聽寫']]
 /** r, l, d: the day it was read, listened to, written from dictation. q: meaning questions right / asked.
  *  dq: dictation words right / total. zh: the Chinese was opened before the questions. u: how much was understood by ear (1–3). */
-export interface StoryRecord { r?: string; l?: string; d?: string; q?: [number, number]; dq?: [number, number]; zh?: boolean; u?: 1 | 2 | 3 }
+export interface StoryRecord { r?: string; l?: string; d?: string; q?: [number, number]; dq?: [number, number]; zh?: boolean; u?: 1 | 2 | 3
+  /** Dictation stopped early (今天寫到這裡): the sentence to go on from next time, and the words right / total so far.
+   *  The passage counts as dictated (`d`) only once its last sentence is done. */
+  dn?: number; dqp?: [number, number]
+  /** Played but not heard to the end (no voice, or the play failed): read along from the text that day; not listening. */
+  lt?: string }
 const field: Record<StoryTab, 'r' | 'l' | 'd'> = { read: 'r', listen: 'l', dictate: 'd' }
 export const storyKey = (id: string) => 'story.' + id
 export const storyLevelKey = 'story.level'
@@ -56,7 +61,9 @@ export function storyOrder(all: readonly Passage[], level: number, checks: Recor
 /** The next passage for a tab: one not done in that tab yet; when all are done, the round starts again. */
 export function nextStory(all: readonly Passage[], level: number, checks: Record<string, boolean>, notes: Record<string, string>, tab: StoryTab, skipped: readonly string[] = []) {
   const order = storyOrder(all, level, checks, notes, tab).filter(p => !skipped.includes(p.id))
-  return order.find(p => !readStory(notes, p.id)[field[tab]]) ?? order[0]
+  // A dictation stopped halfway comes back first, at the sentence where it stopped.
+  const started = tab === 'dictate' ? order.find(p => { const r = readStory(notes, p.id); return !r.d && r.dn !== undefined }) : undefined
+  return started ?? order.find(p => !readStory(notes, p.id)[field[tab]]) ?? order[0]
 }
 export function storyProgress(all: readonly Passage[], level: number, notes: Record<string, string>, tab: StoryTab) {
   const pool = all.filter(p => p.level === level && p.en)
@@ -150,8 +157,18 @@ export function meaningQuestions(passage: Passage, all: readonly Passage[], look
 export function dictationScore(answer: string, sentence: string) {
   const total = normalizeEnglish(sentence).split(' ').filter(Boolean).length
   const diff = answer.trim() ? compareWithReference(answer, [sentence]) : null
-  if (!diff) return { right: 0, total, words: [] as { w: string; extra: boolean }[], missing: normalizeEnglish(sentence).split(' ').filter(Boolean) }
-  return { right: total - diff.missing.length, total, words: diff.words, missing: diff.missing }
+  if (!diff) return { right: 0, total, words: [] as { w: string; extra: boolean }[], missing: normalizeEnglish(sentence).split(' ').filter(Boolean), extra: 0 }
+  // A word written that the sentence does not have is a mistake too (We never recorded… turns the meaning around). A
+  // wrong word is one missing and one extra: counted once.
+  const extra = diff.words.filter(w => w.extra).length
+  return { right: Math.max(0, total - Math.max(diff.missing.length, extra)), total, words: diff.words, missing: diff.missing, extra }
+}
+/** What a dictation saves. `start`: the sentence it began at (after an earlier stop); `stop`: stopped before the last
+ *  sentence, so the passage is not done and the next visit goes on from there. Words right / total add up across visits. */
+export function dictationPatch(before: StoryRecord, start: number, parts: readonly { right: number; total: number }[], stop: boolean, day: string): StoryRecord {
+  const sofar = start && before.dqp ? before.dqp : [0, 0]
+  const sum: [number, number] = [sofar[0] + parts.reduce((n, p) => n + p.right, 0), sofar[1] + parts.reduce((n, p) => n + p.total, 0)]
+  return stop ? { dn: start + parts.length, dqp: sum } : { d: day, dq: sum, dn: undefined, dqp: undefined }
 }
 /** Whole-passage dictation result from its sentences. */
 export const dictationTotal = (parts: readonly { right: number; total: number }[]): [number, number] =>

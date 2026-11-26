@@ -164,18 +164,28 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
 }
 
 /** What Claude said about a variation: the verdict on the first try with the exact text it judged, and whether it gave the answer away. */
-export interface VariationCheck { firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean }
+export interface VariationCheck {
+  firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean
+  /** What he had written when he pressed 看答案 himself: the answer is judged on this, not on what he copied afterwards. */
+  before?: string
+}
 /** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
  *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
-export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }: { item: { zh: string; en: string; alt?: string[] }
+export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, onDone }: { item: { zh: string; en: string; alt?: string[] }
   /** Which of today's variations this is, and how many there are. */
   count?: [number, number]
   /** The id of today's sentence, so the teacher knows the unit and its rule. */
   tutorId?: string; pattern?: string; rule?: string
+  /** The answer of this sentence was already shown on an earlier visit (the page was left and opened again). */
+  peekedBefore?: boolean
+  /** Remembers that the answer was shown, so opening the page again cannot hide it. */
+  onPeek?: () => void
   onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => void }) {
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
-  const [check, setCheck] = useState<VariationCheck>({})
+  // Read once: pressing 看答案 now marks the record too, which must not show the "earlier visit" note right away.
+  const [peekedAtStart] = useState(!!peekedBefore)
+  const [check, setCheck] = useState<VariationCheck>(peekedAtStart ? { revealed: true } : {})
   const [latest, setLatest] = useState<{ v: string; text: string } | null>(null)
   const [selfMark, setSelfMark] = useState(false)
   // With Claude connected there is no 看答案: Claude checks first and gives the answer on 「直接告訴我」. If Claude can't be reached, 看答案 comes back.
@@ -185,7 +195,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
   const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer, check) }
-  const reveal = () => { shownAt.current = Date.now(); setShown(true) }
+  const reveal = () => { shownAt.current = Date.now(); setShown(true); setCheck(c => c.before === undefined ? { ...c, before: answer } : c); onPeek?.() }
   const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
   const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)
   useTaskContext({
@@ -196,11 +206,12 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
   return <section className="ls-vary">
     <div className="pr-label">換個說法{count ? ' ' + count[0] + '／' + count[1] : ''} · 同一個句型</div>
     <h2 className="pr-question">{item.zh}</h2>
+    {peekedAtStart && <p className="ls-help">上次已經看過這題的答案了：這次寫對會記成有提示完成。</p>}
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
     </label>
     <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} onRevise={setAnswer}
-      onReveal={() => { setCheck(c => ({ ...c, revealed: true })); if (keyed && !shown) reveal() }}
+      onReveal={() => { setCheck(c => ({ ...c, revealed: true })); onPeek?.(); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
         setLatest({ v, text })
         if (attempt === 1) setCheck(c => c.firstVerdict ? c : { ...c, firstVerdict: v, checkedText: text })
@@ -221,6 +232,8 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
       </fieldset>}
       {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
+      {answer.trim() && check.before !== undefined && !check.before.trim() && <p className="ls-help">還沒寫就先看了答案：照抄的這題不算完成，會加入複習；明天再自己寫一次。</p>}
+      {answer.trim() && check.before?.trim() && !sameEnglish(check.before, answer) && <p className="ls-help">看了答案以後改過：記成有提示完成（看答案前寫對的話，還是算你自己完成）。</p>}
       {answer.trim() && check.firstVerdict && <p className="ls-help">
         {check.revealed ? '老師已經把答案告訴你了：按「對了」會記成有提示完成。'
           : check.firstVerdict !== 'good' ? '老師指出過要改的地方：改好後按「對了」，這次記成有提示完成。'

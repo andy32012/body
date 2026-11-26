@@ -116,3 +116,30 @@ test('跟 Emma 演一段：她演對方，他演護理師，語音辨識不評�
   assert.match(text, new RegExp('He plays ' + d.you))
   assert.match(text, /do not comment on his pronunciation/)
 })
+
+test('護理聽力重做：看過全文後重做不算只聽就懂；以前過關的不會因為重做比較差而消失，下一級也不會又鎖起來', async () => {
+  const { withBestListen, bestListen } = await import('../src/lib/bridge.ts')
+  const { heardWell, listenPassed, nurseLevelsOpen, nurseListenKey } = await import('../src/lib/nursing.ts')
+  const first = withBestListen(null, { day: '2026-11-20', correct: 3, total: 3, heard: true, plays: 1 })
+  assert.equal(heardWell(first), true)
+  // A redo right after the transcript: saved as practice (not by ear), the pass stays.
+  const redo = withBestListen(first, { day: '2026-11-20', correct: 1, total: 3, heard: false, plays: 1 })
+  assert.equal(redo.correct, 1, '最近一次照實記')
+  assert.deepEqual(bestListen(redo), { day: '2026-11-20', correct: 3, total: 3, heard: true })
+  assert.equal(listenPassed(redo), true)
+  assert.equal(heardWell(redo), true)
+  // An old record (no best) is its own best; a better later attempt replaces the best.
+  const old = { day: '2026-11-10', correct: 1, total: 3, heard: true, plays: 1 }
+  assert.equal(listenPassed(old), false)
+  const later = withBestListen(old, { day: '2026-11-21', correct: 3, total: 3, heard: true, plays: 2 })
+  assert.equal(bestListen(later)?.day, '2026-11-21')
+  assert.equal(withBestListen(later, { day: '2026-11-22', correct: 3, total: 3, heard: false, plays: 0 }).best?.heard, true, '看字全對不會蓋掉只聽全對')
+  // Level opening reads the best attempt: A2 passed, then one redo with the text does not lock B1.
+  const list = (listening as { id: string; level: string }[])
+  const a2 = list.filter(l => l.level === 'A2')
+  const notes: Record<string, string> = {}
+  for (const l of a2) notes[nurseListenKey(l.id)] = JSON.stringify(first)
+  assert.equal(nurseLevelsOpen(list, notes).B1, true)
+  notes[nurseListenKey(a2[0].id)] = JSON.stringify(redo)
+  assert.equal(nurseLevelsOpen(list, notes).B1, true, '重做一段看了字，B1 還是開著')
+})

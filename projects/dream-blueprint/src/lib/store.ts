@@ -300,6 +300,17 @@ export function setLocalModified(ms:number) {
   try { localStorage.setItem(MODIFIED_KEY,String(ms)) } catch { /* optional */ }
 }
 export function updateStore(updater:(prev:AppState)=>AppState) { apply(updater) }
+/** A change worked out from the progress as it is when the change is written (not as it was when it was asked for), and
+ *  the saved result. A merge uses it, so nothing done on this device while the cloud was being read is lost. */
+export function updateStoreNow(updater:(prev:AppState)=>AppState, stamp?:number):Promise<AppState> {
+  return new Promise((resolve,reject)=>apply(prev=>{
+    let next:AppState
+    try { next=updater(prev) } catch (e) { reject(e); return prev }
+    if (stamp) stampOverride=stamp
+    resolve(next)
+    return next
+  },true))
+}
 export function useAppStore() {
   const snapshot=useSyncExternalStore(subscribe,getSnapshot,getSnapshot)
   return {...snapshot,update:updateStore}

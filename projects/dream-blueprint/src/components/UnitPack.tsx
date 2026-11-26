@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import {
-  accentNames, hasPack, heldOpen, listenKey, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
+  accentNames, hasPack, heldOpen, listenKey, withBestListen, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
   type HeldPart, type ListenRecord, type Pack, type PackListening,
 } from '../lib/bridge'
 import { reached } from '../lib/unlock'
-import { passed, readRecord, type ReadPassage } from '../lib/reading'
+import { passed, readRecord, savedPicks, shownPassage, shownPicks, type ReadPassage } from '../lib/reading'
 import { readWrite, selfChecked, taskDone, type WriteStage, type WriteTask } from '../lib/writing'
 import { accentVoices, Transcript, useDialogueVoice, useVoiceList } from './LessonParts'
 import ReadingPath from './ReadingPath'
@@ -58,8 +58,12 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   const [noVoice, setNoVoice] = useState(false)
   const [unsure, setUnsure] = useState(false)
   const [started, setStarted] = useState(0)
+  // A redo starts a new round: plays finished before it do not open its questions.
+  const [playsBefore, setPlaysBefore] = useState(0)
+  // The transcript and the answers were seen in this visit: a redo now is practice, not understanding by ear.
+  const [seenText, setSeenText] = useState(false)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
-  const heard = voice.completed > 0
+  const heard = voice.completed > playsBefore
   const open = heard || unsure || noVoice
   const correct = l.questions.filter((q, i) => answers[i] === q.answer).length
   function playAll() {
@@ -69,7 +73,7 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   }
   function check() {
     voice.stop(); setChecked(true)
-    onSave({ correct, total: l.questions.length, heard: heard && !unsure && !noVoice, plays: voice.completed })
+    onSave({ correct, total: l.questions.length, heard: heard && !unsure && !noVoice && !seenText, plays: voice.completed - playsBefore })
   }
   return <section className="ls-listen up-section">
     <div className="pr-label">聽力 · {l.scene}</div>
@@ -80,6 +84,7 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
       {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />播放對話{voice.completed ? '（完整聽過 ' + voice.completed + ' 次）' : ''}</>}
     </button>
     {noVoice && <p className="ls-help">這個瀏覽器沒辦法播放語音，看下面的對話作答；這次不算「只聽也懂」。</p>}
+    {seenText && !checked && <p className="ls-help">剛剛看過全文和答案：這次重做是練習，先再完整聽一次才能作答，成績不算「只聽也懂」（之前的最好成績會留著）。</p>}
     {!checked && <ol className="ls-qs">
       {l.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
@@ -97,14 +102,16 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
       <Transcript lines={l.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(l.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        {checked && <button type="button" className="pr-link" onClick={() => { voice.stop(); setAnswers([]); setChecked(false); setUnsure(false); setShowZh(false) }}>再做一次（不看字先聽）</button>}
+        {checked && <button type="button" className="pr-link" onClick={() => { voice.stop(); setPlaysBefore(voice.completed); setSeenText(true); setAnswers([]); setChecked(false); setUnsure(false); setShowZh(false) }}>再做一次（不看字先聽）</button>}
       </div>
     </>}
   </section>
 }
 
-function HeldReading({ passage, done, onSubmit }: { passage: ReadPassage; done?: HeldPart; onSubmit: (picks: number[], correct: number) => void }) {
-  const [picks, setPicks] = useState<number[]>(done?.picks ?? [])
+function HeldReading({ passage: data, done, onSubmit }: { passage: ReadPassage; done?: HeldPart; onSubmit: (picks: number[], correct: number) => void }) {
+  // Options shuffled the same way every time (in the data the answers often go A, B, C in turn); saved in data order.
+  const passage = useMemo(() => shownPassage(data), [data])
+  const [picks, setPicks] = useState<number[]>(done?.picks ? shownPicks(passage.qs, done.picks) : [])
   const finished = !!done
   const ready = passage.qs.every((_, i) => picks[i] !== undefined)
   return <article className="up-held">
@@ -118,7 +125,7 @@ function HeldReading({ passage, done, onSubmit }: { passage: ReadPassage; done?:
         {finished && <p className="up-why" data-ok={picks[i] === q.answer}>{picks[i] === q.answer ? '✓ 對。' : '✗ 答案是「' + q.options[q.answer] + '」。'}{q.why}</p>}
       </li>)}
     </ol>
-    {!finished && <button type="button" className="pr-main" disabled={!ready} onClick={() => onSubmit(picks, passage.qs.filter((q, i) => picks[i] === q.answer).length)}>交卷（只有這一次）</button>}
+    {!finished && <button type="button" className="pr-main" disabled={!ready} onClick={() => onSubmit(savedPicks(passage.qs, picks), passage.qs.filter((q, i) => picks[i] === q.answer).length)}>交卷（只有這一次）</button>}
     {finished && <details className="up-zh"><summary>看中文大意</summary><p className="rd-zh">{passage.zh}</p></details>}
   </article>
 }
@@ -261,7 +268,7 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     {tab === 'chunks' && <Chunks key={unit} pack={pack} rate={rate} />}
     {tab === 'read' && <ReadingPath key={unit} state={state} onActivity={onActivity} date={date} only={pack.reading} />}
     {tab === 'listen' && pack.listen.map((l, i) => <PackListen key={unit + '-' + i} l={l} rate={rate} last={readListen(notes, unit, i)}
-      onSave={r => onActivity(prev => ({ ...prev, notes: logSkill({ ...prev.notes, [listenKey(unit, i)]: JSON.stringify({ ...r, day: date }) }, 'listen', date) }))} />)}
+      onSave={r => onActivity(prev => ({ ...prev, notes: logSkill({ ...prev.notes, [listenKey(unit, i)]: JSON.stringify(withBestListen(readListen(prev.notes, unit, i), { ...r, day: date })) }, 'listen', date) }))} />)}
     {tab === 'write' && <section className="up-section">
       <p className="ls-help">兩題段落寫作，題目會要你用這一課的文法。連上 Claude 就照全民英檢中級英文作文的官方評分表批改；沒連的話自己對照檢查（記成自評，不算過關）。</p>
       {tasks.map(t => {

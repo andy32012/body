@@ -45,7 +45,22 @@ export const heldOpen = (cur: { unit: number; day: number }, unit: number) => cu
 
 // ── Pack listening and speaking records.
 export const listenKey = (unit: number, i: number) => 'bridge.listen.' + unit + '.' + i
-export interface ListenRecord { day: string; correct: number; total: number; heard: boolean; plays: number }
+export interface ListenRecord { day: string; correct: number; total: number; heard: boolean; plays: number
+  /** The best attempt so far: a later redo (after seeing the transcript, or a worse day) never takes back a pass. */
+  best?: ListenAttempt }
+export interface ListenAttempt { day: string; correct: number; total: number; heard: boolean }
+const listenClean = (a: ListenAttempt) => a.heard && a.correct / Math.max(1, a.total) >= 0.7
+/** The new attempt saved as the latest, with the best attempt kept (by ear and 70%+ beats the rest, then the score). */
+export function withBestListen(old: ListenRecord | null, rec: ListenRecord): ListenRecord {
+  const prev: ListenAttempt | undefined = old ? old.best ?? { day: old.day, correct: old.correct, total: old.total, heard: old.heard } : undefined
+  const now: ListenAttempt = { day: rec.day, correct: rec.correct, total: rec.total, heard: rec.heard }
+  const ratio = (a: ListenAttempt) => a.correct / Math.max(1, a.total)
+  const better = !prev || (listenClean(now) && !listenClean(prev))
+    || (listenClean(now) === listenClean(prev) && ((now.heard && !prev.heard) || (now.heard === prev.heard && ratio(now) > ratio(prev))))
+  return { ...rec, best: better ? now : prev }
+}
+/** The attempt that decides passing: the best one (older records without `best` are their own best). */
+export const bestListen = (r: ListenRecord | null): ListenAttempt | null => r ? r.best ?? r : null
 export function readListen(notes: Record<string, string>, unit: number, i: number): ListenRecord | null {
   try { return notes[listenKey(unit, i)] ? JSON.parse(notes[listenKey(unit, i)]) as ListenRecord : null } catch { return null }
 }

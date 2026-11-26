@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
+import { savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
   nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
   type ReadLevel, type ReadPassage, type ReadStep,
 } from '../lib/reading'
 import { LockLine } from './Locked'
 import { useTaskContext } from '../lib/taskContext'
+import { logSkill } from '../lib/bridge'
 import { AskWord } from './AIChat'
 import './reading.css'
 
@@ -48,7 +49,9 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     setCurrentId(nextReading(all, only ? null : suggested, state.notes, [])?.id ?? null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all])
-  const passage = all && currentId ? all.find(p => p.id === currentId) ?? null : null
+  const data = all && currentId ? all.find(p => p.id === currentId) ?? null : null
+  // Shown with its options shuffled (the same way every time); answers are saved in the data's own order.
+  const passage = useMemo(() => data && shownPassage(data), [data])
   function moveOn(nextSkip: string[]) {
     if (!all) return
     // The suggestion applies here, when moving on — unless a level was picked by hand.
@@ -156,7 +159,8 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   function finish(p: number[], c: Record<number, string>) {
     if (!passage) return
     const right = passage.qs.filter((x, i) => p[i] === x.answer).length
-    onActivity(prev => ({ ...prev, notes: saveRead(prev.notes, passage.id, { day: date, picks: p, correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: c } : {}), ...(seenZh ? { zh: true } : {}) }) }))
+    // Each day a passage is read counts as a reading day, also when the same passage is read again on a later day.
+    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(prev.notes, passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
     setSaved(true)
   }
   function cause(qi: number, c: string) {
@@ -165,7 +169,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     setCauses(next)
     if (saved && passage) onActivity(prev => {
       const r = readRecord(prev.notes, passage.id)
-      return r ? { ...prev, notes: { ...prev.notes, ['read.' + passage.id]: JSON.stringify({ ...r, causes: next }) } } : prev
+      return r ? { ...prev, notes: { ...prev.notes, ['read.' + passage.id]: JSON.stringify({ ...r, causes: savedCauses(passage.qs, next) }) } } : prev
     })
   }
   const marks = last && at > 0 ? [last.evidence ?? ''] : []
@@ -184,7 +188,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       {passage.paras.map((p, i) => <p key={i} lang="en" className="rd-para">
         {passage.ielts && <b className="rd-letter">{letters[i]}</b>}<Highlight text={p} marks={marks} />
       </p>)}
-      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => { setZh(true); setSeenZh(true) }}>{seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
+      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => { setZh(true); if (!done) setSeenZh(true) }}>{done ? '看中文大意' : seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
     </article>
     {last && <div className="pr-hint rd-feedback" data-ok={!lastWrong}>
       <strong>{lastWrong ? '第 ' + at + ' 題答案是「' + last.options[last.answer] + '」' : '第 ' + at + ' 題答對了'}</strong>
@@ -200,7 +204,13 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       <div className="pr-options rd-options">{q.options.map((o, i) => <button key={o} type="button" lang="en" onClick={() => pick(i)}>{o}</button>)}</div>
     </section>}
     {done && <div className="pr-hint">
-      <strong>這篇答對 {correct} / {passage.qs.length}{redo ? '（重做是練習：答案剛看過，這次不算過關）' : passed({ day: date, picks, correct, total: passage.qs.length, zh: seenZh, tries: 1 }) ? '，過關 ✓' : seenZh ? '（看過中文，下次不看中文再試一次）' : '，70% 以上算過關，之後會再出現'}</strong>
+      <strong>這篇答對 {correct} / {passage.qs.length}{(() => {
+        // Said from what was actually saved: a second try on the same day is practice whichever way it was reached.
+        const rec = saved ? readRecord(state.notes, passage.id) : null
+        if (redo || rec?.practice) return '（今天已經做過這篇：這次是練習，不算新的過關' + (passed(rec) ? '；之前的過關留著 ✓' : '') + '）'
+        if (passed(rec)) return '，過關 ✓'
+        return seenZh ? '（看過中文，下次不看中文再試一次）' : '，70% 以上算過關，之後會再出現'
+      })()}</strong>
       <ul className="rd-review">{passage.qs.map((x, i) => <li key={i} data-ok={picks[i] === x.answer}>{typeNames[x.type]}：{picks[i] === x.answer ? '對' : '錯' + (causes[i] ? '（' + causes[i] + '）' : '')}</li>)}</ul>
       <div className="pr-actions">
         <button type="button" className="pr-main" onClick={() => moveOn([...skip, passage.id])}>下一篇</button>

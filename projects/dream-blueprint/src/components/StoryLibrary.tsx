@@ -7,7 +7,7 @@ import { logSkill } from '../lib/bridge'
 import { newCard } from '../lib/progress'
 import { levelEntry, wordKey } from '../lib/vocab'
 import { useDialogueVoice } from './LessonParts'
-import { storyLevelsOpen, dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
+import { storyLevelsOpen, dictationPatch, dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
   storyTabs, type Lookup, type StoryTab } from '../lib/story'
 import { openAt } from '../lib/unlock'
 import './story.css'
@@ -222,9 +222,10 @@ function StoryListen({ passage, state, onActivity, date, onNext, onDictate }: Pa
   function rate(u: 1 | 2 | 3) {
     voice.stop()
     setRated(u)
-    // Only a play that reached the end counts as listening practice.
+    // Only a play that reached the end counts as listening (the passage's 聽過 and the level's progress). Without it the
+    // text is still there to learn from, recorded apart.
     onActivity(prev => {
-      const notes = saveStory(prev.notes, passage.id, { l: date, ...(heard ? { u } : {}) })
+      const notes = saveStory(prev.notes, passage.id, heard ? { l: date, u } : { lt: date })
       return { ...prev, notes: heard ? logSkill(notes, 'listen', date) : notes }
     })
   }
@@ -266,14 +267,17 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   const sentences = useMemo(() => splitSentences(passage.en ?? ''), [passage])
   const lines = useMemo(() => sentences.map(en => ({ who: '', en, zh: '' })), [sentences])
   const voice = useDialogueVoice(state.settings.speechRate)
-  const [at, setAt] = useState(0)
+  // A dictation stopped early goes on from where it stopped (unless the passage was done since).
+  const [start] = useState(() => { const r = readStory(state.notes, passage.id); return !r.d && r.dn !== undefined && r.dn < sentences.length ? r.dn : 0 })
+  const [at, setAt] = useState(start)
   const [text, setText] = useState('')
   const [plays, setPlays] = useState(0)
+  const [early, setEarly] = useState(false)
   const [noVoice, setNoVoice] = useState(!('speechSynthesis' in window))
   const [results, setResults] = useState<ReturnType<typeof dictationScore>[]>([])
   const [finished, setFinished] = useState(false)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
-  const checked = results[at]
+  const checked = results[at - start]
   const sentence = sentences[at]
   useTaskContext({ label: '聽寫：' + label(passage), detail: '他正在做聽寫（聽一句、寫一句）。現在這一句：' + (sentence ?? '') + '\n他對答案前不要把句子說出來。', draft: text })
   function play() {
@@ -284,23 +288,24 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
     voice.stop()
     setResults(list => [...list, dictationScore(written, sentence)])
   }
-  function done(list: typeof results) {
-    const [right, total] = dictationTotal(list)
-    onActivity(prev => ({ ...prev, notes: logSkill(saveStory(prev.notes, passage.id, { d: date, dq: [right, total] }), 'listen', date) }))
+  function done(list: typeof results, stop = false) {
+    // Stopped early: remember where, the passage is not done yet. The last sentence done: the whole passage counts.
+    onActivity(prev => ({ ...prev, notes: logSkill(saveStory(prev.notes, passage.id, dictationPatch(readStory(prev.notes, passage.id), start, list, stop, date)), 'listen', date) }))
+    setEarly(stop)
     setFinished(true)
   }
   if (noVoice) return <div className="pr-hint"><strong>這台裝置現在沒辦法播放語音</strong><p>聽寫要聽得到聲音才能做。先做「閱讀」，或換一個有英文語音的瀏覽器再試。</p></div>
   if (finished) {
     const [right, total] = dictationTotal(results)
     return <div className="pr-hint">
-      <strong>這段聽寫完成：{total} 個字寫對 {right} 個（{Math.round(right / Math.max(1, total) * 100)}%）</strong>
-      <ol className="st-lines st-recap">{sentences.slice(0, results.length).map((s, i) => <li key={i}><p lang="en">{s}<small> {results[i].right} / {results[i].total}</small></p></li>)}</ol>
+      <strong>{early ? '今天寫了 ' + (start + results.length) + ' / ' + sentences.length + ' 句，下次從第 ' + (start + results.length + 1) + ' 句接著寫' : '這段聽寫完成'}：{total} 個字寫對 {right} 個（{Math.round(right / Math.max(1, total) * 100)}%）</strong>
+      <ol className="st-lines st-recap" start={start + 1}>{sentences.slice(start, start + results.length).map((s, i) => <li key={i}><p lang="en">{s}<small> {results[i].right} / {results[i].total}</small></p></li>)}</ol>
       <p className="rd-zh">{passage.zh}</p>
       <div className="pr-actions"><button type="button" className="pr-main" onClick={onNext}>下一段</button></div>
     </div>
   }
   return <section className="st-dictate">
-    <small>{label(passage)} · 第 {at + 1} / {sentences.length} 句</small>
+    <small>{label(passage)} · 第 {at + 1} / {sentences.length} 句{start && at === start ? '（上次寫到這裡，接著寫）' : ''}</small>
     <button type="button" className="ls-play" onClick={play}><Play size={16} fill="currentColor" />{plays ? '再聽一次' : '播放這一句'}{plays ? '（聽了 ' + plays + ' 次）' : ''}</button>
     <label className="pr-field">我聽到的
       <textarea lang="en" rows={3} value={text} readOnly={!!checked} autoCapitalize="sentences" autoComplete="off" autoCorrect="off" spellCheck={false}
@@ -315,13 +320,14 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
       <p lang="en">{sentence}</p>
       {checked.words.length > 0 && <p className="pr-compare"><small>你寫的：</small> <span lang="en">{checked.words.map((t, i) => <span key={i} className={t.extra ? 'pr-diff-extra' : undefined}>{t.w} </span>)}</span></p>}
       {checked.missing.length > 0 && <p className="pr-compare"><small>沒寫到的字：</small> <span lang="en" className="pr-diff-missing">{checked.missing.join(' ')}</span></p>}
+      {checked.extra > 0 && <p className="pr-compare"><small>多寫了 {checked.extra} 個原句沒有的字（畫波浪線的），也算錯：多一個字意思可能就反了。</small></p>}
       <strong>{checked.total} 個字寫對 {checked.right} 個{checked.right === checked.total ? ' ✓' : ''}</strong>
       <small>大小寫和標點不算錯；畫波浪線的字原句沒有。</small>
       <div className="pr-actions">
         {at + 1 < sentences.length
           ? <button type="button" className="pr-main" onClick={() => { setAt(at + 1); setText(''); setPlays(0) }}>下一句</button>
           : <button type="button" className="pr-main" onClick={() => done(results)}>看整段結果</button>}
-        {at + 1 < sentences.length && results.length >= 2 && <button type="button" className="pr-link" onClick={() => done(results)}>今天寫到這裡</button>}
+        {at + 1 < sentences.length && results.length >= 2 && <button type="button" className="pr-link" onClick={() => done(results, true)}>今天寫到這裡（下次接著寫）</button>}
       </div>
     </div>}
   </section>

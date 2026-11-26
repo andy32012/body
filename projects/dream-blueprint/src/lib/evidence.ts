@@ -15,6 +15,8 @@ export interface Evidence {
   item?: string; hints?: number
   /** Kept only for 待確認, so the answer can be checked later. */
   answer?: string; prompt?: string; ref?: string
+  /** Claude checked it and said it is wrong (the reason): it is not done until he rewrites it right. */
+  wrong?: string
 }
 /** Claude's check of a written answer: good = meaning right and natural; small / again = meaning clear but grammar or words
  *  need fixing; changed = grammatical maybe, but it says something else (換貨 written as a refund). */
@@ -34,11 +36,33 @@ export function setEvidenceLevel(notes: Record<string, string>, unit: number, in
   list[index] = { ...list[index], level, answer: undefined, prompt: undefined, ref: undefined }
   return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }
+/** How Claude's check of a 待確認 answer reads: it must start with 對 or 錯; anything else is not a verdict. */
+export function teacherVerdict(reply: string): 'right' | 'wrong' | 'unclear' {
+  const t = reply.trim()
+  return /^對/.test(t) ? 'right' : /^錯/.test(t) ? 'wrong' : 'unclear'
+}
+/** A 待確認 answer after Claude's check. Right the first time → done alone; right after a rewrite (it was wrong before)
+ *  → done with help. Wrong → still not done, with the reason, the question and his answer kept so he can rewrite it.
+ *  Unclear → nothing changes. */
+export function checkPending(notes: Record<string, string>, unit: number, index: number, reply: string, rewrite?: string) {
+  const verdict = teacherVerdict(reply)
+  const list = readEvidence(notes, unit)
+  const e = list[index]
+  if (!e || verdict === 'unclear') return notes
+  if (verdict === 'right') {
+    list[index] = { ...e, level: e.wrong || rewrite !== undefined ? 'assisted' : 'independent', answer: undefined, prompt: undefined, ref: undefined, wrong: undefined }
+  } else {
+    const reason = reply.trim().replace(/^錯[。，、：:\s]*/, '').split('\n')[0] || '還要再改'
+    list[index] = { ...e, level: 'pending', wrong: reason, ...(rewrite !== undefined ? { answer: rewrite } : {}) }
+  }
+  return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
+}
 export function unitsWithEvidence(notes: Record<string, string>) {
   return Object.keys(notes).filter(k => k.startsWith('evidence.')).map(k => Number(k.slice(9))).filter(n => n > 0).sort((a, b) => a - b)
 }
 export function bestLevel(list: readonly Evidence[], skill: 'write' | 'listen' = 'write'): Level | null {
-  const own = list.filter(e => e.skill === skill)
+  // An answer Claude said is wrong shows nothing yet, not even 自評完成.
+  const own = list.filter(e => e.skill === skill && !e.wrong)
   return own.length ? own.reduce((a, e) => rank[e.level] > rank[a] ? e.level : a, own[0].level) : null
 }
 
@@ -105,7 +129,45 @@ export const sameEnglish = (a: string, b: string) => normalizeEnglish(a) === nor
 export function matchesReference(answer: string, refs: readonly string[]) {
   if (!answer.trim()) return false
   const forms = new Set(answerForms(answer))
-  return refs.some(r => forms.has(referenceForm(r)))
+  return refs.some(r => forms.has(referenceForm(r)) && clauseCommasMissing(r, answer).length === 0)
+}
+
+/** Where commas fall, counted in words (after contractions are expanded): "my sister, who…" → a comma after word 2. */
+function commaPlaces(t: string) {
+  const tokens = base(t).replace(/[^a-z0-9', ]+/g, ' ').replace(/,/g, ' , ').split(/\s+/).filter(Boolean)
+  const places: { at: number; next: string }[] = []
+  let words = 0
+  tokens.forEach((x, i) => { if (x === ',') places.push({ at: words, next: tokens[i + 1] ?? '' }); else words++ })
+  return places
+}
+const relativeWords = new Set(['who', 'whom', 'which', 'whose', 'where'])
+/** The commas of a non-restrictive clause in a reference (", who is a nurse," / ", which made…") that the answer leaves
+ *  out. Without them it is a different sentence (all my sisters vs the one sister), so the words alone are not enough.
+ *  Each is "before" (the comma before who / which) or "after" (the one closing the clause). */
+export function clauseCommasMissing(ref: string, answer: string): ('before' | 'after')[] {
+  const r = commaPlaces(ref)
+  if (!r.some(c => relativeWords.has(c.next))) return []
+  const a = new Set(commaPlaces(answer).map(c => c.at))
+  const missing: ('before' | 'after')[] = []
+  r.forEach((c, i) => {
+    if (!relativeWords.has(c.next)) return
+    if (!a.has(c.at)) missing.push('before')
+    // The clause closes at the next comma, if the sentence goes on after it.
+    const close = r[i + 1]
+    if (close && !relativeWords.has(close.next) && !a.has(close.at)) missing.push('after')
+  })
+  return missing
+}
+/** Said when the words match a reference but the clause commas do not, so he knows why it is not counted as right. */
+export function clauseCommaNote(answer: string, refs: readonly string[]): string | null {
+  if (!answer.trim()) return null
+  const forms = new Set(answerForms(answer))
+  const same = refs.filter(r => forms.has(referenceForm(r)))
+  if (!same.length || same.some(r => clauseCommasMissing(r, answer).length === 0)) return null
+  const missing = clauseCommasMissing(same[0], answer)
+  const where = missing.includes('before') && missing.includes('after') ? '前後兩個逗號'
+    : missing.includes('before') ? 'who／which／whose／where 前面的逗號' : '補充說明結束的那個逗號'
+  return '字都對，但少了' + where + '：補充說明（非限定關係子句）要用逗號隔開，拿掉逗號意思就變了（例如 my sister who is a nurse 聽起來像你有好幾個姊姊）。'
 }
 
 /** Word-by-word comparison with the closest reference, shown only after the reference itself is open:
@@ -153,9 +215,15 @@ export const verifiedAlone = (a: Parameters<typeof judgeWritten>[0]) => judgeWri
 /** The variation is written first and only then compared with the answer. When Claude checked it, the same standard as
  *  every written answer applies: right on the first check → done alone; fixed after feedback, or given the answer → done with help. */
 export function judgeVariation(mark: 'good' | 'small' | 'again', answer: string, en: string | readonly string[],
-  check: { firstVerdict?: Verdict; checkedText?: string; revealed?: boolean } = {}): Level | null {
-  return judgeWritten({ rating: mark === 'good' ? 'correct' : mark === 'small' ? 'minor' : 'again', revealed: !!check.revealed, answer,
-    references: typeof en === 'string' ? [en] : en, firstVerdict: check.firstVerdict, checkedText: check.checkedText })
+  check: { firstVerdict?: Verdict; checkedText?: string; revealed?: boolean; before?: string } = {}): Level | null {
+  // 看答案 pressed by himself: judged on what he had written before he looked. Nothing written yet → copying is not done.
+  const before = check.before
+  if (before !== undefined && !answered(before)) return null
+  const level = judgeWritten({ rating: mark === 'good' ? 'correct' : mark === 'small' ? 'minor' : 'again', revealed: !!check.revealed,
+    answer: before ?? answer, references: typeof en === 'string' ? [en] : en, firstVerdict: check.firstVerdict, checkedText: check.checkedText })
+  // Changed after looking, and what he had before did not match: the answer helped.
+  if (level === 'pending' && before !== undefined && !sameEnglish(before, answer)) return 'assisted'
+  return level
 }
 /** The open task: a frame, the model answer or asking Claude (「我卡住了」) counts as help; the first feedback decides "alone". */
 export function judgeExpress(r: { firstVerdict?: Verdict; help: readonly string[]; answered: boolean }): Level | null {

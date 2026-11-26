@@ -63,3 +63,57 @@ test('中翻英回饋：意思變了是第四種判定；跟參考句比對只�
   assert.deepEqual(d.missing, ['get'])
   assert.equal(compareWithReference("I'm a nursing student", ['I am a nursing student.'])!.same, true)
 })
+
+test('待確認的答案請 Claude 看：說對才升級；說錯留著原答和原因等重寫；看不出對錯就不動', async () => {
+  const { checkPending, teacherVerdict } = await import('../src/lib/evidence.ts')
+  const pending = { day: '2026-11-26', level: 'pending' as const, source: 'vary' as const, skill: 'write' as const, answer: 'I nurse.', prompt: '我是護理師。', ref: 'I am a nurse.' }
+  const start = addEvidence({}, 1, pending)
+  assert.equal(teacherVerdict('對。'), 'right')
+  assert.equal(teacherVerdict('錯。缺少動詞。'), 'wrong')
+  assert.equal(teacherVerdict('嗯，這句可以再想想'), 'unclear')
+  // Right the first time: done alone.
+  assert.equal(readEvidence(checkPending(start, 1, 0, '對'), 1)[0].level, 'independent')
+  // Wrong: nothing gained, the question, his answer and the reason stay.
+  const wrong = checkPending(start, 1, 0, '錯。缺少動詞。')
+  const e = readEvidence(wrong, 1)[0]
+  assert.equal(e.level, 'pending')
+  assert.equal(e.wrong, '缺少動詞。')
+  assert.equal(e.answer, 'I nurse.')
+  assert.equal(e.prompt, '我是護理師。')
+  assert.equal(bestLevel(readEvidence(wrong, 1)), null, '說錯的不算任何完成')
+  // Rewritten right: done with help. Rewritten wrong again: the new answer and reason replace the old.
+  const again = checkPending(wrong, 1, 0, '錯，少了 a', 'I am nurse.')
+  assert.deepEqual([readEvidence(again, 1)[0].answer, readEvidence(again, 1)[0].wrong], ['I am nurse.', '少了 a'])
+  const fixed = readEvidence(checkPending(again, 1, 0, '對', 'I am a nurse.'), 1)[0]
+  assert.equal(fixed.level, 'assisted')
+  assert.equal(fixed.answer, undefined)
+  assert.equal(fixed.wrong, undefined)
+  // Unclear: unchanged.
+  assert.equal(checkPending(start, 1, 0, '這句不錯喔'), start)
+})
+
+test('換個說法自己按「看答案」：用看答案前寫的判；還沒寫就看、看完照抄不算完成', () => {
+  const ref = 'I am not a doctor. I am a nurse.'
+  assert.equal(judgeVariation('good', ref, ref, { before: '' }), null, '空白看答案再抄：不算完成')
+  assert.equal(judgeVariation('good', ref, ref, { before: ref }), 'independent', '先自己寫對再對答案：還是自己完成')
+  assert.equal(judgeVariation('good', ref, ref, { before: 'I not doctor, I nurse.' }), 'assisted', '看了答案才改對：有提示完成')
+  assert.equal(judgeVariation('good', 'No doctor, nurse.', ref, { before: 'No doctor, nurse.' }), 'pending', '沒改、跟參考句不同：待確認')
+  assert.equal(judgeVariation('good', ref, ref, { revealed: true, before: 'I am doctor.' }), 'assisted', '上次已經看過答案')
+})
+
+test('非限定關係子句的逗號要寫：字都對但少了逗號，不算當次獨立完成，而且會說原因', async () => {
+  const { clauseCommaNote } = await import('../src/lib/evidence.ts')
+  const ref = ['Our head nurse, who is very kind, used to work in the US.']
+  assert.equal(matchesReference('Our head nurse, who is very kind, used to work in the US.', ref), true)
+  assert.equal(matchesReference('Our head nurse who is very kind used to work in the US.', ref), false, '兩個逗號都沒寫')
+  assert.equal(matchesReference('Our head nurse, who is very kind used to work in the US.', ref), false, '少了後面那個')
+  assert.match(clauseCommaNote('Our head nurse who is very kind used to work in the US.', ref) ?? '', /前後兩個逗號/)
+  assert.match(clauseCommaNote('Our head nurse, who is very kind used to work in the US.', ref) ?? '', /結束的那個逗號/)
+  // A clause at the end only needs the comma before which.
+  const end = ["He didn't come to work, which made everyone worried."]
+  assert.equal(matchesReference('He did not come to work, which made everyone worried', end), true)
+  assert.equal(matchesReference("He didn't come to work which made everyone worried.", end), false)
+  assert.equal(judgeWritten({ rating: 'correct', revealed: false, answer: 'Our head nurse who is very kind used to work in the US.', references: ref }), 'pending')
+  // Other sentences are not affected by commas.
+  assert.equal(matchesReference('Yes I am', ['Yes, I am.']), true)
+})
