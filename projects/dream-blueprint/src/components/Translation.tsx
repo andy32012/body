@@ -1,3 +1,4 @@
+import DraftVersions from './DraftVersions'
 import OwnCheck from "./OwnCheck";
 import { useRef, useState, type ReactNode } from "react";
 import TutorChat from "./TutorChat";
@@ -151,6 +152,7 @@ export function Translation({
           placeholder="把想到的英文寫在這裡"
         />
       </label>
+      <DraftVersions id={sentence.id} text={answer} onChoose={setAnswer} />
       {hint === 0 && (
         <div className="pr-actions">
           <button className="pr-main" onClick={() => { setSendNow(keyed); setHint(1); }}>

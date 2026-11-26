@@ -14,7 +14,7 @@ import './tutor.css'
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, onBusy, mode = 'translate', restore, previous, selfFix = false, rubric }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, onBusy, backgroundGrade, mode = 'translate', restore, previous, selfFix = false, rubric }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
   /** The published table Claude grades by (全民英檢): a score with its level is shown, and the verdict follows it. */
   rubric?: RubricId
@@ -23,6 +23,8 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result, judged: string) => void; mode?: 'translate' | 'open'
   /** While Claude is checking (the caller can hold its button, so one press is one check). */
   onBusy?: (busy: boolean) => void
+  /** An exercise with persistent grading can save its initial result after the box leaves the page. */
+  backgroundGrade?: { save: (result: Result, judged: string) => void | Promise<void>; waiting: (busy: boolean) => void }
   /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
   restore?: { answer: string; result: Result }
   /** The feedback on the earlier try, so Claude can say which of those issues are now fixed. */
@@ -59,37 +61,54 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   const [graded, setGraded] = useState(() => restore?.answer ?? '')
   async function send(next: TutorTurn[], first: boolean, mine = lastCheck.current) {
     const current = () => checks.current.isCurrent(mine)
+    const persistent = first ? backgroundGrade : undefined
+    const judged = first ? answer.trim() : ''
+    const controller = persistent ? new AbortController() : undefined
+    const timeout = controller ? window.setTimeout(() => controller.abort(), 5 * 60_000) : undefined
+    persistent?.waiting(true)
     setWaiting(true); setError(''); setRaw('')
     try {
-      const reply = await askTutor(sys, next)
-      if (!current()) return
+      const reply = await askTutor(sys, next, controller?.signal)
+      if (controller?.signal.aborted) throw controller.signal.reason
+      clearTimeout(timeout)
+      if (!current() && !persistent) return
       if (first) {
         const parsed = parseCorrection(reply, rubric)
-        setRestored(false)
-        setResult(parsed)
-        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed, answer.trim())
+        if (parsed && persistent) await persistent.save(parsed, judged)
+        const visible = current()
+        if (visible) {
+          setRestored(false)
+          setResult(parsed)
+          if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed, judged)
+        }
         // Each kind of mistake also goes on the shared weak-point list (a second try does not count the same ones again).
         if (parsed?.fixes.length && !previous) {
           const day = dayKey()
           updateStore(prev => ({ ...prev, notes: parsed.fixes.reduce((n, f) => typeof f.tag === 'string' ? addWeak(n, f.tag, day, { w: f.wrong || '（漏寫）', r: f.right }, 'write') : n, prev.notes) }))
         }
+        if (!visible) return
         setTurns([...next, { role: 'assistant', content: reply }])
         if (!parsed) { setError(rubric ? '這次 Claude 沒有照評分表給分（格式不對），這一次不算，再按一次批改就好。' : '這次 Claude 回的格式不對，這一次不算，再按一次批改就好。'); setRaw(reply) }
       } else setTurns([...next, { role: 'assistant', content: reply }])
     } catch (e) {
       if (!current()) return
-      setError(e instanceof Error ? e.message : String(e))
+      setError(controller?.signal.aborted ? '等候批改逾時。原作答已保留，可以重新送出。' : e instanceof Error ? e.message : String(e))
       // A reply cut off or declined is Claude answering badly once, not Claude out of reach: pressing again is the way on.
       if (!(e instanceof ClaudeIncomplete)) onError?.()
     }
-    finally { if (first) inFlight.current = false; if (current()) setWaiting(false) }
+    finally {
+      clearTimeout(timeout)
+      if (first) inFlight.current = false
+      persistent?.waiting(false)
+      if (current()) setWaiting(false)
+    }
   }
 
   useEffect(() => {
     if (!run || inFlight.current) return
     setResult(null); setQuestion(''); setTurns([]); setError(''); setRaw(''); setSaved([]); setHints(selfFix ? 1 : -1)
-    if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); return }
-    if (!answer.trim()) { setError('先寫一點英文再按批改。'); return }
+    if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); onBusy?.(false); return }
+    if (!answer.trim()) { setError('先寫一點英文再按批改。'); onBusy?.(false); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
     inFlight.current = true
     setGraded(answer.trim())

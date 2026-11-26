@@ -10,8 +10,9 @@ import { markSkill } from '../lib/wordSkills'
 import { useTapGuard } from '../lib/tapGuard'
 import { paintSky, seedOf } from '../lib/starfield'
 import { useModal } from '../lib/modal'
-import { formLines, meaningLine, wordKey } from '../lib/vocab'
-import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, dailyQueue, dailyWordPhoto, doneKey, moreKey, newWordPlan, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
+import { meaningLine, wordKey } from '../lib/vocab'
+import { speakEnglishResult } from '../lib/tts'
+import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, currentWordChoice, dailyQueue, dailyWordPhoto, doneKey, moreKey, newWordPlan, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -29,7 +30,8 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   // 上一個: steps back through the words sorted today (0 = the word in front of him now).
   const sorted = readSorted(state.notes, today)
   const [back, setBack] = useState(0)
-  const past = back > 0 ? sorted[sorted.length - back] : undefined
+  const previous = back > 0 ? sorted[sorted.length - back] : undefined
+  const past = previous ? { ...previous, known: currentWordChoice(state, previous) } : undefined
   const pastWord = past ? officialByKey.get(past.k) : undefined
   const word = pastWord ?? current
   const imageKey = word?.en ?? 'done' + today
@@ -41,20 +43,25 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   // 還不熟 / 認得 stay in the same place for the next word: a double tap must not sort that one too.
   const ready = useTapGuard(word?.en)
   const [silent, setSilent] = useState(false)
+  const playback = useRef<AbortController | null>(null)
   const card = useRef<HTMLDivElement>(null)
   const veil = useRef<HTMLDivElement>(null)
   // Opened by itself on the first visit of the day, focus lands on the 今日單字 button when it closes.
   useModal(veil, onClose, { initial: () => card.current, fallback: () => document.querySelector<HTMLElement>('.word-chip') ?? document.getElementById('content') })
-  useEffect(() => () => window.speechSynthesis?.cancel(), [])
+  useEffect(() => {
+    setSilent(false)
+    return () => { playback.current?.abort(); playback.current = null }
+  }, [word?.en])
 
-  function speak() {
-    if (!word || !('speechSynthesis' in window)) { setSilent(true); return }
-    const phrase = new SpeechSynthesisUtterance(word.en.split('/')[0].replace(/\(.*?\)/g, ''))
-    phrase.lang = 'en-US'
-    phrase.rate = state.settings.speechRate
-    phrase.onerror = () => setSilent(true)
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(phrase)
+  async function speak(spelling: string) {
+    playback.current?.abort()
+    const controller = new AbortController()
+    playback.current = controller
+    setSilent(false)
+    const result = await speakEnglishResult(spelling, state.settings.speechRate, controller.signal)
+    if (playback.current !== controller) return
+    playback.current = null
+    setSilent(result === 'failed')
   }
 
   function sort(known: boolean) {
@@ -77,8 +84,8 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
     setReveal(false)
   }
 
-  function stepBack() { setBack(b => Math.min(sorted.length, b + 1)); setReveal(false); window.speechSynthesis?.cancel() }
-  function stepForward() { setBack(b => Math.max(0, b - 1)); setReveal(false); window.speechSynthesis?.cancel() }
+  function stepBack() { setBack(b => Math.min(sorted.length, b + 1)); setReveal(false) }
+  function stepForward() { setBack(b => Math.max(0, b - 1)); setReveal(false) }
   /** A choice changed on a word looked back at: the list and review cards follow, the day's count does not. */
   function change(known: boolean) {
     if (!past) return
@@ -87,6 +94,15 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
 
   const setNote = (key: string, value: string) =>
     update(prev => ({ ...prev, notes: { ...prev.notes, [key]: value } }))
+
+  const visibleForms = reveal || !!past
+  const groups = word?.forms ?? []
+  const spellings = groups.length ? groups.flatMap(group => group.forms) : word ? [word.en] : []
+  const grouped = visibleForms && groups.length > 1
+  const listen = (spelling: string, text: string, className: string) =>
+    <button key={spelling} type="button" className={className} aria-label={'聽 ' + spelling + ' 的發音'} onClick={() => void speak(spelling)}>
+      <Volume2 size={15} aria-hidden="true" />{text && <span lang={text === '聽發音' ? undefined : 'en'}>{text}</span>}
+    </button>
 
   return <div className="daily-word-veil" ref={veil} role="dialog" aria-modal="true" aria-label="今日單字" onClick={onClose}>
     <div className="daily-word-card" ref={card} tabIndex={-1} onClick={event => event.stopPropagation()}>
@@ -101,13 +117,21 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
         <div className="daily-word-body">
           <span className="daily-word-meta">第 {word.level} 級{past ? ' · 今天第 ' + (done - back + 1) + ' 個 · 你選了「' + (past.known ? '認得' : '還不熟') + '」' : ''}</span>
           <strong className="daily-word-term" lang="en">{word.en}</strong>
-          {reveal || past
-            ? formLines(word).length
-              ? <ul className="daily-word-forms">{formLines(word).map(f => <li key={f.en}><b lang="en">{f.en}</b> <small>{f.pos}</small> {f.zh}</li>)}</ul>
+          {visibleForms
+            ? grouped
+              ? <ul className="daily-word-forms">{groups.map(f => <li key={f.forms.join('/')}>
+                {f.forms.map((form, i) => <span key={form} className="daily-word-form">
+                  {i > 0 && ' / '}<b lang="en">{form}</b> {listen(form, '', 'daily-word-form-listen')}
+                </span>)} <small>{f.pos}</small> {f.zh}
+              </li>)}</ul>
               : <p className="daily-word-meaning">{meaningLine(word)}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
-          {(reveal || past) && <HomographNote en={word.en} side="everyday" />}
-          <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal || past ? word.zh : undefined} label="問問 Claude" />{(reveal || past) && <UseWord key={word.en} en={word.en} zh={word.zh}
+          {visibleForms && <HomographNote en={word.en} side="everyday" />}
+          <div className="daily-word-tools">
+            {!grouped && (visibleForms && spellings.length > 1
+              ? spellings.map(form => listen(form, form, 'daily-word-listen'))
+              : spellings[0] && listen(spellings[0], '聽發音', 'daily-word-listen'))}
+            <AskWord en={word.en} zh={visibleForms ? word.zh : undefined} label="問問 Claude" />{visibleForms && <UseWord key={word.en} en={word.en} zh={word.zh}
             onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), 'write', today) }))} />}</div>
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}
         </div>

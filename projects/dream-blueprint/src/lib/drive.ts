@@ -6,7 +6,7 @@
 import { memoryTimes, type MemoryRecords } from './memory'
 
 const KEY = 'dream-blueprint.drive'
-type Drive = { url: string; token: string; sheet?: string; generation?: string }
+type Drive = { url: string; token: string; sheet?: string; generation?: string; settled?: boolean }
 
 function read(): Drive | null {
   try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && v.url && v.token ? v : null } catch { return null }
@@ -17,6 +17,13 @@ function write(v: Drive | null) {
 export const driveConfig = read
 export const driveConnected = () => !!read()
 export const cloudScope = (d = read()) => d ? d.generation ?? d.url : null
+export function readyCloudScope() {
+  const d = read()
+  return d?.settled === false ? null : cloudScope(d)
+}
+export function driveStorageChanged(event: StorageEvent) {
+  return event.storageArea === localStorage && (event.key === null || event.key === KEY || event.key.startsWith('dream-blueprint.cloud-'))
+}
 let connectionAttempt = 0
 function withStoreLock<T>(action: () => T): Promise<T> {
   if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request('dream-blueprint.v2', action)
@@ -36,17 +43,36 @@ export function sameConnection(d: Drive) {
   return current?.url === d.url && current.token === d.token && cloudScope(current) === cloudScope(d)
 }
 
-function rememberCapabilities(json: { url?: string; cas?: boolean; archive?: boolean; folder?: string; atomic?: boolean; guarded?: boolean }, d: Drive) {
-  if (!sameConnection(d)) return
-  if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
+/** An initial pull, push or explicit choice has finished. The persisted connection notifies other tabs. */
+export async function completeDriveConnection(d: Drive) {
+  await withStoreLock(() => {
+    const current = read()
+    if (!current || !sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
+    if (current.settled === false) {
+      write({ ...current, settled: true })
+      if (readyCloudScope() !== cloudScope(d)) throw new Error('瀏覽器無法保存雲端連線狀態，請再試一次。')
+    }
+    window.dispatchEvent(new Event(driveReadyEvent))
+  })
+}
+
+function rememberCapabilities(json: { url?: string; cas?: boolean; archive?: boolean; folder?: string; atomic?: boolean; guarded?: boolean; scriptVersion?: number }, d: Drive) {
+  const current = read()
+  if (!current || !sameConnection(d)) return
+  if (json.url && json.url !== current.sheet) write({ ...current, sheet: json.url })
   if (json.cas) markCas()
   if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
   if (json.atomic) markAtomic()
   try {
     const guarded = localStorage.getItem(GUARDED) === '1'
-    if (!!json.guarded !== guarded) {
-      if (json.guarded) localStorage.setItem(GUARDED, '1')
-      else localStorage.removeItem(GUARDED)
+    const version = typeof json.scriptVersion === 'number' && Number.isSafeInteger(json.scriptVersion) ? json.scriptVersion : 0
+    if (cloudScriptVersion() !== version || !!json.guarded !== guarded) {
+      if (version) localStorage.setItem(SCRIPT_VERSION, String(version))
+      else localStorage.removeItem(SCRIPT_VERSION)
+      if (!!json.guarded !== guarded) {
+        if (json.guarded) localStorage.setItem(GUARDED, '1')
+        else localStorage.removeItem(GUARDED)
+      }
       window.dispatchEvent(new Event('dream-blueprint:cloud'))
     }
   } catch { /* optional */ }
@@ -62,7 +88,7 @@ async function post(body: object, d = read()) {
     : json.error === 'write' ? '雲端這次沒有存完整，雲端還是原本那一份'
     : json.error === 'history' ? '雲端硬碟沒辦法先留一份備份，這次先不蓋掉雲端那份'
     : '雲端硬碟回傳錯誤')
-  rememberCapabilities(json, d)
+  await withStoreLock(() => rememberCapabilities(json, d))
   return json
 }
 /** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
@@ -73,7 +99,7 @@ async function get(type: 'state' | 'memory', d = read()) {
   const res = await fetch(d.url + (type === 'state' ? '?type=state&' : '?') + 'token=' + encodeURIComponent(d.token))
   const old = await res.json()
   if (!old.ok) throw new Error(old.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
-  rememberCapabilities(old, d)
+  await withStoreLock(() => rememberCapabilities(old, d))
   return old
 }
 
@@ -84,7 +110,7 @@ export async function connectDrive(url: string, token: string) {
   const key = token.trim()
   const same = previous?.url === clean && previous.token === key
   const generation = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), n => n.toString(16).padStart(2, '0')).join('')
-  const candidate = same ? previous : { url: clean, token: key, generation: generation() }
+  const candidate = same ? previous : { url: clean, token: key, generation: generation(), settled: false }
   if (!candidate.token) throw new Error('請填入 Apps Script 執行記錄裡的同步密鑰。')
   const attempt = ++connectionAttempt
   const response = await get('memory', candidate)
@@ -155,10 +181,12 @@ const BASE = 'dream-blueprint.cloud-base'
 const CONFLICT = 'dream-blueprint.cloud-conflict'
 const CAS = 'dream-blueprint.cloud-cas'
 const GUARDED = 'dream-blueprint.cloud-guarded'
+const SCRIPT_VERSION = 'dream-blueprint.cloud-script-version'
 export function cloudGuarded() { try { return localStorage.getItem(GUARDED) === '1' } catch { return false } }
+export function cloudScriptVersion() { try { return Number(localStorage.getItem(SCRIPT_VERSION)) || 0 } catch { return 0 } }
 function resetCloudTracking() {
   try {
-    for (const key of [BASE, CONFLICT, CAS, HISTORY, ARCHIVE, ATOMIC, GUARDED, STATUS]) localStorage.removeItem(key)
+    for (const key of [BASE, CONFLICT, CAS, HISTORY, ARCHIVE, ATOMIC, GUARDED, SCRIPT_VERSION, STATUS]) localStorage.removeItem(key)
   } catch { /* optional */ }
   window.dispatchEvent(new Event('dream-blueprint:cloud'))
 }
@@ -218,8 +246,9 @@ export function cloudAtomic() { try { return localStorage.getItem(ATOMIC) === '1
 export function archiveFolderUrl() { try { const v = localStorage.getItem(ARCHIVE) || ''; return v.startsWith('https://') ? v : '' } catch { return '' } }
 /** Saves old records as a file in the Drive archive folder. True only when the script confirms it kept them
  *  (an older script answers ok without keeping anything). */
-export async function archiveToDrive(file: string) {
-  try { const json = await post({ type: 'archive-add', data: file }); return json?.archived === true } catch { return false }
+export async function archiveToDrive(file: string, d: Drive) {
+  if (!sameConnection(d)) return false
+  try { const json = await post({ type: 'archive-add', data: file }, d); return json?.archived === true && sameConnection(d) } catch { return false }
 }
 
 /** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
@@ -327,12 +356,14 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶 v6（貼到 script.google.com 的專案，部署成網頁應用程式）
+export const appsScriptVersion = 7
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v${appsScriptVersion}（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 // v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
 // v4：手機要整理掉的舊紀錄（兩個月前的複習紀錄、幾週前的每日小紀錄、四個月前上完的課的批改全文）先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了手機才拿掉；封存的檔案不會被刪。
 // v5：存進度時先寫到另一張工作表，整份讀回來確認一模一樣才換過去用；存到一半失敗（斷線、逾時），雲端還是原本完整的那份。要先留備份時，備份沒存成功就不蓋掉。
-// v6：擁有者在編輯器執行 setupHistory 設定同步密鑰。進度在鎖內比對版本，並由雲端發行新版號。
+// v7：對話欄位以文字寫入；歷史清理只處理這個專案已標記的快照。
+// 擁有者在編輯器執行 setupHistory 設定同步密鑰。進度在鎖內比對版本，並由雲端發行新版號。
 // setupHistory 保留原有密鑰與資料夾。第一次設定請從 Apps Script 執行記錄複製密鑰，再部署。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
@@ -349,7 +380,7 @@ function accessError(t){
   if(!saved)return 'setup';
   return typeof t==='string'&&saved===t?'':'token';
 }
-function out(o){o.cas=true;o.archive=true;o.atomic=true;o.guarded=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function out(o){o.cas=true;o.archive=true;o.atomic=true;o.guarded=true;o.scriptVersion=${appsScriptVersion};return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
 function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
 function column(name){var sh=tab(name),n=sh.getLastRow()-1;return n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[]}
 // The progress lives on one of two sheets; STATE_SLOT says which one is current (the first one before v5).
@@ -439,27 +470,64 @@ function setupHistory(){
   }finally{lock.releaseLock()}
 }
 function stampName(prefix,at){return prefix+'-'+Utilities.formatDate(new Date(at||Date.now()),Session.getScriptTimeZone(),'yyyy-MM-dd-HHmmss')+'.json'}
+function historyMark(folderId,fileId){return 'dream-blueprint:history:'+folderId+':'+fileId}
+function insideFolder(f,folderId){
+  var parents=f.getParents();while(parents.hasNext())if(parents.next().getId()===folderId)return true;
+  return false;
+}
+function historyPayload(f){
+  try{
+    var d=JSON.parse(f.getBlob().getDataAsString());
+    return d&&typeof d.state==='string'&&d.state&&typeof d.savedAt==='number'?d:null;
+  }catch(e){return null}
+}
 function keepVersion(prefix,state,savedAt){
-  var folder=historyFolder();
-  folder.createFile(stampName(prefix,Date.now()),JSON.stringify({savedAt:savedAt||0,state:state}),MimeType.PLAIN_TEXT);
-  var files=[],it=folder.getFiles();while(it.hasNext())files.push(it.next());
-  files.sort(function(a,b){return b.getDateCreated().getTime()-a.getDateCreated().getTime()});
-  for(var i=30;i<files.length;i++)files[i].setTrashed(true);
+  var folder=historyFolder(),folderId=folder.getId();
+  var latest=folder.createFile(stampName(prefix,Date.now()),JSON.stringify({savedAt:savedAt||0,state:state}),MimeType.PLAIN_TEXT);
+  // An unmarked copy remains available as a legacy snapshot even if tagging fails.
+  try{
+    var latestId=latest.getId();
+    latest.setDescription(historyMark(folderId,latestId));
+    var previous=[],it=folder.getFiles();
+    while(it.hasNext()){
+      var f=it.next(),id=f.getId(),mark=historyMark(folderId,id);
+      if(id!==latestId&&!f.isTrashed()&&f.getMimeType()===MimeType.PLAIN_TEXT&&f.getDescription()===mark){
+        previous.push({file:f,mark:mark,at:f.getDateCreated().getTime()});
+      }
+    }
+    previous.sort(function(a,b){return b.at-a.at});
+    for(var i=29;i<previous.length;i++){
+      var item=previous[i];
+      if(insideFolder(item.file,folderId)&&item.file.getDescription()===item.mark)item.file.setTrashed(true);
+    }
+  }catch(e){console.warn('新歷史快照已保存，清理未完成。')}
 }
 function listHistory(){
-  var folder=historyFolder(),list=[],it=folder.getFiles();
-  while(it.hasNext()){var f=it.next();list.push({id:f.getId(),name:f.getName(),at:f.getDateCreated().getTime(),size:f.getSize()})}
-  list.sort(function(a,b){return b.at-a.at});
-  return {ok:true,history:list.slice(0,30)};
+  var folder=historyFolder(),folderId=folder.getId(),possible=[],it=folder.getFiles();
+  var legacyName=/^[a-z-]*-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}[.]json$/;
+  while(it.hasNext()){
+    var f=it.next();
+    if(f.isTrashed()||f.getMimeType()!==MimeType.PLAIN_TEXT)continue;
+    var marked=f.getDescription()===historyMark(folderId,f.getId());
+    if(marked||legacyName.test(f.getName()))possible.push({file:f,marked:marked,at:f.getDateCreated().getTime()});
+  }
+  possible.sort(function(a,b){return b.at-a.at});
+  var list=[];
+  for(var i=0;i<possible.length&&list.length<30;i++){
+    var item=possible[i],file=item.file;
+    if(item.marked||historyPayload(file))list.push({id:file.getId(),name:file.getName(),at:item.at,size:file.getSize()});
+  }
+  return {ok:true,history:list};
 }
 function readVersion(id){
   var folder=historyFolder(),f;
   try{f=DriveApp.getFileById(String(id))}catch(e){return {ok:false,error:'missing'}}
-  var inside=false,ps=f.getParents();while(ps.hasNext())if(ps.next().getId()===folder.getId())inside=true;
-  if(!inside)return {ok:false,error:'missing'};
-  var d=JSON.parse(f.getBlob().getDataAsString());
-  return {ok:true,state:String(d.state||''),savedAt:Number(d.savedAt)||0};
+  if(f.isTrashed()||f.getMimeType()!==MimeType.PLAIN_TEXT)return {ok:false,error:'missing'};
+  if(!insideFolder(f,folder.getId()))return {ok:false,error:'missing'};
+  var d=historyPayload(f);
+  return d?{ok:true,state:d.state,savedAt:d.savedAt}:{ok:false,error:'missing'};
 }
+function logText(value){return SpreadsheetApp.newRichTextValue().setText(value).build()}
 function doGet(e){
   var lock=LockService.getScriptLock();lock.waitLock(20000);
   try{
@@ -482,9 +550,11 @@ function doPost(e){
     if(d.type==='history-add'&&typeof d.state==='string'&&d.state){keepVersion(String(d.label||'saved').replace(/[^a-z-]/g,''),d.state,Number(d.savedAt)||0);return out({ok:true,added:true})}
     // Old records the phone is about to tidy away: kept as a file in the archive folder, never trashed.
     if(d.type==='archive-add'&&typeof d.data==='string'&&d.data){var af=archiveFolder();af.createFile(stampName('舊紀錄',Date.now()),d.data,MimeType.PLAIN_TEXT);return out({ok:true,archived:true,folder:af.getUrl()})}
-    if(d.type==='log'&&d.rows&&d.rows.length){
-      var sh=ss.getSheetByName('對話紀錄'),now=new Date();
-      sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));
+    if(d.type==='log'&&Array.isArray(d.rows)&&d.rows.length){
+      var sh=ss.getSheetByName('對話紀錄'),now=new Date(),first=sh.getLastRow()+1,source=logText(String(d.source||''));
+      var body=d.rows.map(function(r){return [source,logText(String(r.role||'')),logText(String(r.text||'').slice(0,5000))]});
+      sh.getRange(first,2,body.length,3).setRichTextValues(body);
+      sh.getRange(first,1,body.length,1).setValues(body.map(function(){return [now]}));
     }
     if(d.type==='memory')return out(mergeMemory(d));
     if(d.type==='state'&&typeof d.state==='string'){

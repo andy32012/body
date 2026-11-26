@@ -1377,6 +1377,7 @@
    {
     "k": "fix",
     "q": "The person to who I spoke was very kind.",
+    "requireSameCommas": true,
     "accept": [
      "The person to whom I spoke was very kind."
     ],

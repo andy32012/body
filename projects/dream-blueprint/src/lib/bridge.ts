@@ -30,7 +30,7 @@ export const unitRule = (unit: number) => curriculum.units.find(u => u.id === un
 
 // ── Held-out test: one attempt per part, opened on the unit's last day (its checkpoint) or once it is finished.
 export const heldKey = (unit: number) => 'bridge.held.' + unit
-export interface HeldPart { day: string; correct: number; total: number; picks: number[]; heard?: boolean }
+export interface HeldPart { day: string; correct: number; total: number; picks: number[]; heard?: boolean; at?: number }
 export interface HeldRecord { reading?: HeldPart; listening?: HeldPart }
 export function readHeld(notes: Record<string, string>, unit: number): HeldRecord {
   try { return notes[heldKey(unit)] ? JSON.parse(notes[heldKey(unit)]) as HeldRecord : {} } catch { return {} }
@@ -39,7 +39,20 @@ export function readHeld(notes: Record<string, string>, unit: number): HeldRecor
 export function saveHeld(notes: Record<string, string>, unit: number, part: keyof HeldRecord, rec: HeldPart) {
   const old = readHeld(notes, unit)
   if (old[part] || (part === 'listening' && rec.heard !== true)) return notes
-  return { ...notes, [heldKey(unit)]: JSON.stringify({ ...old, [part]: rec }) }
+  return { ...notes, [heldKey(unit)]: JSON.stringify({ ...old, [part]: { ...rec, at: rec.at ?? Date.now() } }) }
+}
+/** An independently submitted part keeps its original answers and score. For the same part, keep the first submission. */
+export function mergeHeld(older: HeldRecord, newer: HeldRecord): HeldRecord {
+  function first(a?: HeldPart, b?: HeldPart) {
+    if (!a || !b) return a ?? b
+    if (typeof a.at === 'number' && typeof b.at === 'number' && a.at !== b.at) return a.at < b.at ? a : b
+    return a.day <= b.day ? a : b
+  }
+  const { listening: a } = older, { listening: b } = newer
+  const listening = a?.heard === true && b?.heard !== true ? a
+    : b?.heard === true && a?.heard !== true ? b
+    : first(a, b)
+  return { reading: first(older.reading, newer.reading), listening }
 }
 export const heldOpen = (cur: { unit: number; day: number }, unit: number) => cur.unit > unit || (cur.unit === unit && cur.day >= 6)
 

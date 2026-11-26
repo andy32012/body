@@ -49,12 +49,16 @@
 .ai-typing i:nth-child(2) { animation-delay: .15s; }
 .ai-typing i:nth-child(3) { animation-delay: .3s; }
 .ai-error { color: #ef8b7d; margin: 0; font-size: 14px; }
+.ai-failed { display: grid; justify-items: end; gap: 7px; }
+.ai-failed .ai-msg { white-space: pre-wrap; }
+.ai-failed .ai-error { max-width: 92%; overflow-wrap: anywhere; }
 .ai-suggest { display: flex; flex-wrap: wrap; gap: 7px; }
 .ai-suggest button {
   border: 1px solid var(--line); background: transparent; color: var(--text);
   border-radius: 999px; padding: 6px 12px; font-size: 13px;
 }
 .ai-suggest button:hover { border-color: var(--lav); color: var(--lav); }
+.ai-suggest button:disabled { opacity: .45; }
 .ai-input { display: flex; gap: 8px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
 .ai-input input {
   flex: 1; min-width: 0; padding: 10px 13px; border-radius: 12px;

@@ -1,6 +1,6 @@
-import curriculum from '../data/curriculum.json'
 import { readLessonRecord } from './lesson'
 import { readSayCard } from './sayCards'
+import { lessonSentence, units } from './todayLesson'
 
 export interface EmmaLesson { unit: number; day: number; title: string; rule: string; cando: string; sentence: string; words: string[]; mistakes: string[] }
 
@@ -9,9 +9,10 @@ export function emmaLesson(state: { notes: Record<string, string>; curriculum: {
   const rec = readLessonRecord(state.notes, today)
   const unitId = rec?.unit ?? state.curriculum.unit
   const day = Math.min(6, Math.max(1, rec?.day ?? state.curriculum.day))
-  const unit = curriculum.units.find(u => u.id === unitId)
+  const unit = units.find(u => u.id === unitId)
   if (!unit) return null
   const entry = unit.days[Math.min(day, unit.days.length) - 1]
+  const sentence = rec && day < 6 ? lessonSentence(unit, day, rec.retry ?? 0, rec) : entry
   // Newest saved mistakes first (ids carry a base-36 timestamp).
   const mistakes = Object.entries(state.notes)
     .filter(([k]) => k.startsWith('say.'))
@@ -22,7 +23,7 @@ export function emmaLesson(state: { notes: Record<string, string>; curriculum: {
     .map(c => (c!.wrong ? '"' + c!.wrong + '" → ' : '') + '"' + c!.en + '"')
   return {
     unit: unitId, day, title: unit.title, rule: unit.rule ?? '', cando: (unit as { cando?: string }).cando ?? '',
-    sentence: entry?.reference[0] ?? '', words: (entry?.newWords ?? []).map(w => w.en), mistakes,
+    sentence: sentence?.reference[0] ?? '', words: (entry?.newWords ?? []).map(w => w.en), mistakes,
   }
 }
 

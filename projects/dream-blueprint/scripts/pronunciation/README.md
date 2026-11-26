@@ -60,7 +60,7 @@ App 不需要這個資料夾就能跑；只有要改發音課的內容或重錄�
 
 ## 重錄
 
-`record.py` 遇到已經錄過、音標沒變的段落會直接沿用；候選對比字錄到比課程需要的多三組清楚的就停（`--all` 全部錄）。
+`record.py` 會沿用音標和對比字都相同、WAV 仍能完整讀取的錄音。音檔找不到、讀取失敗或長度與製作清單不符時會重錄。候選對比字錄到比課程需要的多三組清楚的就停（`--all` 全部錄）。
 
 需要 Python 3.11+、ffmpeg，以及 `kokoro-onnx`、`misaki`（加 spaCy 的 `en_core_web_sm`）、`faster-whisper`、`cmudict`、`praat-parselmouth`、`soundfile`；切音節另外要 `onnx`、`onnxruntime`，和音素辨識模型 `onnx-community/wavlm-large-english-phoneme-ONNX` 的 `onnx/model.onnx`、`vocab.json`（放在這個資料夾的 `phon/`，或用 `PRON_PHONES` 指到別處；約 1.3 GB，跑的時候要 3 GB 左右的記憶體，女聲、男聲不要同時跑）。Kokoro 的 `kokoro-v1.0.onnx` 和 `voices-v1.0.bin`（kokoro-onnx 的 GitHub release）放在這個資料夾，或用環境變數 `PRON_MODELS` 指到別處。
 

@@ -130,7 +130,9 @@ const answerOf = (e: ExpressRecord): ExpressAnswer => ({
   ...(e.lastAnswer !== undefined ? { lastAnswer: e.lastAnswer } : {}), ...(e.last ? { last: e.last } : {}),
 })
 /** The open task from two devices: the one that got further goes on; the other device's sentences are kept beside it. */
-function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): ExpressRecord | undefined {
+export function mergeExpress(older: ExpressRecord, newer: ExpressRecord): ExpressRecord
+export function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): ExpressRecord | undefined
+export function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): ExpressRecord | undefined {
   if (!older) return newer
   if (!newer) return older
   const further = (e: ExpressRecord) => (e.fixed ? 100 : 0) + (e.corrections ?? 0) * 10 + (e.last ? 2 : 0) + (e.firstResult ? 1 : 0)
@@ -152,6 +154,7 @@ function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): ExpressReco
  *  on one device the later lesson of a day replaces the earlier one. `older` is the copy changed earlier. */
 export function mergeLessonRecords(older: LessonRecord, newer: LessonRecord): LessonRecord {
   if (older.unit !== newer.unit || older.day !== newer.day) return older.unit * 10 + older.day > newer.unit * 10 + newer.day ? older : newer
+  if (older.sentenceId && newer.sentenceId && older.sentenceId !== newer.sentenceId) return newer
   const phases = [older.phase, newer.phase].filter((p): p is LessonPhase => !!p && phaseOrder.includes(p))
   const phase = phases.sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b)).at(-1)
   const recalls = mergeAttempts(older.recalls, newer.recalls)
@@ -179,6 +182,8 @@ export function mergeLessonRecords(older: LessonRecord, newer: LessonRecord): Le
 }
 export interface LessonRecord {
   unit: number; day: number; steps: LessonStep[]
+  retry?: number
+  sentenceId?: string
   corrected?: boolean; saved?: number
   phase?: LessonPhase
   recalls?: Attempt[]; records?: Attempt[]
@@ -229,31 +234,48 @@ export interface RunProgress {
   phase?: 'write' | 'sound'
   answers?: Record<string, string>
   spoken?: string[]
+  updatedAt?: number
 }
-export const runProgressKey = (date: string) => 'progress.' + date
-export function readRunProgress(notes: Record<string, string>, date: string, unit: number, day: number): RunProgress | null {
+export const runProgressKey = (date: string, review?: boolean) =>
+  review === undefined ? 'progress.' + date : 'progress.' + (review ? 'review.' : 'checkpoint.') + date
+type ClosedRun = { closed: true; updatedAt: number }
+export const isClosedRun = (value: unknown): value is ClosedRun =>
+  !!value && typeof value === 'object' && 'closed' in value && value.closed === true &&
+  'updatedAt' in value && typeof value.updatedAt === 'number' && Number.isFinite(value.updatedAt)
+export function readRunProgress(notes: Record<string, string>, date: string, review: boolean, unit: number, day: number): RunProgress | null {
   try {
-    const v = JSON.parse(notes[runProgressKey(date)] || 'null') as RunProgress | null
-    if (!v || v.unit !== unit || v.day !== day || !Number.isInteger(v.pos) || v.pos < 0
+    const raw = notes[runProgressKey(date, review)]
+    const v = JSON.parse(raw ?? notes[runProgressKey(date)] ?? 'null') as RunProgress | ClosedRun | null
+    if (!v || isClosedRun(v) || !Number.isInteger(v.unit) || !Number.isInteger(v.day)
+        || (!review && (v.unit !== unit || v.day !== day)) || !Number.isInteger(v.pos) || v.pos < 0
         || !Array.isArray(v.records) || !v.records.every(r => typeof r?.sentenceId === 'string') || !Array.isArray(v.levels)) return null
+    const activity = v.review ?? (v.day !== 6 || v.items?.length === 1)
+    if (activity !== review) return null
     const answers = Object.fromEntries(Object.entries(v.answers ?? {}).filter(([, value]) => typeof value === 'string'))
     const items = Array.isArray(v.items) ? v.items.filter(id => typeof id === 'string') : undefined
     const spoken = Array.isArray(v.spoken) ? v.spoken.filter(id => typeof id === 'string') : undefined
     const phase = v.phase === 'sound' || v.phase === 'write' ? v.phase : undefined
-    return { ...v, answers, items, spoken, phase }
+    return { ...v, review: activity, answers, items, spoken, phase }
   } catch { return null }
 }
-export function saveRunProgress(notes: Record<string, string>, date: string, p: RunProgress | null) {
-  const next = { ...notes }
-  if (p) next[runProgressKey(date)] = JSON.stringify(p); else delete next[runProgressKey(date)]
-  return next
+export function saveRunProgress(notes: Record<string, string>, date: string, review: boolean, progress: RunProgress | null) {
+  const key = runProgressKey(date, review)
+  let previous = 0
+  try {
+    const value = JSON.parse(notes[key] ?? 'null')
+    if (typeof value?.updatedAt === 'number' && Number.isFinite(value.updatedAt)) previous = value.updatedAt
+  } catch { /* replace an unreadable slot */ }
+  const updatedAt = Math.max(Date.now(), previous + 1)
+  const next = progress ? { ...progress, updatedAt } : { closed: true, updatedAt }
+  return { ...notes, [key]: JSON.stringify(next) }
 }
 /** Keep the first result and its evidence together, even when another device went back to a previous prompt. */
 export function mergeRunProgress(older: RunProgress, newer: RunProgress): RunProgress {
   if (older.unit !== newer.unit || older.day !== newer.day
       || (older.review !== undefined && newer.review !== undefined && older.review !== newer.review)
       || (older.retry !== undefined && newer.retry !== undefined && older.retry !== newer.retry)
-      || (older.items && newer.items && older.items.join('|') !== newer.items.join('|'))) return newer
+      || (older.items && newer.items && older.items.join('|') !== newer.items.join('|')))
+    return (older.updatedAt ?? 0) > (newer.updatedAt ?? 0) ? older : newer
   const further = older.pos > newer.pos ? older : newer
   const records = [...older.records]
   const levels = records.map((_, i) => older.levels[i] ?? null)
@@ -271,6 +293,7 @@ export function mergeRunProgress(older: RunProgress, newer: RunProgress): RunPro
     }
   })
   return { ...older, ...newer, pos: further.pos, phase: further.phase, records, levels, answers,
+    updatedAt: Math.max(older.updatedAt ?? 0, newer.updatedAt ?? 0),
     spoken: unique([...(older.spoken ?? []), ...(newer.spoken ?? [])]) }
 }
 export function readLessonRecord(notes: Record<string, string>, day: string): LessonRecord | null {
@@ -280,6 +303,18 @@ export function readLessonRecord(notes: Record<string, string>, day: string): Le
     const r = JSON.parse(v) as LessonRecord
     return Array.isArray(r.steps) ? r : null
   } catch { return null }
+}
+export function saveLessonExpression(notes: Record<string, string>, date: string, lesson: Pick<LessonRecord, 'unit' | 'day' | 'sentenceId'>,
+  apply: (rec: ExpressRecord) => ExpressRecord, graded: boolean) {
+  const record = readLessonRecord(notes, date)
+  if (!record || record.unit !== lesson.unit || record.day !== lesson.day
+      || (record.sentenceId && record.sentenceId !== lesson.sentenceId)) return notes
+  const express = apply(record.express ?? { corrections: 0, help: [] })
+  if (express === record.express && (!graded || record.corrected)) return notes
+  if (!graded) return { ...notes, [lessonKey(date)]: JSON.stringify({ ...record, express }) }
+  const step = express.fixed ? 'fix' : 'express'
+  const steps = stepOrder.filter(s => s === step || record.steps.includes(s))
+  return { ...notes, [lessonKey(date)]: JSON.stringify({ ...record, express, corrected: true, steps }) }
 }
 export function updateLesson(notes: Record<string, string>, day: string, unit: number, lessonDay: number, patch: Partial<LessonRecord> = {}, step?: LessonStep) {
   const old = readLessonRecord(notes, day)

@@ -974,6 +974,7 @@
    {
     "k": "fix",
     "q": "My brother, he is a nurse, works at night.",
+    "requireSameCommas": true,
     "accept": [
      "My brother, a nurse, works at night.",
      "My brother, who is a nurse, works at night."

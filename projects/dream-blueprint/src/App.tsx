@@ -7,7 +7,7 @@ import {
   Telescope, Mic, House,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { contentNoticeKey, useAppStore, type Page, type PageProps, type AppState } from './lib/store'
+import { contentNoticeKey, readStoreForCloud, updateStoreNow, useAppStore, type Page, type PageProps, type AppState } from './lib/store'
 import { downloadUnsavedDrafts, useUnsavedDrafts } from './lib/drafts'
 import { activePeriod, addDays, dayKey, daysBetween, weekKey, type Energy } from './lib/progress'
 import planData from './data/plan.json'
@@ -34,8 +34,7 @@ import Baseline, { TestPrompt } from './components/Baseline'
 import PracticeMenu, { menuIcons } from './components/PracticeMenu'
 import { showTestPrompt } from './lib/baseline'
 import { MemoryContext, applyMemory, readMemory, replaceMemory, type MemoryApi } from './lib/memory'
-import { driveConnected, cloudConflict, cloudScope, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive, noteSyncFailure } from './lib/drive'
-import { getSnapshot, updateStore } from './lib/store'
+import { archiveToDrive, cloudArchive, cloudConflict, cloudScope, driveConfig, driveReadyEvent, driveStorageChanged, readyCloudScope, sameConnection, clearSyncLink, syncPrefix, takeSyncLink, noteSyncFailure } from './lib/drive'
 import { applyBatch, archiveOld } from './lib/compact'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
@@ -69,10 +68,23 @@ function setView(view:View, detail?:Energy|PlanTab) {
 }
 /** Old records go into the Drive archive first (cloud script v4), and only the ones that arrived leave this device. */
 async function archiveOldRecords() {
-  if(!driveConnected()||!cloudArchive()||cloudConflict())return
-  const today=dayKey()
-  const batch=await archiveOld(getSnapshot().state,today,archiveToDrive)
-  if(batch)updateStore(prev=>applyBatch(prev,batch,today))
+  const connection=driveConfig()
+  if(!connection||connection.settled===false)return
+  const eligible=()=>sameConnection(connection)&&cloudArchive()&&!cloudConflict()
+  const archive=async()=>{
+    if(!eligible())return
+    const today=dayKey()
+    const current=await readStoreForCloud()
+    if(!current.persisted||!eligible())return
+    const batch=await archiveOld(current.state,today,file=>archiveToDrive(file,connection))
+    if(batch&&eligible())await updateStoreNow(prev=>{
+      // The connection can change between the upload and acquiring the store lock.
+      if(!eligible())throw new Error('雲端封存條件已變更，這台仍保留舊紀錄。')
+      return applyBatch(prev,batch,today)
+    })
+  }
+  if(navigator.locks)await navigator.locks.request('dream-blueprint.archive:'+cloudScope(connection),archive)
+  else await archive()
 }
 function nextAction(state:AppState) {
   const unresolved=state.school.requirements.find(r=>!r.done)
@@ -246,12 +258,12 @@ function App() {
     clear:()=>update(s=>({...s,notes:replaceMemory(s.notes,[])}))}
   const requestSync=useRef<((delay: number, reset?: boolean) => void) | null>(null)
   useEffect(()=>{
-    let ready=openedBySync.current?null:cloudScope()
+    let ready=openedBySync.current?null:readyCloudScope()
     let active=true, inFlight=false, pending=false
     let timer: ReturnType<typeof setTimeout> | undefined
     let due=Infinity, last=0, retries=0
     let shouldArchive=!!ready
-    const readyToSync=()=>!!ready&&cloudScope()===ready
+    const readyToSync=()=>!!ready&&readyCloudScope()===ready
     function schedule(delay: number, reset = false) {
       if(!active||!readyToSync())return
       if(reset&&!inFlight)retries=0
@@ -267,8 +279,8 @@ function App() {
       if(inFlight||document.visibilityState!=='visible'||!navigator.onLine){pending=true;return}
       pending=false;inFlight=true;last=Date.now()
       const scope=ready
-      const progress=await autoSettle().then(()=>null,(e:unknown)=>({e}))
-      const memory=scope===ready&&readyToSync()?await syncDriveMemory().then(()=>null,(e:unknown)=>({e})):null
+      const progress=await autoSettle(scope).then(()=>null,(e:unknown)=>({e}))
+      const memory=scope===ready&&readyToSync()?await syncDriveMemory(scope).then(()=>null,(e:unknown)=>({e})):null
       const error=progress??memory
       inFlight=false
       if(!active||!readyToSync())return
@@ -284,21 +296,30 @@ function App() {
         retries=0
         if(pending){pending=false;schedule(0)}
       }
-      if(shouldArchive){
+      if(shouldArchive&&!error&&!paused){
         shouldArchive=false
-        void archiveOldRecords()
+        void archiveOldRecords().catch(()=>{ /* Keep the local details when archiving fails. */ })
       }
     }
     const back=()=>{
       if(document.visibilityState==='visible'&&(pending||Date.now()-last>=30000))schedule(0,true)
     }
     const online=()=>schedule(0,true)
-    const connected=()=>{ready=cloudScope();schedule(0,true)}
+    const connected=()=>{
+      const next=readyCloudScope()
+      if(ready!==next){
+        ready=next;pending=false;last=0;retries=0;shouldArchive=!!next
+        clearTimeout(timer);due=Infinity
+      }
+      schedule(0,true)
+    }
+    const storage=(e:StorageEvent)=>{if(driveStorageChanged(e)&&ready!==readyCloudScope())connected()}
     requestSync.current=schedule
     document.addEventListener('visibilitychange',back)
     window.addEventListener('focus',back)
     window.addEventListener('online',online)
     window.addEventListener(driveReadyEvent,connected)
+    window.addEventListener('storage',storage)
     schedule(0)
     return ()=>{
       active=false
@@ -308,6 +329,7 @@ function App() {
       window.removeEventListener('focus',back)
       window.removeEventListener('online',online)
       window.removeEventListener(driveReadyEvent,connected)
+      window.removeEventListener('storage',storage)
     }
   },[])
   useEffect(()=>{

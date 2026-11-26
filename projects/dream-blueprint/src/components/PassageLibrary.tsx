@@ -1,3 +1,4 @@
+import DraftVersions from './DraftVersions'
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import CorrectBox, { type Result as Feedback } from './CorrectBox'
@@ -123,6 +124,7 @@ function PassagePractice({ passage, state, onActivity, onSkip }: Props & { passa
       <label className="pr-field" htmlFor="passage-answer">我的英文翻譯</label>
       <textarea id="passage-answer" rows={5} lang="en" value={answer} placeholder="一句一句翻，寫不出來的先空著"
         onChange={event => { setAnswer(event.target.value); writeDraft(draftKey, event.target.value) }} />
+      <DraftVersions id={draftKey} text={answer} onChoose={setAnswer} />
       <div className="pr-actions">
         {keyed && <button className={passed ? undefined : 'pr-main'} disabled={!answer.trim() || checking} onClick={() => { setPrevious(last); setUnreachable(false); setRun(n => n + 1) }}>{checking ? 'Claude 批改中……' : run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
         {keyed && <button className="passage-ask" onClick={openClaude}><MessageCircleQuestion size={16} aria-hidden="true" />問問 Claude</button>}

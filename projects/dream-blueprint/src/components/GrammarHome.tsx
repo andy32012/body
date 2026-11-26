@@ -1,3 +1,4 @@
+import DraftVersions from './DraftVersions'
 import { chapterLeft, stagesUsing } from '../lib/writing'
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
@@ -20,6 +21,17 @@ const files = import.meta.glob<{ default: ChapterContent }>('../data/grammar-boo
 const loadChapter = (id: string) => files['../data/grammar-book/' + chapterFile(chapterOf(id)) + '.json']?.().then(f => f.default) ?? Promise.resolve(null)
 const go = (to: string) => { location.hash = '#library/grammar' + (to ? '/' + to : '') }
 
+function GrammarLoadError({ section = false }: { section?: boolean }) {
+  return <div className="pr-hint" role="alert">
+    <strong>{section ? '這一節的教材載入失敗' : '文法講解載入失敗'}</strong>
+    <p>確認網路連線後，重新載入這一頁。</p>
+    <div className="pr-actions">
+      {/* A reload clears the failed module import and keeps the section address. */}
+      <button type="button" className="pr-main" onClick={() => location.reload()}>重新載入</button>
+    </div>
+  </div>
+}
+
 /** 文法講解: 完整文法 (the whole catalog, section by section) and 課程單元 (the course units' teaching, as before). */
 export default function GrammarHome({ state, onActivity, date, hash }: Props) {
   const [index, setIndex] = useState<BookIndex | null>(null)
@@ -31,7 +43,7 @@ export default function GrammarHome({ state, onActivity, date, hash }: Props) {
   }, [])
   const route = index ? bookRoute(index, hash) : null
   useEffect(() => { document.querySelector('.gb-top')?.scrollIntoView({ block: 'start' }) }, [hash])
-  if (failed) return <p>文法講解沒有下載到。連上網路後再打開一次。</p>
+  if (failed) return <GrammarLoadError />
   if (!index || !route) return <p>載入中……</p>
   const units = route.kind === 'unit' || route.kind === 'units'
   return <div className="pr-stack gb-top">
@@ -109,7 +121,8 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
   useTaskContext({
     label: '完整文法：' + name,
     detail: ['他在讀文法講解「' + name + '」（' + levelNames[section.level] + '）' + (chapter ? '，第 ' + chapterLabel(index, chapter.n) + ' 章 ' + chapter.title : '，附錄') + '。',
-      content ? '這一節的重點：\n' + content.points.map(p => '・' + p.t + '：' + p.p).join('\n') : '這一節的講解還沒寫好，他想請你教他：用白話說重點，給兩三個簡單的例句。',
+      content ? '這一節的重點：\n' + content.points.map(p => '・' + p.t + '：' + p.p).join('\n')
+        : (ready ? '本頁沒有載入這一節的教材。' : '這一節的教材尚未上架。') + '他想請你用白話教他重點，給兩三個簡單的例句。',
       '他的英文大約國中一年級程度，用繁體中文、白話回答，例句要簡單。'].join('\n'),
   })
   const onSave = (i: number, right: boolean) => onActivity(prev => ({ ...prev, notes: saveBookDrill(prev.notes, id, i, right, date) }))
@@ -119,11 +132,12 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
     <h3 className="gb-head"><span className="gb-id">{label}</span>{section.title}<em className={'gb-lv gb-lv' + section.level}>{levelNames[section.level]}</em></h3>
     {section.units?.length ? <p className="gb-units">相關課程單元 {section.units.map((u, i) => <span key={u}>{i ? '、' : ''}{reached(u, state.curriculum.unit)
       ? <a href={'#library/grammar/' + u}>{u}</a> : <>{u}（上到才打開）</>}</span>)}</p> : null}
-    {content === undefined ? <p>載入中……</p>
-      : content === null ? <div className="pr-hint"><strong>這一節還在寫</strong><p>想先學的話，按下面的「問 Claude 老師」，請它用白話教你這一節。</p></div>
+    {!ready ? <div className="pr-hint"><strong>這一節還在寫</strong><p>想先學的話，按下面的「問 Claude 老師」，請它用白話教你這一節。</p></div>
+      : content === undefined ? <p>載入中……</p>
+      : content === null ? <GrammarLoadError section />
       : <>
         <ExplainBody steps={content.points} table={content.table} mistakes={content.mistakes} rate={state.settings.speechRate} />
-        <DrillRun key={round} drills={content.drills} indices={content.drills.map((_, i) => i)} title="小練習（3 題）" onAnswer={onSave} missed="錯的題目按「這三題再做一次」再練一遍。"
+        <DrillRun key={round} drills={content.drills} indices={content.drills.map((_, i) => i)} title="小練習（3 題）" onAnswer={onSave} onCorrected={i => onSave(i, true)} missed="還沒改對的題目可以按「這三題再做一次」再練一遍。"
           after={<div className="pr-actions"><button type="button" className="pr-link" onClick={() => setRound(round + 1)}>這三題再做一次</button></div>} />
         <section className="gb-try">
           <strong>自己造一句</strong>
@@ -132,6 +146,7 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
             <textarea lang="en" rows={2} value={text} spellCheck={false} autoComplete="off" autoCapitalize="off"
               onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder="例如照上面的例句換幾個字" />
           </label>
+          <DraftVersions id={draftKey} text={text} onChoose={setText} />
           {tutorKey() ? <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setRun(run + 1)}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>
             : <p className="ls-help">還沒連接 Claude：到「設定 → 連接 Claude」貼上金鑰，就能請它批改。</p>}
           <CorrectBox run={run} mode="open" rubric="gept-sentence" selfFix zh={'用這一節的文法「' + name + '」自己寫一句英文'}

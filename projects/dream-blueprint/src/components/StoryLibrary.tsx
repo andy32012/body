@@ -8,7 +8,7 @@ import { useTapGuard } from '../lib/tapGuard'
 import { logSkill } from '../lib/bridge'
 import { useDialogueVoice } from './LessonParts'
 import { LookedUp, TapWords, useLookup } from './WordLookup'
-import { storyLevelsOpen, dictationPatch, dictationScore, dictationTotal, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
+import { storyLevelsOpen, dictationPatch, dictationScore, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
   storyTabs, type StoryTab } from '../lib/story'
 import { openAt } from '../lib/unlock'
 import './story.css'
@@ -232,7 +232,7 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   const [early, setEarly] = useState(false)
   const [noVoice, setNoVoice] = useState(!('speechSynthesis' in window))
   const [results, setResults] = useState<ReturnType<typeof dictationScore>[]>([])
-  const [finished, setFinished] = useState(false)
+  const [summary, setSummary] = useState<[number, number] | null>(null)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
   const checked = results[at - start]
   const sentence = sentences[at]
@@ -247,19 +247,20 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   }
   function done(list: typeof results, stop = false) {
     // Stopped early: remember where, the passage is not done yet. The last sentence done: the whole passage counts.
+    const patch = dictationPatch(resume, start, list, stop, date)
     onActivity(prev => {
-      const patch = dictationPatch(resume, start, list, stop, date)
       const dAt = Math.max(Date.now(), (readStory(prev.notes, passage.id).dAt ?? 0) + 1)
       return { ...prev, notes: logSkill(saveStory(prev.notes, passage.id, { ...patch, dAt }), 'listen', date) }
     })
     setEarly(stop)
-    setFinished(true)
+    setSummary(patch.dqp ?? patch.dq ?? [0, 0])
   }
   if (noVoice) return <div className="pr-hint"><strong>這台裝置現在沒辦法播放語音</strong><p>聽寫要聽得到聲音才能做。先做「閱讀」，或換一個有英文語音的瀏覽器再試。</p></div>
-  if (finished) {
-    const [right, total] = dictationTotal(results)
+  if (summary) {
+    const [right, total] = summary
     return <div className="pr-hint">
-      <strong>{early ? '今天寫了 ' + (start + results.length) + ' / ' + sentences.length + ' 句，下次從第 ' + (start + results.length + 1) + ' 句接著寫' : '這段聽寫完成'}：{total} 個字寫對 {right} 個（{Math.round(right / Math.max(1, total) * 100)}%）</strong>
+      <strong>{early ? '這輪已寫了 ' + (start + results.length) + ' / ' + sentences.length + ' 句，下次從第 ' + (start + results.length + 1) + ' 句接著寫' : '這段聽寫完成'}：{total} 個字寫對 {right} 個（{Math.round(right / Math.max(1, total) * 100)}%）</strong>
+      {start > 0 && <p>這次接著寫的句子</p>}
       <ol className="st-lines st-recap" start={start + 1}>{sentences.slice(start, start + results.length).map((s, i) => <li key={i}><p lang="en">{s}<small> {results[i].right} / {results[i].total}</small></p></li>)}</ol>
       <p className="rd-zh">{passage.zh}</p>
       <div className="pr-actions"><button type="button" className="pr-main" onClick={onNext}>下一段</button></div>

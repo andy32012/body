@@ -166,7 +166,7 @@ function base(t: string) {
 /** A contraction occupies the same two word positions in either reading. Store the alternate verb at its position
  *  so comparison can try it directly. Commas use these same positions, after every contraction has been expanded. */
 function englishForm(text: string) {
-  const tokens = base(text).match(/[a-z0-9']+|,/g) ?? []
+  const tokens = base(text).replace(/，/g, ',').match(/[a-z0-9']+|,/g) ?? []
   const following = new Array<string>(tokens.length)
   let next = ''
   for (let i = tokens.length - 1; i >= 0; i--) {
@@ -213,9 +213,12 @@ export function normalizeEnglish(t: string) {
  *  statement, so the earlier check no longer applies. (Matching an answer with the reference is looser: normalizeEnglish.) */
 const checkedForm = (t: string) => base(t).replace(/\s+/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim().replace(/[.!]+$/, '').trim()
 export const sameEnglish = (a: string, b: string) => checkedForm(a) === checkedForm(b)
-export function matchesReference(answer: string, refs: readonly string[]) {
+export function matchesReference(answer: string, refs: readonly string[], requireSameCommas = false) {
   if (!answer.trim()) return false
-  return referenceMatches(answer, refs).some(missing => missing.length === 0)
+  const form = englishForm(answer)
+  return matchingReferences(form, refs).some(ref => requireSameCommas
+    ? ref.commas.length === form.commas.length && ref.commas.every((position, i) => position === form.commas[i])
+    : missingCommas(ref, form).length === 0)
 }
 
 const relativeWords = new Set(['who', 'whom', 'which', 'whose', 'where'])
@@ -237,14 +240,14 @@ function missingCommas(ref: EnglishForm, answer: EnglishForm): ('before' | 'afte
   })
   return missing
 }
-function referenceMatches(answer: string, refs: readonly string[]) {
-  const form = englishForm(answer)
-  return refs.map(englishForm).filter(ref => wordsMatch(ref, form)).map(ref => missingCommas(ref, form))
+function matchingReferences(answer: EnglishForm, refs: readonly string[]) {
+  return refs.map(englishForm).filter(ref => wordsMatch(ref, answer))
 }
 /** Said when the words match a reference but the clause commas do not, so he knows why it is not counted as right. */
 export function clauseCommaNote(answer: string, refs: readonly string[]): string | null {
   if (!answer.trim()) return null
-  const matching = referenceMatches(answer, refs)
+  const form = englishForm(answer)
+  const matching = matchingReferences(form, refs).map(ref => missingCommas(ref, form))
   if (!matching.length || matching.some(missing => missing.length === 0)) return null
   const [missing] = matching
   const where = missing.includes('before') && missing.includes('after') ? '前後兩個逗號'

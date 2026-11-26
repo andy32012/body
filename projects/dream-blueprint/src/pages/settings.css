@@ -121,6 +121,7 @@
 .set-toggle input { accent-color:var(--set-tone); width:1.22rem; height:1.22rem; }
 
 .set-status, .set-restore { padding:.7rem .85rem; background:var(--set-tint); border-radius:8px; }
+.set-backup-selection { overflow-wrap:anywhere; }
 .set-status { border-inline-start:3px solid var(--set-tone); }
 .set-body a { color:inherit; text-underline-offset:.2rem; }
 .set-body :is(button,summary,input,textarea,select,a):focus-visible, .set-panel > summary:focus-visible { outline:2px solid var(--set-tone); outline-offset:-2px; }

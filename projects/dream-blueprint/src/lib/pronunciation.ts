@@ -96,15 +96,21 @@ export const hasQuiz = (lesson: PronLesson) => quizFor(lesson, 1).length > 0
 /** d: the day the lesson was last finished; q: the best quiz score; s: the day its sentences were last said aloud. */
 export interface PronRecord { d?: string; q?: [number, number]; s?: string }
 export const pronKey = (id: string) => 'pron.' + id
+export const isPronRecordKey = (key: string) => key.startsWith('pron.') && !!pronLesson(key.slice('pron.'.length))
 export function readPron(notes: Record<string, string>, id: string): PronRecord {
   try { return notes[pronKey(id)] ? JSON.parse(notes[pronKey(id)]) as PronRecord : {} } catch { return {} }
 }
 const ratio = (q?: [number, number]) => q && q[1] > 0 ? q[0] / q[1] : -1
+export function mergePron(older: PronRecord, newer: PronRecord): PronRecord {
+  const lastDay = (a?: string, b?: string) => a && b ? (a > b ? a : b) : a ?? b
+  return {
+    d: lastDay(older.d, newer.d),
+    q: ratio(newer.q) >= ratio(older.q) ? newer.q ?? older.q : older.q,
+    s: lastDay(older.s, newer.s),
+  }
+}
 export function savePron(notes: Record<string, string>, id: string, patch: PronRecord): Record<string, string> {
-  const before = readPron(notes, id)
-  // The best score is kept: a worse second try does not take a pass away.
-  const q = ratio(patch.q) >= ratio(before.q) ? patch.q ?? before.q : before.q
-  return { ...notes, [pronKey(id)]: JSON.stringify({ ...before, ...patch, ...(q ? { q } : {}) }) }
+  return { ...notes, [pronKey(id)]: JSON.stringify(mergePron(readPron(notes, id), patch)) }
 }
 export const PASS = 0.8
 /** A lesson is passed when its quiz reached 80% once; a lesson without a quiz, when it was marked as done. */

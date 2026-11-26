@@ -70,6 +70,7 @@ import {
   readLessonRecord,
   readRunProgress,
   saveRunProgress,
+  saveLessonExpression,
   writeHint,
   resumePhase,
   resumeTarget,
@@ -94,7 +95,7 @@ import {
   retentionDrawCount,
 } from "../lib/grammarRetention";
 import { dueTopic } from "../lib/topics";
-import { allSentences, lesson, sentenceById, syncCustom, units, type Word } from "../lib/todayLesson";
+import { allSentences, lesson, sentenceById, syncCustom, units, type Sentence, type Word } from "../lib/todayLesson";
 import TopicLesson from "../components/TopicLesson";
 import "./practice.css";
 
@@ -120,18 +121,20 @@ function PracticeSession({
   // Continuing an old lesson never takes the place of today's separate record.
   const lessonDate = resumeAt?.date ?? date;
   const [picked] = useState(() =>
-    lesson(state, energy, date, resumeAt ? { unit: resumeAt.rec.unit, day: resumeAt.rec.day } : undefined));
+    lesson(state, energy, date, resumeAt?.rec));
   type Phase = "recall" | "listen" | "write" | "sound" | "vary" | "express" | "done";
   // Normal and high-energy lesson days (not review, not checkpoint) run the guided lesson.
   const guided = !picked.review && !picked.checkpoint && energy !== "low";
-  const [retry] = useState(state.curriculum.retry);
+  const retry = picked.retry;
   // A checkpoint or review day left halfway goes on at the sentence where it stopped (same day, same sentences).
   const [{ run, current }] = useState(() => {
     if (guided) return { run: null, current: picked };
-    const p = readRunProgress(state.notes, date, picked.unit, picked.day);
-    if (!p || (p.review !== undefined && p.review !== picked.review) || (p.retry !== undefined && p.retry !== retry))
+    const p = readRunProgress(state.notes, date, picked.review, picked.unit, picked.day);
+    if (!p || (!picked.review && p.retry !== undefined && p.retry !== retry))
       return { run: null, current: picked };
-    const items = picked.review && p.items ? p.items.flatMap((id) => sentenceById.get(id) ?? []) : picked.items;
+    const savedItems = p.items ?? (picked.review && p.records.length ? p.records.map((r) => r.sentenceId) : undefined);
+    const items = savedItems?.map((id) => sentenceById.get(id)) ?? picked.items;
+    if (!items.every((item): item is Sentence => !!item)) return { run: null, current: picked };
     const ids = items.map((i) => i.id);
     return p.pos < ids.length && p.records.every((r) => ids.includes(r.sentenceId))
       ? { run: p, current: { ...picked, items, freshReview: false } } : { run: null, current: picked };
@@ -152,7 +155,6 @@ function PracticeSession({
   const [firstListen] = useState(() => !readHeard(state.notes, current.unit));
   const heardRecord = readHeard(state.notes, current.unit);
   const thisLessonHeard = heardRecord?.lessonDate === lessonDate ? heardRecord : undefined;
-  const [corrections, setCorrections] = useState(() => resumeAt?.rec.express?.corrections ?? 0);
   const [records, setRecords] = useState<TranslationRecord[]>(() => resumeAt?.rec.records ?? run?.records ?? []);
   const [spoken, setSpoken] = useState<string[]>(run?.spoken ?? []);
   const [feedback, setFeedback] = useState<Session["feedback"]>();
@@ -202,14 +204,22 @@ function PracticeSession({
   const live = guided && !!lessonData;
   const recallNow = guidedRecall[recalls.length];
   const lessonRecord = readLessonRecord(state.notes, lessonDate);
+  const lessonIdentity = { retry, sentenceId: current.items[0].id };
+  const corrections = lessonRecord?.express?.corrections ?? 0;
   const stepsDone: LessonStep[] = [...(lessonRecord?.steps ?? []), ...(guidedRecall.length ? [] : ["recall" as const])];
   const stepNow: LessonStep = phase === "recall" ? "recall" : phase === "listen" ? "listen"
     : phase === "express" ? (corrections ? "fix" : "express") : phase === "done" ? "done" : "pattern";
   /** Saves the lesson's own state (step reached, answers, hints) so a reload or tomorrow continues the same lesson. */
   function save(patch: Partial<LessonRecord>, s?: LessonStep) {
-    update((prev) => ({ ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, patch, s) }));
+    update((prev) => ({ ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { ...patch, ...lessonIdentity }, s) }));
   }
   function step(s: LessonStep, extra: Partial<LessonRecord> = {}) { save(extra, s); }
+  function recordExpression(apply: (rec: ExpressRecord) => ExpressRecord, graded: boolean) {
+    return update((prev) => {
+      const notes = saveLessonExpression(prev.notes, lessonDate, { unit: current.unit, day: current.day, sentenceId: lessonIdentity.sentenceId }, apply, graded);
+      return notes === prev.notes ? prev : { ...prev, notes };
+    });
+  }
   // A double tap must not also press the button that appears under the finger on the next screen.
   const changedAt = useRef(0);
   useEffect(() => { changedAt.current = Date.now(); }, [phase]);
@@ -255,16 +265,16 @@ function PracticeSession({
   /** Where a checkpoint or review day is, kept for today (cleared when it is finished). */
   const keepRun = (at: number, list: TranslationRecord[], phase: "write" | "sound", spokenIds = spoken) => {
     if (guided) return;
-    const progress = { unit: current.unit, day: current.day, pos: at, retry, review: current.review,
+    const progress = { unit: run?.unit ?? current.unit, day: run?.day ?? current.day, pos: at, retry: run?.retry ?? retry, review: current.review,
       items: current.items.map((s) => s.id), records: list, levels: [...checkpointLevels.current], phase,
       answers: { ...runAnswers.current }, spoken: spokenIds };
-    update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, progress) }));
+    update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, current.review, progress) }));
   };
   const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id] : readHints(state.notes, date)[id];
   const saveHint = (id: string) => (use: HintUse) => {
     if (guided) update((prev) => {
       const rec = readLessonRecord(prev.notes, lessonDate);
-      return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { hints: { ...(rec?.hints ?? {}), [id]: use } }) };
+      return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { ...lessonIdentity, hints: { ...(rec?.hints ?? {}), [id]: use } }) };
     });
     else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
   };
@@ -405,7 +415,7 @@ function PracticeSession({
             next.stableUnits = [...new Set([...next.stableUnits, retention.unit])];
           }
           // A checkpoint or review day finished: nothing left to go on with.
-          return guided ? notes : saveRunProgress(notes, date, null);
+          return guided ? notes : saveRunProgress(notes, date, current.review, null);
         })(),
         learningWords: [...new Set([...prev.learningWords, ...learned])],
       };
@@ -606,23 +616,20 @@ function PracticeSession({
         })()}
         {live && lessonData && phase === "express" && (
           <LessonExpress
+            lessonId={[lessonDate, current.unit, current.day, lessonIdentity.sentenceId].join("/")}
             lesson={lessonData}
             prompt={promptFor(lessonData, current.day)}
             draftKey={"express." + current.unit + "." + current.day}
             pattern={current.title}
             saved={lessonRecord?.express}
-            onRecord={(rec: ExpressRecord, corrected: boolean) => {
-              setCorrections(rec.corrections);
-              // "訂正" counts only when the rewrite actually fixed the earlier issues, not just because it was sent again.
-              save({ express: rec, ...(corrected ? { corrected: true } : {}) },
-                corrected ? (rec.fixed ? "fix" : "express") : undefined);
-            }}
+            onRecord={recordExpression}
             onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
             onSpeak={() => { step("express"); location.hash = "speaking/lesson-" + lessonDate; }}
             onFinish={(answer, rec) => {
               if (!settled()) return;
               // Something written counts as the step done, with or without Claude's correction (the summary said 「今天跳過」).
-              save({ express: rec }, rec.first || answer.trim() ? "express" : undefined);
+              if (rec.first) recordExpression(current => current.first ? current : { ...current, first: rec.first, firstHelp: rec.firstHelp }, false);
+              if (rec.first || answer.trim()) step("express");
               evidence(current.unit, judgeExpress({ firstVerdict: rec.firstResult?.verdict, help: rec.firstHelp ?? rec.help, answered: !!(rec.first || answer.trim()) }),
                 { source: "express", skill: "write", answer: rec.first || answer, prompt: promptFor(lessonData, current.day).en, ref: promptFor(lessonData, current.day).sample });
               go("done", {}, "done");

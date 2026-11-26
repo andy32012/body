@@ -189,7 +189,8 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       </div>
     </div>
     <p className="pn-status" role="status">
-      {player.loading ? '正在準備發音…'
+      {player.playbackFailed ? '這次發音沒有播完。請再按播放重試，也可以換另一個聲音。'
+        : player.loading ? '正在準備發音…'
         : player.missing.length ? '錄好的' + player.missing.map(v => voiceNames[v]).join('、') + '現在下載不到，先用這台裝置的語音念（連上網路再打開這一堂就有）。'
         : player.deviceVoice ? '剛才那一下用的是這台裝置的語音；現在錄好的發音準備好了。'
         : '錄好的電腦語音（不是真人），女聲和男聲各一份。'}
@@ -253,7 +254,7 @@ function Chunks({ item, player, choice, rate }: { item: PronItem; player: Player
   // The pieces only exist as recordings: without a downloaded voice the device can still read the whole word, nothing else.
   const voice = chosen.find(v => player.ready.includes(v)) ?? player.ready[0]
   const whole = takes([item.text], choice)
-  const one = (text: string): Take[] => voice ? [{ text, voice }] : []
+  const one = (text: string): Take[] => voice ? [{ text, voice, recordingOnly: true }] : []
   const now = player.now?.text
   const lit = (i: number) => now === clips.pieces[i] || now === clips.slow || now === item.text || clips.grown.some((g, j) => now === g && i <= j + 1)
   return <li className="pn-chunk-card">
@@ -289,19 +290,27 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
   const [picked, setPicked] = useState<number | null>(null)
   const [rights, setRights] = useState<boolean[]>([])
   const [plays, setPlays] = useState(0)
-  // The question whose sound really played: its choices open only then (a play that failed is not a listening answer).
+  // The question whose sound played to the end: a cut-off or failed play cannot open its choices.
   const [heardQ, setHeardQ] = useState(-1)
   const [noSound, setNoSound] = useState(false)
+  const request = useRef(0)
   const q = questions?.[at]
-  const playQ = (n: number, text: string, v: PronVoice) => { if (!player.play([{ text, voice: v }], rate, () => setHeardQ(n))) setNoSound(true) }
+  async function playQ(n: number, text: string, voice: PronVoice) {
+    const id = ++request.current
+    setNoSound(false)
+    const result = await player.play([{ text, voice }], rate)
+    if (id !== request.current) return
+    if (result === 'played') setHeardQ(n)
+    if (result === 'failed') setNoSound(true)
+  }
   // With both voices chosen the questions take turns, so the ear is tested on each.
   const voiceAt = (i: number): PronVoice => choice === 'both' ? (i % 2 ? 'm' : 'f') : choice
-  function hear(question: PronQuestion, v: PronVoice) { playQ(at, question.audio, v); setPlays(n => n + 1) }
+  function hear(question: PronQuestion, v: PronVoice) { void playQ(at, question.audio, v); setPlays(n => n + 1) }
   // Starting and moving on happen inside a tap, so the clip of the new question can play at once.
   function start() {
     const list = quizFor(lesson, Date.now())
     setQuestions(list); setAt(0); setPicked(null); setRights([]); setPlays(1); setHeardQ(-1); setNoSound(false)
-    playQ(0, list[0].audio, voiceAt(0))
+    void playQ(0, list[0].audio, voiceAt(0))
   }
   function choose(i: number) {
     if (!q || picked !== null) return
@@ -312,7 +321,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     if (!questions) return
     if (at + 1 < questions.length) {
       setAt(at + 1); setPicked(null); setPlays(1)
-      playQ(at + 1, questions[at + 1].audio, voiceAt(at + 1))
+      void playQ(at + 1, questions[at + 1].audio, voiceAt(at + 1))
     } else {
       onDone(rights.filter(Boolean).length, rights.length)
       setAt(questions.length)
@@ -336,12 +345,14 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     <small className="pn-count">第 {at + 1} / {questions.length} 題</small>
     <p className="gm-ask">{q.prompt}</p>
     {q.show && <p className="pn-show" lang="en">{q.show}</p>}
-    <button type="button" className="ls-play" onClick={() => hear(q, voice)}><Volume2 size={16} />{plays ? '再聽一次' : '播放'}</button>
+    <button type="button" className="ls-play" onClick={() => hear(q, voice)}><Volume2 size={16} />{noSound ? '重試播放' : plays ? '再聽一次' : '播放'}</button>
     <div className="pr-options gm-options pn-options" data-count={q.options.length}>
       {q.options.map((o, i) => <button key={i + o} type="button" lang="en" disabled={answered || heardQ !== at}
         className={!answered ? undefined : i === q.answer ? 'gm-right' : i === picked ? 'gm-miss' : undefined} onClick={() => choose(i)}>{o}</button>)}
     </div>
-    {!answered && heardQ !== at && <p className="ls-help">{noSound ? '這台裝置現在放不出聲音：測驗要聽得到才算，先看上面的講解和比一比，換個有聲音的地方再測。' : '聽到聲音才能選；沒有聲音的話按「再聽一次」。'}</p>}
+    {!answered && (noSound || heardQ !== at) && <p className="ls-help" role="status">
+      {noSound ? '這次音訊沒播完，可以按「重試播放」。' : '完整聽完這段音訊後就能作答。'}
+    </p>}
     {answered && <div className="gm-feedback" data-ok={picked === q.answer} role="status">
       <strong>{picked === q.answer ? '對了' : '這次是 ' + q.options[q.answer]}</strong>
       {q.why && <small>{q.why}</small>}

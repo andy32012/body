@@ -18,6 +18,18 @@ const resourceSets = manifest => ({
 const currentResources = resourceSets(config);
 const pageVersions = new Map();
 const pending = new Map();
+let galleryNotice;
+
+function notifyGalleryChanged() {
+  if (!galleryNotice) {
+    galleryNotice = self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(pages => {
+      for (const page of pages) {
+        if (page.url.startsWith(scope)) page.postMessage({ type: "GALLERY_CACHE_CHANGED" });
+      }
+    }).catch(() => {}).finally(() => { galleryNotice = undefined; });
+  }
+  return galleryNotice;
+}
 
 async function hasHash(response, hash) {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await response.arrayBuffer()));
@@ -37,7 +49,9 @@ async function saveResource(resource, cache, image) {
         throw new Error("這個檔案尚未下載完成，請連線後再試一次。");
       }
       // Online playback still works when the device is full. The explicit download operation checks cache storage separately.
-      await cache.put(key, response.clone()).catch(() => {});
+      await cache.put(key, response.clone()).then(() => {
+        if (image) return notifyGalleryChanged();
+      }).catch(() => {});
       return response;
     })();
     pending.set(key, download);
@@ -136,7 +150,11 @@ function cleanUnusedReleases() {
     for (const [kind, name] of [["photos", galleryName], ["sounds", soundName]]) {
       const keys = new Set(kept.flatMap(resources => [...resources[kind].values()].map(resource => resource.key)));
       const cache = await caches.open(name);
-      for (const request of await cache.keys()) if (!keys.has(request.url)) await cache.delete(request);
+      let removed = false;
+      for (const request of await cache.keys()) {
+        if (!keys.has(request.url) && await cache.delete(request)) removed = true;
+      }
+      if (kind === "photos" && removed) await notifyGalleryChanged();
     }
   })().finally(() => { cleaning = undefined; });
   return cleaning;

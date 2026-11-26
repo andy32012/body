@@ -7,6 +7,7 @@ Every result is measured again (pitch at the end, harmonics-to-noise ratio, and 
 Writes the takes into out/<f|m>.json and the choices into intonation.json.
 usage: intonation.py <lesson id>"""
 import os, sys
+from math import isfinite
 import numpy as np, soundfile as sf
 from course import parse, clips, slug, HERE, read_json, write_json
 from lib import phonemes, tts, shape, check
@@ -54,11 +55,24 @@ def rising(c, ph, g):
             y, start = rising_end(part, sr, g)
             if y is None: seen.append(f'{voice} {speed}: no voicing'); continue
             y = shape(y, sr)
-            move, rough = final_move(y, sr, g), harmonicity(y, sr, start) - harmonicity(part, sr, start)
+            move = final_move(y, sr, g)
+            if move is None or not isfinite(move):
+                seen.append(f'{voice} {speed}: no measurable final pitch movement')
+                continue
+            before_hnr = harmonicity(part, sr, start)
+            after_hnr = harmonicity(y, sr, start)
+            if not all(hnr is not None and isfinite(hnr) for hnr in (before_hnr, after_hnr)):
+                seen.append(f'{voice} {speed}: no measurable harmonics-to-noise ratio')
+                continue
+            rough = after_hnr - before_hnr
             seen.append(f'{voice} {speed}: {move:+.1f} st, HNR {rough:+.1f} dB')
-            if move is None or move < RISE or rough < -3: continue
+            if move < RISE or rough < -3: continue
             res = check(c, y, sr)
-            if res['grade'] == 'strict': return voice, speed, y, sr, res, f'rises {move:+.1f} st (end raised by resynthesis; was {final_move(part, sr, g):+.1f})', seen
+            if res['grade'] == 'strict':
+                original = final_move(part, sr, g)
+                original_pitch = f'{original:+.1f} st' if original is not None and isfinite(original) else 'not measured'
+                pitch = f'rises {move:+.1f} st (end raised by resynthesis; original pitch movement {original_pitch})'
+                return voice, speed, y, sr, res, pitch, seen
             seen[-1] += f" (words not clear: {res.get('heard')!r})"
     return None, seen
 

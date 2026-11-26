@@ -69,7 +69,7 @@ const schema = z.object({
 export type AppState = z.infer<typeof schema>
 export type Session = AppState['sessions'][number]
 export type SchoolData = AppState['school']
-export type PageProps = {state:AppState, update:(updater:(prev:AppState)=>AppState)=>void, navigate:(page:Page)=>void}
+export type PageProps = {state:AppState, update:(updater:(prev:AppState)=>AppState)=>void|Promise<void>, navigate:(page:Page)=>void}
 export type {Energy, Period} from './progress'
 export const STORAGE_KEY = 'dream-blueprint.v2'
 const oldKey = 'dream-blueprint.v1'
@@ -111,14 +111,19 @@ export function createInitialState(startedDay=dayKey()):AppState {
     checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1','migrate.exam-keys-r038':'1',[writingMigrationKey]:'[]',...Object.fromEntries(contentUpdates.flatMap(u=>[['content.'+u.id,'0'],[contentNoticeKey(u.id),'0']]))},flagged:[],
   }
 }
-export function exportBackup(state:AppState):string {
-  return JSON.stringify(schema.parse(state),null,2)
+export function exportBackup(state:AppState, exportedAt?:Date):string {
+  const backup = schema.parse(state)
+  return JSON.stringify(exportedAt ? {...backup,exportedAt:exportedAt.toISOString()} : backup,null,2)
 }
 export function importBackup(raw:string):AppState {
+  return readBackup(raw).state
+}
+export function readBackup(raw:string):{state:AppState; exportedAt?:number} {
   if (raw.length > 24_000_000) throw new Error('備份超過 24 MB，請確認選取的檔案。')
   let data
   try { data = JSON.parse(raw.replace(/^\uFEFF/,'')) } catch { throw new Error('檔案不是有效的 JSON，請選取夢想藍圖匯出的備份。') }
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('備份需要包含版本與進度。')
+  const exportedAt = typeof data.exportedAt === 'string' ? Date.parse(data.exportedAt) : NaN
   if (data.version === 1) {
     // v1 has sessions and a course cursor, but no review history or separate mood settings.
     if (!Array.isArray(data.sessions) || !data.curriculum || typeof data.startedDay !== 'string')
@@ -170,7 +175,8 @@ export function importBackup(raw:string):AppState {
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
   // Old details leave this device so the saved progress stays well under the browser's ~5 MB (compact.ts). With Google
   // Drive connected they wait here until they are safely in the Drive archive.
-  return compactState(state,dayKey(),undefined,driveConnected())
+  return {state:compactState(state,dayKey(),undefined,driveConnected()),
+    exportedAt:Number.isFinite(exportedAt) ? exportedAt : undefined}
 }
 
 export const contentNoticeKey = (id:string) => 'content.notice.' + id
@@ -389,7 +395,7 @@ export function localModified() {
   return modified
 }
 export function updateStore(updater:(prev:AppState)=>AppState) {
-  void withStoreLock(()=>{
+  return withStoreLock(()=>{
     const prev = currentSnapshot().state
     const state = updater(prev)
     if (prev===state && !dirty) return

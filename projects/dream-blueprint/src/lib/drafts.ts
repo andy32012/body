@@ -1,8 +1,13 @@
 import { useSyncExternalStore } from 'react'
 
 /** Keep half-written answers available in this tab when the browser cannot write a draft. */
-const key = (id: string) => 'dream-blueprint.draft.' + id
+const legacyPrefix = 'dream-blueprint.draft.'
+const revisionPrefix = 'dream-blueprint.draft-version.'
+const revisionKey = (id: string) => revisionPrefix + encodeURIComponent(id) + '/'
+export interface DraftVersion { key: string; text: string }
+const editing = new Map<string, DraftVersion | undefined>()
 const pending = new Map<string, string>()
+const draftChange = 'dream-draft-change'
 const listeners = new Set<() => void>()
 const hasUnsavedDrafts = () => [...pending.values()].some(text => text.trim().length > 0)
 function subscribe(listener: () => void) {
@@ -11,23 +16,91 @@ function subscribe(listener: () => void) {
 }
 export const useUnsavedDrafts = () => useSyncExternalStore(subscribe, hasUnsavedDrafts, () => false)
 
-export function readDraft(id: string) {
-  const draft = pending.get(id)
-  if (draft !== undefined) return draft
-  try { return localStorage.getItem(key(id)) ?? '' } catch { return '' }
+export function draftVersions(id: string): DraftVersion[] {
+  try {
+    const prefix = revisionKey(id)
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix)).sort().reverse()
+    keys.push(legacyPrefix + id)
+    return keys.flatMap(key => {
+      const text = localStorage.getItem(key)
+      return text ? [{ key, text }] : []
+    })
+  } catch { return [] }
 }
-export function writeDraft(id: string, text: string) {
+/** The writing menu reads many tasks. Discover them once without changing a mounted editor's revision. */
+export function savedDraftTexts(prefix: string) {
+  const texts = new Map<string, string[]>()
+  function collect(id: string, text: string | null) {
+    if (!text?.trim()) return
+    const values = texts.get(id)
+    if (values) values.push(text)
+    else texts.set(id, [text])
+  }
+  try {
+    for (const key of Object.keys(localStorage)) {
+      let id: string
+      if (key.startsWith(legacyPrefix + prefix)) id = key.slice(legacyPrefix.length)
+      else if (key.startsWith(revisionPrefix + encodeURIComponent(prefix))) {
+        id = decodeURIComponent(key.slice(revisionPrefix.length).split('/')[0])
+      } else continue
+      collect(id, localStorage.getItem(key))
+    }
+  } catch { /* Pending drafts are still available in this tab. */ }
+  for (const [id, text] of pending) if (id.startsWith(prefix)) collect(id, text)
+  return texts
+}
+export function hasDraft(id: string) {
+  return !!pending.get(id)?.trim() || draftVersions(id).some(v => v.text.trim())
+}
+export function readDraft(id: string) {
+  if (pending.has(id)) return pending.get(id)!
+  const versions = draftVersions(id)
+  const current = versions.find(v => v.key === editing.get(id)?.key) ?? versions[0]
+  editing.set(id, current)
+  return current?.text ?? ''
+}
+/** Revisions have immutable keys. Simultaneous writers can retire their shared base without
+ * deleting one another's subsequent edits, including in browsers without Web Locks. */
+function replaceDraft(id: string, text: string, replaced: DraftVersion[]) {
   const warned = hasUnsavedDrafts()
   try {
-    if (text.trim()) localStorage.setItem(key(id), text)
-    else localStorage.removeItem(key(id))
+    let next: DraftVersion | undefined
+    if (text.trim()) {
+      const token = globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)
+      next = { key: revisionKey(id) + Date.now().toString(36) + '-' + token, text }
+      localStorage.setItem(next.key, text)
+    }
+    for (const version of replaced) {
+      if (localStorage.getItem(version.key) === version.text) localStorage.removeItem(version.key)
+    }
+    editing.set(id, next)
     pending.delete(id)
   } catch {
     pending.set(id, text)
   }
   if (warned !== hasUnsavedDrafts()) listeners.forEach(listener => listener())
+  window.dispatchEvent(new CustomEvent(draftChange, { detail: id }))
+}
+export function writeDraft(id: string, text: string) {
+  const base = editing.get(id)
+  replaceDraft(id, text, base ? [base] : [])
 }
 export const clearDraft = (id: string) => writeDraft(id, '')
+
+/** Only retire the alternatives actually shown to the learner. A later edit keeps its own revision. */
+export function chooseDraft(id: string, text: string, displayed: DraftVersion[]) {
+  replaceDraft(id, text, displayed)
+}
+export function watchDraft(id: string, refresh: () => void) {
+  const prefix = revisionKey(id)
+  const local = (e: Event) => { if ((e as CustomEvent<string>).detail === id) refresh() }
+  const remote = (e: StorageEvent) => {
+    if (e.key === null || e.key === legacyPrefix + id || e.key.startsWith(prefix)) refresh()
+  }
+  window.addEventListener(draftChange, local)
+  window.addEventListener('storage', remote)
+  return () => { window.removeEventListener(draftChange, local); window.removeEventListener('storage', remote) }
+}
 
 export function downloadUnsavedDrafts() {
   const drafts = [...pending.entries()].filter(([, text]) => text.trim()).map(([id, text]) => id + '\n' + text)

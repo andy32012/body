@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import DraftVersions from './DraftVersions'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Gauge, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { dayKey, daysBetween } from '../lib/progress'
@@ -6,9 +7,10 @@ import { askTutor, tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import { useModal } from '../lib/modal'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
+import { speakEnglishResult } from '../lib/tts'
 import './baseline.css'
 
-import { addResult, cefrOf, emptyCheck, forms, formSeen, identifiedResults, laterKey, makeBaselineId, nextForm, readResults, retestInfo, sectionScore, setResultFeedback, speakingFeedbackOk, wordCount, writingFeedbackOk, type BaselineResult, type Form, type Q } from '../lib/baseline'
+import { addResult, cefrOf, emptyCheck, forms, formSeen, identifiedResults, laterKey, makeBaselineId, nextForm, readResults, retestInfo, sectionScore, setResultFeedback, speakingFeedbackOk, wordCount, writingFeedbackOk, type BaselineResult, type Form, type FormId, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
 
 /** Pops up on the home page when the level test is due. Either button keeps it away for the rest of the day; while it is due,
@@ -86,23 +88,25 @@ function Quiz({ qs, answers, setAnswers }: { qs: Q[]; answers: number[]; setAnsw
 
 export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'update'>) {
   const results = useMemo(() => identifiedResults(state.notes), [state.notes])
-  const formId = nextForm(results)
+  const [attempt, setAttempt] = useState<{ formId: FormId; retest: boolean } | null>(null)
+  const formId = attempt?.formId ?? nextForm(results)
   const form = forms[formId]
   const retest = retestInfo(results, dayKey())
-  const [open, setOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [plays, setPlays] = useState(0)
   // Plays that were heard to the end: pressing 播放 alone is not having listened (a cut-off clip is not counted).
   const [heard, setHeard] = useState(0)
-  // Each test form gets its own listening count: a clip still playing from the last form never counts for the next one.
-  const playRun = useRef(0)
-  const resetListening = () => { playRun.current++; if ('speechSynthesis' in window) speechSynthesis.cancel(); setPlays(0); setHeard(0) }
+  const listeningPlayback = useRef<AbortController | null>(null)
+  const stopListening = useCallback(() => {
+    listeningPlayback.current?.abort()
+    listeningPlayback.current = null
+  }, [])
   const [notice, setNotice] = useState('')
   const [listen, setListen] = useState<number[]>([])
   const [read, setRead] = useState<number[]>([])
   // What he wrote stays on this device until the test is saved (leaving the page or closing the test keeps it).
   const draftKey = 'baseline.write.' + formId
-  const [writing, setWriting] = useState(() => readDraft(draftKey))
+  const [writing, setWriting] = useState('')
   const [recording, setRecording] = useState(false)
   const [audio, setAudio] = useState<Blob | null>(null)
   const [seconds, setSeconds] = useState(0)
@@ -123,6 +127,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     alive.current = true
     return () => {
       alive.current = false
+      stopListening()
       activeRequest.current = null
       const current = recorder.current
       recorder.current = null
@@ -130,16 +135,43 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       stream.current?.getTracks().forEach(t => t.stop())
       stream.current = null
     }
-  }, [])
+  }, [stopListening])
 
-  function play() {
-    if (!('speechSynthesis' in window) || plays >= 2) return
-    const u = new SpeechSynthesisUtterance(form.listen)
-    u.lang = 'en-US'; u.rate = 0.9
-    const run = playRun.current
-    u.onend = () => { if (alive.current && playRun.current === run) setHeard(n => n + 1) }
-    speechSynthesis.cancel(); speechSynthesis.speak(u)
-    setPlays(plays + 1)
+  function start() {
+    stopListening()
+    setAttempt({ formId, retest: results.length > 0 })
+    setStep(0); setNotice(''); setBusy('')
+    setPlays(0); setHeard(0); setListen([]); setRead([])
+    setWriting(readDraft(draftKey))
+    setAudio(null); setSeconds(0)
+  }
+  async function play() {
+    if (plays >= 2) return
+    stopListening()
+    const controller = new AbortController()
+    listeningPlayback.current = controller
+    setBusy('')
+    setPlays(n => n + 1)
+    const outcome = await speakEnglishResult(form.listen, 0.9, controller.signal)
+    if (listeningPlayback.current !== controller) return
+    listeningPlayback.current = null
+    if (outcome === 'played') setHeard(n => n + 1)
+    else setBusy('這次沒有播完，可以在剩餘次數內再試。')
+  }
+  function back() {
+    dropRequest()
+    if (recorder.current?.state === 'recording') recorder.current.stop()
+    setBusy('')
+    if (step) setStep(step - 1)
+    else {
+      stopListening()
+      setAttempt(null)
+    }
+  }
+  function next() {
+    if (step === 0) stopListening()
+    setBusy('')
+    setStep(step + 1)
   }
   async function record() {
     if (saveInProgress.current || activeRequest.current !== null) return
@@ -197,7 +229,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     return ((await res.json()).text as string) || ''
   }
   async function finish() {
-    if (saveInProgress.current || recorder.current || activeRequest.current !== null) return
+    if (!attempt || saveInProgress.current || recorder.current || activeRequest.current !== null) return
     // Skipped parts are 缺測 (null), not zero; a listening answer without playing the clip is not a listening score.
     const listening = heard ? sectionScore(form.listenQs, listen) : null
     const reading = sectionScore(form.readQs, read)
@@ -222,20 +254,21 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       if (transcript) { try { speakFeedback = await speakingFeedback(form, transcript, seconds) } catch { missed.push('口說的 Claude 回饋') } }
     }
     const result: BaselineResult = {
-      id, form: formId, date: dayKey(), listening, plays: heard, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
+      id, form: formId, date: dayKey(), listening, plays: heard, reading,
       writing: { text: writing, feedback: writeFeedback },
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
-    update(prev => ({ ...prev, notes: addResult(prev.notes, result) }))
+    update(prev => ({ ...prev, notes: addResult(prev.notes, {
+      ...result, ...(formSeen(identifiedResults(prev.notes), formId) ? { repeat: true } : {}),
+    }) }))
     saveInProgress.current = false
     clearDraft(draftKey)
     if (!alive.current) return
-    setBusy(''); setSaving(false); setOpen(false); setStep(0)
-    setListen([]); setRead([]); setWriting(''); setAudio(null); setSeconds(0); resetListening()
+    setBusy(''); setSaving(false); setAttempt(null)
     setNotice(missed.length ? '結果存好了，但這次沒拿到：' + missed.join('、') + '。Claude 的回饋可以在下面「看每次的聽力稿、作品和回饋」裡按「請 Claude 看」補上。' : '')
   }
 
-  if (results.length && !open) {
+  if (results.length && !attempt) {
     const shown = results.length <= 4 ? results : [results[0], ...results.slice(-3)]
     const first = results[0], last = results[results.length - 1]
     const sign = (n: number) => (n > 0 ? '+' : '') + n
@@ -273,21 +306,21 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
         </div>)}
       </details>
       {retest.due
-        ? <button type="button" className="bl-main" onClick={() => { resetListening(); setNotice(''); setOpen(true) }}>開始第 {results.length} 次回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}，約 15 分鐘）</button>
-        : <button type="button" className="bl-early" onClick={() => { resetListening(); setNotice(''); setOpen(true) }}>想提早回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}）</button>}
+        ? <button type="button" className="bl-main" onClick={start}>開始第 {results.length} 次回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}，約 15 分鐘）</button>
+        : <button type="button" className="bl-early" onClick={start}>想提早回測（{formSeen(results, formId) ? '題本 ' + formId + '，以前做過' : '新題本 ' + formId}）</button>}
       <small>每次換一份新題本，題型、長度和作答條件都一樣（聽力最多聽 2 次、不看字；寫作和口說不查字典、不用翻譯）。題目不同，差一兩題可能只是題目難易，比較「寫得多不多、說得長不長、需要的幫忙有沒有變少」更準。只拿來和自己比，不代表正式程度或雅思分數。</small>
     </section>
   }
 
-  if (!open) return <section className="bl-card">
+  if (!attempt) return <section className="bl-card">
     <header><strong>先做一次起點測驗</strong><span>約 15 分鐘</span></header>
     <p>聽力、閱讀各 3 題，再寫幾句、講一分鐘。結果會留下來，12 週後用新題目比較，看自己到底進步多少。</p>
-    <button type="button" className="bl-main" onClick={() => { resetListening(); setOpen(true) }}>開始</button>
+    <button type="button" className="bl-main" onClick={start}>開始</button>
   </section>
 
   const steps = ['聽力', '閱讀', '寫作', '口說']
   return <section className="bl-card">
-    <header><strong>{results.length ? '回測（題本 ' + formId + '）' : '起點測驗'} · {steps[step]}</strong><span>{step + 1} / 4</span></header>
+    <header><strong>{attempt.retest ? '回測（題本 ' + formId + '）' : '起點測驗'} · {steps[step]}</strong><span>{step + 1} / 4</span></header>
     <div className="bl-steps" aria-hidden="true">{steps.map((s, i) => <i key={s} className={i <= step ? 'on' : ''} />)}</div>
     {step === 0 && <>
       <p>聽一段語音留言（最多聽 2 次），再回答問題。先不要看文字。</p>
@@ -302,6 +335,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       <p lang="en"><b>{form.write}</b></p>
       <p>不要查字典、不要用翻譯，寫得出多少就寫多少。</p>
       <textarea lang="en" rows={5} value={writing} onChange={e => { setWriting(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder="Yesterday I…" />
+      <DraftVersions id={draftKey} text={writing} onChoose={setWriting} />
     </>}
     {step === 3 && <>
       <p lang="en"><b>{form.speak}</b></p>
@@ -312,10 +346,10 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     </>}
     {busy && <p role="status">{busy}</p>}
     <div className="bl-nav">
-      <button type="button" disabled={saving} onClick={() => { dropRequest(); if (recorder.current?.state === 'recording') recorder.current.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
+      <button type="button" disabled={saving} onClick={back}>{step ? '上一步' : '取消'}</button>
       {step < 3
-        ? <button type="button" className="bl-main" onClick={() => { setBusy(''); setStep(step + 1) }}>下一步</button>
-        : <button type="button" className="bl-main" disabled={saving || recording || requesting} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}
+        ? <button type="button" className="bl-main" onClick={next}>下一步</button>
+        : <button type="button" className="bl-main" disabled={saving || recording || requesting} onClick={finish}>{attempt.retest ? '完成，存這次結果' : '完成，存起點'}</button>}
     </div>
   </section>
 }

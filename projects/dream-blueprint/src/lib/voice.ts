@@ -8,7 +8,13 @@ const GUARD = 'dream-blueprint.echo-guard'
 export const voices = ['marin', 'quartz', 'ripple', 'vesper', 'willow', 'stone', 'gleam', 'meridian', 'bossa', 'tempo', 'beacon', 'delta', 'cinder', 'nuri', 'juni', 'flitz', 'brise', 'sillage', 'nira', 'harema', 'shida', 'noeul']
 
 function read(name: string) { try { return localStorage.getItem(name) ?? '' } catch { return '' } }
-function write(name: string, value: string) { try { value ? localStorage.setItem(name, value) : localStorage.removeItem(name) } catch { /* private mode */ } }
+function write(name: string, value: string) {
+  try {
+    if (value) localStorage.setItem(name, value)
+    else localStorage.removeItem(name)
+    return localStorage.getItem(name) === (value || null)
+  } catch { return false }
+}
 export const openaiKey = () => read(KEY)
 export const setOpenaiKey = (v: string) => write(KEY, v.trim())
 export const voiceName = () => read(VOICE) || 'marin'

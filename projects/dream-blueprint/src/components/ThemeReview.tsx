@@ -92,7 +92,9 @@ function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain 
   if (phase === 'drills' && item) return <section className="tr" aria-label={'主題總複習：' + scope.title}>
     <div className="tr-head"><strong>第一部分：文法題混在一起</strong><small>{drillNames[item.drill.k]} · 第 {at + 1} / {items.length} 題</small></div>
     <div className="tr-bar" aria-hidden="true"><i style={{ width: (rights.length / items.length) * 100 + '%' }} /></div>
-    <DrillCard key={at} drill={item.drill} onDone={(right, said) => {
+    <DrillCard key={at} drill={item.drill} onCorrected={() => onActivity(prev => ({
+      ...prev, notes: saveDrill(prev.notes, item.unit, item.index, true, date),
+    }))} onDone={(right, said) => {
       const next = [...rights, right]
       setRights(next)
       onActivity(prev => {

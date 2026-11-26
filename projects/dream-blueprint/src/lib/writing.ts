@@ -1,4 +1,5 @@
 import bookPlan from '../data/writing-book.json'
+import { isTimeSeries } from './chart'
 import { chapterReady, sectionDone, type BookIndex } from './grammarBook'
 import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
 import { openSteps, reached } from './unlock'
@@ -19,12 +20,18 @@ export function chartText(c: WriteChart): string {
   return c.title + ' ' + c.points.map(p => p.label + ' ' + p.value).join(', ')
 }
 /** Task 1's structure hint for each kind of picture. */
-export const taskOneOutlines: Record<'trend' | 'table' | 'process', string[]> = {
+export const taskOneOutlines: Record<'trend' | 'comparison' | 'table' | 'process', string[]> = {
   trend: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
+  comparison: ['Introduction：用自己的話說明比較哪些組別、數字的單位與調查期間', 'Overview：Overall, …（最高、最低或最明顯的差別，不放細節數字）', 'Body 1：比較差距明顯的組別，附數字', 'Body 2：把數字相近的組別一起比較，或補充另一個重要差別'],
   table: ['Introduction：用自己的話改寫題目（表格比較什麼、單位、時間）', 'Overview：Overall, …（最高、最低或最明顯的差別，不放細節數字）', 'Body 1：一組重要的比較，附數字', 'Body 2：另一組比較或例外，附數字；不用每個數字都寫'],
   process: ['Introduction：用自己的話改寫題目（這是什麼流程）', 'Overview：Overall, 一共幾個步驟、從哪裡開始到哪裡結束（不放細節）', 'Body 1：前半的步驟，照順序寫（First, … Next, …）', 'Body 2：後半的步驟（After that, … Finally, …），每個主要步驟都要寫到'],
 }
-export const chartKind = (c: WriteChart | undefined) => !c ? null : isTableChart(c) ? 'table' : isProcessChart(c) ? 'process' : 'trend'
+export function chartKind(c: WriteChart | undefined) {
+  if (!c) return null
+  if (isTableChart(c)) return 'table'
+  if (isProcessChart(c)) return 'process'
+  return isTimeSeries(c.points.map(p => p.label)) ? 'trend' : 'comparison'
+}
 
 /** 寫作階梯：從完整的簡單句逐步練到 IELTS。Claude grades each stage by a published table (see rubricFor). */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: WriteChart
@@ -49,13 +56,17 @@ export interface WriteFeedback {
   unchecked?: string[]
   /** The text that was graded: a later draft is never shown under this check's scores. */
   answer?: string
+  /** When the answer was sent, so order does not depend on which reply finishes first. */
+  submittedAt?: number
 }
 export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number }
 export const writeKey = (id: string) => 'write.' + id
 
-/** Words for these exercises: letters with accents count as one word (résumé, café), so do numbers (150, 37.5, 10,000)
- *  and hyphen / apostrophe joins (well-known, don't). Punctuation alone is not a word. Close to, not the same as, an exam counter. */
-export const wordCount = (text: string) => (text.match(/\p{L}+(?:['’-]\p{L}+)*|\d+(?:[.,]\d+)*/gu) ?? []).length
+const latinLetter = /(?=\p{Script=Latin})\p{L}\p{M}*/u.source
+const latinRun = `(?:${latinLetter})+`
+const writingToken = new RegExp(`${latinRun}(?:['’-]${latinRun})*|\\d+(?:[.,]\\d+)*`, 'gu')
+/** Count Latin words (including accents, hyphens and apostrophes) and numerals, leaving Chinese notes out of the count. */
+export const wordCount = (text: string) => (text.normalize('NFC').match(writingToken) ?? []).length
 
 const str = (v: unknown) => typeof v === 'string' ? v : undefined
 /** Fixes as the page can show them: text only; one without the corrected part says nothing and is left out. */
@@ -89,6 +100,7 @@ export function readWrite(notes: Record<string, string>, id: string): WriteRecor
         ...(l.checks !== undefined ? { checks: cleanChecks(l.checks) } : {}),
         ...(l.unchecked !== undefined ? { unchecked: Array.isArray(l.unchecked) ? l.unchecked.filter((x): x is string => typeof x === 'string') : [] } : {}),
         ...(l.answer !== undefined ? { answer: str(l.answer) } : {}),
+        submittedAt: typeof l.submittedAt === 'number' && l.submittedAt > 0 && Number.isSafeInteger(l.submittedAt) ? l.submittedAt : undefined,
         criteria: l.criteria.map(c => ({ ...c, comment: str(c.comment) ?? '' })) }
     }
     return r
@@ -194,6 +206,7 @@ export const checksFor = (stage: WriteStage, task: WriteTask): string[] => stage
 export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) {
   const r = rubricFor(stage), parts = scoredParts(stage, task), checks = checksFor(stage, task)
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
+  const picture = chartKind(task.chart)
   return [
     '你是英文寫作老師，批改台灣護理系學生玄燁（英文約國中程度，目標雅思）的英文寫作。',
     '題目：' + prompt,
@@ -201,8 +214,9 @@ export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) 
     ...(task.min ? ['這題要求至少 ' + task.min + ' 字。字數不夠時照評分表給分，並在 next 提醒他要寫到幾個字。'] : []),
     ...(stage.grammar ? ['這一階教過的文法：' + stage.grammar.title + '；' + stage.grammar.points.join('；') + '。他是照這個程度寫的，不要因為沒用到更難的文法扣分；分數仍只照下面的官方評分表，不能另加要求，也不能放寬官方標準。'] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，回應題目要照這種題目該有的結構：' + essays[kind].outline.join('；')] : []),
-    ...(task.chart && isProcessChart(task.chart) ? ['這題是流程圖：總覽要說一共幾個步驟、從哪裡開始到哪裡結束；Task Achievement 看主要步驟有沒有都寫到、順序對不對，流程圖沒有數字，不需要數據比較。'] : []),
-    ...(task.chart && isTableChart(task.chart) ? ['這題是表格：總覽要說最高、最低或最明顯的差別；Task Achievement 看有沒有挑出重點來比較，不需要把每個數字都寫出來。'] : []),
+    ...(picture === 'process' ? ['這題是流程圖：總覽要說一共幾個步驟、從哪裡開始到哪裡結束；Task Achievement 看主要步驟有沒有都寫到、順序對不對，流程圖沒有數字，不需要數據比較。'] : []),
+    ...(picture === 'table' ? ['這題是表格：總覽要說最高、最低或最明顯的差別；Task Achievement 看有沒有挑出重點來比較，不需要把每個數字都寫出來。'] : []),
+    ...(picture === 'comparison' ? ['這題的長條比較不同組別。總覽找最高、最低或明顯差別，正文用數字比較組別；橫軸不是時間順序，請勿要求寫時間趨勢。'] : []),
     ...(task.focus ? ['這一課的文法重點：' + task.focus + '。題目要他用這些句型：有沒有用、用得對不對，算在「題目的要求」裡；沒用到就照表給分並說明要怎麼加。'] : []),
     ...(r.id === 'gept-sentence' ? ['題目要的每一句各給一個分數：先找出他寫的哪一句是那一句；沒寫到、或沒用到指定的字，那一句就是 0。'] : []),
     rubricPrompt(r, parts),
@@ -229,6 +243,11 @@ function matchPart(name: string, parts: readonly string[]) {
   return matchCriterion(n, parts)
 }
 
+const wholePieceNames = new Set([
+  '整篇', '整體', '全文', '全篇', '總分', '整篇評分', '整體評分', '全文評分', '全篇評分',
+  '整篇分數', '整體分數', '全文分數', '全篇分數', 'overall', 'overall score', 'overall grade', 'whole piece',
+])
+
 /** Reads Claude's grade against the stage's table. Anything that is not a usable grade returns null: it is shown as a
  *  failed check and never counted. That is a score not on the table (band 7.5 for one criterion, 6 on a 0–5 scale, "4"),
  *  the wrong number of parts, a part without a name or with a name that is not one of the parts (never matched by its
@@ -242,10 +261,10 @@ export function parseGrade(text: string, rubric: Rubric, parts: readonly string[
     if (!Array.isArray(j.scores) || j.scores.length !== parts.length) return null
     const lines = j.scores as { name?: unknown; score?: unknown; reason?: unknown }[]
     if (!lines.every(x => x && typeof x === 'object' && validRubricScore(rubric, x.score) && str(x.reason)?.trim() && str(x.name)?.trim())) return null
-    const otherTables = Object.values(rubrics).filter(r => r.id !== rubric.id).flatMap(r => r.scales.map(sc => sc.name)).filter(n => !parts.includes(n))
+    const wholePiece = (rubric.id === 'gept-paragraph' || rubric.id === 'gept-essay') && parts.length === 1 && parts[0] === '整篇'
     const order: number[] = lines.map(x => {
       const name = str(x.name)!
-      if (parts.length === 1) return matchPart(name, parts) === 0 || matchCriterion(name, otherTables) < 0 ? 0 : -1
+      if (wholePiece) return wholePieceNames.has(name.normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' ')) ? 0 : -1
       return matchPart(name, parts)
     })
     if (order.some(i => i < 0) || new Set(order).size !== parts.length) return null

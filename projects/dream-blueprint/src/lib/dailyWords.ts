@@ -23,14 +23,36 @@ export const seenKey = (day: string) => 'daily-word.seen.' + day
 export const moreKey = (day: string) => 'daily-word.more.' + day
 /** Today's sorted words in order, so the card can step back to the word before. */
 export const sortedKey = (day: string) => 'daily-word.sorted.' + day
+export const isSortedKey = (key: string) => /^daily-word\.sorted\.\d{4}-\d{2}-\d{2}$/.test(key)
 export interface SortedWord { k: string; known: boolean }
 export const officialByKey = new Map(officialWords.map(w => [wordKey(w.en), w]))
 
-export function readSorted(notes: Record<string, string>, day: string): SortedWord[] {
+function sortedRows(raw?: string): SortedWord[] {
   try {
-    const list = JSON.parse(notes[sortedKey(day)] ?? '[]') as unknown
+    const list = JSON.parse(raw ?? '[]') as unknown
     return Array.isArray(list) ? list.filter((e): e is SortedWord => !!e && typeof e.k === 'string' && typeof e.known === 'boolean') : []
   } catch { return [] }
+}
+type WordLists = { knownWords: readonly string[]; learningWords: readonly string[] }
+export function currentWordChoice(lists: WordLists, word: SortedWord): boolean {
+  const known = lists.knownWords.some(w => wordKey(w) === word.k)
+  const learning = lists.learningWords.some(w => wordKey(w) === word.k)
+  return known === learning ? word.known : known
+}
+/** Preserve each word's place in the stack. On an overlapping choice, follow the same classification as the word lists. */
+export function mergeSortedWords(older?: string, newer?: string, lists?: WordLists): SortedWord[] {
+  const byKey = new Map<string, SortedWord>()
+  for (const entry of [...sortedRows(older), ...sortedRows(newer)]) {
+    const k = wordKey(entry.k)
+    const previous = byKey.get(k)
+    const next = { k, known: entry.known }
+    const known = lists && previous && previous.known !== next.known ? currentWordChoice(lists, next) : next.known
+    byKey.set(k, { k, known })
+  }
+  return [...byKey.values()]
+}
+export function readSorted(notes: Record<string, string>, day: string): SortedWord[] {
+  return mergeSortedWords(notes[sortedKey(day)])
 }
 /** Adds a word to today's order; a word already there keeps its place and takes the new choice. */
 export function recordSorted(notes: Record<string, string>, day: string, k: string, known: boolean) {

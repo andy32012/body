@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { clipSlug, packFile, pronVoices, type PronVoice } from './pronunciation'
 import { appRelease, withAppRelease } from './appRelease'
+import { speakEnglishResult, type PlaybackResult } from './tts'
 
 /** A pack holds every clip of one lesson in one voice: 4 bytes (little-endian length of the index), the index as JSON
  *  { clip name: [offset, length] }, then the mp3 clips one after another. One request per lesson and voice instead of dozens. */
@@ -58,8 +59,35 @@ export function offlinePacks(
   })
 }
 
-export interface Take { text: string; voice: PronVoice }
+export interface Take { text: string; voice: PronVoice; recordingOnly?: boolean }
 type Clips = Partial<Record<PronVoice, Map<string, string>>>
+
+function playRecording(audio: HTMLAudioElement, url: string, rate: number, signal: AbortSignal): Promise<PlaybackResult> {
+  return new Promise(resolve => {
+    const failed = () => finish('failed')
+    const aborted = () => finish('aborted')
+    const limit = setTimeout(failed, 30000)
+    let settled = false
+    function finish(result: PlaybackResult) {
+      if (settled) return
+      settled = true
+      clearTimeout(limit)
+      audio.onended = audio.onerror = null
+      signal.removeEventListener('abort', aborted)
+      if (result !== 'played') audio.pause()
+      resolve(result)
+    }
+    audio.onended = () => { if (audio.ended) finish('played') }
+    audio.onerror = () => { if (audio.error) failed() }
+    signal.addEventListener('abort', aborted, { once: true })
+    try {
+      audio.src = url
+      audio.defaultPlaybackRate = rate
+      audio.playbackRate = rate
+      void audio.play().catch(failed)
+    } catch { failed() }
+  })
+}
 
 /** Plays the recorded clips of one lesson. Clips are loaded when the lesson opens, so a tap can start the sound at once
  *  (iPad and iPhone only allow sound that starts inside the tap). Until a voice has loaded, or when it cannot be loaded,
@@ -69,15 +97,16 @@ export function usePronPlayer(lessonId: string) {
   const [missing, setMissing] = useState<PronVoice[]>([])
   const [now, setNow] = useState<Take | null>(null)
   const [deviceVoice, setDeviceVoice] = useState(false)
+  const [playbackFailed, setPlaybackFailed] = useState(false)
   const loaded = useRef<Clips>({})
   const player = useRef<HTMLAudioElement | null>(null)
-  const run = useRef(0)
+  const playback = useRef<AbortController | null>(null)
 
   useEffect(() => {
     const abort = new AbortController()
     const urls: string[] = []
     loaded.current = {}
-    setClips({}); setMissing([]); setDeviceVoice(false)
+    setClips({}); setMissing([]); setDeviceVoice(false); setNow(null); setPlaybackFailed(false)
     for (const voice of pronVoices) {
       fetchPack(lessonId, voice, abort.signal).then(buf => {
         if (abort.signal.aborted) return
@@ -87,63 +116,71 @@ export function usePronPlayer(lessonId: string) {
         setClips(loaded.current)
       }).catch(() => { if (!abort.signal.aborted) setMissing(list => [...list, voice]) })
     }
-    return () => { abort.abort(); urls.forEach(u => URL.revokeObjectURL(u)) }
+    return () => {
+      abort.abort()
+      const playing = playback.current
+      playback.current = null
+      playing?.abort()
+      urls.forEach(u => URL.revokeObjectURL(u))
+    }
   }, [lessonId])
 
   function stop() {
-    run.current++
-    player.current?.pause()
-    window.speechSynthesis?.cancel()
+    const playing = playback.current
+    playback.current = null
+    playing?.abort()
     setNow(null)
   }
-  useEffect(() => stop, [])
 
-  /** Plays the takes one after another. Returns false when nothing on this device can make sound. `onSound` is called
-   *  once sound really comes out (a recording starts playing, or the device voice starts or reaches the end), so a
-   *  listening question can wait for it instead of opening on a play that failed. */
-  function play(queue: Take[], rate = 1, onSound?: () => void): boolean {
+  /** A cancelled play leaves no result. A listening question counts only when its clip reaches the end. */
+  async function play(queue: Take[], rate = 1): Promise<PlaybackResult> {
     stop()
-    if (!queue.length) return true
-    const id = ++run.current
-    let sounded = false
-    const sound = () => { if (id === run.current && !sounded) { sounded = true; onSound?.() } }
-    const audio = player.current ?? (player.current = new Audio())
-    const step = (i: number) => {
-      if (id !== run.current) return
-      const take = queue[i]
-      if (!take) { setNow(null); return }
-      const next = () => { if (id === run.current) setTimeout(() => step(i + 1), 280) }
-      const url = loaded.current[take.voice]?.get(clipSlug(take.text))
-      setNow(take)
-      if (url) {
-        audio.onended = next
-        audio.onerror = next
-        audio.onplaying = sound
-        audio.src = url
-        audio.defaultPlaybackRate = rate
-        audio.playbackRate = rate
-        audio.play().catch(() => { if (id === run.current) setNow(null) })
-        return
+    setPlaybackFailed(false)
+    setDeviceVoice(false)
+    if (!queue.length) return 'aborted'
+    const controller = new AbortController()
+    const { signal } = controller
+    playback.current = controller
+    let deviceText: string | null = null
+    try {
+      for (const [i, take] of queue.entries()) {
+        if (signal.aborted) return 'aborted'
+        const url = loaded.current[take.voice]?.get(clipSlug(take.text))
+        // The device has one voice. A second missing recording of the same text would read identically.
+        if (!url && !take.recordingOnly && deviceText === take.text) continue
+        setNow(take)
+        let result: PlaybackResult
+        if (url) {
+          const audio = player.current ?? (player.current = new Audio())
+          deviceText = null
+          result = await playRecording(audio, url, rate, signal)
+        } else if (take.recordingOnly) {
+          result = 'failed'
+        } else {
+          setDeviceVoice(true)
+          deviceText = take.text
+          result = await speakEnglishResult(take.text, 0.85 * rate, signal)
+        }
+        if (signal.aborted) return 'aborted'
+        if (result !== 'played') {
+          // If the device interrupted this still-current attempt, offer a retry.
+          setPlaybackFailed(true)
+          return 'failed'
+        }
+        if (i + 1 < queue.length) await new Promise(resolve => setTimeout(resolve, 280))
       }
-      if (!('speechSynthesis' in window)) { setNow(null); return }
-      // The device has one voice: when neither recording is there, the same words are not read twice in a row.
-      const before = queue[i - 1]
-      if (before && before.text === take.text && !loaded.current[before.voice]?.get(clipSlug(before.text))) { step(i + 1); return }
-      setDeviceVoice(true)
-      const u = new SpeechSynthesisUtterance(take.text)
-      u.lang = 'en-US'
-      u.rate = 0.85 * rate
-      u.onstart = sound
-      // Some engines never report the start; one that reached its end was heard.
-      u.onend = () => { sound(); next() }
-      u.onerror = next
-      window.speechSynthesis.speak(u)
+      return signal.aborted ? 'aborted' : 'played'
+    } catch {
+      if (signal.aborted) return 'aborted'
+      setPlaybackFailed(true)
+      return 'failed'
+    } finally {
+      if (playback.current === controller) {
+        playback.current = null
+        setNow(null)
+      }
     }
-    const first = queue[0]
-    if (!loaded.current[first.voice]?.get(clipSlug(first.text)) && !('speechSynthesis' in window)) return false
-    step(0)
-    return true
   }
   const ready = pronVoices.filter(v => clips[v])
-  return { play, stop, now, ready, missing, deviceVoice, loading: ready.length + missing.length < pronVoices.length }
+  return { play, stop, now, ready, missing, deviceVoice, playbackFailed, loading: ready.length + missing.length < pronVoices.length }
 }

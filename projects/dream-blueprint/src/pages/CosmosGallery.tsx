@@ -37,49 +37,105 @@ function OfflineLibrary() {
   const [progress, setProgress] = useState({done:0,total:0})
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [statusError, setStatusError] = useState('')
   const [online, setOnline] = useState(navigator.onLine)
   const mounted = useRef(true)
   const inFlight = useRef(false)
+  const requestStatus = useRef<() => void>(() => {})
   const supported = window.isSecureContext && 'serviceWorker' in navigator
   useEffect(() => {
     mounted.current = true
-    const changed = () => setOnline(navigator.onLine)
-    window.addEventListener('online',changed)
-    window.addEventListener('offline',changed)
-    const status = () => getGalleryOfflineStatus().then(result => {
-      if (mounted.current && !inFlight.current) setProgress(result)
-    }).catch(() => {})
-    if (supported) void status()
+    let watching = true
+    let checking = false
+    let queued = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    async function refresh() {
+      if (!watching || checking || inFlight.current || document.hidden) return
+      checking = true
+      queued = false
+      try {
+        const result = await getGalleryOfflineStatus()
+        if (watching && !queued && !inFlight.current) {
+          setProgress(result)
+          setStatusError('')
+        }
+      } catch (error) {
+        if (watching && !queued && !inFlight.current) {
+          setProgress({done:0,total:0})
+          setStatusError(error instanceof Error ? error.message : '目前無法確認離線保存的張數。')
+        }
+      } finally {
+        checking = false
+        if (queued) schedule()
+      }
+    }
+    function schedule() {
+      queued = true
+      if (!watching || !supported || checking || inFlight.current || document.hidden) return
+      clearTimeout(timer)
+      // Delay briefly to group notifications when several photos are being saved.
+      timer = setTimeout(refresh, 150)
+    }
+    const changed = () => { setOnline(navigator.onLine); schedule() }
+    const cacheChanged = (event: MessageEvent) => { if (event.data?.type === 'GALLERY_CACHE_CHANGED') schedule() }
+    requestStatus.current = schedule
+    window.addEventListener('online', changed)
+    window.addEventListener('offline', changed)
+    window.addEventListener('focus', changed)
+    window.addEventListener('pageshow', changed)
+    document.addEventListener('visibilitychange', changed)
+    if (supported) {
+      navigator.serviceWorker.addEventListener('controllerchange', schedule)
+      navigator.serviceWorker.addEventListener('message', cacheChanged)
+      schedule()
+    }
     return () => {
+      watching = false
       mounted.current = false
-      window.removeEventListener('online',changed)
-      window.removeEventListener('offline',changed)
+      clearTimeout(timer)
+      window.removeEventListener('online', changed)
+      window.removeEventListener('offline', changed)
+      window.removeEventListener('focus', changed)
+      window.removeEventListener('pageshow', changed)
+      document.removeEventListener('visibilitychange', changed)
+      if (supported) {
+        navigator.serviceWorker.removeEventListener('controllerchange', schedule)
+        navigator.serviceWorker.removeEventListener('message', cacheChanged)
+      }
     }
   }, [supported])
   async function download() {
     if (inFlight.current) return
     inFlight.current = true
+    requestStatus.current()
     setMessage('')
+    setStatusError('')
     setBusy(true)
     try {
       const result = await downloadGalleryOffline(p => { if (mounted.current) setProgress(p) })
-      if (mounted.current) {setProgress(result); setMessage('全圖庫已保存到這個裝置。')}
+      if (mounted.current) setProgress(result)
     } catch (error) {
       if (mounted.current) setMessage(error instanceof Error ? error.message : '下載中斷，連線後可接續。')
     } finally {
       inFlight.current = false
-      if (mounted.current) setBusy(false)
+      if (mounted.current) {
+        setBusy(false)
+        requestStatus.current()
+      }
     }
   }
   const done = progress.total > 0 && progress.done === progress.total
-  return <details className="cg-offline">
+  return <details className="cg-offline" onToggle={event => { if (event.currentTarget.open) requestStatus.current() }}>
     <summary><ArrowDownToLine size={16} aria-hidden="true"/>離線圖庫</summary>
     <div className="cg-download-panel">
     <button type="button" className="cg-soft-button" disabled={busy || done || !online || !supported} onClick={download}>
-      {done ? <Check size={16}/> : busy ? <LoaderCircle size={16} className="cg-spin"/> : <ArrowDownToLine size={16}/>}
-      {done ? '全庫可離線瀏覽' : busy ? '正在下載' : '保存全圖庫供離線瀏覽'}
+      {busy ? <LoaderCircle size={16} className="cg-spin"/> : done ? <Check size={16}/> : <ArrowDownToLine size={16}/>}
+      {busy ? '正在下載' : done ? '全庫可離線瀏覽' : '保存全圖庫供離線瀏覽'}
     </button>
-    <small role="status">{!online && '目前離線。'}{!supported ? '使用正式 HTTPS 網址可保存全圖庫。' : message || (progress.total && (busy || progress.done > 0) ? '已保存 '+progress.done+' / '+progress.total+' 個檔案' : '')}</small>
+    <small role="status">{!online && '目前離線。'}{!supported ? '使用正式 HTTPS 網址可保存全圖庫。' : <>
+      {progress.total > 0 && '已保存 '+progress.done+' / '+progress.total+' 個檔案。'}
+      {!done && (statusError || message)}
+    </>}</small>
     </div>
   </details>
 }
@@ -90,20 +146,25 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   const ref = useRef<HTMLDialogElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
   const swipeStart = useRef<{x:number;y:number} | null>(null)
-  const [target, setTarget] = useState<string>('today')
-  const [notice, setNotice] = useState('')
+  const [preferredTarget, setTarget] = useState<string>('today')
   const index = group.findIndex(item => item.id === photo.id)
-  const route = destinations.find(([id]) => id === target)!
+  const available = destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled)
+  const [target] = available.find(([id]) => id === preferredTarget) ?? destinations[0]
   const pinned = readBackgroundPin(state.notes, target)
   const currentTitle = photos.find(item => item.id === pinned)?.title
+  useEffect(() => {
+    if (target !== preferredTarget) setTarget(target)
+  }, [preferredTarget, target])
   function move(n:number) {
-    setNotice('')
     change(group[(index+n+group.length)%group.length])
   }
   function choose(automatic:boolean) {
     closeButton.current?.focus({preventScroll:true})
-    update(prev => ({ ...prev, notes: setBackgroundPin(prev.notes, target, automatic ? null : photo.id) }))
-    setNotice(automatic ? route[1]+'背景已恢復自動輪替。' : '已將「'+photo.title+'」設為'+route[1]+'背景。')
+    update(prev => {
+      // Sync may have disabled the selected page while this save waited for the store lock.
+      if (target === 'rivals' && !prev.settings.rivalsEnabled) return prev
+      return { ...prev, notes: setBackgroundPin(prev.notes, target, automatic ? null : photo.id) }
+    })
   }
   useEffect(() => {
     const dialog = ref.current!
@@ -156,12 +217,12 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
         <details className="cg-background">
           <summary><Pin size={14} aria-hidden="true"/>頁面背景<ChevronDown size={14} aria-hidden="true"/></summary>
           <div className="cg-placement"><label htmlFor="cg-destination">套用頁面</label>
-            <select id="cg-destination" value={target} onChange={e => {setTarget(e.target.value);setNotice('')}}>
-              {destinations.filter(([id]) => id !== 'rivals' || state.settings.rivalsEnabled).map(([id,name]) => <option key={id} value={id}>{name}</option>)}
+            <select id="cg-destination" value={target} onChange={e => setTarget(e.target.value)}>
+              {available.map(([id,name]) => <option key={id} value={id}>{name}</option>)}
             </select>
             <div className="cg-pin-buttons"><button type="button" onClick={() => choose(false)} disabled={pinned === photo.id}><Pin size={14}/>設為這張</button>
               <button type="button" onClick={() => choose(true)} disabled={!pinned}><RotateCw size={14}/>自動輪替</button></div>
-            <small role="status">{notice || (currentTitle ? '目前固定 · '+currentTitle : '目前自動輪替')}</small>
+            <small role="status">{currentTitle ? '目前固定 · '+currentTitle : '目前自動輪替'}</small>
           </div>
         </details>
       </div>

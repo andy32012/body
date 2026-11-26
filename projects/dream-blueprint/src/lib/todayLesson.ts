@@ -8,6 +8,7 @@ import { workloadWords } from "./workloadWords";
 import { readSayCard, sayCardSentence } from "./sayCards";
 import { unitGate } from "./cefr";
 import { topics } from "./topics";
+import type { LessonRecord } from "./lesson";
 
 /** Today's lesson, built from the course position: which sentence or checkpoint, its new words, or a review day. */
 export type Word = { en: string; zh: string; example?: string; exampleZh?: string };
@@ -50,15 +51,28 @@ export function syncCustom(notes: Record<string, string>) {
 }
 const anchor = sentences[0];
 
+type LessonPosition = Pick<LessonRecord, 'unit' | 'day' | 'retry' | 'sentenceId' | 'records' | 'hints'>;
+
+export function lessonSentence(unit: Unit, day: number, retry: number, saved?: LessonPosition): Sentence {
+  const original = unit.days[day - 1];
+  const alternate = day >= 4 ? unit.backup[day - 4] : undefined;
+  if (!alternate) return original;
+  const candidates = [original, alternate];
+  const attempted = saved?.records?.find(record => candidates.some(c => c.id === record.sentenceId));
+  const hinted = candidates.filter(sentence => saved?.hints?.[sentence.id]);
+  const savedId = saved?.sentenceId ?? attempted?.sentenceId ?? (hinted.length === 1 ? hinted[0].id : undefined);
+  return candidates.find(sentence => sentence.id === savedId) ?? (retry > 0 ? alternate : original);
+}
+
 /** `at` continues a lesson that was already started (its core may be saved and the curriculum moved on). */
-export function lesson(state: AppState, energy: Energy, date: string, at?: { unit: number; day: number }) {
+export function lesson(state: AppState, energy: Energy, date: string, at?: LessonPosition) {
   syncCustom(state.notes);
-  const cursor = at ? { ...state.curriculum, unit: at.unit, day: at.day } : state.curriculum;
+  const cursor = at ?? state.curriculum;
   const unit =
     units.find((u) => u.id === cursor.unit) ?? units[units.length - 1];
   const index = Math.min(6, Math.max(1, cursor.day));
   const entry = unit.days[index - 1];
-  const retry = cursor.retry > 0;
+  const retry = cursor.retry ?? (cursor.unit === state.curriculum.unit ? state.curriculum.retry : 0);
   const advancedToday = state.sessions.some(
     (s) => s.day === date && (s.advanced ?? s.energy !== "low"),
   );
@@ -83,12 +97,10 @@ export function lesson(state: AppState, energy: Energy, date: string, at?: { uni
   const items = review
     ? [previous ?? anchor]
     : checkpoint
-      ? retry
+      ? retry > 0
         ? unit.backup.slice(-3)
         : unit.checkpoint
-      : retry && index >= 4
-        ? [unit.backup[index - 4] ?? entry]
-        : [entry];
+      : [lessonSentence(unit, index, retry, at)];
   const previousPair = [...new Set(completed)]
     .reverse()
     .flatMap((id) => sentenceById.get(id) ?? [])
@@ -106,6 +118,7 @@ export function lesson(state: AppState, energy: Energy, date: string, at?: { uni
   return {
     unit: unit.id,
     day: index,
+    retry,
     title: review ? "今天只練這一句" : unit.title,
     zh: review && !previous ? "用自己記得的一句英文複習。" : items[0].zh,
     newWords: vocabulary,
@@ -133,7 +146,7 @@ export function getLessonPreview(
   state: AppState,
   energy: Energy,
   date = dayKey(),
-  at?: { unit: number; day: number },
+  at?: LessonPosition,
 ) {
   return lesson(state, energy, date, at);
 }

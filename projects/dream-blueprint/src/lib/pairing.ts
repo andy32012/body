@@ -94,3 +94,6 @@ export function payloadFrom(text: string): string | null {
 }
 /** Tell the open app that a pairing link should be shown (from Settings or a link opened in a running tab). */
 export const pairEvent = 'dream-blueprint:pair'
+export const pairKeysEvent = 'dream-blueprint:keys'
+/** Only success flags, never the actual keys, are included in the local UI event. */
+export type PairedFields = { claude: boolean; model: boolean; openai: boolean }

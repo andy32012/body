@@ -94,7 +94,7 @@ function Panel({ title, hint, icon: Icon, children }: { title: string; hint?: st
   </details>
 }
 
-import { exportBackup, getSnapshot, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
+import { exportBackup, getSnapshot, readBackup, restoreBackup, replacePeriod, updateStoreNow, type AppState, type PageProps } from '../lib/store'
 import { archiveFolderUrl, cloudArchive, driveConnected } from '../lib/drive'
 import { dayKey, addDays, activePeriod } from '../lib/progress'
 import { noteMoved } from '../lib/wordStates'
@@ -102,6 +102,14 @@ import { DAILY_CHOICES, DEFAULT_DAILY, countKey } from '../lib/dailyWords'
 
 type SettingsData = AppState['settings']
 type PeriodType = SettingsData['periods'][number]['type']
+type OfficeDraft = { base: string; text: string }
+class OfficeReplyChanged extends Error {
+  constructor(readonly saved: string) { super('系辦回覆已在別處更新。') }
+}
+type BackupSelection = { name: string; id: number } & (
+  { phase: 'reading' } | { phase: 'ready'; raw: string; exportedAt?: number; modifiedAt: number }
+)
+const backupTime = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'medium', timeStyle: 'short' })
 const periodNames: Record<PeriodType, string> = { semester: '一般學期', exam: '考週', internship: '實習', vacation: '寒暑假' }
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 const sourceLinks = [
@@ -118,33 +126,58 @@ export default function Settings(props: PageProps) {
   const s = state.settings
   const set = <K extends keyof SettingsData,>(key: K, value: SettingsData[K]) => update(prev => ({...prev, settings: {...prev.settings, [key]: value}}))
   const today = dayKey()
-  const [reply, setReply] = useState(s.officeReply)
+  const [officeDraft, setOfficeDraft] = useState<OfficeDraft | null>(null)
+  const [officeConflict, setOfficeConflict] = useState<OfficeReplyChanged | null>(null)
+  const [officeSaving, setOfficeSaving] = useState(false)
   const [why, setWhy] = useState(s.why)
   const [period, setPeriod] = useState<PeriodType>('exam')
   const [start, setStart] = useState(dayKey())
   const [end, setEnd] = useState(dayKey())
   const [text, setText] = useState('')
   const [wordMode, setWordMode] = useState<'learn' | 'known'>('learn')
-  const [backup, setBackup] = useState<AppState | null>(null)
+  const [backup, setBackup] = useState<BackupSelection | null>(null)
   const [restoring, setRestoring] = useState(false)
   const [result, setResult] = useState({area:'', msg:''})
   const announce = (area:string,msg:string) => setResult({area,msg})
-  const status = (area:string) => result.area === area ? <p role="status" className="set-status">{result.msg}</p> : null
+  const status = (area:string) => result.area === area && result.msg ? <p role="status" className="set-status">{result.msg}</p> : null
   const wordInput = useRef<HTMLInputElement>(null)
   const backupInput = useRef<HTMLInputElement>(null)
+  const backupRead = useRef(0)
+  const restorePending = useRef(false)
+
+  async function saveOffice(approved = officeDraft?.base) {
+    if (!officeDraft || officeSaving || restorePending.current) return
+    const reply = officeDraft.text.trim()
+    setOfficeSaving(true)
+    try {
+      await updateStoreNow(prev => {
+        if (prev.settings.officeReply !== approved && prev.settings.officeReply !== reply)
+          throw new OfficeReplyChanged(prev.settings.officeReply)
+        return {...prev, settings: {...prev.settings, officeReply:reply, officeAsked:prev.settings.officeAsked || !!reply}}
+      })
+      setOfficeDraft(null)
+      setOfficeConflict(null)
+      announce('office','已儲存系辦回覆。')
+    } catch (error) {
+      if (error instanceof OfficeReplyChanged) setOfficeConflict(error)
+      else announce('office',error instanceof Error ? error.message : '系辦回覆儲存失敗，請再試一次。')
+    } finally { setOfficeSaving(false) }
+  }
 
   async function confirmRestore() {
-    if (!backup || restoring) return
+    if (backup?.phase !== 'ready' || backup.id !== backupRead.current || restorePending.current || officeSaving) return
+    restorePending.current = true
     setRestoring(true)
     try {
-      const restored = await restoreBackup(exportBackup(backup),undefined,{expected:getSnapshot().state})
+      const restored = await restoreBackup(backup.raw,undefined,{expected:getSnapshot().state})
       setWhy(restored.settings.why)
-      setReply(restored.settings.officeReply)
+      setOfficeDraft(null)
+      setOfficeConflict(null)
       setBackup(null)
       announce('backup','進度和設定已還原。')
     } catch (error) {
       announce('backup',error instanceof Error ? error.message : '還原失敗，請確認瀏覽器可以儲存資料後再試。')
-    } finally { setRestoring(false) }
+    } finally { restorePending.current = false; setRestoring(false) }
   }
 
   function savePeriod() {
@@ -179,7 +212,7 @@ export default function Settings(props: PageProps) {
     } catch (e) { announce('words', (e as Error).message) }
   }
   function download() {
-    const file = new Blob([exportBackup(state)], {type:'application/json'})
+    const file = new Blob([exportBackup(state,new Date())], {type:'application/json'})
     const url = URL.createObjectURL(file)
     const link = document.createElement('a')
     link.href = url
@@ -190,14 +223,36 @@ export default function Settings(props: PageProps) {
     window.setTimeout(() => URL.revokeObjectURL(url), 5000)
     announce('backup','已建立備份，請收好下載的檔案。')
   }
-  async function readFile(file: File | undefined, mode:'backup'|'words') {
+  async function readWordFile(file: File | undefined) {
     if (!file) return
-    if (mode === 'backup') setBackup(null)
+    try {
+      setText(await file.text())
+      announce('words','已讀取檔案，可檢查內容再匯入。')
+    } catch (e) { announce('words', e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。') }
+  }
+
+  async function selectBackup(file: File | undefined) {
+    if (!file || restorePending.current) return
+    const id = ++backupRead.current
+    setBackup({name:file.name,id,phase:'reading'})
+    announce('backup','')
     try {
       const raw = await file.text()
-      if (mode === 'backup') { setBackup(importBackup(raw)); announce('backup','備份已讀取，請確認是否還原。') }
-      else { setText(raw); announce('words','已讀取檔案，可檢查內容再匯入。') }
-    } catch (e) { announce(mode, e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。') }
+      if (id !== backupRead.current) return
+      const {exportedAt} = readBackup(raw)
+      setBackup({name:file.name,id,phase:'ready',raw,exportedAt,modifiedAt:file.lastModified})
+    } catch (e) {
+      if (id !== backupRead.current) return
+      setBackup(null)
+      announce('backup',e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。')
+    }
+  }
+
+  function cancelBackup() {
+    if (restorePending.current) return
+    backupRead.current++
+    setBackup(null)
+    announce('backup','已保留目前進度。')
   }
   return <section className="settings-page" aria-label="設定">
     <header className="set-hero">
@@ -245,8 +300,23 @@ export default function Settings(props: PageProps) {
       <label>為什麼出發<textarea rows={3} maxLength={50000} value={why} onChange={e=>setWhy(e.target.value)} placeholder="用一到三句話，留給累了的自己。" /></label>
       <button type="button" onClick={()=>{set('why',why.trim()); announce('why','已儲存出發的原因。')}}>儲存出發的原因</button>{status('why')}
       <label>已確認的基護實習時段<input aria-label="已確認的基護實習時段" value={s.internshipSeason} onChange={e=>set('internshipSeason',e.target.value)} /></label>
-      <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={reply} onChange={e=>setReply(e.target.value)} placeholder="有確切梯次或報到日期時，可以記在這裡。" /></label>
-      <button type="button" onClick={()=>{update(prev=>({...prev,settings:{...prev.settings,officeReply:reply.trim(),officeAsked:prev.settings.officeAsked||!!reply.trim()}})); announce('office','已儲存系辦回覆。')}}>儲存系辦回覆</button>{status('office')}
+      <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={officeDraft?.text ?? s.officeReply}
+        readOnly={officeSaving || restoring} placeholder="有確切梯次或報到日期時，可以記在這裡。"
+        onChange={e=>{
+          const text=e.target.value
+          setOfficeDraft(text===s.officeReply ? null : {base:officeDraft?.base ?? s.officeReply,text})
+          setOfficeConflict(null)
+          announce('office','')
+        }}/></label>
+      {officeConflict && officeDraft ? <div className="set-restore">
+        <p role="status">另一份系辦回覆已存入。上方是你正在編輯的內容，下方是儲存時讀到的版本。</p>
+        <label>目前已存的系辦回覆<textarea rows={3} readOnly value={officeConflict.saved}/></label>
+        <div className="set-actions">
+          <button type="button" disabled={officeSaving || restoring} onClick={()=>{setOfficeDraft(null);setOfficeConflict(null)}}>使用已存版本</button>
+          <button type="button" disabled={officeSaving || restoring} onClick={()=>void saveOffice(officeConflict.saved)}>儲存我編輯的版本</button>
+        </div>
+      </div> : <button type="button" disabled={!officeDraft || officeSaving || restoring} onClick={()=>void saveOffice()}>儲存系辦回覆</button>}
+      {status('office')}
     </Panel>
     <Panel icon={KeyRound} title="連接 Claude" hint="用自己的 API 金鑰，讓 Claude 批改中翻英"><ClaudeConnect /></Panel>
     <Panel icon={Crosshair} title="我的弱點" hint={weakTop.length ? '最常錯：'+weakTop.map(w=>w.k).join('、') : '批改和口說找到的錯會記在這裡'}><WeakPanel /></Panel>
@@ -262,7 +332,7 @@ export default function Settings(props: PageProps) {
       <p>每行一個單字，可接中文和級別。支援貼上文字、逗號分隔檔與試算表複製的欄位。</p>
       <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text} onChange={e=>setText(e.target.value)} /></label>
       <label>這一批單字<select value={wordMode} onChange={e=>setWordMode(e.target.value as 'learn' | 'known')}><option value="learn">加入想學的清單</option><option value="known">已經認得，略過新字練習</option></select></label>
-      <input type="file" ref={wordInput} hidden accept=".csv,.tsv,.txt,text/plain,text/csv" onChange={e=>{void readFile(e.target.files?.[0],'words');e.target.value=''}}/>
+      <input type="file" ref={wordInput} hidden accept=".csv,.tsv,.txt,text/plain,text/csv" onChange={e=>{void readWordFile(e.target.files?.[0]);e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" onClick={saveVocabulary}>匯入單字</button></div>{status('words')}
     </Panel>
     {!(["exam","internship"].includes(activePeriod(today,s.periods))) && <Panel icon={ListChecks} title="第 1、2 級單字快篩" hint="認得的單字直接略過"><VocabScreen {...props} /></Panel>}
@@ -271,12 +341,21 @@ export default function Settings(props: PageProps) {
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
       {(()=>{const mb=JSON.stringify(state).length/1e6; const folder=archiveFolderUrl(); return <p className={mb>3.5?'set-warn':undefined}>進度檔大小：{mb<0.1?'不到 0.1':mb.toFixed(1)} MB（手機的瀏覽器大約能存 5 MB）。{
         driveConnected()&&cloudArchive()?<>兩個月以前的複習紀錄、幾週前的每天小紀錄、四個月前上完的課的批改全文，會先存進你雲端硬碟的「夢想藍圖・封存」資料夾，雲端說收到了才從這台拿掉，一筆都不會丟。{folder&&<> <a href={folder} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</>
-        :driveConnected()?'舊紀錄會先留在這台，等雲端小程式更新到最新的 v5（v4 以上都可以），就會先存進雲端硬碟再從這台整理掉（步驟在上面「雲端硬碟」那一區）。'
+        :driveConnected()?'舊紀錄會先留在這台。請依上方「雲端硬碟」的步驟更新雲端小程式。支援封存的版本會先將紀錄存進雲端硬碟，再從這台整理掉。'
         :'兩個月以前的複習紀錄會整理成統計，每天的小紀錄幾週後清掉，所以會一直維持在安全範圍。連上雲端硬碟的話，整理掉之前會先存一份到雲端。'}{mb>3.5?' 現在偏大了，請跟 Claude 說要把進度改存到 IndexedDB。':''}</p>})()}
-      <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void readFile(e.target.files?.[0],'backup');e.target.value=''}}/>
+      <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void selectBackup(e.target.files?.[0]);e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" disabled={restoring} onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
-      {backup && <div className="set-restore"><b>用這份備份取代目前進度？</b><p>還原會包含原本的課表、學習紀錄和設定。</p>
-        <div className="set-actions"><button type="button" disabled={restoring} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button><button type="button" disabled={restoring} onClick={()=>{setBackup(null); announce('backup','已保留目前進度。')}}>取消</button></div></div>}{status('backup')}
+      {backup && <div className="set-restore set-backup-selection">
+        <b>{backup.name}</b>
+        {backup.phase==='reading' ? <p role="status">正在讀取這份備份……</p> : <>
+          <p>{backup.exportedAt === undefined ? '檔案修改時間' : '備份匯出時間'} {backupTime.format(backup.exportedAt ?? backup.modifiedAt)}</p>
+          <p>還原會用這份備份的課表、學習紀錄和設定取代目前進度。</p>
+        </>}
+        <div className="set-actions">
+          {backup.phase==='ready' && <button type="button" disabled={restoring || officeSaving} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button>}
+          <button type="button" disabled={restoring} onClick={cancelBackup}>取消</button>
+        </div>
+      </div>}{status('backup')}
     </Panel>
     </section>
     <section className="set-group set-preferences" aria-labelledby="set-preferences-heading">

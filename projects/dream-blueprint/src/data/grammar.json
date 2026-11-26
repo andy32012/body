@@ -5349,6 +5349,7 @@
    {
     "k": "fix",
     "q": "The nurse which helped me was nice.",
+    "requireSameCommas": true,
     "accept": [
      "The nurse who helped me was nice.",
      "The nurse that helped me was nice."
@@ -5358,6 +5359,7 @@
    {
     "k": "fix",
     "q": "She has a brother who work in a bank.",
+    "requireSameCommas": true,
     "accept": [
      "She has a brother who works in a bank."
     ],
@@ -8767,6 +8769,7 @@
    {
     "k": "fix",
     "q": "My brother, that lives in Japan, is a nurse.",
+    "requireSameCommas": true,
     "accept": [
      "My brother, who lives in Japan, is a nurse."
     ],
@@ -8775,6 +8778,7 @@
    {
     "k": "fix",
     "q": "He failed the test, what surprised us.",
+    "requireSameCommas": true,
     "accept": [
      "He failed the test, which surprised us."
     ],

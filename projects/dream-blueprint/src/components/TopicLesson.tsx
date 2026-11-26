@@ -1,3 +1,4 @@
+import DraftVersions from './DraftVersions'
 import AskWhy from './AskWhy'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, ChevronLeft, Mic, Pause, Play, Square, Volume2 } from 'lucide-react'
@@ -96,7 +97,7 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
         : <SentenceItems {...shared} sentences={topic.review.practice} label="換情境" doneLabel="下一步：說"
           intro={<p className="tl-situation">{topic.review.situation}</p>}
           preparation={() => <p className="ls-help">這次不先看規則：先自己寫，真的卡住再看提示（看了就記成有提示完成）。</p>}
-          onAllDone={results => save({ review: { level: judgeReview(results) } })} />}
+          onAllDone={results => save(r => ({ review: { ...r.review, level: judgeReview(results) } }))} />}
     </div>
   </section>
 }
@@ -376,6 +377,7 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
     <label className="pr-field">我的重述（先說出來，再打下來）
       <textarea lang="en" rows={3} value={text} spellCheck={false} autoComplete="off" onChange={e => { setText(e.target.value); writeDraft(key, e.target.value) }} />
     </label>
+    <DraftVersions id={key} text={text} onChoose={setText} />
     <div className="ls-helps" role="group" aria-label="需要幫忙時打開">
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
@@ -509,7 +511,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
   const [busy, setBusy] = useState('')
   const [met, setMet] = useState<boolean[]>(() => task.conditions.map(() => false))
   const [run, setRun] = useState(0)
-  const [result, setResult] = useState<Result>()
+  const [feedback, setFeedback] = useState<{ checkedText: string; fixes: Result['fixes'] }>()
   const [submitted, setSubmitted] = useState<SpeakRecord | null>(null)
   const done = submitted ?? (part === 'C' ? rec.review?.speak : rec.speak)
   const ready = useReady()
@@ -553,7 +555,8 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     const textLevel = text.trim() ? judgeExpress({ answered: true, help: open.help, firstVerdict: verdict }) : null
     const level = how === 'typed' ? null : judgeSpeak({ said: true, transcript: text, help: open.help, firstVerdict: verdict })
     const unmet = task.conditions.filter((_, i) => !met[i])
-    const record: SpeakRecord = { level, textLevel, mode: how, help: open.help, ...(verdict ? { firstVerdict: verdict } : {}), recorded: !!clip, goals: speakGoals(result?.fixes ?? [], unmet) }
+    const fixes = feedback?.checkedText === text.trim() ? feedback.fixes : []
+    const record: SpeakRecord = { level, textLevel, mode: how, help: open.help, ...(verdict ? { firstVerdict: verdict } : {}), recorded: !!clip, goals: speakGoals(fixes, unmet) }
     if (part === 'C') save(r => ({ review: { level: r.review?.level ?? null, speak: record } }))
     else save({ speak: record })
     clearDraft(draftKey)
@@ -584,6 +587,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <label className="pr-field">{openaiKey() ? '你剛剛說的（打下來，或錄音後按「把錄音轉成文字」）' : '你剛剛說的（照著打下來）'}
       <textarea lang="en" rows={4} value={text} spellCheck={false} autoComplete="off" placeholder="照你說的寫，不用先改好" onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
+    <DraftVersions id={draftKey} text={text} onChoose={setText} />
     {offered && <section className="pr-reference" aria-live="polite"><small>錄音轉好的文字（你在等的時候改過框裡的字，所以沒有直接換掉）</small><p lang="en">{offered}</p>
       <div className="pr-actions"><button type="button" className="pr-link" onClick={() => { setText(offered); writeDraft(draftKey, offered); setOffered('') }}>換成這段辨識結果</button>
         <button type="button" className="pr-link" onClick={() => setOffered('')}>不用，留我改的</button></div></section>}
@@ -597,7 +601,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <CorrectBox run={run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
       reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
       onReveal={() => open.addHelp('sample')}
-      onResult={(v, _n, r, sentText) => { open.setVerdict(v, sentText); setResult(r) }}
+      onResult={(v, _n, r, sentText) => { open.setVerdict(v, sentText); setFeedback({ checkedText: sentText, fixes: r.fixes }) }}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>說完後勾一下：我有做到</legend>
       {task.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
@@ -643,6 +647,7 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
     <label className="pr-field">我的訊息
       <textarea lang="en" rows={5} value={text} spellCheck={false} autoComplete="off" placeholder="寫你自己的內容" onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
+    <DraftVersions id={draftKey} text={text} onChoose={setText} />
     <p className="tl-count" data-ok={inRange}>已寫 {n} 句{!enough ? '，要 ' + W.minSentences + '–5 句' : n > 5 ? '：訊息最多 5 句，挑最重要的留下' : ''}（只算長度，兩個字以上才算一句；文法和意思要另外檢查）</p>
     <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
       <span>卡住了？一層一層打開：</span>

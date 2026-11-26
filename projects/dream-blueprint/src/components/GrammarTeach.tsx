@@ -74,8 +74,10 @@ export function ExplainBody({ steps, table, mistakes, rate }: { steps: GrammarSt
 const drillInstruction = (drill: Drill) => drill.k === 'choose' ? '' : drill.instruction ??
   (drill.k === 'fix' ? '這句有一個地方錯了，改成正確的句子。' : '')
 
-/** One drill with feedback. The first try is recorded when onDone is supplied. */
-export function DrillCard({ drill, onDone }: { drill: Drill; onDone?: (right: boolean, said: string) => void }) {
+/** One drill with feedback. Report the first try and the first successful correction separately. */
+export function DrillCard({ drill, onDone, onCorrected }: {
+  drill: Drill; onDone?: (right: boolean, said: string) => void; onCorrected?: () => void
+}) {
   // Start from the sentence to edit so only the requested part needs retyping on a phone.
   const [text, setText] = useState(drill.k === 'fix' ? drill.q : '')
   const [missed, setMissed] = useState<number[]>([])
@@ -90,6 +92,7 @@ export function DrillCard({ drill, onDone }: { drill: Drill; onDone?: (right: bo
     const right = checkDrill(drill, answer)
     const typed = typeof answer === 'number' ? (drill.k === 'choose' ? drill.options[answer] ?? '' : '') : answer
     if (result === null) { setResult(right); onDone?.(right, typed) }
+    else if (right) onCorrected?.()
     setSaid(typed)
     if (right) setSolved(true)
     else if (typeof answer === 'number') setMissed(m => [...m, answer])
@@ -118,7 +121,7 @@ export function DrillCard({ drill, onDone }: { drill: Drill; onDone?: (right: bo
       </div>}
     </form>}
     {result !== null && (solved ? <div className="gm-feedback" data-ok={result} role="status">
-      <strong>{result ? '對了' : onDone ? '這次改對了（第一次的錯照樣記，之後會再出現）' : '這次改對了'}</strong>
+      <strong>{result ? '對了' : onCorrected ? '這次改對了（保留首次的作答紀錄）' : '這次改對了'}</strong>
       <p lang="en">{drillAnswer(drill)}</p>
       {drill.k === 'fix' && drill.accept.length > 1 && <small>也可以寫：<span lang="en">{drill.accept.slice(1).join('／')}</span></small>}
       <small>{drill.why}</small>
@@ -139,23 +142,27 @@ export function GrammarDrills({ unit, indices, onSave, date, done, after }: { un
   after?: ReactNode }) {
   const g = grammarFor(unit)
   if (!g) return null
-  return <DrillRun drills={g.drills} indices={indices} done={done} after={after} onAnswer={(i, right, said) => onSave(notes => {
+  return <DrillRun drills={g.drills} indices={indices} done={done} after={after}
+    onCorrected={i => onSave(notes => saveDrill(notes, unit, i, true, date))}
+    onAnswer={(i, right, said) => onSave(notes => {
     // A miss also goes on the shared weak-point list, under this unit's grammar.
     const saved = saveDrill(notes, unit, i, right, date)
     const label = labelOfUnit(unit)
     return right || !label ? saved : addWeak(saved, label, date, { w: said, r: drillAnswer(g.drills[i]) }, 'drill')
   })} />
 }
-/** Any list of drills, one at a time (a course unit's, or a section's three in 完整文法). `onAnswer` gets each first answer. */
-export function DrillRun({ drills, indices, onAnswer, done, after, title = '小練習：先認得，再寫', missed = '錯的題目之後會再出現一次。' }: { drills: Drill[]; indices: number[]
-  onAnswer: (index: number, right: boolean, said: string) => void; done?: string; after?: ReactNode; title?: string
+/** Any list of drills, one at a time (a course unit's, or a section's three in 完整文法). */
+export function DrillRun({ drills, indices, onAnswer, onCorrected, done, after, title = '小練習：先認得，再寫', missed = '還沒改對的題目之後會再出現。' }: { drills: Drill[]; indices: number[]
+  onAnswer: (index: number, right: boolean, said: string) => void; onCorrected: (index: number) => void
+  done?: string; after?: ReactNode; title?: string
   /** What happens to the drills missed (in a lesson they come back on later days). */
   missed?: string }) {
-  const g = { drills }
   const [at, setAt] = useState(0)
   const [answered, setAnswered] = useState(false)
   const [rights, setRights] = useState<boolean[]>([])
-  const drill = g?.drills[indices[at]]
+  const [corrected, setCorrected] = useState(0)
+  const index = indices[at]
+  const drill = drills[index]
   useTaskContext(drill ? {
     label: '文法小練習（' + drillNames[drill.k] + '）：' + drill.q,
     detail: ['文法小練習，題目：' + drill.q, drillInstruction(drill), drill.k === 'choose' ? '選項：' + drill.options.join(' / ') : '', '正確答案：' + drillAnswer(drill) + '（他作答前不要說出來）', '原因：' + drill.why].filter(Boolean).join('\n'),
@@ -164,16 +171,19 @@ export function DrillRun({ drills, indices, onAnswer, done, after, title = '小�
   if (!drill) {
     const right = rights.filter(Boolean).length
     return <div className="gm-drills gm-drills-done" role="status">
-      <strong>小練習做完了：{rights.length} 題對 {right} 題</strong>
-      <p>{right < rights.length ? missed : '都認得了。'}{done ?? ''}</p>
+      <strong>第一次 {rights.length} 題答對 {right} 題{corrected > 0 ? ' · 當場訂正 ' + corrected + ' 題' : ''}</strong>
+      <p>{right + corrected < rights.length ? missed : '這輪都答對了。'}{done ?? ''}</p>
       {after}
     </div>
   }
   return <div className="gm-drills">
     <div className="gm-drills-head"><strong>{title}</strong><small>{drillNames[drill.k]} · 第 {at + 1} / {indices.length} 題</small></div>
-    <DrillCard key={indices[at]} drill={drill} onDone={(right, said) => {
+    <DrillCard key={index} drill={drill} onDone={(right, said) => {
       setAnswered(true); setRights(r => [...r, right])
-      onAnswer(indices[at], right, said)
+      onAnswer(index, right, said)
+    }} onCorrected={() => {
+      setCorrected(n => n + 1)
+      onCorrected(index)
     }} />
     {answered && <button type="button" className="pr-main gm-next" onClick={() => { setAt(at + 1); setAnswered(false) }}>{at + 1 < indices.length ? '下一題' : '看結果'}</button>}
   </div>

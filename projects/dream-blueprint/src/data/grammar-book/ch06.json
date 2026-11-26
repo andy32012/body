@@ -727,6 +727,7 @@
    {
     "k": "fix",
     "q": "She is the nurse which helped my mother.",
+    "requireSameCommas": true,
     "accept": [
      "She is the nurse who helped my mother.",
      "She is the nurse that helped my mother."

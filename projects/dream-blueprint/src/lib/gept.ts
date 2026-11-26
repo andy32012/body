@@ -1,5 +1,7 @@
 import { weakLabelPrompt } from './weakPoints'
 import { rubricPrompt, rubrics, type RubricId } from './rubrics'
+import { legacyRecordId } from './recordId'
+import { sayIdentity } from './sayCards'
 
 /**
  * 全民英檢口說練習. The formats follow LTTC's published descriptions (中級: 朗讀短文 2 篇、回答問題 10 題、看圖敘述;
@@ -38,10 +40,14 @@ export const answerSeconds = (level: GeptLevel, i: number) => level === 'interme
 export const readSeconds: Record<GeptLevel, { silent: number; aloud: number }> = { elementary: { silent: 60, aloud: 60 }, intermediate: { silent: 60, aloud: 120 } }
 
 export const geptKey = (level: GeptLevel, id: string) => 'gept.speak.' + level + '.' + id
+type GeptReading = { r?: number; rp?: number[] }
 /** d: day last practised; q / p: 回答問題 / 看圖敘述 reference scores (latest); best: the best 回答問題 score ever;
- *  r: words heard of the whole read-aloud part (%), rp: of each of its pieces (sentences, passage…).
+ *  r / rp: words heard of the latest whole read-aloud part and its pieces (%). readBest: one best attempt.
  *  rr: sentences repeated (including the legacy count), rrIds: the known, zero-based sentence IDs in this set. */
-export interface GeptRecord { d?: string; q?: number; best?: number; p?: number; r?: number; rp?: number[]; rr?: number; rrIds?: number[] }
+export interface GeptRecord extends GeptReading {
+  d?: string; q?: number; best?: number; p?: number; rr?: number; rrIds?: number[]
+  readAt?: number; readBest?: GeptReading; weakMarks?: string[]
+}
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
   try {
     const record = JSON.parse(notes[geptKey(level, id)] || '{}') as GeptRecord | null
@@ -58,7 +64,9 @@ export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: rea
 export function saveGept(notes: Record<string, string>, level: GeptLevel, id: string, patch: GeptRecord) {
   const old = readGept(notes, level, id)
   const best = Math.max(bestQ(old), bestQ(patch))
-  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...mergedRepeats(old, patch), ...(best >= 0 ? { best } : {}) }) }
+  const reading = hasReading(patch) ? { ...patch, readAt: Math.max(patch.readAt ?? Date.now(), (old.readAt ?? 0) + 1) } : patch
+  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...mergedRepeats(old, patch),
+    ...mergeReading(old, reading), ...mergeMistakes(old, patch), ...(best >= 0 ? { best } : {}) }) }
 }
 
 function mergedRepeats(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'rr' | 'rrIds'> {
@@ -72,27 +80,50 @@ function mergedRepeats(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'rr' | 'r
 export function mergeGeptRecords(a: GeptRecord, b: GeptRecord): GeptRecord {
   const best = Math.max(bestQ(a), bestQ(b))
   const bestPicture = Math.max(a.p ?? -1, b.p ?? -1)
-  const read = betterReading(a, b) ? a : b
   return {
     ...a, ...b, ...mergedRepeats(a, b),
     ...(best >= 0 ? { best } : {}),
     ...(bestPicture >= 0 ? { p: bestPicture } : {}),
-    r: read.r,
-    rp: read.rp,
+    ...mergeReading(a, b),
+    ...mergeMistakes(a, b),
   }
 }
 
-function betterReading(a: GeptRecord, b: GeptRecord): boolean {
-  const completed = (r: GeptRecord) => r.rp?.filter(n => n >= readPieceDone).length ?? 0
+const hasReading = (r: GeptReading) => r.r !== undefined || !!r.rp?.length
+function mergeReading(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'r' | 'rp' | 'readAt' | 'readBest'> {
+  const latest = hasReading(b) && (!hasReading(a) || (b.readAt ?? 0) >= (a.readAt ?? 0)) ? b : a
+  let best: GeptReading | undefined
+  for (const reading of [a, a.readBest, b, b.readBest]) {
+    if (reading && hasReading(reading) && (!best || betterReading(reading, best))) {
+      best = { r: reading.r, rp: reading.rp }
+    }
+  }
+  return { r: latest.r, rp: latest.rp, readAt: latest.readAt, readBest: best }
+}
+
+function betterReading(a: GeptReading, b: GeptReading): boolean {
+  const completed = (r: GeptReading) => r.rp?.filter(n => n >= readPieceDone).length ?? 0
   const aDone = completed(a), bDone = completed(b)
   return aDone !== bDone ? aDone > bDone : (a.r ?? -1) > (b.r ?? -1)
 }
+
+/** The same mistake quoted in another check of the same recording is still one mistake. */
+export const geptMistakeId = (attempt: string, wrong: string) =>
+  legacyRecordId(JSON.stringify([attempt, sayIdentity(wrong) || wrong.trim()]))
+export const newGeptAttempt = () => globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
+function mergeMistakes(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'weakMarks'> {
+  // A grader can return up to three cards; keep a bounded list of recently seen marks in each round.
+  const marks = [...new Set([...(a.weakMarks ?? []), ...(b.weakMarks ?? [])])].slice(-180)
+  return marks.length ? { weakMarks: marks } : {}
+}
+
 /** A piece of the read-aloud part counts as read when at least this share of its words was heard. */
 export const readPieceDone = 30
 /** Every part of the round was done: the repeated sentences (初級), each read-aloud piece, the questions and (中級) the
  *  picture. A record from before the pieces were kept apart cannot show that both pieces were read. */
 export function geptRoundDone(r: GeptRecord, level: GeptLevel, set: { repeat?: readonly string[] }, pieces: number) {
-  const read = (r.rp?.length ?? 0) >= pieces && r.rp!.every(x => x >= readPieceDone)
+  const bestPieces = r.readBest?.rp ?? r.rp ?? []
+  const read = bestPieces.length >= pieces && bestPieces.every(x => x >= readPieceDone)
   const repeated = level !== 'elementary' || (r.rr ?? 0) >= (set.repeat?.length ?? 0)
   return read && repeated && r.q !== undefined && (level === 'elementary' || r.p !== undefined)
 }

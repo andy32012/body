@@ -137,6 +137,19 @@ export function addWeak(notes: Record<string, string>, rawLabel: string, day: st
   return write(notes, next)
 }
 
+/** Refreshes the correction for an existing example without counting the same attempt twice. */
+export function refreshWeakExample(notes: Record<string, string>, label: string, example: { w: string; r: string }, src: WeakSource) {
+  const list = readWeak(notes)
+  const item = list.find(x => x.k === label)
+  if (!item || !weakAfterRemoval(item, readRemoved(notes)[label])) return notes
+  const w = clip(example.w) || '（沒寫）', r = clip(example.r)
+  const index = item.ex.findIndex(old => old.src === src && squash(old.w) === squash(w))
+  if (!r || index < 0 || item.ex[index].r === r) return notes
+  const ex = [...item.ex]
+  ex[index] = { w, r, src }
+  return write(notes, list.map(x => x === item ? { ...item, ex } : x))
+}
+
 /** The same grammar written right on its own: the point gets one miss lighter, and goes away at zero. */
 export function easeWeak(notes: Record<string, string>, rawLabel: string) {
   const k = normalizeLabel(rawLabel)

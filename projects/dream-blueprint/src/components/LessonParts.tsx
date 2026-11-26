@@ -1,6 +1,7 @@
+import DraftVersions from './DraftVersions'
 import OwnCheck from './OwnCheck'
 import AskWhy from './AskWhy'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Check, Pause, Play, Volume2 } from 'lucide-react'
 import CorrectBox from './CorrectBox'
 import TutorChat from './TutorChat'
@@ -12,7 +13,7 @@ import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { chartBounds, isTimeSeries } from '../lib/chart'
 import { isProcessChart, isTableChart, type WriteChart } from '../lib/writing'
 import type { SayCard } from '../lib/sayCards'
-import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type HeardRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
+import { issuesFixed, lessonSteps, mergeExpress, sentenceFrame, type CorrectionResult, type ExpressRecord, type HeardRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
 import './lesson.css'
 
 /** `pick` lists the earlier steps that can be looked at again; pressing one calls onPick. `review` is the one being looked at. */
@@ -242,6 +243,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
     </label>
+    {draftKey && <DraftVersions id={draftKey} text={answer} onChoose={setAnswerNow} />}
     <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} trackWeak={!alreadyMarked}
       onReveal={() => { setCheck(c => ({ ...c, revealed: true })); onPeek?.(); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
@@ -319,17 +321,28 @@ export function ChartView({ chart }: { chart: WriteChart }) {
   return <MiniChart chart={chart} />
 }
 
-/** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again.
- *  Help comes in layers — purpose (中文說明) → cue (句型) → frame (句架) → model (參考寫法) — and every layer used is saved,
- *  as are the first answer, its feedback and the corrected try, so a reload comes back to the same feedback. */
-export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
+const pendingExpressions = new Set<string>()
+const expressionListeners = new Set<() => void>()
+function subscribeExpressions(listener: () => void) {
+  expressionListeners.add(listener)
+  return () => { expressionListeners.delete(listener) }
+}
+function markExpressionPending(lessonId: string, pending: boolean) {
+  if (pending) pendingExpressions.add(lessonId)
+  else pendingExpressions.delete(lessonId)
+  expressionListeners.forEach(listener => listener())
+}
+
+/** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again. */
+export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
   /** The open task is today's (promptFor), not always the unit's first. */
-  lesson: Lesson; prompt: LessonPrompt; draftKey: string; pattern: string; saved?: ExpressRecord
-  onRecord: (rec: ExpressRecord, corrected: boolean) => void; onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
+  lessonId: string; lesson: Lesson; prompt: LessonPrompt; draftKey: string; pattern: string; saved?: ExpressRecord
+  onRecord: (apply: (rec: ExpressRecord) => ExpressRecord, corrected: boolean) => void | Promise<void>
+  onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
 }) {
   const [answer, setAnswer] = useState(() => readDraft(draftKey) || saved?.lastAnswer || '')
   const [run, setRun] = useState(0)
-  const [rec, setRec] = useState<ExpressRecord>(() => saved ?? { corrections: 0, help: [] })
+  const rec = saved ?? { corrections: 0, help: [] }
   const [shown, setShown] = useState<string[]>(() => saved?.help ?? [])
   const mountedAt = useRef(Date.now())
   const keyed = !!tutorKey()
@@ -347,31 +360,43 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     if (Date.now() - mountedAt.current < 450) return
     setShown(list => list.includes(kind) ? list : [...list, kind])
     if (rec.help.includes(kind)) return
-    const next = { ...rec, help: [...rec.help, kind] }
-    setRec(next); onRecord(next, false)
+    onRecord(current => current.help.includes(kind) ? current : { ...current, help: [...current.help, kind] }, false)
   }
   const [previous, setPrevious] = useState<CorrectionResult>()
   // While Claude checks, the answer and the button wait: the check belongs to the text that was sent.
   const [checking, setChecking] = useState(false)
+  const pending = useSyncExternalStore(subscribeExpressions, () => pendingExpressions.has(lessonId), () => false)
+  const waiting = checking || pending
+  const submission = useRef<ExpressRecord | undefined>(undefined)
+  const waitingForGrade = pending || !!submission.current
   /** The first answer is kept the moment it is sent, so a failed request still leaves a record. */
   function submit() {
-    if (!answer.trim() || checking) return
+    if (!answer.trim() || submission.current || pendingExpressions.has(lessonId)) return
     setPrevious(rec.last)
+    const first = { first: answer, firstHelp: [...rec.help] }
+    submission.current = rec.first ? rec : { ...rec, ...first }
+    setChecking(true)
     if (!rec.first) {
-      const next: ExpressRecord = { ...rec, first: answer, firstHelp: [...rec.help] }
-      setRec(next); onRecord(next, false)
+      onRecord(current => current.first ? current : { ...current, ...first }, false)
     }
     setRun(n => n + 1)
   }
   function result(r: CorrectionResult, sent: string) {
-    const isFirst = !rec.firstResult && (rec.first ?? sent).trim() === sent.trim()
-    const fixed = rec.corrections > 0 && issuesFixed(r, rec.last)
+    const submitted = submission.current
+    if (!submitted) return
+    const isFirst = !submitted.firstResult && (submitted.first ?? sent).trim() === sent.trim()
+    const fixed = submitted.corrections > 0 && issuesFixed(r, submitted.last)
     const next: ExpressRecord = {
-      ...rec, corrections: rec.corrections + 1, lastAnswer: sent, last: r, fixed,
-      ...(rec.first ? {} : { first: sent, firstHelp: [...rec.help] }),
+      ...submitted, corrections: submitted.corrections + 1, lastAnswer: sent, last: r, fixed,
       ...(isFirst ? { firstResult: r } : {}),
     }
-    setRec(next); onRecord(next, true)
+    return onRecord(current => {
+      const sameAnswer = !current.first || current.first === submitted.first
+      if (!sameAnswer || current.corrections !== submitted.corrections || current.lastAnswer !== submitted.lastAnswer)
+        return mergeExpress(current, next)
+      return { ...next, help: [...new Set([...next.help, ...current.help])],
+        revealed: next.revealed || current.revealed, others: current.others }
+    }, true)
   }
   function finish() {
     const next = !rec.first && answer.trim() ? { ...rec, first: answer, firstHelp: [...rec.help] } : rec
@@ -385,11 +410,12 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     <h2 className="pr-question ls-prompt" lang="en">{p.en}</h2>
     {p.chart && <MiniChart chart={p.chart} />}
     {p.scaffold && <ol className="ls-scaffold" aria-label="回答的順序">{p.scaffold.map(s => <li key={s} lang="en">{s}</li>)}</ol>}
-    {p.scaffold && !answer.trim() && <button type="button" className="pr-link ls-zh-toggle" onClick={() => { const t = p.scaffold!.map(x => x.replace(/…$/, ' ')).join('\n'); setAnswer(t); writeDraft(draftKey, t); help('frame') }}>用這個順序開頭</button>}
+    {p.scaffold && !answer.trim() && <button type="button" className="pr-link ls-zh-toggle" disabled={waiting} onClick={() => { const t = p.scaffold!.map(x => x.replace(/…$/, ' ')).join('\n'); setAnswer(t); writeDraft(draftKey, t); help('frame') }}>用這個順序開頭</button>}
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼" readOnly={checking}
+      <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼" readOnly={waiting}
         onChange={e => { setAnswer(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
+    <DraftVersions id={draftKey} text={answer} onChoose={setAnswer} disabled={waiting} />
     <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
       <span>卡住了？一層一層打開：</span>
       <button type="button" aria-pressed={sees('zh')} onClick={() => help('zh')}>① 要做什麼</button>
@@ -401,17 +427,19 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     {sees('cue') && <p className="ls-help">這課的句型：<b>{pattern}</b>{lesson.cando ? '。目標：' + lesson.cando : ''}</p>}
     {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     <div className="pr-actions">
-      {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim() || checking} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
-      <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
+      {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim() || waiting} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
+      <button type="button" className="pr-link" disabled={waitingForGrade} onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
     {!keyed && <p className="ls-help">還沒連接 Claude，先自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
-    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
+    {pending && !checking && <p role="status" className="ls-help">Claude 正在批改這份作答，回覆會保存在這一堂。</p>}
+    <CorrectBox key={run ? 'checking' : 'saved-' + rec.corrections + '-' + (rec.lastAnswer ?? '')} run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
       restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
       previous={previous} selfFix={!corrected || !rec.revealed}
-      onReveal={() => { if (!rec.revealed) { const next = { ...rec, revealed: true }; setRec(next); onRecord(next, false) } }}
-      onSave={onSave} onBusy={setChecking} onResult={(_, __, r, sent) => result(r, sent)} />
+      onReveal={() => { if (!rec.revealed) onRecord(current => ({ ...current, revealed: true }), false) }}
+      onSave={onSave} onBusy={busy => { if (!busy) submission.current = undefined; setChecking(busy) }}
+      backgroundGrade={{ save: result, waiting: busy => markExpressionPending(lessonId, busy) }} />
     {corrected && !rec.fixed && !good && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，請 Claude 再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}
     {rec.fixed && <p className="ls-help ls-fixnote">上次的問題都改好了。</p>}
-    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={finish}>{good ? 'Claude 說寫得好，完成今天這一堂 →' : '完成今天這一堂'}</button>
+    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} disabled={waitingForGrade} onClick={finish}>{good ? 'Claude 說寫得好，完成今天這一堂 →' : '完成今天這一堂'}</button>
   </section>
 }

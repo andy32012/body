@@ -217,7 +217,8 @@ export function dictationScore(answer: string, sentence: string) {
  *  sentence, so the passage is not done and the next visit goes on from there. Words right / total add up across visits. */
 export function dictationPatch(before: StoryRecord, start: number, parts: readonly { right: number; total: number }[], stop: boolean, day: string): StoryRecord {
   const sofar = start && start === before.dn && before.dqp ? before.dqp : [0, 0]
-  const sum: [number, number] = [sofar[0] + parts.reduce((n, p) => n + p.right, 0), sofar[1] + parts.reduce((n, p) => n + p.total, 0)]
+  const [right, total] = dictationTotal(parts)
+  const sum: [number, number] = [sofar[0] + right, sofar[1] + total]
   return stop ? { dn: start + parts.length, dqp: sum } : { d: day, dq: sum, dn: undefined, dqp: undefined }
 }
 /** Whole-passage dictation result from its sentences. */

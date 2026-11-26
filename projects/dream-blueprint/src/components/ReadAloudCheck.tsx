@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Mic, Square, Volume2 } from 'lucide-react'
 import { engineNames, listen, listenEngine, type Listening } from '../lib/speech'
 import { compareReading, missedWords, type ReadResult } from '../lib/readAloud'
-import { speakEnglish } from '../lib/tts'
+import { speakEnglish, stopSpeaking } from '../lib/tts'
 import './read-aloud.css'
 
 /** 朗讀比對: read the text aloud, then see which words speech recognition did not catch. Honest about what it is:
@@ -50,6 +50,9 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
 
   async function start() {
     if (active.current) return
+    // Another comparison on the same page can also have a word sample playing.
+    stopSpeaking()
+    sample.current = null
     const controller = new AbortController()
     active.current = controller
     setError(''); setPartial(''); setResult(null); setHeard(''); setTick(0)
@@ -79,6 +82,7 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
   }
   function stop() { setPhase('working'); session.current?.stop() }
   function playSample(word: string) {
+    if (active.current) return
     sample.current?.abort()
     const controller = new AbortController()
     sample.current = controller
@@ -102,7 +106,7 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
         <p className="ra-sum">聽出 {result.heard} / {result.total} 個字{seconds ? ' · ' + seconds + ' 秒' : ''}{result.ratio >= 0.95 ? '，很清楚' : ''}</p>
         {missed.length > 0 && <div className="ra-missed">
           <small>沒聽出來的字（點一下聽示範）：</small>
-          {missed.slice(0, 12).map(w => <button key={w} type="button" lang="en" onClick={() => playSample(w)}><Volume2 size={12} />{w}</button>)}
+          {missed.slice(0, 12).map(w => <button key={w} type="button" lang="en" disabled={phase === 'working'} onClick={() => playSample(w)}><Volume2 size={12} />{w}</button>)}
         </div>}
         {hideText && <p className="ra-heard"><small>辨識到的：</small><span lang="en">{heard}</span></p>}
         <small className="ra-note">這不是發音分數：用{engineNames[engine]}比對，沒聽出來可能是念不清楚、太小聲、漏念，也可能是辨識錯。同一個字常常沒聽出來，再聽示範念幾次。</small>

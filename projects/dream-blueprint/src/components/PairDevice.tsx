@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import { Smartphone } from 'lucide-react'
 import { setTutorKey, setTutorModel, tutorKey, tutorModel } from '../lib/tutor'
 import { openaiKey, setOpenaiKey } from '../lib/voice'
-import { normalizePairCode, open, pairDurationMs, pairEvent, pairPrefix, pairingLinkError, payloadFrom, randomCode, seal } from '../lib/pairing'
+import { normalizePairCode, open, pairDurationMs, pairEvent, pairKeysEvent, pairPrefix, pairingLinkError, payloadFrom, randomCode, seal, type PairedFields } from '../lib/pairing'
 import { useModal } from '../lib/modal'
 import './pair.css'
 
@@ -128,18 +128,26 @@ export function PairReceive({ payload, onDone }: { payload: string; onDone: () =
         : linkErrors[r.reason])
       return
     }
-    setTutorKey(r.keys.claude)
-    if (r.keys.model) setTutorModel(r.keys.model)
-    if (r.keys.openai) setOpenaiKey(r.keys.openai)
-    setVoice(Boolean(openaiKey()))
+    const claude = setTutorKey(r.keys.claude)
+    const model = Boolean(claude && r.keys.model && setTutorModel(r.keys.model))
+    const openai = Boolean(r.keys.openai && setOpenaiKey(r.keys.openai))
+    const saved: PairedFields = { claude, model, openai }
+    if (claude || openai) window.dispatchEvent(new CustomEvent(pairKeysEvent, { detail: saved }))
+    const failed = [!claude && 'Claude 金鑰', !!r.keys.model && !model && 'Claude 模型', !!r.keys.openai && !openai && 'OpenAI 金鑰'].filter(Boolean)
+    if (failed.length) {
+      const verified = [claude && 'Claude 金鑰', model && 'Claude 模型', openai && 'OpenAI 金鑰'].filter(Boolean)
+      setMsg((verified.length ? '已儲存 ' + verified.join('、') + '。' : '')
+        + '無法確認已儲存 ' + failed.join('、') + '。請在瀏覽器可以儲存資料後再按一次「連接」。')
+      return
+    }
+    setVoice(openai)
     setCode('')
-    window.dispatchEvent(new Event('dream-blueprint:keys'))
     setOk(true)
   }
   return <div className="pair-veil" ref={veil} role="dialog" aria-modal="true" aria-labelledby="pair-title">
     <form className="pair-box" onSubmit={e => { e.preventDefault(); void submit() }}>
-      <h2 id="pair-title">{ok ? '這台也連上 Claude 了 ✓' : '連接這台裝置'}</h2>
-      {ok ? <p>{voice ? '這台裝置已儲存 Claude 和 OpenAI 的金鑰。' : '這台裝置已儲存 Claude 金鑰。口說用的 OpenAI 金鑰可以另外在口說頁設定。'}</p>
+      <h2 id="pair-title">{ok ? '配對金鑰已儲存 ✓' : '連接這台裝置'}</h2>
+      {ok ? <p>{voice ? '這台裝置已儲存 Claude 和 OpenAI 的金鑰。' : '這次已儲存 Claude 金鑰。口說用的 OpenAI 金鑰可在口說頁另外設定。'}</p>
         : linkError ? <p className="pair-err" role="alert">{linkErrors[linkError]}</p> : <>
           <p>輸入電腦畫面上的 26 位配對密語，空格可省略。連接後會更新這台裝置上相同服務的金鑰。</p>
           <input autoComplete="off" spellCheck={false} autoCapitalize="characters" maxLength={36}

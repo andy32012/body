@@ -6,8 +6,8 @@ import { exportBackup, importBackup, localModified, readStoreForCloud, recordClo
 import { mergeStates } from './merge'
 import { mergeMemory, readDeleted, readMemory, readMemoryTimes, writeMemoryRecords, type MemoryRecords } from './memory'
 import {
-  addHistory, clearConflict, cloudConflict, cloudScope, driveConfig, driveReadyEvent, loadDriveMemory, loadDriveState, loadHistoryVersion,
-  markConflict, markMergeWaiting, noteSynced, sameConnection, saveDriveMemory, saveDriveState, syncDecision, type DriveMemory,
+  addHistory, clearConflict, cloudConflict, cloudScope, completeDriveConnection, driveConfig, loadDriveMemory, loadDriveState, loadHistoryVersion,
+  markConflict, markMergeWaiting, noteSynced, readyCloudScope, sameConnection, saveDriveMemory, saveDriveState, syncDecision, type DriveMemory,
 } from './drive'
 
 export const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -45,7 +45,9 @@ async function push(d: Connection, snapshot: Progress, base: number, backup = fa
   const result = await saveDriveState({ state: JSON.stringify(snapshot.state), modified: snapshot.modified, base, backup }, d)
   requireConnection(d)
   if (result.kind === 'saved') {
-    if (!await recordCloudSave(result.savedAt, snapshot.modified, snapshot.base, snapshot.scope)) {
+    const acknowledged = await recordCloudSave(result.savedAt, snapshot.modified, snapshot.base, snapshot.scope)
+    requireConnection(d)
+    if (!acknowledged) {
       throw new Error('雲端已收到上次的存檔，本機另有更新，尚待再次同步。')
     }
     clearConflict()
@@ -55,37 +57,41 @@ async function push(d: Connection, snapshot: Progress, base: number, backup = fa
 }
 
 export type Settled = { kind: 'pulled' | 'pushed' | 'none' } | { kind: 'conflict'; remoteAt: number }
-export async function settleProgress(): Promise<Settled> {
-  try {
-    return await withProgress(async d => {
-      const remote = await loadDriveState(d)
-      const seen = await readStoreForCloud()
+export function settleProgress(): Promise<Settled> {
+  return withProgress(async d => {
+    const result = await settleInitialProgress(d)
+    if (result.kind !== 'conflict') await completeDriveConnection(d)
+    return result
+  })
+}
+
+async function settleInitialProgress(d: Connection): Promise<Settled> {
+  const remote = await loadDriveState(d)
+  const seen = await readStoreForCloud()
+  requireConnection(d)
+  const decision = syncDecision(remote?.state ? remote.savedAt : null, seen.base, seen.modified)
+  if (decision === 'pull' && remote?.state) {
+    if (await replaceIfUnchanged(remote.state, remote.savedAt, seen.modified, seen.base, seen.scope)) {
       requireConnection(d)
-      const decision = syncDecision(remote?.state ? remote.savedAt : null, seen.base, seen.modified)
-      if (decision === 'pull' && remote?.state) {
-        if (await replaceIfUnchanged(remote.state, remote.savedAt, seen.modified, seen.base, seen.scope)) {
-          clearConflict()
-          noteSynced('已從雲端硬碟載入最新的學習進度')
-          return { kind: 'pulled' }
-        }
-        markConflict(remote.savedAt, false)
-        return { kind: 'conflict', remoteAt: remote.savedAt }
-      }
-      if (decision === 'conflict' && remote) {
-        markConflict(remote.savedAt, false)
-        return { kind: 'conflict', remoteAt: remote.savedAt }
-      }
-      if (decision === 'push') {
-        const result = await push(d, seen, remote?.savedAt ?? 0)
-        if (result.kind === 'saved') return { kind: 'pushed' }
-        markConflict(result.savedAt, false)
-        return { kind: 'conflict', remoteAt: result.savedAt }
-      }
-      return { kind: 'none' }
-    })
-  } finally {
-    window.dispatchEvent(new Event(driveReadyEvent))
+      clearConflict()
+      noteSynced('已從雲端硬碟載入最新的學習進度')
+      return { kind: 'pulled' }
+    }
+    requireConnection(d)
+    markConflict(remote.savedAt, false)
+    return { kind: 'conflict', remoteAt: remote.savedAt }
   }
+  if (decision === 'conflict' && remote) {
+    markConflict(remote.savedAt, false)
+    return { kind: 'conflict', remoteAt: remote.savedAt }
+  }
+  if (decision === 'push') {
+    const result = await push(d, seen, remote?.savedAt ?? 0)
+    if (result.kind === 'saved') return { kind: 'pushed' }
+    markConflict(result.savedAt, false)
+    return { kind: 'conflict', remoteAt: result.savedAt }
+  }
+  return { kind: 'none' }
 }
 
 /** Replace this device's progress only if its copy is still the one that was backed up. */
@@ -97,8 +103,10 @@ export function takeCloudCopy() {
     download(backupName('this-device'), exportBackup(seen.state))
     requireConnection(d)
     await restoreBackup(remote.state, remote.savedAt, { cloudBase: remote.savedAt, expected: seen.state, scope: cloudScope(d) })
+    requireConnection(d)
     clearConflict()
     noteSynced('已換成雲端硬碟的進度（這台原本的進度已下載成備份檔）')
+    await completeDriveConnection(d)
     return '已換成雲端硬碟的進度。這台原本的進度下載成備份檔了，需要時可以到「備份」匯入。'
   })
 }
@@ -128,11 +136,13 @@ async function mergeNow(d: Connection, quiet: boolean) {
     const result = await push(d, merged, remote.savedAt)
     if (result.kind === 'saved') {
       noteSynced('兩份進度已合併，也存到雲端硬碟了')
+      if (!quiet) await completeDriveConnection(d)
       const c = merged.state.curriculum
       return '兩份合併好了：兩台做過的都留著，課表接在單元 ' + c.unit + ' 第 ' + c.day + ' 天。' + (quiet ? '' : '這台原本的進度也下載成備份檔了。')
     }
     if (round >= mergeRounds) {
       markMergeWaiting(result.savedAt)
+      if (!quiet) await completeDriveConnection(d)
       return '另一台裝置一直有新進度存進雲端，這次合併好的先留在這台（兩台做過的都在），等一下會自己再合併一次。'
     }
     const again = await loadDriveState(d)
@@ -151,6 +161,7 @@ export function keepThisCopy() {
       markConflict(result.savedAt, false)
       throw new Error('雲端已有新進度，請先重新確認要使用的版本。兩份都已保留。')
     }
+    await completeDriveConnection(d)
     return remote?.state
       ? '已用這台裝置的進度更新雲端。雲端原本的進度已下載成備份檔。'
       : '已把這台裝置的進度存到雲端。'
@@ -173,6 +184,7 @@ export function restoreVersion(id: string) {
       markConflict(result.savedAt, false)
       return '已先還原至本機。雲端另有新進度，兩份都已保留，請在設定確認要使用的版本。'
     }
+    await completeDriveConnection(d)
     return '已經還原到 ' + stamp(version.savedAt || Date.now()) + ' 那份進度。還原前的進度已' + (kept ? '存進歷史版本。' : '下載成備份檔。')
   })
 }
@@ -182,9 +194,11 @@ export function settleAction(decision: ReturnType<typeof syncDecision>, paused: 
   return decision
 }
 let settling: Promise<'pull' | 'merge' | 'push' | 'none'> | null = null
-export function autoSettle() {
-  if (!driveConfig()) return Promise.resolve('none' as const)
-  if (!settling) settling = withProgress(settleNow).finally(() => { settling = null })
+export function autoSettle(scope = readyCloudScope()) {
+  if (!scope || readyCloudScope() !== scope) return Promise.resolve('none' as const)
+  if (!settling) settling = withProgress(async d => {
+    return cloudScope(d) === scope && readyCloudScope() === scope ? settleNow(d) : 'none'
+  }).finally(() => { settling = null })
   return settling
 }
 async function settleNow(d: Connection): Promise<'pull' | 'merge' | 'push' | 'none'> {
@@ -227,10 +241,10 @@ function combineMemory(a: MemoryRecords, b: MemoryRecords) {
 
 let memoryWork: Promise<void> = Promise.resolve()
 /** Carry additions and deletion records both ways; a notebook left open can never send its stale copy over the cloud. */
-export function syncDriveMemory() {
+export function syncDriveMemory(scope = readyCloudScope()) {
   const d = driveConfig()
-  if (!d) return Promise.resolve()
-  const sync = () => syncMemoryNow(requireConnection(d))
+  if (!d || !scope || cloudScope(d) !== scope || readyCloudScope() !== scope) return Promise.resolve()
+  const sync = async () => { if (readyCloudScope() === scope) await syncMemoryNow(requireConnection(d)) }
   const next = memoryWork.then(() => navigator.locks ? navigator.locks.request('dream-blueprint.cloud-memory', sync) : sync())
   memoryWork = next.catch(() => {})
   return next

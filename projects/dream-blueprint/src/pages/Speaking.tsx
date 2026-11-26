@@ -20,7 +20,7 @@ import cueCards from '../data/cue-cards.json'
 import { markLessonStep, promptFor, readLessonRecord, type Lesson } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import { emmaLevel } from '../lib/cefr'
-import { logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
+import { hasPack, logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
 import { nurseInstructions, nurseSpeakKey, type NurseListening } from '../lib/nursing'
 import { PairPaste } from '../components/PairDevice'
 import { partNames, readWordChat, wordChatBack, wordChatInstructions } from '../lib/wordChat'
@@ -42,6 +42,12 @@ type Attempt = {
   error?: string
 }
 type CardWork = { prepNotes?: string; prepEnd?: number; attempt?: Attempt }
+type SceneLoad<T> = { status: 'loading' | 'missing' | 'failed' } | { status: 'ready'; value: T }
+const sceneStatus = {
+  loading: '載入中……',
+  missing: '找不到這個口說任務。請回到練習重新選題。',
+  failed: '口說教材下載失敗。請連上網路後重試。',
+}
 
 function keepFix(prev: AppState, fix: SpeakFix & { key: string }, day: string): { state: AppState; fix: Fix } {
   const tag = fix.tag ? normalizeLabel(fix.tag) : null
@@ -69,24 +75,35 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   })
   // "43-0": the first speaking task of bridge unit 43's pack.
   const [packRef] = useState(() => { const m = (packMode ?? '').match(/^(\d+)-(\d+)$/); return m ? { unit: Number(m[1]), i: Number(m[2]) } : null })
-  const [pack, setPack] = useState<Pack | null>(null)
-  // The task or scene could not be downloaded: say so instead of 「還在載入」 forever.
-  const [loadFailed, setLoadFailed] = useState(false)
+  const [packLoad, setPackLoad] = useState<SceneLoad<Pack>>({ status: 'loading' })
   useEffect(() => {
     if (!packRef) return
     let alive = true
-    import('../data/bridge.json').then(f => { const p = (f.default as Pack[]).find(x => x.unit === packRef.unit); if (alive && p?.speak[packRef.i]) setPack(p) }).catch(() => { if (alive) setLoadFailed(true) })
+    import('../data/bridge.json').then(f => {
+      if (!alive) return
+      const pack = (f.default as Pack[]).find(x => x.unit === packRef.unit)
+      setPackLoad(pack?.speak[packRef.i] ? { status: 'ready', value: pack } : { status: 'missing' })
+    }).catch(() => { if (alive) setPackLoad({ status: 'failed' }) })
     return () => { alive = false }
   }, [packRef])
+  const pack = packLoad.status === 'ready' ? packLoad.value : null
   const packTask = pack && packRef ? pack.speak[packRef.i] : null
   // "nl-07": act out a nursing listening dialogue; Emma plays the other person.
-  const [nurse, setNurse] = useState<NurseListening | null>(null)
+  const [nurseLoad, setNurseLoad] = useState<SceneLoad<NurseListening>>({ status: 'loading' })
   useEffect(() => {
     if (!nurseMode) return
     let alive = true
-    import('../data/nursing-listening.json').then(f => { const l = (f.default as NurseListening[]).find(x => x.id === nurseMode); if (alive && l) setNurse(l) }).catch(() => { if (alive) setLoadFailed(true) })
+    import('../data/nursing-listening.json').then(f => {
+      if (!alive) return
+      const nurse = (f.default as NurseListening[]).find(x => x.id === nurseMode)
+      setNurseLoad(nurse ? { status: 'ready', value: nurse } : { status: 'missing' })
+    }).catch(() => { if (alive) setNurseLoad({ status: 'failed' }) })
     return () => { alive = false }
   }, [nurseMode])
+  const nurse = nurseLoad.status === 'ready' ? nurseLoad.value : null
+  const sceneUnavailable = (packMode !== undefined && !packTask) || (nurseMode !== undefined && !nurse)
+  const packStatus = packRef ? packLoad.status : 'missing'
+  const nurseStatus = nurseMode ? nurseLoad.status : 'missing'
   // From a word card: chat about that word; Emma knows the list, the drill and the other words of the round.
   const [wordChat] = useState(() => readWordChat(wordMode))
   const [task, setTask] = useState<string>()
@@ -179,10 +196,8 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }) }, [lines])
 
   async function start() {
-    if (setup.current || (attempt && pending.current.has(attempt.id))) return
+    if (sceneUnavailable || setup.current || (attempt && pending.current.has(attempt.id))) return
     if (!openaiKey()) { setSettings(true); return }
-    if (packRef && !packTask) { setError(loadFailed ? '口說任務沒有下載到：連上網路後重新整理這一頁。' : '口說任務還在載入，等一下再按。'); return }
-    if (nurseMode && !nurse) { setError(loadFailed ? '這段情境沒有下載到：連上網路後重新整理這一頁。' : '情境還在載入，等一下再按。'); return }
     setError(''); setYouMs(0); setYouFrom(undefined); setLiveAt(undefined); setTick(Date.now())
     const mine = attempts.current.start()
     const recording: Attempt = { id: mine, focus, lines: [], fixes: [], review: '' }
@@ -369,18 +384,20 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           <a href="#speaking">改回一般聊天</a>
         </div>}
 
-        {packRef && <div className="sp-lesson">
-          <small>單元 {packRef.unit} · 口說任務 {packRef.i + 1}{pack ? ' · ' + unitTitle(packRef.unit).split(/[：（]/)[0] : ''}</small>
-          <strong>{packTask ? packTask.title : '載入中……'}</strong>
+        {packMode !== undefined && <div className="sp-lesson">
+          <small>{packRef ? '單元 ' + packRef.unit + ' · 口說任務 ' + (packRef.i + 1) : '單元口說任務'}{pack && packRef ? ' · ' + unitTitle(packRef.unit).split(/[：（]/)[0] : ''}</small>
+          {packTask ? <strong>{packTask.title}</strong> : packStatus !== 'ready' && <strong role="status">{sceneStatus[packStatus]}</strong>}
           {packTask && <span>{packTask.zh}</span>}
-          <a href={'#library/unit/speak/' + packRef.unit}>回到單元讀聽說寫</a>
+          {packStatus === 'failed' && <button type="button" className="sp-link" onClick={() => location.reload()}>重新下載口說教材</button>}
+          <a href={'#library/unit/speak' + (packRef && hasPack(packRef.unit) ? '/' + packRef.unit : '')}>回到單元讀聽說寫</a>
         </div>}
 
-        {nurseMode && <div className="sp-lesson">
+        {nurseMode !== undefined && <div className="sp-lesson">
           <small>護理英文 · 演一段{nurse ? ' · ' + nurse.level : ''}</small>
-          <strong lang="en">{nurse ? nurse.title : '載入中……'}</strong>
+          {nurse ? <strong lang="en">{nurse.title}</strong> : nurseStatus !== 'ready' && <strong role="status">{sceneStatus[nurseStatus]}</strong>}
           {nurse && <span>{nurse.scene}。你演 {nurse.you}，Emma 演 {nurse.emma}。她聽的是語音辨識的文字，不會評你的發音。</span>}
-          <a href={'#library/nlisten/' + (nurse?.id ?? '')}>回到這段聽力</a>
+          {nurseStatus === 'failed' && <button type="button" className="sp-link" onClick={() => location.reload()}>重新下載口說教材</button>}
+          <a href={nurse ? '#library/nlisten/' + nurse.id : '#library/nlisten'}>{nurse ? '回到這段聽力' : '回到護理聽力選一段'}</a>
         </div>}
 
         {topic && <div className="sp-lesson">
@@ -426,7 +443,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           <span>Emma 知道你在複習這個字，會找你用它說幾句；想問意思、用法，或這一輪的其他字{wordChat.others.length ? '（' + wordChat.others.join('、') + '）' : ''}，直接問她。</span>
           <a href={wordChatBack(wordChat)}>回到{wordChat.where}</a>
         </div>}
-        {!card && !lesson && !topic && !packRef && !nurseMode && !wordChat && <div className="sp-links">
+        {!card && !lesson && !topic && packMode === undefined && nurseMode === undefined && !wordChat && <div className="sp-links">
           <a className="sp-ielts-link" href="#speaking/gept">練全民英檢口說（朗讀、回答問題、看圖敘述）→</a>
           <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>
         </div>}
@@ -447,7 +464,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           <VoiceWave levels={levels} live={status === 'live'} className="sp-wave" />
           <span className={'sp-tag you' + (who === 'you' ? ' on' : '')}>你</span>
           <span className={'sp-tag her' + (who === 'her' ? ' on' : '')}>{NAME}</span>
-          {lines.length === 0 && <p className="sp-hint">{status === 'connecting' ? `正在打給 ${NAME}…` : live ? 'Say hi!' : '按下麥克風開始聊天'}</p>}
+          {lines.length === 0 && !sceneUnavailable && <p className="sp-hint">{status === 'connecting' ? `正在打給 ${NAME}…` : live ? 'Say hi!' : '按下麥克風開始聊天'}</p>}
         </div>
 
         {lines.length > 0 && <div className="sp-stage" ref={log} aria-live="polite">
@@ -460,7 +477,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
       </div>
       <footer className="sp-bar">
         <button type="button" className={'sp-mic' + (live ? ' on' : '')}
-          disabled={!live && (noting || fixing)}
+          disabled={!live && (sceneUnavailable || noting || fixing)}
           onClick={() => live ? (session.current ? session.current.stop() : setup.current?.abort()) : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
           {live ? <Square size={18} fill="currentColor" /> : <Mic size={22} />}
         </button>

@@ -22,13 +22,27 @@ all_clips = clips(lessons)
 t0 = time.time()
 made = 0
 
+def readable_take(path, seconds):
+    try:
+        with sf.SoundFile(path) as audio:
+            frames = len(audio.read(dtype='float32'))
+            if frames == 0 or frames != audio.frames:
+                return False
+            # The log rounds the duration to hundredths. A shorter decoded file needs a new take.
+            return seconds is None or abs(frames / audio.samplerate - seconds) < 0.01
+    except (OSError, RuntimeError):
+        return False
+
 def take(s, voice):
-    """The clearest of three speeds for one clip in one voice (remembered between runs while its phonemes stay the same)."""
+    """The clearest of three speeds for one clip in one voice. Reuse a logged take if its audio still matches."""
     global made
     c = all_clips[s]
     ph = phonemes(c)
+    folder = os.path.join(HERE, 'out', G, voice)
+    wav_path = os.path.join(folder, s + '.wav')
     old = takes.get(s, {}).get(voice)
-    if old and old['phonemes'] == ph and old['others'] == c['others']: return old
+    if old and old['phonemes'] == ph and old['others'] == c['others'] and readable_take(wav_path, old.get('secs')):
+        return old
     base = 0.85 if c['kind'] == 'word' else 0.9
     best = None
     for speed in (base, base + 0.12, base - 0.1):
@@ -37,9 +51,8 @@ def take(s, voice):
         if best is None or res['value'] > best[1]['value']: best = (x, res, speed)
         if res['grade'] == 'strict': break
     x, res, speed = best
-    folder = os.path.join(HERE, 'out', G, voice)
     os.makedirs(folder, exist_ok=True)
-    sf.write(os.path.join(folder, s + '.wav'), x, sr, subtype='PCM_16')
+    sf.write(wav_path, x, sr, subtype='PCM_16')
     rec = {'text': c['text'], 'phonemes': ph, 'others': c['others'], 'speed': round(speed, 2), 'secs': round(len(x) / sr, 2), **res}
     takes.setdefault(s, {})[voice] = rec
     write_json(LOG, takes)

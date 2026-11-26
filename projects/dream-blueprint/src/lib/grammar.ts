@@ -9,7 +9,10 @@ export interface GrammarStep { t: string; p: string; ex: GrammarExample[] }
 export interface GrammarTable { title: string; head: string[]; rows: string[][] }
 export interface GrammarMistake { bad: string; good: string; why: string }
 export interface ChooseDrill { k: 'choose'; q: string; options: string[]; answer: number; why: string }
-export interface TypeDrill { k: 'fill' | 'fix'; q: string; accept: string[]; why: string; instruction?: string }
+export interface TypeDrill { k: 'fill' | 'fix'; q: string; accept: string[]; why: string; instruction?: string
+  /** Some fixes preserve the meaning of the original clause by keeping exactly the commas in a reference sentence. */
+  requireSameCommas?: boolean
+}
 export type Drill = ChooseDrill | TypeDrill
 export interface GrammarUnit { unit: number; steps: GrammarStep[]; table?: GrammarTable; mistakes: GrammarMistake[]; drills: Drill[]
   /** A1–A2 items the unit did not teach (checked against the Core Inventory): extra teaching and practice drills, kept
@@ -20,13 +23,13 @@ export const grammarUnits = data as GrammarUnit[]
 export const grammarFor = (unit: number) => grammarUnits.find(g => g.unit === unit)
 export const drillNames: Record<Drill['k'], string> = { choose: '選擇', fill: '填空', fix: '改錯' }
 
-/** A typed answer is compared the way written sentences are: case, punctuation and contractions do not matter
- *  (isn't = is not). A choice is right when it is the answer's index. */
+/** A typed answer ignores case and ordinary punctuation, with contractions handled like written sentences.
+ *  Fixes can require the reference's commas when commas determine the intended meaning. */
 export function checkDrill(d: Drill, answer: string | number) {
   if (d.k === 'choose') return answer === d.answer
   const text = String(answer)
   if (!text.trim()) return false
-  if (d.k === 'fix') return matchesReference(text, d.accept)
+  if (d.k === 'fix') return matchesReference(text, d.accept, d.requireSameCommas)
   const typed = normalizeEnglish(text)
   return d.accept.some(a => normalizeEnglish(a) === typed)
 }

@@ -62,7 +62,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const resume = !active ? null : coreSaved(active.rec)
     ? (active.date === today ? 'same' : 'later')
     : state.curriculum.unit === active.rec.unit && state.curriculum.day === active.rec.day ? 'core' : null
-  const at = resume === 'same' && active ? { unit: active.rec.unit, day: active.rec.day } : undefined
+  const at = resume === 'same' || resume === 'core' ? active?.rec : undefined
   const lesson = getLessonPreview(state, energy, today, at)
   const finished = mainLessonDone(state, today)
   // Other earlier lessons still missing 表達 (the active pointer only remembers the latest one).

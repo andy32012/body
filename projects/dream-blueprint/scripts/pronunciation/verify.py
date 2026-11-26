@@ -2,16 +2,28 @@
 as it is and shifted by 12 ms (two of the three measurements made when recording; for the intonation lesson also the direction
 of the pitch at the end).
 usage: verify.py <public/pron directory> [lesson id ...]"""
-import json, os, struct, subprocess, sys
-import numpy as np
+import argparse, json, os, struct, subprocess, sys
 from course import parse, clips, slug, lesson_texts
+
+parser = argparse.ArgumentParser(description='Verify the published pronunciation packs.')
+parser.add_argument('directory', help='directory containing the pronunciation packs')
+parser.add_argument('lesson_ids', nargs='*', metavar='lesson_id', help='verify only these lessons (default: all)')
+args = parser.parse_args()
+course = parse()
+requested = set(args.lesson_ids)
+unknown = requested - {lesson['id'] for lesson in course}
+if unknown:
+    parser.error('unknown lesson ID(s): ' + ', '.join(sorted(unknown)))
+lessons = [lesson for lesson in course if not requested or lesson['id'] in requested]
+if not lessons:
+    parser.error('the course has no lessons to verify')
+
+# Check the selection before loading the speech models or opening any packs.
+import numpy as np
 from lib import check_once, ORDER, padded, transcribe, norm
 from pitchwork import final_move
 
-src = sys.argv[1]
-only = sys.argv[2:]          # lesson ids; none = every lesson
-lessons = [l for l in parse() if not only or l['id'] in only]
-all_clips = clips(parse())
+all_clips = clips(course)
 def decode(mp3):
     p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'mp3', '-i', '-', '-f', 'f32le', '-ac', '1', '-ar', '24000', '-'], input=mp3, capture_output=True, check=True).stdout
     return np.frombuffer(p, dtype=np.float32), 24000
@@ -22,7 +34,7 @@ for l in lessons:
         for it in l['items']: want[it['text']] = 'rise' if it['label'] == '↗' else 'fall'
         for q in l['quiz']: want[q['audio']] = 'rise' if q['options'][q['answer']].startswith('上升') else 'fall'
     for g in 'fm':
-        with open(os.path.join(src, f"{l['id']}-{g}.pack"), 'rb') as pack:
+        with open(os.path.join(args.directory, f"{l['id']}-{g}.pack"), 'rb') as pack:
             raw = pack.read()
         size = struct.unpack('<I', raw[:4])[0]
         index = json.loads(raw[4:4 + size])

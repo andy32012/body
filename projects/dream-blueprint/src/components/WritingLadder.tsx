@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import DraftVersions from './DraftVersions'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
-import { readDraft, writeDraft } from '../lib/drafts'
+import { hasDraft, readDraft, savedDraftTexts, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteRecord, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { chapterReady, type BookIndex } from '../lib/grammarBook'
 import { LockLine } from './Locked'
@@ -55,6 +56,22 @@ function Graded({ fb, short }: { fb: WriteFeedback; short?: { words: number; min
 
 /** 寫作階梯: Claude grades each piece by the published table for its stage (全民英檢 or IELTS); IELTS tasks get a timer and a word target. */
 type LadderProps = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }
+
+// Keep a check attached to the task even if changing practice modes unmounts the ladder.
+type PaidGrade = { feedback: WriteFeedback; best?: number; words: number; day: string }
+type WritingCheck = { busy: true } | { busy: false; error: string; claudeDown?: boolean; unsaved?: PaidGrade }
+const writingChecks = new Map<string, WritingCheck>()
+const checkListeners = new Set<() => void>()
+function subscribeToChecks(listener: () => void) {
+  checkListeners.add(listener)
+  return () => { checkListeners.delete(listener) }
+}
+function setWritingCheck(id: string, check?: WritingCheck) {
+  if (check) writingChecks.set(id, check)
+  else writingChecks.delete(id)
+  checkListeners.forEach(listener => listener())
+}
+
 /** The writing bank and grammar catalog load only when the ladder opens. */
 export default function WritingLadder(props: LadderProps) {
   const [material, setMaterial] = useState<{ stages: WriteStage[]; index: BookIndex } | null>(null)
@@ -74,40 +91,44 @@ export default function WritingLadder(props: LadderProps) {
 
 function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderProps & { stages: WriteStage[]; index: BookIndex }) {
   // An unsubmitted draft is local. Remember the work available when this page opened, including drafts written before the new grammar requirements.
-  const [drafts] = useState(() => new Map(stages.flatMap(s => {
-    const task = s.tasks.find(t => {
-      const text = readDraft('write.' + t.id).trim()
-      return text !== '' && text !== readWrite(state.notes, t.id)?.last?.answer?.trim()
-    })
-    return task ? [[s.id, task] as const] : []
-  })))
+  const [drafts] = useState(() => {
+    const savedTexts = savedDraftTexts('write.')
+    return new Map(stages.flatMap(s => {
+      const task = s.tasks.find(t => savedTexts.get('write.' + t.id)?.some(
+        text => text.trim() !== readWrite(state.notes, t.id)?.last?.answer?.trim()))
+      return task ? [[s.id, task] as const] : []
+    }))
+  })
   const draftStages = useMemo(() => new Set(drafts.keys()), [drafts])
   const suggested = suggestedStage(stages, state.notes, draftStages)
   const unit = state.curriculum.unit
   const openStage = stagesOpen(stages, state.notes, unit, { index, draftedStages: draftStages })
   const firstOpenTask = (s: WriteStage) => {
     const draft = drafts.get(s.id)
-    if (draft && writeTaskOpen(draft, unit) && readDraft('write.' + draft.id).trim()) return draft
+    if (draft && writeTaskOpen(draft, unit) && hasDraft('write.' + draft.id)) return draft
     return s.tasks.find(t => writeTaskOpen(t, unit) && !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks.find(t => writeTaskOpen(t, unit)) ?? s.tasks[0]
   }
   // A task opened from a unit's pack (library/writing/<id>) starts on that task, if it is open.
   const fromPack = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask && writeTaskOpen(t, unit))) : undefined
   const [stageId, setStageId] = useState(() => fromPack && openStage[fromPack.id] ? fromPack.id : suggested)
   const stage = stages.find(s => s.id === stageId) ?? stages.find(s => s.id === suggested)!
-  const firstOpen = firstOpenTask(stage)
-  const [taskId, setTaskId] = useState(() => fromPack && initialTask && fromPack.id === stage.id ? initialTask : firstOpen.id)
-  const task = stage.tasks.find(t => t.id === taskId && writeTaskOpen(t, unit)) ?? firstOpen
+  const [taskId, setTaskId] = useState(() => fromPack && initialTask && fromPack.id === stage.id ? initialTask : firstOpenTask(stage).id)
+  const task = stage.tasks.find(t => t.id === taskId && writeTaskOpen(t, unit)) ?? firstOpenTask(stage)
   const pages = useMemo(() => writingTaskPages(stage), [stage])
   const [pageIndex, setPageIndex] = useState(() => pages.findIndex(p => p.tasks.some(t => t.task.id === task.id)))
   const taskPage = pages[pageIndex] ?? pages[0]
   useEffect(() => { setPageIndex(pages.findIndex(p => p.tasks.some(t => t.task.id === task.id))) }, [pages, task.id])
   const draftKey = 'write.' + task.id
-  const [text, setText] = useState(() => readDraft(draftKey))
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  // Claude could not be reached this time (no network, a refused key…): the model essay opens as a way on.
-  const [claudeDown, setClaudeDown] = useState(false)
-  const [fb, setFb] = useState<WriteFeedback | null>(() => readWrite(state.notes, task.id)?.last ?? null)
+  const [draft, setDraft] = useState(() => ({ key: draftKey, text: readDraft(draftKey) }))
+  const text = draft.key === draftKey ? draft.text : readDraft(draftKey)
+  const checking = useSyncExternalStore(subscribeToChecks, () => writingChecks.get(task.id))
+  const busy = checking?.busy ?? false
+  const error = checking?.busy === false ? checking.error : ''
+  const unsaved = checking?.busy === false && checking.unsaved
+  // A network or key error lets the learner use the sample. An incomplete grade only offers a retry.
+  const claudeDown = checking?.busy === false && checking.claudeDown
+  const rec = readWrite(state.notes, task.id)
+  const fb = rec?.last
   const [showRevised, setShowRevised] = useState(false)
   const [showSample, setShowSample] = useState(false)
   const [ticks, setTicks] = useState<boolean[]>([])
@@ -125,18 +146,19 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
     strip.scrollLeft += selected.getBoundingClientRect().left - strip.getBoundingClientRect().left - (strip.clientWidth - selected.offsetWidth) / 2
   }, [stage.id])
   useEffect(() => () => stopSpeaking(), [stage.id])
-  // Each check carries a number; switching task cancels it, so a late reply never lands on another question.
-  const request = useRef(0)
   // Each task keeps its own timer: going to another task and back finds it where it was (still running, or run out).
   const timers = useRef(new Map<string, number>())
   const timerTask = useRef(task.id)
   useEffect(() => { if (endAt) timers.current.set(timerTask.current, endAt); else timers.current.delete(timerTask.current) }, [endAt])
-  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false); timerTask.current = task.id; setEndAt(timers.current.get(task.id)); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [task.id])
+  useEffect(() => {
+    setDraft({ key: draftKey, text: readDraft(draftKey) })
+    setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false)
+    timerTask.current = task.id
+    setEndAt(timers.current.get(task.id))
+  }, [task.id, draftKey])
   useEffect(() => { if (!endAt) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [endAt])
   const words = wordCount(text)
   const keyed = !!tutorKey()
-  const rec = readWrite(state.notes, task.id)
   const left = endAt ? Math.max(0, endAt - now) : 0
   const rubric = rubricFor(stage)
   const parts = scoredParts(stage, task)
@@ -149,36 +171,70 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
   const prompt = task.prompt + (task.chart ? '\n圖表資料：' + chartText(task.chart) : '')
   const sentencePoints = rubric.id === 'gept-sentence' ? rubric.max * parts.length : 0
 
-  function save(patch: Partial<NonNullable<typeof rec>>, id = task.id, count = words) {
-    onActivity(prev => {
+  async function save(patch: Partial<WriteRecord>, id = task.id, count = words, day = date) {
+    let applied = false
+    await onActivity(prev => {
       const old = readWrite(prev.notes, id)
-      // The best score is worked out from the saved record, so two checks in a row cannot overwrite each other.
       const best = patch.best === undefined ? old?.best : Math.max(old?.best ?? 0, patch.best)
-      const next = { ...old, ...patch, best, day: date, words: count, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0) }
+      // An older submission still counts as a try but cannot replace a newer draft's feedback.
+      const olderFeedback = (old?.last?.submittedAt ?? 0) > (patch.last?.submittedAt ?? Infinity)
+      const next = { ...old, ...patch, best, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0),
+        last: olderFeedback ? old?.last : patch.last ?? old?.last,
+        day: old?.day && old.day > day ? old.day : day, words: olderFeedback ? old?.words ?? count : count }
       // Every day he hands in writing counts as a writing day, even when the same task is redone on a later day.
-      return { ...prev, notes: logSkill({ ...prev.notes, [writeKey(id)]: JSON.stringify(next) }, 'write', date) }
+      const notes = logSkill({ ...prev.notes, [writeKey(id)]: JSON.stringify(next) }, 'write', day)
+      applied = true
+      return { ...prev, notes }
     })
+    return applied
+  }
+  async function saveGrade(grade: PaidGrade) {
+    let saved = false
+    try {
+      saved = await save({ last: grade.feedback, best: grade.best }, task.id, grade.words, grade.day)
+    } catch {
+      // Keep the reply available for another local save attempt.
+    }
+    setWritingCheck(task.id, saved ? undefined
+      : { busy: false, unsaved: grade, error: '已收到批改，暫時無法寫入練習紀錄。可以再按一次儲存這份回覆。' })
+  }
+  function retrySave() {
+    const active = writingChecks.get(task.id)
+    if (active?.busy !== false || !active.unsaved) return
+    setWritingCheck(task.id, { busy: true })
+    void saveGrade(active.unsaved)
   }
   async function check() {
-    if (!text.trim() || busy) return
-    const mine = ++request.current
-    const asked = { id: task.id, words, ielts: !!stage.ielts, rubric, parts, checks, task, text: text.trim() }
-    setBusy(true); setError(''); setShowRevised(false)
+    const answer = text.trim()
+    const active = writingChecks.get(task.id)
+    if (!answer || active?.busy || active?.unsaved) return
+    const submittedAt = Math.max(Date.now(), (rec?.last?.submittedAt ?? 0) + 1)
+    setWritingCheck(task.id, { busy: true })
+    setShowRevised(false)
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 5 * 60_000)
+    let failure: WritingCheck | undefined
+    let grade: PaidGrade | undefined
     try {
-      const reply = await askTutor(gradePrompt(stage, task, prompt), [{ role: 'user', content: text.trim() }])
-      if (mine !== request.current) return
-      setClaudeDown(false)
-      const f = parseGrade(reply, asked.rubric, asked.parts, asked.checks)
-      if (!f) { setError('評分失敗：回傳的批改缺了項目名稱或理由，或分數不在評分表上（' + (asked.ielts ? '每項是 1–9 的整數 band' : '0–' + asked.rubric.max + ' 的整數') + '）。這次不算數，也不會記成過關，再按一次批改。'); return }
-      // The check belongs to the text that was sent: it is saved with it, and a later draft is never shown under its scores.
-      const graded: WriteFeedback = { ...f, answer: asked.text }
-      setFb(graded)
-      save({ last: graded, best: countedBest(graded, asked.ielts, asked.words, asked.task) }, asked.id, asked.words)
+      const reply = await askTutor(gradePrompt(stage, task, prompt), [{ role: 'user', content: answer }], controller.signal)
+      if (controller.signal.aborted) throw controller.signal.reason
+      const f = parseGrade(reply, rubric, parts, checks)
+      if (!f) {
+        failure = { busy: false, error: '評分失敗：回傳的批改項目、理由或分數不符評分表，請再按一次批改。' }
+        return
+      }
+      const graded: WriteFeedback = { ...f, answer, submittedAt }
+      grade = { feedback: graded, best: countedBest(graded, !!stage.ielts, words, task), words, day: date }
     } catch (e) {
-      // A reply cut off or declined is not Claude out of reach: the sample essay stays hidden, pressing again is the way on.
-      if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(!(e instanceof ClaudeIncomplete)) }
+      const error = controller.signal.aborted ? '等候批改逾時。草稿已保留，可以重新送出。'
+        : e instanceof Error ? e.message : String(e)
+      failure = { busy: false, error, claudeDown: !(e instanceof ClaudeIncomplete) }
     }
-    finally { if (mine === request.current) setBusy(false) }
+    finally {
+      clearTimeout(timeout)
+      if (!grade) setWritingCheck(task.id, failure)
+    }
+    if (grade) await saveGrade(grade)
   }
   /** Another task: the page scrolls back up to its question (the essay box below follows the chosen task). */
   function goTo(id: string) {
@@ -299,17 +355,19 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
     </section>
     <label className="pr-field">我的英文
       <textarea lang="en" rows={rubric.id === 'gept-sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off" readOnly={busy}
-        onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
+        onChange={e => { setDraft({ key: draftKey, text: e.target.value }); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
     </label>
+    <DraftVersions id={draftKey} text={text} onChoose={value => setDraft({ key: draftKey, text: value })} disabled={busy} />
     <div className="wl-bar">
       <span data-ok={words >= task.min}>{words} / {task.min} 字</span>
       {stage.ielts && (endAt ? <span data-ok={left > 0}>{left > 0 ? '剩 ' + Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0') : '時間到（可以繼續寫完）'}</span>
         : <button type="button" className="pr-link" onClick={() => { setEndAt(Date.now() + (stage.minutes ?? 20) * 60000); setNow(Date.now()) }}>開始計時 {stage.minutes} 分鐘</button>)}
       {bestText && <span>最佳：{bestText}</span>}
     </div>
-    {stage.ielts && <small className="wl-count">字數怎麼算：英文字和數字各算一個（well-known、don't、37.5 都算一個），標點不算。跟考場算法接近，但不完全一樣，寧可多寫幾個字。</small>}
+    {stage.ielts && <small className="wl-count">英文字和數字各算一個（well-known、don't、37.5 都算一個）。中文和標點不計入字數，這裡的字數供練習參考。</small>}
     <div className="pr-actions">
-      {keyed ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? 'Claude 批改中……' : fb ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表批改'}</button>
+      {unsaved ? <button type="button" className="pr-main" onClick={retrySave}>儲存已收到的批改</button>
+        : keyed || busy ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? 'Claude 批改中……' : fb ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表批改'}</button>
         : <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setTicks(selfList.map(() => false))}>自己對照評分表檢查</button>}
       <StuckButton />
       {/* With Claude connected there is no model essay: Claude grades and teaches. It opens only if Claude can't be reached. */}
@@ -321,7 +379,7 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
       <strong>逐項檢查，做到就打勾</strong>
       {selfList.map((c, i) => <label key={c}><input type="checkbox" checked={!!ticks[i]} onChange={e => { const n = [...ticks]; n[i] = e.target.checked; setTicks(n) }} /> {c}</label>)}
       {savedSelf ? <p className="wl-saved" role="status">記下來了 ✓（自評完成・待確認）</p>
-        : <button type="button" disabled={!ticks.length || ticks.some(x => !x)} onClick={() => { save({ self: 1, day: date, words }); setSavedSelf(true) }}>都做到了，記下來</button>}
+        : <button type="button" disabled={!ticks.length || ticks.some(x => !x)} onClick={() => { void save({ self: 1, day: date, words }); setSavedSelf(true) }}>都做到了，記下來</button>}
       <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 照評分表批改過才算。</small>
     </section>}
     {fb && <section className="wl-fb" aria-live="polite">

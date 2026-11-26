@@ -3,8 +3,8 @@ import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
 import { useMemory } from '../lib/memory'
 import {
-  appsScriptCode, archiveFolderUrl, cloudArchive, cloudConflict, cloudGuarded, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
-  importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type HistoryEntry,
+  appsScriptCode, appsScriptVersion, archiveFolderUrl, cloudArchive, cloudConflict, cloudScope, cloudScriptVersion, cloudStatus,
+  connectDrive, disconnectDrive, driveConfig, driveLogsOn, driveReadyEvent, driveStorageChanged, importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type HistoryEntry,
 } from '../lib/drive'
 import { keepThisCopy, mergeWithCloud, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
 import './pair.css'
@@ -46,10 +46,10 @@ function CloudHistory({ onStatus }: { onStatus: (message: string) => void }) {
   }
   const label = (h: HistoryEntry) => stamp(h.at) + (h.name.startsWith('before-restore') ? '（還原前自動留的）' : '')
   return <details className="set-details" onToggle={e => { if ((e.currentTarget as HTMLDetailsElement).open && list === undefined) void load() }}>
-    <summary>雲端歷史版本（最多留 30 份，可以還原）</summary>
+    <summary>雲端歷史版本（顯示最近 30 份，可以還原）</summary>
     <p>雲端的進度要被蓋掉之前，雲端小程式會先把舊的那份留下來（最多每小時一份，兩台選版本或還原時一定會留）。不小心選錯、資料怪怪的，就從這裡回到之前的某一份。</p>
     {busy && <p>處理中……</p>}
-    {list === null && <p className="set-warn">你的雲端小程式還是舊版。請照下面的步驟更新到 v6，之後就會保留歷史版本。</p>}
+    {list === null && <p className="set-warn">你的雲端小程式還是舊版。請照下面的步驟更新到 v{appsScriptVersion}，之後就會保留歷史版本。</p>}
     {list && !list.length && <p>還沒有歷史版本：下次雲端的進度被更新時，會開始留。</p>}
     {list && list.length > 0 && <div className="set-list">{list.map(h => <div key={h.id}>
       <span>{label(h)}<small> · {Math.max(1, Math.round(h.size / 1024))} KB</small></span>
@@ -74,15 +74,22 @@ export default function MemoryPanel() {
   const [busy, setBusy] = useState(false)
   useEffect(() => {
     const on = () => { setConflict(cloudConflict()); setDrive(driveConfig()) }
+    const storage = (e: StorageEvent) => { if (driveStorageChanged(e)) on() }
     window.addEventListener('dream-blueprint:cloud', on)
-    return () => window.removeEventListener('dream-blueprint:cloud', on)
+    window.addEventListener(driveReadyEvent, on)
+    window.addEventListener('storage', storage)
+    return () => {
+      window.removeEventListener('dream-blueprint:cloud', on)
+      window.removeEventListener(driveReadyEvent, on)
+      window.removeEventListener('storage', storage)
+    }
   }, [])
 
-  async function connect(fn: () => Promise<unknown>) {
+  async function connect(establish?: () => Promise<unknown>) {
     setBusy(true)
     setStatus('連接中……')
     try {
-      await fn()
+      if (establish) await establish()
       setDrive(driveConfig())
       setKey(''); setCode('')
       try {
@@ -90,7 +97,7 @@ export default function MemoryPanel() {
         setStatus(r.kind === 'pulled' ? '連上了！已經換成雲端硬碟裡最新的學習進度。'
           : r.kind === 'conflict' ? '連上了。這台和雲端都有進度，請在下面選擇合併或使用其中一份。'
             : '連上了！之後記住的事和學習進度都會存進雲端硬碟。')
-      } catch (e) { setStatus('連上了，但學習進度這次沒同步到（' + (e instanceof Error ? e.message : String(e)) + '）。') }
+      } catch (e) { setStatus('連線設定已保存，請再確認學習進度（' + (e instanceof Error ? e.message : String(e)) + '）。') }
     } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
     finally { setBusy(false) }
   }
@@ -105,11 +112,11 @@ export default function MemoryPanel() {
   /** Pick one copy when both changed (the other one is downloaded as a backup first). */
   async function choose(pick: () => Promise<string>) {
     setBusy(true)
-    try { setStatus(await pick()) } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setBusy(false) }
+    try { setStatus(await pick()) } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) } finally { setDrive(driveConfig()); setBusy(false) }
   }
 
   return <>
-    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，可以按「刪掉」。雲端小程式 v6 會合併各裝置新增或刪除的記憶。</p>
+    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，可以按「刪掉」。雲端小程式會合併各裝置新增或刪除的記憶。</p>
     {notes.length ? <div className="set-list">
       {notes.map((n, i) => <div key={i + n}><span>{n}</span><button type="button" onClick={() => remove(i)}>刪掉</button></div>)}
     </div> : <p>目前還沒有記住任何事。</p>}
@@ -117,7 +124,10 @@ export default function MemoryPanel() {
 
     <h3 className="set-subhead">雲端硬碟</h3>
     {drive ? <>
-      <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存：「記憶」是她們記住的事、「進度」是整份學習進度（課表、單字、複習卡、勾選、作答紀錄），有變動 5 秒後自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>
+      {drive.settled === false ? <div className="set-warn" role="status">
+        <p>連線設定已保存。確認學習進度後，同一瀏覽器的分頁就會接續自動同步。</p>
+        {!conflict && <button type="button" disabled={busy} onClick={() => void connect()}>確認學習進度</button>}
+      </div> : <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存助教記憶和學習進度。有變動 5 秒後會自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>}
       <p>手機只留最近的紀錄：太舊的複習紀錄、每天的小紀錄、舊課的批改全文，會先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了才從手機拿掉，封存的檔案不會被刪{cloudArchive() ? '。' : '（雲端小程式要 v4 以上，照下面「更新雲端小程式」做一次）。'}{archiveFolderUrl() && <> <a href={archiveFolderUrl()} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</p>
       {conflict && <div className="set-warn" role="alert">
         <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置也有自己的改動。按「兩份合併」會保留兩台的作答和應補強的課程，也可以選擇其中一份。</p>
@@ -131,19 +141,19 @@ export default function MemoryPanel() {
       {drive.sheet && <p><a href={drive.sheet} target="_blank" rel="noreferrer">打開雲端硬碟裡的試算表</a></p>}
       <label className="set-check"><input type="checkbox" checked={logs} onChange={e => { setDriveLogs(e.target.checked); setLogs(e.target.checked) }} />
         這台裝置也把對話逐字稿（問問 Claude、英文口說）存進試算表的「對話紀錄」（預設關）</label>
-      <SyncQr />
+      <SyncQr key={cloudScope(drive)} />
       <p>掃了沒反應，或是用加到主畫面的 App 開的？就改用同步碼：按下面的按鈕複製，用 LINE 傳給自己，貼到那台的「貼上同步碼」。</p>
       <div className="set-actions">
         <button type="button" onClick={copyCode}>複製同步碼（給手機用）</button>
         <button type="button" disabled={busy} onClick={() => { void disconnectDrive().then(() => { setDrive(driveConfig()); setStatus('這台裝置已中斷雲端硬碟。') }, (e: unknown) => setStatus(String(e))) }}>這台裝置中斷連線</button>
       </div>
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
-      <CloudHistory onStatus={setStatus} />
+      <CloudHistory key={cloudScope(drive)} onStatus={setStatus} />
       <details className="set-details">
-        <summary>{cloudGuarded() ? '雲端小程式 v6' : '更新雲端小程式到 v6（進度版本檢查與記憶合併）'}</summary>
+        <summary>{cloudScriptVersion() >= appsScriptVersion ? `雲端小程式 v${appsScriptVersion}` : `更新雲端小程式到 v${appsScriptVersion}（對話純文字與歷史快照保護）`}</summary>
         <ol>
           <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
-          <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。原本的同步密鑰與已存資料會保留。</li>
+          <li>如果舊專案尚未設定同步密鑰，在函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。已設定過的專案可直接更新部署。</li>
           <li>右上選「部署」→「管理部署作業」→ 鉛筆圖示 → 版本選「新版本」→「部署」。原本網址和同步碼可繼續使用。</li>
         </ol>
         <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>

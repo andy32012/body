@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { driveConnected, driveReadyEvent, importSyncCode, sameDrive } from '../lib/drive'
+import { driveReadyEvent, importSyncCode, readyCloudScope, sameDrive } from '../lib/drive'
 import { keepThisCopy, settleProgress, stamp, takeCloudCopy, type Settled } from '../lib/cloudSync'
 import { useModal } from '../lib/modal'
 import './pair.css'
@@ -24,7 +24,7 @@ export default function SyncReceive({ code, onDone }: { code: string; onDone: ()
       if (r.kind === 'conflict') { setRemoteAt(r.remoteAt); setPhase('conflict') }
       else setPhase(r.kind === 'none' ? 'same' : r.kind)
     } catch (e) {
-      if (driveConnected()) window.dispatchEvent(new Event(driveReadyEvent))
+      if (readyCloudScope()) window.dispatchEvent(new Event(driveReadyEvent))
       setMsg(e instanceof Error ? e.message : String(e)); setPhase('error')
     }
   }

@@ -17,12 +17,17 @@ function read(name: string) {
   try { return localStorage.getItem(name) ?? '' } catch { return '' }
 }
 function write(name: string, value: string) {
-  try { value ? localStorage.setItem(name, value) : localStorage.removeItem(name) } catch { /* private mode */ }
+  try {
+    if (value) localStorage.setItem(name, value)
+    else localStorage.removeItem(name)
+    return localStorage.getItem(name) === (value || null)
+  } catch { return false }
 }
 export const tutorKey = () => read(KEY)
 export const setTutorKey = (value: string) => write(KEY, value.trim())
 export const tutorModel = () => read(MODEL) || tutorModels[0].id
 export const setTutorModel = (value: string) => write(MODEL, value)
+export const isTutorCredentialStorageKey = (key: string | null) => key === null || key === KEY || key === MODEL
 
 export type TutorTurn = { role: 'user' | 'assistant'; content: string }
 export type TutorSentence = { id: string; zh: string; reference: string[]; grammar: string[]; hints: string[]; why: string; newWords: { en: string; zh: string }[] }
