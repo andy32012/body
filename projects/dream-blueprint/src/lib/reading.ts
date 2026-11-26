@@ -27,7 +27,7 @@ export const readBands: { id: ReadBand; name: string; note: string }[] = [
 export const readSteps: ReadStep[] = readLevels.flatMap(l => readBands.map(b => ({ level: l.id, band: b.id })))
 export const readStepKey = (s: ReadStep): ReadStepKey => `${s.level}-${s.band}`
 export const readStepName = (s: ReadStep) => s.level + ' ' + readBands.find(b => b.id === s.band)!.name
-const atStep = (p: ReadPassage, s: ReadStep) => p.level === s.level && p.band === s.band
+const atStep = (p: ReadStep, s: ReadStep) => p.level === s.level && p.band === s.band
 export const typeNames: Record<QType, string> = {
   main: '主旨', detail: '細節', reference: '代名詞指什麼', vocab: '猜字義', evidence: '找證據', tfng: '是／非／沒提到', heading: '段落標題',
 }
@@ -92,16 +92,21 @@ function preservedLevel(all: readonly ReadPassage[], notes: Record<string, strin
   const open = openSteps(groups.map(g => g.ids.filter(id => { const a = earlier(id); return !!a && clean(a) }).length >= levelTarget(g.ids.length)))
   return groups.filter((_, i) => open[i] || recorded[i]).at(-1)?.level
 }
-export function readStepProgress(all: readonly ReadPassage[], step: ReadStep, notes: Record<string, string>) {
+/** Passages read in the same levels with records of their own (閱讀測驗 puts the past-exam passages here): they count
+ *  toward a band's passes and keep a band they were read in open, but a band's target stays the graded passages' own,
+ *  so more passages never mean more to read before the next band opens. */
+export interface ReadExtra { id: string; level: ReadLevel; band: ReadBand; recorded: boolean; passed: boolean; day?: string }
+export function readStepProgress(all: readonly ReadPassage[], step: ReadStep, notes: Record<string, string>, extra: readonly ReadExtra[] = []) {
   const here = all.filter(p => atStep(p, step))
-  return { total: here.length, ok: here.filter(p => passed(readRecord(notes, p.id))).length, target: levelTarget(here.length) }
+  const more = extra.filter(e => atStep(e, step))
+  return { total: here.length + more.length, ok: here.filter(p => passed(readRecord(notes, p.id))).length + more.filter(e => e.passed).length, target: levelTarget(here.length) }
 }
-function readingPosition(all: readonly ReadPassage[], notes: Record<string, string>) {
+function readingPosition(all: readonly ReadPassage[], notes: Record<string, string>, extra: readonly ReadExtra[] = []) {
   const level = preservedLevel(all, notes)
   let recorded = -1, firstPreserved = -1, lastPreserved = -1
   for (const [i, s] of readSteps.entries()) {
     const here = all.filter(p => atStep(p, s))
-    if (here.some(p => readRecord(notes, p.id) !== null)) recorded = i
+    if (here.some(p => readRecord(notes, p.id) !== null) || extra.some(e => e.recorded && atStep(e, s))) recorded = i
     if (here.length && s.level === level) {
       if (firstPreserved < 0) firstPreserved = i
       lastPreserved = i
@@ -112,23 +117,30 @@ function readingPosition(all: readonly ReadPassage[], notes: Record<string, stri
   return { frontier: Math.max(recorded, lastPreserved), suggestedFrom: Math.max(firstPreserved, 0) }
 }
 /** The first band not yet passed, from the easiest, or from the first band of a level unlocked in the previous edition. */
-export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>): ReadStep {
-  const { suggestedFrom } = readingPosition(all, notes)
+export function suggestedLevel(all: readonly ReadPassage[], notes: Record<string, string>, extra: readonly ReadExtra[] = []): ReadStep {
+  const { suggestedFrom } = readingPosition(all, notes, extra)
   for (const s of readSteps.slice(suggestedFrom)) {
-    const progress = readStepProgress(all, s, notes)
+    const progress = readStepProgress(all, s, notes, extra)
     if (progress.total && progress.ok < progress.target) return s
   }
   return readSteps.filter(s => all.some(p => atStep(p, s))).at(-1) ?? readSteps[0]
 }
 /** Open one band at a time. Empty bands do not block the next one. Recorded or previously unlocked bands keep their
  *  whole prefix open, and completing that position can open the next band without repeating the new earlier work. */
-export function readLevelsOpen(all: readonly ReadPassage[], notes: Record<string, string>): Record<ReadStepKey, boolean> {
-  const { frontier } = readingPosition(all, notes)
+export function readLevelsOpen(all: readonly ReadPassage[], notes: Record<string, string>, extra: readonly ReadExtra[] = []): Record<ReadStepKey, boolean> {
+  const { frontier } = readingPosition(all, notes, extra)
   const open = openSteps(readSteps.map((s, i) => {
-    const { ok, target } = readStepProgress(all, s, notes)
+    const { ok, target } = readStepProgress(all, s, notes, extra)
     return i < frontier || ok >= target
   }))
   return Object.fromEntries(readSteps.map((s, i) => [readStepKey(s), open[i]])) as Record<ReadStepKey, boolean>
+}
+/** Said when 下一篇 moves to the suggested band: up when the band before it is passed, or back to the first band not passed
+ *  yet (after a passage read in a later band, for example one left halfway). */
+export function moveNote(from: ReadStep, to: ReadStep) {
+  const up = readSteps.findIndex(s => readStepKey(s) === readStepKey(to)) > readSteps.findIndex(s => readStepKey(s) === readStepKey(from))
+  return up ? '前面這一小級過關的篇數夠了，升到 ' + readStepName(to) + '。想留在原本的小級多讀幾篇，按上面的按鈕就好。'
+    : '接下來從還沒過關的 ' + readStepName(to) + '讀起，一小級一小級往上。想留在 ' + readStepName(from) + '，按上面的按鈕就好。'
 }
 /** The preceding nonempty band, for the lock's concrete requirement. */
 export function previousReadStep(all: readonly ReadPassage[], step: ReadStep) {

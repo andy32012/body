@@ -2,10 +2,10 @@ import type { ReadBand, ReadLevel } from './reading'
 import { baseForms } from './story'
 import { levelEntry, wordKey } from './vocab'
 
-/** 歷屆考題閱讀: reading passages from Taiwan's public exams (會考, 學測, 指考 and the civil-service exams), with the
- *  official answers, placed on the same steps as the graded reading (A1–B2, 簡單／中等／難). Official exam papers are not
- *  protected by copyright in Taiwan (著作權法第 9 條). This is a library to read in: it never opens or locks the graded
- *  reading, and nothing here counts toward its targets. */
+/** Reading passages from Taiwan's public exams (會考, 學測, 指考 and the civil-service exams), with the official answers,
+ *  placed on the same steps as the graded reading (A1–B2, 簡單／中等／難). Official exam papers are not protected by
+ *  copyright in Taiwan (著作權法第 9 條). In 閱讀測驗 they are passages of those bands (readingTest.ts): their passes count
+ *  toward opening the next band. The screen never says which exam a passage came from. */
 export type ExamKind = 'cap' | 'gsat' | 'ast' | 'civil'
 export interface ExamQuestion {
   /** The question's number on the paper. */
@@ -18,7 +18,8 @@ export interface ExamQuestion {
 }
 export interface ExamPassage {
   id: string; level: ReadLevel; band: ReadBand; kind: ExamKind
-  /** Short name shown on screen (113 會考, 92 學測（補考）, 114 高考三級); `exam` is the paper's full official name. */
+  /** Where it came from (113 會考, 92 學測（補考）, 114 高考三級; `exam` is the paper's full official name): kept for
+   *  maintenance, never shown on screen. */
   source: string; exam: string
   first: number; last: number; words: number
   /** Paragraphs; a blank is written {{n}} with the question's number. */
@@ -49,6 +50,14 @@ export function blankParts(para: string): ({ text: string } | { blank: number })
     const m = t.match(/^\{\{(\d+)\}\}$/)
     return m ? { blank: Number(m[1]) } : { text: t }
   })
+}
+
+/** The blanks numbered the way they are shown: 1, 2, 3 … in the order they appear in the text (the paper's own question
+ *  numbers, like 41–45, are not shown). Blanks that need the paper's picture are numbered too, so the numbers have no gaps. */
+export function blankNumbers(p: Pick<ExamPassage, 'paras'>): Map<number, number> {
+  const out = new Map<number, number>()
+  for (const m of p.paras.join(' ').matchAll(/\{\{(\d+)\}\}/g)) if (!out.has(Number(m[1]))) out.set(Number(m[1]), out.size + 1)
+  return out
 }
 
 /** One record per passage, `exam.read.<id>`, apart from the graded reading's `read.<id>`. The latest attempt, plus `best`:

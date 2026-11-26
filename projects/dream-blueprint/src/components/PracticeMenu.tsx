@@ -1,6 +1,6 @@
 import {
   AudioLines, BookA, BookOpenText, ChevronRight, ClipboardList, FileText, Gauge, Headphones, HeartPulse, Languages, Layers,
-  ListChecks, ListFilter, Mic, Newspaper, PenLine, Repeat, ScrollText, Shuffle, SpellCheck, Stethoscope,
+  ListChecks, ListFilter, Mic, Newspaper, PenLine, Repeat, Shuffle, SpellCheck, Stethoscope,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { AppState } from '../lib/store'
@@ -12,7 +12,7 @@ import './practice-menu.css'
 
 /** One icon per kind of practice, shared by the sidebar and the 英文練習 page. */
 export const menuIcons: Record<MenuId, LucideIcon> = {
-  translate: Languages, speaking: Mic, listen: Repeat, story: BookOpenText, reading: FileText, pastexam: ScrollText, writing: PenLine, unit: Layers,
+  translate: Languages, speaking: Mic, listen: Repeat, story: BookOpenText, reading: FileText, writing: PenLine, unit: Layers,
   quiz: ListChecks, grammar: SpellCheck, theme: Shuffle, sound: AudioLines, words: BookA, screen: ListFilter, passage: Newspaper,
   nlisten: Headphones, nread: ClipboardList, nwords: Stethoscope, case: HeartPulse,
 }

@@ -70,5 +70,7 @@ export const askEvent = 'dream-blueprint:ask-claude'
 export function askClaude(text: string) {
   window.dispatchEvent(new CustomEvent(askEvent, { detail: text }))
 }
+/** What 「問 Claude 老師」 on a tapped word sends: the teacher asks first whether he knows what it means here, then explains. */
+export const wordQuestion = (form: string) => '我想問這篇文章裡的「' + form + '」。你先問我知不知道它在這裡是什麼意思，等我回答了再跟我說對不對、怎麼用。'
 /** Open the floating Claude chat on the task on screen, without sending anything (「問問 Claude」). */
 export const openClaude = () => askClaude('')

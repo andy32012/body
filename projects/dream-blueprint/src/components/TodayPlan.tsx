@@ -70,7 +70,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   // Reading: the passages with comprehension questions first; once the A1–B1 ones are done, the graded passages.
   const questionsLeft = plainReadCount(state.notes) < QUESTION_PASSAGES
   const readHash = questionsLeft ? 'library/reading' : 'library/story/read'
-  const readDetail = questionsLeft ? '一篇閱讀理解（有題目）；還有時間再讀一段短文' : '短文閱讀一兩段，不會的字點一下看意思'
+  const readDetail = questionsLeft ? '一篇閱讀測驗（有題目）；還有時間再讀一段短文' : '短文閱讀一兩段，不會的字點一下看意思'
   const listenHash = 'library/story/listen'
   // Speaking: the pronunciation course first (it needs no key and no partner); once every lesson is passed, Emma.
   const sound = nextPron(state.notes)
@@ -128,8 +128,8 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     listen: { id: 'listen', title: '聽力', detail: pack ? '單元 ' + pack + ' 的聽力：先不看字聽完再作答，再一句一句跟著念' : '短文聽力：先不看字聽一段，再看著字跟著念；還有時間就做一段聽寫', auto: listenedToday,
       go: to(where('listen', listenHash)), goLabel: pack ? '聽力' : '短文', go2: to('library/listen'), go2Label: '跟讀' },
     read: testDay ? { id: 'read', title: '單元回測', detail: '單元 ' + pack + ' 最後一天：沒看過的閱讀和聽力，各只有一次機會', auto: !!(held.reading && held.listening), go: to('library/unit/test'), goLabel: '回測' }
-      : { id: 'read', title: '閱讀', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '閱讀理解一到兩篇（錯的題目選「卡在哪」），再讀幾段短文', auto: readToday,
-        go: to(where('read', 'library/reading')), goLabel: pack ? '閱讀' : '閱讀理解', go2: to(pack ? 'library/reading' : 'library/story/read'), go2Label: pack ? '其他文章' : '短文' },
+      : { id: 'read', title: '閱讀', detail: pack ? '單元 ' + pack + ' 的兩篇閱讀；錯的題目選「卡在哪」' : '閱讀測驗一到兩篇（錯的題目選「卡在哪」），再讀幾段短文', auto: readToday,
+        go: to(where('read', 'library/reading')), goLabel: pack ? '閱讀' : '閱讀測驗', go2: to(pack ? 'library/reading' : 'library/story/read'), go2Label: pack ? '其他文章' : '短文' },
     write: { id: 'write', title: '寫作', detail: pack ? '單元 ' + pack + ' 的段落寫作一題，批改完改一版' : '寫作階梯一題，批改完改一版', auto: wroteToday,
       go: to(where('write', 'library/writing')), goLabel: '寫作' },
     speak: { id: 'speak', title: '口說', detail: pack ? '跟 Emma 做單元 ' + pack + ' 的口說任務，或練一張雅思 Part 2 題目卡' : sound ? soundDetail + '；再跟 Emma 聊 10 分鐘' : '跟 Emma 聊 20 分鐘，或練一張雅思 Part 2 題目卡', auto: spokeToday,

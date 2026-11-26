@@ -54,7 +54,6 @@ import UseWord from "../components/UseWord";
 import EmmaWordLink from "../components/EmmaWordLink";
 import { speakEnglish } from "../lib/tts";
 import ReadingPath from "../components/ReadingPath";
-import PastExamReading from "../components/PastExamReading";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
 import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/GrammarTeach";
@@ -1231,7 +1230,6 @@ function Extras({
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
-      {mode === "pastexam" && <PastExamReading state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
       {mode === "nwords" && <NursingWords state={state} onActivity={onActivity} date={date} />}

@@ -59,3 +59,12 @@ test('網址認得出是哪一頁：只開 #library 是英文練習的清單，�
   assert.equal(libraryPage('sound'), 'sound', '只給種類也可以（App 的路由只留斜線後那一段）')
   for (const m of libraryModes) assert.equal(libraryPage('#library/' + m), m)
 })
+
+test('閱讀理解和歷屆考題閱讀合成一個「閱讀測驗」：選單只有一個入口，以前存的歷屆考題網址也打開閱讀測驗', () => {
+  const entries = menuGroups({ unit: open }).flatMap(g => g.entries)
+  const reading = entries.filter(e => /閱讀/.test(e.label) && !/護理|短文/.test(e.label))
+  assert.deepEqual(reading.map(e => [e.id, e.label]), [['reading', '閱讀測驗']])
+  assert.ok(!entries.some(e => e.label.includes('歷屆考題')), '選單上沒有歷屆考題閱讀')
+  assert.equal(libraryPage('#library/pastexam'), 'reading')
+  assert.equal(libraryPage('library/pastexam'), 'reading')
+})
