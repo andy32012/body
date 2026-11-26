@@ -75,9 +75,12 @@ export function Translation({
     detail: ["題目（中翻英）：" + sentence.zh, "這題練的文法：" + sentence.grammar.join("、"), "課本提示：" + sentence.hints.join(" ／ "),
       "參考答案（只供你判斷，他沒說要看答案前不要說出來）：" + sentence.reference.join(" / ")].join("\n"),
     draft: answer,
+    onHelp: () => askHelp(),
   });
   const mountedAt = useRef(Date.now());
   const ready = () => Date.now() - mountedAt.current > 450;
+  /** Asked Claude for help on this sentence (「我卡住了」 or the floating chat): not done alone any more. */
+  function askHelp() { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }
   const setHint = (h: number) => { if (ready()) record(h, seenHint || h >= 2); };
   /** The shared weak-point list, when no Claude verdict did it already: a self-marked miss counts against the
    *  sentence's grammar; written right alone (and matching a reference) takes one miss off it. */
@@ -143,7 +146,7 @@ export function Translation({
           >
             我想看提示
           </button>
-          <StuckButton onUse={() => { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }} />
+          <StuckButton onUse={askHelp} />
         </div>
       )}
       {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)}

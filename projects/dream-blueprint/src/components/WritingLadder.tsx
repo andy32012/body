@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, countedBest, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, countedBest, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
@@ -111,7 +111,11 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   useEffect(() => () => stopSpeaking(), [stage.id])
   // Each check carries a number; switching task cancels it, so a late reply never lands on another question.
   const request = useRef(0)
-  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Each task keeps its own timer: going to another task and back finds it where it was (still running, or run out).
+  const timers = useRef(new Map<string, number>())
+  const timerTask = useRef(task.id)
+  useEffect(() => { if (endAt) timers.current.set(timerTask.current, endAt); else timers.current.delete(timerTask.current) }, [endAt])
+  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false); timerTask.current = task.id; setEndAt(timers.current.get(task.id)); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.id])
   useEffect(() => { if (!endAt) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [endAt])
   const words = wordCount(text)
@@ -223,6 +227,14 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
           {!open && '🔒 '}{label}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
       })}</div>
     </section>}
+    {(() => {
+      const { prev, next } = taskNeighbors(stage, task.id, unit)
+      const name = (id: string) => pages.flatMap(p => p.tasks).find(t => t.task.id === id)?.label
+      return (prev || next) && <div className="wl-seq">
+        {prev ? <button type="button" className="pr-link" onClick={() => goTo(prev.id)}>← 上一題{name(prev.id) ? '：' + name(prev.id) : ''}</button> : <span />}
+        {next && <button type="button" className="pr-link" onClick={() => goTo(next.id)}>{name(next.id) ? name(next.id) + '：' : ''}下一題 →</button>}
+      </div>
+    })()}
     <section className="wl-task">
       <small className="wl-current">目前作答：{pages.flatMap(p => p.tasks).find(t => t.task.id === task.id)?.label}</small>
       <h3 lang="en">{task.prompt}</h3>

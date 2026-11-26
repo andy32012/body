@@ -9,7 +9,7 @@ import StuckButton from './StuckButton'
 import { Transcript, useDialogueVoice } from './LessonParts'
 import { answered, judgeExpress, judgeWritten, levelNames, type Level, type Verdict } from '../lib/evidence'
 import { readHints, sentenceFrame, writeHint } from '../lib/lesson'
-import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
+import { clearDraft, readDraft, transcriptLanding, writeDraft } from '../lib/drafts'
 import { tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import { addSayCard } from '../lib/sayCards'
@@ -368,7 +368,7 @@ function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 
   const [text, setText] = useState(() => readDraft(key))
   const [run, setRun] = useState(0)
   const ready = useReady()
-  useTaskContext({ label: '重述對話：' + topic.title, detail: ['重述題：' + L.retell, '對話：' + L.dialogue.map(l => l.who + ': ' + l.en).join(' / '), '參考說法（不要直接給他）：' + L.retellSample].join('\n'), draft: text })
+  useTaskContext({ label: '重述對話：' + topic.title, detail: ['重述題：' + L.retell, '對話：' + L.dialogue.map(l => l.who + ': ' + l.en).join(' / '), '參考說法（不要直接給他）：' + L.retellSample].join('\n'), draft: text, onHelp: () => open.addHelp('claude') })
   return <>
     <h2 className="pr-question">不看稿，用兩三句說出重點</h2>
     <p className="ls-help">{L.retell}</p>
@@ -438,33 +438,57 @@ async function transcribe(blob: Blob) {
   if (!res.ok) throw new Error('轉文字失敗（' + res.status + '）')
   return ((await res.json()).text as string) || ''
 }
-/** Optional: record yourself and listen back. The clip stays on this screen. */
+/** Optional: record yourself and listen back. The clip stays on this screen. Each press asks for the microphone once;
+ *  leaving the step (or skipping it) while the permission is still pending cancels that request, so a late permission
+ *  never starts a recording nobody can see, and every microphone track it got is stopped. */
 function Recorder({ onClip }: { onClip?: (blob: Blob) => void }) {
   const [recording, setRecording] = useState(false)
+  const [requesting, setRequesting] = useState(false)
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const recorder = useRef<MediaRecorder | null>(null)
-  useEffect(() => () => { if (recorder.current?.state === 'recording') recorder.current.stop() }, [])
+  const stream = useRef<MediaStream | null>(null)
+  const asking = useRef(0)
+  const alive = useRef(true)
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false; asking.current++
+      try { if (recorder.current?.state === 'recording') recorder.current.stop() } catch { /* already stopped */ }
+      stream.current?.getTracks().forEach(t => t.stop())
+    }
+  }, [])
   useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') return null
   async function toggle() {
     if (recording) { recorder.current?.stop(); return }
-    setError('')
+    if (requesting) return
+    const mine = ++asking.current
+    setError(''); setRequesting(true)
+    let media: MediaStream | null = null
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      media = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // The permission came back after he left or pressed again: close it, record nothing.
+      if (!alive.current || asking.current !== mine) { media.getTracks().forEach(t => t.stop()); return }
+      stream.current = media
       const chunks: Blob[] = []
-      const r = new MediaRecorder(stream)
+      const r = new MediaRecorder(media)
       r.ondataavailable = e => chunks.push(e.data)
       r.onstop = () => {
-        stream.getTracks().forEach(t => t.stop())
+        media?.getTracks().forEach(t => t.stop())
+        if (stream.current === media) stream.current = null
+        if (!alive.current) return
         const blob = new Blob(chunks, { type: r.mimeType })
         setUrl(URL.createObjectURL(blob)); setRecording(false); onClip?.(blob)
       }
       recorder.current = r; r.start(); setRecording(true)
-    } catch { setError('麥克風被擋住了，直接說出來就好。') }
+    } catch {
+      media?.getTracks().forEach(t => t.stop()); if (stream.current === media) stream.current = null
+      if (alive.current && asking.current === mine) setError('麥克風被擋住了，直接說出來就好。')
+    } finally { if (alive.current && asking.current === mine) setRequesting(false) }
   }
   return <div className="tl-rec">
-    <button type="button" className="ls-play" onClick={toggle}>{recording ? <><Square size={14} />停止錄音</> : <><Mic size={14} />{url ? '重錄' : '錄音（選用）'}</>}</button>
+    <button type="button" className="ls-play" onClick={toggle} disabled={requesting}>{recording ? <><Square size={14} />停止錄音</> : requesting ? '等麥克風允許……' : <><Mic size={14} />{url ? '重錄' : '錄音（選用）'}</>}</button>
     {url && <audio controls src={url} />}
     {error && <p className="ls-help">{error}</p>}
   </div>
@@ -493,15 +517,38 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     label: '口說：' + task.situation,
     detail: ['口說情境：' + task.situation, '要做到：' + task.conditions.join('；'), '這是他說完後打下來的文字稿，只看內容和文法，不評發音。', '參考說法（不要直接給他）：' + task.sample].join('\n'),
     draft: text,
+    onHelp: () => open.addHelp('claude'),
   })
+  // The transcript belongs to the clip it was made from and the text as it was when asked: a reply that comes back after
+  // he typed his own changes, recorded again or left the step never replaces what is in the box (it waits as a choice).
+  const textNow = useRef(text)
+  textNow.current = text
+  const transcribing = useRef(0)
+  const alive = useRef(true)
+  useEffect(() => { alive.current = true; return () => { alive.current = false; transcribing.current++ } }, [])
+  const [offered, setOffered] = useState('')
+  // A new recording makes the earlier one's pending transcript (and any waiting choice) out of date.
+  const clipNow = useRef(clip)
+  useEffect(() => {
+    if (clipNow.current === clip) return
+    clipNow.current = clip; transcribing.current++; setOffered('')
+    setBusy(b => b === '轉文字中……' ? '' : b)
+  }, [clip])
   async function toText() {
     if (!clip) return
-    setBusy('轉文字中……')
-    try { const t = await transcribe(clip); if (t) { setText(t); writeDraft(draftKey, t) } setBusy('') }
-    catch (e) { setBusy(e instanceof Error ? e.message : String(e)) }
+    const mine = ++transcribing.current, before = textNow.current, from = clip
+    setBusy('轉文字中……'); setOffered('')
+    try {
+      const t = await transcribe(from)
+      if (!alive.current || transcribing.current !== mine) return
+      const land = transcriptLanding(before, textNow.current, t)
+      if (land === 'fill') { setText(t); writeDraft(draftKey, t) } else if (land === 'offer') setOffered(t)
+      setBusy('')
+    } catch (e) { if (alive.current && transcribing.current === mine) setBusy(e instanceof Error ? e.message : String(e)) }
   }
   function finish() {
     if (!ready() || !how) return
+    transcribing.current++
     const verdict = open.verdictFor(text)
     const textLevel = text.trim() ? judgeExpress({ answered: true, help: open.help, firstVerdict: verdict }) : null
     const level = how === 'typed' ? null : judgeSpeak({ said: true, transcript: text, help: open.help, firstVerdict: verdict })
@@ -537,6 +584,9 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <label className="pr-field">{openaiKey() ? '你剛剛說的（打下來，或錄音後按「把錄音轉成文字」）' : '你剛剛說的（照著打下來）'}
       <textarea lang="en" rows={4} value={text} spellCheck={false} autoComplete="off" placeholder="照你說的寫，不用先改好" onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
+    {offered && <section className="pr-reference" aria-live="polite"><small>錄音轉好的文字（你在等的時候改過框裡的字，所以沒有直接換掉）</small><p lang="en">{offered}</p>
+      <div className="pr-actions"><button type="button" className="pr-link" onClick={() => { setText(offered); writeDraft(draftKey, offered); setOffered('') }}>換成這段辨識結果</button>
+        <button type="button" className="pr-link" onClick={() => setOffered('')}>不用，留我改的</button></div></section>}
     <div className="ls-helps" role="group" aria-label="卡住了再打開">
       <span>卡住了？</span>
       <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>句型提示</button>
@@ -586,6 +636,7 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
     label: '寫訊息：' + W.task,
     detail: ['寫一則 3–5 句的訊息：' + W.task, '要寫到：' + W.conditions.join('；'), '這個主題的句型：' + topic.grammar.title, '參考寫法（不要直接給他）：' + W.sample, '他要寫自己的內容；幫他想內容或句型就好，不要替他寫整段。'].join('\n'),
     draft: text,
+    onHelp: () => open.addHelp('claude'),
   })
   return <section className="tl-write">
     <div className="pr-label">寫訊息 · {W.minSentences}–5 句</div>

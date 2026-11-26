@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUp, X } from 'lucide-react'
 import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
-import { askEvent, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
+import { askEvent, askedAbout, currentTask, useCurrentTask } from '../lib/taskContext'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { useModal } from '../lib/modal'
@@ -207,8 +207,13 @@ export function AIAssistant({ progress }: { progress: string }) {
     '以下是網站自動產生的他的進度：',
     progress,
   ].join('\n')
-  // Read at send time, so the latest draft goes along with the question.
-  const system = () => base + '\n' + taskPrompt(currentTask())
+  // 「只問單字或別的」: the task on screen stays out of the question and its record (back on for the next task).
+  const [general, setGeneral] = useState(false)
+  const generalNow = useRef(general)
+  generalNow.current = general
+  useEffect(() => { setGeneral(false) }, [task?.label])
+  // Read at send time, so the latest draft goes along with the question; asking about the task records the help.
+  const system = () => base + '\n' + askedAbout(currentTask(), generalNow.current).prompt
   return <>
     <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
       <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
@@ -221,10 +226,12 @@ export function AIAssistant({ progress }: { progress: string }) {
       <button type="button" className="ai-fab-label" onClick={() => setOpen(true)}>問問 Claude</button>
     </div>
     {open && <AISheet title="問問 Claude" onClose={() => setOpen(false)}>
-      {task && <p className="ai-task"><b>正在協助</b><span>{task.label}</span></p>}
+      {task && <p className="ai-task"><b>{general ? '先不帶這題' : '正在協助'}</b><span>{task.label}</span></p>}
+      {task?.onHelp && <p className="ai-task-note">{general ? '現在問的不會帶這一題，也不影響這題的紀錄。' : '問這一題會記成「有提示完成」（跟按「我卡住了」一樣）；要正式批改，用題目下面的批改按鈕。'}
+        <button type="button" className="pr-link" onClick={() => setGeneral(!general)}>{general ? '改回問這一題' : '只問單字或別的'}</button></p>}
       <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} ask={ask} alwaysSuggest={!!task}
-        suggestions={task ? ['我卡住了，給我一點提示就好', '幫我看我寫的哪裡怪', '這題要用哪個文法？'] : []}
-        placeholder={task ? '問這一題，或問別的' : '問單字、文法，或叫我出一句中翻英'} />
+        suggestions={task && !general ? ['我卡住了，給我一點提示就好', '幫我看我寫的哪裡怪', '這題要用哪個文法？'] : []}
+        placeholder={task && !general ? '問這一題' + (task.onHelp ? '' : '，或問別的') : '問單字、文法，或叫我出一句中翻英'} />
     </AISheet>}
   </>
 }

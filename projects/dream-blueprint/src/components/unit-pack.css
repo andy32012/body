@@ -1,7 +1,7 @@
 .up { min-width: 0; }
-.up-head { display: grid; gap: .45rem; }
+.up-head { display: grid; gap: .45rem; grid-template-columns: minmax(0, 1fr); }
 .up-pick { display: flex; align-items: center; gap: .6rem; font-weight: 600; flex-wrap: wrap; }
-.up-pick select { min-width: 0; max-width: 100%; }
+.up-pick select { min-width: 0; max-width: 100%; flex: 1 1 10rem; }
 .up-focus { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
 .up-focus b { display: inline-block; margin-right: .5rem; padding: 0 .45rem; border-radius: 6px; font-size: .8rem; letter-spacing: .04em;
   background: var(--practice-accent-wash); color: var(--practice-ink); }

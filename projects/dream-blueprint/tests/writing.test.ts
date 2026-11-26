@@ -352,3 +352,17 @@ test('畫面上的中文要求和最少字數也交給 Claude；字數不到就�
   assert.equal(countedBest(f, false, wordCount('I am Amy. We study. We are here.'), b6), undefined, '8 個字不到 10 字：不算過關')
   assert.equal(countedBest(f, false, 10, b6), 5, '到 10 字就照分數算')
 })
+
+// R022: 上一題／下一題 walk the open tasks in the order the list shows them, not by what is still undone.
+test('writing tasks have a previous and next one in list order', async () => {
+  const { taskNeighbors } = await import('../src/lib/writing.ts')
+  const s = by('bridge')
+  const order = writingTaskPages(s).flatMap(p => p.tasks.map(t => t.task)).filter(t => writeTaskOpen(t, 53))
+  assert.ok(order.length >= 3)
+  assert.deepEqual(taskNeighbors(s, order[0].id, 53), { prev: undefined, next: order[1] })
+  assert.deepEqual(taskNeighbors(s, order[1].id, 53), { prev: order[0], next: order[2] })
+  assert.equal(taskNeighbors(s, order[order.length - 1].id, 53).next, undefined)
+  // Tasks not open yet are skipped.
+  const early = writingTaskPages(s).flatMap(p => p.tasks.map(t => t.task)).filter(t => writeTaskOpen(t, 1))
+  if (early.length) assert.ok(!taskNeighbors(s, early[0].id, 1).next || writeTaskOpen(taskNeighbors(s, early[0].id, 1).next!, 1))
+})

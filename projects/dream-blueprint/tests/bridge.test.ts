@@ -159,3 +159,23 @@ test('同一篇隔天再讀（或同一題隔天再寫）：兩天都算進這�
   notes = logSkill(saveRead(notes, 'a1-lin', { day: '2026-11-24', picks: [0, 0, 0, 0], correct: 4, total: 4 }), 'read', '2026-11-24')
   assert.equal(weekCounts(notes, [], '2026-11-24').read, 2, '同一天做兩次還是一天')
 })
+
+// R028: every saved listening attempt showed the answers and the transcript, so only the first attempt at a dialogue
+// can count as understood by ear — also after leaving, a reload or a restored backup (the record says it was done).
+test('a redo of a listening dialogue that was answered before is practice, whatever the visit', async () => {
+  const { listenAttempt, withBestListen, bestListen } = await import('../src/lib/bridge.ts')
+  const first = listenAttempt(null, { correct: 1, total: 3, played: true, textShown: false, plays: 1 })
+  assert.equal(first.heard, true)
+  const saved = withBestListen(null, { ...first, day: '2026-11-20' })
+  // Came back later (new visit: nothing seen in this visit), played it fully and got 3/3: practice, not by ear.
+  const redo = listenAttempt(saved, { correct: 3, total: 3, played: true, textShown: false, plays: 1 })
+  assert.equal(redo.heard, false)
+  const after = withBestListen(saved, { ...redo, day: '2026-11-26' })
+  assert.deepEqual(bestListen(after), { day: '2026-11-20', correct: 1, total: 3, heard: true })
+  // A first attempt without a confirmed full play, or with the text on screen, is not by ear either.
+  assert.equal(listenAttempt(null, { correct: 3, total: 3, played: false, textShown: false, plays: 0 }).heard, false)
+  assert.equal(listenAttempt(null, { correct: 3, total: 3, played: true, textShown: true, plays: 1 }).heard, false)
+  // A pass that was already earned stays.
+  const passed = withBestListen(null, { correct: 3, total: 3, heard: true, plays: 1, day: '2026-11-01' })
+  assert.equal(bestListen(withBestListen(passed, { ...listenAttempt(passed, { correct: 0, total: 3, played: true, textShown: false, plays: 1 }), day: '2026-11-26' }))?.correct, 3)
+})

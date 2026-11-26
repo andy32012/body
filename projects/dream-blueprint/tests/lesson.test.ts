@@ -368,6 +368,25 @@ test('閱讀裡打開「用它寫一句」再收起來：浮動 Claude 看到的
   assert.equal(currentTask(), null)
 })
 
+test('浮動 Claude 問這一題就記成有提示；改成「只問單字或別的」不帶題目、不記（審核 R007）', async () => {
+  const { askedAbout, currentTask, hideTask, showTask, taskPrompt } = await import('../src/lib/taskContext.ts')
+  const task = Symbol('translation')
+  let helped = 0
+  showTask(task, { label: '中翻英：這位病人醒著。', detail: '參考答案：This patient is awake.', draft: 'I are wrong.', onHelp: () => { helped++ } })
+  // Asked with the task attached: the task hears about it, and the prompt carries the task.
+  const withTask = askedAbout(currentTask(), false)
+  assert.match(withTask.prompt, /這位病人醒著/)
+  assert.equal(helped, 1)
+  // A general question: no task in the prompt, nothing recorded.
+  const general = askedAbout(currentTask(), true)
+  assert.equal(general.prompt, '')
+  assert.equal(helped, 1)
+  // Nothing on screen: nothing to record.
+  hideTask(task)
+  assert.equal(askedAbout(currentTask(), false).prompt, taskPrompt(null))
+  assert.equal(helped, 1)
+})
+
 test('看過的提示只會變多：Claude 的回覆晚到，也不會把提示層級、看過答案或問過 Claude 退回去（審核 R008）', async () => {
   const { raiseHelp } = await import('../src/lib/lesson.ts')
   const seen = { h: 3, r: true, c: true }
@@ -376,4 +395,14 @@ test('看過的提示只會變多：Claude 的回覆晚到，也不會把提示�
   assert.deepEqual(raiseHelp({ h: 4, r: true }, { h: 4, r: true }), { h: 4, r: true })
   const first = raiseHelp({ h: 1, r: false }, { v: 'again', vt: 'I are wrong.' })
   assert.deepEqual(raiseHelp(first, { v: 'good', vt: 'I am right.' }), { h: 1, r: false, v: 'again', vt: 'I are wrong.' }, '第一次的判定留著')
+})
+
+test('只有一個情境的科目：練完再按下一個也有情境可做（同一個再做一次），不會整頁空白（審核 R027）', async () => {
+  const { nextScenario } = await import('../src/lib/scenarios.ts')
+  const { default: data } = await import('../src/data/scenarios.json', { with: { type: 'json' } })
+  const one = (data as { id: string; subjects?: string[] }[]).filter(s => s.subjects?.includes('產兒科護理學'))
+  assert.ok(one.length >= 1)
+  const only = [one[0]] as Parameters<typeof nextScenario>[0]
+  assert.equal(nextScenario(only, {}, [only[0].id])?.id, only[0].id, '都跳過了：回到同一個，不是 undefined')
+  assert.equal(nextScenario([] as Parameters<typeof nextScenario>[0], {}), undefined, '真的沒有情境才是空的')
 })

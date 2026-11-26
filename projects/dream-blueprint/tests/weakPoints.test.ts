@@ -159,3 +159,18 @@ test('錯句卡分得出數字：Take 5 mg. 和 Take 50 mg. 是兩張卡，刪�
   assert.equal(sayIdentity("I don’t know."), sayIdentity("I don't know"))
   assert.notEqual(sayIdentity('I can go.'), sayIdentity('I cango.'))
 })
+
+// R014: a reply that is not the fixed format (or was cut off) is no feedback: nothing is saved and he can send the
+// same transcript again.
+test('Emma feedback counts only when every required line came back', async () => {
+  const { speakFeedbackOk } = await import('../src/lib/speakFeedback.ts')
+  const full = parseSpeakFeedback(['[用了] 1 ||| I am eating.', '[卡] I go yesterday ||| I went yesterday ||| 我昨天去了 ||| 過去的事用過去式 ||| 過去式', '[下次] I was reading. ||| 我那時在讀書', '[鼓勵] 你今天講了好多句！'].join('\n'))
+  assert.equal(speakFeedbackOk(full, false), true)
+  // Cut off before [下次] and [鼓勵], or free text only: not feedback.
+  assert.equal(speakFeedbackOk(parseSpeakFeedback('[用了] 1 ||| I am eating.\n[卡] I go yesterday ||| I went yesterday ||| 我昨天去了 ||| 過去的事'), false), false)
+  assert.equal(speakFeedbackOk(parseSpeakFeedback('Great job today! Keep going.'), false), false)
+  // IELTS Part 2: the three judged lines and the fixed line about fluency and pronunciation.
+  const part2 = parseSpeakFeedback(['內容和連貫：有回答到題目；可以多講一個例子。', '詞彙：用了 crowded；可以換掉重複的 good。', '文法：時態大多對；過去式還會漏。', '流暢度和發音：只看逐字稿沒辦法評估，要聽錄音。'].join('\n'))
+  assert.equal(speakFeedbackOk(part2, true), true)
+  assert.equal(speakFeedbackOk(parseSpeakFeedback('內容和連貫：有回答到題目。'), true), false)
+})

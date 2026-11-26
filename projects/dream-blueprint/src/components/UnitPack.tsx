@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import {
-  accentNames, hasPack, heldOpen, listenKey, withBestListen, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
+  accentNames, hasPack, heldOpen, listenAttempt, listenKey, withBestListen, logSkill, packFor, packUnits, readHeld, readListen, saveHeld, speakKey, unitTitle,
   type HeldPart, type ListenRecord, type Pack, type PackListening,
 } from '../lib/bridge'
 import { reached } from '../lib/unlock'
@@ -60,7 +60,8 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   const [started, setStarted] = useState(0)
   // A redo starts a new round: plays finished before it do not open its questions.
   const [playsBefore, setPlaysBefore] = useState(0)
-  // The transcript and the answers were seen in this visit: a redo now is practice, not understanding by ear.
+  // The transcript and the answers were seen in this visit (a saved record means they were seen before): a redo is
+  // practice, not understanding by ear (listenAttempt).
   const [seenText, setSeenText] = useState(false)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
   const heard = voice.completed > playsBefore
@@ -73,18 +74,18 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   }
   function check() {
     voice.stop(); setChecked(true)
-    onSave({ correct, total: l.questions.length, heard: heard && !unsure && !noVoice && !seenText, plays: voice.completed - playsBefore })
+    onSave(listenAttempt(last, { correct, total: l.questions.length, played: heard && !unsure, textShown: noVoice || seenText, plays: voice.completed - playsBefore }))
   }
   return <section className="ls-listen up-section">
     <div className="pr-label">聽力 · {l.scene}</div>
     <h3 lang="en" className="up-title">{l.title}</h3>
     <p className="ls-help">電腦語音（不是真人錄音）：{hasAccent ? accentNames[l.accent] + '口音' : '這台裝置沒有' + accentNames[l.accent] + '語音，先用其他英文語音'}。先不看字完整聽一到兩次，再回答。
-      {last ? ' 上次 ' + last.correct + ' / ' + last.total + (last.heard ? '' : '（沒有確認聽完，不算只聽也懂）') + '。' : ''}</p>
+      {last ? ' 上次 ' + last.correct + ' / ' + last.total + (last.heard ? '' : '（重做、看過字或沒有確認聽完，不算只聽也懂）') + '。' : ''}</p>
     <button type="button" className="ls-play" onClick={playAll}>
       {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />播放對話{voice.completed ? '（完整聽過 ' + voice.completed + ' 次）' : ''}</>}
     </button>
     {noVoice && <p className="ls-help">這個瀏覽器沒辦法播放語音，看下面的對話作答；這次不算「只聽也懂」。</p>}
-    {seenText && !checked && <p className="ls-help">剛剛看過全文和答案：這次重做是練習，先再完整聽一次才能作答，成績不算「只聽也懂」（之前的最好成績會留著）。</p>}
+    {(seenText || last) && !checked && <p className="ls-help">{seenText ? '剛剛看過全文和答案：這次重做是練習，先再完整聽一次才能作答，' : '這段之前做過、對過答案：這次是練習，'}成績不算「只聽也懂」（之前的最好成績會留著）。要再算只聽也懂，就換一段還沒聽過的。</p>}
     {!checked && <ol className="ls-qs">
       {l.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>

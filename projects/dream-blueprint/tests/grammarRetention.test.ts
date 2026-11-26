@@ -34,3 +34,22 @@ test("後續回想：空白、看過提示或沒人確認的「對了」都不�
   assert.equal(recheckMakesStable({ rating: "correct", revealed: true, verified: true }), false);
   assert.equal(recheckMakesStable(undefined), false);
 });
+
+// R032: 穩了 needs two checked, unaided answers at least four days apart on different sentences.
+test("the grammar star map needs another sentence, not the same one twice", async () => {
+  const { grammarStars } = await import("../src/lib/grammarRetention.ts");
+  const t = (day: string, sentenceId: string, rating: "correct" | "minor" | "again" = "correct") =>
+    ({ day, translations: [{ sentenceId, rating, grammar: ["be 動詞"], revealed: false, verified: true }] });
+  // The same sentence twice, five days apart: still practising.
+  assert.deepEqual(grammarStars([t("2026-11-26", "s-001"), t("2026-11-21", "s-001")]).stars["練習中"], ["be 動詞"]);
+  // Another sentence four days later, written alone and checked: 穩了.
+  assert.deepEqual(grammarStars([t("2026-11-21", "s-001"), t("2026-11-25", "s-002")]).stars["穩了"], ["be 動詞"]);
+  // Too close together, or not checked, or with the answer seen: not yet.
+  assert.deepEqual(grammarStars([t("2026-11-21", "s-001"), t("2026-11-24", "s-002")]).stars["練習中"], ["be 動詞"]);
+  const unchecked = { day: "2026-11-25", translations: [{ sentenceId: "s-002", rating: "correct" as const, grammar: ["be 動詞"], revealed: false }] };
+  assert.deepEqual(grammarStars([t("2026-11-21", "s-001"), unchecked]).stars["練習中"], ["be 動詞"]);
+  // The last two wrong: 還常錯 (unchanged rule), and the counts per rating stay.
+  const wrong = grammarStars([t("2026-11-21", "s-001", "again"), t("2026-11-22", "s-002", "minor")]);
+  assert.deepEqual(wrong.stars["還常錯"], ["be 動詞"]);
+  assert.deepEqual(wrong.counts, { correct: 0, minor: 1, again: 1 });
+});

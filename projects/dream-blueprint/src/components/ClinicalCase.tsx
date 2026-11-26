@@ -21,7 +21,7 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
   // A case left halfway is resumed, unless a subject was chosen and the case belongs to another one.
   const [saved] = useState(() => { const p = readProgress(state.notes); return p && pool.some(c => c.id === p.id) ? p : null })
   const [skip, setSkip] = useState<string[]>([])
-  const [current, setCurrent] = useState(() => saved ? all.find(c => c.id === saved.id)! : nextScenario(pool.length ? pool : all, state.notes))
+  const [current, setCurrent] = useState(() => saved ? all.find(c => c.id === saved.id)! : nextScenario(pool.length ? pool : all, state.notes) ?? all[0])
   const [step, setStep] = useState(saved?.step ?? 0)
   const [picked, setPicked] = useState<number | undefined>(saved?.picked)
   const [results, setResults] = useState<StepResult[]>(saved?.results ?? [])
@@ -61,7 +61,7 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
     const nextSkip = [...skip, current.id]
     setSkip(nextSkip)
     const list = pool.length ? pool : all
-    setCurrent(nextScenario(list, state.notes, nextSkip.filter(id => list.some(c => c.id === id)).length >= list.length ? [current.id] : nextSkip))
+    setCurrent(nextScenario(list, state.notes, nextSkip.filter(id => list.some(c => c.id === id)).length >= list.length ? [current.id] : nextSkip) ?? current)
     setStep(0); setPicked(undefined); setResults([]); setZh(false); keep(null)
   }
   const lastCause = results.at(-1)?.cause
@@ -110,7 +110,12 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
       <strong>這個情境答對 {results.filter(r => r.correct).length} / {results.length} 步</strong>
       <ul className="cc-result">{results.map(r => <li key={r.kind} data-ok={r.correct}>{stepNames[r.kind]}：{r.correct ? '對' : '錯' + (r.cause ? '（' + r.cause + '）' : '')}</li>)}</ul>
       <p>錯的情境之後會再出現。英文看不懂的，可以把題目句子拿去「問問 Claude」。</p>
-      <button type="button" className="pr-main qz-next" onClick={another}>下一個情境</button>
+      {(pool.length ? pool : all).length > 1 ? <button type="button" className="pr-main qz-next" onClick={another}>下一個情境</button>
+        : <div className="pr-actions">
+          <p className="ls-help">這一科目前只有這一個情境，這一輪做完了。</p>
+          <button type="button" className="pr-main qz-next" onClick={another}>重做這個情境</button>
+          {subject && <a className="pr-link" href="#plan/exam">回國考科目</a>}
+        </div>}
     </div>}
   </div>
 }

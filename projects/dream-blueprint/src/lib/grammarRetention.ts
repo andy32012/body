@@ -1,4 +1,5 @@
 import type { AppState } from "./store";
+import { addDays } from "./progress";
 
 type Notes = AppState["notes"];
 const key = (unit: number, field: string) =>
@@ -81,4 +82,32 @@ export function checkpointOutcome(records: readonly { rating: string; revealed: 
     finished: correct.length >= 2,
     independent: correct.filter((t) => !t.revealed && t.verified === true).length >= 2,
   };
+}
+
+type Rating = "correct" | "minor" | "again";
+export type StarLabel = "穩了" | "還常錯" | "練習中";
+interface StarTry { day: string; sentenceId: string; rating: Rating; revealed: boolean; verified: boolean }
+/** 文法星圖 from the translations he wrote. 穩了: the latest answer for that grammar point was written alone and checked
+ *  (Claude's first check or the exact reference), and another sentence with the same point was too, at least four days
+ *  earlier — the same sentence twice is remembering a sentence, not the rule. 還常錯: the last two answers were not right. */
+export function grammarStars(sessions: readonly { day: string; translations?: readonly { sentenceId: string; rating: Rating; grammar: readonly string[]; revealed: boolean; verified?: boolean }[] }[]) {
+  const logs = [...sessions].sort((a, b) => a.day.localeCompare(b.day));
+  const history = new Map<string, StarTry[]>();
+  const counts: Record<Rating, number> = { correct: 0, minor: 0, again: 0 };
+  for (const session of logs)
+    for (const t of session.translations ?? []) {
+      counts[t.rating]++;
+      for (const tag of new Set(t.grammar))
+        history.set(tag, [...history.get(tag) ?? [], { day: session.day, sentenceId: t.sentenceId, rating: t.rating, revealed: t.revealed, verified: t.verified === true }]);
+    }
+  const alone = (e: StarTry) => e.rating === "correct" && !e.revealed && e.verified;
+  const stars: Record<StarLabel, string[]> = { "穩了": [], "還常錯": [], "練習中": [] };
+  history.forEach((entries, tag) => {
+    const latest = entries[entries.length - 1];
+    const lastTwo = entries.slice(-2);
+    if (lastTwo.length === 2 && lastTwo.every(e => e.rating !== "correct")) stars["還常錯"].push(tag);
+    else if (alone(latest) && entries.some(e => alone(e) && e.sentenceId !== latest.sentenceId && e.day <= addDays(latest.day, -4))) stars["穩了"].push(tag);
+    else stars["練習中"].push(tag);
+  });
+  return { stars, counts, practised: history.size };
 }

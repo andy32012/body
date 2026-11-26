@@ -62,6 +62,12 @@ export function withBestListen(old: ListenRecord | null, rec: ListenRecord): Lis
   const now: ListenAttempt = { day: rec.day, correct: rec.correct, total: rec.total, heard: rec.heard }
   return { ...rec, best: betterListen(now, prev) ? now : prev }
 }
+/** A checked attempt as it is saved. Checking always shows the answers and the transcript, so only the first attempt at
+ *  a dialogue (no saved record yet) can count as understood by ear — and only after a confirmed complete play with no
+ *  text on screen. Any later attempt, in the same visit or after leaving, reloading or restoring a backup, is practice. */
+export function listenAttempt(last: ListenRecord | null, a: { correct: number; total: number; played: boolean; textShown: boolean; plays: number }): Omit<ListenRecord, 'day'> {
+  return { correct: a.correct, total: a.total, heard: !last && a.played && !a.textShown, plays: a.plays }
+}
 /** The attempt that decides passing: the best one (older records without `best` are their own best). */
 export const bestListen = (r: ListenRecord | null): ListenAttempt | null => r ? r.best ?? r : null
 export function readListen(notes: Record<string, string>, unit: number, i: number): ListenRecord | null {

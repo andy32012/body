@@ -4,7 +4,7 @@ import { addDays, attendance, dayKey, intervals, weekKey } from "../lib/progress
 import { seasonHistory } from "../lib/rivals";
 import { delayedRecall } from "../lib/compact";
 import type { PageProps } from "../lib/store";
-import { getRetentionStatus } from "../lib/grammarRetention";
+import { getRetentionStatus, grammarStars } from "../lib/grammarRetention";
 import EvidencePanel from "../components/EvidencePanel";
 import { levelNames, type Level } from "../lib/evidence";
 import { readTopic, topicStatus, topics } from "../lib/topics";
@@ -96,38 +96,11 @@ function WeeklyChart({ sessions, today }: { sessions: Sessions; today: string })
 }
 
 function GrammarHistory({ sessions }: { sessions: Sessions }) {
-  const logs = [...sessions].sort((a, b) => a.day.localeCompare(b.day));
-  type Entry = { date: string, rating: Rating, revealed: boolean, verified: boolean };
-  const history = new Map<string, Entry[]>();
-  // Counts toward 穩了 only when written alone and checked (Claude's first check or the exact reference).
-  const alone = (e: Entry) => e.rating === "correct" && !e.revealed && e.verified;
-  const counts = { correct: 0, minor: 0, again: 0 };
-  for (const session of logs) {
-    for (const translation of session.translations ?? []) {
-      counts[translation.rating]++;
-      for (const tag of new Set(translation.grammar)) {
-        const seen = history.get(tag) ?? [];
-        seen.push({ date: session.day, rating: translation.rating, revealed: translation.revealed, verified: translation.verified === true });
-        history.set(tag, seen);
-      }
-    }
-  }
-  const categories = { "穩了": [] as string[], "還常錯": [] as string[], "練習中": [] as string[] };
-  history.forEach((entries, tag) => {
-    const latest = entries[entries.length - 1];
-    const lastTwo = entries.slice(-2);
-    if (lastTwo.length === 2 && lastTwo.every(e => e.rating !== "correct")) {
-      categories["還常錯"].push(tag);
-    } else if (alone(latest) && entries.some(e => alone(e) && e.date <= addDays(latest.date, -4))) {
-      categories["穩了"].push(tag);
-    } else {
-      categories["練習中"].push(tag);
-    }
-  });
+  const { stars: categories, counts, practised } = grammarStars(sessions);
   return <section className="history-section history-grammar">
     <h2>文法星圖</h2>
-    <p className="history-note">兩次相隔至少四天、都自己答對而且確認過（Claude 看過，或跟參考答案一樣）的文法點，才會標成「穩了」。沒人確認的自評「對了」不算。</p>
-    {history.size === 0 ? <p>完成中翻英並自評後，這裡會出現你練過的文法點。</p> :
+    <p className="history-note">同一個文法點換一句、兩次相隔至少四天，都自己答對而且確認過（Claude 看過，或跟參考答案一樣），才會標成「穩了」；同一句背熟答對兩次不算。沒人確認的自評「對了」不算。</p>
+    {practised === 0 ? <p>完成中翻英並自評後，這裡會出現你練過的文法點。</p> :
       Object.entries(categories).filter(([, tags]) => tags.length).map(([label, tags]) =>
         <div key={label}><h3>{label}</h3>{tags.map(tag => <span className="history-chip" key={tag}>{tag}</span>)}</div>)}
     <h3>中翻英自評</h3>

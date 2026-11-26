@@ -10,7 +10,7 @@ import { dayKey } from '../lib/progress'
 import { addSayCard, hasSayCard, removeSayCard } from '../lib/sayCards'
 import { checkSequence } from '../lib/checks'
 import { addWeak, easeWeak, labelOfUnit, normalizeLabel, weakLinesEn } from '../lib/weakPoints'
-import { parseSpeakFeedback, speakFeedbackPrompt, type SpeakFeedback, type SpeakFix } from '../lib/speakFeedback'
+import { parseSpeakFeedback, speakFeedbackOk, speakFeedbackPrompt, type SpeakFeedback, type SpeakFix } from '../lib/speakFeedback'
 import { speakEnglish } from '../lib/tts'
 import curriculum from '../data/curriculum.json'
 import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
@@ -70,15 +70,26 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   // the card as done must not swap the title above the feedback; only 換一張 / 下一張 moves on.
   const [cardId, setCardId] = useState(() => ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, [])?.id : undefined)
   const card = ieltsMode ? (cueCards as CueCard[]).find(c => c.id === cardId) ?? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
-  function nextCard() {
+  // Each card keeps its notes, transcript and feedback, so going back to the previous card shows them again.
+  const cardWork = useRef(new Map<string, { prepNotes: string; lines: typeof lines; feedback: SpeakFeedback | null; fixes: typeof fixes; review: string; fbError: string }>())
+  function moveCard(to: string | undefined, skip: string[]) {
     if (!card) return
     // Feedback still being written for the call on this card stays with that call (its corrections are saved), not
     // under the new card.
     attempts.current.start()
-    const skip = [...cardSkip, card.id]
-    setCardSkip(skip); setCardId(nextCueCard(cueCards as CueCard[], state.notes, skip)?.id); setPrepEnd(undefined); setPrepNotes('')
-    setLines([]); setFeedback(null); setFixes([]); setNoting(false); setStatus('idle')
+    cardWork.current.set(card.id, { prepNotes, lines, feedback: noting ? null : feedback, fixes: noting ? [] : fixes, review, fbError })
+    const back = to ? cardWork.current.get(to) : undefined
+    setCardSkip(skip); setCardId(to); setPrepEnd(undefined); setPrepNotes(back?.prepNotes ?? '')
+    setLines(back?.lines ?? []); setFeedback(back?.feedback ?? null); setFixes(back?.fixes ?? []); setReview(back?.review ?? ''); setFbError(back?.fbError ?? '')
+    setNoting(false); setStatus('idle')
   }
+  function nextCard() {
+    if (!card) return
+    const skip = [...cardSkip, card.id]
+    moveCard(nextCueCard(cueCards as CueCard[], state.notes, skip)?.id, skip)
+  }
+  const prevCardId = cardSkip[cardSkip.length - 1]
+  function prevCard() { if (card && prevCardId) moveCard(prevCardId, cardSkip.slice(0, -1)) }
   const [prepEnd, setPrepEnd] = useState<number>()
   const [prepNotes, setPrepNotes] = useState('')
   const [liveAt, setLiveAt] = useState<number>()
@@ -125,6 +136,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   // Each call, and each new card, gets a number: only the current one changes the screen. A call cancelled while it
   // was being set up cannot set a newer call back to idle, and late feedback does not land under another card.
   const attempts = useRef(checkSequence())
+  // The call on screen: a transcript sent by hand after it ended belongs to it.
+  const lastAttempt = useRef(0)
+  // What he said, kept after the call so he can fix what speech recognition misheard and send it for feedback.
+  const [review, setReview] = useState('')
+  const [fbError, setFbError] = useState('')
+  const grading = useRef(false)
   useEffect(() => () => { setup.current?.abort(); session.current?.stop() }, [])
   // One wrap-up per call, however the call ended.
   const wrapped = useRef(false)
@@ -150,8 +167,9 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (!openaiKey()) { setSettings(true); return }
     if (packRef && !packTask) { setError(loadFailed ? '口說任務沒有下載到：連上網路後重新整理這一頁。' : '口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError(loadFailed ? '這段情境沒有下載到：連上網路後重新整理這一頁。' : '情境還在載入，等一下再按。'); return }
-    setError(''); setLines([]); setFeedback(null); setFixes([]); setNoting(false); setYouMs(0); setYouFrom(undefined)
+    setError(''); setLines([]); setFeedback(null); setFixes([]); setNoting(false); setYouMs(0); setYouFrom(undefined); setReview(''); setFbError('')
     const mine = attempts.current.start()
+    lastAttempt.current = mine
     const mineNow = () => attempts.current.isCurrent(mine)
     setup.current?.abort()
     const controller = new AbortController()
@@ -201,6 +219,9 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     const userLines = said.filter(l => l.role === 'user')
     const userWords = userLines.map(l => l.text).join(' ').split(/\s+/).filter(Boolean).length
     const spoke = userLines.length >= 2 || userWords >= 15
+    const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
+    // Even one short sentence stays on screen, to correct and send by hand (「請 Claude 批改」).
+    if (userLines.length && mineNow()) setReview(transcript)
     if (!spoke) return
     // Speaking counts toward the week's balance of skills, whatever the mode.
     update(prev => {
@@ -214,23 +235,34 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       const rec = readLessonRecord(prev.notes, today)
       return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
     })
+    // A longer call is sent by itself, as before; a short one waits for his press.
     if (!tutorKey()) return
-    if (mineNow()) setNoting(true)
+    await grade(transcript, mine)
+  }
+
+  /** Claude's feedback on a transcript (the call's own, or the one he corrected). Only a complete reply counts: then
+   *  the corrections go into review and onto the weak-point list; an error or a broken reply keeps the transcript and
+   *  says what happened, so the same transcript can be sent again. */
+  async function grade(transcript: string, mine: number) {
+    const mineNow = () => attempts.current.isCurrent(mine)
+    if (grading.current || !transcript.trim()) return
+    grading.current = true
+    if (mineNow()) { setNoting(true); setFbError(''); setFeedback(null); setFixes([]) }
     try {
-      const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
       const raw = await askTutor((card ? part2FeedbackPrompt + '\n題目卡：' + card.topic : speakFeedbackPrompt(focus, NAME)) + '\n' + memoryPrompt(memory.notes),
         [{ role: 'user', content: transcript }])
       const { clean, remember, forget } = extractMemory(raw)
-      if (remember.length || forget.length) memory.update(remember, forget)
       const fb = parseSpeakFeedback(clean)
+      if (!speakFeedbackOk(fb, !!card)) throw new Error('Claude 的回饋格式不完整，這次不算，什麼都沒有記。可以用同一份逐字稿再批一次。')
+      if (remember.length || forget.length) memory.update(remember, forget)
       const day = dayKey()
       // The corrections go into review by themselves (each can be taken out again), and onto the weak-point list.
       // The corrections are saved either way; they are shown only while this call is still the one on screen.
       if (mineNow()) setFixes(fb.fixes.map(f => ({ ...f, status: hasSayCard(notesRef.current, f.en) ? 'already' : 'added' })))
       if (fb.fixes.length) update(prev => fb.fixes.reduce((next, f, i) => keepFix(next, f, day, i), prev))
       if (mineNow()) setFeedback(fb)
-    } catch { /* feedback is optional */ }
-    finally { if (mineNow()) setNoting(false) }
+    } catch (e) { if (mineNow()) setFbError(e instanceof Error ? e.message : String(e)) }
+    finally { grading.current = false; if (mineNow()) setNoting(false) }
   }
 
   function keepFix<S extends Parameters<typeof addSayCard>[0]>(prev: S, f: SpeakFix, day: string, salt: number): S {
@@ -305,8 +337,10 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
             <textarea lang="en" rows={3} value={prepNotes} onChange={e => setPrepNotes(e.target.value)} placeholder="例如：grandma / nurse / hospital / kind" />
           </label>}
           <button type="button" className="sp-link" onClick={nextCard}>換一張題目卡</button>
+          {prevCardId && <button type="button" className="sp-link" onClick={prevCard}>回上一張題目卡</button>}
         </>}
         {status === 'closed' && <button type="button" className="sp-link" onClick={nextCard}>下一張題目卡</button>}
+        {status === 'closed' && prevCardId && <button type="button" className="sp-link" onClick={prevCard}>回上一張題目卡</button>}
         {status === 'live' && liveAt && <p className="sp-timer">{youFrom ? '從你開口算起 ' + clock(tick - youFrom) + ' · 實際出聲 ' + clock(youMs) : '等你開口才開始計時'} · 通話 {clock(tick - liveAt)}（Part 2 目標從開口算 1–2 分鐘，之後 Emma 會問 Part 3）</p>}
         <a href="#speaking">改回一般聊天</a>
       </div>}
@@ -355,6 +389,16 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         </button>
       </footer>
     </section>
+
+    {!live && review && <section className="sp-notes sp-review">
+      <strong>這次的逐字稿</strong>
+      <p>語音辨識聽錯的字可以先改，再請 Claude 批改。{noting ? '批改中……' : feedback ? '這份已經批改過了。' : '還沒批改。'}</p>
+      <textarea rows={6} value={review} lang="en" spellCheck={false} autoComplete="off" readOnly={noting} onChange={e => setReview(e.target.value)} aria-label="這次的逐字稿" />
+      {tutorKey() ? <div className="pr-actions"><button type="button" className="pr-main" disabled={noting || !review.trim()} onClick={() => void grade(review, lastAttempt.current)}>
+        {fbError ? '用同一份逐字稿再批一次' : feedback ? '改好了，再批一次' : '請 Claude 批改'}</button></div>
+        : <p>連接 Claude 之後（設定 → 連接 Claude）就能批改這份逐字稿。</p>}
+      {fbError && <p className="sp-error" role="alert">{fbError}</p>}
+    </section>}
 
     {(noting || feedback) && <section className="sp-notes sp-feedback" aria-live="polite">
       <strong>這次聊天的回饋</strong>

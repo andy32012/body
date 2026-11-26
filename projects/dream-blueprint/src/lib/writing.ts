@@ -342,3 +342,11 @@ export function writingTaskPages(stage: WriteStage): WriteTaskPage[] {
   })
 }
 
+
+/** 上一題／下一題 on the writing page: the open tasks of a stage in the order the list shows them (not the undone-first
+ *  order of the 下一題 offered after feedback). */
+export function taskNeighbors(stage: WriteStage, id: string, unit: number): { prev?: WriteTask; next?: WriteTask } {
+  const order = writingTaskPages(stage).flatMap(p => p.tasks.map(t => t.task)).filter(t => writeTaskOpen(t, unit))
+  const i = order.findIndex(t => t.id === id)
+  return i < 0 ? {} : { prev: order[i - 1], next: order[i + 1] }
+}

@@ -149,6 +149,7 @@ function ReadPart({ texts, lists, level, rate, onRead }: { texts: string[]; list
     {phase !== 'ready' && <>
       {texts.map(piece)}
       {phase === 'silent' && <div className="gp-row"><span className="gp-timer">默讀還有 {left} 秒（全部一起）</span><button type="button" className="gp-link" onClick={() => setPhase('aloud')}>準備好了</button></div>}
+      <button type="button" className="gp-link" onClick={() => { setLeft(time.silent); setPhase('ready') }}>{phase === 'silent' ? '先不要，回到開始前' : '從默讀重新來一次'}</button>
       {phase === 'aloud' && <>
         <p className="gp-small">{level === 'elementary' ? '句子和短文' : '兩篇短文'}要在 {minutes(time.aloud)}內一起念完，時間到會自己停。</p>
         <ReadAloudCheck text={texts.join(' ')} rate={rate} maxMs={time.aloud * 1000} onResult={(r, words) => onRead(r.ratio, texts.map(t => compareReading(t, words).ratio))} />
@@ -204,6 +205,10 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       setPhase('between')
     } finally { clearInterval(timer); session.current = null }
   }
+  /** Back (or forward) to a question already answered, without asking it again: its answer shows, to keep or answer
+   *  again. The set is scored once, when he asks for the result. */
+  function view(k: number) { stopSpeaking(); setAt(k); setError(''); setShow(true); setPhase('between') }
+  const answeredAll = questions.every((_, j) => kept.current[j] !== undefined)
   async function score() {
     if (!tutorKey()) { setPhase('done'); onScore(undefined); return }
     setPhase('scoring')
@@ -238,8 +243,12 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
         <div className="gp-row">
           {/* After the last question (when its recording failed) there is no next one: answer it again, or see the result. */}
           {at + 1 < questions.length
-            ? <button type="button" className="gp-open" onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
+            ? kept.current[at + 1] !== undefined
+              ? <button type="button" className="gp-open" onClick={() => view(at + 1)}>下一題（第 {at + 2} 題，已經答過）</button>
+              : <button type="button" className="gp-open" onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
             : <button type="button" className="gp-open" onClick={() => void score()}>看結果</button>}
+          {answeredAll && at + 1 < questions.length && <button type="button" className="gp-link" onClick={() => void score()}>都答完了，看結果</button>}
+          {at > 0 && <button type="button" className="gp-link" onClick={() => view(at - 1)}>上一題（第 {at} 題）</button>}
           <button type="button" className={at + 1 < questions.length ? 'gp-link' : 'gp-link gp-retry'} onClick={() => void ask(at)}>這題重答</button>
         </div>
       </>}
@@ -249,7 +258,10 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       {error && <p className="gp-warn" role="alert">{error}</p>}
       {fb ? <FeedbackView fb={fb} items={questions} answers={answers} rubric={speakRubric[level]} /> : <Transcripts items={questions} answers={answers} />}
       {!fb && tutorKey() && <button type="button" className="gp-open" onClick={() => void score()}>用同樣的回答，請 Claude 再批一次</button>}
-      <button type="button" className="gp-link" onClick={() => { kept.current = []; setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
+      <div className="gp-row">
+        <button type="button" className="gp-link" onClick={() => view(0)}>回去看每一題、改答案（改完再看一次結果）</button>
+        <button type="button" className="gp-link" onClick={() => { kept.current = []; setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
+      </div>
     </>}
   </div>
 }

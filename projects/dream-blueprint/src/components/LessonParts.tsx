@@ -212,6 +212,8 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
     label: '換個說法：' + item.zh,
     detail: ['題目（中翻英，跟今天的句子同一個句型）：' + item.zh, pattern ? '句型：' + pattern : '', '參考答案（他還沒看答案前不要說出來）：' + sentence.reference.join(' / ')].filter(Boolean).join('\n'),
     draft: answer,
+    // Asked the floating Claude about it: counted like the teacher giving the answer (有提示完成).
+    onHelp: () => { setCheck(c => c.revealed ? c : { ...c, revealed: true }); onPeek?.() },
   })
   return <section className="ls-vary">
     <div className="pr-label">換個說法{count ? ' ' + count[0] + '／' + count[1] : ''} · 同一個句型</div>
@@ -317,6 +319,7 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     detail: ['開放寫作題：' + p.en + '（' + p.zh + '）', '這課的句型：' + pattern + (lesson.cando ? '。目標：' + lesson.cando : ''),
       '參考寫法（只是例子，不要直接給他）：' + p.sample, '他要寫自己的內容；幫他想內容或句型就好，不要替他寫整段。'].join('\n'),
     draft: answer,
+    onHelp: () => help('claude'),
   })
   function help(kind: 'zh' | 'cue' | 'frame' | 'sample' | 'claude') {
     if (Date.now() - mountedAt.current < 450) return

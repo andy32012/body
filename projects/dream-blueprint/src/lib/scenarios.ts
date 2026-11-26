@@ -20,9 +20,11 @@ export function saveCase(notes: Record<string, string>, id: string, day: string,
   const rec: CaseRecord = { day, results, tries: (old?.tries ?? 0) + 1, ...(usedZh ? { usedZh: true } : {}) }
   return { ...notes, [caseKey(id)]: JSON.stringify(rec) }
 }
-/** New cases first; then ones with a wrong step, the longest ago first; then the rest. */
-export function nextScenario(all: readonly Scenario[], notes: Record<string, string>, skip: readonly string[] = []) {
-  const pool = all.filter(s => !skip.includes(s.id))
+/** New cases first; then ones with a wrong step, the longest ago first; then the rest. When every case was skipped
+ *  (a subject with one case, done just now), the skips are ignored: the same case can be done again. */
+export function nextScenario(all: readonly Scenario[], notes: Record<string, string>, skip: readonly string[] = []): Scenario | undefined {
+  const left = all.filter(s => !skip.includes(s.id))
+  const pool = left.length ? left : all
   const fresh = pool.find(s => !readCase(notes, s.id))
   if (fresh) return fresh
   const missed = pool.filter(s => readCase(notes, s.id)!.results.some(r => !r.correct))

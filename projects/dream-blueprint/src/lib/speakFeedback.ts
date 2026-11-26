@@ -44,3 +44,12 @@ export function parseSpeakFeedback(text: string): SpeakFeedback {
   out.rest = rest.join('\n')
   return out
 }
+
+/** Whether Claude's reply is the feedback it was asked for. A chat needs the 用了, 下次 and 鼓勵 lines (a reply cut off
+ *  or written as free text has none of them); IELTS Part 2 needs its three judged lines and the fixed line about fluency
+ *  and pronunciation. Anything less is no feedback: nothing is saved, and the same transcript can be sent again. */
+export function speakFeedbackOk(fb: SpeakFeedback, part2: boolean): boolean {
+  if (!part2) return !!fb.used && !!fb.next && !!fb.cheer
+  const lines = fb.rest.split('\n').map(l => l.trim()).filter(Boolean)
+  return lines.length >= 4 && lines.some(l => l.includes('流暢度和發音'))
+}
