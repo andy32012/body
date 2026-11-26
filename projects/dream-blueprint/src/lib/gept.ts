@@ -17,14 +17,14 @@ export const geptLevels: Record<GeptLevel, { name: string; cefr: string; minutes
     name: '初級', cefr: 'A2', minutes: 10,
     parts: [
       { part: 'repeat', name: '複誦', how: '每句聽兩次，聽完跟著說一次（看不到句子）。' },
-      { part: 'read', name: '朗讀句子與短文', how: '先默讀，再用正常的速度清楚念出來。' },
+      { part: 'read', name: '朗讀句子與短文', how: '五個句子和一篇短文一起：先默讀 1 分鐘，再在 1 分鐘內用正常的速度念完。' },
       { part: 'questions', name: '回答問題', how: '每題聽兩次（題目不印出來），每題約 15 秒回答。' },
     ],
   },
   intermediate: {
     name: '中級', cefr: 'B1', minutes: 15,
     parts: [
-      { part: 'read', name: '朗讀短文', how: '兩篇短文，每篇先默讀 1 分鐘，再在 2 分鐘內念完。' },
+      { part: 'read', name: '朗讀短文', how: '兩篇短文一起：先默讀 1 分鐘，再在 2 分鐘內把兩篇念完。' },
       { part: 'questions', name: '回答問題', how: '10 題，每題聽兩次（題目不印出來）；第 1–5 題各 15 秒，第 6–10 題各 30 秒。' },
       { part: 'picture', name: '看圖敘述', how: '先用 30 秒看圖和問題，再用 1 分 30 秒描述，問題是用來提示你可以講什麼。' },
     ],
@@ -33,19 +33,37 @@ export const geptLevels: Record<GeptLevel, { name: string; cefr: string; minutes
 
 /** Answer time for question `i` (0-based). */
 export const answerSeconds = (level: GeptLevel, i: number) => level === 'intermediate' && i >= 5 ? 30 : 15
+/** The read-aloud part as the test times it, for the whole part (not each sentence group or passage): 初級 five
+ *  sentences and a passage, 1 minute to read silently and 1 minute aloud; 中級 two passages, 1 minute and 2 minutes. */
+export const readSeconds: Record<GeptLevel, { silent: number; aloud: number }> = { elementary: { silent: 60, aloud: 60 }, intermediate: { silent: 60, aloud: 120 } }
 
 export const geptKey = (level: GeptLevel, id: string) => 'gept.speak.' + level + '.' + id
-export interface GeptRecord { d?: string; q?: number; p?: number; r?: number }
+/** d: day last practised; q / p: 回答問題 / 看圖敘述 reference scores (latest); best: the best 回答問題 score ever;
+ *  r: words heard of the whole read-aloud part (%), rp: of each of its pieces (sentences, passage…), rr: sentences repeated. */
+export interface GeptRecord { d?: string; q?: number; best?: number; p?: number; r?: number; rp?: number[]; rr?: number }
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
   try { return JSON.parse(notes[geptKey(level, id)] || '{}') as GeptRecord } catch { return {} }
 }
-/** 中級 opens once a 初級 round's 回答問題 reached 4 級分 on Claude's reference score — the official pass level. */
+/** 中級 opens once a 初級 round's 回答問題 reached 4 級分 on Claude's reference score — the official pass level. Once
+ *  open it stays open: a later, lower try of the same round does not lock it again. */
 export const geptPass = 4
+const bestQ = (r: GeptRecord) => Math.max(r.best ?? -1, r.q ?? -1)
 export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: readonly string[]): Record<GeptLevel, boolean> {
-  return { elementary: true, intermediate: elementaryIds.some(id => (readGept(notes, 'elementary', id).q ?? 0) >= geptPass) }
+  return { elementary: true, intermediate: elementaryIds.some(id => bestQ(readGept(notes, 'elementary', id)) >= geptPass) }
 }
 export function saveGept(notes: Record<string, string>, level: GeptLevel, id: string, patch: GeptRecord) {
-  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...readGept(notes, level, id), ...patch }) }
+  const old = readGept(notes, level, id)
+  const best = patch.q !== undefined ? Math.max(bestQ(old), patch.q) : old.best
+  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...(best !== undefined && best >= 0 ? { best } : {}) }) }
+}
+/** A piece of the read-aloud part counts as read when at least this share of its words was heard. */
+export const readPieceDone = 30
+/** Every part of the round was done: the repeated sentences (初級), each read-aloud piece, the questions and (中級) the
+ *  picture. A record from before the pieces were kept apart cannot show that both pieces were read. */
+export function geptRoundDone(r: GeptRecord, level: GeptLevel, set: { repeat?: readonly string[] }, pieces: number) {
+  const read = (r.rp?.length ?? 0) >= pieces && r.rp!.every(x => x >= readPieceDone)
+  const repeated = level !== 'elementary' || (r.rr ?? 0) >= (set.repeat?.length ?? 0)
+  return read && repeated && r.q !== undefined && (level === 'elementary' || r.p !== undefined)
 }
 
 /** The official 全民英檢 speaking tables (see rubrics.ts), with what a transcript can and can't show. */
@@ -111,8 +129,11 @@ export function parseGeptFeedback(text: string): GeptFeedback {
     if (!m) { if (line) rest.push(line); continue }
     const parts = m[2].split('|||').map(p => p.trim())
     if (m[1] === '分數') {
-      const n = Number((parts[0].match(/\d+(?:\.\d+)?/) ?? [''])[0])
-      if (Number.isFinite(n) && n >= 0 && n <= 5 && parts[0].trim() !== '') out.score = Math.round(n * 2) / 2
+      // Only a score on the table: 0–5 in steps of .5, written first. A negative number, one in between (3.8) or no
+      // number at all (無法評分) is no score — not rounded into one.
+      const head = parts[0].match(/^(\d+(?:\.\d+)?)(?![\d.])/)
+      const n = head ? Number(head[1]) : NaN
+      if (Number.isFinite(n) && n >= 0 && n <= 5 && Number.isInteger(n * 2)) out.score = n
       out.why = parts[1] ?? ''
     } else if (m[1] === '題') {
       const n = Number((parts[0].match(/\d+/) ?? ['0'])[0])

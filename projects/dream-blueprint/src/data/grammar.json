@@ -160,7 +160,7 @@
   "steps": [
    {
     "t": "只有一個：前面要有 a 或 an",
-    "p": "可數名詞只有一個的時候，前面要加 a 或 an。看下一個字「開頭的發音」：母音（a、e、i、o、u 的音）用 an，其他用 a。",
+    "p": "可數名詞只有一個的時候，前面要加 a 或 an（前面已經有 this、my、the 這種字時就不用，例如 my pen、the apple）。看下一個字「開頭的發音」：母音（a、e、i、o、u 的音）用 an，其他用 a。",
     "ex": [
      {
       "en": "I have a pen.",
@@ -4198,7 +4198,7 @@
    {
     "bad": "Who did call you?",
     "good": "Who called you?",
-    "why": "Who 當主詞時直接接動詞，不加 did。"
+    "why": "Who 當主詞時直接接動詞，不加 did。（要強調「到底是誰真的打來」時才會說 Who did call you?，這一課練一般的問法。）"
    }
   ],
   "drills": [
@@ -4257,7 +4257,7 @@
     "accept": [
      "Who helped you?"
     ],
-    "why": "Who 當主詞，不加 did，直接用過去式 helped。"
+    "why": "Who 當主詞，不加 did，直接用過去式 helped。（強調時才說 Who did help you?，這裡練一般的問法。）"
    },
    {
     "k": "fix",
@@ -5329,9 +5329,10 @@
     "k": "fill",
     "q": "Today is not ___ hot as yesterday.（填一個字）",
     "accept": [
-     "as"
+     "as",
+     "so"
     ],
-    "why": "not as…as：沒有那麼……。"
+    "why": "not as…as／not so…as：沒有那麼……。as 比較常用，so 也對。"
    },
    {
     "k": "fix",
@@ -6506,7 +6507,7 @@
     "p": "It is important that…（…很重要）、It is possible that…（有可能…）。",
     "ex": [
      {
-      "en": "It is important that you take the antibiotics.",
+      "en": "It is important that you take the antibiotics on time.",
       "zh": "按時吃抗生素很重要。"
      },
      {
@@ -7932,9 +7933,9 @@
     "why": "if 那一句用 had + 過去分詞，不用 would have。"
    },
    {
-    "bad": "If she had studied, she would pass.",
-    "good": "If she had studied, she would have passed.",
-    "why": "講過去的結果用 would have + 過去分詞。"
+    "bad": "If she had studied, she would pass the test last week.",
+    "good": "If she had studied, she would have passed the test last week.",
+    "why": "講過去的結果用 would have + 過去分詞。（結果在現在的話，例如 If she had studied, she would be a nurse now，是另一種「混合假設」，之後再學。）"
    }
   ],
   "drills": [

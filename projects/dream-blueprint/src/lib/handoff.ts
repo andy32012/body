@@ -1,7 +1,7 @@
 import type { AppState } from './store'
 import curriculum from '../data/curriculum.json'
 import { activePeriod } from './progress'
-import { assistedUnits } from './grammarRetention'
+import { assistedUnits, markAssisted } from './grammarRetention'
 import { certStatus, certifiedLevel, courseProgress, exams, unitGate } from './cefr'
 import { hasPack, readHeld, type HeldPart } from './bridge'
 import { topWeak, weakLines } from './weakPoints'
@@ -105,4 +105,13 @@ function packLine(state: AppState) {
   const part = (name: string, p?: HeldPart) => p ? name + ' ' + p.correct + '/' + p.total : null
   const done = [part('閱讀', h.reading), part('聽力', h.listening)].filter(Boolean)
   return '- 這是 B1→B2 橋接單元，另有一包讀聽說寫（兩篇閱讀、一段聽力、兩題段落寫作、兩個口說任務）和一次沒看過的回測' + (done.length ? '；回測第一次成績：' + done.join('、') : '（第 6 天開放）') + '。'
+}
+
+/** 「把進度設成這一天」: the course goes on from that unit and day. Units before it that were done elsewhere are not
+ *  「穩了」 here — each waits for an unaided recheck. Going back to practise again changes only where the course goes on:
+ *  units already 穩了 stay 穩了 (practising again is not taking back what he showed). */
+export function setCourseStart<S extends Pick<AppState, 'curriculum' | 'notes'>>(prev: S, unit: number, day: number, today: string): S {
+  let notes = prev.notes
+  for (let id = 1; id < unit; id++) if (!prev.curriculum.stableUnits.includes(id) && !notes['unit-assisted.' + id]) notes = markAssisted(notes, id, today)
+  return { ...prev, notes, curriculum: { ...prev.curriculum, unit, day, retry: 0 } }
 }

@@ -149,3 +149,19 @@ test('教材修正後，學過的字和句子排進今天複習，進度不歸�
   next.cards[0].due = '2026-12-01'
   assert.equal(applyContentUpdates(next, '2026-11-23').cards[0].due, '2026-12-01')
 })
+
+test('寫得進去就讀得回來：40 筆很長的待確認作答、一則貼了很長的答案，備份匯出再匯入都正常（稽核 R-03）', async () => {
+  const {addEvidence,readEvidence}=await import('../src/lib/evidence')
+  const state=createInitialState('2026-11-26')
+  let notes=state.notes
+  for (let i=0;i<40;i++) {
+    const day='2026-10-'+String(1+(i%28)).padStart(2,'0')
+    notes=addEvidence(notes,3,{day,level:'pending',source:'express',skill:'write',item:'u3-p'+i,answer:'I will call my mother tonight. '.repeat(40).slice(0,1200),prompt:'p'.repeat(50),ref:'r'.repeat(50)})
+  }
+  notes=addEvidence(notes,4,{day:'2026-11-26',level:'pending',source:'express',skill:'write',item:'u4-long',answer:'She is tired. '.repeat(6000)})
+  const big={...state,notes}
+  assert.ok(notes['evidence.3'].length>50000,'這則紀錄本身就超過舊的五萬字上限')
+  const back=importBackup(exportBackup(big))
+  assert.equal(readEvidence(back.notes,3).length,40)
+  assert.equal(readEvidence(back.notes,4)[0].answer?.length,'She is tired. '.length*6000,'答案一個字都沒被截掉')
+})

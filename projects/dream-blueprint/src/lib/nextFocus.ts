@@ -2,6 +2,7 @@ import { addDays } from './progress'
 import { readEvidence, unitsWithEvidence, type Evidence } from './evidence'
 import { readQuizRecord } from './quiz'
 import { readSkills } from './wordSkills'
+import { readHeard, type HeardRecord } from './lesson'
 
 /** One small, evidence-based adjustment for today. It replaces part of the chosen time (never adds to it),
  *  says what it is based on, and says so plainly when there is not enough to go on. */
@@ -16,6 +17,13 @@ interface Input {
   notes: Record<string, string>
   sessions: { day: string; translations?: Translation[] }[]
   learningWords?: string[]
+}
+
+/** The lesson's first listen of each unit's dialogue (the questions answered by ear), newest last. */
+function firstListens(notes: Record<string, string>) {
+  return Object.keys(notes).filter(k => /^lesson\.heard\.\d+$/.test(k)).map(k => readHeard(notes, Number(k.slice(13))))
+    .filter((r): r is HeardRecord => !!r && typeof r.day === 'string' && r.total > 0 && Number.isFinite(r.correct))
+    .sort((a, b) => a.day.localeCompare(b.day))
 }
 
 function recentEvidence(notes: Record<string, string>) {
@@ -38,6 +46,12 @@ export function nextFocus(input: Input, today: string, energy: 'low' | 'normal' 
   if (listen.length >= 2 && byEar >= 2)
     return { kind: 'listen', minutes: 5, action: { label: '先練 5 分鐘聽', hash: 'library/words/listen' },
       reason: `最近 ${listen.length} 次只聽對話，有 ${byEar} 次要看字才答得出來。今天先花 5 分鐘練聽熟字，再上課。` }
+  // The daily lesson's listening questions keep going wrong (kept as they were answered, not as "done with help").
+  const lastListens = firstListens(input.notes).slice(-3)
+  const missed = lastListens.filter(r => r.correct < r.total).length
+  if (lastListens.length >= 2 && missed >= 2)
+    return { kind: 'listen', minutes: 5, action: { label: '先練 5 分鐘聽', hash: 'library/words/listen' },
+      reason: `最近 ${lastListens.length} 個單元第一次聽課文對話，有 ${missed} 次題目沒有全對。今天先花 5 分鐘練聽熟字，再上課。` }
   if (read >= 8 && heard * 3 <= read)
     return { kind: 'listen', minutes: 5, action: { label: '先練 5 分鐘聽', hash: 'library/words/listen' },
       reason: `在學的字裡，${read} 個看得懂，但只有 ${heard} 個練過「聽懂」。今天先花 5 分鐘聽音選意思。` }

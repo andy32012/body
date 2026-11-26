@@ -327,24 +327,37 @@ function Recorder() {
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const recorder = useRef<MediaRecorder | null>(null)
-  useEffect(() => () => { if (recorder.current?.state === 'recording') recorder.current.stop() }, [])
+  // Left this screen while the browser was still asking for the microphone: the late permission records nothing.
+  const alive = useRef(true)
+  const asking = useRef(false)
+  useEffect(() => { alive.current = true; return () => { alive.current = false; if (recorder.current?.state === 'recording') recorder.current.stop() } }, [])
   useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
   const supported = useMemo(() => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== 'undefined', [])
   if (!supported) return null
   async function toggle() {
     if (recording) { recorder.current?.stop(); return }
+    if (asking.current) return
+    asking.current = true
     setError('')
+    let stream: MediaStream | null = null
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      if (!alive.current) { stream.getTracks().forEach(t => t.stop()); return }
+      const got = stream
       const chunks: Blob[] = []
-      const r = new MediaRecorder(stream)
+      const r = new MediaRecorder(got)
       r.ondataavailable = e => chunks.push(e.data)
       r.onstop = () => {
-        stream.getTracks().forEach(t => t.stop())
+        got.getTracks().forEach(t => t.stop())
+        if (!alive.current) return
         setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType }))); setRecording(false)
       }
       recorder.current = r; r.start(); setRecording(true)
-    } catch { setError('麥克風被擋住了，直接念出來就好。') }
+    } catch {
+      // The microphone opened but the recording could not start: close it again.
+      stream?.getTracks().forEach(t => t.stop())
+      if (alive.current) setError('錄音開不起來（麥克風被擋住或這個瀏覽器不能錄），直接念出來就好。')
+    } finally { asking.current = false }
   }
   return <div className="pn-rec">
     <button type="button" className="pr-link" onClick={toggle}>{recording ? <><Square size={13} />停止錄音</> : <><Mic size={13} />{url ? '重錄' : '錄自己的聲音'}</>}</button>

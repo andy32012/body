@@ -2,12 +2,16 @@
 // the day plan (dailyPlan.ts), the review boxes and caps (progress.ts: intervals, reviewBudget, reviewEnergy, reviewLoad)
 // and the new-word brake (dailyWords.ts). Run: npm run words:pace
 // The learner model is an assumption: about 40% of level-1 words unknown (60/80/90% for the higher levels),
-// 85% of word cards and 80% of sentence cards recalled, a lesson on every regular and winter day (units 1–48).
+// 85% of word cards and 80% of sentence cards recalled, a lesson on every regular and winter day (every published unit).
 // The dates in cefr.ts (wordsBy) and the README come from the first line of output.
 import { dayBudget } from '../src/lib/dailyPlan.ts'
 import { createInitialState } from '../src/lib/store.ts'
 import { addDays, newCard, reviewBudget, reviewCard, reviewEnergy, reviewLoad, sentenceReviewKey, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
 import { countKey, dailyTarget } from '../src/lib/dailyWords.ts'
+import curriculum from '../src/data/curriculum.json' with { type: 'json' }
+
+// All the units the course has (53 now), not a number written in here.
+const lastUnit = curriculum.units.length
 
 // WORDS=20 npm run words:pace shows the pace for another daily count (one of DAILY_CHOICES); without it, the default.
 const perDay = Number(process.env.WORDS) || 0
@@ -39,7 +43,7 @@ function run(label: string, sundays: boolean, seed = 7) {
     let words = 0, sentences = 0
     if (studies) {
       for (const c of cards.filter(c => c.id.startsWith('word:') && isDue(c, day)).sort(byDue).slice(0, reviewBudget(cap))) { review(c, rand() < 0.85); words++ }
-      if ((b.kind === 'regular' || b.kind === 'winter') && unit <= 48) {
+      if ((b.kind === 'regular' || b.kind === 'winter') && unit <= lastUnit) {
         const ofDay = (d: number) => cards.find(c => { const m = lessonOf.get(c.id); return !!m && m.unit === unit && m.d === d })
         const recall = uday >= 2 && uday <= 4 ? [ofDay(uday - 1)] : uday === 6 ? [ofDay(5)]
           : uday === 5 ? [ofDay(1), ofDay(2), cards.filter(c => !c.id.startsWith('word:') && isDue(c, day) && (lessonOf.get(c.id)?.unit ?? 0) < unit).sort(byDue)[0]] : []

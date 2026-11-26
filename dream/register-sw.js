@@ -32,7 +32,12 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
         .then(html => !html.includes(new URL(entry).pathname.split("/").pop()), () => true)
         .then(newer => { nextRelease = newer; if (newer) showUpdate(); });
     });
-    const view = url => new URL(url).hash.slice(1).split("/")[0] || "today";
+    // A view is a page, and inside the practice library one kind of practice (#library/writing, #library/reading…):
+    // moving between kinds also switches, before the old page asks for a part the site no longer publishes.
+    const view = url => {
+      const parts = new URL(url).hash.slice(1).split("/");
+      return (parts[0] === "library" ? parts.slice(0, 2).join("/") : parts[0]) || "today";
+    };
     window.addEventListener("hashchange", event => {
       if (nextRelease && view(event.oldURL) !== view(event.newURL)) window.location.reload();
     });

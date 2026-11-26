@@ -117,3 +117,16 @@ test('非限定關係子句的逗號要寫：字都對但少了逗號，不算�
   // Other sentences are not affected by commas.
   assert.equal(matchesReference('Yes I am', ['Yes, I am.']), true)
 })
+
+test('Claude 判對以後把非限定子句的逗號刪掉：改過的這一版沒人確認過，不算獨立完成（稽核 CUR-02）', async () => {
+  const { judgeWritten, sameEnglish } = await import('../src/lib/evidence.ts')
+  const refs = ['My sister, who is a nurse, lives in Taipei.']
+  const judged = (answer: string) => judgeWritten({ rating: 'correct', revealed: false, answer, references: refs, firstVerdict: 'good', checkedText: refs[0] })
+  assert.equal(judged('My sister, who is a nurse, lives in Taipei.'), 'independent')
+  assert.equal(judged('my sister, who is a nurse, lives in Taipei'), 'independent', '大小寫、句點不算改過')
+  assert.notEqual(judged('My sister who is a nurse lives in Taipei.'), 'independent', '兩個逗號都刪掉')
+  assert.notEqual(judged('My sister who is a nurse, lives in Taipei.'), 'independent', '刪掉第一個')
+  assert.notEqual(judged('My sister, who is a nurse lives in Taipei.'), 'independent', '刪掉第二個')
+  assert.equal(sameEnglish("I'm fine.", 'I am fine'), true)
+  assert.equal(sameEnglish('Are you OK?', 'Are you OK'), false, '問號拿掉變成直述句，要再確認')
+})

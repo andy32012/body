@@ -176,6 +176,27 @@ test("切換版本會等到離開目前頁面，讓進行中的練習保留原�
   assert.equal(reloads, 0);
   navigate("#practice/high", "#today");
   assert.equal(reloads, 1);
+  // Inside the practice library: another kind of practice switches; another task of the same kind does not.
+  navigate("#library/writing/t1-101", "#library/writing/t1-102");
+  assert.equal(reloads, 1, "同一種練習換題不切換");
+  navigate("#library/reading", "#library/writing");
+  assert.equal(reloads, 2, "換到另一種練習就換新版");
+});
+
+test("換新版以後，還開著的舊頁面要讀舊版的教材檔，也讀得到（稽核 R-08）", async () => {
+  const app = await browserHarness();
+  // The release before: one of its lesson files is no longer published.
+  const oldCore = prefix + "core-older";
+  const oldFile = scope + "assets/writing-OLD123.js";
+  await (await app.caches.open(prefix + "core-oldest")).put(scope + "assets/x.js", new Response("x"));
+  await (await app.caches.open(oldCore)).put(oldFile, new Response("old writing"));
+  await app.dispatch("install");
+  await app.dispatch("activate");
+  const names = await app.caches.keys();
+  assert.ok(names.includes(oldCore), "剛被換掉的那一版先留著");
+  assert.ok(!names.includes(prefix + "core-oldest"), "更早的版本清掉");
+  app.controls.offline = true;
+  assert.equal(await (await app.request("assets/writing-OLD123.js")).text(), "old writing");
 });
 
 test("分開儲存預設首圖、已看照片與整套圖鑑，斷線下載可續傳", async t => {

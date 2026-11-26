@@ -9,17 +9,34 @@ export type Result = { verdict: 'good' | 'small' | 'again' | 'changed'; correcte
   rubric?: RubricId; score?: number; reason?: string }
 export const verdictNames = { good: '全對', small: '小錯', again: '要再練', changed: '意思不一樣' }
 
-/** Claude's JSON. With a table, the verdict follows the score (全對 only at the top level), so it can't be friendlier than the table. */
-export function parseCorrection(text: string, rubric?: RubricId): Result | null {
+const text = (v: unknown) => typeof v === 'string' ? v : undefined
+/** One fix as the page can show it: strings only; a fix without the corrected part says nothing and is left out. */
+function cleanFix(v: unknown): Fix | null {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null
+  const f = v as Record<string, unknown>
+  const right = text(f.right)
+  if (!right?.trim()) return null
+  const zh = text(f.zh), en = text(f.en), tag = text(f.tag)
+  return { wrong: text(f.wrong) ?? '', right, why: text(f.why) ?? '', ...(zh !== undefined ? { zh } : {}), ...(en !== undefined ? { en } : {}), ...(tag !== undefined ? { tag } : {}) }
+}
+/** Claude's JSON, or null when it is not a judgement — then nothing is marked and he can ask again. With a table the
+ *  score must be one on the table (a missing or impossible score is no judgement, as the README says), and the verdict
+ *  follows it (全對 only at the top level), so it can't be friendlier than the table. 意思不一樣 is never turned into
+ *  全對 by a high score. Without a table the verdict must be one of the four. */
+export function parseCorrection(reply: string, rubric?: RubricId): Result | null {
   try {
-    const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1))
-    if (typeof json.corrected !== 'string') return null
-    const nums = (v: unknown) => Array.isArray(v) ? v.filter((n): n is number => typeof n === 'number') : undefined
-    const claimed: Result['verdict'] = json.verdict in verdictNames ? json.verdict : 'small'
+    const json = JSON.parse(reply.slice(reply.indexOf('{'), reply.lastIndexOf('}') + 1)) as Record<string, unknown>
+    if (!json || typeof json !== 'object' || typeof json.corrected !== 'string') return null
+    const nums = (v: unknown) => Array.isArray(v) ? v.filter((n): n is number => Number.isInteger(n) && n >= 0) : undefined
+    const named = typeof json.verdict === 'string' && json.verdict in verdictNames ? json.verdict as Result['verdict'] : null
     const table = rubric ? rubrics[rubric] : null
     const scored = table && validRubricScore(table, json.score) ? json.score as number : undefined
-    return { verdict: table && scored !== undefined ? verdictFor(table, scored, claimed) : claimed, corrected: json.corrected, fixes: Array.isArray(json.fixes) ? json.fixes : [], note: json.note, resolved: nums(json.resolved), still: nums(json.still),
-      ...(rubric && scored !== undefined ? { rubric, score: scored, reason: typeof json.reason === 'string' ? json.reason : '' } : {}) }
+    if (table ? scored === undefined : !named) return null
+    const verdict: Result['verdict'] = table && scored !== undefined ? (named === 'changed' ? 'changed' : verdictFor(table, scored, named ?? 'again')) : named!
+    const fixes = Array.isArray(json.fixes) ? json.fixes.map(cleanFix).filter((f): f is Fix => !!f) : []
+    const note = text(json.note)
+    return { verdict, corrected: json.corrected, fixes, ...(note ? { note } : {}), resolved: nums(json.resolved), still: nums(json.still),
+      ...(rubric && scored !== undefined ? { rubric, score: scored, reason: text(json.reason) ?? '' } : {}) }
   } catch { return null }
 }
 

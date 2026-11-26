@@ -19,8 +19,9 @@ export interface Rubric {
   max: number
   step: number
   scales: Scale[]
-  /** How the official test sets its pass mark, as a share of the full score. */
-  pass?: { share: number; note: string }
+  /** This app's practice target for one task, as a share of the full score (`note` says it in words), and how the
+   *  official test really passes (`official`): a whole paper, weighted — not every part on its own. */
+  pass?: { share: number; note: string; official: string }
   /** Official rules that go with the table. */
   rules?: string[]
   /** What can't be judged from text alone. */
@@ -86,7 +87,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '有錯，但這句要練的重點句型是對的。',
       '錯太多、沒寫，或寫了等於沒寫。',
     ]) }],
-    pass: { share: 0.7, note: '初級寫作滿分 100 分，70 分通過：要拿到七成的分數' },
+    pass: { share: 0.7, note: '每句平均七成（1.4 分）以上', official: '正式考試看整份寫作：單句寫作（15 題、每題 2 分）和段落寫作（0–5 級分）各佔 50%，換算成 100 分，70 分通過；不是每一部分都要過，例如單句全對、段落 3 級分就是 50＋30＝80 分。' },
   },
   'gept-paragraph': {
     id: 'gept-paragraph', title: '全民英檢初級寫作・段落寫作', source: geptElementary, max: 5, step: 1,
@@ -98,7 +99,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '只回答到一個問題或重點；文法、用字錯太多，嚴重影響理解。',
       '沒寫，或寫了等於沒寫。',
     ]) }],
-    pass: { share: 0.7, note: '初級寫作滿分 100 分，70 分通過：這一部分要 4 級分以上' },
+    pass: { share: 0.7, note: '這一篇 4 級分以上', official: '正式考試看整份寫作：單句寫作（15 題、每題 2 分）和段落寫作（0–5 級分）各佔 50%，換算成 100 分，70 分通過；不是每一部分都要過，例如單句全對、段落 3 級分就是 50＋30＝80 分。' },
   },
   'gept-essay': {
     id: 'gept-essay', title: '全民英檢中級寫作・英文作文', source: geptIntermediate, max: 5, step: 1,
@@ -110,7 +111,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '內容不符合題目要求，看不懂；沒有組織；能用的字彙和句型非常有限；文法、拼字、標點錯得太多。',
       '沒寫，或寫了等於沒寫。',
     ]) }],
-    pass: { share: 0.8, note: '中級寫作滿分 100 分，80 分通過：要 4 級分以上' },
+    pass: { share: 0.8, note: '這一篇 4 級分以上', official: '正式考試看整份寫作：中譯英佔 40%、英文作文佔 60%（各 0–5 級分，兩位評分員平均後換算），合計 100 分，80 分通過；不是每一部分都要 4 級分，例如中譯英 3 級分（24 分）加作文 5 級分（60 分）是 84 分，反過來中譯英 5 級分加作文 3 級分只有 76 分。' },
   },
   'gept-translation': {
     id: 'gept-translation', title: '全民英檢中級寫作・中譯英', source: geptIntermediate, max: 5, step: 1,
@@ -122,7 +123,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '沒有譯出原文的意思；句型掌握很差，看不懂；錯誤又多又嚴重。',
       '沒寫，或寫了等於沒寫。',
     ]) }],
-    pass: { share: 0.8, note: '中級寫作滿分 100 分，80 分通過：要 4 級分以上' },
+    pass: { share: 0.8, note: '這一段 4 級分以上', official: '正式考試看整份寫作：中譯英佔 40%、英文作文佔 60%（各 0–5 級分，兩位評分員平均後換算），合計 100 分，80 分通過；不是每一部分都要 4 級分，例如中譯英 3 級分（24 分）加作文 5 級分（60 分）是 84 分，反過來中譯英 5 級分加作文 3 級分只有 76 分。' },
   },
   'gept-speak-elementary': {
     id: 'gept-speak-elementary', title: '全民英檢初級口說・語法與字彙', source: geptElementary, max: 5, step: 0.5,
@@ -134,7 +135,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '幾乎沒有句型和文法可言，字彙嚴重不足，很難表達。',
       '沒有回答，或回答了等於沒回答。',
     ]) }],
-    pass: { share: 0.8, note: '初級口說滿分 100 分，80 分通過（4 級分）' },
+    pass: { share: 0.8, note: '回答問題 4 級分以上', official: '正式考試：「發音、語調、流暢」和「語法、字彙」兩半各 0–5 級分，相加乘以 10 換算成 100 分，80 分通過（例如兩半都 4 級分）。這裡只評得到「語法、字彙」那一半。' },
     limits: '官方另一半分數看發音、語調和流暢度；逐字稿聽不到聲音，這裡只評語法和字彙，也就是只評官方的一半。',
   },
   'gept-speak-intermediate': {
@@ -147,7 +148,7 @@ export const rubrics: Record<RubricId, Rubric> = {
       '文法錯很多、會的字和片語有限，沒辦法清楚表達，幾乎不能溝通。',
       '沒有回答，或回答了等於沒回答。',
     ]) }],
-    pass: { share: 0.8, note: '中級口說滿分 100 分，80 分通過（4 級分）' },
+    pass: { share: 0.8, note: '4 級分以上', official: '正式考試：整體 0–5 級分換算成 100 分，80 分（4 級分）通過；官方同時聽發音和語調，這裡只看得到逐字稿。' },
     limits: '官方會同時看發音和語調；逐字稿聽不到聲音，這裡只評內容、文法和字彙。',
   },
   'ielts-task1': {

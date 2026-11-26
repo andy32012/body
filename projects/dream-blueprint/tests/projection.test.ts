@@ -111,3 +111,15 @@ test('照課表天天上課、其中幾天是生活主題：主題那天也算�
   const days = projectCalendar({...base,today:'2026-12-14',from:'2026-12-14',to:'2026-12-19',ranges:[],startedDay:'2026-11-23',cursor:14,sessions:sessions as never})
   assert.ok(days.every(d=>d.kind==='lesson'||d.kind==='topic'),'下週照常每天上課：'+days.map(d=>d.kind).join(','))
 })
+
+test('今天上完生活主題：日曆不會假設今天還要加上一堂文法，明天才是下一堂文法（稽核 D-03）', () => {
+  const t1 = topicData[0]
+  const sessions = [{ day: '2026-11-30', energy: 'normal' as const, sentenceId: 'u1-d6' }, { day: '2026-12-01', energy: 'normal' as const, advanced: false, sentenceId: 'topic:' + t1.id + ':understand' }]
+  const days = projectCalendar({ ...base, today: '2026-12-01', from: '2026-12-01', to: '2026-12-04', ranges: [], startedDay: '2026-11-23', cursor: 6,
+    sessions: sessions as never, topics: topicData.map(t => ({ n: t.n, title: t.title, after: t.after, done: t.n === t1.n ? { A: '2026-12-01' } : {} })) })
+  const at = (day: string) => days.find(d => d.day === day)!
+  assert.equal(at('2026-12-01').unit, null, '今天沒有再排文法')
+  assert.match(at('2026-12-01').label, /生活主題/)
+  assert.deepEqual([at('2026-12-02').unit, at('2026-12-02').lessonDay], [2, 1], '明天上單元 2 第 1 天')
+  assert.equal(at('2026-12-03').topic?.part, 'B', '後天接著生活主題第二次')
+})

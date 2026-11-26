@@ -26,19 +26,70 @@ export interface ReviewArchive {
   recalled: number
   /** The weekly race's review bonus of each folded day that had one. */
   bonus: Record<string, number>
+  /** Each folded day: [lines, delayed, recalled]. Two devices' archives merge day by day (the fuller count of a day), so
+   *  lines folded on different devices all count and lines folded on both count once. */
+  days?: Record<string, DayCount>
+  /** What was folded before days were kept apart: one block for every day before its `before`. */
+  base?: { before: string; total: number; delayed: number; recalled: number }
 }
+export type DayCount = [lines: number, delayed: number, recalled: number]
 const empty: ReviewArchive = { before: '', total: 0, delayed: 0, recalled: 0, bonus: {} }
+const isCount = (v: unknown): v is DayCount => Array.isArray(v) && v.length === 3 && v.every(n => Number.isInteger(n) && n >= 0)
 
 export function readArchive(notes: Record<string, string>): ReviewArchive {
   try {
     const a = JSON.parse(notes[archiveKey] || 'null') as Partial<ReviewArchive> | null
     if (!a || typeof a !== 'object') return empty
+    const days = a.days && typeof a.days === 'object' ? Object.fromEntries(Object.entries(a.days).filter(([, c]) => isCount(c))) : undefined
+    const b = a.base && typeof a.base === 'object' ? a.base : undefined
     return {
       before: typeof a.before === 'string' ? a.before : '',
       total: Number(a.total) || 0, delayed: Number(a.delayed) || 0, recalled: Number(a.recalled) || 0,
       bonus: a.bonus && typeof a.bonus === 'object' ? a.bonus : {},
+      ...(days ? { days } : {}),
+      ...(b ? { base: { before: typeof b.before === 'string' ? b.before : '', total: Number(b.total) || 0, delayed: Number(b.delayed) || 0, recalled: Number(b.recalled) || 0 } } : {}),
     }
   } catch { return empty }
+}
+const countLines = (events: readonly ReviewEvent[]): DayCount => {
+  const delayed = events.filter(e => e.gap >= 4 && !e.shownAnswer)
+  return [events.length, delayed.length, delayed.filter(e => e.remembered).length]
+}
+/** The day counts of an archive; one written before day counts were kept is a single block (`base`). */
+function dayParts(a: ReviewArchive): { base?: ReviewArchive['base']; days: Record<string, DayCount> } {
+  if (a.days) return { base: a.base, days: a.days }
+  return { base: a.total || a.delayed || a.recalled ? { before: a.before, total: a.total, delayed: a.delayed, recalled: a.recalled } : undefined, days: {} }
+}
+function withTotals(a: Pick<ReviewArchive, 'before' | 'bonus' | 'days' | 'base'>): ReviewArchive {
+  const t = [a.base?.total ?? 0, a.base?.delayed ?? 0, a.base?.recalled ?? 0]
+  for (const c of Object.values(a.days ?? {})) { t[0] += c[0]; t[1] += c[1]; t[2] += c[2] }
+  return { before: a.before, total: t[0], delayed: t[1], recalled: t[2], bonus: a.bonus, days: a.days ?? {}, ...(a.base ? { base: a.base } : {}) }
+}
+const byDay = (events: readonly ReviewEvent[]) => {
+  const out = new Map<string, ReviewEvent[]>()
+  for (const e of events) out.set(e.day, [...(out.get(e.day) ?? []), e])
+  return out
+}
+/** Two devices' archives as one, with the review lines of both (`events`): every folded day counted once, as its fuller
+ *  count, and lines one device still kept for a day the other folded counted with that day. The result's `before` is
+ *  the later one; lines before it are folded in (the caller drops them). */
+export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readonly ReviewEvent[]): ReviewArchive {
+  const px = dayParts(x), py = dayParts(y)
+  const base = !px.base ? py.base : !py.base ? px.base
+    : py.base.before > px.base.before || (py.base.before === px.base.before && py.base.total > px.base.total) ? py.base : px.base
+  const before = x.before > y.before ? x.before : y.before
+  const cut = base?.before ?? ''
+  const fuller = (a: DayCount | undefined, b: DayCount) => !a || b[0] > a[0] ? b : a
+  const days: Record<string, DayCount> = {}
+  for (const [d, c] of [...Object.entries(px.days), ...Object.entries(py.days)]) if (d >= cut) days[d] = fuller(days[d], c)
+  const bonus: Record<string, number> = { ...x.bonus }
+  for (const [d, v] of Object.entries(y.bonus)) bonus[d] = Math.max(bonus[d] ?? 0, Number(v) || 0)
+  for (const [d, lines] of byDay(events.filter(e => e.day < before && e.day >= cut))) {
+    days[d] = fuller(days[d], countLines(lines))
+    const b = reviewBonus(lines, d)
+    if (b > (bonus[d] ?? 0)) bonus[d] = b
+  }
+  return withTotals({ before, bonus, days, ...(base ? { base } : {}) })
 }
 
 /** The race bonus of a day, from the review lines or, once they are folded, from the archive. */
@@ -95,7 +146,9 @@ function slim(value: string): string | null {
     if (!Array.isArray(rec.steps) || !rec.steps.includes('done') || rec.slim) return null
     const { recalls: _r, records: _s, hints: _h, ...rest } = rec
     const e = rec.express
-    const express = e ? { first: e.first, lastAnswer: e.lastAnswer, corrections: e.corrections ?? 0, help: e.help ?? [], fixed: e.fixed, revealed: e.revealed } : undefined
+    // His own sentences stay (another device's too); Claude's full feedback is what leaves.
+    const others = Array.isArray(e?.others) ? (e.others as { first?: unknown; lastAnswer?: unknown }[]).map(o => ({ first: o?.first, lastAnswer: o?.lastAnswer })) : undefined
+    const express = e ? { first: e.first, lastAnswer: e.lastAnswer, corrections: e.corrections ?? 0, help: e.help ?? [], fixed: e.fixed, revealed: e.revealed, ...(others ? { others } : {}) } : undefined
     return JSON.stringify({ ...rest, ...(express ? { express } : {}), slim: true })
   } catch { return null /* an unreadable record is left as it is */ }
 }
@@ -134,14 +187,13 @@ export function applyBatch<S extends Compactable>(state: S, batch: Batch, archiv
       const a = readArchive(notes)
       const bonus = { ...a.bonus }
       for (const day of new Set(old.map(e => e.day))) { const b = reviewBonus(old, day); if (b > 0) bonus[day] = b }
-      const delayed = old.filter(e => e.gap >= 4 && !e.shownAnswer)
-      const archive: ReviewArchive = {
-        before: batch.upTo.events > a.before ? batch.upTo.events : a.before,
-        total: a.total + old.length,
-        delayed: a.delayed + delayed.length,
-        recalled: a.recalled + delayed.filter(e => e.remembered).length,
-        bonus,
+      const { base, days: had } = dayParts(a)
+      const days = { ...had }
+      for (const [day, lines] of byDay(old)) {
+        const c = countLines(lines), d = days[day]
+        days[day] = d ? [d[0] + c[0], d[1] + c[1], d[2] + c[2]] : c
       }
+      const archive = withTotals({ before: batch.upTo.events > a.before ? batch.upTo.events : a.before, bonus, days, ...(base ? { base } : {}) })
       notes = { ...notes, [archiveKey]: JSON.stringify(archive) }
     } else reviewEvents = state.reviewEvents
   }

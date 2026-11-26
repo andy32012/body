@@ -91,11 +91,14 @@ function inflections(word: string): string[] {
 }
 /** Whether a sentence uses the word (or one of its listed forms), counting inflected and irregular forms. */
 export function wordUsed(answer: string, en: string) {
-  // Words keep their hyphen (T-shirt) and abbreviation dots (a.m., O.K.); the dots are then dropped, as in spelling.
-  const tokens = (plain(answer).match(/[a-z0-9']+(?:[-.][a-z0-9']+)*\.?/g) ?? []).map(t => t.replace(/\./g, ''))
   // The spellings the word table lists (acknowledgment as well as acknowledgement) count too.
-  const listed = levelEntry(en)?.forms?.flatMap(f => f.forms).map(f => spelled(f)) ?? []
-  return [...new Set([...spellingForms(en), ...listed])].map(f => f.replace(/\./g, '')).some(form => {
+  const tableForms = levelEntry(en)?.forms?.flatMap(f => f.forms) ?? []
+  const forms = [...new Set([...spellingForms(en), ...tableForms.map(f => spelled(f))])].map(f => f.replace(/\./g, ''))
+  // Words keep their hyphen (T-shirt) and dots. Dots are dropped (as in spelling) only for a word that is written with
+  // dots itself (a.m., O.K.), so tis.sue or t.i.s.s.u.e. is not tissue; a full stop after a word is not part of it.
+  const dotted = [en, ...tableForms].some(f => /[a-z]\.[a-z]/i.test(f))
+  const tokens = (plain(answer).match(/[a-z0-9']+(?:[-.][a-z0-9']+)*\.?/g) ?? []).map(t => dotted ? t.replace(/\./g, '') : t.replace(/\.$/, ''))
+  return forms.some(form => {
     const words = form.split(' ').filter(Boolean)
     if (!words.length) return false
     const first = new Set(inflections(words[0]))

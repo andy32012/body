@@ -20,7 +20,8 @@ export default function SyncPaused() {
   if (!conflict || !driveConnected()) return null
   async function merge() {
     setBusy(true)
-    try { setMessage(await mergeWithCloud()); setConflict(null) }
+    // Read again afterwards: a merge that kept meeting newer saves stays paused and merges again later.
+    try { setMessage(await mergeWithCloud()); setConflict(cloudConflict()) }
     catch (e) { setMessage('合併失敗：' + (e instanceof Error ? e.message : String(e)) + '。網路好了再按一次，兩份都還在。') }
     finally { setBusy(false) }
   }

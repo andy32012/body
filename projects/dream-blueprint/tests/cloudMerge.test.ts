@@ -81,3 +81,57 @@ test('合併到一半另一台剛好也存了：再合併一次，不會把另�
   assert.deepEqual(getSnapshot().state.sessions.map(x => x.id).sort(), ids)
   assert.equal(cloudConflict(), null, '同步沒有暫停')
 })
+
+/** Another device saves one more session just before each of this device's saves, `times` times (稽核 R-01). */
+function busyCloud(cloud: { state: string; savedAt: number }, times: number, forced: number[]) {
+  fakeScript(cloud, {
+    beforeSave: n => {
+      if (n >= times) return
+      const later = JSON.parse(cloud.state)
+      later.sessions.push(session('s-ipad-' + (n + 1), '2026-11-26'))
+      cloud.state = JSON.stringify(later); cloud.savedAt = 3000 + n
+    },
+  })
+  const plain = globalThis.fetch
+  globalThis.fetch = (async (u: string, init?: { body?: string }) => {
+    const b = JSON.parse(init?.body ?? '{}')
+    if (b.type === 'state' && b.snapshot) forced.push(1)
+    return plain(u, init)
+  }) as typeof fetch
+}
+function startBoth() {
+  const here = createInitialState('2026-11-26')
+  here.sessions = [session('s-here', '2026-11-26')]
+  store.set(STORAGE_KEY, JSON.stringify(here))
+  updateStore(() => here)
+  const there = createInitialState('2026-11-26')
+  there.sessions = [session('s-ipad', '2026-11-26')]
+  connect(1000, 1500)
+  return { state: JSON.stringify(there), savedAt: 2000 }
+}
+const sessionIds = (json: string) => (JSON.parse(json).sessions as { id: string }[]).map(x => x.id).sort()
+
+test('另一台連續存了三次：第三次也不會硬蓋掉，三筆新紀錄都在雲端', async () => {
+  const cloud = startBoth()
+  const forced: number[] = []
+  busyCloud(cloud, 3, forced)
+  await mergeWithCloud(true)
+  assert.equal(forced.length, 0, '自己合併時從來不硬蓋雲端')
+  assert.deepEqual(sessionIds(cloud.state), ['s-here', 's-ipad', 's-ipad-1', 's-ipad-2', 's-ipad-3'])
+  assert.deepEqual(getSnapshot().state.sessions.map(x => x.id).sort(), sessionIds(cloud.state))
+  assert.equal(cloudConflict(), null)
+})
+
+test('雲端一直有新進度進來：合併好的先留在這台、標成等一下再同步，雲端那份一筆都不少', async () => {
+  const cloud = startBoth()
+  const forced: number[] = []
+  busyCloud(cloud, 99, forced)
+  const message = await mergeWithCloud(true)
+  assert.equal(forced.length, 0, '沒有硬蓋雲端')
+  const inCloud = sessionIds(cloud.state)
+  assert.ok(!inCloud.includes('s-here') && inCloud.includes('s-ipad-1'), '雲端還是另一台最新存的那份，沒有被蓋掉')
+  const here = getSnapshot().state.sessions.map(x => x.id)
+  for (const id of ['s-here', 's-ipad', 's-ipad-1', 's-ipad-2']) assert.ok(here.includes(id), '這台留著合併好的：' + id)
+  assert.ok(cloudConflict(), '標成還沒同步，之後會再合併')
+  assert.match(message, /再/)
+})

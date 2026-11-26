@@ -67,3 +67,13 @@ test('複習：問「這個字根是什麼意思」，選項不會有兩個一�
   assert.notDeepEqual(reviewRound(checks, 0).map(p => p.id), reviewRound(checks, 1).map(p => p.id))
   assert.equal(reviewRound({}, 0).length, 0)
 })
+
+test('字根的 ID 跟著意思走：重排或插入新的字根，學過的紀錄不會指到別的字根（稽核 R-10）', async () => {
+  const { readFileSync } = await import('node:fs')
+  const recorded = JSON.parse(readFileSync(new URL('./fixtures/word-part-ids.json', import.meta.url), 'utf8')) as Record<string, string>
+  const parts = (await import('../src/data/word-parts.json', { with: { type: 'json' } })).default as { id: string; part: string }[]
+  const now = new Map(parts.map(p => [p.id, p.part]))
+  const moved = Object.entries(recorded).filter(([id, part]) => now.get(id) !== part).map(([id, part]) => id + ' 原本是 ' + part + '，現在是 ' + (now.get(id) ?? '（不見了）'))
+  assert.deepEqual(moved, [], '\n' + moved.join('\n'))
+  assert.equal(new Set(parts.map(p => p.id)).size, parts.length, 'ID 不重複')
+})

@@ -43,6 +43,16 @@ for (const entry of levels) {
     if (!aliasIndex.has(spelling)) aliasIndex.set(spelling, canonical)
   }
 }
+// The spellings an entry lists in `forms` (Mr for Mr./Mister, acknowledgment for acknowledge(ment)) find it too, and
+// so does a short form without its full stop (Mrs for Mrs., as a tapped word arrives without it). A spelling another
+// entry already has keeps that entry, so no existing key changes.
+for (const entry of levels as LevelEntry[]) {
+  const canonical = normalize(entry.en)
+  const listed = [...spellings(entry.en), ...(entry.forms?.flatMap(f => f.forms) ?? []).map(normalize)]
+  for (const spelling of [...listed, ...listed.filter(x => x.endsWith('.')).map(x => x.slice(0, -1))]) {
+    if (spelling && !aliasIndex.has(spelling)) aliasIndex.set(spelling, canonical)
+  }
+}
 export function wordKey(word: string) {
   const normalized = normalize(word)
   return aliasIndex.get(normalized) ?? normalized

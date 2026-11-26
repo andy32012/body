@@ -105,6 +105,13 @@ export function markConflict(remoteAt: number) {
   setStatus(false, '雲端硬碟有另一台裝置存的新進度，這台也有改動：先暫停同步、兩份都保留，請到設定 → 雲端硬碟選要留哪一份。')
   window.dispatchEvent(new Event('dream-blueprint:cloud'))
 }
+/** A merge that kept meeting newer saves from another device: the merged progress stays on this device, nothing in the
+ *  cloud is overwritten, and syncing stays paused until the next merge (when the app opens or comes back). */
+export function markMergeWaiting(remoteAt: number) {
+  try { localStorage.setItem(CONFLICT, JSON.stringify({ remoteAt, found: Date.now() })) } catch { /* optional */ }
+  setStatus(false, '另一台裝置一直有新進度存進雲端：這台合併好的進度先留在這台，兩份都保留，等一下會自己再合併一次。')
+  window.dispatchEvent(new Event('dream-blueprint:cloud'))
+}
 export function clearConflict() { try { localStorage.removeItem(CONFLICT) } catch { /* optional */ } ; window.dispatchEvent?.(new Event('dream-blueprint:cloud')) }
 function markCas() { try { localStorage.setItem(CAS, '1') } catch { /* optional */ } }
 /** Whether the deployed script refuses stale saves by itself (the updated version does). */

@@ -32,3 +32,19 @@ test('同一個句型兩週內錯三句 → 對比重練；自己寫常要提示
   for (const d of ['2026-11-19', '2026-11-20', day]) good = ev(good, 1, 'independent', 'write', 'pattern', d)
   assert.equal(nextFocus({ notes: good, sessions: [] }, day, 'normal').kind, 'raise')
 })
+
+test('每日課第一次聽對話一直答錯：先練聽，不會因為寫作都自己寫對就說「提高難度」（稽核 CUR-08）', async () => {
+  const { nextFocus } = await import('../src/lib/nextFocus.ts')
+  const { addEvidence } = await import('../src/lib/evidence.ts')
+  let notes: Record<string, string> = {}
+  for (const [unit, day] of [[3, '2026-11-20'], [4, '2026-11-22'], [5, '2026-11-24']] as const) {
+    notes['lesson.heard.' + unit] = JSON.stringify({ day, correct: 0, total: 2, plays: 1 })
+    notes = addEvidence(notes, unit, { day, level: 'independent', source: 'pattern', skill: 'write', item: 'u' + unit + '-d1' })
+  }
+  const f = nextFocus({ notes, sessions: [] }, '2026-11-26', 'normal')
+  assert.equal(f.kind, 'listen')
+  assert.match(f.reason, /第一次聽課文對話/)
+  // Heard right: the writing decides as before.
+  for (const unit of [3, 4, 5]) notes['lesson.heard.' + unit] = JSON.stringify({ day: '2026-11-2' + unit, correct: 2, total: 2, plays: 1 })
+  assert.equal(nextFocus({ notes, sessions: [] }, '2026-11-26', 'normal').kind, 'raise')
+})

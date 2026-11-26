@@ -93,6 +93,45 @@ test('練習紀錄：每一回記日期和分數', () => {
   let notes: Record<string, string> = {}
   notes = saveGept(notes, 'intermediate', 'i1', { d: '2026-11-24', q: 3.5 })
   notes = saveGept(notes, 'intermediate', 'i1', { p: 4 })
-  assert.deepEqual(readGept(notes, 'intermediate', 'i1'), { d: '2026-11-24', q: 3.5, p: 4 })
+  assert.deepEqual(readGept(notes, 'intermediate', 'i1'), { d: '2026-11-24', q: 3.5, best: 3.5, p: 4 }, '問答也記最好的一次')
   assert.deepEqual(readGept(notes, 'elementary', 'e1'), {})
+})
+
+test('口說分數看不懂就不算：-5、3.8、無法評分都不會變成一個分數（稽核 SV-06）', async () => {
+  const { parseGeptFeedback } = await import('../src/lib/gept.ts')
+  const score = (line: string) => parseGeptFeedback('[分數] ' + line + ' ||| 理由').score
+  assert.equal(score('-5'), undefined)
+  assert.equal(score('3.8'), undefined)
+  assert.equal(score('無法評分'), undefined)
+  assert.equal(score('6'), undefined)
+  assert.equal(score('4'), 4)
+  assert.equal(score('4.5'), 4.5)
+  assert.equal(score('4 級分'), 4)
+  assert.equal(score('0'), 0)
+})
+
+test('初級問答拿過 4 級分打開中級：之後同一回重做分數比較低，中級也不會又鎖起來（稽核 SV-07）', async () => {
+  const { geptLevelsOpen, saveGept, readGept } = await import('../src/lib/gept.ts')
+  let notes: Record<string, string> = {}
+  notes = saveGept(notes, 'elementary', 'e1', { q: 4, d: '2026-11-20' })
+  assert.equal(geptLevelsOpen(notes, ['e1']).intermediate, true)
+  notes = saveGept(notes, 'elementary', 'e1', { q: 3, d: '2026-11-26' })
+  assert.equal(readGept(notes, 'elementary', 'e1').q, 3, '最近一次照實記')
+  assert.equal(readGept(notes, 'elementary', 'e1').best, 4)
+  assert.equal(geptLevelsOpen(notes, ['e1']).intermediate, true, '打開過就不會再鎖')
+  // A record from before best was kept: its q still opens it.
+  assert.equal(geptLevelsOpen({ 'gept.speak.elementary.e2': JSON.stringify({ q: 4 }) }, ['e2']).intermediate, true)
+})
+
+test('朗讀照官方時間：整個朗讀部分一起默讀 1 分鐘，初級 1 分鐘、中級 2 分鐘念完；兩段都念到才算這一回做完（稽核 SV-05、D-SV-02）', async () => {
+  const { readSeconds, geptRoundDone } = await import('../src/lib/gept.ts')
+  assert.deepEqual(readSeconds.elementary, { silent: 60, aloud: 60 })
+  assert.deepEqual(readSeconds.intermediate, { silent: 60, aloud: 120 })
+  const el = { repeat: ['a', 'b', 'c'] }
+  assert.equal(geptRoundDone({ r: 60, q: 4, rr: 3 }, 'elementary', el, 2), false, '以前的紀錄看不出兩段都念了')
+  assert.equal(geptRoundDone({ r: 60, rp: [90, 0], q: 4, rr: 3 }, 'elementary', el, 2), false, '只念了句子，短文沒念')
+  assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4, rr: 2 }, 'elementary', el, 2), false, '複誦只做了兩句')
+  assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4, rr: 3 }, 'elementary', el, 2), true)
+  assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4 }, 'intermediate', {}, 2), false, '中級還要看圖敘述')
+  assert.equal(geptRoundDone({ r: 80, rp: [90, 70], q: 4, p: 3 }, 'intermediate', {}, 2), true)
 })

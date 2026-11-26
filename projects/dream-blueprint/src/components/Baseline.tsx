@@ -68,6 +68,8 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [plays, setPlays] = useState(0)
+  // Plays that were heard to the end: pressing 播放 alone is not having listened (a cut-off clip is not counted).
+  const [heard, setHeard] = useState(0)
   const [listen, setListen] = useState<number[]>([])
   const [read, setRead] = useState<number[]>([])
   // What he wrote stays on this device until the test is saved (leaving the page or closing the test keeps it).
@@ -83,6 +85,10 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   const stream = useRef<MediaStream | null>(null)
   const started = useRef(0)
   const alive = useRef(true)
+  // Each press of 錄音 is one request; going back a step or finishing cancels a request still waiting for permission.
+  const asking = useRef(0)
+  const [requesting, setRequesting] = useState(false)
+  const dropRequest = () => { asking.current++; setRequesting(false) }
   // Leaving the page (or closing the test) turns the microphone off, also when permission comes back after leaving.
   useEffect(() => {
     alive.current = true
@@ -93,20 +99,28 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     if (!('speechSynthesis' in window) || plays >= 2) return
     const u = new SpeechSynthesisUtterance(form.listen)
     u.lang = 'en-US'; u.rate = 0.9
+    u.onend = () => { if (alive.current) setHeard(n => n + 1) }
     speechSynthesis.cancel(); speechSynthesis.speak(u)
     setPlays(plays + 1)
   }
   async function record() {
     if (recording) { recorder.current?.stop(); return }
+    if (requesting) return
+    const mine = ++asking.current
+    setRequesting(true)
+    let media: MediaStream | null = null
     try {
-      const media = await navigator.mediaDevices.getUserMedia({ audio: true })
-      if (!alive.current) { media.getTracks().forEach(t => t.stop()); return }
+      media = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Permission came back after leaving the test, going back a step or finishing: nothing is recorded.
+      if (!alive.current || asking.current !== mine) { media.getTracks().forEach(t => t.stop()); return }
+      setRequesting(false)
       stream.current = media
+      const got = media
       const chunks: Blob[] = []
-      const r = new MediaRecorder(media)
+      const r = new MediaRecorder(got)
       r.ondataavailable = e => chunks.push(e.data)
       r.onstop = () => {
-        media.getTracks().forEach(t => t.stop())
+        got.getTracks().forEach(t => t.stop())
         stream.current = null
         if (!alive.current) return
         setAudio(new Blob(chunks, { type: r.mimeType }))
@@ -114,7 +128,11 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
         setRecording(false)
       }
       recorder.current = r; started.current = Date.now(); r.start(); setRecording(true)
-    } catch { setBusy('麥克風被擋住了，可以先略過口說。') }
+    } catch {
+      // The microphone opened but the recorder could not start: close it again.
+      media?.getTracks().forEach(t => t.stop()); stream.current = null
+      if (alive.current && asking.current === mine) { setRequesting(false); setBusy('錄音開不起來（麥克風被擋住或這個瀏覽器不能錄），可以先略過口說。') }
+    }
   }
   async function transcribe(blob: Blob) {
     if (!openaiKey()) return ''
@@ -128,7 +146,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   }
   async function finish() {
     // Skipped parts are 缺測 (null), not zero; a listening answer without playing the clip is not a listening score.
-    const listening = plays ? sectionScore(form.listenQs, listen) : null
+    const listening = heard ? sectionScore(form.listenQs, listen) : null
     const reading = sectionScore(form.readQs, read)
     if (emptyCheck({ listening, reading, writing: { text: writing, feedback: '' }, speaking: { transcript: '', feedback: '', seconds: audio ? seconds : 0 } })) {
       setBusy('這次每一項都跳過了：沒有存結果，題本也沒有用掉。回上一步補做一項，就可以存。'); return
@@ -143,7 +161,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       }
     } catch { /* keep whatever we have */ }
     const result: BaselineResult = {
-      form: formId, date: dayKey(), listening, plays, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
+      form: formId, date: dayKey(), listening, plays: heard, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
       writing: { text: writing, feedback: writeFeedback },
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
@@ -218,16 +236,16 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     {step === 3 && <>
       <p lang="en"><b>{form.speak}</b></p>
       <p>按下錄音直接講，講完按停止。{openaiKey() ? '會用 OpenAI 轉成文字再請 Claude 給回饋。' : '（沒有 OpenAI 金鑰，只會記下長度。）'}</p>
-      <button type="button" className={'bl-rec' + (recording ? ' on' : '')} onClick={record}>{recording ? <><Square size={15} fill="currentColor" />停止</> : <><Mic size={16} />{audio ? '重錄' : '錄音'}</>}</button>
+      <button type="button" className={'bl-rec' + (recording ? ' on' : '')} disabled={requesting} onClick={record}>{recording ? <><Square size={15} fill="currentColor" />停止</> : requesting ? <><Mic size={16} />等麥克風允許……</> : <><Mic size={16} />{audio ? '重錄' : '錄音'}</>}</button>
       {audio && !recording && <p>錄好了，約 {seconds} 秒。</p>}
       {recording && <p>講完先按「停止」，再按完成。</p>}
     </>}
     {busy && <p role="status">{busy}</p>}
     <div className="bl-nav">
-      <button type="button" disabled={saving} onClick={() => { if (recording) recorder.current?.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
+      <button type="button" disabled={saving} onClick={() => { dropRequest(); if (recording) recorder.current?.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
       {step < 3
         ? <button type="button" className="bl-main" onClick={() => { setBusy(''); setStep(step + 1) }}>下一步</button>
-        : <button type="button" className="bl-main" disabled={saving || recording} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}
+        : <button type="button" className="bl-main" disabled={saving || recording || requesting} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}
     </div>
   </section>
 }

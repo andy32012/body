@@ -107,7 +107,7 @@
     "zh": "他不是醫生，他是病人。",
     "en": "He is not a doctor. He is a patient.",
     "alt": [
-     "He is not a doctor, he is a patient."
+     "He's not a doctor. He's a patient."
     ]
    },
    {
@@ -691,7 +691,7 @@
    {
     "en": "Answer these with Yes, I do. or No, I don't., and add one more sentence each: Do you cook? Do you exercise? Do you read at night?",
     "zh": "用 Yes, I do.／No, I don't. 回答這三題，每題再多說一句：Do you cook? Do you exercise? Do you read at night?",
-    "sample": "Do you cook? No, I don't. My mom cooks for me. Do you exercise? Yes, I do. I run on Sundays."
+    "sample": "Do you cook? No, I don't. My mom cooks for me. Do you exercise? Yes, I do. I run on Sundays. Do you read at night? Yes, I do. I read a book before bed."
    }
   ]
  },
@@ -2556,7 +2556,7 @@
    {
     "en": "Write about your week: two things you always or usually do, and one thing you never do. Add how often (twice a week, every day…) to at least one of them.",
     "zh": "寫你的一週：兩件總是或通常做的事、一件從來不做的事；至少一句加上次數（once a week、every day…），其他句可以只說時間。",
-    "sample": "I usually get up at seven. I go to the gym twice a week. I never skip breakfast."
+    "sample": "I usually get up at seven. I usually go to the gym twice a week. I never skip breakfast."
    },
    {
     "en": "Write about a family member's habits. Use always, usually, sometimes, and never.",
@@ -4650,7 +4650,7 @@
    {
     "en": "Write three things you don't know about the future. Use I don't know if… or I don't know when…",
     "zh": "寫三件你不確定的未來的事，用 I don't know if… 或 I don't know when…。",
-    "sample": "I don't know if I will pass the test. I don't know when my sister will come home. I don't know where I will work after school."
+    "sample": "I don't know if I will pass the test. I don't know when my sister will come home. I don't know when I will start my first job."
    },
    {
     "en": "You are at a train station. Write three polite questions with Could you tell me… or Do you know…",
@@ -6000,9 +6000,11 @@
     ]
    },
    {
-    "zh": "胰島素應該在飯前打。",
-    "en": "Insulin should be given before meals.",
+    "zh": "這位病人的胰島素應該在飯前打（照他的醫囑）。",
+    "en": "This patient's insulin should be given before meals.",
     "alt": [
+     "The patient's insulin should be given before meals.",
+     "Insulin should be given before meals.",
      "The insulin should be given before meals."
     ]
    },
@@ -7503,10 +7505,12 @@
     ]
    },
    {
-    "zh": "他的血糖很低，他一定沒吃午餐。",
-    "en": "His blood sugar is low. He must have skipped lunch.",
+    "zh": "他的血糖很低，他可能沒吃午餐（要問過才知道）。",
+    "en": "His blood sugar is low. He might have skipped lunch.",
     "alt": [
-     "His blood sugar is low. He must not have eaten lunch."
+     "His blood sugar is low. He may have skipped lunch.",
+     "His blood sugar is low. He could have skipped lunch.",
+     "His blood sugar is low. He might not have eaten lunch."
     ]
    },
    {

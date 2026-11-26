@@ -8,6 +8,7 @@ import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { dayKey } from '../lib/progress'
 import { addSayCard, hasSayCard, removeSayCard } from '../lib/sayCards'
+import { checkSequence } from '../lib/checks'
 import { addWeak, easeWeak, labelOfUnit, normalizeLabel, weakLinesEn } from '../lib/weakPoints'
 import { parseSpeakFeedback, speakFeedbackPrompt, type SpeakFeedback, type SpeakFix } from '../lib/speakFeedback'
 import { speakEnglish } from '../lib/tts'
@@ -71,9 +72,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   const card = ieltsMode ? (cueCards as CueCard[]).find(c => c.id === cardId) ?? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
   function nextCard() {
     if (!card) return
+    // Feedback still being written for the call on this card stays with that call (its corrections are saved), not
+    // under the new card.
+    attempts.current.start()
     const skip = [...cardSkip, card.id]
     setCardSkip(skip); setCardId(nextCueCard(cueCards as CueCard[], state.notes, skip)?.id); setPrepEnd(undefined); setPrepNotes('')
-    setLines([]); setFeedback(null); setStatus('idle')
+    setLines([]); setFeedback(null); setFixes([]); setNoting(false); setStatus('idle')
   }
   const [prepEnd, setPrepEnd] = useState<number>()
   const [prepNotes, setPrepNotes] = useState('')
@@ -118,6 +122,9 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
 
   // A call still being set up (permission dialog open, network not answered) is cancelled by 結束 or by leaving.
   const setup = useRef<AbortController | null>(null)
+  // Each call, and each new card, gets a number: only the current one changes the screen. A call cancelled while it
+  // was being set up cannot set a newer call back to idle, and late feedback does not land under another card.
+  const attempts = useRef(checkSequence())
   useEffect(() => () => { setup.current?.abort(); session.current?.stop() }, [])
   // One wrap-up per call, however the call ended.
   const wrapped = useRef(false)
@@ -143,14 +150,16 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     if (!openaiKey()) { setSettings(true); return }
     if (packRef && !packTask) { setError(loadFailed ? '口說任務沒有下載到：連上網路後重新整理這一頁。' : '口說任務還在載入，等一下再按。'); return }
     if (nurseMode && !nurse) { setError(loadFailed ? '這段情境沒有下載到：連上網路後重新整理這一頁。' : '情境還在載入，等一下再按。'); return }
-    setError(''); setLines([]); setFeedback(null); setFixes([]); setYouMs(0); setYouFrom(undefined)
+    setError(''); setLines([]); setFeedback(null); setFixes([]); setNoting(false); setYouMs(0); setYouFrom(undefined)
+    const mine = attempts.current.start()
+    const mineNow = () => attempts.current.isCurrent(mine)
     setup.current?.abort()
     const controller = new AbortController()
     setup.current = controller
     wrapped.current = false
     const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : wordChat ? wordChatInstructions(wordChat) : ''
     try {
-      session.current = await startVoice({
+      const started = await startVoice({
         // Everything but the IELTS test knows what his course has taught and corrects him by his rule.
         instructions: emmaInstructions(memory.notes, extra, emmaLevel(state.curriculum.unit), {
           // Role-plays (life topic, unit task, nursing scene) keep their own rule for mistakes.
@@ -161,18 +170,22 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
         quiet: card ? undefined : { afterMs: 10000, times: 2, say: quietNudge },
         // Not in Part 2 either: a "Mm-hm" from her would cut a hole in his long answer.
         guard: echoGuard() && !card,
-        onLine: setLines,
+        onLine: change => { if (mineNow()) setLines(change) },
         signal: controller.signal,
-        onLevel: (her, you) => { levels.current = { her, you } },
+        onLevel: (her, you) => { if (mineNow()) levels.current = { her, you } },
         onState: (s, detail) => {
+          if (!mineNow()) return
           setStatus(s)
           if (s === 'live') setLiveAt(Date.now())
           if (detail) setError(detail)
-          if (s === 'closed') { session.current = null; if (!wrapped.current) { wrapped.current = true; void wrapUp() } }
+          if (s === 'closed') { session.current = null; if (!wrapped.current) { wrapped.current = true; void wrapUp(mine) } }
         },
       })
-      if (controller.signal.aborted) session.current?.stop()
+      // Ended (or another call started) while it was connecting: this one is hung up, the newer one is left alone.
+      if (controller.signal.aborted || !mineNow()) { started.stop(); return }
+      session.current = started
     } catch (e) {
+      if (!mineNow()) return
       setStatus('idle')
       if (controller.signal.aborted) return
       const msg = e instanceof Error ? e.message : String(e)
@@ -180,7 +193,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
     }
   }
 
-  async function wrapUp() {
+  async function wrapUp(mine: number) {
+    const mineNow = () => attempts.current.isCurrent(mine)
     const said = linesRef.current
     driveLog('英文口說', said.map(l => ({ role: l.role === 'user' ? 'user' : NAME, text: l.text })))
     // One long answer (a Part 2 monologue arrives as one line) counts as much as a back-and-forth.
@@ -201,7 +215,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       return rec ? { ...prev, notes: markLessonStep(prev.notes, today, rec.unit, rec.day, 'express') } : prev
     })
     if (!tutorKey()) return
-    setNoting(true)
+    if (mineNow()) setNoting(true)
     try {
       const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
       const raw = await askTutor((card ? part2FeedbackPrompt + '\n題目卡：' + card.topic : speakFeedbackPrompt(focus, NAME)) + '\n' + memoryPrompt(memory.notes),
@@ -211,11 +225,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
       const fb = parseSpeakFeedback(clean)
       const day = dayKey()
       // The corrections go into review by themselves (each can be taken out again), and onto the weak-point list.
-      setFixes(fb.fixes.map(f => ({ ...f, status: hasSayCard(notesRef.current, f.en) ? 'already' : 'added' })))
+      // The corrections are saved either way; they are shown only while this call is still the one on screen.
+      if (mineNow()) setFixes(fb.fixes.map(f => ({ ...f, status: hasSayCard(notesRef.current, f.en) ? 'already' : 'added' })))
       if (fb.fixes.length) update(prev => fb.fixes.reduce((next, f, i) => keepFix(next, f, day, i), prev))
-      setFeedback(fb)
+      if (mineNow()) setFeedback(fb)
     } catch { /* feedback is optional */ }
-    finally { setNoting(false) }
+    finally { if (mineNow()) setNoting(false) }
   }
 
   function keepFix<S extends Parameters<typeof addSayCard>[0]>(prev: S, f: SpeakFix, day: string, salt: number): S {

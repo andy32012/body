@@ -161,3 +161,13 @@ test('實習清單：一般短文、發音課不會把「護理英文：聽或�
   notes = { ...notes, [nurseSpeakKey('nl-01')]: day }
   assert.equal(nurseSpokeOn(notes, day), true)
 })
+
+test('護理單字同一個字今天再做一次：「今天過關」不會重複算（稽核 SV-04）', async () => {
+  const { countNurseWord, nurseWordsOn } = await import('../src/lib/nursing.ts')
+  let notes: Record<string, string> = {}
+  for (const w of ['pulse', 'fever', 'pulse', 'pulse']) notes = countNurseWord(notes, '2026-11-26', w)
+  assert.equal(nurseWordsOn(notes, '2026-11-26'), 2)
+  // A day counted the old way keeps its number.
+  assert.equal(nurseWordsOn({ 'nurse.words.2026-11-20': '7' }, '2026-11-20'), 7)
+  assert.equal(nurseWordsOn(countNurseWord({ 'nurse.words.2026-11-20': '7' }, '2026-11-20', 'pulse'), '2026-11-20'), 8)
+})

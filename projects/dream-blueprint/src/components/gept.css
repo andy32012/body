@@ -24,6 +24,8 @@
 .gp-list > li:last-child { border-bottom: 0; padding-bottom: 0; }
 .gp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; }
 .gp-read strong { font-size: 15px; }
+.gp-read { display: grid; gap: 10px; }
+.gp-read-piece { display: grid; gap: 6px; }
 .gp-passage { margin: 0; font-size: 16px; line-height: 1.85; overflow-wrap: anywhere; }
 .gp-sentences { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; font-size: 15.5px; line-height: 1.6; overflow-wrap: anywhere; }
 .gp-timer { font-variant-numeric: tabular-nums; color: var(--lav); font-weight: 650; }

@@ -36,7 +36,7 @@ function Graded({ fb }: { fb: WriteFeedback }) {
   const ok = passes(r, scores.length ? got / scores.length : 0)
   return <>
     <div className="wl-fb-head"><strong>Claude 批改</strong><span className="wl-band">{ielts ? 'IELTS 練習估計 ' + fb.band : r.id === 'gept-sentence' ? got + ' / ' + full + ' 分' : got + ' / 5 級分'}</span></div>
-    <p className="wl-pass" data-ok={ok}>照「{r.title}」官方評分表給分{r.pass ? (ok ? '：✓ 達到通過標準（' + r.pass.note + '）' : '：還沒到通過標準（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>
+    <p className="wl-pass" data-ok={ok}>照「{r.title}」官方評分表給分{r.pass ? (ok ? '：✓ 達到這裡的練習目標（' + r.pass.note + '）' : '：還沒到這裡的練習目標（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>
     {fb.summary && <p>{fb.summary}</p>}
     <ul className="wl-scores">{scores.map((s, i) => <li key={s.name}>
       <span className="wl-score" data-level={levelOf(s.score, r.max)}>{s.score}{ielts ? '' : ' / ' + r.max}</span>

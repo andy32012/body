@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Camera, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
-import { geptLevelsOpen, geptPass, speakRubric,
+import { geptLevelsOpen, geptPass, geptRoundDone, readSeconds, speakRubric,
   answerSeconds, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept,
   type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord,
 } from '../lib/gept'
@@ -14,6 +14,7 @@ import { addWeak, normalizeLabel } from '../lib/weakPoints'
 import { logSkill } from '../lib/bridge'
 import { dayKey } from '../lib/progress'
 import ReadAloudCheck from './ReadAloudCheck'
+import { compareReading } from '../lib/readAloud'
 import { RubricTable } from './RubricTable'
 import { LockLine } from './Locked'
 import { levelText, rubrics, type RubricId } from '../lib/rubrics'
@@ -69,8 +70,8 @@ export default function GeptSpeaking({ state, update }: PageProps) {
         {sets.map((s, i) => {
           const rec = readGept(state.notes, level, s.id)
           return <button key={s.id} type="button" aria-pressed={s.id === setId} onClick={() => { setSetId(s.id); setOpen([]) }}>
-            {/* ✓ only when every scored part was done; one part started is said as such. */}
-            第 {i + 1} 回{rec.r !== undefined && rec.q !== undefined && (level === 'elementary' || rec.p !== undefined) ? ' ✓' : rec.d ? <small>做過一部分</small> : ''}{rec.q !== undefined ? <small>問答 {rec.q}</small> : null}
+            {/* ✓ only when every part of the round was done (each read-aloud piece, the repeated sentences); one part started is said as such. */}
+            第 {i + 1} 回{geptRoundDone(rec, level, level === 'elementary' ? elementary.find(e => e.id === s.id) ?? {} : {}, level === 'elementary' ? 2 : intermediate.find(m => m.id === s.id)?.passages.length ?? 2) ? ' ✓' : rec.d ? <small>做過一部分</small> : ''}{rec.q !== undefined ? <small>問答 {rec.q}</small> : null}
           </button>
         })}
       </div>
@@ -83,9 +84,10 @@ export default function GeptSpeaking({ state, update }: PageProps) {
     {info.parts.map(p => <section key={setId + p.part} className="gp-part" aria-label={p.name}>
       <header><h2>{p.name}</h2><small>{p.how}</small></header>
       {!open.includes(p.part) ? <button type="button" className="gp-open" disabled={!engine} onClick={() => setOpen(o => [...o, p.part])}>開始這一部分</button>
-        : p.part === 'repeat' && el ? <RepeatPart sentences={el.repeat} rate={rate} />
-        : p.part === 'read' ? <ReadPart texts={el ? [el.readSentences.join(' '), el.readPassage] : mid!.passages} lists={el ? [el.readSentences] : []} level={level} rate={rate}
-            onRead={ratio => save({ r: Math.round(ratio * 100) })} />
+        : p.part === 'repeat' && el ? <RepeatPart key={setId} sentences={el.repeat} rate={rate}
+            onRepeated={n => { if (n > (readGept(state.notes, level, setId).rr ?? 0)) save({ rr: n }) }} />
+        : p.part === 'read' ? <ReadPart key={setId} texts={el ? [el.readSentences.join(' '), el.readPassage] : mid!.passages} lists={el ? [el.readSentences] : []} level={level} rate={rate}
+            onRead={(whole, pieces) => save({ r: Math.round(whole * 100), rp: pieces.map(x => Math.round(x * 100)) })} />
         : p.part === 'questions' ? <QuestionsPart key={setId} level={level} questions={(el ?? mid)!.questions} rate={rate} onScore={(score, fb) => save({ ...(score !== undefined ? { q: score } : {}) }, fb)} />
         : p.part === 'picture' && mid ? <PicturePart key={setId} picture={mid.picture} rate={rate} onScore={(score, fb) => save({ ...(score !== undefined ? { p: score } : {}) }, fb)} />
         : null}
@@ -93,11 +95,13 @@ export default function GeptSpeaking({ state, update }: PageProps) {
   </div>
 }
 
-/** 複誦: hear the sentence twice without seeing it, then say it. */
-function RepeatPart({ sentences, rate }: { sentences: string[]; rate: number }) {
-  return <ol className="gp-list">{sentences.map((s, i) => <RepeatItem key={s} n={i + 1} text={s} rate={rate} />)}</ol>
+/** 複誦: hear the sentence twice without seeing it, then say it. How many sentences were said is kept for the round. */
+function RepeatPart({ sentences, rate, onRepeated }: { sentences: string[]; rate: number; onRepeated: (count: number) => void }) {
+  const said = useRef(new Set<string>())
+  const done = (s: string) => { said.current.add(s); onRepeated(said.current.size) }
+  return <ol className="gp-list">{sentences.map((s, i) => <RepeatItem key={s} n={i + 1} text={s} rate={rate} onSaid={() => done(s)} />)}</ol>
 }
-function RepeatItem({ n, text, rate }: { n: number; text: string; rate: number }) {
+function RepeatItem({ n, text, rate, onSaid }: { n: number; text: string; rate: number; onSaid: () => void }) {
   const [played, setPlayed] = useState(false)
   const [playing, setPlaying] = useState(false)
   async function play() {
@@ -107,43 +111,60 @@ function RepeatItem({ n, text, rate }: { n: number; text: string; rate: number }
   }
   return <li>
     <button type="button" className="gp-play" disabled={playing} onClick={() => void play()}><Volume2 size={14} />{playing ? '播放中……' : played ? '再聽兩次' : '第 ' + n + ' 句：聽兩次'}</button>
-    {played && <ReadAloudCheck text={text} rate={rate} maxMs={15000} hideText compact />}
+    {played && <ReadAloudCheck text={text} rate={rate} maxMs={15000} hideText compact onResult={onSaid} />}
   </li>
 }
 
-/** 朗讀: read silently first (a minute, or skip), then aloud; then see which words came through. */
-function ReadPart({ texts, lists, level, rate, onRead }: { texts: string[]; lists: string[][]; level: GeptLevel; rate: number; onRead: (ratio: number) => void }) {
-  return <ol className="gp-list">{texts.map((t, i) => <ReadItem key={t} n={i} text={t} list={lists[i]} title={level === 'elementary' ? (lists[i] ? '五個句子' : '短文') : '短文 ' + (i + 1)} rate={rate} onRead={onRead} />)}</ol>
-}
-function ReadItem({ text, list, title, rate, onRead }: { n: number; text: string; list?: string[]; title: string; rate: number; onRead: (ratio: number) => void }) {
+/** 朗讀 as the test runs it: every piece of the part on screen together (初級 the five sentences and the passage, 中級
+ *  both passages), one silent minute for all of them, then one time to read them all aloud (初級 1 minute, 中級 2
+ *  minutes), not a minute and two minutes for each. Reading piece by piece without the clock is a practice mode of its
+ *  own and is not kept as the round's result. Afterwards: which words came through, for the whole part and each piece. */
+function ReadPart({ texts, lists, level, rate, onRead }: { texts: string[]; lists: string[][]; level: GeptLevel; rate: number; onRead: (whole: number, pieces: number[]) => void }) {
+  const time = readSeconds[level]
+  const [mode, setMode] = useState<'test' | 'practice'>('test')
   const [phase, setPhase] = useState<'ready' | 'silent' | 'aloud'>('ready')
-  const [left, setLeft] = useState(60)
+  const [left, setLeft] = useState(time.silent)
   useEffect(() => {
     if (phase !== 'silent') return
-    const end = Date.now() + 60000
+    const end = Date.now() + time.silent * 1000
     const t = setInterval(() => { const s = Math.ceil((end - Date.now()) / 1000); setLeft(Math.max(0, s)); if (s <= 0) setPhase('aloud') }, 250)
     return () => clearInterval(t)
-  }, [phase])
-  return <li className="gp-read">
-    <strong>{title}</strong>
+  }, [phase, time.silent])
+  const titles = texts.map((_, i) => level === 'elementary' ? (lists[i] ? '五個句子' : '短文') : '短文 ' + (i + 1))
+  const piece = (t: string, i: number) => <section key={t} className="gp-read-piece">
+    <strong>{titles[i]}</strong>
+    {lists[i] ? <ol className="gp-sentences" lang="en">{lists[i].map(s => <li key={s}>{s}</li>)}</ol> : <p className="gp-passage" lang="en">{t}</p>}
+  </section>
+  const minutes = (sec: number) => sec % 60 ? sec + ' 秒' : sec / 60 + ' 分鐘'
+  if (mode === 'practice') return <div className="gp-read">
+    <p className="gp-small">分段練習：一段一段念，不計時，不算這一回的成績。<button type="button" className="gp-link" onClick={() => setMode('test')}>回到照考試時間</button></p>
+    <ol className="gp-list">{texts.map((t, i) => <li key={t} className="gp-read">{piece(t, i)}<ReadAloudCheck text={t} rate={rate} maxMs={120000} /></li>)}</ol>
+  </div>
+  return <div className="gp-read">
     {phase === 'ready' && <div className="gp-row">
-      <button type="button" className="gp-play" onClick={() => setPhase('silent')}>開始默讀 1 分鐘</button>
+      <button type="button" className="gp-play" onClick={() => setPhase('silent')}>開始默讀 {minutes(time.silent)}</button>
       <button type="button" className="gp-link" onClick={() => setPhase('aloud')}>直接開始念</button>
+      <button type="button" className="gp-link" onClick={() => setMode('practice')}>分段練習（不計時）</button>
     </div>}
     {phase !== 'ready' && <>
-      {list ? <ol className="gp-sentences" lang="en">{list.map(s => <li key={s}>{s}</li>)}</ol> : <p className="gp-passage" lang="en">{text}</p>}
-      {phase === 'silent' && <div className="gp-row"><span className="gp-timer">默讀還有 {left} 秒</span><button type="button" className="gp-link" onClick={() => setPhase('aloud')}>準備好了</button></div>}
-      {phase === 'aloud' && <ReadAloudCheck text={text} rate={rate} maxMs={120000} onResult={r => onRead(r.ratio)} />}
+      {texts.map(piece)}
+      {phase === 'silent' && <div className="gp-row"><span className="gp-timer">默讀還有 {left} 秒（全部一起）</span><button type="button" className="gp-link" onClick={() => setPhase('aloud')}>準備好了</button></div>}
+      {phase === 'aloud' && <>
+        <p className="gp-small">{level === 'elementary' ? '句子和短文' : '兩篇短文'}要在 {minutes(time.aloud)}內一起念完，時間到會自己停。</p>
+        <ReadAloudCheck text={texts.join(' ')} rate={rate} maxMs={time.aloud * 1000} onResult={(r, words) => onRead(r.ratio, texts.map(t => compareReading(t, words).ratio))} />
+      </>}
     </>}
-  </li>
+  </div>
 }
 
 /** One answer: the question is read twice (not shown unless asked), then the answer time runs. */
 function useAnswer() {
   const session = useRef<Listening | null>(null)
   const alive = useRef(true)
-  useEffect(() => () => { alive.current = false; session.current?.cancel(); stopSpeaking() }, [])
-  return { session, alive }
+  // Leaving the page cancels the recording, also one whose microphone permission comes back only afterwards.
+  const leaving = useRef(new AbortController())
+  useEffect(() => () => { alive.current = false; leaving.current.abort(); session.current?.cancel(); stopSpeaking() }, [])
+  return { session, alive, signal: leaving.current.signal }
 }
 
 /** 回答問題: ten questions (中級) or seven (初級), one after another; Claude scores them together at the end. */
@@ -156,7 +177,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
   const [left, setLeft] = useState(0)
   const [error, setError] = useState('')
   const [fb, setFb] = useState<GeptFeedback | null>(null)
-  const { session, alive } = useAnswer()
+  const { session, alive, signal } = useAnswer()
 
   async function ask(k: number) {
     setAt(k); setError(''); setPhase('playing'); setShow(false)
@@ -166,7 +187,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
     const secs = answerSeconds(level, k)
     let timer: ReturnType<typeof setInterval> | undefined
     try {
-      const s = await listen({ maxMs: secs * 1000 })
+      const s = await listen({ maxMs: secs * 1000, signal })
       session.current = s
       const end = Date.now() + secs * 1000
       setLeft(secs); setPhase('answering')
@@ -178,6 +199,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       if (k + 1 < questions.length) setPhase('between')
       else void score()
     } catch (e) {
+      if (!alive.current) return
       setError(e instanceof Error ? e.message : String(e))
       setPhase('between')
     } finally { clearInterval(timer); session.current = null }
@@ -238,7 +260,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
   const [said, setSaid] = useState('')
   const [error, setError] = useState('')
   const [fb, setFb] = useState<GeptFeedback | null>(null)
-  const { session, alive } = useAnswer()
+  const { session, alive, signal } = useAnswer()
   const file = useRef<HTMLInputElement>(null)
   const skip = useRef(false)
   const [big, setBig] = useState(false)
@@ -262,7 +284,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     if (!alive.current) return
     let timer: ReturnType<typeof setInterval> | undefined
     try {
-      const s = await listen({ maxMs: 90000 })
+      const s = await listen({ maxMs: 90000, signal })
       session.current = s
       const end = Date.now() + 90000
       setLeft(90); setPhase('talking')
@@ -275,7 +297,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       const result = parseGeptFeedback(await askTutor(picturePrompt({ describe, questions }), [{ role: 'user', content: '他說：' + (text || '（沒有說話）') }]))
       if (!alive.current) return
       setFb(result); onScore(result.score, result); setPhase('done')
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); setPhase('done') }
+    } catch (e) { if (alive.current) { setError(e instanceof Error ? e.message : String(e)); setPhase('done') } }
     finally { clearInterval(timer); session.current = null }
   }
 

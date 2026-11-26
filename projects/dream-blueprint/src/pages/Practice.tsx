@@ -530,6 +530,12 @@ function PracticeSession({
               pattern={current.title}
               rule={current.rule}
               peekedBefore={!!lessonRecord?.peeked?.includes(at)}
+              saved={lessonRecord?.varyChecks?.[at]}
+              draftKey={"vary." + current.unit + "." + current.day + "." + at}
+              onCheck={(check) => update((prev) => {
+                const rec = readLessonRecord(prev.notes, lessonDate);
+                return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { varyChecks: { ...(rec?.varyChecks ?? {}), [at]: check } }) };
+              })}
               onPeek={() => update((prev) => {
                 const rec = readLessonRecord(prev.notes, lessonDate);
                 if (rec?.peeked?.includes(at)) return prev;

@@ -112,9 +112,11 @@ export function baseForms(word: string): string[] {
   const out = [w]
   if (irregular[w]) out.push(irregular[w])
   // A stem ending in one vowel and one consonant comes from a word with -e (caring → care, hoping → hope, using → use);
-  // the doubled consonant is the other way round (hopping → hop). Only table words are taken, so a wrong guess is skipped.
+  // a doubled consonant is either the word's own (added → add, called → call, missed → miss) or doubled for the ending
+  // (hopping → hop, planned → plan): the whole stem first, so add is found before the table's ad. Only table words are
+  // taken, so a stem that is no word (hopp) is skipped.
   const add = (stem: string) => {
-    if (/([b-df-hj-np-tv-z])\1$/.test(stem)) { out.push(stem.slice(0, -1)); out.push(stem); return }
+    if (/([b-df-hj-np-tv-z])\1$/.test(stem)) { out.push(stem); out.push(stem.slice(0, -1)); return }
     if (/(^|[^aeiou])[aeiou][b-df-hj-np-tv-z]$/.test(stem)) { out.push(stem + 'e'); out.push(stem); return }
     out.push(stem); out.push(stem + 'e')
   }

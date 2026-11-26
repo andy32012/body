@@ -91,8 +91,10 @@ function walk(input: CalendarInput): PlannedDay[] {
   const stuck = !!input.lockedUnit && Math.floor(cursor / schedule.daysPerUnit) + 1 >= input.lockedUnit
   let credit = 1 - pace
   const topics = (input.topics ?? []).map(t => ({ ...t, done: { ...t.done } }))
-  const lastMain = input.sessions.filter(s => s.day < input.today && s.energy !== 'low').at(-1)
+  // Today's main lesson counts once it is done (a grammar lesson, or a life topic, which does not move the course on).
+  const lastMain = input.sessions.filter(s => s.day <= input.today && s.energy !== 'low').at(-1)
   let topicTurn = !lastMain?.sentenceId?.startsWith('topic:')
+  const topicToday = input.sessions.some(s => s.day === input.today && s.energy !== 'low' && s.sentenceId?.startsWith('topic:'))
   /** The same rule as the daily lesson: an open part first, then the next part of the first unlocked topic that is ready. */
   function topicFor(day: string): { t: typeof topics[number]; part: Part } | null {
     const open = topics.find(t => t.open && !t.done[t.open])
@@ -129,6 +131,9 @@ function walk(input: CalendarInput): PlannedDay[] {
       item.label = '過年休息'
     } else if (advanced.has(day)) {
       item.label = '今天已完成課表練習'
+    } else if (day === input.today && topicToday) {
+      // Today's main lesson was a life topic: an extra grammar lesson today is optional, so the calendar does not assume it.
+      item.label = '今天已完成生活主題'
     } else {
       const dow = weekday(day)
       let regular = period === 'vacation' ? dow !== 0 : weekdays.includes(dow)

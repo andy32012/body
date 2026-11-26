@@ -141,3 +141,21 @@ test('弱點清單再多也不會超過一則筆記的長度上限', () => {
   assert.ok(notes[weakKey].length <= 30000, String(notes[weakKey].length))
   assert.ok(readWeak(notes).length >= 20)
 })
+
+test('錯句卡分得出數字：Take 5 mg. 和 Take 50 mg. 是兩張卡，刪一張不會刪到另一張（稽核 LIT-04）', async () => {
+  const { addSayCard, hasSayCard, removeSayCard, sayIdentity } = await import('../src/lib/sayCards.ts')
+  let s = { notes: {} as Record<string, string>, cards: [] as import('../src/lib/progress.ts').ReviewCard[] }
+  s = addSayCard(s, { zh: '服用五毫克。', en: 'Take 5 mg.' }, '2026-11-26', 'a')
+  assert.equal(hasSayCard(s.notes, 'Take 50 mg.'), false)
+  s = addSayCard(s, { zh: '服用五十毫克。', en: 'Take 50 mg.' }, '2026-11-26', 'b')
+  assert.equal(s.cards.length, 2)
+  assert.equal(hasSayCard(s.notes, 'take 5 mg'), true, '大小寫和標點不同還是同一句')
+  s = removeSayCard(s, 'Take 50 mg.')
+  assert.equal(s.cards.length, 1)
+  assert.equal(hasSayCard(s.notes, 'Take 5 mg.'), true, '另一張還在')
+  assert.notEqual(sayIdentity('Go to room 12.'), sayIdentity('Go to room 120.'))
+  assert.notEqual(sayIdentity('Give 2.5 mL.'), sayIdentity('Give 25 mL.'))
+  assert.equal(sayIdentity('It costs 1,000 dollars.'), sayIdentity('It costs 1000 dollars'))
+  assert.equal(sayIdentity("I don’t know."), sayIdentity("I don't know"))
+  assert.notEqual(sayIdentity('I can go.'), sayIdentity('I cango.'))
+})

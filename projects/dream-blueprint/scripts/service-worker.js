@@ -49,10 +49,24 @@ self.addEventListener("install", event => {
   })());
 });
 
+// The release just replaced keeps its files until the next update: a page still open on it can load a part it had not
+// opened yet (a lesson's data is loaded when first opened) after the site has stopped publishing those files.
+const earlierCores = async () => (await caches.keys()).filter(name => name.startsWith(prefix + "core-") && name !== coreName);
+async function fromEarlierRelease(href) {
+  for (const name of await earlierCores()) {
+    const hit = await (await caches.open(name)).match(href);
+    if (hit) return hit;
+  }
+  return undefined;
+}
+
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
+    // Cache names come back in the order they were made: the last earlier core is the release just replaced.
+    const cores = await earlierCores();
+    const previous = cores[cores.length - 1];
     for (const name of await caches.keys()) {
-      if (name.startsWith(prefix) && name !== coreName && name !== galleryName && name !== soundName) await caches.delete(name);
+      if (name.startsWith(prefix) && name !== coreName && name !== previous && name !== galleryName && name !== soundName) await caches.delete(name);
     }
     await self.clients.claim();
     const gallery = await caches.open(galleryName);
@@ -109,6 +123,11 @@ self.addEventListener("fetch", event => {
   }
   if (coreURLs.has(key)) {
     event.respondWith((async () => (await (await caches.open(coreName)).match(key)) || fetch(request))());
+    return;
+  }
+  // A file of the release before this one, asked for by a page opened before the update.
+  if (url.href.startsWith(absolute("assets/"))) {
+    event.respondWith((async () => (await fromEarlierRelease(url.href)) || fetch(request))());
   }
 });
 

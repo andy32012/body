@@ -2,6 +2,7 @@ import { officialWords, wordKey } from './vocab'
 import { addDays, newCard, recentRecall, reviewBudget, reviewLoad, wordForecast, type Energy, type ReviewCard, type ReviewEvent } from './progress'
 import { createSceneDeck } from './backgroundRotation'
 import { seedOf } from './starfield'
+import { noteMoved } from './wordStates'
 
 const wordPhotos = createSceneDeck(seedOf('daily-word'))
 const wordIndices = new Map(officialWords.map((word, index) => [word.en, index]))
@@ -57,7 +58,7 @@ export function changeSorted<S extends Sortable>(prev: S, k: string, known: bool
     knownWords: known ? [...others(prev.knownWords), k] : others(prev.knownWords),
     learningWords: known ? others(prev.learningWords) : [...others(prev.learningWords), k],
     cards,
-    notes: recordSorted(prev.notes, day, k, known),
+    notes: noteMoved(recordSorted(prev.notes, day, k, known), [k], known ? 'k' : 'l', day),
   }
 }
 
@@ -68,10 +69,13 @@ export function addWordsToReview<S extends Sortable>(prev: S, keys: readonly str
   const fresh = [...new Set(keys.map(wordKey))].filter(k => !have.has('word:' + k))
   if (!fresh.length) return prev
   const moved = new Set(fresh)
+  const wasKnown = prev.knownWords.map(wordKey).filter(k => moved.has(k))
   return { ...prev,
     knownWords: prev.knownWords.filter(w => !moved.has(wordKey(w))),
     learningWords: [...new Set([...prev.learningWords, ...fresh])],
-    cards: [...prev.cards, ...fresh.map(k => newCard('word:' + k, day))] }
+    cards: [...prev.cards, ...fresh.map(k => newCard('word:' + k, day))],
+    // Moved from 認得: recorded, so a device that still has it as 認得 does not take it back when the two merge.
+    notes: noteMoved(prev.notes, wasKnown, 'l', day) }
 }
 
 /** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */

@@ -108,3 +108,18 @@ test('短文讀聽和 7000 單短文：前一級完成八成才打開下一級�
   assert.equal(passageLevelsOpen(all, checks(8))[1], true)
   assert.equal(passageLevelsOpen(all, checks(8))[2], false)
 })
+
+test('往回把進度設到前面的單元重練：已經穩了的單元還是穩了（稽核 R-06）', async () => {
+  const { setCourseStart } = await import('../src/lib/handoff.ts')
+  const { createInitialState } = await import('../src/lib/store.ts')
+  const s = createInitialState('2026-11-26')
+  s.curriculum = { unit: 4, day: 1, retry: 0, stableUnits: [1, 2, 3] }
+  const back = setCourseStart(s, 2, 1, '2026-11-26')
+  assert.deepEqual(back.curriculum, { unit: 2, day: 1, retry: 0, stableUnits: [1, 2, 3] })
+  // Jumping ahead: the skipped units wait for an unaided recheck, they are not 穩了.
+  const ahead = setCourseStart(s, 6, 1, '2026-11-26')
+  assert.deepEqual(ahead.curriculum.stableUnits, [1, 2, 3])
+  assert.equal(ahead.notes['unit-assisted.4'], '2026-11-26')
+  assert.equal(ahead.notes['unit-assisted.5'], '2026-11-26')
+  assert.equal(ahead.notes['unit-assisted.2'], undefined)
+})

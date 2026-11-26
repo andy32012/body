@@ -70,6 +70,93 @@ export interface ExpressRecord {
   revealed?: boolean
   /** The last rewrite fixed every issue from the round before it (not just "sent again"). */
   fixed?: boolean
+  /** The same task answered on another device the same day (kept by 「兩份合併」, so neither sentence is lost). */
+  others?: ExpressAnswer[]
+}
+export type ExpressAnswer = Pick<ExpressRecord, 'first' | 'firstResult' | 'lastAnswer' | 'last'>
+
+const stepOrder: readonly LessonStep[] = lessonSteps.map(s => s[0])
+const phaseOrder: readonly LessonPhase[] = ['recall', 'listen', 'write', 'sound', 'vary', 'express', 'done']
+const ratingRank: Record<Attempt['rating'], number> = { again: 0, minor: 1, correct: 2 }
+const unique = <T>(xs: readonly T[]) => [...new Set(xs)]
+
+/** One hint record from two devices: the most help either used, Claude's first verdict from the copy changed earlier. */
+export function mergeHintUse(older: HintUse, newer: HintUse): HintUse {
+  const judged = older.v ? older : newer
+  return {
+    h: Math.max(older.h ?? 0, newer.h ?? 0), r: !!(older.r || newer.r),
+    ...(judged.v ? { v: judged.v } : {}), ...(judged.v && judged.vt !== undefined ? { vt: judged.vt } : {}),
+    ...(older.c || newer.c ? { c: true } : {}),
+  }
+}
+export function mergeHints(older: Record<string, HintUse>, newer: Record<string, HintUse>): Record<string, HintUse> {
+  const out: Record<string, HintUse> = { ...older }
+  for (const [id, use] of Object.entries(newer)) out[id] = older[id] ? mergeHintUse(older[id], use) : use
+  return out
+}
+/** Answers in order (recall i answers recall item i). The same items on both: each counted as its more careful
+ *  judgement; otherwise the copy that got further (on a tie, the one changed earlier). */
+function mergeAttempts(older?: Attempt[], newer?: Attempt[]): Attempt[] | undefined {
+  if (!older?.length) return newer
+  if (!newer?.length) return older
+  if (older.length !== newer.length || older.some((a, i) => a.sentenceId !== newer[i].sentenceId)) return newer.length > older.length ? newer : older
+  return older.map((a, i) => {
+    const b = newer[i]
+    const careful = ratingRank[b.rating] < ratingRank[a.rating] ? b : a
+    return { ...careful, revealed: !!(a.revealed || b.revealed), grammar: unique([...(a.grammar ?? []), ...(b.grammar ?? [])]) }
+  })
+}
+const answerOf = (e: ExpressRecord): ExpressAnswer => ({
+  ...(e.first !== undefined ? { first: e.first } : {}), ...(e.firstResult ? { firstResult: e.firstResult } : {}),
+  ...(e.lastAnswer !== undefined ? { lastAnswer: e.lastAnswer } : {}), ...(e.last ? { last: e.last } : {}),
+})
+/** The open task from two devices: the one that got further goes on; the other device's sentences are kept beside it. */
+function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): ExpressRecord | undefined {
+  if (!older) return newer
+  if (!newer) return older
+  const further = (e: ExpressRecord) => (e.fixed ? 100 : 0) + (e.corrections ?? 0) * 10 + (e.last ? 2 : 0) + (e.firstResult ? 1 : 0)
+  const [main, other] = further(newer) > further(older) ? [newer, older] : [older, newer]
+  const kept = [...(main.others ?? []), ...(other.others ?? [])]
+  const otherAnswer = answerOf(other)
+  if ((other.first || other.lastAnswer) && (other.first !== main.first || other.lastAnswer !== main.lastAnswer)) kept.push(otherAnswer)
+  const seen = new Set<string>()
+  const others = kept.filter(o => { const k = JSON.stringify([o.first ?? '', o.lastAnswer ?? '']); if (seen.has(k)) return false; seen.add(k); return true })
+  return {
+    ...main,
+    help: unique([...(main.help ?? []), ...(other.help ?? [])]),
+    ...(main.revealed || other.revealed ? { revealed: true } : {}),
+    ...(others.length ? { others } : {}),
+  }
+}
+/** One day's lesson record from two devices (「兩份合併」): every step, answer and the open task's sentences from both,
+ *  help counted as the most used. A different lesson saved under the same day: the one further along the course, as
+ *  on one device the later lesson of a day replaces the earlier one. `older` is the copy changed earlier. */
+export function mergeLessonRecords(older: LessonRecord, newer: LessonRecord): LessonRecord {
+  if (older.unit !== newer.unit || older.day !== newer.day) return older.unit * 10 + older.day > newer.unit * 10 + newer.day ? older : newer
+  const phases = [older.phase, newer.phase].filter((p): p is LessonPhase => !!p && phaseOrder.includes(p))
+  const phase = phases.sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b)).at(-1)
+  const recalls = mergeAttempts(older.recalls, newer.recalls)
+  const records = mergeAttempts(older.records, newer.records)
+  const hints = older.hints || newer.hints ? mergeHints(older.hints ?? {}, newer.hints ?? {}) : undefined
+  const express = mergeExpress(older.express, newer.express)
+  const peeked = unique([...(older.peeked ?? []), ...(newer.peeked ?? [])]).sort((a, b) => a - b)
+  const varyChecks: Record<string, VariationCheck> = { ...(older.varyChecks ?? {}) }
+  for (const [k, c] of Object.entries(newer.varyChecks ?? {})) varyChecks[k] = varyChecks[k] ? mergeVariationCheck(varyChecks[k], c) : c
+  const full = !(older as { slim?: boolean }).slim || !(newer as { slim?: boolean }).slim
+  const merged: LessonRecord & { slim?: boolean } = {
+    ...older, ...newer,
+    steps: stepOrder.filter(s => older.steps.includes(s) || newer.steps.includes(s)),
+    ...(phase ? { phase } : {}),
+    ...(older.corrected || newer.corrected ? { corrected: true } : {}),
+    ...(older.saved !== undefined || newer.saved !== undefined ? { saved: Math.max(older.saved ?? 0, newer.saved ?? 0) } : {}),
+    ...(older.varied !== undefined || newer.varied !== undefined ? { varied: Math.max(older.varied ?? 0, newer.varied ?? 0) } : {}),
+    ...(recalls ? { recalls } : {}), ...(records ? { records } : {}), ...(hints ? { hints } : {}), ...(express ? { express } : {}),
+    ...(peeked.length ? { peeked } : {}),
+    ...(Object.keys(varyChecks).length ? { varyChecks } : {}),
+  }
+  // A slimmed copy (details sent to the Drive archive) and a full one: the full one's details stay.
+  if (full) delete merged.slim
+  return merged
 }
 export interface LessonRecord {
   unit: number; day: number; steps: LessonStep[]
@@ -82,6 +169,29 @@ export interface LessonRecord {
   varied?: number
   /** Today's variations whose answer was shown (by 看答案 or by Claude), so opening the page again cannot hide it. */
   peeked?: number[]
+  /** Each variation's check so far (by its number today): Claude's first verdict and the text it judged, help seen.
+   *  Kept as it happens, so leaving the page and coming back cannot turn an answer fixed with help into one done alone. */
+  varyChecks?: Record<string, VariationCheck>
+}
+/** One variation's check. */
+export interface VariationCheck {
+  firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean
+  /** What he had written when he pressed 看答案 himself: the answer is judged on this, not on what he copied afterwards. */
+  before?: string
+  /** Claude's latest verdict and the text it was about (for 「Claude 說對了，下一步」 after coming back). */
+  last?: { v: string; text: string }
+}
+/** Two devices' checks of one variation: the first verdict and the text before looking from the copy changed earlier
+ *  (when it has them), help seen on either. */
+export function mergeVariationCheck(older: VariationCheck, newer: VariationCheck): VariationCheck {
+  const judged = older.firstVerdict ? older : newer
+  return {
+    ...newer, ...older,
+    ...(judged.firstVerdict ? { firstVerdict: judged.firstVerdict, checkedText: judged.checkedText } : {}),
+    ...(older.before !== undefined ? { before: older.before } : newer.before !== undefined ? { before: newer.before } : {}),
+    ...(older.revealed || newer.revealed ? { revealed: true } : {}),
+    ...(newer.last ?? older.last ? { last: newer.last ?? older.last } : {}),
+  }
 }
 /** A checkpoint or review day left halfway (a reload, another page): which sentence it was on and the answers so far,
  *  kept for that day only, so it goes on instead of asking the same sentences again. `levels` are the checkpoint's

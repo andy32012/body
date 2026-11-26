@@ -48,8 +48,13 @@ export async function startVoice(opts: {
   let mic: MediaStream
   try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
   catch (e) { ctx?.close().catch(() => {}); throw e }
-  if (opts.signal?.aborted) { mic.getTracks().forEach(t => t.stop()); ctx?.close().catch(() => {}); opts.onState('closed'); throw new DOMException('ended', 'AbortError') }
-  const pc = new RTCPeerConnection()
+  // Before the call is set up, any way out (ended while asking, a browser that cannot open the connection) releases the
+  // microphone and the sound at once.
+  const release = (pc?: RTCPeerConnection) => { mic.getTracks().forEach(t => t.stop()); try { pc?.close() } catch { /* already closed */ } ; ctx?.close().catch(() => {}); opts.onState('closed') }
+  if (opts.signal?.aborted) { release(); throw new DOMException('ended', 'AbortError') }
+  let pc: RTCPeerConnection
+  try { pc = new RTCPeerConnection() } catch (e) { release(); throw e }
+  let closed = false
   // Levels for the wave: "her" is Emma's voice, "you" is the microphone (both 0–1).
   let frame = 0
   let herAnalyser: AnalyserNode | null = null
@@ -78,6 +83,7 @@ export async function startVoice(opts: {
     } catch { /* level meter is optional */ }
   }
   pc.ontrack = e => {
+    if (closed) return
     audio.srcObject = e.streams[0]
     audio.play().catch(() => { /* Safari allows sound while the microphone is on; ignore other refusals */ })
     if (!ctx) return
@@ -88,9 +94,9 @@ export async function startVoice(opts: {
     } catch { /* optional */ }
   }
   const micTrack = mic.getAudioTracks()[0]
-  pc.addTrack(micTrack, mic)
-  const events = pc.createDataChannel('oai-events')
-  let closed = false
+  let events: RTCDataChannel
+  try { pc.addTrack(micTrack, mic); events = pc.createDataChannel('oai-events') }
+  catch (e) { cancelAnimationFrame(frame); release(pc); throw e }
   // Turn-taking help (voiceTurns.ts). Runs on a timer, not on animation frames, so it keeps going in a background tab.
   // Without a working level meter both simply stay out of the way: the microphone stays open, and the quiet watch
   // goes by the transcript alone.
@@ -137,6 +143,8 @@ export async function startVoice(opts: {
     return [...prev, { role, text: delta.trimStart() }]
   })
   events.onmessage = e => {
+    // Messages still queued when the call ended (it stays open a moment to say goodbye) change nothing.
+    if (closed) return
     let msg: { type?: string; delta?: string; error?: { message?: string; client_event_id?: string }; message?: string }
     try { msg = JSON.parse(e.data) } catch { return }
     if (msg.type === 'session.started') { live = true; quiet = quietStart(performance.now()); opts.onState('live') }
@@ -155,8 +163,9 @@ export async function startVoice(opts: {
   try {
     const offer = await pc.createOffer()
     await pc.setLocalDescription(offer)
+    // Ending the call also cancels a request on its way, and no second request is sent after it ended.
     const create = (opening?: string) => fetch('https://api.openai.com/v1/live/sessions', {
-      method: 'POST',
+      method: 'POST', signal: opts.signal,
       headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         session: {
@@ -170,10 +179,12 @@ export async function startVoice(opts: {
     let res = await create(opts.opening)
     aborted()
     let data = await res.json().catch(() => null)
+    aborted()
     // The opening message is an extra: if the service does not take the request with it, the call starts without it.
     if (opts.opening && (res.status === 400 || res.status === 422)) {
       res = await create()
       data = await res.json().catch(() => null)
+      aborted()
     }
     if (!res.ok) {
       const msg = data?.error?.message ?? res.statusText

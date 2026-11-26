@@ -5,7 +5,7 @@
 import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified, updateStoreNow } from './store'
 import { mergeStates } from './merge'
 import {
-  addHistory, clearConflict, cloudBase, cloudConflict, cloudStatus, driveConnected, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, noteSynced, saveDriveState, setCloudBase, syncDecision,
+  addHistory, clearConflict, cloudBase, cloudConflict, cloudStatus, driveConnected, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, markMergeWaiting, noteSynced, saveDriveState, setCloudBase, syncDecision,
 } from './drive'
 
 export const stamp = (at: number) => new Date(at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -64,9 +64,17 @@ export async function takeCloudCopy() {
   noteSynced('已換成雲端硬碟的進度（這台原本的進度已下載成備份檔）')
   return '已換成雲端硬碟的進度。這台原本的進度下載成備份檔了，需要時可以到「備份」匯入。'
 }
+/** How many times a merge is saved, each save checked against the cloud copy it merged, before it stops and waits. */
+export const mergeRounds = 4
+let merging: Promise<string> | null = null
 /** Keep both: this device's progress and the cloud copy merged into one, saved here and to the cloud. This device's copy
- *  is downloaded first and the cloud copy goes into the cloud history, so nothing can be lost. */
-export async function mergeWithCloud(quiet = false) {
+ *  is downloaded first and the cloud copy goes into the cloud history, so nothing can be lost. One merge runs at a time:
+ *  the banner's button and the automatic catch-up pressed together share the same merge. */
+export function mergeWithCloud(quiet = false): Promise<string> {
+  if (!merging) merging = mergeNow(quiet).finally(() => { merging = null })
+  return merging
+}
+async function mergeNow(quiet: boolean) {
   const first = await loadDriveState()
   if (!first?.state) throw new Error('雲端硬碟裡沒有進度可以合併。')
   let remote = { state: first.state, savedAt: first.savedAt }
@@ -75,7 +83,7 @@ export async function mergeWithCloud(quiet = false) {
   // the script cannot keep history).
   if (!quiet || !(await addHistory(JSON.stringify(mine), localModified() || Date.now(), 'before-merge'))) download(backupName('this-device'), exportBackup(mine))
   let merged = mine
-  for (let attempt = 0; ; attempt++) {
+  for (let round = 1; ; round++) {
     const theirs = importBackup(remote.state)
     const mineNewer = localModified() >= remote.savedAt
     const now = Date.now()
@@ -84,11 +92,17 @@ export async function mergeWithCloud(quiet = false) {
     merged = await updateStoreNow(prev => importBackup(JSON.stringify(mergeStates(prev, theirs, mineNewer))), now)
     clearConflict()
     const since = Date.now()
-    // Saved only if the cloud still holds the copy just merged; when another device saved meanwhile, merge that too.
-    // After a few rounds the merged copy is saved anyway (the script keeps the cloud copy in its history).
-    const last = attempt >= 2
-    await saveDriveState(JSON.stringify(merged), now, remote.savedAt, last)
-    const again = !last && cloudConflict() ? await loadDriveState() : null
+    // Saved only if the cloud still holds the copy just merged; when another device saved meanwhile, that copy is
+    // merged too. Never forced: a cloud copy this device has not merged in is never overwritten.
+    await saveDriveState(JSON.stringify(merged), now, remote.savedAt)
+    const refused = cloudConflict()
+    if (!refused) { failedSince(since); break }
+    if (round >= mergeRounds) {
+      // Still racing another device: keep the merged progress here and merge again later, instead of overwriting.
+      markMergeWaiting(refused.remoteAt)
+      return '另一台裝置一直有新進度存進雲端，這次合併好的先留在這台（兩台做過的都在），等一下會自己再合併一次。'
+    }
+    const again = await loadDriveState()
     if (!again?.state) { failedSince(since); break }
     remote = { state: again.state, savedAt: again.savedAt }
   }

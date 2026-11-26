@@ -140,7 +140,7 @@
   { "en": "painkiller", "zh": "止痛藥", "area": "給藥", "ex": "Can I have a painkiller, please?", "exZh": "可以給我止痛藥嗎？" },
   { "en": "blood thinner", "zh": "抗凝血劑", "area": "給藥", "ex": "Blood thinners can cause easy bruising.", "exZh": "抗凝血劑會讓人容易瘀青。" },
   { "en": "insulin", "zh": "胰島素", "area": "給藥", "ex": "Check his blood sugar before giving insulin.", "exZh": "打胰島素前先測他的血糖。" },
-  { "en": "inhaler", "zh": "吸入器", "area": "給藥", "ex": "Shake a metered-dose inhaler before you use it, but check first: many powder inhalers should not be shaken.", "exZh": "定量噴霧吸入器用前先搖一搖；但先確認是哪一種：很多乾粉吸入器不能搖。" },
+  { "en": "inhaler", "zh": "吸入器", "area": "給藥", "ex": "This inhaler needs to be shaken before you use it. Always follow the instructions for your own device.", "exZh": "這支吸入器用前要先搖一搖；每一種吸入器都要照它自己的使用說明（有些不用搖，有些不能搖）。" },
   { "en": "ointment", "zh": "藥膏", "area": "給藥", "ex": "Put a thin layer of ointment on the rash.", "exZh": "在疹子上塗一層薄薄的藥膏。" },
   { "en": "eye drops", "zh": "眼藥水", "area": "給藥", "ex": "Use two eye drops in each eye.", "exZh": "每隻眼睛點兩滴。" },
   { "en": "overdose", "zh": "過量", "area": "給藥", "ex": "Too much acetaminophen can be an overdose.", "exZh": "吃太多 acetaminophen 可能過量。" },

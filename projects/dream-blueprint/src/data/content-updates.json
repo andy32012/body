@@ -161,5 +161,33 @@
   "nursingWords": [
    "inhaler"
   ]
+ },
+ {
+  "id": "2026-11-26-audit4",
+  "date": "2026-11-26",
+  "note": "修正幾篇閱讀：骨折沒有癒合只能說「可能」在受傷前後死亡、信封是乾的只是推測、颱風停電到下午、看牙醫多久一次聽牙醫的、每個護生跟自己的導師、英文沒說兄弟姊妹誰大；護理閱讀：夜班新出現的意識混亂先評估、通報，低血糖恢復後的點心要有醣類和蛋白質；護理聽力的血糖加上單位 mg/dL；課文的傷口和胰島素句子講明是這位病人、u52 那句加上「剛才」。依據：SWGANTH 創傷分析指引與英國皇家學會法醫人類學入門、NICE 譫妄指引 CG103、CDC 低血糖說明。",
+  "words": [],
+  "sentences": [
+   "u41-d5",
+   "u52-r1"
+  ],
+  "passages": [
+   "a1-teeth",
+   "a2-typhoon",
+   "br44-r1",
+   "br45-r2",
+   "br45-held",
+   "a1-easy-blue-bag",
+   "a1-mid-rainy-hall",
+   "b2-hard-warning-model",
+   "n-a2-night-shift",
+   "n-b1-hypoglycemia"
+  ],
+  "listening": [
+   "nl-08"
+  ],
+  "nursingWords": [
+   "inhaler"
+  ]
  }
 ]

@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import DiagnoseBox from './DiagnoseBox'
 import { useTaskContext } from '../lib/taskContext'
 import {
-  advanceQuiz, causeOptions, nextQuizItem, nextSubjectQuiz, quizSectionKey, quizSummary, recordQuizAnswer, recordQuizCause,
+  advanceQuiz, causeOptions, nextQuizItem, nextSubjectQuiz, subjectDoneToday, quizSectionKey, quizSummary, recordQuizAnswer, recordQuizCause,
   sectionNames, sectionOf, type QuizItem, type QuizSection,
 } from '../lib/quiz'
 
@@ -23,7 +23,7 @@ export default function QuizPractice({ state, update, onActivity = update, date,
   const [picked, setPicked] = useState<number>()
   const [showZh, setShowZh] = useState(false)
   const [cause, setCause] = useState('')
-  const summary = quizSummary(items, section, state.notes)
+  const summary = quizSummary(items, section, state.notes, subject)
 
   function reset() { setPicked(undefined); setShowZh(false); setCause('') }
   function choose(next: QuizSection) {
@@ -61,7 +61,11 @@ export default function QuizPractice({ state, update, onActivity = update, date,
       picked === undefined ? '他還沒作答；正確答案是第 ' + (current.item.answerIndex + 1) + ' 個，他作答前不要說出來，只幫他看懂題目。'
         : '他選了第 ' + (picked + 1) + ' 個，正確答案是第 ' + (current.item.answerIndex + 1) + ' 個。說明：' + current.item.explanation].join('\n'),
   } : null)
-  if (!current) return <p>{subject ? '「' + subject + '」還沒有護理英文題。' : '這一區還沒有題目。'}</p>
+  if (!current) return subject && subjectDoneToday(items, subject, state.notes, date)
+    ? <div className="pr-hint"><strong>「{subject}」的 {summary.total} 題今天都做過了</strong>
+        <p>{summary.wrongNow ? '答錯的 ' + summary.wrongNow + ' 題明天會再出現。' : '全部答對了。'}明天再來這一科，或先去練全部的題目。</p>
+        <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { location.hash = 'library/quiz' }}>改練全部題目</button></div></div>
+    : <p>{subject ? '「' + subject + '」還沒有護理英文題。' : '這一區還沒有題目。'}</p>
   const { item: question, retry } = current
   const nursing = sectionOf(question) === 'nursing'
   const wrong = picked !== undefined && picked !== question.answerIndex

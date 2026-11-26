@@ -2,31 +2,44 @@ import { useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { dayKey } from '../lib/progress'
 import {
-  certStatus, certifiedLevel, courseProgress, exams, levelIds, lrPass, removeAttempt, saveAttempt, steps, swPass, visaCurrent, visaScreen, waiting,
-  type CertAttempt, type CertStatus, type ExamId, type LevelId, type Step,
+  certStatus, certifiedLevel, courseProgress, exams, levelIds, lrPass, removeAttempt, saveAttempt, speakingOf, speakingPass, steps, visaCurrent, visaScreen, waiting, writingOf, writingPass,
+  type CertAttempt, type CertStatus, type ExamId, type GeptParts, type LevelId, type Step,
 } from '../lib/cefr'
 import { officialWords, wordKey } from '../lib/vocab'
 import './level-ladder.css'
 
 const md = (d: string) => d.slice(0, 4) + '/' + d.slice(5, 7) + '/' + d.slice(8)
 const isGept = (e: ExamId) => e === 'gept-a2' || e === 'gept-b1' || e === 'gept-b2'
-const partNames = { lr: '聽讀', sw: '說寫', both: '聽讀＋說寫（一日考）' } as const
+const partNames: Record<GeptParts, string> = { lr: '聽讀', sw: '說寫', both: '聽讀＋說寫（一日考）', w: '只考寫作（說寫只差寫作）', s: '只考口說（說寫只差口說）' }
 
-function statusLine(s: CertStatus, step: Step) {
+/** What a 全民英檢 level still needs, from what is passed and still counts (lib/cefr.ts geptPassed). */
+function stillNeeds(s: CertStatus, today: string) {
+  const until = s.until ? '（' + md(s.until) + ' 以前要報名）' : ''
+  if (s.until && s.until < today) return '之前通過的部分已經超過兩年，要從聽讀重新考'
+  if (s.lr && s.w) return '聽讀和寫作過了，還差口說：報名「只考口說」' + until
+  if (s.lr && s.s) return '聽讀和口說過了，還差寫作：報名「只考寫作」' + until
+  if (s.lr) return '聽讀過了，還差說寫' + until
+  return (s.w ? '一日考寫作過了' : '一日考口說過了') + '，還差聽讀：先考過聽讀，再補沒過的那一項' + until
+}
+function statusLine(s: CertStatus, step: Step, today: string) {
   const exam = exams[step.exams[0]].name
   if (s.state === 'passed') return '✓ 通過，升到 ' + step.to + (s.passedOn ? '（' + md(s.passedOn) + '）' : '')
-  if (s.state === 'waiting' && s.next) return '等成績：' + exams[s.next.exam].name + ' ' + md(s.next.date) + (s.lr ? '（聽讀已過）' : s.sw ? '（說寫已過）' : '') + ' · 下一段先讀'
-  if (s.state === 'partial') return (s.lr ? '聽讀過了，還差說寫' : '說寫過了，還差聽讀') + ' · 報名下一場才能接著上'
+  if (s.state === 'waiting' && s.next) return '等成績：' + exams[s.next.exam].name + ' ' + md(s.next.date) + (s.lr ? '（聽讀已過）' : s.w || s.s ? '（一日考有一項已過）' : '') + ' · 下一段先讀'
+  if (s.state === 'partial') return stillNeeds(s, today) + ' · 報名下一場才能接著上'
   if (s.state === 'failed') return '這次沒過 · 補最弱的那一項，報名下一場才能接著上'
   return '還沒報名' + exam + (step.bookWhen ? ' · ' + step.bookWhen : '')
 }
 /** What a filled-in result says, part by part. */
 function resultLine(a: CertAttempt) {
   if (waiting(a)) return '等成績'
-  if (isGept(a.exam)) return [
-    a.lr && (lrPass(a.lr) ? '聽讀過' : '聽讀沒過（聽 ' + a.lr[0] + '、讀 ' + a.lr[1] + '）'),
-    a.sw && (swPass(a.exam, a.sw) ? '說寫過' : '說寫沒過（寫 ' + a.sw[0] + '、說 ' + a.sw[1] + '）'),
-  ].filter(Boolean).join('、')
+  if (isGept(a.exam)) {
+    const w = writingOf(a), sp = speakingOf(a)
+    return [
+      a.lr && (lrPass(a.lr) ? '聽讀過' : '聽讀沒過（聽 ' + a.lr[0] + '、讀 ' + a.lr[1] + '）'),
+      w !== undefined && (writingPass(a) ? '寫作過（' + w + '）' : '寫作沒過（' + w + '）'),
+      sp !== undefined && (speakingPass(a) ? '口說過（' + sp + '）' : '口說沒過（' + sp + '）'),
+    ].filter(Boolean).join('、')
+  }
   if (a.exam === 'ielts' && a.band) return '總分 ' + a.band.overall + (a.band.speaking !== undefined ? '、口說 ' + a.band.speaking : '')
   return (a.otherName ? a.otherName + ' ' : '') + (a.otherLevel ? a.otherLevel + ' ' : '') + (a.passed ? '通過' : '沒過')
 }
@@ -38,12 +51,18 @@ function ScoreForm({ attempt, onSave }: { attempt: CertAttempt; onSave: (a: Cert
     <input type="number" inputMode="decimal" min={0} max={max} step={step} value={v[k] ?? ''} onChange={e => setV({ ...v, [k]: e.target.value })} /></label>
   const okRange = (k: string, max: number, step = 1) => v[k] !== undefined && v[k] !== '' && num(k) >= 0 && num(k) <= max && Number.isInteger(num(k) / step)
   if (isGept(attempt.exam)) {
-    const lr = attempt.parts !== 'sw', sw = attempt.parts !== 'lr'
+    // Only the parts this sitting had: a skill not taken is not a zero.
+    const parts = attempt.parts ?? 'both'
+    const lr = parts === 'lr' || parts === 'both', sw = parts === 'sw' || parts === 'both'
     const ready = (!lr || (okRange('l', 120) && okRange('r', 120))) && (!sw || (okRange('w', 100) && okRange('s', 100)))
+      && (parts !== 'w' || okRange('w', 100)) && (parts !== 's' || okRange('s', 100))
     return <div className="ll-score">
       {lr && <>{field('l', '聽力（滿分 120）', 120)}{field('r', '閱讀（滿分 120）', 120)}</>}
-      {sw && <>{field('w', '寫作（滿分 100）', 100)}{field('s', '口說（滿分 100）', 100)}</>}
-      <button type="button" disabled={!ready} onClick={() => onSave({ ...attempt, ...(lr ? { lr: [num('l'), num('r')] as [number, number] } : {}), ...(sw ? { sw: [num('w'), num('s')] as [number, number] } : {}) })}>記下成績</button>
+      {(sw || parts === 'w') && field('w', '寫作（滿分 100）', 100)}
+      {(sw || parts === 's') && field('s', '口說（滿分 100）', 100)}
+      <button type="button" disabled={!ready} onClick={() => onSave({ ...attempt,
+        ...(lr ? { lr: [num('l'), num('r')] as [number, number] } : {}), ...(sw ? { sw: [num('w'), num('s')] as [number, number] } : {}),
+        ...(parts === 'w' ? { writing: num('w') } : {}), ...(parts === 's' ? { speaking: num('s') } : {}) })}>記下成績</button>
     </div>
   }
   if (attempt.exam === 'ielts') {
@@ -62,7 +81,7 @@ function ScoreForm({ attempt, onSave }: { attempt: CertAttempt; onSave: (a: Cert
 
 function Booking({ step, onSave }: { step: Step; onSave: (a: CertAttempt) => void }) {
   const [exam, setExam] = useState<ExamId>(step.exams[0])
-  const [parts, setParts] = useState<'lr' | 'sw' | 'both'>('lr')
+  const [parts, setParts] = useState<GeptParts>('lr')
   const [date, setDate] = useState('')
   const [otherName, setOtherName] = useState('')
   const [otherLevel, setOtherLevel] = useState<LevelId>(step.to)
@@ -72,7 +91,7 @@ function Booking({ step, onSave }: { step: Step; onSave: (a: CertAttempt) => voi
       <select value={exam} onChange={e => setExam(e.target.value as ExamId)}>{step.exams.map(id => <option key={id} value={id}>{exams[id].name}</option>)}</select>
     </label>
     {isGept(exam) && <label>這次考
-      <select value={parts} onChange={e => setParts(e.target.value as 'lr' | 'sw' | 'both')}>{(Object.keys(partNames) as (keyof typeof partNames)[]).map(p => <option key={p} value={p}>{partNames[p]}</option>)}</select>
+      <select value={parts} onChange={e => setParts(e.target.value as GeptParts)}>{(Object.keys(partNames) as GeptParts[]).map(p => <option key={p} value={p}>{partNames[p]}</option>)}</select>
     </label>}
     {exam === 'other' && <>
       <label>證照名稱<input value={otherName} onChange={e => setOtherName(e.target.value)} placeholder="例如：劍橋 A2 Key" /></label>
@@ -117,13 +136,13 @@ export default function LevelLadder({ state, update }: Pick<PageProps, 'state' |
           <div className="ll-body">
             <header>
               <h3>{step.from} → {step.to}{step.optional ? '（選修）' : ''}{current ? <small>現在在這一段</small> : null}</h3>
-              <p className="ll-status">{statusLine(s, step)}</p>
+              <p className="ll-status">{statusLine(s, step, today)}</p>
             </header>
             <p className="ll-meta">{step.optional ? step.target : '預估 ' + step.target} · 參考時數 {step.hours}（Cambridge 估的有老師帶的時數，自己讀通常要更多）</p>
             <p className="ll-meta">教材：{step.practice}</p>
             {step.units && <div className="ll-bar"><span>每日課 {units} / {step.units[1] - step.units[0] + 1} 單元（單元 {step.units[0]}–{step.units[1]}）</span>
               <progress max={step.units[1] - step.units[0] + 1} value={units} /></div>}
-            {step.words && <div className="ll-bar"><span>7000 單第 {step.words[0]}–{step.words[1]} 級：看過 {known} / {words.length} 個{step.wordsBy ? ' · 照計畫' + step.wordsBy : ''}</span>
+            {step.words && <div className="ll-bar"><span>7000 單第 {step.words[0]}–{step.words[1]} 級：看過 {known} / {words.length} 個{step.wordsBy ? ' · 計畫的目標：' + step.wordsBy : ''}{step.wordsForecast ? '；照現在的複習規則推算：' + step.wordsForecast + '（每天都開到週日不開）' : ''}</span>
               <progress max={words.length} value={known} /></div>}
             <details className="ll-exams"><summary>怎麼考、多少錢</summary>
               {step.exams.filter(id => id !== 'other').map(id => { const e = exams[id]; return <div key={id} className="ll-exam">
@@ -143,9 +162,12 @@ export default function LevelLadder({ state, update }: Pick<PageProps, 'state' |
                 <button type="button" className="ll-remove" onClick={() => update(prev => ({ ...prev, notes: removeAttempt(prev.notes, step.to, a.id) }))}>刪掉這筆</button>
               </li>)}
             </ul>}
-            {s.state !== 'passed' && (booking === step.to
+            {booking === step.to
               ? <Booking step={step} onSave={a => save(step.to, a)} />
-              : <button type="button" className="ll-add" onClick={() => setBooking(step.to)}>＋ 報名了，填考試日期</button>)}
+              : s.state !== 'passed'
+                ? <button type="button" className="ll-add" onClick={() => setBooking(step.to)}>＋ 報名了，填考試日期</button>
+                // Passed stays passed; a new sitting (an IELTS score that runs out for VisaScreen) can still be added.
+                : <button type="button" className="ll-add ll-again" onClick={() => setBooking(step.to)}>＋ 又報名了一場（例如雅思要重考）</button>}
           </div>
         </li>
       })}

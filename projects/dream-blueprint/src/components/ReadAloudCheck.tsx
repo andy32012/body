@@ -23,15 +23,20 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
   const session = useRef<Listening | null>(null)
   const started = useRef(0)
   const [tick, setTick] = useState(0)
-  useEffect(() => () => session.current?.cancel(), [])
+  // Leaving cancels the recording, also one whose microphone permission comes back only afterwards; one press asks once.
+  const leaving = useRef(new AbortController())
+  const asking = useRef(false)
+  useEffect(() => () => { leaving.current.abort(); session.current?.cancel() }, [])
   useEffect(() => { if (phase !== 'listening') return; const t = setInterval(() => setTick(Date.now()), 500); return () => clearInterval(t) }, [phase])
   const engine = listenEngine()
   if (!engine) return <p className="ra-note">這台裝置不能做朗讀比對：到「口說」頁的設定填 OpenAI 金鑰，或改用 Chrome、Safari。</p>
 
   async function start() {
+    if (asking.current) return
+    asking.current = true
     setError(''); setPartial(''); setResult(null); setHeard('')
     try {
-      const s = await listen({ maxMs, onPartial: setPartial })
+      const s = await listen({ maxMs, onPartial: setPartial, signal: leaving.current.signal })
       session.current = s
       started.current = Date.now()
       setPhase('listening')
@@ -43,7 +48,8 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
         if (words.trim()) onResult?.(r, words, secs)
       }, e => { setError(e instanceof Error ? e.message : String(e)); setPhase('idle') })
         .finally(() => { session.current = null })
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); setPhase('idle') }
+    } catch (e) { if (!leaving.current.signal.aborted) { setError(e instanceof Error ? e.message : String(e)); setPhase('idle') } }
+    finally { asking.current = false }
   }
   function stop() { setPhase('working'); session.current?.stop() }
 

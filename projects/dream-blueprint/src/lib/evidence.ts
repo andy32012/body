@@ -125,7 +125,12 @@ function answerForms(t: string): string[] {
 export function normalizeEnglish(t: string) {
   return referenceForm(t)
 }
-export const sameEnglish = (a: string, b: string) => normalizeEnglish(a) === normalizeEnglish(b)
+/** Whether an answer is still the text that was checked (by Claude, or before the answer was shown). Case, spacing,
+ *  curly quotes, contractions and how a statement ends (. or !) may differ; every other mark counts: taking the commas
+ *  out of "My sister, who is a nurse, lives in Taipei." changes what it says, and so does turning a question into a
+ *  statement, so the earlier check no longer applies. (Matching an answer with the reference is looser: normalizeEnglish.) */
+const checkedForm = (t: string) => base(t).replace(/\s+/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim().replace(/[.!]+$/, '').trim()
+export const sameEnglish = (a: string, b: string) => checkedForm(a) === checkedForm(b)
 export function matchesReference(answer: string, refs: readonly string[]) {
   if (!answer.trim()) return false
   const forms = new Set(answerForms(answer))

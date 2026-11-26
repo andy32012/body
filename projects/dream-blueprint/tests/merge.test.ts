@@ -4,6 +4,7 @@ import { mergeNote, mergeStates } from '../src/lib/merge.ts'
 import { createInitialState, importBackup } from '../src/lib/store.ts'
 import { newCard } from '../src/lib/progress.ts'
 import { removeWeak } from '../src/lib/weakPoints.ts'
+import { applyBatch, delayedRecall, oldDetails, bonusOn } from '../src/lib/compact.ts'
 
 const session = (id: string, day: string, extra = {}) => ({ id, day, energy: 'normal' as const, period: 'semester' as const, sentenceId: '', words: [], translations: [], spokenIds: [], ...extra })
 
@@ -131,4 +132,97 @@ test('一台已經把舊的複習紀錄收進封存：合併後不會重複算',
   }
   const older = JSON.stringify({ before: '2026-08-15', total: 1, delayed: 1, recalled: 1, bonus: 0 })
   assert.equal(JSON.parse(mergeNote('review.archive', b.notes['review.archive'], older)).before, '2026-09-15', '留收得比較多的那份')
+})
+
+test('同一天的課兩台都上過：比較新但只做到聽力的那份，不會蓋掉另一台寫的表達和做完的步驟（稽核 R-02）', () => {
+  const key = 'lesson.2026-11-26'
+  const answer = (sentenceId: string, rating: 'correct' | 'minor' | 'again') => ({ sentenceId, rating, grammar: [], revealed: false })
+  // The computer, earlier: recall, listen, pattern and the open task done, the first answer kept with its feedback.
+  const computer = JSON.stringify({
+    unit: 5, day: 2, steps: ['recall', 'listen', 'pattern', 'express'], phase: 'express', varied: 2,
+    recalls: [answer('u4-d1', 'correct'), answer('u4-d2', 'minor')], records: [answer('u5-d2', 'correct')],
+    hints: { 'u5-d2': { h: 1, r: false, v: 'good', vt: 'I will call you tonight.' } },
+    express: { first: 'I will call my mom tonight because she is sick.', firstResult: { verdict: 'small', corrected: 'I will call my mom tonight because she is sick.', fixes: [] }, corrections: 1, help: ['frame'] },
+  })
+  // The phone, later: only recall and listen, with a hint the computer did not use.
+  const phone = JSON.stringify({
+    unit: 5, day: 2, steps: ['recall', 'listen'], phase: 'listen', varied: 0,
+    recalls: [answer('u4-d1', 'again'), answer('u4-d2', 'minor')],
+    hints: { 'u5-d2': { h: 3, r: true } },
+  })
+  const merged = JSON.parse(mergeNote(key, computer, phone))
+  assert.deepEqual(merged.steps, ['recall', 'listen', 'pattern', 'express'], '做完的步驟都還在')
+  assert.equal(merged.phase, 'express')
+  assert.equal(merged.varied, 2)
+  assert.equal(merged.express.first, 'I will call my mom tonight because she is sick.', '另一台寫的表達原句還在')
+  assert.equal(merged.express.firstResult.verdict, 'small')
+  assert.equal(merged.records.length, 1)
+  assert.equal(merged.recalls[0].rating, 'again', '同一句兩台都答過：算比較保守的那次')
+  assert.deepEqual(merged.hints['u5-d2'], { h: 3, r: true, v: 'good', vt: 'I will call you tonight.' }, '提示用到的最多那次、看過答案都算')
+
+  // Both wrote the open task differently: both sentences stay.
+  const tablet = JSON.stringify({
+    unit: 5, day: 2, steps: ['recall', 'listen', 'pattern', 'express', 'fix'], phase: 'done',
+    express: { first: 'I call my mom tonight.', lastAnswer: 'I will call my mom tonight.', last: { verdict: 'good', corrected: 'I will call my mom tonight.', fixes: [] }, corrections: 2, help: [], fixed: true },
+  })
+  const both = JSON.parse(mergeNote(key, computer, tablet))
+  assert.equal(both.express.lastAnswer, 'I will call my mom tonight.', '改好的那份接著用')
+  assert.ok(both.express.fixed)
+  const sentences = [both.express.first, ...(both.express.others ?? []).map((o: { first?: string }) => o.first)]
+  assert.ok(sentences.includes('I will call my mom tonight because she is sick.') && sentences.includes('I call my mom tonight.'), '兩台寫的原句都留著')
+  assert.ok(both.express.help.includes('frame'))
+
+  // A different lesson saved under the same day: the one further along the course, like on one device.
+  const next = JSON.stringify({ unit: 5, day: 3, steps: ['recall'], phase: 'recall' })
+  assert.equal(JSON.parse(mergeNote(key, next, computer)).day, 3)
+  assert.equal(JSON.parse(mergeNote(key, computer, next)).day, 3)
+
+  // The day's hints outside the lesson keep the most help from either device.
+  const hints = JSON.parse(mergeNote('hints.2026-11-26', JSON.stringify({ a: { h: 2, r: false, v: 'good', vt: 'x' } }), JSON.stringify({ a: { h: 1, r: true }, b: { h: 1, r: false } })))
+  assert.deepEqual(hints, { a: { h: 2, r: true, v: 'good', vt: 'x' }, b: { h: 1, r: false } })
+})
+
+test('兩台各自把不同的舊複習紀錄收進封存：合併後兩邊收的都算，兩邊都有的只算一次（稽核 R-04）', () => {
+  const ev = (id: string, day: string) => ({ id, day, gap: 5, remembered: true, shownAnswer: false })
+  const start = createInitialState('2026-07-01')
+  const a = structuredClone(start), b = structuredClone(start)
+  a.reviewEvents = [ev('word:cat', '2026-08-01'), ev('word:dog', '2026-11-20')]
+  b.reviewEvents = [ev('word:sun', '2026-08-03'), ev('word:dog', '2026-11-20')]
+  const fold = (s: typeof a) => applyBatch(s, oldDetails(s, '2026-11-26'), '2026-11-26')
+  const fa = fold(a), fb = fold(b)
+  assert.equal(fa.reviewEvents.length, 1, '八月那筆收進封存了')
+  for (const m of [mergeStates(fa, fb, true), mergeStates(fb, fa, false)])
+    assert.deepEqual(delayedRecall(m), { delayed: 3, recalled: 3 }, 'cat、sun 兩筆封存的都在，dog 只算一次')
+  // Folded on one device and still kept on the other: counted once.
+  for (const m of [mergeStates(fa, a, true), mergeStates(a, fa, true)]) {
+    assert.deepEqual(delayedRecall(m), { delayed: 2, recalled: 2 })
+    assert.deepEqual(m.reviewEvents.map(e => e.day), ['2026-11-20'])
+  }
+  // Merged twice (another round of syncing): still the same numbers.
+  const once = mergeStates(fa, fb, true)
+  assert.deepEqual(delayedRecall(mergeStates(once, fb, true)), { delayed: 3, recalled: 3 })
+  assert.equal(bonusOn(once, '2026-08-03'), bonusOn(b, '2026-08-03'), '比賽的複習加分也還在')
+})
+
+test('一台把「認得」改成「還不熟」：同步合併後就是還不熟，不會兩邊都算、從待學裡消失（稽核 R-05）', async () => {
+  const { changeSorted, addWordsToReview } = await import('../src/lib/dailyWords.ts')
+  const start = createInitialState('2026-11-20')
+  start.knownWords = ['student', 'pupil']
+  // The phone (changed earlier) moved student back to 還不熟 today; the computer (changed later) did something else.
+  const phone = changeSorted(structuredClone(start), 'student', false, '2026-11-26')
+  const computer = structuredClone(start)
+  computer.sessions = [session('s-pc', '2026-11-26')]
+  for (const m of [mergeStates(phone, computer, false), mergeStates(computer, phone, true)]) {
+    assert.ok(m.learningWords.includes('student') && !m.knownWords.includes('student'), '還不熟，不再同時算認得')
+    assert.ok(m.knownWords.includes('pupil'))
+  }
+  // Without a record of the move (progress from before this fix): the copy changed last decides.
+  const old = structuredClone(start), moved = structuredClone(start)
+  moved.knownWords = ['pupil']; moved.learningWords = ['student']
+  const m = mergeStates(old, moved, false)
+  assert.ok(m.learningWords.includes('student') && !m.knownWords.includes('student'))
+  // A word put into review from a reading on one device, still 認得 on the other: it is being learned.
+  const read = addWordsToReview(structuredClone(start), ['pupil'], '2026-11-26')
+  for (const x of [mergeStates(read, computer, false), mergeStates(computer, read, true)])
+    assert.ok(x.learningWords.includes('pupil') && !x.knownWords.includes('pupil'))
 })

@@ -20,7 +20,16 @@ export function readSayCard(value: string): SayCard | null {
   } catch { return null }
 }
 
-const squash = (t: string) => t.toLowerCase().replace(/[^a-z]/g, '')
+/** The same sentence however it is capitalised or punctuated, with its words and numbers kept apart: "Take 5 mg." and
+ *  "Take 50 mg." (or room 12 and room 120) are two cards; "take 5 mg" is the first one again. */
+export function sayIdentity(t: string) {
+  return t.toLowerCase().replace(/[\u2018\u2019`]/g, "'")
+    .replace(/(\d),(?=\d{3}\b)/g, '$1')
+    .replace(/(\d)\.(?=\d)/g, '$1point')
+    .replace(/'/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').trim()
+}
+const squash = sayIdentity
 /** The note key of the saved card with this English, if there is one. */
 function sayNoteOf(notes: Record<string, string>, en: string) {
   return Object.keys(notes).find(k => k.startsWith('say.') && squash(readSayCard(notes[k])?.en ?? '') === squash(en))

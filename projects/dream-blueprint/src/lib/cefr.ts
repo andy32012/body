@@ -16,10 +16,13 @@ export interface Step {
   units: [number, number] | null
   /** 7000 單 levels that belong here. */
   words: [number, number] | null
-  /** When those levels are seen at the planned pace: 20 new words a day (DEFAULT_DAILY), review first, the app opened every day
-   *  (Sunday's short plan too), new words paused in the internship and licensing exam (2028-02 to 2029-07).
-   *  Worked out day by day with the app's own review rules: `npm run words:pace` (scripts/words-pace.ts). */
+  /** The plan's target for seeing those levels (a goal, kept as it was set). */
   wordsBy?: string
+  /** Where the app's own rules land at the planned pace (20 new words a day, review first, the review cap and the new-word
+   *  brake), worked out day by day by `npm run words:pace` (scripts/words-pace.ts, every published unit): the range is
+   *  from opening the app every day to leaving Sundays out. A model with assumptions, not a promise — rerun it when the
+   *  rules change. Last run 2026-11-26. */
+  wordsForecast?: string
   /** Rough date in the five-year plan, and Cambridge's guided-learning hours from zero (self-study usually needs more). */
   target: string; hours: string
   /** When the plan books this certificate, if not right after the step's last unit (shown where the units end). */
@@ -60,13 +63,13 @@ function unitsOf(stages: readonly string[]): [number, number] | null {
 /** "1–28": a step's units as the plan texts write them. */
 const span = (stages: readonly string[]) => (unitsOf(stages) ?? []).join('–')
 export const steps: readonly Step[] = [
-  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 3 月看完', target: '2027 年下半年', hours: '約 200 小時', exams: ['gept-a2', 'other'],
-    practice: '每日課單元 ' + span(['A']) + '、7000 單第 1–2 級、閱讀 A1–A2、寫作①句子、生活主題' },
-  { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 7 月、第 4 級約 2027 年 12 月看完，趕在實習之前', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
-    practice: '每日課單元 ' + span(['B']) + '、7000 單第 3–4 級、閱讀 B1、寫作②一段和③多段' },
-  { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2029 年 10 月看完', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
+  { from: 'A1', to: 'A2', units: unitsOf(['A']), words: [1, 2], wordsBy: '約 2027 年 3 月看完', wordsForecast: '第 2 級約 2027 年 4–5 月', target: '2027 年下半年', hours: '約 200 小時', exams: ['gept-a2', 'other'],
+    practice: '每日課單元 ' + span(['A']) + '、7000 單第 1–2 級、閱讀 A1–A2、寫作階梯①–⑥（從一句完整的話到三五句的小短文）、生活主題' },
+  { from: 'A2', to: 'B1', units: unitsOf(['B']), words: [3, 4], wordsBy: '第 3 級約 2027 年 7 月、第 4 級約 2027 年 12 月看完，趕在實習之前', wordsForecast: '第 3 級約 2027 年 11 月到 2028 年 1 月、第 4 級約 2029 年 8–11 月', target: '2028 年初', hours: '約 350–400 小時', exams: ['gept-b1', 'other'],
+    practice: '每日課單元 ' + span(['B']) + '、7000 單第 3–4 級、閱讀 B1、寫作階梯⑦一段、⑧說出意見、⑨多段' },
+  { from: 'B1', to: 'B2', units: unitsOf(['C', 'BR']), words: [5, 6], wordsBy: '約 2029 年 10 月看完', wordsForecast: '第 5 級約 2030 年 12 月到 2031 年 12 月，第 6 級要到 2032 年以後', target: '2030 年中', hours: '約 500–600 小時', exams: ['gept-b2', 'ielts', 'other'], ielts: 5.5,
     bookWhen: '先不考：等 7000 單第 5–6 級看完（約 2029 年 10 月，國考後）再報名',
-    practice: '每日課單元 ' + span(['C']) + '，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作④⑤⑥、口說 Part 2' },
+    practice: '每日課單元 ' + span(['C']) + '，再接 B1→B2 橋接單元（敘事時態、未來完成、推測、第三類假設、wish、非限定關係子句），每個橋接單元都有讀聽說寫和沒看過的回測；7000 單第 5–6 級、閱讀 B2、寫作階梯⑩–⑭（數字和變化、雅思 Task 1／2、兩面意見、橋接段落）、口說 Part 2' },
   { from: 'B2', to: 'C1', units: unitsOf(['C1']), words: null, target: '2031 年底', hours: '約 700–800 小時', exams: ['ielts', 'gept-c1', 'other'], ielts: 7,
     practice: '每日課教材還在寫；先用雅思閱讀、寫作 Task 1／2、口說 Part 2 和 Emma 練，最後一年找真人老師練口說' },
   { from: 'C1', to: 'C2', units: null, words: null, target: '選修，到美國以後', hours: '約 1,000–1,200 小時', exams: ['ielts', 'other'], ielts: 8.5, optional: true,
@@ -80,12 +83,15 @@ export interface CertAttempt {
   exam: ExamId
   /** Test date. */
   date: string
-  /** GEPT: which half this sitting was (聽讀 / 說寫 / both, as in the one-day test). */
-  parts?: 'lr' | 'sw' | 'both'
+  /** GEPT: what this sitting was — 聽讀, 說寫, all four in one day (一日考), or one skill taken again (只考寫作 / 只考口說). */
+  parts?: GeptParts
   /** GEPT listening, reading (out of 120). */
   lr?: [number, number]
   /** GEPT writing, speaking (out of 100). */
   sw?: [number, number]
+  /** GEPT writing or speaking taken on its own (out of 100): not taking a skill is not a zero. */
+  writing?: number
+  speaking?: number
   /** IELTS bands. */
   band?: { overall: number; listening?: number; reading?: number; writing?: number; speaking?: number }
   /** GEPT 高級 and other certificates: the result as printed. */
@@ -108,16 +114,61 @@ export function removeAttempt(notes: Record<string, string>, to: LevelId, id: st
   return { ...notes, [certKey(to)]: JSON.stringify(readAttempts(notes, to).filter(a => a.id !== id)) }
 }
 
+export type GeptParts = 'lr' | 'sw' | 'both' | 'w' | 's'
 const gept = (e: ExamId) => e === 'gept-a2' || e === 'gept-b1' || e === 'gept-b2'
 export const lrPass = (lr?: readonly number[]) => !!lr && lr[0] + lr[1] >= 160 && lr[0] >= 72 && lr[1] >= 72
-export const swPass = (exam: ExamId, sw?: readonly number[]) => !!sw && sw[0] >= (exam === 'gept-a2' ? 70 : 80) && sw[1] >= 80
-const takesLr = (a: CertAttempt) => a.parts !== 'sw'
-const takesSw = (a: CertAttempt) => a.parts !== 'lr'
+const writingMark = (exam: ExamId) => exam === 'gept-a2' ? 70 : 80
+export const swPass = (exam: ExamId, sw?: readonly number[]) => !!sw && sw[0] >= writingMark(exam) && sw[1] >= 80
+// A sitting saved before the parts were asked is all four.
+const partsOf = (a: CertAttempt): GeptParts => a.parts ?? 'both'
+const takesLr = (a: CertAttempt) => partsOf(a) === 'lr' || partsOf(a) === 'both'
+const takesW = (a: CertAttempt) => ['sw', 'both', 'w'].includes(partsOf(a))
+const takesS = (a: CertAttempt) => ['sw', 'both', 's'].includes(partsOf(a))
+export const writingOf = (a: CertAttempt) => partsOf(a) === 'w' ? a.writing : takesW(a) ? a.sw?.[0] : undefined
+export const speakingOf = (a: CertAttempt) => partsOf(a) === 's' ? a.speaking : takesS(a) ? a.sw?.[1] : undefined
+export const writingPass = (a: CertAttempt) => { const w = writingOf(a); return w !== undefined && w >= writingMark(a.exam) }
+export const speakingPass = (a: CertAttempt) => { const v = speakingOf(a); return v !== undefined && v >= 80 }
 /** No result filled in yet: booked, or taken and waiting for the scores. */
 export function waiting(a: CertAttempt) {
-  if (gept(a.exam)) return (takesLr(a) && !a.lr) || (takesSw(a) && !a.sw)
+  if (gept(a.exam)) return (takesLr(a) && !a.lr) || (takesW(a) && writingOf(a) === undefined) || (takesS(a) && speakingOf(a) === undefined)
   if (a.exam === 'ielts') return !a.band
   return a.passed === undefined
+}
+/** Two years on from a test day (the 全民英檢 window for the second stage and for taking failed parts again). */
+export const twoYearsOn = (day: string) => String(Number(day.slice(0, 4)) + 2) + day.slice(4)
+/**
+ * Whether 全民英檢 sittings of one level add up to passing it, and when (LTTC 報名須知 2027 初級 p.6、中級 p.13 and
+ * 一日考問與答): a passed 聽讀 lets 說寫 be taken within two years of that 聽讀 test day; 說寫 is taken together the first
+ * time and afterwards only the failed one (只考寫作／只考口說); a one-day test (all four in a day) never joins results
+ * passed before it, and its failed parts can be taken again within two years of it (failed 聽讀 first, at a 聽讀 test).
+ * The certificate itself never expires: a level passed stays passed.
+ */
+export function geptPassed(attempts: readonly CertAttempt[]): { on?: string; until?: string; lr: boolean; w: boolean; s: boolean } {
+  let best: string | undefined
+  let open: { until: string; lr: boolean; w: boolean; s: boolean } | undefined
+  const sorted = [...attempts].sort((a, b) => a.date.localeCompare(b.date))
+  for (const anchor of sorted.filter(a => takesLr(a) && lrPass(a.lr))) {
+    const until = twoYearsOn(anchor.date)
+    const second = (a: CertAttempt) => partsOf(a) === 'sw' || partsOf(a) === 'w' || partsOf(a) === 's'
+    const counted = sorted.filter(a => a === anchor
+      // Writing and speaking taken later, within two years of this 聽讀 (a one-day test does not join an earlier 聽讀).
+      || (second(a) && a.date >= anchor.date && a.date <= until)
+      // A one-day test whose 聽讀 failed, then 聽讀 passed at a later test within its two years: what it passed counts.
+      || (partsOf(anchor) === 'lr' && partsOf(a) === 'both' && a.date < anchor.date && anchor.date <= twoYearsOn(a.date)))
+    const wOn = counted.filter(writingPass).map(a => a.date).sort()[0]
+    const sOn = counted.filter(speakingPass).map(a => a.date).sort()[0]
+    if (wOn && sOn) {
+      const on = [anchor.date, wOn, sOn].sort().at(-1)!
+      if (!best || on < best) best = on
+    } else if (!open || !open.lr || until > open.until) open = { until, lr: true, w: !!wOn, s: !!sOn }
+  }
+  if (best) return { on: best, lr: true, w: true, s: true }
+  // A one-day test whose 聽讀 failed: what it passed waits two years for 聽讀 to be passed at a 聽讀 test.
+  if (!open) for (const d of sorted.filter(a => partsOf(a) === 'both' && !lrPass(a.lr) && (writingPass(a) || speakingPass(a)))) {
+    const until = twoYearsOn(d.date)
+    if (!open || until > open.until) open = { until, lr: false, w: writingPass(d), s: speakingPass(d) }
+  }
+  return { until: open?.until, lr: open?.lr ?? false, w: open?.w ?? false, s: open?.s ?? false }
 }
 /** Whether one sitting (with the others before it, for GEPT halves) reached `to`. */
 function attemptPasses(a: CertAttempt, to: LevelId) {
@@ -129,27 +180,21 @@ function attemptPasses(a: CertAttempt, to: LevelId) {
 }
 
 export type CertState = 'passed' | 'waiting' | 'partial' | 'failed' | 'none'
-export interface CertStatus { state: CertState; passedOn?: string; next?: CertAttempt; lr?: boolean; sw?: boolean; attempts: CertAttempt[] }
+/** lr / w / s: what is passed and still counts (GEPT); until: the last day the missing parts can still be taken. */
+export interface CertStatus { state: CertState; passedOn?: string; next?: CertAttempt; lr?: boolean; sw?: boolean; w?: boolean; s?: boolean; until?: string; attempts: CertAttempt[] }
 export function certStatus(notes: Record<string, string>, to: LevelId): CertStatus {
   const attempts = readAttempts(notes, to)
-  let passedOn: string | undefined
-  // GEPT halves can come from different sittings of the same level. A one-day test (both halves in one sitting) does not
-  // reach back: its scores never join a half passed at an earlier sitting (LTTC 一日考問與答). A half it missed can be
-  // taken again later, and that later sitting joins the half it passed.
   const geptExam = steps.find(s => s.to === to)?.exams.find(gept)
-  const lrOk = attempts.filter(a => a.exam === geptExam && takesLr(a) && lrPass(a.lr))
-  const swOk = attempts.filter(a => a.exam === geptExam && takesSw(a) && geptExam && swPass(geptExam, a.sw))
-  for (const l of lrOk) for (const w of swOk) {
-    const later = l.date > w.date ? l : w.date > l.date ? w : l.parts === 'both' ? w : l
-    if (l.id !== w.id && later.parts === 'both') continue
-    const on = l.date > w.date ? l.date : w.date
-    if (!passedOn || on < passedOn) passedOn = on
-  }
+  const mine = attempts.filter(a => a.exam === geptExam && !waiting(a))
+  const g = geptPassed(mine)
+  let passedOn = g.on
   for (const a of attempts) if (attemptPasses(a, to) && (!passedOn || a.date < passedOn)) passedOn = a.date
   const next = attempts.find(waiting)
   if (passedOn) return { state: 'passed', passedOn, attempts }
-  if (next) return { state: 'waiting', next, attempts, lr: lrOk.length > 0, sw: swOk.length > 0 }
-  if (lrOk.length || swOk.length) return { state: 'partial', attempts, lr: lrOk.length > 0, sw: swOk.length > 0 }
+  // What is passed and can still be joined (a 聽讀 with its two years, what a one-day test passed); `until` says how long.
+  const parts = { lr: g.lr, sw: g.w && g.s, w: g.w, s: g.s, ...(g.until ? { until: g.until } : {}) }
+  if (next) return { state: 'waiting', next, attempts, ...parts }
+  if (g.lr || g.w || g.s) return { state: 'partial', attempts, ...parts }
   return { state: attempts.length ? 'failed' : 'none', attempts }
 }
 

@@ -10,31 +10,48 @@ export interface TaskContext {
   draft?: string
 }
 
+// Every task on screen, newest opened last: a box opened inside a page (用它寫一句 inside a reading) is the task until it
+// is closed, and then the page's own task is the task again.
+const open = new Map<symbol, { ctx: TaskContext; at: number }>()
+let opened = 0
 let current: TaskContext | null = null
 let owner: symbol | null = null
 const subs = new Set<() => void>()
 const emit = () => subs.forEach(f => f())
+function settle() {
+  let top: [symbol, { ctx: TaskContext; at: number }] | null = null
+  for (const e of open) if (!top || e[1].at > top[1].at) top = e
+  const next = top?.[1].ctx ?? null
+  // Typing changes only the draft; the label line does not need to re-render the chat.
+  const same = owner === (top?.[0] ?? null) && current?.label === next?.label && current?.detail === next?.detail
+  current = next ? { ...next } : null
+  owner = top?.[0] ?? null
+  if (!same) emit()
+}
 
 export function currentTask() { return current }
 export function useCurrentTask() {
   return useSyncExternalStore(f => { subs.add(f); return () => { subs.delete(f) } }, () => current, () => null)
 }
 
-/** Register the task shown on screen; it is cleared when the component goes away. */
+/** Register the task shown on screen. Passing null (a box folded away) or leaving the screen takes it out again, and
+ *  the task under it (the page it was opened in) comes back. */
 export function useTaskContext(ctx: TaskContext | null) {
   const id = useRef(Symbol('task'))
   const label = ctx?.label, detail = ctx?.detail, draft = ctx?.draft
   useEffect(() => {
-    if (!ctx) return
-    const same = current && owner === id.current && current.label === ctx.label && current.detail === ctx.detail
-    current = { label: ctx.label, detail: ctx.detail, draft: ctx.draft }
-    owner = id.current
-    // Typing changes only the draft; the label line does not need to re-render the chat.
-    if (!same) emit()
+    if (ctx) showTask(id.current, ctx); else hideTask(id.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [label, detail, draft])
-  useEffect(() => () => { if (owner === id.current) { current = null; owner = null; emit() } }, [])
+  }, [label, detail, draft, !ctx])
+  useEffect(() => () => hideTask(id.current), [])
 }
+/** The hook's two moves, as plain functions: a task shown (or its draft changed; it keeps its place), and taken out. */
+export function showTask(id: symbol, ctx: TaskContext) {
+  const had = open.get(id)
+  open.set(id, { ctx: { label: ctx.label, detail: ctx.detail, draft: ctx.draft }, at: had?.at ?? ++opened })
+  settle()
+}
+export function hideTask(id: symbol) { if (open.delete(id)) settle() }
 
 /** The text appended to the chat's system prompt while a task is on screen. */
 export function taskPrompt(t: TaskContext | null) {

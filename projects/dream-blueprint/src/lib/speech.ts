@@ -42,34 +42,45 @@ const micError = (e: unknown) => {
   return new Error(/Permission|NotAllowed|not-allowed/i.test(msg) ? '麥克風被擋住了：按網址列左邊的圖示，把麥克風改成「允許」再試一次。' : msg)
 }
 
-/** Starts listening. `maxMs` stops by itself (an answer time); `onPartial` gets words as they come (browser only). */
-export async function listen(opts: { maxMs?: number; onPartial?: (text: string) => void } = {}): Promise<Listening> {
+/** Starts listening. `maxMs` stops by itself (an answer time); `onPartial` gets words as they come (browser only).
+ *  `signal`: leaving the page (or the question) cancels it, also while the browser is still asking for the microphone. */
+export async function listen(opts: { maxMs?: number; onPartial?: (text: string) => void; signal?: AbortSignal } = {}): Promise<Listening> {
   const engine = listenEngine()
   if (!engine) throw new Error('這個瀏覽器不能做語音辨識。到口說頁的設定填 OpenAI 金鑰，或改用 Chrome、Safari。')
-  return engine === 'openai' ? recordAndTranscribe(opts.maxMs) : browserListen(opts.maxMs, opts.onPartial)
+  const listening = await (engine === 'openai' ? recordAndTranscribe(opts.maxMs, opts.signal) : browserListen(opts.maxMs, opts.onPartial))
+  if (opts.signal?.aborted) { listening.cancel(); throw new DOMException('ended', 'AbortError') }
+  opts.signal?.addEventListener('abort', () => listening.cancel(), { once: true })
+  return listening
 }
 
-async function recordAndTranscribe(maxMs?: number): Promise<Listening> {
+async function recordAndTranscribe(maxMs?: number, signal?: AbortSignal): Promise<Listening> {
   let stream: MediaStream
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
   catch (e) { throw micError(e) }
+  // Every way this can fail once the microphone is open closes it again.
+  const release = () => stream.getTracks().forEach(t => t.stop())
+  if (signal?.aborted) { release(); throw new DOMException('ended', 'AbortError') }
   const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find(t => MediaRecorder.isTypeSupported?.(t)) ?? ''
-  const recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined)
+  let recorder: MediaRecorder
+  try { recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined) }
+  catch (e) { release(); throw new Error('這個瀏覽器不能錄音（' + (e instanceof Error ? e.message : String(e)) + '）。') }
   const chunks: Blob[] = []
   let cancelled = false
   let timer: ReturnType<typeof setTimeout> | undefined
   const done = new Promise<string>((resolve, reject) => {
     recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
+    recorder.onerror = () => { clearTimeout(timer); release(); reject(new Error('錄音中斷了，再試一次。')) }
     recorder.onstop = () => {
       clearTimeout(timer)
-      stream.getTracks().forEach(t => t.stop())
+      release()
       if (cancelled) { resolve(''); return }
       const blob = new Blob(chunks, { type: recorder.mimeType || type || 'audio/webm' })
       if (blob.size < 1200) { resolve(''); return }
       transcribe(blob).then(resolve, reject)
     }
   })
-  recorder.start(250)
+  try { recorder.start(250) }
+  catch (e) { release(); throw new Error('錄音開不起來（' + (e instanceof Error ? e.message : String(e)) + '），再試一次。') }
   const stop = () => { if (recorder.state !== 'inactive') recorder.stop() }
   if (maxMs) timer = setTimeout(stop, maxMs)
   return { engine: 'openai', done, stop, cancel: () => { cancelled = true; stop() } }

@@ -187,3 +187,16 @@ test('點字查意思：不會把字形猜錯（ones 不是 on、caring 不是 c
   assert.equal(en('drew'), 'draw')
   assert.equal(en('led'), 'lead')
 })
+
+test('added、adding 查到 add（加），不是 ad（廣告）；hopping、planned 還是 hop、plan（稽核 LIT-D01）', async () => {
+  const { lookupWord } = await import('../src/lib/story.ts')
+  const en = (w: string) => lookupWord(w, { words: [] })?.en
+  assert.equal(en('added'), 'add')
+  assert.equal(en('adding'), 'add')
+  assert.equal(en('called'), 'call')
+  assert.equal(en('missed'), 'miss')
+  assert.equal(en('hopping'), 'hop')
+  assert.equal(en('planned'), 'plan')
+  assert.equal(en('stopped'), 'stop')
+  assert.equal(en('caring'), 'care')
+})

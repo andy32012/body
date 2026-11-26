@@ -2810,8 +2810,8 @@
               "zh": "椅子",
               "example": "Please sit on this chair.",
               "exampleZh": "請坐這張椅子。",
-              "source": "level6",
-              "level": 6
+              "source": "level1",
+              "level": 1
             },
             {
               "en": "floor",
@@ -2836,8 +2836,8 @@
               "zh": "椅子",
               "example": "Please sit on this chair.",
               "exampleZh": "請坐這張椅子。",
-              "source": "level6",
-              "level": 6
+              "source": "level1",
+              "level": 1
             },
             {
               "en": "floor",
@@ -8557,8 +8557,7 @@
               "zh": "媽媽",
               "example": "My mom is at home.",
               "exampleZh": "我媽媽在家。",
-              "source": "nursing",
-              "level": 4
+              "source": "curriculum"
             }
           ],
           "words": [
@@ -8575,8 +8574,7 @@
               "zh": "媽媽",
               "example": "My mom is at home.",
               "exampleZh": "我媽媽在家。",
-              "source": "nursing",
-              "level": 4
+              "source": "curriculum"
             }
           ],
           "sentences": [
@@ -33756,7 +33754,7 @@
         {
           "id": "u41-d5",
           "day": 5,
-          "zh": "傷口必須保持乾燥，而且敷料應該每天換。",
+          "zh": "這個傷口必須保持乾燥，而且敷料應該每天換。",
           "grammar": [
             "助動詞的被動"
           ],
@@ -33765,10 +33763,12 @@
             "must be kept 加形容詞；should be changed。"
           ],
           "reference": [
+            "This wound must be kept dry, and the dressing should be changed every day.",
+            "This wound must be kept dry and the dressing should be changed daily.",
             "The wound must be kept dry, and the dressing should be changed every day.",
             "The wound must be kept dry and the dressing should be changed daily."
           ],
-          "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
+          "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是這位病人的傷口：每種傷口要不要保持乾燥、多久換一次敷料，都要照醫囑和傷口的狀況。）",
           "newWords": [
             {
               "en": "dry",
@@ -33809,7 +33809,7 @@
             {
               "id": "u41-d5",
               "day": 5,
-              "zh": "傷口必須保持乾燥，而且敷料應該每天換。",
+              "zh": "這個傷口必須保持乾燥，而且敷料應該每天換。",
               "grammar": [
                 "助動詞的被動"
               ],
@@ -33818,10 +33818,12 @@
                 "must be kept 加形容詞；should be changed。"
               ],
               "reference": [
+                "This wound must be kept dry, and the dressing should be changed every day.",
+                "This wound must be kept dry and the dressing should be changed daily.",
                 "The wound must be kept dry, and the dressing should be changed every day.",
                 "The wound must be kept dry and the dressing should be changed daily."
               ],
-              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。",
+              "why": "助動詞加 be 加過去分詞：can be done、should be given、must be checked、will be discharged。醫囑和衛教常用這種說法，因為重點是事情要怎麼做。（這句講的是這位病人的傷口：每種傷口要不要保持乾燥、多久換一次敷料，都要照醫囑和傷口的狀況。）",
               "newWords": []
             }
           ],
@@ -40655,7 +40657,7 @@
             },
             {
               "en": "suggest",
-              "zh": "提議、建議",
+              "zh": "提議、建議；（證據）顯示、暗示",
               "example": "The evidence suggests he was tired.",
               "exampleZh": "證據顯示他很累。",
               "source": "level2",
@@ -40673,7 +40675,7 @@
             },
             {
               "en": "suggest",
-              "zh": "提議、建議",
+              "zh": "提議、建議；（證據）顯示、暗示",
               "example": "The evidence suggests he was tired.",
               "exampleZh": "證據顯示他很累。",
               "source": "level2",
@@ -42582,7 +42584,7 @@
         {
           "id": "u52-r1",
           "day": 4,
-          "zh": "你不應該一個人搬病人。",
+          "zh": "你剛才不應該一個人搬病人。",
           "grammar": [
             "wish 和 should have"
           ],
@@ -42681,7 +42683,7 @@
         {
           "id": "u52-r1",
           "day": 4,
-          "zh": "你不應該一個人搬病人。",
+          "zh": "你剛才不應該一個人搬病人。",
           "grammar": [
             "wish 和 should have"
           ],

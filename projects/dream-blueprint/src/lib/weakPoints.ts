@@ -85,8 +85,8 @@ export function readWeak(notes: Record<string, string>): WeakItem[] {
       .map(x => ({ ...x, first: typeof x.first === 'string' ? x.first : x.last, ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [] }))
   } catch { return [] }
 }
-/** Saved notes are capped at 50,000 characters each (store.ts); the list stays well under that by dropping the
- *  examples of the weakest points first, then those points. */
+/** The list stays under 30,000 characters (it was sized when each saved note was capped at 50,000; the cap is now the
+ *  whole progress size) by dropping the examples of the weakest points first, then those points. */
 function write(notes: Record<string, string>, list: WeakItem[]) {
   let kept = list
   let json = JSON.stringify(kept)

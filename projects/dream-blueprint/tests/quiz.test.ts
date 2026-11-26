@@ -62,3 +62,35 @@ test('國考科目頁按「練這科」：只出那一科的護理英文題，�
     assert.equal(notes[quizPosKey('nursing')], undefined, '全部題庫的進度不動')
   }
 })
+
+test('練一科：同一天做完一輪就說今天做完了，不會一直回到第一題；上面的題數也是這一科的（稽核 D-01、D-02）', async () => {
+  const { nextSubjectQuiz, quizSummary, recordQuizAnswer, subjectDoneToday, subjectQuizzes } = await import('../src/lib/quiz.ts')
+  const bank = (await import('../src/data/quiz.json', { with: { type: 'json' } })).default as Parameters<typeof subjectQuizzes>[0]
+  const subject = bank.find(q => q.subjects?.length)?.subjects?.[0]
+  assert.ok(subject)
+  const list = subjectQuizzes(bank, subject!)
+  let notes: Record<string, string> = {}
+  const today = '2026-11-26'
+  const seen: string[] = []
+  for (let i = 0; i < list.length + 3; i++) {
+    const next = nextSubjectQuiz(bank, subject!, notes, today)
+    if (!next) break
+    seen.push(next.item.id)
+    notes = recordQuizAnswer(notes, next.item, i === 0 ? (next.item.answerIndex + 1) % next.item.options.length : next.item.answerIndex, today, false)
+  }
+  assert.deepEqual(seen, list.map(q => q.id), '每題一次，照順序，不重複')
+  assert.equal(subjectDoneToday(bank, subject!, notes, today), true)
+  const s = quizSummary(bank, 'nursing', notes, subject)
+  assert.equal(s.total, list.length, '題數是這一科的')
+  assert.equal(s.answered, list.length)
+  assert.equal(s.wrongNow, 1)
+  // Tomorrow: the wrong one first, then the rest in order (not the first one again and again).
+  const tomorrow = '2026-11-27'
+  const first = nextSubjectQuiz(bank, subject!, notes, tomorrow)!
+  assert.equal(first.retry, true)
+  notes = recordQuizAnswer(notes, first.item, first.item.answerIndex, tomorrow, false)
+  const second = nextSubjectQuiz(bank, subject!, notes, tomorrow)!
+  assert.equal(second.item.id, list[1].id)
+  notes = recordQuizAnswer(notes, second.item, second.item.answerIndex, tomorrow, false)
+  assert.equal(nextSubjectQuiz(bank, subject!, notes, tomorrow)?.item.id, list[2]?.id)
+})

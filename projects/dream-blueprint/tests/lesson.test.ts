@@ -334,3 +334,36 @@ test('小關卡或複習日做到一半重新整理：記得做到第幾句、�
   assert.equal(notes[runProgressKey(day)], undefined, '做完就清掉')
   assert.equal(readRunProgress({ [runProgressKey(day)]: 'x' }, day, 3, 6), null)
 })
+
+test('換個說法寫到一半離開：老師第一次的判定和看過答案都留在今天的課裡，兩台合併也不會不見（稽核 CUR-06）', async () => {
+  const { updateLesson, readLessonRecord, mergeLessonRecords } = await import('../src/lib/lesson.ts')
+  const { judgeVariation } = await import('../src/lib/evidence.ts')
+  const day = '2026-11-26'
+  let notes: Record<string, string> = {}
+  // Claude said 小錯 on the first try; he left before finishing.
+  notes = updateLesson(notes, day, 5, 2, { varyChecks: { 0: { firstVerdict: 'small', checkedText: 'He go to school.' } } })
+  const kept = readLessonRecord(notes, day)?.varyChecks?.[0]
+  assert.equal(kept?.firstVerdict, 'small')
+  // Back again, he types the right answer: it was fixed after feedback, so it is done with help.
+  assert.equal(judgeVariation('good', 'He goes to school.', 'He goes to school.', kept), 'assisted')
+  assert.equal(judgeVariation('good', 'He goes to school.', 'He goes to school.', {}), 'independent', '沒有留下紀錄的話，會被當成自己寫對')
+  // The phone (changed later) has no check for it: the first verdict stays.
+  const merged = mergeLessonRecords(readLessonRecord(notes, day)!, { unit: 5, day: 2, steps: ['recall'], varyChecks: { 0: { revealed: true } } })
+  assert.deepEqual(merged.varyChecks?.[0], { firstVerdict: 'small', checkedText: 'He go to school.', revealed: true })
+})
+
+test('閱讀裡打開「用它寫一句」再收起來：浮動 Claude 看到的又是閱讀這一題，不是收起來的造句（稽核 LIT-06）', async () => {
+  const { currentTask, hideTask, showTask } = await import('../src/lib/taskContext.ts')
+  const reading = Symbol('reading'), word = Symbol('word')
+  showTask(reading, { label: '閱讀：第 3 題', detail: '題目…' })
+  showTask(word, { label: '用單字造句：nurse', detail: '…', draft: 'I am' })
+  assert.equal(currentTask()?.label, '用單字造句：nurse')
+  // Typing on the reading page does not take the place of the open box.
+  showTask(reading, { label: '閱讀：第 3 題', detail: '題目…', draft: 'B' })
+  assert.equal(currentTask()?.label, '用單字造句：nurse')
+  hideTask(word)
+  assert.equal(currentTask()?.label, '閱讀：第 3 題')
+  assert.equal(currentTask()?.draft, 'B')
+  hideTask(reading)
+  assert.equal(currentTask(), null)
+})

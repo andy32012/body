@@ -78,11 +78,16 @@ export function nextQuizItem(items: readonly QuizItem[], section: QuizSection, n
   return { item: list[index], retry: false, index, total: list.length }
 }
 
+type SubjectItem = QuizItem & { subjects?: string[] }
+/** One licensing-exam subject's nursing questions, in the bank's order. */
+export const subjectQuizzes = <T extends SubjectItem>(items: readonly T[], subject: string) => items.filter(q => sectionOf(q) === 'nursing' && q.subjects?.includes(subject))
 /** Questions of one licensing-exam subject (from the 國考科目 page): one answered wrong and due again first, then one
- *  never answered, then the one answered longest ago. The shared order of the whole bank is not moved. */
-export function nextSubjectQuiz(items: readonly (QuizItem & { subjects?: string[] })[], subject: string, notes: Record<string, string>, today: string):
+ *  never answered, then the one answered longest ago (in the bank's order among the same day). One already answered
+ *  today does not come again today — a wrong one comes back tomorrow — so null also means: all done for today
+ *  (`subjectDoneToday`). The shared order of the whole bank is not moved. */
+export function nextSubjectQuiz(items: readonly SubjectItem[], subject: string, notes: Record<string, string>, today: string):
   { item: QuizItem; retry: boolean; index: number; total: number } | null {
-  const list = items.filter(q => sectionOf(q) === 'nursing' && q.subjects?.includes(subject))
+  const list = subjectQuizzes(items, subject)
   if (!list.length) return null
   const yesterday = addDays(today, -1)
   const at = (item: QuizItem, retry = false) => ({ item, retry, index: list.indexOf(item), total: list.length })
@@ -90,10 +95,18 @@ export function nextSubjectQuiz(items: readonly (QuizItem & { subjects?: string[
   if (retry) return at(retry, true)
   const fresh = list.find(q => !readQuizRecord(notes, q.id))
   if (fresh) return at(fresh)
-  return at([...list].sort((a, b) => readQuizRecord(notes, a.id)!.day.localeCompare(readQuizRecord(notes, b.id)!.day))[0])
+  const waiting = list.filter(q => readQuizRecord(notes, q.id)!.day < today)
+  if (!waiting.length) return null
+  return at([...waiting].sort((a, b) => readQuizRecord(notes, a.id)!.day.localeCompare(readQuizRecord(notes, b.id)!.day))[0])
 }
-export function quizSummary(items: readonly QuizItem[], section: QuizSection, notes: Record<string, string>) {
-  const list = items.filter(q => sectionOf(q) === section)
+/** Every question of the subject has been answered today (nothing is due again before tomorrow). */
+export const subjectDoneToday = (items: readonly SubjectItem[], subject: string, notes: Record<string, string>, today: string) => {
+  const list = subjectQuizzes(items, subject)
+  return list.length > 0 && list.every(q => readQuizRecord(notes, q.id)?.day === today)
+}
+/** The counts shown above the questions; with `subject`, the same questions that are being asked. */
+export function quizSummary(items: readonly SubjectItem[], section: QuizSection, notes: Record<string, string>, subject?: string) {
+  const list = subject ? subjectQuizzes(items, subject) : items.filter(q => sectionOf(q) === section)
   const recs = list.map(q => readQuizRecord(notes, q.id)).filter((r): r is QuizRecord => !!r)
   const causes: Record<string, number> = {}
   for (const r of recs) for (const c of r.causes ?? []) causes[c] = (causes[c] ?? 0) + 1

@@ -6,11 +6,11 @@ import { sameEnglish } from '../lib/evidence'
 import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
-import { readDraft, writeDraft } from '../lib/drafts'
+import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { chartBounds, isTimeSeries } from '../lib/chart'
 import { isProcessChart, isTableChart, type WriteChart } from '../lib/writing'
 import type { SayCard } from '../lib/sayCards'
-import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
+import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
 import './lesson.css'
 
 /** `pick` lists the earlier steps that can be looked at again; pressing one calls onPick. `review` is the one being looked at. */
@@ -165,14 +165,14 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
 }
 
 /** What Claude said about a variation: the verdict on the first try with the exact text it judged, and whether it gave the answer away. */
-export interface VariationCheck {
-  firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean
-  /** What he had written when he pressed 看答案 himself: the answer is judged on this, not on what he copied afterwards. */
-  before?: string
-}
+export type { VariationCheck } from '../lib/lesson'
 /** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
  *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
-export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, onDone }: { item: { zh: string; en: string; alt?: string[] }
+export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, saved, draftKey, onCheck, onDone }: { item: { zh: string; en: string; alt?: string[] }
+  /** The check kept from an earlier visit today, and where to keep it (so leaving and coming back changes nothing). */
+  saved?: VariationCheck; onCheck?: (check: VariationCheck) => void
+  /** Where the answer being written is kept while he is away. */
+  draftKey?: string
   /** Which of today's variations this is, and how many there are. */
   count?: [number, number]
   /** The id of today's sentence, so the teacher knows the unit and its rule. */
@@ -182,12 +182,21 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   /** Remembers that the answer was shown, so opening the page again cannot hide it. */
   onPeek?: () => void
   onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => void }) {
-  const [answer, setAnswer] = useState('')
+  const [answer, setAnswerNow] = useState(() => draftKey ? readDraft(draftKey) : '')
+  const setAnswer = (text: string) => { setAnswerNow(text); if (draftKey) writeDraft(draftKey, text) }
   const [shown, setShown] = useState(false)
   // Read once: pressing 看答案 now marks the record too, which must not show the "earlier visit" note right away.
   const [peekedAtStart] = useState(!!peekedBefore)
-  const [check, setCheck] = useState<VariationCheck>(peekedAtStart ? { revealed: true } : {})
-  const [latest, setLatest] = useState<{ v: string; text: string } | null>(null)
+  const [check, setCheck] = useState<VariationCheck>(() => ({ ...(saved ?? {}), ...(peekedAtStart ? { revealed: true } : {}) }))
+  const [latest, setLatestNow] = useState<{ v: string; text: string } | null>(() => saved?.last ?? null)
+  const setLatest = (l: { v: string; text: string }) => { setLatestNow(l); setCheck(c => ({ ...c, last: l })) }
+  // Every change of the check is kept as it happens (not only when the variation is finished).
+  const firstCheck = useRef(true)
+  useEffect(() => {
+    if (firstCheck.current) { firstCheck.current = false; return }
+    onCheck?.(check)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [check])
   const [selfMark, setSelfMark] = useState(false)
   // With Claude connected there is no 看答案: Claude checks first and gives the answer on 「直接告訴我」. If Claude can't be reached, 看答案 comes back.
   const keyed = !!tutorKey()
@@ -195,7 +204,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   const mountedAt = useRef(Date.now())
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
-  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) onDone(m, answer, check) }
+  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) { if (draftKey) clearDraft(draftKey); onDone(m, answer, check) } }
   const reveal = () => { shownAt.current = Date.now(); setShown(true); setCheck(c => c.before === undefined ? { ...c, before: answer } : c); onPeek?.() }
   const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
   const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)

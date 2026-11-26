@@ -79,6 +79,7 @@ function Panel({ title, hint, icon: Icon, children }: { title: string; hint?: st
 import { exportBackup, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
 import { archiveFolderUrl, cloudArchive, driveConnected } from '../lib/drive'
 import { dayKey, addDays, activePeriod } from '../lib/progress'
+import { noteMoved } from '../lib/wordStates'
 import { DAILY_CHOICES, DEFAULT_DAILY, countKey } from '../lib/dailyWords'
 
 type SettingsData = AppState['settings']
@@ -133,7 +134,9 @@ export default function Settings(props: PageProps) {
         if (wordMode === 'known') for (const key of inputKeys) known.add(key)
         const learning = new Set(prev.learningWords.map(w => w.toLowerCase()))
         if (wordMode === 'learn') for (const key of inputKeys) learning.add(key)
-        return {...prev, customWords:[...dict.values()], knownWords:[...known], learningWords:[...learning].filter(key=>!known.has(key))}
+        // Words moved from 還不熟 to 認得 are recorded, so merging with another device keeps them 認得.
+        const movedToKnown = wordMode === 'known' ? inputKeys.filter(key => learning.has(key)) : []
+        return {...prev, customWords:[...dict.values()], knownWords:[...known], learningWords:[...learning].filter(key=>!known.has(key)), notes:noteMoved(prev.notes, movedToKnown, 'k', dayKey())}
       })
       setText('')
       announce('words', '已匯入 ' + parsed.length + ' 個單字，重複的單字已合併。')

@@ -80,10 +80,21 @@ export function nurseReadOn(notes: Record<string, string>, day: string) {
 export const nurseSpokeOn = (notes: Record<string, string>, day: string) =>
   Object.entries(notes).some(([k, v]) => k.startsWith('nurse.speak.') && v === day)
 
-/** Counts a nursing word passed in a drill today. */
-export const countNurseWord = (notes: Record<string, string>, day: string) =>
-  ({ ...notes, [nurseWordsKey(day)]: String((Number(notes[nurseWordsKey(day)]) || 0) + 1) })
-export const nurseWordsOn = (notes: Record<string, string>, day: string) => Number(notes[nurseWordsKey(day)]) || 0
+/** The nursing words passed in a drill today, each once however often it is done again (a list of words; a plain
+ *  number is how it was counted before, and that day keeps counting the old way). */
+export function countNurseWord(notes: Record<string, string>, day: string, word?: string) {
+  const key = nurseWordsKey(day), v = notes[key]
+  if (!word || (v !== undefined && /^\d+$/.test(v))) return { ...notes, [key]: String((Number(v) || 0) + 1) }
+  const list = passedWords(v)
+  return list.includes(word) ? notes : { ...notes, [key]: JSON.stringify([...list, word]) }
+}
+function passedWords(v: string | undefined): string[] {
+  try { const list = JSON.parse(v ?? '[]') as unknown; return Array.isArray(list) ? list.filter((w): w is string => typeof w === 'string') : [] } catch { return [] }
+}
+export const nurseWordsOn = (notes: Record<string, string>, day: string) => {
+  const v = notes[nurseWordsKey(day)]
+  return v !== undefined && /^\d+$/.test(v) ? Number(v) : passedWords(v).length
+}
 
 /** What Emma is told when he acts out a dialogue: she plays the other person, he plays the nurse (or the student). */
 export function nurseInstructions(l: NurseListening) {

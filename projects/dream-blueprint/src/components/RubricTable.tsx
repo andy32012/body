@@ -11,7 +11,8 @@ export function RubricTable({ rubric, label = '評分表', open = false }: { rub
       <ol>{s.levels.map(l => <li key={l.score}><span className="rb-score">{l.score}</span><span>{l.text}</span></li>)}</ol>
     </div>)}
     {rubric.rules && <ul className="rb-rules">{rubric.rules.map(r => <li key={r}>{r}</li>)}</ul>}
-    {rubric.pass && <p className="rb-note">通過標準：{rubric.pass.note}</p>}
+    {rubric.pass && <p className="rb-note">{rubric.pass.official}</p>}
+    {rubric.pass && <p className="rb-note">這裡的練習目標（不是官方的通過標準）：{rubric.pass.note}</p>}
     {rubric.limits && <p className="rb-note">{rubric.limits}</p>}
     <p className="rb-source">照官方說明整理：<a href={rubric.source.url} target="_blank" rel="noopener noreferrer">{rubric.source.name}</a></p>
   </details>

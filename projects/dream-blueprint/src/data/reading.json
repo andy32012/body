@@ -1063,13 +1063,13 @@
     "level": "A1",
     "title": "Clean Teeth",
     "topic": "健康",
-    "words": 66,
+    "words": 71,
     "paras": [
       "Your teeth are important. You use them to eat and to talk. Clean teeth also give you a nice smile.",
       "Brush your teeth two times a day, in the morning and before bed. Brush for two minutes each time. Do not brush too hard.",
-      "Sweet food and sweet drinks are bad for your teeth. Drink water after you eat candy. Visit the dentist every six months."
+      "Sweet food and sweet drinks are bad for your teeth. Drink water after you eat candy. Visit the dentist for check-ups. Your dentist tells you how often."
     ],
-    "zh": "牙齒很重要，你用它們吃東西和說話。乾淨的牙齒也讓你笑起來好看。一天刷兩次牙，早上和睡前各一次，每次刷兩分鐘，不要刷太用力。甜食和含糖飲料對牙齒不好，吃完糖果後要喝水。每六個月看一次牙醫。",
+    "zh": "牙齒很重要，你用它們吃東西和說話。乾淨的牙齒也讓你笑起來好看。一天刷兩次牙，早上和睡前各一次，每次刷兩分鐘，不要刷太用力。甜食和含糖飲料對牙齒不好，吃完糖果後要喝水。要定期看牙醫檢查，多久去一次聽牙醫的建議。",
     "qs": [
       {
         "type": "main",
@@ -1091,7 +1091,7 @@
           "Two hours"
         ],
         "answer": 1,
-        "why": "Brush for two minutes each time.（每次兩分鐘）；six months 是多久看一次牙醫。",
+        "why": "Brush for two minutes each time.（每次兩分鐘）。",
         "evidence": "Brush for two minutes each time."
       },
       {
@@ -1932,13 +1932,13 @@
     "level": "A2",
     "title": "A Typhoon Day",
     "topic": "天氣",
-    "words": 124,
+    "words": 127,
     "paras": [
       "Last September, a strong typhoon came to Taiwan. The day before, my father checked the windows, and my mother bought rice, noodles, and bottled water. Schools and offices were closed the next day.",
       "In the morning, the wind was very loud and the rain hit the windows hard. At ten o'clock, the lights went out. We had no power for five hours. We could not watch TV or charge our phones, so we played cards and talked. My grandmother told us stories about typhoons when she was a child.",
-      "In the evening, the rain stopped and the power came back. Some trees on our street fell down, but nobody was hurt. It was a scary day, but I enjoyed the time with my family."
+      "The power came back in the afternoon, and in the evening the rain stopped. Some trees on our street fell down, but nobody was hurt. It was a scary day, but I enjoyed the time with my family."
     ],
-    "zh": "去年九月，一個強烈颱風來到台灣。前一天，爸爸檢查了窗戶，媽媽買了米、麵和瓶裝水。隔天學校和公司都放假。早上風聲很大，雨重重打在窗戶上。十點的時候停電了，我們五個小時沒有電，不能看電視也不能幫手機充電，所以我們玩撲克牌、聊天。奶奶跟我們說她小時候遇到颱風的故事。傍晚雨停了，電也來了。我們街上有些樹倒了，但是沒有人受傷。那是可怕的一天，但我很喜歡和家人在一起的時光。",
+    "zh": "去年九月，一個強烈颱風來到台灣。前一天，爸爸檢查了窗戶，媽媽買了米、麵和瓶裝水。隔天學校和公司都放假。早上風聲很大，雨重重打在窗戶上。十點的時候停電了，我們五個小時沒有電，不能看電視也不能幫手機充電，所以我們玩撲克牌、聊天。奶奶跟我們說她小時候遇到颱風的故事。下午電來了，傍晚雨也停了。我們街上有些樹倒了，但是沒有人受傷。那是可怕的一天，但我很喜歡和家人在一起的時光。",
     "qs": [
       {
         "type": "detail",
@@ -3567,7 +3567,7 @@
       "The morning shift starts with handover at 7:30 a.m., so please arrive by 7:15. Please bring your student ID card, a watch with a second hand, and a small notebook. Phones must be kept in your locker during the shift.",
       "By the time the placement finishes, you will have completed about 120 hours on the ward. On the last day, you and your mentor will be meeting to discuss your progress. If you have any questions before then, I will be holding an online question session this Wednesday at 6 p.m. Best wishes, Ms. Lin, Clinical Coordinator"
     ],
-    "zh": "臨床實習協調員林老師寫給二年級學生的信：第一次實習 3 月 3 日（週一）開始，為期四週。第一週不會自己照顧病人，而是整個班跟著一位資深護理師（導師），看她怎麼安排一天、跟病人溝通、做紀錄，導師會期待學生發問。第二週起自己照顧一到兩位病人，導師會檢查；第二週結束前會練習量生命徵象、在督導下給口服藥、寫簡單的護理紀錄；第三週要向小組報告個案。早班七點半交班，請七點十五分前到，帶學生證、有秒針的手錶和小筆記本，手機要放置物櫃。實習結束時會累積約 120 小時，最後一天和導師面談進度；週三晚上六點有線上問答。",
+    "zh": "臨床實習協調員林老師寫給二年級學生的信：第一次實習 3 月 3 日（週一）開始，為期四週。第一週不會自己照顧病人，而是每個人整個班次都跟著自己的導師（一位資深護理師），看她怎麼安排一天、跟病人溝通、做紀錄，導師會期待學生發問。第二週起自己照顧一到兩位病人，導師會檢查；第二週結束前會練習量生命徵象、在督導下給口服藥、寫簡單的護理紀錄；第三週要向小組報告個案。早班七點半交班，請七點十五分前到，帶學生證、有秒針的手錶和小筆記本，手機要放置物櫃。實習結束時會累積約 120 小時，最後一天和導師面談進度；週三晚上六點有線上問答。",
     "qs": [
       {
         "type": "main",
@@ -4018,16 +4018,16 @@
     "level": "B2",
     "title": "What Old Bones Can Tell Us",
     "topic": "橋接 45：推測",
-    "words": 270,
+    "words": 316,
     "unit": 50,
     "paras": [
       "When archaeologists find a human skeleton, they cannot ask the person any questions. Instead, they have to work like detectives, using small clues to build a picture of a life that ended long ago.",
       "Bones can reveal a surprising amount. The shape of the pelvis, for example, usually shows whether the person was male or female. The teeth give clues about age: a skeleton with all its adult teeth, but with little wear on them, probably belonged to a young adult. Heavy wear suggests that the person must have eaten rough, hard food for many years.",
-      "Some of the most interesting clues are injuries. A break that shows no sign of healing tells archaeologists that the person must have died at or around the time of the injury. A break that has healed, on the other hand, means the person lived for weeks or even years afterwards.",
+      "Some of the most interesting clues are injuries. A break that has healed means the person lived for weeks or even years afterwards, because bone takes time to repair itself. A break that shows no sign of healing is harder to read. The person might have died at or around the time of the injury, but the bone could also have broken after death, for example under the weight of the soil. Archaeologists have to look at other details, such as the shape and colour of the broken edges, before they can say which is more likely.",
       "Healed injuries can also tell us something about how people treated each other. Imagine a skeleton with a badly broken thigh bone that healed. A person with such an injury could not have walked, hunted or gathered food for many weeks. They can't have survived alone. Someone must have brought them food and water, kept them warm and protected them. In other words, someone must have cared for them.",
       "Of course, archaeologists have to be careful. Bones alone may not tell the whole story, and different experts sometimes reach different conclusions from the same evidence. But when the clues point in the same direction, they allow us to imagine the lives, and sometimes the kindness, of people who lived thousands of years ago."
     ],
-    "zh": "考古學家找到人骨時沒辦法問問題，只能像偵探一樣用小線索拼出很久以前的生活。骨頭透露的資訊多得驚人：骨盆形狀通常看得出男女；牙齒是年齡線索——成人牙齒都在但磨損少，大概是年輕人；磨損很重表示這個人一定長年吃粗硬的食物。受傷也是重要線索：骨折完全沒有癒合，代表這人一定是在受傷當時或前後死亡；骨折癒合了，代表他之後又活了幾週甚至幾年。癒合的傷也透露人與人之間怎麼相待：大腿骨嚴重骨折又癒合的人，好幾週不可能走路、打獵或採集食物，不可能獨自活下來，一定有人送食物和水、幫他保暖、保護他——也就是有人照顧過他。當然考古學家必須小心：光靠骨頭不一定看得到全貌，不同專家對同樣的證據有時會有不同結論；但線索都指向同一方向時，我們就能想像幾千年前的人怎麼生活，有時還能看見他們的善良。",
+    "zh": "考古學家找到人骨時沒辦法問問題，只能像偵探一樣用小線索拼出很久以前的生活。骨頭透露的資訊多得驚人：骨盆形狀通常看得出男女；牙齒是年齡線索——成人牙齒都在但磨損少，大概是年輕人；磨損很重表示這個人一定長年吃粗硬的食物。受傷也是重要線索：骨折癒合了，代表他之後又活了幾週甚至幾年，因為骨頭要時間才能長好；骨折完全沒有癒合就比較難判斷——這個人可能是在受傷當時或前後死亡，但骨頭也可能是死後才斷的（例如被土壓斷），考古學家要再看斷口的形狀和顏色等其他細節，才能說哪一種比較可能。癒合的傷也透露人與人之間怎麼相待：大腿骨嚴重骨折又癒合的人，好幾週不可能走路、打獵或採集食物，不可能獨自活下來，一定有人送食物和水、幫他保暖、保護他——也就是有人照顧過他。當然考古學家必須小心：光靠骨頭不一定看得到全貌，不同專家對同樣的證據有時會有不同結論；但線索都指向同一方向時，我們就能想像幾千年前的人怎麼生活，有時還能看見他們的善良。",
     "qs": [
       {
         "type": "main",
@@ -4054,15 +4054,15 @@
       },
       {
         "type": "detail",
-        "q": "What does a break with no sign of healing tell archaeologists?",
+        "q": "What can archaeologists conclude from a break that shows no sign of healing, on its own?",
         "options": [
           "The person lived for years after the injury.",
-          "The person died at or around the time of the injury.",
+          "Not enough to be sure: the person might have died around the time of the injury, or the bone might have broken after death.",
           "The person was cared for by others."
         ],
         "answer": 1,
-        "why": "沒有癒合 → must have died at or around the time of the injury；癒合的才代表之後還活著。",
-        "evidence": "the person must have died at or around the time of the injury"
+        "why": "沒有癒合只能說「可能」在受傷前後死亡（might have died），骨頭也可能是死後才斷的（could have broken after death），要再看斷口等其他細節；癒合了才確定之後還活著。單一線索不夠時用 might／could，不用 must。",
+        "evidence": "The person might have died at or around the time of the injury, but the bone could also have broken after death"
       },
       {
         "type": "reference",
@@ -4142,17 +4142,17 @@
     "level": "B2",
     "title": "The Mystery of the Thank-You Card",
     "topic": "橋接 45：推測",
-    "words": 235,
+    "words": 255,
     "unit": 50,
     "held": true,
     "paras": [
       "One Monday morning, a small blue envelope appeared on the desk at the nurses' station on Ward 9. Inside was a card with a drawing of a cat and four words: 'Thank you for everything.' There was no name, and nobody had seen who had left it.",
-      "The nurses started guessing. 'It must be from Mr. Lo,' said Grace. 'He went home on Saturday, and he was always talking about his cat.' But Peter shook his head. 'It can't be from Mr. Lo. He broke his right wrist, and this writing is very neat. He couldn't have written it himself.'",
-      "'Maybe his wife wrote it for him,' Grace suggested. Peter thought for a moment. 'She might have. But look at the envelope. It's completely dry, and it rained heavily all weekend. Whoever left it must have come in this morning, after the rain stopped.'",
+      "The nurses started guessing. 'It must be from Mr. Lo,' said Grace. 'He went home on Saturday, and he was always talking about his cat.' But Peter shook his head. 'It can't be from Mr. Lo. He broke his right wrist, and he writes with his right hand. This writing is very neat. He couldn't have written it himself.'",
+      "'Maybe his wife wrote it for him,' Grace suggested. Peter thought for a moment. 'She might have. But look at the envelope. It's completely dry, and it rained heavily all weekend. Whoever left it must have come in this morning, after the rain stopped.' 'Unless it was in a bag,' said Grace. 'Then it could have stayed dry.'",
       "Then Lily, a student nurse, noticed something else. The cat had been drawn with a purple crayon, the kind of crayon that young children use. 'It might have been a child,' she said. 'Didn't Mr. Lo's granddaughter visit him every afternoon? She was always drawing.'",
       "At lunchtime, the mystery was solved. Mr. Lo's granddaughter came back to pick up a scarf that he had left behind. When she saw the card on the desk, she smiled shyly. 'Grandpa told me what to write,' she said. 'I did the cat by myself.'"
     ],
-    "zh": "某個週一早上，9 病房護理站桌上出現一個藍色小信封，裡面的卡片畫了一隻貓，寫著「謝謝你們所做的一切」，沒有署名，也沒人看到是誰放的。護理師們開始猜：Grace 說一定是週六出院的羅先生，他老是聊他的貓；Peter 搖頭說不可能，羅先生右手腕骨折，這字又很工整，他不可能自己寫。Grace 說也許是太太代寫，Peter 說有可能，但信封完全是乾的，整個週末都在下大雨，放卡片的人一定是今天早上雨停後才來的。學生護理師 Lily 又注意到：貓是用紫色蠟筆畫的，那是小孩用的蠟筆，可能是小孩畫的——羅先生的孫女不是每天下午都來、一直在畫畫嗎？中午謎底揭曉：羅先生的孫女回來拿他忘了帶走的圍巾，看到卡片害羞地笑著說：「爺爺告訴我要寫什麼，貓是我自己畫的。」",
+    "zh": "某個週一早上，9 病房護理站桌上出現一個藍色小信封，裡面的卡片畫了一隻貓，寫著「謝謝你們所做的一切」，沒有署名，也沒人看到是誰放的。護理師們開始猜：Grace 說一定是週六出院的羅先生，他老是聊他的貓；Peter 搖頭說不可能，羅先生右手腕骨折，他又是用右手寫字，這字很工整，他不可能自己寫。Grace 說也許是太太代寫，Peter 說有可能，但信封完全是乾的，整個週末都在下大雨，放卡片的人一定是今天早上雨停後才來的；Grace 說除非信封放在袋子裡，那樣也可能是乾的。學生護理師 Lily 又注意到：貓是用紫色蠟筆畫的，那是小孩用的蠟筆，可能是小孩畫的——羅先生的孫女不是每天下午都來、一直在畫畫嗎？中午謎底揭曉：羅先生的孫女回來拿他忘了帶走的圍巾，看到卡片害羞地笑著說：「爺爺告訴我要寫什麼，貓是我自己畫的。」",
     "qs": [
       {
         "type": "main",
@@ -4174,19 +4174,19 @@
           "Mr. Lo had left the hospital a week earlier."
         ],
         "answer": 0,
-        "why": "Peter 說羅先生右手腕骨折、字又很工整 → He couldn't have written it himself。",
-        "evidence": "He broke his right wrist, and this writing is very neat."
+        "why": "Peter 說羅先生右手腕骨折、他又用右手寫字，字卻很工整 → He couldn't have written it himself。",
+        "evidence": "He broke his right wrist, and he writes with his right hand."
       },
       {
         "type": "evidence",
-        "q": "Which clue showed that the card had been left that morning?",
+        "q": "Which clue made Peter think that the card had been left that morning?",
         "options": [
           "The envelope was completely dry.",
           "The card had a drawing of a cat.",
           "The writing was very neat."
         ],
         "answer": 0,
-        "why": "整個週末下大雨，信封卻是乾的 → must have come in this morning, after the rain stopped。",
+        "why": "整個週末下大雨，信封卻是乾的，Peter 就推測是今天早上雨停後才放的（must have come）。這只是推測：Grace 馬上提醒，放在袋子裡也可能是乾的。",
         "evidence": "It's completely dry, and it rained heavily all weekend."
       },
       {
@@ -5388,7 +5388,7 @@
           "Green"
         ],
         "answer": 2,
-        "why": "綠色是弟弟的書包；藍色是美的，白色是姓名卡。",
+        "why": "綠色是兄弟的書包（英文沒說是哥哥還是弟弟）；藍色是美的，白色是姓名卡。",
         "evidence": "Her brother has a green bag."
       },
       {
@@ -6206,7 +6206,7 @@
           "Drawing an umbrella"
         ],
         "answer": 1,
-        "why": "妹妹正用手機確認時間。",
+        "why": "姊妹正用手機看時間（sister 沒說是姊姊還是妹妹）。",
         "evidence": "Her sister is checking the time on her phone."
       },
       {
@@ -13130,12 +13130,12 @@
         "type": "detail",
         "q": "Which change could alter the information received by the system?",
         "options": [
-          "A different colour on the committee’s meeting room wall",
-          "The addition of a supplier’s slogan to a presentation",
+          "A higher overall accuracy figure in the supplier’s presentation",
+          "The committee’s decision to name who reviews each warning",
           "A revised form or a change in recording practice"
         ],
         "answer": 2,
-        "why": "第四段列出表單、病人群體、紀錄方式可能改變資料。",
+        "why": "第四段列出表單、病人群體、紀錄方式改變，可能改變軟體收到的資料；廠商的整體準確率和誰來審閱警示，都不會改變輸入的資料。",
         "evidence": "A revised form, a new patient group or a changed recording practice could alter what the software receives."
       },
       {

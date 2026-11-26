@@ -1,7 +1,9 @@
 import type { AppState } from './store'
 import { memoryDeletedKey, memoryNoteKey, mergeMemory, readDeleted, readMemory, writeMemory } from './memory'
 import { readRemoved, weakKey, weakRemovedKey } from './weakPoints'
-import { archiveKey } from './compact'
+import { archiveKey, mergeArchives, readArchive } from './compact'
+import { mergeHints, mergeLessonRecords, type HintUse, type LessonRecord } from './lesson'
+import { mergeMoved, movedKey, readMoved, settleWords } from './wordStates'
 
 /**
  * 「兩份合併」: when two devices both changed the progress since they last synced, keep everything from both instead of
@@ -38,6 +40,17 @@ export function mergeNote(key: string, older: string, newer: string): string {
   }
   // The folded old review lines: the archive folded further along (the lines before it are dropped from the merge).
   if (key === 'review.archive' && isObj(a) && isObj(b)) return String(a.before ?? '') > String(b.before ?? '') ? older : newer
+  // A day's lesson on two devices: steps, answers and the open task's sentences from both, not just the copy changed last.
+  if (/^lesson\.\d{4}-\d{2}-\d{2}$/.test(key) && isObj(a) && isObj(b) && Array.isArray(a.steps) && Array.isArray(b.steps))
+    return JSON.stringify(mergeLessonRecords(a as unknown as LessonRecord, b as unknown as LessonRecord))
+  // Help used that day outside the lesson (hints and answers shown): the most from either device.
+  if (/^hints\.\d{4}-\d{2}-\d{2}$/.test(key) && isObj(a) && isObj(b))
+    return JSON.stringify(mergeHints(a as Record<string, HintUse>, b as Record<string, HintUse>))
+  // When words last moved between 認得 and 還不熟: the later move of each word.
+  if (key === movedKey) return JSON.stringify(mergeMoved(readMoved({ [key]: older }), readMoved({ [key]: newer })))
+  // A checkpoint left halfway on both: the one that got further (the same checkpoint), else the copy changed last.
+  if (/^progress\.\d{4}-\d{2}-\d{2}$/.test(key) && isObj(a) && isObj(b) && a.unit === b.unit && a.day === b.day && typeof a.pos === 'number' && typeof b.pos === 'number')
+    return a.pos > b.pos ? older : newer
   // Weak points: one entry per label; keep the one seen more often, with both sides' examples.
   if (Array.isArray(a) && Array.isArray(b) && [...a, ...b].every(x => isObj(x) && typeof x.k === 'string' && typeof x.n === 'number')) {
     const items = new Map<string, Record<string, unknown>>()
@@ -97,18 +110,21 @@ export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean
       if (Array.isArray(list)) merged[weakKey] = JSON.stringify(list.filter(i => !removed[i.k] || (i.last ?? '') > removed[i.k]))
     } catch { /* leave it */ }
   }
-  // Review lines from before the kept archive were folded into it: keeping them too would count them twice.
-  const before = (() => { try { return String(JSON.parse(merged[archiveKey] ?? 'null')?.before ?? '') } catch { return '' } })()
+  // Old review lines folded on either device: the two archives merged day by day; lines from before the merged archive
+  // are folded into it (keeping them too would count them twice).
+  const events = unionBy(older.reviewEvents, newer.reviewEvents, e => [e.id, e.day, e.gap, e.remembered, e.shownAnswer].join('|'))
+  const archive = archiveKey in older.notes || archiveKey in newer.notes ? mergeArchives(readArchive(older.notes), readArchive(newer.notes), events) : null
+  if (archive) merged[archiveKey] = JSON.stringify(archive)
+  const before = archive?.before ?? ''
   return {
     ...newer,
     startedDay: [mine.startedDay, theirs.startedDay].sort()[0],
     sessions: [...sessions.values()].sort((a, b) => a.day.localeCompare(b.day)),
     cards: [...cards.values()],
-    reviewEvents: unionBy(older.reviewEvents, newer.reviewEvents, e => [e.id, e.day, e.gap, e.remembered, e.shownAnswer].join('|'))
-      .filter(e => !before || e.day >= before).sort((a, b) => a.day.localeCompare(b.day)),
+    reviewEvents: events.filter(e => !before || e.day >= before).sort((a, b) => a.day.localeCompare(b.day)),
     curriculum: { ...ahead.curriculum, stableUnits: [...new Set([...mine.curriculum.stableUnits, ...theirs.curriculum.stableUnits])].sort((a, b) => a - b) },
-    knownWords: unionBy(older.knownWords, newer.knownWords, w => w),
-    learningWords: unionBy(older.learningWords, newer.learningWords, w => w),
+    // A word moved to 還不熟 on one device and still 認得 on the other is on one list only: the later move decides.
+    ...settleWords(unionBy(older.knownWords, newer.knownWords, w => w), unionBy(older.learningWords, newer.learningWords, w => w), readMoved(merged), newer),
     customWords: unionBy(newer.customWords, older.customWords, w => w.en.toLowerCase()),
     // Flags are cleared one by one in Settings: the copy changed last decides.
     flagged: newer.flagged,

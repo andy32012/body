@@ -2,8 +2,7 @@ import { useState } from 'react'
 import type { PageProps } from '../lib/store'
 import curriculum from '../data/curriculum.json'
 import { dayKey } from '../lib/progress'
-import { handoffText } from '../lib/handoff'
-import { markAssisted } from '../lib/grammarRetention'
+import { handoffText, setCourseStart } from '../lib/handoff'
 
 export default function AIHandoff({ state, update }: Pick<PageProps, 'state' | 'update'>) {
   const today = dayKey()
@@ -19,7 +18,7 @@ export default function AIHandoff({ state, update }: Pick<PageProps, 'state' | '
   }
   return <>
     <p>想讓別的 AI 接著教你時，按「複製交接內容」貼過去。內容依這台裝置的紀錄自動產生：現在做到哪一天、最近做過的句子、哪些文法還常錯，還有你要的教法。</p>
-    <p>在別的地方上過課，就在這裡把進度改成做到的地方，網站才會接得上。跳過的單元不會直接算「穩了」，之後的回想會各出一句讓你自己寫，寫對才算。</p>
+    <p>在別的地方上過課，就在這裡把進度改成做到的地方，網站才會接得上。跳過的單元不會直接算「穩了」，之後的回想會各出一句讓你自己寫，寫對才算。往回改是重新練一次，已經「穩了」的單元還是算穩了。</p>
     <div className="set-dates">
       <label>單元<select id="handoff-unit" value={unit} onChange={e => setUnit(Number(e.target.value))}>
         {curriculum.units.map(u => <option key={u.id} value={u.id}>{u.id}．{u.title}</option>)}
@@ -29,12 +28,8 @@ export default function AIHandoff({ state, update }: Pick<PageProps, 'state' | '
       </select></label>
     </div>
     <button type="button" onClick={() => {
-      // Units done elsewhere move the cursor but are not 「穩了」 here: each waits for an unaided recheck first.
-      update(prev => {
-        let notes = prev.notes
-        for (let id = 1; id < unit; id++) if (!prev.curriculum.stableUnits.includes(id) && !notes['unit-assisted.' + id]) notes = markAssisted(notes, id, today)
-        return { ...prev, notes, curriculum: { ...prev.curriculum, unit, day, retry: 0, stableUnits: prev.curriculum.stableUnits.filter(id => id < unit) } }
-      })
+      // Units done elsewhere move the cursor but are not 「穩了」 here; going back keeps units already 穩了.
+      update(prev => setCourseStart(prev, unit, day, today))
       setSaved('已設定：下一次從單元 ' + unit + ' 第 ' + day + ' 天開始。')
     }}>把進度設成這一天</button>
     <small role="status">{saved}</small>

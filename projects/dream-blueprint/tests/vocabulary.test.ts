@@ -119,3 +119,13 @@ test('分級找字：打完整的字，那個字一定在結果裡、而且排�
   for (const w of officialWords) assert.ok(lookupWords(officialWords, w.level, w.en).some(x => x.en === w.en), w.en + ' 找得到自己')
   assert.ok(lookupWords(officialWords, 1, 'in').length <= 12)
 })
+
+test('造句檢查：tis.sue、t.i.s.s.u.e. 不算用到 tissue；a.m.、T-shirt、O.K. 照樣算（稽核 D-SV-03）', async () => {
+  const { wordUsed } = await import('../src/lib/wordSkills.ts')
+  assert.equal(wordUsed('I need a tis.sue.', 'tissue'), false)
+  assert.equal(wordUsed('I need a t.i.s.s.u.e.', 'tissue'), false)
+  assert.equal(wordUsed('I need a tissue.', 'tissue'), true)
+  assert.equal(wordUsed('I wake up at 7 a.m. every day.', 'am/a.m.'), true)
+  assert.equal(wordUsed('Mr. Lee is here.', 'Mr./Mister'), true)
+  assert.equal(wordUsed('I wear a T-shirt.', 'T-shirt'), true)
+})

@@ -72,6 +72,10 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
         : '他選了第 ' + (picked + 1) + ' 個，正確是第 ' + (s.answer + 1) + ' 個。說明：' + s.why].join('\n'),
   } : null)
   const top = Object.entries(summary.count).sort((a, b) => b[1] - a[1])[0]
+  // A subject without cases (an old bookmark): say so, instead of quietly giving cases of every subject.
+  if (subject && !pool.length) return <div className="pr-hint"><strong>「{subject}」還沒有臨床情境</strong>
+    <p>這一科的情境還沒寫好。</p>
+    <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { location.hash = 'library/case' }}>改練全部情境</button></div></div>
   return <div className="pr-stack cc">
     {subject && <p className="qz-meta"><span>只出「{subject}」的情境（{pool.length} 個）</span><a href="#library/case">改練全部情境</a></p>}
     <p className="qz-meta"><span>臨床情境 · {current.topic}</span><span>做過 {summary.done} / {summary.total}</span>{top && <span>最常卡在：{top[0]}</span>}</p>

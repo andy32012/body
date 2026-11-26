@@ -116,3 +116,52 @@ test('證照：沒登錄成績不說「證照上是 A1」；雅思超過兩年�
   assert.equal(visaScreen(saveAttempt({}, 'C1', { id: 'k', exam: 'ielts', date: '2024-02-29', band: { overall: 7, speaking: 7 } }))?.until, '2026-02-28', '閏年 2/29 算到 2/28')
   assert.equal(visaCurrent(null, '2026-11-26'), false)
 })
+
+test('字表 forms 裡列出的寫法也查得到原本那個字：Mr、acknowledgment（稽核 SV-10）', async () => {
+  const { levelEntry } = await import('../src/lib/vocab.ts')
+  assert.equal(levelEntry('Mr')?.en, levelEntry('Mr.')?.en)
+  assert.ok(levelEntry('Mr'))
+  assert.equal(levelEntry('acknowledgment')?.en, levelEntry('acknowledgement')?.en)
+  assert.ok(levelEntry('acknowledgment'))
+})
+
+test('Mrs、Ms 沒有句點也查得到太太、女士，不會被當成 Mr 的複數', async () => {
+  const { levelEntry } = await import('../src/lib/vocab.ts')
+  const { lookupWord } = await import('../src/lib/story.ts')
+  assert.equal(levelEntry('Mrs')?.en, 'Mrs.')
+  assert.equal(levelEntry('Ms')?.en, 'Ms.')
+  assert.equal(lookupWord('Mrs.', { words: [] })?.en, 'Mrs.')
+  assert.equal(lookupWord('Mr.', { words: [] })?.en, 'Mr./Mister')
+})
+
+test('全民英檢兩階段要在兩年內：聽讀和說寫隔太久不算；一日考不能接以前的成績；只差一項可以只考那一項（稽核 CUR-03）', () => {
+  const save = (list: Parameters<typeof saveAttempt>[2][]) => list.reduce((n, a) => saveAttempt(n, 'A2', a), {} as Record<string, string>)
+  // 1. 聽讀 2020, 說寫 2026: more than two years apart.
+  const far = save([{ id: 'a', exam: 'gept-a2', date: '2020-01-01', parts: 'lr', lr: [80, 80] }, { id: 'b', exam: 'gept-a2', date: '2026-01-01', parts: 'sw', sw: [80, 80] }])
+  assert.notEqual(certStatus(far, 'A2').state, 'passed')
+  // 2. A one-day test does not join a 聽讀 passed before it.
+  const oneDay = save([{ id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'lr', lr: [80, 80] }, { id: 'b', exam: 'gept-a2', date: '2026-06-01', parts: 'both', lr: [60, 60], sw: [80, 80] }])
+  assert.notEqual(certStatus(oneDay, 'A2').state, 'passed')
+  // 3. 寫作 passed, 口說 not: later only 口說, within the two years.
+  const retake = save([
+    { id: 'a', exam: 'gept-a2', date: '2025-01-01', parts: 'lr', lr: [80, 80] },
+    { id: 'b', exam: 'gept-a2', date: '2025-05-01', parts: 'sw', sw: [80, 60] },
+  ])
+  const half = certStatus(retake, 'A2')
+  assert.deepEqual([half.state, half.lr, half.w, half.s, half.until], ['partial', true, true, false, '2027-01-01'])
+  const done = saveAttempt(retake, 'A2', { id: 'c', exam: 'gept-a2', date: '2026-01-01', parts: 's', speaking: 80 })
+  assert.deepEqual([certStatus(done, 'A2').state, certStatus(done, 'A2').passedOn], ['passed', '2026-01-01'])
+  // The same retake after the two years: not passed.
+  const late = saveAttempt(retake, 'A2', { id: 'c', exam: 'gept-a2', date: '2027-03-01', parts: 's', speaking: 80 })
+  assert.notEqual(certStatus(late, 'A2').state, 'passed')
+  // A one-day test all passed; one whose 聽讀 failed counts once 聽讀 is passed later and the missing part is taken.
+  assert.equal(certStatus(save([{ id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'both', lr: [80, 80], sw: [80, 80] }]), 'A2').state, 'passed')
+  const day = save([
+    { id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'both', lr: [60, 60], sw: [80, 60] },
+    { id: 'b', exam: 'gept-a2', date: '2026-03-01', parts: 'lr', lr: [80, 80] },
+  ])
+  assert.deepEqual([certStatus(day, 'A2').state, certStatus(day, 'A2').w], ['partial', true])
+  assert.equal(certStatus(saveAttempt(day, 'A2', { id: 'c', exam: 'gept-a2', date: '2026-07-01', parts: 's', speaking: 85 }), 'A2').state, 'passed')
+  // A sitting waiting for scores (only 口說 booked) is waiting, not a zero.
+  assert.equal(certStatus(saveAttempt(retake, 'A2', { id: 'c', exam: 'gept-a2', date: '2026-01-01', parts: 's' }), 'A2').state, 'waiting')
+})

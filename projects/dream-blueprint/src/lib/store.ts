@@ -9,6 +9,11 @@ import { driveConnected } from './drive'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
+/** One note is one record that keeps growing (a unit's evidence with answers waiting for a check, a day's lesson, word
+ *  records). It may be as big as the whole saved progress, which the browser keeps under about 5 MB, so every note the
+ *  app could save also reads back (and a backup or a merge of two devices round-trips). */
+export const NOTE_LIMIT = 5_000_000
+const noteText = z.string().max(NOTE_LIMIT)
 const id = z.string().min(1).max(512)
 const day = z.iso.date()
 const weekday = z.number().int().min(0).max(6)
@@ -55,7 +60,7 @@ const schema = z.object({
   // Units come from the published course (42 + bridge units, more later); the cap only rejects nonsense.
   curriculum:z.object({unit:z.number().int().min(1).max(200),day:z.number().int().min(1).max(6),retry:natural,stableUnits:z.array(z.number().int().min(1).max(200))}),
   knownWords:stringList,learningWords:stringList,customWords:z.array(customWord),
-  checks:z.record(safeKey,z.boolean()),notes:z.record(safeKey,str),flagged:stringList,
+  checks:z.record(safeKey,z.boolean()),notes:z.record(safeKey,noteText),flagged:stringList,
 })
 export type AppState = z.infer<typeof schema>
 export type Session = AppState['sessions'][number]

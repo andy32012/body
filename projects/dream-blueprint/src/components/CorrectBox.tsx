@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { askTutor, tutorKey, type TutorTurn } from '../lib/tutor'
 import { fixToCard, type SayCard } from '../lib/sayCards'
 import { updateStore } from '../lib/store'
@@ -8,15 +8,20 @@ import type { RubricId } from '../lib/rubrics'
 import { correctionPrompt, parseCorrection, verdictNames, type Result } from '../lib/correction'
 export type { Result } from '../lib/correction'
 import { RubricScore } from './RubricTable'
+import { checkSequence } from '../lib/checks'
 import './tutor.css'
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, mode = 'translate', restore, previous, selfFix = false, rubric }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, onBusy, mode = 'translate', restore, previous, selfFix = false, rubric }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
   /** The published table Claude grades by (全民英檢): a score with its level is shown, and the verdict follows it. */
   rubric?: RubricId
-  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result) => void; mode?: 'translate' | 'open'
+  /** `judged`: the exact text Claude judged, so the caller can tell when the answer was changed afterwards. Only the
+   *  latest check of a box that is still on screen reports; a slower reply to an earlier check is dropped. */
+  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result, judged: string) => void; mode?: 'translate' | 'open'
+  /** While Claude is checking (the caller can hold its button, so one press is one check). */
+  onBusy?: (busy: boolean) => void
   /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
   restore?: { answer: string; result: Result }
   /** The feedback on the earlier try, so Claude can say which of those issues are now fixed. */
@@ -39,25 +44,33 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   // In self-fix mode the corrected text stays hidden until asked for; a restored result is shown in full.
   const [hints, setHints] = useState(() => restore || !selfFix ? -1 : 1)
 
-  async function send(next: TutorTurn[], first: boolean) {
-    setBusy(true); setError('')
+  // Each check gets a number; a reply that comes back after a newer check started, or after the box left the screen
+  // (another passage), is dropped instead of landing on what is shown now.
+  const checks = useRef(checkSequence())
+  const lastCheck = useRef(0)
+  useEffect(() => { const c = checks.current; c.open(); return () => c.close() }, [])
+  const setWaiting = (on: boolean) => { setBusy(on); onBusy?.(on) }
+  async function send(next: TutorTurn[], first: boolean, mine = lastCheck.current) {
+    const current = () => checks.current.isCurrent(mine)
+    setWaiting(true); setError('')
     try {
       const reply = await askTutor(sys, next)
+      if (!current()) return
       if (first) {
         const parsed = parseCorrection(reply, rubric)
         setRestored(false)
         setResult(parsed)
-        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed)
+        if (parsed) onResult?.(parsed.verdict, parsed.fixes.length, parsed, answer.trim())
         // Each kind of mistake also goes on the shared weak-point list (a second try does not count the same ones again).
         if (parsed?.fixes.length && !previous) {
           const day = dayKey()
           updateStore(prev => ({ ...prev, notes: parsed.fixes.reduce((n, f) => typeof f.tag === 'string' ? addWeak(n, f.tag, day, { w: f.wrong || '（漏寫）', r: f.right }, 'write') : n, prev.notes) }))
         }
         setTurns([...next, { role: 'assistant', content: reply }])
-        if (!parsed) setError('老師回得格式怪怪的，下面是原文：\n' + reply)
+        if (!parsed) setError((rubric ? '這次 Claude 沒有照評分表給分（格式不對），這一次不算，再按一次批改就好。' : '老師回得格式怪怪的，這一次不算，再按一次批改就好。') + '下面是原文：\n' + reply)
       } else setTurns([...next, { role: 'assistant', content: reply }])
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); onError?.() }
-    finally { setBusy(false) }
+    } catch (e) { if (current()) { setError(e instanceof Error ? e.message : String(e)); onError?.() } }
+    finally { if (current()) setWaiting(false) }
   }
 
   useEffect(() => {
@@ -66,7 +79,8 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
     if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); return }
     if (!answer.trim()) { setError('先寫一點英文再按批改。'); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
-    setTurns(first); void send(first, true)
+    lastCheck.current = checks.current.start()
+    setTurns(first); void send(first, true, lastCheck.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run])
   if (!run && !restore && !result) return null
