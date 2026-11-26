@@ -1,11 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import writing from '../src/data/writing.json' with { type: 'json' }
-import { checksFor, essayKind, gradePrompt, migrateWritingProgress, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writeTaskOpen, writingMigrationKey, writingTaskPages, type WriteStage } from '../src/lib/writing.ts'
+import { chartKind, chartText, checksFor, essayKind, gradePrompt, isProcessChart, isTableChart, migrateWritingProgress, taskOneOutlines, type ProcessChart, type TableChart, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writeTaskOpen, writingMigrationKey, writingTaskPages, type WriteStage } from '../src/lib/writing.ts'
 import { createInitialState, exportBackup, importBackup } from '../src/lib/store.ts'
 import { packUnits } from '../src/lib/bridge.ts'
 
-const stages = writing.stages as WriteStage[]
+const stages = writing.stages as unknown as WriteStage[]
 const by = (id: string) => stages.find(s => s.id === id)!
 const record = (best?: number) => JSON.stringify({ day: '2026-11-24', words: 30, tries: best === undefined ? 0 : 1, ...(best === undefined ? { self: 1 } : { best }) })
 const notesFor = (ids: string[], best?: number) => Object.fromEntries(ids.map(id => [writeKey(id), record(best)]))
@@ -61,9 +61,65 @@ test('題目 id 不重複、範文達字數；數字暖身有可畫的小圖表'
   }
   for (const t of [...by('numbers').tasks, ...by('task1').tasks]) {
     assert.ok(t.chart?.title.trim(), t.id + ' 圖表標題')
-    assert.ok(t.chart.points.length >= 3, t.id + ' 圖表數據')
-    assert.ok(t.chart.points.every(p => p.label.trim() && Number.isFinite(p.value)), t.id)
-    assert.equal(new Set(t.chart.points.map(p => p.label)).size, t.chart.points.length, t.id + ' 圖表標籤不能重複')
+    const c = t.chart
+    if (isTableChart(c) || isProcessChart(c)) continue
+    assert.ok(c.points.length >= 3, t.id + ' 圖表數據')
+    assert.ok(c.points.every(p => p.label.trim() && Number.isFinite(p.value)), t.id)
+    assert.equal(new Set(c.points.map(p => p.label)).size, c.points.length, t.id + ' 圖表標籤不能重複')
+  }
+})
+
+test('Task 1 也有表格和流程圖：表格每列數字對齊欄位、範文的數字都在表上；流程圖照順序、範文說了幾個步驟', () => {
+  const t1 = by('task1').tasks
+  const tables = t1.filter(t => t.chart && isTableChart(t.chart))
+  const processes = t1.filter(t => t.chart && isProcessChart(t.chart))
+  assert.ok(tables.length >= 10 && processes.length >= 10, '表格和流程圖各至少 10 題')
+  assert.ok(by('numbers').tasks.every(t => t.chart && !isTableChart(t.chart) && !isProcessChart(t.chart)), '數字暖身維持單一數列')
+  const numberWords: Record<string, number> = { four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9 }
+  for (const t of tables) {
+    const c = t.chart as TableChart
+    assert.ok(c.columns.length >= 2 && c.rows.length >= 3, t.id + ' 至少兩欄三列')
+    assert.equal(new Set(c.rows.map(r => r.label)).size, c.rows.length, t.id + ' 列名不重複')
+    for (const r of c.rows) assert.ok(r.values.length === c.columns.length && r.values.every(Number.isFinite), t.id + ' ' + r.label + ' 每欄一個數字')
+    assert.match(t.prompt, /^The table shows /, t.id)
+    assert.match(t.sample, /\bOverall\b/, t.id + ' 有總覽')
+    // Every figure in the table that the sample quotes is the table's own (a sample cannot invent data).
+    const onTable = new Set(c.rows.flatMap(r => r.values))
+    assert.ok([...onTable].filter(v => new RegExp('(^|[^\\d.,])' + v.toLocaleString('en-US').replace(/[.]/g, '\\.') + '(?![\\d])').test(t.sample)).length >= onTable.size / 2, t.id + ' 範文引用表上的數字')
+    assert.ok(chartText(c).includes(c.columns.join(' | ')), t.id + ' 給 Claude 的文字有整張表')
+  }
+  for (const t of processes) {
+    const c = t.chart as ProcessChart
+    assert.ok(c.steps.length >= 5 && new Set(c.steps).size === c.steps.length, t.id + ' 至少五個不同步驟')
+    assert.match(t.prompt, /^The diagram shows /, t.id)
+    assert.doesNotMatch(t.prompt, /comparisons/, t.id + ' 流程圖不要求比較數字')
+    const stated = t.sample.match(/\b(four|five|six|seven|eight|nine)\b (?:stages|steps|main stages)/)
+    if (stated) assert.equal(numberWords[stated[1]], c.steps.length, t.id + ' 範文說的步驟數和圖一樣')
+    assert.match(t.sample, /\bOverall\b/, t.id + ' 有總覽')
+    assert.ok(chartText(c).includes(c.steps.length + '. ' + c.steps.at(-1)), t.id + ' 給 Claude 的文字有每一步')
+  }
+  assert.deepEqual(taskOneOutlines.process.length, 4)
+  assert.equal(chartKind(processes[0].chart), 'process')
+  assert.equal(chartKind(tables[0].chart), 'table')
+  assert.equal(chartKind(t1[0].chart), 'trend')
+  assert.match(gradePrompt(by('task1'), processes[0], processes[0].prompt), /流程圖/)
+  assert.match(gradePrompt(by('task1'), tables[0], tables[0].prompt), /表格/)
+})
+
+test('範文結尾不重複：⑦⑧ 每篇最後一句都不同；長篇結論段裡的句子最多 8 篇共用', () => {
+  const sentencesOf = (text: string) => text.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(s => s.split(/\s+/).length >= 4)
+  for (const id of ['paragraph', 'opinion']) {
+    const last = by(id).tasks.map(t => sentencesOf(t.sample).at(-1))
+    assert.equal(new Set(last).size, last.length, id + ' 每篇的結論句要扣住自己的題目')
+  }
+  for (const id of ['paragraph', 'opinion', 'multi', 'twosides', 'task2']) {
+    const count = new Map<string, number>()
+    for (const t of by(id).tasks) {
+      const paras = t.sample.split('\n').filter(p => p.split(/\s+/).length >= 4)
+      for (const s of new Set(sentencesOf(paras.at(-1)!))) count.set(s, (count.get(s) ?? 0) + 1)
+    }
+    const top = [...count].sort((a, b) => b[1] - a[1])[0]
+    assert.ok(top[1] <= 8, id + ' 結論段同一句用了 ' + top[1] + ' 次：' + top[0])
   }
 })
 

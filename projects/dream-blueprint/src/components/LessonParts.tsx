@@ -8,6 +8,7 @@ import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { chartBounds, isTimeSeries } from '../lib/chart'
+import { isProcessChart, isTableChart, type WriteChart } from '../lib/writing'
 import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep } from '../lib/lesson'
 import './lesson.css'
@@ -267,6 +268,22 @@ export function MiniChart({ chart }: { chart: NonNullable<LessonPrompt['chart']>
       </g>)}
     </svg>
   </figure>
+}
+
+/** A writing task's picture: a line or bars (MiniChart), a table with several columns, or a process drawn as numbered steps. */
+export function ChartView({ chart }: { chart: WriteChart }) {
+  if (isTableChart(chart)) return <figure className="ls-chart ls-table">
+    <figcaption lang="en">{chart.title}</figcaption>
+    <div className="ls-table-wrap"><table lang="en">
+      <thead><tr><td />{chart.columns.map(c => <th key={c} scope="col">{c}</th>)}</tr></thead>
+      <tbody>{chart.rows.map(r => <tr key={r.label}><th scope="row">{r.label}</th>{r.values.map((v, i) => <td key={i}>{v}</td>)}</tr>)}</tbody>
+    </table></div>
+  </figure>
+  if (isProcessChart(chart)) return <figure className="ls-chart ls-process">
+    <figcaption lang="en">{chart.title}</figcaption>
+    <ol lang="en">{chart.steps.map((step, i) => <li key={i}><b aria-hidden="true">{i + 1}</b><span>{step}</span></li>)}</ol>
+  </figure>
+  return <MiniChart chart={chart} />
 }
 
 /** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again.

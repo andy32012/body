@@ -4,21 +4,20 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { checksFor, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
 import { speakEnglish, stopSpeaking } from '../lib/tts'
-import { MiniChart } from './LessonParts'
+import { ChartView } from './LessonParts'
 import StuckButton from './StuckButton'
 import { RubricTable } from './RubricTable'
 import './grammar.css'
 import './writing.css'
 
 const outlines: Record<string, string[]> = {
-  paragraph: ['Topic sentence：一句說整段要講什麼', 'First, …', 'Also / Second, …', 'Finally, …', 'Conclusion：For these reasons, …'],
+  paragraph: ['Topic sentence：一句說整段要講什麼', 'First, …', 'Also / Second, …', 'Finally, …', 'Conclusion：換個說法再講一次主題（For these reasons／That is why／All in all, …）'],
   multi: ['第一段：開頭（打招呼／說出主題或立場）', '第二段：內容（理由、例子、經過）', '第三段：結尾（總結／請求／祝福）'],
-  task1: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
   task2: ['Introduction：改寫題目＋你的立場', 'Body 1：第一個論點＋解釋＋例子', 'Body 2：第二個論點（或另一方看法）＋解釋＋例子', 'Conclusion：重申立場，不加新論點'],
   bridge: ['第一句：說出這一段要講什麼', '中間三到五句：照題目用這一課的句型寫，用時間、因果、轉折的字接起來（First / Then / because / so / However）', '最後一句：收尾（結果、感想或建議）'],
 }
@@ -124,8 +123,8 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   const selfList = checks.length ? checks : parts
   useTaskContext({ label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n評分表：' + rubric.title + '（官方）' + (checks.length ? '\n這一階的要求：' + checks.join('；') : '') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text })
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
-  const outline = kind ? essays[kind].outline : outlines[stage.id]
-  const prompt = task.prompt + (task.chart ? '\n圖表資料：' + task.chart.title + ' ' + task.chart.points.map(p => p.label + ' ' + p.value).join(', ') : '')
+  const outline = kind ? essays[kind].outline : stage.id === 'task1' ? taskOneOutlines[chartKind(task.chart) ?? 'trend'] : outlines[stage.id]
+  const prompt = task.prompt + (task.chart ? '\n圖表資料：' + chartText(task.chart) : '')
   const sentencePoints = rubric.id === 'gept-sentence' ? rubric.max * parts.length : 0
 
   function save(patch: Partial<NonNullable<typeof rec>>, id = task.id, count = words) {
@@ -221,7 +220,7 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       <small className="wl-current">目前作答：{pages.flatMap(p => p.tasks).find(t => t.task.id === task.id)?.label}</small>
       <h3 lang="en">{task.prompt}</h3>
       <p className="wl-zh">{task.zh}</p>
-      {task.chart && <MiniChart chart={task.chart} />}
+      {task.chart && <ChartView chart={task.chart} />}
       {outline && <details className="wl-outline"><summary>結構提示{kind ? '（' + essays[kind].name + '題）' : ''}</summary><ol>{outline.map(o => <li key={o}>{o}</li>)}</ol></details>}
       {rubric.id === 'gept-sentence' && <p className="wl-parts">要寫的句子：{parts.join('、')}（每句 0–2 分）</p>}
       {checks.length > 0 && <details className="wl-criteria"><summary>這{kind ? '題' : '一階'}要做到（{checks.length} 項）</summary><ul>{checks.map(c => <li key={c}>{c}</li>)}</ul></details>}

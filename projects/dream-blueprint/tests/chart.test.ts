@@ -25,6 +25,7 @@ test('全部數字暖身與 Task 1 真實題目都能畫出不同刻度及有效
   for (const stage of writing.stages.filter(s => s.id === 'numbers' || s.id === 'task1')) {
     for (const task of stage.tasks) {
       assert.ok('chart' in task && task.chart, task.id + ' 有圖表')
+      if (!('points' in task.chart)) continue   // a table or a process diagram: no axis to draw
       const values = task.chart.points.map(p => p.value)
       const { lo, hi } = chartBounds(values)
       assert.ok(Number.isFinite(lo) && Number.isFinite(hi) && lo < hi, task.id)
@@ -50,6 +51,6 @@ test('寫作 Task 1 的圖：時間（月份、星期）畫成折線，不同中
   const charts: { title: string; points: { label: string }[] }[] = []
   const walk = (o: unknown): void => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { const r = o as Record<string, unknown>; if (r.chart) charts.push(r.chart as typeof charts[number]); Object.values(r).forEach(walk) } }
   walk(writing)
-  const centres = charts.filter(c => c.points.every(p => /^[A-F]$/.test(p.label)))
+  const centres = charts.filter(c => c.points?.every(p => /^[A-F]$/.test(p.label)))
   assert.ok(centres.length > 0 && centres.every(c => !isTimeSeries(c.points.map(p => p.label))), '中心比較的圖都畫成長條')
 })

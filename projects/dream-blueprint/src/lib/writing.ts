@@ -2,8 +2,30 @@ import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, typ
 import { openSteps, reached } from './unlock'
 import { unitPackOpen } from './bridge'
 
+/** A Task 1 picture: numbers over time or across groups (a line or bars), a table with several columns, or the steps of a
+ *  process in order. */
+export interface PointChart { title: string; points: { label: string; value: number }[] }
+export interface TableChart { kind: 'table'; title: string; columns: string[]; rows: { label: string; values: number[] }[] }
+export interface ProcessChart { kind: 'process'; title: string; steps: string[] }
+export type WriteChart = PointChart | TableChart | ProcessChart
+export const isTableChart = (c: WriteChart): c is TableChart => 'kind' in c && c.kind === 'table'
+export const isProcessChart = (c: WriteChart): c is ProcessChart => 'kind' in c && c.kind === 'process'
+/** The picture as text, for Claude (who cannot see it). */
+export function chartText(c: WriteChart): string {
+  if (isTableChart(c)) return c.title + '（表格）\n' + ['', ...c.columns].join(' | ') + '\n' + c.rows.map(r => [r.label, ...r.values].join(' | ')).join('\n')
+  if (isProcessChart(c)) return c.title + '（流程圖，照順序）：' + c.steps.map((x, i) => (i + 1) + '. ' + x).join(' → ')
+  return c.title + ' ' + c.points.map(p => p.label + ' ' + p.value).join(', ')
+}
+/** Task 1's structure hint for each kind of picture. */
+export const taskOneOutlines: Record<'trend' | 'table' | 'process', string[]> = {
+  trend: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
+  table: ['Introduction：用自己的話改寫題目（表格比較什麼、單位、時間）', 'Overview：Overall, …（最高、最低或最明顯的差別，不放細節數字）', 'Body 1：一組重要的比較，附數字', 'Body 2：另一組比較或例外，附數字；不用每個數字都寫'],
+  process: ['Introduction：用自己的話改寫題目（這是什麼流程）', 'Overview：Overall, 一共幾個步驟、從哪裡開始到哪裡結束（不放細節）', 'Body 1：前半的步驟，照順序寫（First, … Next, …）', 'Body 2：後半的步驟（After that, … Finally, …），每個主要步驟都要寫到'],
+}
+export const chartKind = (c: WriteChart | undefined) => !c ? null : isTableChart(c) ? 'table' : isProcessChart(c) ? 'process' : 'trend'
+
 /** 寫作階梯：從完整的簡單句逐步練到 IELTS。Claude grades each stage by a published table (see rubricFor). */
-export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: { title: string; points: { label: string; value: number }[] }
+export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: WriteChart
   /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
   unit?: number; focus?: string }
 export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
@@ -144,6 +166,8 @@ export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) 
     '題目：' + prompt,
     ...(stage.grammar ? ['這一階教過的文法：' + stage.grammar.title + '；' + stage.grammar.points.join('；') + '。他是照這個程度寫的，不要因為沒用到更難的文法扣分；分數仍只照下面的官方評分表，不能另加要求，也不能放寬官方標準。'] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，回應題目要照這種題目該有的結構：' + essays[kind].outline.join('；')] : []),
+    ...(task.chart && isProcessChart(task.chart) ? ['這題是流程圖：總覽要說一共幾個步驟、從哪裡開始到哪裡結束；Task Achievement 看主要步驟有沒有都寫到、順序對不對，流程圖沒有數字，不需要數據比較。'] : []),
+    ...(task.chart && isTableChart(task.chart) ? ['這題是表格：總覽要說最高、最低或最明顯的差別；Task Achievement 看有沒有挑出重點來比較，不需要把每個數字都寫出來。'] : []),
     ...(task.focus ? ['這一課的文法重點：' + task.focus + '。題目要他用這些句型：有沒有用、用得對不對，算在「題目的要求」裡；沒用到就照表給分並說明要怎麼加。'] : []),
     ...(r.id === 'gept-sentence' ? ['題目要的每一句各給一個分數：先找出他寫的哪一句是那一句；沒寫到、或沒用到指定的字，那一句就是 0。'] : []),
     rubricPrompt(r, parts),
