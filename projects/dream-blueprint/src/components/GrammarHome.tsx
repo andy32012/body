@@ -1,3 +1,4 @@
+import { chapterLeft, stagesUsing } from '../lib/writing'
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { bookRoute, chapterFile, chapterLabel, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone, sectionLabel, shownParts,
@@ -138,6 +139,11 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
         </section>
       </>}
     <div className="pr-actions"><button type="button" className="ask-word gb-ask" onClick={openClaude}><PetIcon size={18} />問 Claude 老師</button></div>
+    {/* The writing ladder follows this book: the stages that use this chapter, and how much of it is left to learn. */}
+    {chapter && stagesUsing(chapter.n).length > 0 && (() => {
+      const left = chapterLeft(state.notes, chapter.n)
+      return <p className="gb-writing">寫作階梯{stagesUsing(chapter.n).map(st => '「' + st.name + '」').join('、')}要先讀這一章：{left ? '還有 ' + left + ' 節的小練習沒做，做完這一章就符合打開的條件。' : '這一章讀完了。'}<a href="#library/writing">去寫作階梯 →</a></p>
+    })()}
     <nav className="gb-nav" aria-label="上一節、下一節">
       {prev ? <a href={'#library/grammar/' + prev.id}>← 上一節<small>{sectionLabel(index, prev.id)} {prev.title}</small></a> : <span />}
       {next ? <a href={'#library/grammar/' + next.id}>下一節 →<small>{sectionLabel(index, next.id)} {next.title}</small></a> : <span />}

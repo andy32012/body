@@ -66,3 +66,7 @@
 .wl-checks li[data-ok="true"] span { color: #3fbf8a; }
 .wl-checks li[data-ok="false"] span { color: #e06a5a; }
 .wl-checks small { display: block; opacity: .85; }
+.wl-locked { display: grid; gap: .5rem; padding: .9rem 1rem; border-radius: 14px; border: 1px dashed var(--practice-line, var(--line)); background: var(--practice-inset, var(--panel)); min-width: 0; }
+.wl-locked ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .3rem; }
+.wl-locked a, .wl-book a { overflow-wrap: anywhere; }
+.wl-book { margin: 0; font-size: .88rem; color: var(--practice-secondary, var(--muted)); overflow-wrap: anywhere; }

@@ -11,7 +11,8 @@ test('每一種練習都是自己一頁：英文練習底下每種一個入口�
   assert.deepEqual(groups.map(g => g.id), ['main', 'words', 'nursing'])
   const all = ids(groups)
   assert.equal(new Set(all).size, all.length, '沒有重複')
-  assert.deepEqual(all.filter(id => id !== 'speaking').sort(), [...libraryModes].sort(), '每一種練習都在選單上')
+  // Every kind of practice is on the menu, except 選擇題 (taken out at the owner's request; its address still works).
+  assert.deepEqual(all.filter(id => id !== 'speaking').sort(), libraryModes.filter(m => m !== 'quiz').sort(), '每一種練習都在選單上')
   assert.deepEqual(all.slice(0, 2), ['translate', 'speaking'])
   for (const g of groups) for (const e of g.entries) {
     assert.ok(e.label && e.note, e.id + ' 有名字和一句說明')
@@ -67,4 +68,10 @@ test('閱讀理解和歷屆考題閱讀合成一個「閱讀測驗」：選單�
   assert.ok(!entries.some(e => e.label.includes('歷屆考題')), '選單上沒有歷屆考題閱讀')
   assert.equal(libraryPage('#library/pastexam'), 'reading')
   assert.equal(libraryPage('library/pastexam'), 'reading')
+})
+
+test('選擇題 is no longer in the 英文練習 menu (the owner asked), but an old #library/quiz link still opens it', () => {
+  const groups = menuGroups({ unit: 30 })
+  assert.ok(!groups.flatMap(g => g.entries).some(e => e.id === 'quiz'))
+  assert.equal(libraryPage('#library/quiz'), 'quiz')
 })

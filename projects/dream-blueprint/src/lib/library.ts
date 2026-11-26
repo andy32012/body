@@ -47,7 +47,9 @@ export interface MenuGroup { id: LibraryGroup; title: string; entries: MenuEntry
 
 /** The menu's order: 中翻英 and 英文口說 first, then the other kinds of practice; words and nursing English each in a group. */
 const groups: { id: LibraryGroup; title: string; ids: MenuId[] }[] = [
-  { id: 'main', title: '聽說讀寫', ids: ['translate', 'speaking', 'listen', 'story', 'reading', 'writing', 'unit', 'quiz', 'grammar', 'theme', 'sound'] },
+  // 選擇題 left the menu (the owner found it of little use); #library/quiz still opens, and the 國考科目 page links to
+  // its nursing questions. During exams and internship they are listed with nursing English as 護理英文題.
+  { id: 'main', title: '聽說讀寫', ids: ['translate', 'speaking', 'listen', 'story', 'reading', 'writing', 'unit', 'grammar', 'theme', 'sound'] },
   { id: 'words', title: '單字', ids: ['words', 'screen', 'passage'] },
   { id: 'nursing', title: '護理英文', ids: ['nlisten', 'nread', 'nwords', 'case'] },
 ]
@@ -62,7 +64,6 @@ export function menuGroups({ periodQuiet = false, unit = 1 }: { periodQuiet?: bo
   if (!finishedRuns(unit).length) resting.add('theme')
   return groups.map(g => {
     let ids = g.ids.filter(id => !resting.has(id))
-    if (periodQuiet && g.id === 'main') ids = ids.filter(id => id !== 'quiz')
     if (periodQuiet && g.id === 'nursing') ids = [...ids, 'quiz']
     return { id: g.id, title: g.title, entries: ids.map(id => ({ id, label: modeLabel(id, periodQuiet), note: notes[id], hash: menuHash(id) })) }
   })

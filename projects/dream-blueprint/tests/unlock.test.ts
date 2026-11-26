@@ -47,10 +47,14 @@ test('閱讀理解：十二小級依序打開，差一篇不開，看過中文�
   assert.equal(readLevelsOpen(nursing, pass(nursing.slice(0, 7).map(p => p.id)))['B1-mid'], true, '中間沒有文章的小級不擋後面')
 })
 
-test('寫作階梯：前一階做完兩題才打開下一階；橋接段落跟著單元開', () => {
+test('寫作階梯（文法都讀完）：前一階做完兩題才打開下一階；橋接段落跟著單元開', () => {
   const stages = writing.stages as WriteStage[]
-  const done = (ids: string[], best = 5) => Object.fromEntries(ids.map(id => [writeKey(id), JSON.stringify({ day: '2026-11-24', words: 40, tries: 1, best })]))
-  const start = stagesOpen(stages, {}, 1)
+  // Every 完整文法 chapter learned, so this tests the step-by-step rule alone (the grammar lock: tests/writing.test.ts).
+  const grammar: Record<string, string> = {}
+  for (let ch = 1; ch <= 41; ch++) for (let k = 1; k <= 30; k++) grammar['gbook.' + ch + '-' + k] = JSON.stringify({ marks: { 0: true, 1: true, 2: true } })
+  const done = (ids: string[], best = 5) => ({ ...grammar, ...Object.fromEntries(ids.map(id => [writeKey(id), JSON.stringify({ day: '2026-11-24', words: 40, tries: 1, best })])) })
+  assert.equal(stagesOpen(stages, {}, 1).basic, false, '第一章還沒讀，第一階也先鎖著')
+  const start = stagesOpen(stages, grammar, 1)
   assert.deepEqual(stages.map(s => start[s.id]), [true, false, false, false, false, false, false, false, false, false, false, false, false, false])
   const one = stagesOpen(stages, done(['b1']), 1)
   assert.equal(one.longer, false, '只做完一題')

@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, countedBest, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
@@ -182,16 +182,34 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   const bestText = rec?.best === undefined || rec.best > (stage.ielts ? 9 : 5) ? ''
     : stage.ielts ? '練習估計 ' + rec.best : sentencePoints ? Math.round(rec.best / 5 * sentencePoints) + ' / ' + sentencePoints + ' 分' : (Number.isInteger(rec.best) ? rec.best : rec.best.toFixed(1)) + ' / 5 級分'
 
-  return <div className="pr-stack wl">
-    <div ref={stageStrip} className="pr-options wl-stages" role="group" aria-label="寫作階梯">
+  const strip = <div ref={stageStrip} className="pr-options wl-stages" role="group" aria-label="寫作階梯">
       {stages.map((s, i) => {
         const before = !s.pack ? stages.slice(0, i).filter(x => !x.pack).at(-1) : undefined
         return <button key={s.id} type="button" aria-pressed={s.id === stage.id} disabled={!openStage[s.id]} data-locked={!openStage[s.id]} onClick={() => { setStageId(s.id); setTaskId(firstOpenTask(s).id) }}>
           {s.name}{openStage[s.id] ? <small>{stageDone[s.id]} / {s.tasks.length}{s.id === suggested ? ' · 建議' : ''}</small>
-            : <LockLine text={s.pack ? '上到單元 ' + packUnits[0] + ' 才打開' : before ? '「' + before.name.replace(/^\S+\s*/, '') + '」做完 ' + stageTarget(before) + ' 題才打開（現在 ' + stageDone[before.id] + '）' : '還沒打開'} />}</button>
+            : <LockLine text={s.pack ? '上到單元 ' + packUnits[0] + ' 才打開'
+              : before && stageDone[before.id] < stageTarget(before) ? '「' + before.name.replace(/^\S+\s*/, '') + '」做完 ' + stageTarget(before) + ' 題才打開（現在 ' + stageDone[before.id] + '）'
+              : bookMissing(s.id, state.notes).length ? '先讀完文法講解第 ' + bookMissing(s.id, state.notes).map(m => bookChapter(m.chapter).label).join('、') + ' 章才打開'
+              : '還沒打開'} />}</button>
       })}
     </div>
+
+  // The ladder follows 完整文法: a stage whose grammar is not learned yet shows what to read first.
+  const missing = bookMissing(stage.id, state.notes)
+  const prevStage = !stage.pack ? stages.slice(0, stages.indexOf(stage)).filter(x => !x.pack).at(-1) : undefined
+  if (!openStage[stage.id]) return <div className="pr-stack wl">
+    {strip}
+    <section className="wl-locked">
+      <strong>{stage.name}：先讀完文法講解</strong>
+      <p>寫作階梯跟著「文法講解 → 完整文法」一步一步走：這一階用到的文法要先讀完、每一節的三題小練習都做過，才會打開。</p>
+      {missing.length > 0 && <ul>{missing.map(m => <li key={m.chapter}><a href={'#library/grammar/' + firstUndone(state.notes, m.chapter)}>第 {bookChapter(m.chapter).label} 章 {bookChapter(m.chapter).title}</a>（還有 {m.left} 節的小練習沒做）</li>)}</ul>}
+      {prevStage && stageDone[prevStage.id] < stageTarget(prevStage) && <p>也要先把前一階「{prevStage.name}」做完 {stageTarget(prevStage)} 題（現在 {stageDone[prevStage.id]} 題）。</p>}
+    </section>
+  </div>
+  return <div className="pr-stack wl">
+    {strip}
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
+    {stageChapters(stage.id).length > 0 && <p className="wl-book">這一階用到的文法（完整文法）：{stageChapters(stage.id).map((ch, i) => <span key={ch}>{i ? '、' : ''}<a href={'#library/grammar/' + ch + '-1'}>第 {bookChapter(ch).label} 章 {bookChapter(ch).title}</a></span>)}</p>}
     {stage.grammar && <details key={stage.id} className="wl-grammar" open={!stageStarted}>
       <summary>這一階要用的文法</summary>
       <div className="gm-explain">

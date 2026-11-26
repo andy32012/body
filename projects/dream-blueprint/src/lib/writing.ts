@@ -1,3 +1,5 @@
+import bookPlan from '../data/writing-book.json'
+import { sectionDone } from './grammarBook'
 import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
 import { openSteps, reached } from './unlock'
 import { unitPackOpen } from './bridge'
@@ -303,11 +305,41 @@ function writingFrontier(ladder: readonly WriteStage[], notes: Record<string, st
 }
 /** Each stage opens after two checked passes in the preceding stage. Any recorded later stage keeps its whole prefix
  *  open, as do stages already unlocked before the extra steps were added. Bridge access still follows the course. */
+/** The 完整文法 chapters a stage uses (src/data/writing-book.json): they are learned first. */
+export const stageChapters = (stageId: string): number[] => bookPlan.stages.find(s => s.stage === stageId)?.chapters ?? []
+/** A chapter is learned when every one of its sections has its three drills done. */
+export function chapterLeft(notes: Record<string, string>, chapter: number): number {
+  const n = (bookPlan.sections as Record<string, number>)[String(chapter)] ?? 0
+  let left = 0
+  for (let k = 1; k <= n; k++) if (!sectionDone(notes, chapter + '-' + k)) left++
+  return left
+}
+/** How the grammar page names a chapter (its shown number, the skipped first chapter not counted) and its title. */
+export const bookChapter = (chapter: number): { label: number; title: string } => (bookPlan.chapters as Record<string, { label: number; title: string }>)[String(chapter)] ?? { label: chapter, title: '' }
+/** The first section of a chapter whose drills are not done yet (where 「去讀」 goes). */
+export function firstUndone(notes: Record<string, string>, chapter: number): string {
+  const n = (bookPlan.sections as Record<string, number>)[String(chapter)] ?? 1
+  for (let k = 1; k <= n; k++) if (!sectionDone(notes, chapter + '-' + k)) return chapter + '-' + k
+  return chapter + '-1'
+}
+/** The ladder stages that use a chapter (the grammar page links to them). */
+export const stagesUsing = (chapter: number) => bookPlan.stages.filter(s => s.chapters.includes(chapter)).map(s => ({ id: s.stage, name: s.name }))
+/** The chapters of a stage still to learn, with how many sections each has left (empty: the grammar is done). */
+export function bookMissing(stageId: string, notes: Record<string, string>): { chapter: number; left: number }[] {
+  return stageChapters(stageId).map(chapter => ({ chapter, left: chapterLeft(notes, chapter) })).filter(c => c.left > 0)
+}
+/** He has written at least one task of the stage. */
+export const stageStarted = (stage: WriteStage, notes: Record<string, string>) => stage.tasks.some(t => readWrite(notes, t.id) !== null)
+/** Which stages are open. A ladder stage: the one before passed (step by step) and the grammar it uses learned in 完整文法
+ *  first — up to the furthest stage he already wrote in, nothing is locked again. A unit pack's stage: with the unit packs. */
 export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, string>, unit: number): Record<string, boolean> {
   const ladder = stages.filter(s => !s.pack)
   const frontier = writingFrontier(ladder, notes)
   const open = openSteps(ladder.map((s, i) => i < frontier || stageComplete(s, notes)))
-  return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i]]), ...stages.filter(s => s.pack).map((s): [string, boolean] => [s.id, unitPackOpen(unit)])])
+  // Everything up to the furthest stage he has written in stays as it was: the grammar lock never closes earlier work.
+  const furthest = ladder.reduce((far, s, i) => stageStarted(s, notes) ? i : far, -1)
+  return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i] && (i <= furthest || !bookMissing(s.id, notes).length)]),
+    ...stages.filter(s => s.pack).map((s): [string, boolean] => [s.id, unitPackOpen(unit)])])
 }
 /** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
 export const writeTaskOpen = (task: Pick<WriteTask, 'unit'>, unit: number) => task.unit === undefined || reached(task.unit, unit)

@@ -6,6 +6,7 @@ import { createInitialState, exportBackup, importBackup } from '../src/lib/store
 import { packUnits } from '../src/lib/bridge.ts'
 
 const stages = writing.stages as unknown as WriteStage[]
+import bookPlan from '../src/data/writing-book.json' with { type: 'json' }
 const by = (id: string) => stages.find(s => s.id === id)!
 const record = (best?: number) => JSON.stringify({ day: '2026-11-24', words: 30, tries: best === undefined ? 0 : 1, ...(best === undefined ? { self: 1 } : { best }) })
 const notesFor = (ids: string[], best?: number) => Object.fromEntries(ids.map(id => [writeKey(id), record(best)]))
@@ -203,9 +204,14 @@ test('批改包含這一階教過的文法，但仍只照官方評分表', () =>
   assert.doesNotThrow(() => gradePrompt(optional, optional.tasks[0], optional.tasks[0].prompt))
 })
 
-test('新使用者完整走十三階：每階過兩題才開下一階，不因舊階段名稱跳過新階段', () => {
+/** Every 完整文法 chapter learned (all drills done), so the ladder's own step-by-step rule can be tested on its own. */
+function allGrammar(notes: Record<string, string>) {
+  for (const [ch, n] of Object.entries(bookPlan.sections)) for (let k = 1; k <= n; k++) notes = { ...notes, ['gbook.' + ch + '-' + k]: JSON.stringify({ marks: { 0: true, 1: true, 2: true } }) }
+  return notes
+}
+test('新使用者完整走十三階（文法都讀完）：每階過兩題才開下一階，不因舊階段名稱跳過新階段', () => {
   const ladder = stages.filter(s => !s.pack)
-  let notes = createInitialState('2026-11-24').notes
+  let notes = allGrammar(createInitialState('2026-11-24').notes)
   for (const [i, s] of ladder.entries()) {
     const open = stagesOpen(stages, notes, 1)
     assert.deepEqual(ladder.map(x => open[x.id]), ladder.map((_, j) => j <= i), s.id)
@@ -234,8 +240,8 @@ test('只要有作答紀錄，該階與之前新增的階段保持打開，建�
   assert.equal(stagesOpen(stages, bridgeOnly, packUnits[0]).bridge, true)
 })
 
-test('舊版 sentence 已過兩題：新增初階與 steps 不鎖回 sentence、paragraph', () => {
-  const notes = notesFor(['s1', 's2'], 4)
+test('舊版 sentence 已過兩題（文法都讀完）：新增初階與 steps 不鎖回 sentence、paragraph', () => {
+  const notes = allGrammar(notesFor(['s1', 's2'], 4))
   const before = { ...notes }
   const open = stagesOpen(stages, notes, 1)
   for (const id of ['basic', 'longer', 'negq', 'yesterday', 'sentence', 'steps', 'paragraph']) assert.equal(open[id], true, id)
@@ -243,17 +249,17 @@ test('舊版 sentence 已過兩題：新增初階與 steps 不鎖回 sentence、
   assert.equal(suggestedStage(stages, notes), 'paragraph')
   assert.deepEqual(notes, before, '讀取不修改舊紀錄')
   for (const best of [undefined, 3]) {
-    const attempted = notesFor(['s1'], best)
+    const attempted = allGrammar(notesFor(['s1'], best))
     assert.equal(stagesOpen(stages, attempted, 1).sentence, true)
     assert.equal(stagesOpen(stages, attempted, 1).paragraph, false, '尚未開過的階段不憑空算過')
     assert.equal(suggestedStage(stages, attempted), 'sentence')
   }
 })
 
-test('舊版更後面的已解鎖階段也保留；一次性匯入不改任何原作答資料', () => {
+test('舊版更後面的已解鎖階段也保留（文法都讀完）；一次性匯入不改任何原作答資料', () => {
   const old = createInitialState('2026-11-24')
   delete old.notes[writingMigrationKey]
-  Object.assign(old.notes, notesFor(['s1', 's2', 'p1', 'p2', 'm1', 'm2'], 4))
+  Object.assign(old.notes, allGrammar(notesFor(['s1', 's2', 'p1', 'p2', 'm1', 'm2'], 4)))
   const original = { ...old.notes }
   const upgraded = importBackup(JSON.stringify(old))
   for (const [key, value] of Object.entries(original)) assert.equal(upgraded.notes[key], value, key)
@@ -365,4 +371,55 @@ test('writing tasks have a previous and next one in list order', async () => {
   // Tasks not open yet are skipped.
   const early = writingTaskPages(s).flatMap(p => p.tasks.map(t => t.task)).filter(t => writeTaskOpen(t, 1))
   if (early.length) assert.ok(!taskNeighbors(s, early[0].id, 1).next || writeTaskOpen(taskNeighbors(s, early[0].id, 1).next!, 1))
+})
+
+// The writing ladder follows 完整文法: a stage opens once the grammar chapters it uses are learned (every section's three
+// drills done), on top of passing the stage before. A stage he already wrote in stays open.
+test('a writing stage waits for its grammar chapters in 完整文法', async () => {
+  const { bookMissing, stagesOpen } = await import('../src/lib/writing.ts')
+  const { saveBookDrill } = await import('../src/lib/grammarBook.ts')
+  const learn = (notes: Record<string, string>, ch: number, n: number) => {
+    for (let k = 1; k <= n; k++) for (let i = 0; i < 3; i++) notes = saveBookDrill(notes, ch + '-' + k, i, true, '2026-11-26')
+    return notes
+  }
+  let notes: Record<string, string> = {}
+  assert.equal(stagesOpen(stages, notes, 1).basic, false)
+  assert.deepEqual(bookMissing('basic', notes).map(m => m.chapter), [2])
+  notes = learn(notes, 2, 15)
+  assert.equal(stagesOpen(stages, notes, 1).basic, false, 'one section still to do')
+  assert.equal(bookMissing('basic', notes)[0].left, 1)
+  notes = learn(notes, 2, 16)
+  assert.equal(stagesOpen(stages, notes, 1).basic, true)
+  // A stage already written in stays open, whatever the grammar.
+  const started = { [writeKey('b1')]: JSON.stringify({ best: 3, last: { scores: [], fixes: [] } }) }
+  assert.equal(stagesOpen(stages, started, 1).basic, true)
+})
+
+test('the writing-to-grammar map matches the stages and the grammar book', async () => {
+  const plan = (await import('../src/data/writing-book.json', { with: { type: 'json' } })).default
+  const index = (await import('../src/data/grammar-book/index.json', { with: { type: 'json' } })).default
+  for (const s of plan.stages) assert.equal(by(s.stage).name, s.name, s.stage)
+  for (const p of index.parts) for (const c of p.chapters) assert.equal(plan.sections[String(c.n) as keyof typeof plan.sections], c.sections.length, 'ch ' + c.n)
+  // Every ladder stage (not the unit packs) is in the map.
+  assert.deepEqual(stages.filter(s => !s.pack).map(s => s.id), plan.stages.map(s => s.stage))
+})
+
+test('old progress: stages up to the furthest one he wrote in stay open without the grammar', () => {
+  const notes = notesFor(['s1', 's2'], 4)
+  const open = stagesOpen(stages, notes, 1)
+  // basic … sentence stay open (he wrote in sentence); steps needs its grammar (連接詞與連接語) first.
+  for (const id of ['basic', 'longer', 'negq', 'yesterday', 'sentence']) assert.equal(open[id], true, id)
+  assert.equal(open.steps, false)
+})
+
+test('the writing map names chapters the way the grammar page does', async () => {
+  const { bookChapter, firstUndone, stagesUsing } = await import('../src/lib/writing.ts')
+  const { chapterLabel } = await import('../src/lib/grammarBook.ts')
+  const index = (await import('../src/data/grammar-book/index.json', { with: { type: 'json' } })).default
+  for (const p of index.parts) for (const c of p.chapters) if (!('skip' in c && c.skip)) {
+    assert.equal(bookChapter(c.n).label, chapterLabel(index as never, c.n), 'ch ' + c.n)
+    assert.equal(bookChapter(c.n).title, c.title)
+  }
+  assert.equal(firstUndone({}, 2), '2-1')
+  assert.deepEqual(stagesUsing(2).map(s => s.id), ['basic'])
 })
