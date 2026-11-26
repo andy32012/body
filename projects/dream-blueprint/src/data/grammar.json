@@ -153,6 +153,79 @@
      "aren't"
     ]
    ]
+  },
+  "extra": {
+   "title": "my、your、his、her：說「誰的」",
+   "steps": [
+    {
+     "t": "名詞前面放 my、your、his、her……，說是誰的",
+     "p": "I → my（我的）、you → your（你的）、he → his（他的）、she → her（她的）、it → its（它的）、we → our（我們的）、they → their（他們的）。後面一定要接名詞。",
+     "ex": [
+      {
+       "en": "My mother is a nurse.",
+       "zh": "我媽媽是護理師。"
+      },
+      {
+       "en": "Her brother is a doctor.",
+       "zh": "她哥哥是醫師。"
+      }
+     ]
+    },
+    {
+     "t": "its 是「它的」，it's 是 it is",
+     "p": "its 沒有一撇，是「它的」；it's 有一撇，是 it is 的縮寫。their（他們的）也不要寫成 there（那裡）或 they're（they are）。",
+     "ex": [
+      {
+       "en": "Our teacher is kind.",
+       "zh": "我們的老師很親切。"
+      },
+      {
+       "en": "Their room is small.",
+       "zh": "他們的房間很小。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "___ name is Amy. I am a student.",
+     "options": [
+      "I",
+      "My",
+      "Me"
+     ],
+     "answer": 1,
+     "why": "名詞 name 前面說「我的」用 my。"
+    },
+    {
+     "k": "choose",
+     "q": "Tom and Sam are brothers. ___ father is a doctor.",
+     "options": [
+      "Their",
+      "They",
+      "There"
+     ],
+     "answer": 0,
+     "why": "說「他們的」用 their；they 是「他們」，there 是「那裡」。"
+    },
+    {
+     "k": "fill",
+     "q": "She is a nurse. ___ (她的) patients are kind.",
+     "accept": [
+      "Her"
+     ],
+     "why": "說「她的」用 her，後面接名詞 patients。"
+    },
+    {
+     "k": "fix",
+     "q": "He is my friend. He name is Leo.",
+     "accept": [
+      "He is my friend. His name is Leo."
+     ],
+     "why": "名詞 name 前面要用 his（他的），不是 he（他）。"
+    }
+   ]
   }
  },
  {
@@ -308,6 +381,79 @@
      "直接背",
      "child → children、foot → feet、man → men、woman → women、tooth → teeth"
     ]
+   ]
+  },
+  "extra": {
+   "title": "名詞＋'s：說「某人的」",
+   "steps": [
+    {
+     "t": "人或名詞後面加 's，表示「誰的」",
+     "p": "Amy's bag 是「Amy 的包包」，my mother's room 是「我媽媽的房間」。's 放在「擁有的人」後面，東西放在後面。",
+     "ex": [
+      {
+       "en": "Tom's sister is a nurse.",
+       "zh": "Tom 的姊姊是護理師。"
+      },
+      {
+       "en": "The doctor's car is red.",
+       "zh": "那位醫師的車是紅色的。"
+      }
+     ]
+    },
+    {
+     "t": "已經有 s 的複數只加 '，不規則複數加 's",
+     "p": "兩個以上的護理師：the nurses' room（只加一撇）；children、men 這種不規則複數沒有 s，照樣加 's：the children's books。",
+     "ex": [
+      {
+       "en": "The nurses' room is small.",
+       "zh": "護理師們的休息室很小。"
+      },
+      {
+       "en": "The children's toys are new.",
+       "zh": "孩子們的玩具是新的。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "___ phone is new.",
+     "options": [
+      "Amy",
+      "Amy's",
+      "Amys"
+     ],
+     "answer": 1,
+     "why": "說「Amy 的」要在 Amy 後面加 's。"
+    },
+    {
+     "k": "choose",
+     "q": "The ___ room is big. (兩位以上護理師的房間)",
+     "options": [
+      "nurse's",
+      "nurses'",
+      "nurses's"
+     ],
+     "answer": 1,
+     "why": "nurses 已經有 s，只加一撇：nurses'。"
+    },
+    {
+     "k": "fill",
+     "q": "My ___ (brother，所有格) name is Ben.",
+     "accept": [
+      "brother's"
+     ],
+     "why": "一個哥哥（單數）的，加 's：brother's。"
+    },
+    {
+     "k": "fix",
+     "q": "Lisa bag is red.",
+     "accept": [
+      "Lisa's bag is red."
+     ],
+     "why": "說「Lisa 的包包」要寫 Lisa's bag。"
+    }
    ]
   }
  },
@@ -615,6 +761,79 @@
      "直接背",
      "have → has"
     ]
+   ]
+  },
+  "extra": {
+   "title": "me、him、her、them：動詞後面的人",
+   "steps": [
+    {
+     "t": "動詞後面用 me、you、him、her、it、us、them",
+     "p": "放在主詞位置用 I、he、she、we、they；放在動詞後面、當「被做的人」，要換成 me、him、her、us、them（you 和 it 不變）。",
+     "ex": [
+      {
+       "en": "She helps me.",
+       "zh": "她幫我。"
+      },
+      {
+       "en": "I like them.",
+       "zh": "我喜歡他們。"
+      }
+     ]
+    },
+    {
+     "t": "him、her、them 指前面說過的人",
+     "p": "前面已經說過是誰，後面就用 him／her／them 代替，不用再說一次名字。",
+     "ex": [
+      {
+       "en": "Dr. Lin is kind. The patients love her.",
+       "zh": "林醫師很親切，病人都很愛她。"
+      },
+      {
+       "en": "My brother calls us.",
+       "zh": "我哥哥打電話給我們。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "Ann is my friend. I like ___.",
+     "options": [
+      "she",
+      "her",
+      "hers"
+     ],
+     "answer": 1,
+     "why": "動詞 like 後面要用受格：her。"
+    },
+    {
+     "k": "choose",
+     "q": "Tom and Lily help ___. (我們)",
+     "options": [
+      "we",
+      "our",
+      "us"
+     ],
+     "answer": 2,
+     "why": "動詞 help 後面用受格：us。"
+    },
+    {
+     "k": "fill",
+     "q": "My dog loves ___ (我).",
+     "accept": [
+      "me"
+     ],
+     "why": "動詞 loves 後面用受格：me。"
+    },
+    {
+     "k": "fix",
+     "q": "He calls I.",
+     "accept": [
+      "He calls me."
+     ],
+     "why": "I 只能當主詞，動詞後面要用 me。"
+    }
    ]
   }
  },
@@ -1722,6 +1941,82 @@
      "am／is／are going to + 原形",
      "已經計畫好的事"
     ]
+   ]
+  },
+  "extra": {
+   "title": "已經約好的未來：be＋V-ing",
+   "steps": [
+    {
+     "t": "已經約好、排進行程的事，用 am／is／are＋V-ing",
+     "p": "跟人約好、已經排好的事，常用現在進行式，而且要加未來的時間（tomorrow、next week），聽的人才知道是在說未來。",
+     "ex": [
+      {
+       "en": "I am meeting Dr. Lin tomorrow.",
+       "zh": "我明天要跟林醫師見面。"
+      },
+      {
+       "en": "We are flying to Tokyo next week.",
+       "zh": "我們下週要飛東京。"
+      }
+     ]
+    },
+    {
+     "t": "沒有約好、只是打算或猜，用 be going to 或 will",
+     "p": "打算做的事用 be going to；猜會發生的事用 will。已經約好（有時間、有人、有票）的事，才用 be＋V-ing。",
+     "ex": [
+      {
+       "en": "I am going to study tonight.",
+       "zh": "我今晚打算讀書。"
+      },
+      {
+       "en": "I think it will rain.",
+       "zh": "我覺得會下雨。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "I ___ my teacher at 3 p.m. tomorrow. (已經約好)",
+     "options": [
+      "meet",
+      "am meeting",
+      "met"
+     ],
+     "answer": 1,
+     "why": "已經約好的事，用 am＋V-ing，再加未來時間 tomorrow。"
+    },
+    {
+     "k": "choose",
+     "q": "She ___ to Kaohsiung next Monday. (票已經買好)",
+     "options": [
+      "is going",
+      "went",
+      "go"
+     ],
+     "answer": 0,
+     "why": "已經排好的行程用 is going；went 是過去，go 不配 she。"
+    },
+    {
+     "k": "fill",
+     "q": "We ___ (have) dinner with Amy tonight. (已經約好)",
+     "accept": [
+      "are having",
+      "'re having",
+      "’re having"
+     ],
+     "why": "已經約好的事，用 are＋having。"
+    },
+    {
+     "k": "fix",
+     "q": "I meeting my friend tomorrow.",
+     "accept": [
+      "I am meeting my friend tomorrow.",
+      "I'm meeting my friend tomorrow."
+     ],
+     "why": "進行式一定要有 be 動詞：I am meeting。"
+    }
    ]
   }
  },
@@ -3503,6 +3798,79 @@
      "if you need help"
     ]
    ]
+  },
+  "extra": {
+   "title": "一定會發生的事實：If＋現在式，現在式",
+   "steps": [
+    {
+     "t": "說「只要……就一定……」的事實，兩邊都用現在式",
+     "p": "自然現象、身體反應、每次都一樣的結果，if 後面和結果都用現在式。if 那半句放前面時，後面加逗號。",
+     "ex": [
+      {
+       "en": "If you heat ice, it melts.",
+       "zh": "冰一加熱就會融化。"
+      },
+      {
+       "en": "If I don't sleep, I feel tired.",
+       "zh": "我只要沒睡，就會覺得累。"
+      }
+     ]
+    },
+    {
+     "t": "這種 if 可以換成 when",
+     "p": "每次都會發生，所以 if 換成 when 意思差不多：When you heat ice, it melts.。只是「可能發生一次、看情況」的事，結果用 will，第 26 單元會教。",
+     "ex": [
+      {
+       "en": "When water boils, it makes bubbles.",
+       "zh": "水煮開時會冒泡泡。"
+      },
+      {
+       "en": "If you press this button, the light goes on.",
+       "zh": "只要按這個按鈕，燈就會亮。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "If you mix red and white, you ___ pink.",
+     "options": [
+      "get",
+      "got",
+      "getting"
+     ],
+     "answer": 0,
+     "why": "每次都一樣的結果，用現在式 get。"
+    },
+    {
+     "k": "choose",
+     "q": "If water ___ 100°C, it boils.",
+     "options": [
+      "reach",
+      "reaches",
+      "reached"
+     ],
+     "answer": 1,
+     "why": "water 是單數，現在式加 s：reaches。"
+    },
+    {
+     "k": "fill",
+     "q": "If you press this button, the light ___ (go) on.",
+     "accept": [
+      "goes"
+     ],
+     "why": "事實用現在式；the light 是單數，go 加 es：goes。"
+    },
+    {
+     "k": "fix",
+     "q": "If you heat ice, it melted.",
+     "accept": [
+      "If you heat ice, it melts."
+     ],
+     "why": "一定會發生的事實，結果也用現在式：it melts。"
+    }
+   ]
   }
  },
  {
@@ -4464,6 +4832,79 @@
      "wait for／listen to／look for／take care of",
      "wait for the bus"
     ]
+   ]
+  },
+  "extra": {
+   "title": "常用片語動詞：get up、look for、turn on……",
+   "steps": [
+    {
+     "t": "動詞＋小字（up、on、off、for），變成新的意思",
+     "p": "get up（起床）、wake up（醒來）、look for（找）、turn on／turn off（打開／關掉電器）、put on（穿上）、take off（脫下）。要整組一起記。",
+     "ex": [
+      {
+       "en": "I get up at seven.",
+       "zh": "我七點起床。"
+      },
+      {
+       "en": "She is looking for her keys.",
+       "zh": "她在找她的鑰匙。"
+      }
+     ]
+    },
+    {
+     "t": "turn on、put on 這種，東西可以放中間；it 和 them 一定放中間",
+     "p": "turn on the light = turn the light on；換成 it、them 時一定要放中間：turn it on（不能說 turn on it）。look for 不能拆開：look for it。",
+     "ex": [
+      {
+       "en": "Please turn it off.",
+       "zh": "請把它關掉。"
+      },
+      {
+       "en": "Put your jacket on.",
+       "zh": "把你的外套穿上。"
+      }
+     ]
+    }
+   ],
+   "drills": [
+    {
+     "k": "choose",
+     "q": "It's cold. Please ___ your coat.",
+     "options": [
+      "put on",
+      "take off",
+      "look for"
+     ],
+     "answer": 0,
+     "why": "天氣冷要「穿上」外套：put on。"
+    },
+    {
+     "k": "choose",
+     "q": "I can't find my phone. I'm ___ it.",
+     "options": [
+      "looking for",
+      "getting up",
+      "turning off"
+     ],
+     "answer": 0,
+     "why": "找不到東西，正在「找」：looking for。"
+    },
+    {
+     "k": "fill",
+     "q": "The room is dark. Can you turn ___ the light?",
+     "accept": [
+      "on"
+     ],
+     "why": "把燈「打開」是 turn on。"
+    },
+    {
+     "k": "fix",
+     "q": "Please turn on it.",
+     "accept": [
+      "Please turn it on."
+     ],
+     "why": "turn on 遇到 it，it 一定放中間：turn it on。"
+    }
    ]
   }
  },

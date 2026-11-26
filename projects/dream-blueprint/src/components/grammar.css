@@ -54,3 +54,6 @@
 .gm-book h3 { margin: .2rem 0 0; }
 .gm-pick { display: grid; gap: .3rem; font-size: .88rem; color: var(--practice-secondary); }
 .gm-pick select { width: 100%; max-width: 100%; }
+.gm-extra { display: grid; gap: .7rem; margin-top: 1rem; padding: .9rem 1rem; border-radius: 14px; border: 1px dashed var(--practice-line, var(--line)); background: var(--practice-inset, transparent); min-width: 0; }
+.gm-extra h3 { margin: 0; font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+.gm-extra-note { margin: 0; font-size: .85rem; color: var(--practice-secondary, var(--muted)); }

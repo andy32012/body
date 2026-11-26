@@ -101,3 +101,25 @@ test('文法小練習的紀錄：只記第一次，之後改對記成「後來�
   assert.deepEqual(drillSummary(notes, 1), { total: 7, done: 7, first: 6, open: 0 })
   assert.deepEqual(readGrammar({ 'gram.3': 'not json' }, 3).marks, {}, '壞掉的紀錄當成沒有')
 })
+
+// A1–A2 items the Core Inventory lists that the units did not teach: a supplement on six units (the three steps and
+// seven drills of each unit stay as they are).
+test('A1–A2 補充：六個單元有補充講解和小練習，每題只有一個標準答案', async () => {
+  const { grammarFor, checkDrill, drillAnswer } = await import('../src/lib/grammar.ts')
+  const want: Record<number, RegExp> = { 1: /\bmy\b.*\byour\b/, 2: /’s|'s/, 4: /\bme\b.*\bhim\b/, 11: /tomorrow|next/, 22: /\bIf\b/, 28: /look for|turn/ }
+  for (const [unit, sign] of Object.entries(want)) {
+    const g = grammarFor(Number(unit))!
+    assert.ok(g.extra, 'unit ' + unit + ' 有補充')
+    assert.equal(g.steps.length, 3, 'unit ' + unit + ' 原本的三步不變')
+    assert.equal(g.drills.length, 7, 'unit ' + unit + ' 原本的七題不變')
+    assert.ok(g.extra!.steps.length >= 2 && g.extra!.drills.length >= 4, 'unit ' + unit + ' 補充至少兩步、四題')
+    assert.match(JSON.stringify(g.extra), sign, 'unit ' + unit + ' 教到該教的')
+    for (const d of g.extra!.drills) {
+      assert.ok(d.why.trim(), unit + ' ' + d.q + ' 有原因')
+      assert.equal(checkDrill(d, d.k === 'choose' ? d.answer : d.accept[0]), true, unit + ' ' + d.q + ' 標準答案判對')
+      assert.ok(drillAnswer(d).trim(), unit + ' ' + d.q + ' 有顯示用的答案')
+      if (d.k === 'choose') assert.ok(d.options.filter((_, i) => checkDrill(d, i)).length === 1, unit + ' ' + d.q + ' 只有一個選項對')
+      if (d.k === 'fix') assert.equal(checkDrill(d, d.q), false, unit + ' ' + d.q + ' 原句不算對')
+    }
+  }
+})

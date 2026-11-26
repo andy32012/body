@@ -24,7 +24,17 @@ function say(text: string, rate: number) {
 /** The teaching itself: the steps with examples, one table to look things up in, and the mistakes learners usually make. */
 export function GrammarExplain({ unit, rate }: { unit: number; rate: number }) {
   const g = grammarFor(unit)
-  return g ? <ExplainBody steps={g.steps} table={g.table} mistakes={g.mistakes} rate={rate} /> : null
+  if (!g) return null
+  return <>
+    <ExplainBody steps={g.steps} table={g.table} mistakes={g.mistakes} rate={rate} />
+    {/* A1–A2 items this unit did not teach before (checked against the Core Inventory): extra, practice only. */}
+    {g.extra && <section className="gm-extra" aria-label="補充">
+      <h3>補充：A1／A2 也要會——{g.extra.title}</h3>
+      <ExplainBody steps={g.extra.steps} mistakes={[]} rate={rate} />
+      <p className="gm-extra-note">補充練習：做來熟悉，不算進這一課的七題，也不會排進每日課。</p>
+      {g.extra.drills.map((d, i) => <DrillCard key={unit + '-x' + i} drill={d} onDone={() => {}} />)}
+    </section>}
+  </>
 }
 /** The same teaching from any source (a course unit, a section of 完整文法). Each example can be played. */
 export function ExplainBody({ steps, table, mistakes, rate }: { steps: GrammarStep[]; table?: GrammarTable; mistakes: GrammarMistake[]; rate: number }) {
@@ -48,6 +58,7 @@ export function ExplainBody({ steps, table, mistakes, rate }: { steps: GrammarSt
         <tbody>{g.table.rows.map((r, i) => <tr key={i}>{r.map((c, j) => j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>)}</tr>)}</tbody>
       </table></div>
     </figure>}
+    {g.mistakes.length > 0 && <>
     <section className="gm-mistakes">
       <h4>常見錯誤</h4>
       {g.mistakes.map(m => <p key={m.bad}>
@@ -56,6 +67,7 @@ export function ExplainBody({ steps, table, mistakes, rate }: { steps: GrammarSt
         <small>{m.why}</small>
       </p>)}
     </section>
+    </>}
   </div>
 }
 
