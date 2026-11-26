@@ -51,18 +51,30 @@ export function neighbors(index: BookIndex, id: string): { prev?: FlatSection; n
   const i = all.findIndex(s => s.id === id)
   return i < 0 ? {} : { prev: all[i - 1], next: all[i + 1] }
 }
+/** The chapter number he sees: skipped chapters don't count, so with 第 1 章 skipped chapter 2 shows as 第 1 章.
+ *  Records (gbook.<id>) and addresses keep the catalog's own numbers. */
+export function chapterLabel(index: BookIndex, n: number): number {
+  return n - index.parts.flatMap(p => p.chapters).filter(c => c.skip && c.n < n).length
+}
+/** The section number he sees: 2-1 → 1-1 once 第 1 章 is skipped; the appendix keeps A-1…A-10. */
+export function sectionLabel(index: BookIndex, id: string): string {
+  const c = chapterOf(id)
+  return c === 'A' ? id : chapterLabel(index, c) + '-' + id.split('-')[1]
+}
 /** Whether a chapter's teaching is written. */
 export const chapterReady = (index: BookIndex, c: ChapterKey) => c === 'A' ? !!index.appendixReady : !!index.parts.flatMap(p => p.chapters).find(x => x.n === c)?.ready
 
 export type BookRoute = { kind: 'catalog' } | { kind: 'units' } | { kind: 'unit'; unit: number } | { kind: 'section'; id: string }
 /** #library/grammar → the catalog; …/12 → course unit 12 (the old address, kept); …/14-2 or …/A-1 → that section;
- *  …/units → the course units. Anything else opens the catalog. */
+ *  …/units → the course units. Anything else opens the catalog, and so does a skipped chapter's section (its number
+ *  now belongs to the chapter after it). */
 export function bookRoute(index: BookIndex, hash: string): BookRoute {
   const rest = hash.replace(/^#/, '').split('/')[2]
   if (!rest) return { kind: 'catalog' }
   if (rest === 'units') return { kind: 'units' }
   if (/^\d+$/.test(rest) && Number(rest) > 0) return { kind: 'unit', unit: Number(rest) }
-  return findSection(index, rest) ? { kind: 'section', id: rest } : { kind: 'catalog' }
+  const found = findSection(index, rest)
+  return found && !found.chapter?.skip ? { kind: 'section', id: rest } : { kind: 'catalog' }
 }
 
 export const bookKey = (id: string) => 'gbook.' + id

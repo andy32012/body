@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { bookRoute, chapterFile, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone, shownParts,
+import { bookRoute, chapterFile, chapterLabel, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone, sectionLabel, shownParts,
   type BookIndex, type ChapterContent, type SectionContent } from '../lib/grammarBook'
 import { openClaude, useTaskContext } from '../lib/taskContext'
 import { readDraft, writeDraft } from '../lib/drafts'
@@ -58,20 +58,20 @@ function Catalog({ index, notes }: { index: BookIndex; notes: Record<string, str
     const ready = chapterReady(index, s.chapter)
     const done = ready && sectionDone(notes, s.id)
     return <li key={s.id}><a href={'#library/grammar/' + s.id} data-done={done || undefined} data-ready={ready || undefined}>
-      <span className="gb-id">{s.id}</span><span className="gb-title">{s.title}</span>
+      <span className="gb-id">{sectionLabel(index, s.id)}</span><span className="gb-title">{s.title}</span>
       <em className={'gb-lv gb-lv' + s.level}>{levelNames[s.level]}</em>{done ? <i className="gb-ok" aria-label="練過">✓</i> : null}
     </a></li>
   }
   return <div className="pr-stack gb">
-    <p className="gb-intro">照「英文文法完整主題目錄」排，從第 {chapters[0].n} 章「{chapters[0].title}」讀起：{chapters.length} 章、{all.length - index.appendix.length} 節，另有 {index.appendix.length} 張附錄表。每一節有白話重點、例句（可以點來聽）、常見錯誤、3 題小練習，還可以自己造一句請 Claude 批改。標「基礎」的先讀。</p>
+    <p className="gb-intro">照「英文文法完整主題目錄」排：{chapters.length} 章、{all.length - index.appendix.length} 節，另有 {index.appendix.length} 張附錄表。每一節有白話重點、例句（可以點來聽）、常見錯誤、3 題小練習，還可以自己造一句請 Claude 批改。標「基礎」的先讀。</p>
     <p className="qz-meta"><span>寫好 {written.length} / {all.length} 節</span><span>練過 {practised.length} 節</span></p>
-    {upNext && <div className="pr-actions"><a className="pr-main gb-next" href={'#library/grammar/' + upNext.id}>{practised.length ? '接著讀' : '從這裡開始'}：{upNext.id} {upNext.title} →</a></div>}
+    {upNext && <div className="pr-actions"><a className="pr-main gb-next" href={'#library/grammar/' + upNext.id}>{practised.length ? '接著讀' : '從這裡開始'}：{sectionLabel(index, upNext.id)} {upNext.title} →</a></div>}
     {parts.map(p => <section key={p.id} className="gb-part">
       <h3>{p.title}</h3>
       {p.chapters.map(c => {
         const done = c.ready ? c.sections.filter(s => sectionDone(notes, s.id)).length : 0
         return <details key={c.n} className="gb-ch" open={openAt === c.n || undefined}>
-          <summary><b>第 {c.n} 章</b><span>{c.title}</span><small>{c.ready ? '練過 ' + done + ' / ' + c.sections.length + ' 節' : c.sections.length + ' 節 · 還在寫'}</small></summary>
+          <summary><b>第 {chapterLabel(index, c.n)} 章</b><span>{c.title}</span><small>{c.ready ? '練過 ' + done + ' / ' + c.sections.length + ' 節' : c.sections.length + ' 節 · 還在寫'}</small></summary>
           <ol className="gb-list">{c.sections.map(s => row({ ...s, chapter: c.n }))}</ol>
         </details>
       })}
@@ -99,22 +99,23 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
     return () => { alive = false }
   }, [id, ready])
   const { prev, next } = neighbors(index, id)
-  const name = id + ' ' + section.title
+  const label = sectionLabel(index, id)
+  const name = label + ' ' + section.title
   const draftKey = 'gbook-' + id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [run, setRun] = useState(0)
   const [round, setRound] = useState(0)
   useTaskContext({
     label: '完整文法：' + name,
-    detail: ['他在讀文法講解「' + name + '」（' + levelNames[section.level] + '）' + (chapter ? '，第 ' + chapter.n + ' 章 ' + chapter.title : '，附錄') + '。',
+    detail: ['他在讀文法講解「' + name + '」（' + levelNames[section.level] + '）' + (chapter ? '，第 ' + chapterLabel(index, chapter.n) + ' 章 ' + chapter.title : '，附錄') + '。',
       content ? '這一節的重點：\n' + content.points.map(p => '・' + p.t + '：' + p.p).join('\n') : '這一節的講解還沒寫好，他想請你教他：用白話說重點，給兩三個簡單的例句。',
       '他的英文大約國中一年級程度，用繁體中文、白話回答，例句要簡單。'].join('\n'),
   })
   const onSave = (i: number, right: boolean) => onActivity(prev => ({ ...prev, notes: saveBookDrill(prev.notes, id, i, right, date) }))
   return <div className="pr-stack gb gb-sec">
     <a className="pr-link gb-back" href="#library/grammar">← 回目錄</a>
-    <small className="gb-crumb">{part ? part.title + ' · 第 ' + chapter!.n + ' 章 ' + chapter!.title : '附錄'}</small>
-    <h3 className="gb-head"><span className="gb-id">{id}</span>{section.title}<em className={'gb-lv gb-lv' + section.level}>{levelNames[section.level]}</em></h3>
+    <small className="gb-crumb">{part ? part.title + ' · 第 ' + chapterLabel(index, chapter!.n) + ' 章 ' + chapter!.title : '附錄'}</small>
+    <h3 className="gb-head"><span className="gb-id">{label}</span>{section.title}<em className={'gb-lv gb-lv' + section.level}>{levelNames[section.level]}</em></h3>
     {section.units?.length ? <p className="gb-units">課程單元 {section.units.map((u, i) => <span key={u}>{i ? '、' : ''}{reached(u, state.curriculum.unit)
       ? <a href={'#library/grammar/' + u}>{u}</a> : <>{u}（上到才打開）</>}</span>)} 也教過這個，裡面有完整講解和 7 題小練習。</p> : null}
     {content === undefined ? <p>載入中……</p>
@@ -138,8 +139,8 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
       </>}
     <div className="pr-actions"><button type="button" className="ask-word gb-ask" onClick={openClaude}><PetIcon size={18} />問 Claude 老師</button></div>
     <nav className="gb-nav" aria-label="上一節、下一節">
-      {prev ? <a href={'#library/grammar/' + prev.id}>← 上一節<small>{prev.id} {prev.title}</small></a> : <span />}
-      {next ? <a href={'#library/grammar/' + next.id}>下一節 →<small>{next.id} {next.title}</small></a> : <span />}
+      {prev ? <a href={'#library/grammar/' + prev.id}>← 上一節<small>{sectionLabel(index, prev.id)} {prev.title}</small></a> : <span />}
+      {next ? <a href={'#library/grammar/' + next.id}>下一節 →<small>{sectionLabel(index, next.id)} {next.title}</small></a> : <span />}
     </nav>
   </div>
 }
