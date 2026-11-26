@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { reached } from '../lib/unlock'
 import { Volume2 } from 'lucide-react'
 import curriculum from '../data/curriculum.json'
@@ -84,7 +84,11 @@ export function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boo
           : <textarea lang="en" rows={2} value={text} readOnly={result !== null} autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck={false}
               onChange={e => setText(e.target.value)} />}
       </label>
-      {result === null && <button type="submit" className="pr-main" disabled={untouched}>對答案</button>}
+      {result === null && <div className="pr-actions">
+        <button type="submit" className="pr-main" disabled={untouched}>對答案</button>
+        {/* A way on without an answer: it counts as missed and comes back later, like any wrong answer. */}
+        <button type="button" className="pr-link" onClick={() => check(drill.k === 'fix' ? drill.q : '')}>不會，看答案</button>
+      </div>}
     </form>}
     {result !== null && <div className="gm-feedback" data-ok={result} role="status">
       <strong>{result ? '對了' : '還沒對'}</strong>
@@ -96,7 +100,9 @@ export function DrillCard({ drill, onDone }: { drill: Drill; onDone: (right: boo
 }
 
 /** The drills, one at a time. `indices` is fixed when the block opens; the first try of each drill is what gets recorded. */
-export function GrammarDrills({ unit, indices, onSave, date, done }: { unit: number; indices: number[]; onSave: SaveNotes; date: string; done?: string }) {
+export function GrammarDrills({ unit, indices, onSave, date, done, after }: { unit: number; indices: number[]; onSave: SaveNotes; date: string; done?: string
+  /** Where to go once the drills are done (the grammar book: the next unit). */
+  after?: ReactNode }) {
   const g = grammarFor(unit)
   const [at, setAt] = useState(0)
   const [answered, setAnswered] = useState(false)
@@ -112,6 +118,7 @@ export function GrammarDrills({ unit, indices, onSave, date, done }: { unit: num
     return <div className="gm-drills gm-drills-done" role="status">
       <strong>小練習做完了：{rights.length} 題對 {right} 題</strong>
       <p>{right < rights.length ? '錯的題目之後會再出現一次。' : '都認得了。'}{done ?? ''}</p>
+      {after}
     </div>
   }
   return <div className="gm-drills">
@@ -155,6 +162,12 @@ export function GrammarBook({ state, onActivity, date, initialUnit }: Pick<PageP
   const sum = drillSummary(state.notes, unit)
   const stages = [...new Set(curriculum.overview.map(o => o.stage))]
   const onSave: SaveNotes = apply => onActivity(prev => ({ ...prev, notes: apply(prev.notes) }))
+  // The unit after this one, if the course has reached it.
+  const next = curriculum.overview.find(o => o.unit === unit + 1 && reached(o.unit, state.curriculum.unit) && grammarFor(o.unit))
+  function open(u: number) {
+    setUnit(u); setRound(0)
+    requestAnimationFrame(() => document.querySelector('.gm-book')?.scrollIntoView({ block: 'start' }))
+  }
   if (!info || !g) return <p>這個單元的講解還沒有寫好。</p>
   return <div className="pr-stack gm gm-book">
     <label className="gm-pick">單元
@@ -168,7 +181,12 @@ export function GrammarBook({ state, onActivity, date, initialUnit }: Pick<PageP
     <h3>{info.title}</h3>
     <p className="gm-rule">{info.rule}</p>
     <GrammarExplain key={unit} unit={unit} rate={state.settings.speechRate} />
-    <GrammarDrills key={unit + '.' + round} unit={unit} indices={g.drills.map((_, i) => i)} onSave={onSave} date={date} />
+    <GrammarDrills key={unit + '.' + round} unit={unit} indices={g.drills.map((_, i) => i)} onSave={onSave} date={date}
+      after={<div className="pr-actions">
+        {next ? <button type="button" className="pr-main" onClick={() => open(next.unit)}>下一個單元：{next.unit}．{next.title} →</button>
+          : <small>{unit < grammarUnits.length ? '下一個單元等每天的課上到才打開。' : '這是最後一個單元。'}可以在最上面選其他單元複習。</small>}
+        <button type="button" className="pr-link" onClick={() => setRound(round + 1)}>這個單元再做一次</button>
+      </div>} />
     <button type="button" className="pr-link" onClick={() => setRound(round + 1)}>這個單元的小練習從頭再做一次</button>
   </div>
 }

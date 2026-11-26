@@ -321,3 +321,16 @@ test('單元小關卡那天算上完今天的課：清單打勾，生活主題�
   assert.equal(mainLessonDone({ ...open, notes: updateLesson(open.notes, day, 1, 2, {}, 'done') }, day), true)
   assert.equal(mainLessonDone({ notes: {}, sessions: [{ id: 'library-' + day, day, energy: 'low', advanced: false, sentenceId: '' }] }, day), false, '只在練習頁加練不算')
 })
+
+test('小關卡或複習日做到一半重新整理：記得做到第幾句、前面的答案；只限當天、同一組句子', async () => {
+  const { readRunProgress, saveRunProgress, runProgressKey } = await import('../src/lib/lesson.ts')
+  const day = '2026-11-26'
+  const records = [{ sentenceId: 'u3-c1', rating: 'correct' as const, grammar: [], revealed: false, verified: true }]
+  let notes = saveRunProgress({}, day, { unit: 3, day: 6, pos: 1, records, levels: ['independent'] })
+  assert.deepEqual(readRunProgress(notes, day, 3, 6)?.pos, 1)
+  assert.equal(readRunProgress(notes, day, 4, 1), null, '別的單元、別天的不會拿來用')
+  assert.equal(readRunProgress(notes, '2026-11-27', 3, 6), null)
+  notes = saveRunProgress(notes, day, null)
+  assert.equal(notes[runProgressKey(day)], undefined, '做完就清掉')
+  assert.equal(readRunProgress({ [runProgressKey(day)]: 'x' }, day, 3, 6), null)
+})

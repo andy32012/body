@@ -92,6 +92,8 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
         onClick={() => { setPicked(j); say(word.en, rate) }}>{o.zh}</button>)}</div>
       {!heard && typeof speechSynthesis === 'undefined' && <p className="ls-help">這個瀏覽器不能播放語音，聽懂練習先換別的模式。</p>}
       {!heard && <p className="ls-help">先按播放聽一次，聲音出來後才能選意思（這樣才算「聽懂」）。按了沒聲音，檢查音量或換個瀏覽器。</p>}
+      {/* No sound on this device right now: move on without counting this word as 聽懂. */}
+      {!heard && picked === undefined && <button type="button" className="pr-link" onClick={() => next(false)}>聽不到聲音？略過這個字（不算）→</button>}
       {picked !== undefined && <button type="button" className="pr-main" onClick={() => next(right)}>下一個</button>}
     </>}
     {skill === 'say' && <>
@@ -108,7 +110,10 @@ export default function WordSkills({ skill, words, distractors, notes, keyOf, ra
         <input lang="en" value={answer} disabled={shown} autoCapitalize="off" autoComplete="off" spellCheck={false} onChange={e => setAnswer(e.target.value)} placeholder="拼出英文" />
         {!shown && <button type="submit" className="pr-main" disabled={!answer.trim()}>檢查</button>}
       </form>
-      {!shown && <button type="button" className="pr-link" onClick={() => { setHelped(true); setAnswer(word.en.slice(0, 1)) }}>給我第一個字母</button>}
+      {!shown && <div className="pr-actions">
+        <button type="button" className="pr-link" onClick={() => { setHelped(true); setAnswer(word.en.slice(0, 1)) }}>給我第一個字母</button>
+        <button type="button" className="pr-link" onClick={() => { setAnswer(''); setShown(true) }}>不會，看答案</button>
+      </div>}
       {shown && <>
         <p className={'ws-answer ' + (spellingMatches(answer, word.en) ? 'ok' : 'no')} lang="en">{spellingMatches(answer, word.en) ? '✓ ' : '✗ 正確是 '}{word.en}</p>
         {helped && spellingMatches(answer, word.en) && <p className="ls-help">有用「第一個字母」提示，這次記成有提示完成，下一輪再自己拼一次。</p>}

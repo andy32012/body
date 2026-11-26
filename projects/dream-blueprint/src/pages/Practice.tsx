@@ -67,6 +67,8 @@ import {
   readHeard,
   readHints,
   readLessonRecord,
+  readRunProgress,
+  saveRunProgress,
   writeHint,
   resumePhase,
   resumeTarget,
@@ -123,22 +125,32 @@ function PracticeSession({
   }, []);
   const [current] = useState(() =>
     lesson(state, energy, date, resumeAt ? { unit: resumeAt.rec.unit, day: resumeAt.rec.day } : undefined));
-  const [pos, setPos] = useState(0);
   type Phase = "recall" | "listen" | "write" | "sound" | "vary" | "express" | "done";
   // Normal and high-energy lesson days (not review, not checkpoint) run the guided lesson.
   const guided = !current.review && !current.checkpoint && energy !== "low";
+  // A checkpoint or review day left halfway goes on at the sentence where it stopped (same day, same sentences).
+  const [run] = useState(() => {
+    if (guided) return null;
+    const p = readRunProgress(state.notes, date, current.unit, current.day);
+    const ids = current.items.map((i) => i.id);
+    return p && p.pos < ids.length && p.records.every((r) => ids.includes(r.sentenceId)) ? p : null;
+  });
+  const [pos, setPos] = useState(run?.pos ?? 0);
   const [lessonData, setLessonData] = useState<Lesson | null | undefined>(guided ? undefined : null);
+  // The lesson content could not be downloaded (offline before it was ever saved): say so and wait, instead of falling
+  // back to a step that was already done (its buttons would not move on).
+  const [lessonFailed, setLessonFailed] = useState(false);
   useEffect(() => {
     if (!guided) return;
     let alive = true;
     import("../data/lessons.json")
       .then((file) => { if (alive) setLessonData((file.default as Lesson[]).find((l) => l.unit === current.unit) ?? null); })
-      .catch(() => { if (alive) setLessonData(null); });
+      .catch(() => { if (alive) setLessonFailed(true); });
     return () => { alive = false; };
   }, [guided, current.unit]);
   const [firstListen] = useState(() => !readHeard(state.notes, current.unit));
   const [corrections, setCorrections] = useState(() => resumeAt?.rec.express?.corrections ?? 0);
-  const [records, setRecords] = useState<TranslationRecord[]>(() => resumeAt?.rec.records ?? []);
+  const [records, setRecords] = useState<TranslationRecord[]>(() => resumeAt?.rec.records ?? run?.records ?? []);
   const [spoken, setSpoken] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<Session["feedback"]>();
   const [sessionId] = useState(
@@ -177,7 +189,7 @@ function PracticeSession({
   // Guided lessons start by recalling: day 5 → days 1–2 (and an older unit), days 2–4 → the day before.
   const guidedRecall = current.day === 5 ? recallItems
     : current.previousDay ? [{ sentence: current.previousDay, label: "回想上一天的句子" }] : [];
-  const [phase, setPhase] = useState<Phase>(() => !guided ? "write"
+  const [phase, setPhase] = useState<Phase>(() => !guided ? (run?.records.some((r) => r.sentenceId === current.items[run.pos]?.id) ? "sound" : "write")
     : (resumeAt && resumePhase(resumeAt.rec)) || (guidedRecall.length ? "recall" : "listen"));
   useEffect(() => {
     if (lessonData === null && phase !== "write" && phase !== "done") setPhase("write");
@@ -234,7 +246,12 @@ function PracticeSession({
     const keep = level === "pending" ? {} : { answer: undefined, prompt: undefined, ref: undefined };
     update((prev) => ({ ...prev, notes: addEvidence(prev.notes, unit, { day: date, level, ...e, ...keep }) }));
   }
-  const checkpointLevels = useRef<(Level | null)[]>([]);
+  const checkpointLevels = useRef<(Level | null)[]>((run?.levels ?? []) as (Level | null)[]);
+  /** Where a checkpoint or review day is, kept for today (cleared when it is finished). */
+  const keepRun = (at: number, list: TranslationRecord[]) => {
+    if (guided) return;
+    update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, { unit: current.unit, day: current.day, pos: at, records: list, levels: checkpointLevels.current }) }));
+  };
   const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id] : readHints(state.notes, date)[id];
   const saveHint = (id: string) => (use: HintUse) => {
     if (guided) update((prev) => {
@@ -265,6 +282,7 @@ function PracticeSession({
       },
     ];
     setRecords(list);
+    keepRun(pos, list);
     go("sound", { records: list });
   }
   function finish(skip = false, next: Phase = "done") {
@@ -362,7 +380,8 @@ function PracticeSession({
             notes = clearAssisted(notes, retention.unit);
             next.stableUnits = [...new Set([...next.stableUnits, retention.unit])];
           }
-          return notes;
+          // A checkpoint or review day finished: nothing left to go on with.
+          return guided ? notes : saveRunProgress(notes, date, null);
         })(),
         learningWords: [...new Set([...prev.learningWords, ...learned])],
       };
@@ -438,7 +457,13 @@ function PracticeSession({
           </section>
         )}
         <div className="pr-phase" hidden={!!reviewing}>
-        {guided && lessonData === undefined && <p className="ls-help">準備今天這一堂…</p>}
+        {guided && lessonData === undefined && (lessonFailed ? (
+          <div className="pr-hint" role="alert">
+            <strong>今天這一堂的教材沒有下載到</strong>
+            <p>可能是網路斷了。連上網路後按「重新載入」，會從剛剛做到的地方接著上，寫過的都還在。</p>
+            <div className="pr-actions"><button className="pr-main" onClick={() => location.reload()}>重新載入</button></div>
+          </div>
+        ) : <p className="ls-help">準備今天這一堂…</p>)}
         {live && phase === "recall" && (
           recallNow ? (
             <div className="pr-hint">
@@ -669,6 +694,7 @@ function PracticeSession({
                   className="pr-main"
                   onClick={() => {
                     if (!settled()) return;
+                    keepRun(pos + 1, records);
                     setPos(pos + 1);
                     setPhase("write");
                   }}
@@ -1147,19 +1173,29 @@ function Extras({
           )}
           {repeat ? (
             repeatDone ? (
-              <>
-                <p>這一句已記下。</p>
-                {repeatIndex + 1 < translationPool.length && (
+              repeatIndex + 1 < translationPool.length ? (
+                <div className="pr-actions">
+                  <p className="ls-help">這一句已記下（第 {repeatIndex + 1} / {translationPool.length} 句）。</p>
                   <button
+                    className="pr-main"
                     onClick={() => {
                       setRepeatIndex(repeatIndex + 1);
                       setRepeatDone(false);
                     }}
                   >
-                    換一句
+                    下一句 →
                   </button>
-                )}
-              </>
+                </div>
+              ) : (
+                <div className="pr-hint">
+                  <strong>這一輪 {translationPool.length} 句都做完了</strong>
+                  <p>到期的句子卡會在之後的日子再出現。想再練可以從第一句再來一輪，或回英文練習選別的。</p>
+                  <div className="pr-actions">
+                    <button className="pr-main" onClick={() => { setRepeatIndex(0); setRepeatDone(false); }}>從第一句再來一輪</button>
+                    <button className="pr-link" onClick={() => { location.hash = "library"; }}>回英文練習</button>
+                  </div>
+                </div>
+              )
             ) : (
               <Translation
                 key={repeat.id}

@@ -44,10 +44,12 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   // "43-0": the first speaking task of bridge unit 43's pack.
   const [packRef] = useState(() => { const m = (packMode ?? '').match(/^(\d+)-(\d+)$/); return m ? { unit: Number(m[1]), i: Number(m[2]) } : null })
   const [pack, setPack] = useState<Pack | null>(null)
+  // The task or scene could not be downloaded: say so instead of 「還在載入」 forever.
+  const [loadFailed, setLoadFailed] = useState(false)
   useEffect(() => {
     if (!packRef) return
     let alive = true
-    import('../data/bridge.json').then(f => { const p = (f.default as Pack[]).find(x => x.unit === packRef.unit); if (alive && p?.speak[packRef.i]) setPack(p) }).catch(() => {})
+    import('../data/bridge.json').then(f => { const p = (f.default as Pack[]).find(x => x.unit === packRef.unit); if (alive && p?.speak[packRef.i]) setPack(p) }).catch(() => { if (alive) setLoadFailed(true) })
     return () => { alive = false }
   }, [packRef])
   const packTask = pack && packRef ? pack.speak[packRef.i] : null
@@ -56,7 +58,7 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
   useEffect(() => {
     if (!nurseMode) return
     let alive = true
-    import('../data/nursing-listening.json').then(f => { const l = (f.default as NurseListening[]).find(x => x.id === nurseMode); if (alive && l) setNurse(l) }).catch(() => {})
+    import('../data/nursing-listening.json').then(f => { const l = (f.default as NurseListening[]).find(x => x.id === nurseMode); if (alive && l) setNurse(l) }).catch(() => { if (alive) setLoadFailed(true) })
     return () => { alive = false }
   }, [nurseMode])
   // From a word card: chat about that word; Emma knows the list, the drill and the other words of the round.
@@ -139,8 +141,8 @@ export default function Speaking({ state, update, lessonMode = false, ieltsMode 
 
   async function start() {
     if (!openaiKey()) { setSettings(true); return }
-    if (packRef && !packTask) { setError('口說任務還在載入，等一下再按。'); return }
-    if (nurseMode && !nurse) { setError('情境還在載入，等一下再按。'); return }
+    if (packRef && !packTask) { setError(loadFailed ? '口說任務沒有下載到：連上網路後重新整理這一頁。' : '口說任務還在載入，等一下再按。'); return }
+    if (nurseMode && !nurse) { setError(loadFailed ? '這段情境沒有下載到：連上網路後重新整理這一頁。' : '情境還在載入，等一下再按。'); return }
     setError(''); setLines([]); setFeedback(null); setFixes([]); setYouMs(0); setYouFrom(undefined)
     setup.current?.abort()
     const controller = new AbortController()

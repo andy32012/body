@@ -6,6 +6,7 @@ import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
 import { markSkill } from '../lib/wordSkills'
+import { useTapGuard } from '../lib/tapGuard'
 import { paintSky, seedOf } from '../lib/starfield'
 import { useModal } from '../lib/modal'
 import { formLines, meaningLine, wordKey } from '../lib/vocab'
@@ -36,6 +37,8 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   const sky = useRef<HTMLCanvasElement>(null)
   useEffect(() => { if (sky.current) paintSky(sky.current, seed) }, [seed])
   const [reveal, setReveal] = useState(false)
+  // 還不熟 / 認得 stay in the same place for the next word: a double tap must not sort that one too.
+  const ready = useTapGuard(word?.en)
   const [silent, setSilent] = useState(false)
   const card = useRef<HTMLDivElement>(null)
   const veil = useRef<HTMLDivElement>(null)
@@ -54,7 +57,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   }
 
   function sort(known: boolean) {
-    if (!current || past) return
+    if (!current || past || !ready()) return
     const key = wordKey(current.en)
     update(prev => {
       if ([...prev.knownWords, ...prev.learningWords].some(w => wordKey(w) === key)) return prev

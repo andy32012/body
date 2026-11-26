@@ -83,6 +83,22 @@ export interface LessonRecord {
   /** Today's variations whose answer was shown (by 看答案 or by Claude), so opening the page again cannot hide it. */
   peeked?: number[]
 }
+/** A checkpoint or review day left halfway (a reload, another page): which sentence it was on and the answers so far,
+ *  kept for that day only, so it goes on instead of asking the same sentences again. `levels` are the checkpoint's
+ *  judgements so far ('assisted' | 'independent' | 'delayed' | 'pending', or null for not done). */
+export interface RunProgress { unit: number; day: number; pos: number; records: (Attempt & { verified?: boolean })[]; levels: (string | null)[] }
+export const runProgressKey = (date: string) => 'progress.' + date
+export function readRunProgress(notes: Record<string, string>, date: string, unit: number, day: number): RunProgress | null {
+  try {
+    const v = JSON.parse(notes[runProgressKey(date)] || 'null') as RunProgress | null
+    return v && v.unit === unit && v.day === day && Number.isInteger(v.pos) && Array.isArray(v.records) && Array.isArray(v.levels) ? v : null
+  } catch { return null }
+}
+export function saveRunProgress(notes: Record<string, string>, date: string, p: RunProgress | null) {
+  const next = { ...notes }
+  if (p) next[runProgressKey(date)] = JSON.stringify(p); else delete next[runProgressKey(date)]
+  return next
+}
 export function readLessonRecord(notes: Record<string, string>, day: string): LessonRecord | null {
   try {
     const v = notes[lessonKey(day)]

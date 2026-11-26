@@ -3,6 +3,7 @@ import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import type { Passage } from '../lib/passages'
 import { useTaskContext } from '../lib/taskContext'
+import { useTapGuard } from '../lib/tapGuard'
 import { logSkill } from '../lib/bridge'
 import { newCard } from '../lib/progress'
 import { levelEntry, wordKey } from '../lib/vocab'
@@ -167,11 +168,14 @@ function StoryRead({ passage, all, state, onActivity, date, onNext }: PartProps 
     setQs(made); setPhase('quiz')
   }
   function pick(i: number) {
+    // A double tap on an answer must not also answer the next word that appears in the same place.
+    if (!ready()) return
     const nextPicks = [...picks, i]
     setPicks(nextPicks)
     if (nextPicks.length === qs.length) finish(qs.filter((q, j) => nextPicks[j] === q.answer).length, qs.length)
   }
   const q = phase === 'quiz' ? qs[picks.length] : undefined
+  const ready = useTapGuard(phase + picks.length)
   const right = qs.filter((x, j) => picks[j] === x.answer).length
   return <>
     <article className="rd-passage st-text">

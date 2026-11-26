@@ -1,6 +1,7 @@
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
 import { markSkill } from '../lib/wordSkills'
+import { useTapGuard } from '../lib/tapGuard'
 import { useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { activePeriod, dayKey, newCard, weekKey } from '../lib/progress'
@@ -27,6 +28,8 @@ export default function VocabScreen({state, update}: PageProps) {
   const queue = useMemo(() => getScreeningQueue(state.knownWords, state.learningWords, state.customWords),
     [state.knownWords, state.learningWords, state.customWords])
   const item = queue[0]
+  // 認得 / 不認得 stay in the same place for the next word: a double tap must not sort that one too.
+  const ready = useTapGuard(item?.en)
   const [reveal, setReveal] = useState(false)
   const [tab, setTab] = useState<'screen'|'learn'|'roots'|'lookup'>('screen')
   const [working, setWorking] = useState(false)
@@ -51,7 +54,7 @@ export default function VocabScreen({state, update}: PageProps) {
   }, [state.learningWords, state.knownWords, state.cards, state.customWords])
 
   function classify(known: boolean) {
-    if (!item || quiet) return
+    if (!item || quiet || !ready()) return
     const key = wordKey(item.en)
     update(prev => {
       if (Number(prev.notes[dailyKey] || 0) >= 50 ||

@@ -226,3 +226,18 @@ test('開 App 時的一次性轉換只用原本的題目清單，不用載入整
     { 'write.s1': rec(6), 'write.s2': rec(6), 'write.p1': rec(5), 'write.p2': rec(4), 'write.m1': rec(4) }]
   for (const notes of cases) assert.equal(migrateWritingProgress(legacyLadder, notes)[writingMigrationKey], migrateWritingProgress(full, notes)[writingMigrationKey], JSON.stringify(notes))
 })
+
+test('寫作做完一題，下面就有「下一題」：先去還沒寫過的，再去還沒過關的；都過關就沒有', async () => {
+  const { nextWritingTask, writeKey } = await import('../src/lib/writing.ts')
+  const stage = { id: 'basic', name: '① 一句完整的話', goal: '', criteria: [], tasks: ['b1', 'b2', 'b3', 'b4'].map(id => ({ id, prompt: '', zh: '', min: 1, sample: '' })) }
+  const rec = (best?: number) => JSON.stringify({ day: '2026-11-26', words: 8, tries: 1, ...(best !== undefined ? { best } : { self: 1 }) })
+  assert.equal(nextWritingTask(stage, 'b1', {}, 1)?.id, 'b2')
+  const notes = { [writeKey('b1')]: rec(4), [writeKey('b2')]: rec() }
+  assert.equal(nextWritingTask(stage, 'b1', notes, 1)?.id, 'b3', '自評過的 b2 算寫過，先去沒寫過的 b3')
+  assert.equal(nextWritingTask(stage, 'b4', { ...notes, [writeKey('b3')]: rec(2), [writeKey('b4')]: rec(4) }, 1)?.id, 'b2', '都寫過了：回頭找還沒過關的')
+  const all = Object.fromEntries(stage.tasks.map(t => [writeKey(t.id), rec(4)]))
+  assert.equal(nextWritingTask(stage, 'b2', all, 1), null, '全部過關')
+  // Tasks of a unit not reached yet are skipped.
+  const pack = { ...stage, tasks: [{ id: 'p1', prompt: '', zh: '', min: 1, sample: '', unit: 43 }, { id: 'p2', prompt: '', zh: '', min: 1, sample: '', unit: 44 }] }
+  assert.equal(nextWritingTask(pack, 'p1', {}, 43), null, '單元 44 還沒上到')
+})

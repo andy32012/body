@@ -30,6 +30,8 @@
 .wl-bar [data-ok="false"] { opacity: .8; }
 .wl-self { display: grid; gap: .4rem; font-size: .9rem; }
 .wl-self label { display: flex; gap: .5rem; align-items: flex-start; }
+.wl-saved { margin: 0; font-weight: 650; color: var(--practice-ok, #2f8a5b); }
+.wl-next-task { margin-top: .2rem; }
 .wl-fb { display: grid; gap: .55rem; padding: .8rem .9rem; border-radius: 12px; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); }
 .wl-fb p { margin: 0; }
 .wl-fb-head { display: flex; gap: .6rem; align-items: center; }

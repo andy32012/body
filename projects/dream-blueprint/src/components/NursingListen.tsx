@@ -45,18 +45,32 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
   if (failed) return <p>護理聽力載入失敗，連上網路再試一次。</p>
   if (!all) return <p className="ls-help">載入護理聽力……</p>
   const l = all.find(x => x.id === shownId)
-  if (!l) return roundDone ? <div className="pr-hint">
-    <strong>這一輪開放的對話都看過或略過了</strong>
-    <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { setRoundDone(false); setSkip([]); setCurrentId(undefined); setShownId(null) }}>從第一段再來一輪</button></div>
+  function open(id: string | undefined, more: string[] = skip) {
+    setRoundDone(false); setSkip(more); setCurrentId(id); setShownId(null)
+    if (location.hash.startsWith('#library/nlisten/')) history.replaceState(null, '', '#library/nlisten')
+    document.querySelector('.pr-extras')?.scrollIntoView({ block: 'start' })
+  }
+  /** Every dialogue, to pick one: under the player, and on its own (opened) when a round is over. */
+  const list = (currentDialogue?: string) => <details className="nl-list" open={!currentDialogue}><summary>全部 {all.length} 段，選一段聽</summary>
+    <ol>{all.map(x => {
+      const r = readNurseListen(state.notes, x.id)
+      return <li key={x.id}>
+        <button type="button" className="pr-link" aria-current={x.id === currentDialogue ? 'true' : undefined} disabled={!levelOpen[x.level]} data-locked={!levelOpen[x.level]} onClick={() => open(x.id)}>{levelOpen[x.level] ? '' : '🔒 '}{x.title}</button>
+        <small> {x.level} · {x.scene}{r ? ' · ' + r.correct + ' / ' + r.total + (r.heard ? '' : '（看過字）') : ''}</small>
+      </li>
+    })}</ol>
+  </details>
+  if (!l) return roundDone ? <div className="pr-stack nl">
+    <div className="pr-hint">
+      <strong>這一輪開放的對話都看過或略過了</strong>
+      <p>可以從第一段再來一輪，或在下面直接選一段。</p>
+      <div className="pr-actions"><button type="button" className="pr-main" onClick={() => open(undefined, [])}>從第一段再來一輪</button></div>
+    </div>
+    {list()}
   </div> : <p className="ls-help">準備對話中……</p>
   const heard = all.filter(x => readNurseListen(state.notes, x.id)).length
   const good = all.filter(x => heardWell(readNurseListen(state.notes, x.id))).length
   const spoke = state.notes[nurseSpeakKey(l.id)]
-  function open(id: string | undefined, more: string[] = skip) {
-    setSkip(more); setCurrentId(id); setShownId(null)
-    if (location.hash.startsWith('#library/nlisten/')) history.replaceState(null, '', '#library/nlisten')
-    document.querySelector('.pr-extras')?.scrollIntoView({ block: 'start' })
-  }
   return <div className="pr-stack nl">
     <p className="qz-meta"><span>護理聽力共 {all.length} 段</span><span>聽過 {heard}</span><span>只聽就全對 {good}</span><span>{levelNames[l.level]}（{l.level}）</span></p>
     <p className="qz-meta nl-levels">{nurseLevels.map((lv, i) => {
@@ -79,14 +93,6 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
       <button type="button" onClick={() => open(undefined, [...skip, l.id])}>下一段</button>
     </div>
     {spoke && <small className="ls-help">上次跟 Emma 演這段：{spoke}</small>}
-    <details className="nl-list"><summary>全部 {all.length} 段，選一段聽</summary>
-      <ol>{all.map(x => {
-        const r = readNurseListen(state.notes, x.id)
-        return <li key={x.id}>
-          <button type="button" className="pr-link" aria-current={x.id === l.id ? 'true' : undefined} disabled={!levelOpen[x.level]} data-locked={!levelOpen[x.level]} onClick={() => open(x.id)}>{levelOpen[x.level] ? '' : '🔒 '}{x.title}</button>
-          <small> {x.level} · {x.scene}{r ? ' · ' + r.correct + ' / ' + r.total + (r.heard ? '' : '（看過字）') : ''}</small>
-        </li>
-      })}</ol>
-    </details>
+    {list(l.id)}
   </div>
 }

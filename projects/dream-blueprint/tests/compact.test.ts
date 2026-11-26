@@ -44,6 +44,7 @@ test('只在當天有用的小紀錄幾週後清掉，其他紀錄一個都不�
     'daily-word.sorted.2027-03-01': '[]', 'daily-word.done.2027-03-01': '20', 'daily-word.seen.2027-05-30': '1',
     'plan.2027-03-01.words': '1', 'plan.2027-05-30.lesson': '1', 'hints.2027-03-01': '{}', 'review.sentences.2027-03-01': '5',
     'topic.skip.2027-02-01': '1', 'nurse.words.2027-02-01': '3', 'word-part.day.2027-02-01': '2', 'vocab-screen.2027-02-01': '{}',
+    'progress.2027-02-01': '{"unit":3,"day":6,"pos":1,"records":[],"levels":[]}',
     'say.say-abc': '{"zh":"x","en":"y"}', 'evidence.3': '[]', 'read.a1-1': '{"day":"2027-01-01"}', 'weak.v1': '[]', 'ai.memory': '[]',
   }
   const c = compactState({ reviewEvents: [], notes }, today)

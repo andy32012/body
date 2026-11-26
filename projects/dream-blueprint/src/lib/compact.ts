@@ -65,6 +65,7 @@ const dayOnly = [
   `^review\\.sentences\\.${DATE}$`,
   `^plan\\.${DATE}\\..+$`,
   `^vocab-screen\\.${DATE}$`,
+  `^progress\\.${DATE}$`,
 ].map(p => new RegExp(p))
 const lessonRecord = new RegExp(`^lesson\\.${DATE}$`)
 

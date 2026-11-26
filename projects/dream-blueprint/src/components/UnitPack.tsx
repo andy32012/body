@@ -176,10 +176,11 @@ function HeldTest({ pack, state, onActivity, date }: { pack: Pack; state: PagePr
   const open = heldOpen(state.curriculum, pack.unit)
   const rec = readHeld(state.notes, pack.unit)
   const [passage, setPassage] = useState<ReadPassage | null>(null)
+  const [readFailed, setReadFailed] = useState(false)
   useEffect(() => {
     if (!open) return
     let alive = true
-    import('../data/reading.json').then(f => { if (alive) setPassage((f.default as ReadPassage[]).find(p => p.id === pack.heldReading) ?? null) }).catch(() => {})
+    import('../data/reading.json').then(f => { if (alive) setPassage((f.default as ReadPassage[]).find(p => p.id === pack.heldReading) ?? null) }).catch(() => { if (alive) setReadFailed(true) })
     return () => { alive = false }
   }, [open, pack.heldReading])
   if (!open) return <div className="pr-hint up-section">
@@ -199,7 +200,10 @@ function HeldTest({ pack, state, onActivity, date }: { pack: Pack; state: PagePr
       {rec.listening && <span>聽力：沒聽過的 {pct(rec.listening.correct, rec.listening.total)}{rec.listening.heard ? '' : '（沒有確認聽完）'}</span>}
     </p>}
     {passage ? <HeldReading passage={passage} done={rec.reading}
-      onSubmit={(picks, correct) => save('reading', { day: date, picks, correct, total: passage.qs.length })} /> : <p>載入中……</p>}
+      onSubmit={(picks, correct) => save('reading', { day: date, picks, correct, total: passage.qs.length })} />
+      : readFailed ? <div className="pr-hint" role="alert"><strong>回測的閱讀沒有下載到</strong><p>可能是網路斷了；回測還沒做，機會還在。連上網路後按「重新載入」。下面的聽力可以先做。</p>
+        <div className="pr-actions"><button type="button" className="pr-main" onClick={() => location.reload()}>重新載入</button></div></div>
+      : <p>載入中……</p>}
     <HeldListening l={pack.heldListen} rate={state.settings.speechRate} done={rec.listening}
       onSubmit={(picks, correct, heard) => save('listening', { day: date, picks, correct, total: pack.heldListen.questions.length, heard })} />
   </section>

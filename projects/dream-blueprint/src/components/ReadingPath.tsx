@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
+import { readReadingProgress, saveReadingProgress, savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
   nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
   type ReadLevel, type ReadPassage, type ReadStep,
 } from '../lib/reading'
 import { LockLine } from './Locked'
 import { useTaskContext } from '../lib/taskContext'
 import { logSkill } from '../lib/bridge'
+import { useTapGuard } from '../lib/tapGuard'
 import { AskWord } from './AIChat'
 import './reading.css'
 
@@ -43,8 +44,16 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const [skip, setSkip] = useState<string[]>([])
   const [currentId, setCurrentId] = useState<string | null | undefined>(undefined)
   const [moved, setMoved] = useState<ReadStep | null>(null)
+  // Which list this is, for a passage left halfway: general reading, nursing reading or a unit's pack.
+  const progressSet = set === 'nursing' ? 'nursing' : only ? 'unit' : 'general'
   useEffect(() => {
     if (!all || currentId !== undefined) return
+    // A passage left halfway comes back first, at the question where it stopped.
+    const half = readReadingProgress(state.notes, progressSet)
+    const back = half && all.find(p => p.id === half.id)
+    if (back && (only || readLevelsOpen(all, state.notes)[readStepKey(back)])) {
+      setStep({ level: back.level, band: back.band }); setCurrentId(back.id); return
+    }
     setStep(suggested)
     setCurrentId(nextReading(all, only ? null : suggested, state.notes, [])?.id ?? null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,8 +93,20 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const [seenZh, setSeenZh] = useState(false)
   const [saved, setSaved] = useState(false)
   const [redo, setRedo] = useState(false)
-  useEffect(() => { setPicks([]); setCauses({}); setZh(false); setSeenZh(false); setSaved(false); setRedo(false) }, [passage?.id])
+  useEffect(() => {
+    // Back to a passage left halfway: the answers so far (and whether the Chinese was opened) come back.
+    const half = passage ? readReadingProgress(state.notes, progressSet) : null
+    const resume = half && passage && half.id === passage.id && half.picks.length < passage.qs.length ? half : null
+    setPicks(resume?.picks ?? []); setCauses(resume?.causes ?? {}); setZh(false); setSeenZh(!!resume?.zh); setSaved(false); setRedo(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passage?.id])
   const at = picks.length
+  const ready = useTapGuard(passage?.id + ':' + at)
+  /** The answers so far, kept until the passage is done (a redo is practice and is not kept). */
+  const keep = (p: number[], c: Record<number, string>, z: boolean) => {
+    if (!passage || redo) return
+    onActivity(prev => ({ ...prev, notes: saveReadingProgress(prev.notes, progressSet, { id: passage.id, picks: p, ...(Object.keys(c).length ? { causes: c } : {}), ...(z ? { zh: true } : {}) }) }))
+  }
   const q = passage?.qs[at]
   useTaskContext(passage ? {
     label: '閱讀：' + passage.title + (q ? '（第 ' + (at + 1) + ' 題）' : ''),
@@ -151,22 +172,25 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const last = at > 0 ? passage.qs[at - 1] : null
   const lastWrong = last && picks[at - 1] !== last.answer
   function pick(i: number) {
-    if (!passage || done) return
+    // The next question appears under the finger: a double tap must not answer it too.
+    if (!passage || done || !ready()) return
     const next = [...picks, i]
     setPicks(next)
     if (next.length === passage.qs.length) finish(next, causes)
+    else keep(next, causes, seenZh)
   }
   function finish(p: number[], c: Record<number, string>) {
     if (!passage) return
     const right = passage.qs.filter((x, i) => p[i] === x.answer).length
     // Each day a passage is read counts as a reading day, also when the same passage is read again on a later day.
-    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(prev.notes, passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
+    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(saveReadingProgress(prev.notes, progressSet, null), passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
     setSaved(true)
   }
   function cause(qi: number, c: string) {
     if (causes[qi]) return
     const next = { ...causes, [qi]: c }
     setCauses(next)
+    if (!saved) keep(picks, next, seenZh)
     if (saved && passage) onActivity(prev => {
       const r = readRecord(prev.notes, passage.id)
       return r ? { ...prev, notes: { ...prev.notes, ['read.' + passage.id]: JSON.stringify({ ...r, causes: savedCauses(passage.qs, next) }) } } : prev
@@ -188,7 +212,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       {passage.paras.map((p, i) => <p key={i} lang="en" className="rd-para">
         {passage.ielts && <b className="rd-letter">{letters[i]}</b>}<Highlight text={p} marks={marks} />
       </p>)}
-      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => { setZh(true); if (!done) setSeenZh(true) }}>{done ? '看中文大意' : seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
+      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => { setZh(true); if (!done) { setSeenZh(true); keep(picks, causes, true) } }}>{done ? '看中文大意' : seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
     </article>
     {last && <div className="pr-hint rd-feedback" data-ok={!lastWrong}>
       <strong>{lastWrong ? '第 ' + at + ' 題答案是「' + last.options[last.answer] + '」' : '第 ' + at + ' 題答對了'}</strong>

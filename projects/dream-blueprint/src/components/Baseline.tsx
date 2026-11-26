@@ -5,6 +5,7 @@ import { dayKey, daysBetween } from '../lib/progress'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
 import { useModal } from '../lib/modal'
+import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import './baseline.css'
 
 import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, wordCount, type BaselineResult, type Q } from '../lib/baseline'
@@ -69,7 +70,9 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   const [plays, setPlays] = useState(0)
   const [listen, setListen] = useState<number[]>([])
   const [read, setRead] = useState<number[]>([])
-  const [writing, setWriting] = useState('')
+  // What he wrote stays on this device until the test is saved (leaving the page or closing the test keeps it).
+  const draftKey = 'baseline.write.' + formId
+  const [writing, setWriting] = useState(() => readDraft(draftKey))
   const [recording, setRecording] = useState(false)
   const [audio, setAudio] = useState<Blob | null>(null)
   const [seconds, setSeconds] = useState(0)
@@ -146,7 +149,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     }
     update(prev => ({ ...prev, notes: addResult(prev.notes, result) }))
     setBusy(''); setSaving(false); setOpen(false); setStep(0)
-    setListen([]); setRead([]); setWriting(''); setAudio(null); setSeconds(0); setPlays(0)
+    setListen([]); setRead([]); setWriting(''); clearDraft(draftKey); setAudio(null); setSeconds(0); setPlays(0)
   }
 
   if (results.length && !open) {
@@ -210,7 +213,7 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     {step === 2 && <>
       <p lang="en"><b>{form.write}</b></p>
       <p>不要查字典、不要用翻譯，寫得出多少就寫多少。</p>
-      <textarea lang="en" rows={5} value={writing} onChange={e => setWriting(e.target.value)} placeholder="Yesterday I…" />
+      <textarea lang="en" rows={5} value={writing} onChange={e => { setWriting(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder="Yesterday I…" />
     </>}
     {step === 3 && <>
       <p lang="en"><b>{form.speak}</b></p>

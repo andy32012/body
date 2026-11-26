@@ -246,6 +246,14 @@ export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, 
 }
 /** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
 export const writeTaskOpen = (task: Pick<WriteTask, 'unit'>, unit: number) => task.unit === undefined || reached(task.unit, unit)
+/** The task to go on to after `currentId` in the same stage: the next open one never tried, then the next one not passed
+ *  yet (from the current one on, wrapping round); null when every open task of the stage is passed. */
+export function nextWritingTask(stage: WriteStage, currentId: string, notes: Record<string, string>, unit: number): WriteTask | null {
+  const open = stage.tasks.filter(t => writeTaskOpen(t, unit))
+  const at = open.findIndex(t => t.id === currentId)
+  const order = [...open.slice(at + 1), ...open.slice(0, Math.max(0, at))]
+  return order.find(t => !readWrite(notes, t.id)) ?? order.find(t => !taskDone(readWrite(notes, t.id), !!stage.ielts)) ?? null
+}
 
 export interface WriteTaskPage {
   label: string

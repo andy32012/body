@@ -220,7 +220,8 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
       }} />
     {!shown ? <>
       {(!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div>}
-      {keyed && !claudeDown && check.firstVerdict && <div className="pr-actions ls-skip"><span className="ls-help">照 Claude 的提示改好再批一次；真的不會，按「直接告訴我」，或</span><button type="button" className="pr-link" onClick={() => done('again')}>先跳過這題（加入複習）→</button></div>}
+      {/* A way on from the very first screen: a blank answer cannot be sent to Claude, and he may not know where to start. */}
+      {keyed && !claudeDown && <div className="pr-actions ls-skip"><span className="ls-help">{check.firstVerdict ? '照 Claude 的提示改好再批一次；真的不會，按「直接告訴我」，或' : answer.trim() ? '寫好就請 Claude 批改；想不出來也可以' : '連第一個字都想不到？可以'}</span><button type="button" className="pr-link" onClick={() => done('again')}>{check.firstVerdict ? '先跳過這題（加入複習）→' : '不會，先跳過（加入複習）→'}</button></div>}
     </> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
       {latest?.v === 'good' && sameEnglish(latest.text, answer) && !selfMark ? <div className="pr-actions pr-next-step">

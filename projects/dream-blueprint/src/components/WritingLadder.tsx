@@ -4,7 +4,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { checksFor, essayKind, essays, gradePrompt, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, type WriteFeedback, type WriteStage } from '../lib/writing'
+import { checksFor, essayKind, essays, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, scoreOf, selfChecked, stagesOpen, stageTarget, suggestedStage, taskDone, wordCount, writeKey, writeTaskOpen, writingTaskPages, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
@@ -94,6 +94,8 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   const [showRevised, setShowRevised] = useState(false)
   const [showSample, setShowSample] = useState(false)
   const [ticks, setTicks] = useState<boolean[]>([])
+  // The self-check was saved just now (without Claude): say so, and offer the next task.
+  const [savedSelf, setSavedSelf] = useState(false)
   const [endAt, setEndAt] = useState<number>()
   const [now, setNow] = useState(Date.now())
   const stageStrip = useRef<HTMLDivElement>(null)
@@ -108,7 +110,7 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   useEffect(() => () => stopSpeaking(), [stage.id])
   // Each check carries a number; switching task cancels it, so a late reply never lands on another question.
   const request = useRef(0)
-  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { request.current++; setBusy(false); setText(readDraft(draftKey)); setFb(readWrite(state.notes, task.id)?.last ?? null); setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false); setEndAt(undefined); setError('') // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.id])
   useEffect(() => { if (!endAt) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [endAt])
   const words = wordCount(text)
@@ -152,6 +154,20 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
     } catch (e) { if (mine === request.current) { setError(e instanceof Error ? e.message : String(e)); setClaudeDown(true) } }
     finally { if (mine === request.current) setBusy(false) }
   }
+  /** Another task: the page scrolls back up to its question (the essay box below follows the chosen task). */
+  function goTo(id: string) {
+    setTaskId(id)
+    requestAnimationFrame(() => document.querySelector('.wl-task')?.scrollIntoView({ block: 'start' }))
+  }
+  /** 上一組 / 下一組 / the range list: the question below changes with the list, to the first open task of that group,
+   *  so the list and the essay never show two different tasks (each task keeps its own draft). */
+  function showPage(i: number) {
+    const page = pages[i]
+    if (!page) return
+    setPageIndex(i)
+    const first = page.tasks.find(t => writeTaskOpen(t.task, unit) && !taskDone(readWrite(state.notes, t.task.id), !!stage.ielts)) ?? page.tasks.find(t => writeTaskOpen(t.task, unit))
+    if (first) setTaskId(first.task.id)
+  }
   const stageDone = useMemo(() => Object.fromEntries(stages.map(s => [s.id, s.tasks.filter(t => taskDone(readWrite(state.notes, t.id), !!s.ielts)).length])), [state.notes, stages])
   const bestText = rec?.best === undefined || rec.best > (stage.ielts ? 9 : 5) ? ''
     : stage.ielts ? '練習估計 ' + rec.best : sentencePoints ? Math.round(rec.best / 5 * sentencePoints) + ' / ' + sentencePoints + ' 分' : (Number.isInteger(rec.best) ? rec.best : rec.best.toFixed(1)) + ' / 5 級分'
@@ -189,11 +205,11 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       <p className="wl-bank">這一階共 {stage.tasks.length} 題・已過關 {stageDone[stage.id]} 題
         <small>{stage.pack ? '依單元選題，上到該單元才打開。' : '通過 ' + stageTarget(stage) + ' 題就能往下一階，其餘可以慢慢加練。'}</small></p>
       {pages.length > 1 && <div className="wl-pages">
-        <button type="button" aria-label="前一組題目" disabled={pageIndex <= 0} onClick={() => setPageIndex(i => i - 1)}>上一組</button>
-        <label><span className="wl-range-label">選題範圍</span><select aria-label="選題範圍" value={Math.max(0, pageIndex)} onChange={e => setPageIndex(Number(e.target.value))}>
+        <button type="button" aria-label="前一組題目" disabled={pageIndex <= 0} onClick={() => showPage(pageIndex - 1)}>上一組</button>
+        <label><span className="wl-range-label">選題範圍</span><select aria-label="選題範圍" value={Math.max(0, pageIndex)} onChange={e => showPage(Number(e.target.value))}>
           {pages.map((p, i) => <option key={p.label} value={i}>{p.label}{p.tasks.every(t => !writeTaskOpen(t.task, unit)) ? '（未解鎖）' : ''}</option>)}
         </select></label>
-        <button type="button" aria-label="下一組題目" disabled={pageIndex >= pages.length - 1} onClick={() => setPageIndex(i => i + 1)}>下一組</button>
+        <button type="button" aria-label="下一組題目" disabled={pageIndex >= pages.length - 1} onClick={() => showPage(pageIndex + 1)}>下一組</button>
       </div>}
       <div className="wl-tasks" role="group" aria-label="題目">{taskPage?.tasks.map(({ task: t, label }) => {
         const open = writeTaskOpen(t, unit)
@@ -234,7 +250,8 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
     {!keyed && ticks.length > 0 && <section className="wl-self">
       <strong>逐項檢查，做到就打勾</strong>
       {selfList.map((c, i) => <label key={c}><input type="checkbox" checked={!!ticks[i]} onChange={e => { const n = [...ticks]; n[i] = e.target.checked; setTicks(n) }} /> {c}</label>)}
-      <button type="button" disabled={!ticks.length || ticks.some(x => !x)} onClick={() => save({ self: 1, day: date, words })}>都做到了，記下來</button>
+      {savedSelf ? <p className="wl-saved" role="status">記下來了 ✓（自評完成・待確認）</p>
+        : <button type="button" disabled={!ticks.length || ticks.some(x => !x)} onClick={() => { save({ self: 1, day: date, words }); setSavedSelf(true) }}>都做到了，記下來</button>}
       <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 照評分表批改過才算。</small>
     </section>}
     {fb && <section className="wl-fb" aria-live="polite">
@@ -251,5 +268,17 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       {showRevised && fb.revised && <section className="pr-reference">{fb.revised.split('\n').map((l, i) => l.trim() ? <p key={i} lang="en">{l}</p> : null)}</section>}
       {stage.ielts && <small className="wl-note">分數是照官方 band descriptors 的練習估計，跟正式考官評分可能有差距。</small>}
     </section>}
+    {(fb || savedSelf) && (() => {
+      // Done with this task: the way on is right here, not back up in the list.
+      const next = nextWritingTask(stage, task.id, state.notes, unit)
+      const label = next ? pages.flatMap(p => p.tasks).find(t => t.task.id === next.id)?.label : undefined
+      const passedStage = stageDone[stage.id] >= stageTarget(stage)
+      const following = stages.slice(stages.indexOf(stage) + 1).find(s => !s.pack && openStage[s.id])
+      return <div className="pr-actions wl-next-task">
+        {next && <button type="button" className={passedStage && following ? undefined : 'pr-main'} onClick={() => goTo(next.id)}>下一題{label ? '：' + label : ''} →</button>}
+        {passedStage && following && <button type="button" className="pr-main" onClick={() => { setStageId(following.id); goTo(firstOpenTask(following).id) }}>這一階過關了，去下一階：{following.name} →</button>}
+        {!next && !(passedStage && following) && <p className="ls-help">這一階開放的題目都過關了。</p>}
+      </div>
+    })()}
   </div>
 }
