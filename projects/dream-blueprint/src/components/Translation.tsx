@@ -51,6 +51,9 @@ export function Translation({
   // The exact text Claude's first verdict was about: editing the answer afterwards makes that verdict stale.
   const [checkedText, setCheckedText] = useState<string | undefined>(() => saved?.vt);
   const [askedHelp, setAskedHelp] = useState(() => !!saved?.c);
+  // Claude's latest verdict and the text it judged: 「對了」 on what is in the box now means one tap goes on.
+  const [latest, setLatest] = useState<{ v: Verdict; text: string } | null>(null);
+  const [selfMark, setSelfMark] = useState(false);
   // With Claude connected, 「請 Claude 批改」 sends the answer at once and there is no reference sentence to open:
   // Claude checks and, when asked (「直接告訴我」), gives the answer. The reference opens only if Claude can't be reached.
   const keyed = !!tutorKey();
@@ -140,7 +143,7 @@ export function Translation({
       )}
       {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)}
         onRevise={(t) => { setAnswer(t); writeDraft(sentence.id, t); }}
-        onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
+        onVerdict={(v, attempt, text) => { setLatest({ v, text }); if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
           <strong>自己檢查看看</strong>
@@ -211,7 +214,15 @@ export function Translation({
           )}
         </section>
       )}
-      {hint >= 1 && (
+      {hint >= 1 && latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark && (
+        <div className="pr-actions pr-next-step">
+          <button className="pr-main" onClick={() => { if (!ready()) return; clearDraft(sentence.id); noteWeak("good", seenHint || hint >= 2 || askedHelp); onMark("good", seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}>
+            Claude 說對了，下一步 →
+          </button>
+          <button className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
+        </div>
+      )}
+      {hint >= 1 && !(latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark) && (
         <fieldset className="pr-marks">
           <legend>我的自評</legend>
           {marks.map(([mark, label]) => (

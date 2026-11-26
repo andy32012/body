@@ -176,6 +176,8 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(false)
   const [check, setCheck] = useState<VariationCheck>({})
+  const [latest, setLatest] = useState<{ v: string; text: string } | null>(null)
+  const [selfMark, setSelfMark] = useState(false)
   // With Claude connected there is no 看答案: Claude checks first and gives the answer on 「直接告訴我」. If Claude can't be reached, 看答案 comes back.
   const keyed = !!tutorKey()
   const [claudeDown, setClaudeDown] = useState(false)
@@ -200,17 +202,21 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
     <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} onRevise={setAnswer}
       onReveal={() => { setCheck(c => ({ ...c, revealed: true })); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
+        setLatest({ v, text })
         if (attempt === 1) setCheck(c => c.firstVerdict ? c : { ...c, firstVerdict: v, checkedText: text })
         // The teacher says it is right: the reference and the marks open without another tap.
         if (v === 'good') setShown(true)
       }} />
     {!shown ? (!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
-      <fieldset className="pr-marks"><legend>我寫得…</legend>
+      {latest?.v === 'good' && sameEnglish(latest.text, answer) && !selfMark ? <div className="pr-actions pr-next-step">
+        <button type="button" className="pr-main" onClick={() => done('good')}>Claude 說對了，{count && count[0] < count[1] ? '下一題' : '下一步'} →</button>
+        <button type="button" className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
+      </div> : <fieldset className="pr-marks"><legend>我寫得…</legend>
         <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
         <button type="button" disabled={!answer.trim()} onClick={() => done('small')}>差一點（加入複習）</button>
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
-      </fieldset>
+      </fieldset>}
       {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
       {answer.trim() && check.firstVerdict && <p className="ls-help">
         {check.revealed ? '老師已經把答案告訴你了：按「對了」會記成有提示完成。'
