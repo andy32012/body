@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { bookRoute, chapterFile, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone,
+import { bookRoute, chapterFile, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone, shownParts,
   type BookIndex, type ChapterContent, type SectionContent } from '../lib/grammarBook'
 import { openClaude, useTaskContext } from '../lib/taskContext'
 import { readDraft, writeDraft } from '../lib/drafts'
@@ -52,6 +52,8 @@ function Catalog({ index, notes }: { index: BookIndex; notes: Record<string, str
   const practised = written.filter(s => sectionDone(notes, s.id))
   const upNext = written.find(s => !sectionDone(notes, s.id))
   const openAt = upNext ? upNext.chapter : undefined
+  const parts = useMemo(() => shownParts(index), [index])
+  const chapters = parts.flatMap(p => p.chapters)
   const row = (s: (typeof all)[number]) => {
     const ready = chapterReady(index, s.chapter)
     const done = ready && sectionDone(notes, s.id)
@@ -61,10 +63,10 @@ function Catalog({ index, notes }: { index: BookIndex; notes: Record<string, str
     </a></li>
   }
   return <div className="pr-stack gb">
-    <p className="gb-intro">照「英文文法完整主題目錄」排：5 部、41 章、638 節，另有 10 張附錄表。每一節有白話重點、例句（可以點來聽）、常見錯誤、3 題小練習，還可以自己造一句請 Claude 批改。標「基礎」的先讀。</p>
+    <p className="gb-intro">照「英文文法完整主題目錄」排，從第 {chapters[0].n} 章「{chapters[0].title}」讀起：{chapters.length} 章、{all.length - index.appendix.length} 節，另有 {index.appendix.length} 張附錄表。每一節有白話重點、例句（可以點來聽）、常見錯誤、3 題小練習，還可以自己造一句請 Claude 批改。標「基礎」的先讀。</p>
     <p className="qz-meta"><span>寫好 {written.length} / {all.length} 節</span><span>練過 {practised.length} 節</span></p>
     {upNext && <div className="pr-actions"><a className="pr-main gb-next" href={'#library/grammar/' + upNext.id}>{practised.length ? '接著讀' : '從這裡開始'}：{upNext.id} {upNext.title} →</a></div>}
-    {index.parts.map(p => <section key={p.id} className="gb-part">
+    {parts.map(p => <section key={p.id} className="gb-part">
       <h3>{p.title}</h3>
       {p.chapters.map(c => {
         const done = c.ready ? c.sections.filter(s => sectionDone(notes, s.id)).length : 0

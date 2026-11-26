@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import index from '../src/data/grammar-book/index.json' with { type: 'json' }
-import { bookRoute, chapterFile, flatSections, neighbors, readBook, saveBookDrill, sectionDone, type BookIndex, type ChapterContent } from '../src/lib/grammarBook.ts'
+import { bookRoute, chapterFile, flatSections, neighbors, readBook, saveBookDrill, sectionDone, shownParts, type BookIndex, type ChapterContent } from '../src/lib/grammarBook.ts'
 import { checkDrill, drillAnswer } from '../src/lib/grammar.ts'
 
 /** 完整文法: the owner's catalog (英文文法完整主題目錄), every section with teaching and three drills. */
@@ -21,7 +21,7 @@ test('完整文法目錄：5 部、41 章、638 節加 10 張附錄；編號照�
   }
   assert.equal(chapters.reduce((n, c) => n + c.sections.length, 0), 638)
   assert.deepEqual(book.appendix.map(s => s.id), Array.from({ length: 10 }, (_, i) => 'A-' + (i + 1)))
-  const all = flatSections(book)
+  const all = [...chapters.flatMap(c => c.sections), ...book.appendix]
   assert.equal(all.length, 648)
   assert.equal(new Set(all.map(s => s.id)).size, 648)
   for (const s of all) {
@@ -33,13 +33,26 @@ test('完整文法目錄：5 部、41 章、638 節加 10 張附錄；編號照�
 })
 
 test('上一節、下一節照目錄順序走，跨章接得上，附錄在最後', () => {
-  assert.equal(neighbors(book, '1-1').prev, undefined)
-  assert.equal(neighbors(book, '1-1').next?.id, '1-2')
-  assert.equal(neighbors(book, '1-12').next?.id, '2-1', '第 1 章最後一節接第 2 章第一節')
-  assert.equal(neighbors(book, '2-1').prev?.id, '1-12')
+  assert.equal(neighbors(book, '2-1').prev, undefined, '第 1 章不讀，2-1 是第一節')
+  assert.equal(neighbors(book, '2-1').next?.id, '2-2')
+  assert.equal(neighbors(book, '2-16').next?.id, '3-1', '第 2 章最後一節接第 3 章第一節')
+  assert.equal(neighbors(book, '3-1').prev?.id, '2-16')
   assert.equal(neighbors(book, '41-14').next?.id, 'A-1')
   assert.equal(neighbors(book, 'A-10').next, undefined)
   assert.deepEqual(neighbors(book, 'nope'), {})
+})
+
+test('第 1 章（文法用語）照他的意思不放進目錄：從第 2 章五大句型讀起，第 1 章的講解和網址還在', () => {
+  const shown = shownParts(book)
+  assert.equal(shown.length, 5, '第一部還在，只是少了第 1 章')
+  assert.equal(shown[0].chapters[0].n, 2, '目錄的第一章是第 2 章 句子成分與基本句型')
+  const order = flatSections(book)
+  assert.equal(order[0].id, '2-1', '「從這裡開始」從 2-1 開始')
+  assert.equal(order.length, 648 - 12)
+  assert.ok(!order.some(s => s.chapter === 1), '第 1 章不算進寫好、練過的節數')
+  assert.deepEqual(neighbors(book, '1-3'), {}, '第 1 章不在上一節、下一節的路線上')
+  assert.deepEqual(bookRoute(book, '#library/grammar/1-3'), { kind: 'section', id: '1-3' }, '直接打開第 1 章的網址還找得到')
+  assert.ok(existsSync(path.join(dir, 'ch01.json')), '第 1 章的講解沒有刪掉')
 })
 
 test('網址：#library/grammar 是目錄，數字是原本的課程單元，14-2 這種是小節，units 是單元清單', () => {

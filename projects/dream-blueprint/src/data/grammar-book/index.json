@@ -70,7 +70,8 @@
        "level": 1
       }
      ],
-     "ready": true
+     "ready": true,
+     "skip": true
     },
     {
      "n": 2,

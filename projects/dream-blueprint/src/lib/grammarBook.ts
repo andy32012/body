@@ -12,7 +12,10 @@ export interface BookSection { id: string; title: string; level: BookLevel
   units?: number[] }
 export interface BookChapter { n: number; title: string; en: string; sections: BookSection[]
   /** Every section of the chapter is written (its file exists). */
-  ready?: boolean }
+  ready?: boolean
+  /** Left out of the catalog and the reading order (第 1 章's grammar terms: he wants to start from 五大句型).
+   *  Its teaching and its addresses stay. */
+  skip?: boolean }
 export interface BookPart { id: string; title: string; chapters: BookChapter[] }
 export interface BookIndex { parts: BookPart[]; appendix: BookSection[]; appendixReady?: boolean }
 export interface SectionContent { points: GrammarStep[]; table?: GrammarTable; mistakes: GrammarMistake[]; drills: Drill[] }
@@ -23,10 +26,14 @@ export type ChapterKey = number | 'A'
 export const chapterOf = (id: string): ChapterKey => id.startsWith('A-') ? 'A' : Number(id.split('-')[0])
 export const chapterFile = (c: ChapterKey) => c === 'A' ? 'appendix' : 'ch' + String(c).padStart(2, '0')
 
+/** The parts and chapters he reads: skipped chapters left out (and a part left with none). */
+export function shownParts(index: BookIndex): BookPart[] {
+  return index.parts.map(p => ({ ...p, chapters: p.chapters.filter(c => !c.skip) })).filter(p => p.chapters.length)
+}
 export type FlatSection = BookSection & { chapter: ChapterKey }
-/** Every section in reading order: the chapters, then the appendix. */
+/** Every section in reading order: the chapters he reads, then the appendix. */
 export function flatSections(index: BookIndex): FlatSection[] {
-  return [...index.parts.flatMap(p => p.chapters.flatMap(c => c.sections.map(s => ({ ...s, chapter: c.n as ChapterKey })))),
+  return [...shownParts(index).flatMap(p => p.chapters.flatMap(c => c.sections.map(s => ({ ...s, chapter: c.n as ChapterKey })))),
     ...index.appendix.map(s => ({ ...s, chapter: 'A' as ChapterKey }))]
 }
 /** A section with its chapter and part (none for the appendix). */
