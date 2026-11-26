@@ -97,6 +97,8 @@
 
 病人身分確認依 [Joint Commission 的兩項識別資訊說明](https://www.jointcommission.org/en-us/knowledge-library/support-center/standards-interpretation/standards-faqs/000001463)，用姓名和出生日期核對，不把床號或手圈本身當識別資訊；手機情境依 [NCSBN 社群媒體與病人隱私指引](https://www.ncsbn.org/public-files/NCSBN_SocialMedia.pdf)，不以私人手機拍攝病人，工作用途依實習單位規定使用核准工具。
 
+批改框下面的「問 Claude」那一格如果打的是改好的英文句子（跟原本答案或參考句大多是同樣的字），會當成「我改成」送去批改，也會填回上面的答案格，判對了一樣出現「對了」可以往下一步；真的問問題照舊。Claude 在批改框裡不會自己出下一句，下一題由 App 出。
+
 連接 Claude 之後，練習頁不放參考答案：中翻英按「請 Claude 批改」就直接送出，沒有「看參考句」；換個說法沒有「看答案」；寫作階梯沒有「看參考範文」。卡住就問 Claude，或寫過一次之後按「直接告訴我」（算有提示完成）。只有 Claude 連不上（沒網路、額度用完、金鑰錯）時，參考句、看答案和參考範文才會回來；沒連 Claude 的裝置照舊自己對答案。
 
 官方說明：[全民英檢初級（寫作／口說能力測驗分數說明）](https://www.gept.org.tw/exam_intro/t01_introduction.asp)、[全民英檢中級](https://www.gept.org.tw/exam_intro/t02_introduction.asp)、[IELTS Writing Band Descriptors](https://ielts.org/cdn/ielts-downloadable-assets/ielts-guidance-and-support/ielts-guides/ielts-writing-band-descriptors.pdf)。

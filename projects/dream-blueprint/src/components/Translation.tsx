@@ -139,6 +139,7 @@ export function Translation({
         </div>
       )}
       {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)}
+        onRevise={(t) => { setAnswer(t); writeDraft(sentence.id, t); }}
         onVerdict={(v, attempt, text) => { if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">

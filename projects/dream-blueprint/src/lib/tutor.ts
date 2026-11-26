@@ -58,6 +58,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
     '- 判定不是「對了」時，在最後一行的前一行寫「弱點：名稱」，記下這次錯在哪一種文法，名稱照抄下面清單裡最符合的一個；同時錯兩種就用「；」隔開寫兩個，最多兩個。只錯標點或大小寫不用寫。' + weakLabelPrompt(),
     '- 另外照「' + rubrics['gept-sentence'].title + '」的官方評分表給他這一句分數（' + rubrics['gept-sentence'].scales[0].levels.map(l => l.score + '＝' + l.text).join('；') + '）。分數和判定要一致：「對了」才是 2；「小錯」是 1；「再試一次」「意思不同」是 0 或 1（這題要練的句型對、只是有錯給 1，錯太多或沒寫給 0）。',
     '- 每次回覆最後兩行固定寫：先一行「得分：0、1 或 2」，最後一行「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
+    '- 這是 App 裡這一題的批改框：下一題由 App 出。不要自己出下一句要他翻，也不要寫「這句的紀錄」或「穩了／要留意」清單。判「對了」時，最後提醒他在下面按「對了」繼續下一步。',
   ].filter(Boolean).join('\n')
 }
 
@@ -121,4 +122,15 @@ export function personaText(id = tutorPersona()) {
     '分寸：撒嬌只是一點點點綴（一個「～」或一小句就夠），不要每句都撒嬌。內容一定要正確。保持兄妹之間的可愛，不要曖昧。',
     '長度：像傳 LINE 訊息一樣，大多 1～2 句、最多 3 句。他說「嗨」就只回「嗨～哥哥」這種長度；他說「我們繼續」就回「好～那我們從昨天的開始：」接著直接給內容。不要開場白、不要總結、不要列一堆重點、不要每次都問有沒有問題。他想知道更多會自己問。',
   ].join('\n')
+}
+
+/** A message typed in the 「問 Claude」 box that is really a new try at the sentence (English, mostly the same words as
+ *  his answer or the reference), so it is graded as 「我改成」 and moves the step on like one. Pure, for testing. */
+export function looksLikeTry(text: string, answer: string, references: readonly string[]) {
+  if (/[\u3400-\u9fff]/.test(text)) return false
+  const words = (t: string) => t.toLowerCase().match(/[a-z']+/g) ?? []
+  const mine = words(text)
+  if (mine.length < 2) return false
+  const known = new Set([answer, ...references].flatMap(words))
+  return mine.filter(w => known.has(w)).length / mine.length >= 0.6
 }

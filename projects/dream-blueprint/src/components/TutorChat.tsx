@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { askTutor, sentenceScoreOf, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
+import { askTutor, looksLikeTry, sentenceScoreOf, tutorKey, tutorSystem, verdictOf, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { settleSentence } from '../lib/rubrics'
 import { RubricScore } from './RubricTable'
 import { sameEnglish } from '../lib/evidence'
@@ -17,12 +17,14 @@ const isTry = (t: TutorTurn) => t.role === 'user' && (t.content.startsWith('我�
 const judged = (reply: string) => { const v = verdictOf(reply); return v ? settleSentence(v, sentenceScoreOf(reply)) : null }
 
 /** onReveal fires when Claude hands over the answer, so it counts the same as opening the reference. */
-export default function TutorChat({ sentence, answer, onReveal, onVerdict, onError, autoSend = false }: {
+export default function TutorChat({ sentence, answer, onReveal, onVerdict, onError, onRevise, autoSend = false }: {
   sentence: TutorSentence; answer: string; onReveal?: () => void
   /** Claude's verdict on each submitted try (1 = the first try, before any feedback), with the exact text it judged. */
   onVerdict?: (verdict: 'good' | 'small' | 'again' | 'changed', attempt: number, text: string) => void
   /** Claude could not be reached, so the caller can open another way on (the reference sentence). */
   onError?: () => void
+  /** A corrected sentence typed in the question box: the caller puts it in the answer box, so marking uses it. */
+  onRevise?: (text: string) => void
   /** Send the answer for checking as soon as the box opens (「請 Claude 批改」 was pressed above). */
   autoSend?: boolean
 }) {
@@ -101,7 +103,13 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
         : <button className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我改成：' + answer.trim())}>改好了，請 Claude 再批一次</button>}
       {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => { onReveal?.(); void send('我還是不會，請直接給答案並完整講原因。') }}>直接告訴我</button>}
     </div>
-    {attempts > 0 && <form className="tu-ask" onSubmit={e => { e.preventDefault(); send(question.trim()); setQuestion('') }}>
+    {attempts > 0 && <form className="tu-ask" onSubmit={e => {
+      e.preventDefault()
+      const q = question.trim()
+      // A corrected sentence typed here (instead of in the answer box) is graded as a new try, so the step can go on.
+      if (looksLikeTry(q, answer, sentence.reference)) { onRevise?.(q); void send('我改成：' + q) } else void send(q)
+      setQuestion('')
+    }}>
       <input value={question} onChange={e => setQuestion(e.target.value)} placeholder="問 Claude，例如：為什麼不用 being？" />
       <button type="submit" disabled={busy || !question.trim()}>問</button>
     </form>}

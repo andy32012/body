@@ -197,7 +197,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
     </label>
-    <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)}
+    <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} onRevise={setAnswer}
       onReveal={() => { setCheck(c => ({ ...c, revealed: true })); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
         if (attempt === 1) setCheck(c => c.firstVerdict ? c : { ...c, firstVerdict: v, checkedText: text })
