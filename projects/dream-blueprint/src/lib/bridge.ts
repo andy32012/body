@@ -51,13 +51,16 @@ export interface ListenRecord { day: string; correct: number; total: number; hea
 export interface ListenAttempt { day: string; correct: number; total: number; heard: boolean }
 const listenClean = (a: ListenAttempt) => a.heard && a.correct / Math.max(1, a.total) >= 0.7
 /** The new attempt saved as the latest, with the best attempt kept (by ear and 70%+ beats the rest, then the score). */
+/** Whether attempt `now` beats `prev`: by ear and 70%+ beats the rest, then by ear, then the score. */
+export function betterListen(now: ListenAttempt, prev?: ListenAttempt) {
+  const ratio = (a: ListenAttempt) => a.correct / Math.max(1, a.total)
+  return !prev || (listenClean(now) && !listenClean(prev))
+    || (listenClean(now) === listenClean(prev) && ((now.heard && !prev.heard) || (now.heard === prev.heard && ratio(now) > ratio(prev))))
+}
 export function withBestListen(old: ListenRecord | null, rec: ListenRecord): ListenRecord {
   const prev: ListenAttempt | undefined = old ? old.best ?? { day: old.day, correct: old.correct, total: old.total, heard: old.heard } : undefined
   const now: ListenAttempt = { day: rec.day, correct: rec.correct, total: rec.total, heard: rec.heard }
-  const ratio = (a: ListenAttempt) => a.correct / Math.max(1, a.total)
-  const better = !prev || (listenClean(now) && !listenClean(prev))
-    || (listenClean(now) === listenClean(prev) && ((now.heard && !prev.heard) || (now.heard === prev.heard && ratio(now) > ratio(prev))))
-  return { ...rec, best: better ? now : prev }
+  return { ...rec, best: betterListen(now, prev) ? now : prev }
 }
 /** The attempt that decides passing: the best one (older records without `best` are their own best). */
 export const bestListen = (r: ListenRecord | null): ListenAttempt | null => r ? r.best ?? r : null

@@ -4,6 +4,8 @@ import { readRemoved, weakKey, weakRemovedKey } from './weakPoints'
 import { archiveKey, mergeArchives, readArchive } from './compact'
 import { mergeHints, mergeLessonRecords, type HintUse, type LessonRecord } from './lesson'
 import { mergeMoved, movedKey, readMoved, settleWords } from './wordStates'
+import { betterRead, type ReadAttempt } from './reading'
+import { betterListen, type ListenAttempt } from './bridge'
 
 /**
  * 「兩份合併」: when two devices both changed the progress since they last synced, keep everything from both instead of
@@ -19,6 +21,47 @@ const unionBy = <T>(a: readonly T[], b: readonly T[], key: (x: T) => string) => 
 const parse = (v: string): unknown => { try { return JSON.parse(v) } catch { return undefined } }
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
 
+const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) ? v : 0
+const earliest = (...days: unknown[]) => days.filter((d): d is string => typeof d === 'string' && !!d).sort()[0]
+/** read.*, write.*, nurse.listen.*, bridge.listen.*, story.<passage>, topic.<id>: see mergeNote. Null for anything else. */
+function mergePractice(key: string, a: unknown, b: unknown): string | null {
+  if (!isObj(a) || !isObj(b)) return null
+  if (/^read\./.test(key) && typeof a.correct === 'number' && typeof b.correct === 'number') {
+    const bestOf = (r: Record<string, unknown>) => (isObj(r.best) ? r.best : { day: r.day, correct: r.correct, total: r.total, ...(r.zh ? { zh: true } : {}) }) as unknown as ReadAttempt
+    const ba = bestOf(a), bb = bestOf(b)
+    const legacyBest = b.legacyBest ?? a.legacyBest
+    return JSON.stringify({ ...b, best: betterRead(ba, bb) ? ba : bb, tries: Math.max(num(a.tries), num(b.tries)), ...(legacyBest ? { legacyBest } : {}) })
+  }
+  if (/^write\./.test(key) && (typeof a.day === 'string' || typeof b.day === 'string')) {
+    const bests = [a.best, b.best].filter((n): n is number => typeof n === 'number' && n >= 0 && n <= 9)
+    const self = Math.max(num(a.self), num(b.self))
+    return JSON.stringify({ ...a, ...b, ...(bests.length ? { best: Math.max(...bests) } : {}), tries: Math.max(num(a.tries), num(b.tries)), ...(self ? { self } : {}) })
+  }
+  if (/^(nurse|bridge)\.listen\./.test(key) && typeof a.correct === 'number' && typeof b.correct === 'number') {
+    const bestOf = (r: Record<string, unknown>) => (isObj(r.best) ? r.best : { day: r.day, correct: r.correct, total: r.total, heard: !!r.heard }) as unknown as ListenAttempt
+    const ba = bestOf(a), bb = bestOf(b)
+    return JSON.stringify({ ...b, best: betterListen(ba, bb) ? ba : bb, plays: Math.max(num(a.plays), num(b.plays)) })
+  }
+  if (/^story\./.test(key)) {
+    const out: Record<string, unknown> = { ...a, ...b }
+    for (const f of ['r', 'l', 'd']) { const day = earliest(a[f], b[f]); if (day) out[f] = day }
+    // Dictation finished on either device: where it stopped halfway no longer matters.
+    if (out.d) { delete out.dn; delete out.dqp }
+    return JSON.stringify(out)
+  }
+  if (/^topic\./.test(key) && isObj(a.done) && isObj(b.done)) {
+    const done: Record<string, string> = {}
+    for (const p of new Set([...Object.keys(a.done), ...Object.keys(b.done)])) { const day = earliest(a.done[p], b.done[p]); if (day) done[p] = day }
+    const open = isObj(a.open) || isObj(b.open) ? { ...(isObj(a.open) ? a.open : {}), ...(isObj(b.open) ? b.open : {}) } : undefined
+    // Where to continue: the newer copy's place, unless that part is already finished on either device.
+    const cur = [b.cur, a.cur].find(c => isObj(c) && typeof c.part === 'string' && !done[c.part])
+    const out: Record<string, unknown> = { ...a, ...b, done, ...(open ? { open } : {}) }
+    if (cur) out.cur = cur; else delete out.cur
+    return JSON.stringify(out)
+  }
+  return null
+}
+
 /** One note both sides wrote differently. `newer` is the value from the copy changed last. */
 export function mergeNote(key: string, older: string, newer: string): string {
   if (older === newer) return newer
@@ -26,6 +69,10 @@ export function mergeNote(key: string, older: string, newer: string): string {
   // numbers are settings (how many new words a day): the one changed last.
   if (/\d{4}-\d{2}-\d{2}/.test(key) && /^\d+$/.test(older) && /^\d+$/.test(newer)) return String(Math.max(Number(older), Number(newer)))
   const a = parse(older), b = parse(newer)
+  // A practice record both devices wrote: the latest attempt from the copy changed last, but the best attempt that
+  // counts, the most tries and every finished mode or part from either side, so a pass or a best score never goes back.
+  const practice = mergePractice(key, a, b)
+  if (practice) return practice
   // The days each skill was practised: every day from both devices.
   if (key === 'skills.log' && isObj(a) && isObj(b)) {
     const out: Record<string, unknown> = { ...a }

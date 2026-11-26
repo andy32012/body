@@ -1,3 +1,4 @@
+import { bookingNote } from './geptSessions'
 import schedule from '../data/curriculumSchedule.json' with { type: 'json' }
 import topicData from '../data/topics.json' with { type: 'json' }
 import { activePeriod, addDays, daysBetween, type Energy, type Period, type PeriodRange } from './progress.ts'
@@ -168,7 +169,10 @@ function walk(input: CalendarInput): PlannedDay[] {
             if (ending) {
               item.gate = ending.to
               const exam = exams[ending.exams[0]].name
-              item.label += ' · ' + ending.from + '→' + ending.to + ' 上完，' + (ending.bookWhen ? exam + ending.bookWhen : '報名' + exam)
+              // 全民英檢's own registration windows decide the reminder (審核 R035): the next session still open, or that the
+              // published ones have closed.
+              const id = ending.exams[0]
+              item.label += ' · ' + ending.from + '→' + ending.to + ' 上完，' + (ending.bookWhen ? exam + ending.bookWhen : '報名' + exam + (id === 'gept-a2' || id === 'gept-b1' ? '：' + bookingNote(id, day) : ''))
             }
             cursor++
           } else {

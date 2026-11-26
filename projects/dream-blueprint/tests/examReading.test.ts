@@ -129,3 +129,21 @@ test('加進單字複習：變成待學單字，明天複習；已經在複習�
   assert.equal(next.cards.find(c => c.id === 'word:leaf')!.due, '2026-11-27')
   assert.equal(addWordsToReview(next, ['leaf'], '2026-11-26'), next, '沒有新字就不改')
 })
+
+test('答鍵改過的 94 學測兩篇：照官方作答拿滿分；存著選項的舊紀錄打開 App 時照新答鍵重算（審核 R038）', async () => {
+  const { default: b2 } = await import('../src/data/exam-reading-b2.json', { with: { type: 'json' } })
+  const keys = (id: string) => (b2 as { id: string; qs: { answer: number }[] }[]).find(x => x.id === id)!.qs.map(q => q.answer)
+  assert.deepEqual(keys('ex-gsat-94-3'), [0, 3, 1, 0], '第 49–52 題：A、D、B、A')
+  assert.deepEqual(keys('ex-gsat-94-4'), [1, 2, 3, 2], '第 53–56 題：B、C、D、C')
+  const { createInitialState, exportBackup, importBackup } = await import('../src/lib/store.ts')
+  const old = createInitialState('2026-11-20')
+  old.notes['exam.read.ex-gsat-94-3'] = JSON.stringify({ day: '2026-11-20', correct: 0, total: 4, picks: [0, 3, 1, 0], tries: 1, best: { day: '2026-11-20', correct: 0, total: 4 } })
+  old.notes['exam.read.ex-gsat-94-4'] = JSON.stringify({ day: '2026-11-21', correct: 2, total: 4, picks: [1, 2, 3, 2], tries: 2, best: { day: '2026-11-19', correct: 3, total: 4 } })
+  delete old.notes['migrate.exam-keys-r038']
+  const after = importBackup(exportBackup(old)).notes
+  const r3 = JSON.parse(after['exam.read.ex-gsat-94-3']), r4 = JSON.parse(after['exam.read.ex-gsat-94-4'])
+  assert.deepEqual([r3.correct, r3.best.correct], [4, 4], '最近一次照新答鍵重算，最佳也是它')
+  assert.equal(r4.correct, 4)
+  assert.equal(r4.best.correct, 4, '重算後比以前的最佳好，就換成這一次')
+  assert.equal(after['migrate.exam-keys-r038'], '1', '只做一次')
+})

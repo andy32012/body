@@ -68,7 +68,9 @@ test('舊文章與原題逐題原封不動，新題只能接在最後，舊答�
         // 2026-11-26-audit4
         'a1-teeth': [0, 1, 2, 1, 1], 'a2-typhoon': [1, 2, 0, 2, 1, 2], 'br44-r1': [0, 1, 0, 1, 2, 1, 2, 0], 'br45-r2': [0, 1, 1, 1, 1, 2, 0, 2, 2],
         'br45-held': [0, 0, 0, 0, 1, 2, 1, 2], 'a1-easy-blue-bag': [0, 1, 2, 0], 'a1-mid-rainy-hall': [1, 2, 0, 1, 2],
-        'b2-hard-warning-model': [0, 1, 0, 2, 2, 1, 0, 2, 1, 0], 'n-a2-night-shift': [1, 1, 1, 0, 2, 2] }
+        'b2-hard-warning-model': [0, 1, 0, 2, 2, 1, 0, 2, 1, 0], 'n-a2-night-shift': [1, 1, 1, 0, 2, 2],
+        // 2026-11-26-audit-gpt1 (CPR depth limit and AED hand-off; two questions added after the old six)
+        'n-b1-cpr': [2, 2, 1, 0, 0, 1] }
       assert.ok(answers[p.id], p.id + ' 修正的文章要在這裡記下原本的答案位置')
       assert.deepEqual(p.qs.slice(0, answers[p.id].length).map(q => q.answer), answers[p.id], p.id + ' 修正後答案位置不變')
       continue

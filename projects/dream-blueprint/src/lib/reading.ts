@@ -51,7 +51,9 @@ export function readRecord(notes: Record<string, string>, id: string): ReadRecor
   try { const v = notes[readKey(id)]; return v ? JSON.parse(v) as ReadRecord : null } catch { return null }
 }
 const clean = (a: ReadAttempt) => !a.zh && a.correct / Math.max(1, a.total) >= 0.7
-const better = (a: ReadAttempt, b?: ReadAttempt) => !b || (clean(a) && !clean(b)) || (clean(a) === clean(b) && a.correct / Math.max(1, a.total) > b.correct / Math.max(1, b.total))
+/** Whether attempt `a` beats `b`: passing (70%+, Chinese not opened) beats not passing, then the higher score. */
+export const betterRead = (a: ReadAttempt, b?: ReadAttempt) => !b || (clean(a) && !clean(b)) || (clean(a) === clean(b) && a.correct / Math.max(1, a.total) > b.correct / Math.max(1, b.total))
+const better = betterRead
 export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries' | 'best' | 'practice' | 'bandVersion' | 'legacyBest'>) {
   const old = readRecord(notes, id)
   const oldBest: ReadAttempt | undefined = old?.best ?? (old ? { day: old.day, correct: old.correct, total: old.total, ...(old.zh ? { zh: true } : {}) } : undefined)

@@ -42,7 +42,7 @@ test('生活主題寫在排到它的那幾個月', () => {
   }
 })
 
-test('一級的單元上完的那個月要報名那張證照；中高級等 7000 單第 5–6 級看完才報名', () => {
+test('一級的單元上完的那個月要報名那張證照；中高級看中高級題型的模擬成績報名，不等 7000 單看完（審核 R036）', () => {
   const gates = days.filter(d => d.gate)
   assert.deepEqual(gates.map(d => d.gate), ['A2', 'B1', 'B2'])
   for (const g of gates) {
@@ -54,11 +54,15 @@ test('一級的單元上完的那個月要報名那張證照；中高級等 7000
     if (!step.bookWhen) assert.ok(unitsIn(addDays(g.day, 1).slice(0, 7)).includes(step.units![1] + 1), g.day)
   }
   const b2 = steps.find(s => s.to === 'B2')!
-  const [, year, month] = /(\d{4}) 年 (\d+) 月/.exec(b2.wordsBy!)!
-  const wordsDone = year + '-' + month.padStart(2, '0')
-  assert.deepEqual(plan.months.filter(m => /報名全民英檢中高級/.test(m.english)).map(m => m.month), [wordsDone])
-  assert.match(b2.bookWhen!, new RegExp(year + ' 年 ' + month + ' 月'))
+  const [, year, month] = /目標約 (\d{4}) 年 (\d+) 月/.exec(b2.bookWhen!)!
+  const target = year + '-' + month.padStart(2, '0')
+  assert.deepEqual(plan.months.filter(m => /報名全民英檢中高級/.test(m.english)).map(m => m.month), [target], '報名中高級的那個月就是目標月')
   assert.match(plan.years.find(y => y.year === +year)!.english, /報名全民英檢中高級/)
+  // The words forecast says level 5 takes until the end of 2030 at the current pace: finishing them is no booking condition.
+  assert.match(b2.bookWhen!, /不用等 7000 單/)
+  assert.doesNotMatch(b2.bookWhen!, /^先不考：等 7000 單/)
+  assert.doesNotMatch(JSON.stringify(plan), /第 6 級看完：報名/)
+  assert.match(b2.wordsForecast!, /2030 年/)
 })
 
 test('全部單元上完以後沒有升級關卡擋著（沒有下一段的課要開），日曆寫「都上完了」', () => {

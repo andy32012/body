@@ -89,6 +89,8 @@ export function saveExamRead(notes: Record<string, string>, id: string, attempt:
   return { ...notes, [examReadKey(id)]: JSON.stringify(rec) }
 }
 
+export { correctedKeys, rescoreExams } from './examKeys'
+
 export function readExamPlace(notes: Record<string, string>): ExamPlace | null {
   try {
     const p = JSON.parse(notes[examPlaceKey] ?? 'null') as ExamPlace | null

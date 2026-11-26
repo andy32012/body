@@ -226,3 +226,33 @@ test('一台把「認得」改成「還不熟」：同步合併後就是還不�
   for (const x of [mergeStates(read, computer, false), mergeStates(computer, read, true)])
     assert.ok(x.learningWords.includes('pupil') && !x.knownWords.includes('pupil'))
 })
+
+test('同一項練習兩台都做過：過關、最高分、做完的模式和主題的步驟都留著，最新的那次作答照比較新的那台（審核 R031）', async () => {
+  const { mergeNote } = await import('../src/lib/merge.ts')
+  const { passed } = await import('../src/lib/reading.ts')
+  const { listenPassed } = await import('../src/lib/nursing.ts')
+  const both = (key: string, older: object, newer: object) => [JSON.parse(mergeNote(key, JSON.stringify(older), JSON.stringify(newer))), JSON.parse(mergeNote(key, JSON.stringify(newer), JSON.stringify(older)))]
+  // 一般閱讀：舊的那台 3/3 沒看中文過關，新的那台看了中文 0/3。
+  const readOld = { day: '2026-11-20', picks: [0, 1, 2], correct: 3, total: 3, tries: 1, bandVersion: 1, best: { day: '2026-11-20', correct: 3, total: 3 } }
+  const readNew = { day: '2026-11-21', picks: [1, 1, 1], correct: 0, total: 3, zh: true, tries: 1, bandVersion: 1, best: { day: '2026-11-21', correct: 0, total: 3, zh: true } }
+  for (const r of both('read.a1-cat', readOld, readNew)) assert.equal(passed(r), true, '過關不會倒退')
+  assert.equal(both('read.a1-cat', readOld, readNew)[0].day, '2026-11-21', '最新的那次作答照比較新的那台')
+  // 寫作：舊的最高 4，新的那次只有 1。
+  const [w] = both('write.b1', { day: '2026-11-20', words: 12, tries: 2, best: 4 }, { day: '2026-11-21', words: 10, tries: 1, best: 1 })
+  assert.equal(w.best, 4, '最高分留著')
+  assert.equal(w.day, '2026-11-21')
+  assert.equal(w.tries, 2)
+  // 護理聽力和單元聽力：舊的只聽 3/3，新的沒聽完 1/3。
+  for (const key of ['nurse.listen.n-a2-01', 'bridge.listen.48.0']) {
+    for (const n of both(key, { day: '2026-11-20', correct: 3, total: 3, heard: true, plays: 1 }, { day: '2026-11-21', correct: 1, total: 3, heard: false, plays: 2 })) assert.equal(listenPassed(n), true, key + ' 聽懂的紀錄留著')
+  }
+  // 短文：手機讀完、電腦聽完，兩個模式都算完成。
+  for (const s of both('story.p-3-12', { r: '2026-11-20', q: [3, 3] }, { l: '2026-11-21', u: 3 })) { assert.equal(s.r, '2026-11-20'); assert.equal(s.l, '2026-11-21') }
+  // 生活主題：手機做完 A，電腦（比較新）還停在 A 的第 2 步：A 算做完，可以接著做 B。
+  for (const t of both('topic.t1', { done: { A: '2026-11-20' } }, { done: {}, cur: { part: 'A', step: 2, day: '2026-11-21' } })) {
+    assert.equal(t.done.A, '2026-11-20', 'A 算做完')
+    assert.equal(t.cur, undefined, '停在已經做完的 A 中間的位置不留著')
+  }
+  // 設定類的值照舊跟著比較新的那份。
+  assert.equal(mergeNote('story.level', '2', '3'), '3')
+})

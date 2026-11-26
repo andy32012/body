@@ -85,3 +85,61 @@ test('連續存兩次（第一次還沒回來就又改了）：不會把自己�
     assert.equal(cloudBase(), 3000)
   } finally { globalThis.fetch = realFetch }
 })
+
+/** The deployed script's rule (v4): refuse a save whose base is older than what the cloud holds, unless it is a chosen
+ *  overwrite. Each state carries its content so a test can see whose progress ended up in the cloud. */
+function fakeScript(start: { at: number; state: string }) {
+  const cloud = { ...start }
+  const realFetch = globalThis.fetch
+  globalThis.fetch = (async (_u: string, init?: { body?: string }) => {
+    const b = JSON.parse(init?.body ?? '{}')
+    await new Promise(r => setTimeout(r, b.delay ?? 5))
+    if (b.type !== 'state') return { json: async () => ({ ok: true }) }
+    if (!b.snapshot && typeof b.base === 'number' && cloud.at > b.base) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloud.at }) }
+    cloud.at = b.savedAt; cloud.state = b.state
+    return { json: async () => ({ ok: true, state: true }) }
+  }) as typeof fetch
+  Object.assign(globalThis, { window: { dispatchEvent() {} } })
+  return { cloud, restore: () => { globalThis.fetch = realFetch } }
+}
+
+test('同一個瀏覽器兩個分頁：舊分頁慢回來的存檔被拒絕時，不會硬蓋掉另一個分頁剛存的新進度（審核 R002）', async () => {
+  const { saveDriveState, cloudConflict } = await import('../src/lib/drive')
+  store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
+  store.set('dream-blueprint.cloud-cas', '1')
+  store.delete('dream-blueprint.cloud-conflict')
+  store.set('dream-blueprint.cloud-own', JSON.stringify([5000]))
+  const fake = fakeScript({ at: 5000, state: '{"answers":1}' })
+  try {
+    // The other tab already saved the newer progress (two answers) as its own save.
+    fake.cloud.at = 5200; fake.cloud.state = '{"answers":2}'
+    store.set('dream-blueprint.cloud-own', JSON.stringify([5000, 5200]))
+    // This tab's old snapshot (one answer, started from 5000) arrives late.
+    await saveDriveState('{"answers":1}', 5100, 5000)
+    assert.equal(fake.cloud.state, '{"answers":2}', '雲端留著兩筆作答的新進度')
+    assert.equal(fake.cloud.at, 5200, '版本沒有倒退')
+    assert.equal(cloudConflict(), null)
+  } finally { fake.restore() }
+})
+
+test('手機和電腦時鐘不一樣：時鐘慢的那台存上去的版本也比它接手的那一版新，另一台看得出雲端變了（審核 R030）', async () => {
+  const { saveDriveState, cloudBase, syncDecision, saveVersion } = await import('../src/lib/drive')
+  assert.equal(saveVersion(1500, 2000), 2001, '時鐘慢：比接手的版本大一')
+  assert.equal(saveVersion(3000, 2000), 3000, '時鐘正常：照時間')
+  store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
+  store.set('dream-blueprint.cloud-cas', '1')
+  store.delete('dream-blueprint.cloud-conflict')
+  store.set('dream-blueprint.cloud-own', '[]')
+  store.set('dream-blueprint.cloud-base', '2000')
+  const fake = fakeScript({ at: 2000, state: '{"from":"A"}' })
+  try {
+    // Device B (clock behind) continues from A's 2000 and saves at its own time 1500.
+    await saveDriveState('{"from":"B"}', 1500)
+    assert.ok(fake.cloud.at > 2000, '雲端版本往前進，不會變成 1500')
+    assert.equal(cloudBase(), fake.cloud.at)
+    // Device A still thinks the cloud is at 2000: it sees the change and does not just push over it.
+    assert.equal(syncDecision(fake.cloud.at, 2000, 2000), 'pull')
+    assert.equal(syncDecision(fake.cloud.at, 2000, 2100), 'conflict')
+  } finally { fake.restore() }
+  assert.equal(syncDecision(1500, 2000, 1800), 'pull', '舊版留下比較小的雲端時間，也算雲端變了')
+})

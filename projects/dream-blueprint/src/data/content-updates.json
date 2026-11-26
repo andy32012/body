@@ -189,5 +189,21 @@
   "nursingWords": [
    "inhaler"
   ]
+ },
+ {
+  "id": "2026-11-26-audit-gpt1",
+  "date": "2026-11-26",
+  "note": "照審核報告修正：成人 CPR 加上按壓深度上限（5–6 公分）和 AED 接手時的按壓銜接（依 AHA 2025 成人基本救命術指引）；輸血反應改成用新的管路接生理食鹽水、不可以沖原本的輸血管，再量生命徵象、通知醫師和血庫（依 Australian Red Cross Lifeblood 疑似輸血反應處理）；94 學測時差和紅火蟻兩篇的六題答案改成官方答案（舊的作答照新答案重算）。",
+  "words": [],
+  "sentences": [],
+  "passages": [
+   "n-b1-cpr",
+   "ex-gsat-94-3",
+   "ex-gsat-94-4"
+  ],
+  "listening": [
+   "nl-25"
+  ],
+  "nursingWords": []
  }
 ]

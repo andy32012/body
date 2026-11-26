@@ -158,9 +158,20 @@ export async function archiveToDrive(file: string) {
 
 /** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
 export function syncDecision(remoteAt: number | null, base: number, localAt: number): 'pull' | 'push' | 'conflict' | 'none' {
-  if (remoteAt !== null && remoteAt > base) return localAt > base ? 'conflict' : 'pull'
+  // Any other version than the one this device started from means another device saved (an old app version on a
+  // device with its clock behind could leave a smaller number), so it is never just pushed over.
+  if (remoteAt !== null && remoteAt !== base) return localAt > base ? 'conflict' : 'pull'
   return remoteAt === null || localAt > base ? 'push' : 'none'
 }
+
+/** The version a save is stored as: its time, but always after the version it started from. Devices' clocks differ, so
+ *  a device whose clock is behind would otherwise store a smaller number than the one it continued from, and another
+ *  device would take the cloud for older than what it last saw and save over it. */
+export const saveVersion = (savedAt: number, base: number) => Math.max(savedAt, base + 1)
+/** A local change's time, after the cloud version this device holds, so a change made after syncing is always seen as
+ *  not yet in the cloud, whatever the clock says. */
+export const localStamp = (now: number, base: number) => Math.max(now, base + 1)
+const MODIFIED = 'dream-blueprint.modified'
 
 /** Whole progress, stored in chunks on the 「進度」 sheet. */
 export async function loadDriveState(): Promise<{ state: string | null; savedAt: number } | null> {
@@ -185,17 +196,26 @@ async function saveNow(state: string, savedAt: number, base: number, force: bool
     // An older script cannot check `base` itself, so look first.
     if (!force && !cloudCas()) {
       const remote = await loadDriveState()
-      if (remote?.state && remote.savedAt > base) { markConflict(remote.savedAt); return }
+      if (remote?.state && remote.savedAt !== base) { markConflict(remote.savedAt); return }
     }
+    const version = saveVersion(savedAt, base)
     // A chosen overwrite asks the script to keep the cloud copy in its history first (v3; older scripts ignore it).
-    const json = await post({ type: 'state', state, savedAt, ...(force ? { snapshot: true } : { base }) })
+    const json = await post({ type: 'state', state, savedAt: version, ...(force ? { snapshot: true } : { base }) })
     if (json?.history === true) markHistory()
-    // Refused because the cloud holds a copy this device saved itself (an older tab or a save that raced): not a conflict.
-    if (json?.error === 'stale' && ownSaves().includes(Number(json.savedAt)) && !force) return saveNow(state, savedAt, Number(json.savedAt), true)
+    // Refused because the cloud holds a copy saved in this browser (another tab, or a save that raced): not a conflict.
+    // When that copy is newer than this one, this one is out of date (the other tab's progress has everything on this
+    // device): it is dropped, never forced over the newer one. When it is older, this one goes on top of it.
+    if (json?.error === 'stale' && ownSaves().includes(Number(json.savedAt)) && !force) {
+      const at = Number(json.savedAt)
+      if (at >= version) { setCloudBase(at); return }
+      return saveNow(state, savedAt, at, false)
+    }
     if (json?.error === 'stale') { markConflict(Number(json.savedAt) || 0); return }
     if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
-    setCloudBase(savedAt)
-    rememberOwnSave(savedAt)
+    setCloudBase(version)
+    rememberOwnSave(version)
+    // Changes made while this save was on its way are still not in the cloud: keep their time after the new version.
+    try { const local = Number(localStorage.getItem(MODIFIED)) || 0; if (local > savedAt && local <= version) localStorage.setItem(MODIFIED, String(version + 1)) } catch { /* optional */ }
     setStatus(true, '學習進度已存到雲端硬碟')
   } catch (e) {
     setStatus(false, '同步失敗：' + (e instanceof Error ? e.message : String(e)) + '，下次有變動會再試')

@@ -2,7 +2,7 @@
  * Which progress a device uses after connecting to Google Drive, shared by Settings and the scan-to-connect dialog.
  * Nothing is thrown away: when one copy replaces the other, the replaced copy is downloaded as a backup file first.
  */
-import { exportBackup, getSnapshot, importBackup, localModified, restoreBackup, setLocalModified, updateStoreNow } from './store'
+import { exportBackup, getSnapshot, importBackup, localModified, replaceIfUnchanged, restoreBackup, setLocalModified, updateStoreNow } from './store'
 import { mergeStates } from './merge'
 import {
   addHistory, clearConflict, cloudBase, cloudConflict, cloudStatus, driveConnected, driveReadyEvent, loadDriveState, loadHistoryVersion, markConflict, markMergeWaiting, noteSynced, saveDriveState, setCloudBase, syncDecision,
@@ -34,11 +34,17 @@ export type Settled = { kind: 'pulled' | 'pushed' | 'none' } | { kind: 'conflict
 export async function settleProgress(): Promise<Settled> {
   try {
     const remote = await loadDriveState()
-    const decision = syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), localModified())
+    const seen = localModified()
+    const decision = syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), seen)
     if (decision === 'pull' && remote?.state) {
-      restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt)
-      noteSynced('已從雲端硬碟載入最新的學習進度')
-      return { kind: 'pulled' }
+      // Only if nothing changed here while the cloud was being read; otherwise both are kept (merged).
+      if (await replaceIfUnchanged(remote.state, remote.savedAt, seen)) {
+        setCloudBase(remote.savedAt)
+        noteSynced('已從雲端硬碟載入最新的學習進度')
+        return { kind: 'pulled' }
+      }
+      await mergeWithCloud(true)
+      return { kind: 'pushed' }
     }
     if (decision === 'conflict' && remote) { markConflict(remote.savedAt); return { kind: 'conflict', remoteAt: remote.savedAt } }
     if (decision === 'push') {
@@ -149,10 +155,14 @@ export function settleAction(decision: ReturnType<typeof syncDecision>, paused: 
 export async function autoSettle(): Promise<'pull' | 'merge' | 'push' | 'none'> {
   if (!driveConnected()) return 'none'
   const remote = await loadDriveState()
-  const action = settleAction(syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), localModified()), !!cloudConflict())
+  const seen = localModified()
+  const action = settleAction(syncDecision(remote?.state ? remote.savedAt : null, cloudBase(), seen), !!cloudConflict())
   if (action === 'pull' && remote?.state) {
-    restoreBackup(remote.state, remote.savedAt); setCloudBase(remote.savedAt)
-    noteSynced('已從雲端硬碟載入最新的學習進度')
+    // Only if nothing changed here while the cloud was being read (also in another tab); otherwise both are merged.
+    if (await replaceIfUnchanged(remote.state, remote.savedAt, seen)) {
+      setCloudBase(remote.savedAt)
+      noteSynced('已從雲端硬碟載入最新的學習進度')
+    } else await mergeWithCloud(true)
   } else if (action === 'merge' && remote?.state) {
     await mergeWithCloud(true)
   } else if (action === 'push') {

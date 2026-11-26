@@ -135,3 +135,26 @@ test('雲端一直有新進度進來：合併好的先留在這台、標成等�
   assert.ok(cloudConflict(), '標成還沒同步，之後會再合併')
   assert.match(message, /再/)
 })
+
+test('時鐘慢的裝置：同步之後做的改變，時間一定排在它拿到的雲端版本之後（審核 R030）', async () => {
+  const future = Date.now() + 86_400_000
+  connect(future, 0)
+  updateStore(prev => ({ ...prev, notes: { ...prev.notes, 'test.clock': '1' } }))
+  await new Promise(r => setTimeout(r, 20))
+  assert.equal(getSnapshot().state.notes['test.clock'], '1')
+  assert.ok(Number(store.get('dream-blueprint.modified')) > future, '這次改變的時間在雲端版本之後，下次同步看得出這台還沒存上去')
+})
+
+test('雲端那份只在這台沒改過時才整份換上：等鎖的時候這台剛好改了，就不換，改由合併（審核 R029）', async () => {
+  const { replaceIfUnchanged, localModified } = await import('../src/lib/store.ts')
+  connect(1000, 1000)
+  const seen = localModified()
+  updateStore(prev => ({ ...prev, notes: { ...prev.notes, 'test.queued': 'local' } }))
+  await new Promise(r => setTimeout(r, 20))
+  const cloud = createInitialState(); cloud.notes['test.cloud'] = '1'
+  assert.equal(await replaceIfUnchanged(JSON.stringify(cloud), 2000, seen), false, '這台剛改過：不整份換掉')
+  assert.equal(getSnapshot().state.notes['test.queued'], 'local', '剛做的還在')
+  assert.equal(await replaceIfUnchanged(JSON.stringify(cloud), 2000, localModified()), true, '沒改過才換上雲端那份')
+  assert.equal(getSnapshot().state.notes['test.cloud'], '1')
+  assert.equal(localModified(), 2000)
+})

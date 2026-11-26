@@ -5,7 +5,8 @@ import { defaultSchool } from './school'
 import contentUpdates from '../data/content-updates.json'
 import { legacyLadder, migrateWritingProgress, writingMigrationKey } from './writing'
 import { compactState } from './compact'
-import { driveConnected } from './drive'
+import { rescoreExams } from './examKeys'
+import { cloudBase, driveConnected, localStamp } from './drive'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
@@ -104,7 +105,7 @@ export function createInitialState(startedDay=dayKey()):AppState {
     school:JSON.parse(JSON.stringify(defaultSchool)),sessions:[],cards:[],reviewEvents:[],
     curriculum:{unit:1,day:1,retry:0,stableUnits:[]},knownWords:[],learningWords:[],customWords:[],
     // A new start has nothing to reschedule, so every material update counts as already applied.
-    checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1',[writingMigrationKey]:'[]',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
+    checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1','migrate.exam-keys-r038':'1',[writingMigrationKey]:'[]',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
   }
 }
 export function exportBackup(state:AppState):string {
@@ -159,6 +160,8 @@ export function importBackup(raw:string):AppState {
     state.notes={...state.notes,'migrate.daily90':'1'}
   }
   state.notes=migrateWritingProgress(legacyLadder,state.notes)
+  // Six answer keys of two 94 學測 passages were wrong: saved picks are scored again with the corrected keys, once.
+  if (!state.notes['migrate.exam-keys-r038']) state.notes={...rescoreExams(state.notes),'migrate.exam-keys-r038':'1'}
   applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
@@ -272,7 +275,9 @@ function commit(updater:(prev:AppState)=>AppState,replace=false) {
     try {
       const raw=JSON.stringify(state)
       localStorage.setItem(STORAGE_KEY,raw)
-      try { localStorage.setItem(MODIFIED_KEY,String(stampOverride ?? Date.now())) } catch { /* optional */ }
+      // After the cloud version this device holds, whatever its clock says (a device behind would otherwise stamp a change
+      // made after syncing as older than the sync, and the next sync could take the cloud copy over it).
+      try { localStorage.setItem(MODIFIED_KEY,String(stampOverride ?? localStamp(Date.now(),cloudBase()))) } catch { /* optional */ }
       stampOverride=null
       rawLoaded=raw
       dirty=false
@@ -294,6 +299,21 @@ export function restoreBackup(raw:string, stamp?:number) {
   const state=importBackup(raw)
   if (stamp) stampOverride=stamp
   apply(()=>state,true)
+}
+/** Takes a whole copy (the cloud's) only if this device's progress hasn't changed since `seen` — its modified time when
+ *  the choice to take the cloud copy was made. The check runs inside the same lock that writes, so a change queued in
+ *  this or another tab meanwhile is never replaced. False when it changed: then the caller merges instead. */
+export function replaceIfUnchanged(raw:string, stamp:number, seen:number):Promise<boolean> {
+  const state=importBackup(raw)
+  const run=()=>{
+    refreshStorage()
+    if (localModified()!==seen) return false
+    stampOverride=stamp
+    commit(()=>state,true)
+    return true
+  }
+  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request(STORAGE_KEY,run)
+  return Promise.resolve(run())
 }
 /** When this device last changed its progress (ms). 0 means never since cloud sync existed. */
 export const MODIFIED_KEY='dream-blueprint.modified'
