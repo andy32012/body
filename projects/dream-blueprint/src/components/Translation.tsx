@@ -224,7 +224,7 @@ export function Translation({
       )}
       {hint >= 1 && !(latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark) && (
         <fieldset className="pr-marks">
-          <legend>我的自評</legend>
+          <legend>我的自評（按一個就到下一步）</legend>
           {marks.map(([mark, label]) => (
             <button
               key={mark}

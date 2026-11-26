@@ -207,12 +207,15 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, onDone }:
         // The teacher says it is right: the reference and the marks open without another tap.
         if (v === 'good') setShown(true)
       }} />
-    {!shown ? (!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div> : <>
+    {!shown ? <>
+      {(!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>看答案</button></div>}
+      {keyed && !claudeDown && check.firstVerdict && <div className="pr-actions ls-skip"><span className="ls-help">照 Claude 的提示改好再批一次；真的不會，按「直接告訴我」，或</span><button type="button" className="pr-link" onClick={() => done('again')}>先跳過這題（加入複習）→</button></div>}
+    </> : <>
       <section className="pr-reference"><small>參考句</small><p lang="en">{item.en}</p>{item.alt?.map(a => <p lang="en" key={a}>{a}</p>)}</section>
       {latest?.v === 'good' && sameEnglish(latest.text, answer) && !selfMark ? <div className="pr-actions pr-next-step">
         <button type="button" className="pr-main" onClick={() => done('good')}>Claude 說對了，{count && count[0] < count[1] ? '下一題' : '下一步'} →</button>
         <button type="button" className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
-      </div> : <fieldset className="pr-marks"><legend>我寫得…</legend>
+      </div> : <fieldset className="pr-marks"><legend>我寫得…（按一個就到{count && count[0] < count[1] ? '下一題' : '下一步'}）</legend>
         <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
         <button type="button" disabled={!answer.trim()} onClick={() => done('small')}>差一點（加入複習）</button>
         <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
@@ -303,8 +306,10 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     onFinish(answer, next)
   }
   const sees = (kind: string) => shown.includes(kind)
+  // Claude says what is in the box now is good: finishing is the way on, not another check.
+  const good = rec.last?.verdict === 'good' && (rec.lastAnswer ?? '').trim() === answer.trim()
   return <section className="ls-express">
-    <div className="pr-label">{corrected ? '訂正再試' : '表達 · 用自己的話'}</div>
+    <div className="pr-label">{good ? '表達 · Claude 說寫得好' : corrected ? '訂正再試' : '表達 · 用自己的話'}</div>
     <h2 className="pr-question ls-prompt" lang="en">{p.en}</h2>
     {p.chart && <MiniChart chart={p.chart} />}
     {p.scaffold && <ol className="ls-scaffold" aria-label="回答的順序">{p.scaffold.map(s => <li key={s} lang="en">{s}</li>)}</ol>}
@@ -326,7 +331,7 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
     {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     {sees('sample') && <section className="pr-reference"><small>參考寫法（只是一種例子）</small><p lang="en">{p.sample}</p></section>}
     <div className="pr-actions">
-      {keyed && <button type="button" className="pr-main" disabled={!answer.trim()} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
+      {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim()} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
       <button type="button" className="pr-link" onClick={onSpeak}>改用說的：跟 Emma 練</button>
     </div>
     {!keyed && <p className="ls-help">還沒連接 Claude，先對照參考寫法自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
@@ -335,8 +340,8 @@ export function LessonExpress({ lesson, prompt, draftKey, pattern, saved, onReco
       previous={previous} selfFix={!corrected || !rec.revealed}
       onReveal={() => { if (!rec.revealed) { const next = { ...rec, revealed: true }; setRec(next); onRecord(next, false) } }}
       onSave={onSave} onResult={(_, __, r) => result(r)} />
-    {corrected && !rec.fixed && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，請 Claude 再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}
+    {corrected && !rec.fixed && !good && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，請 Claude 再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}
     {rec.fixed && <p className="ls-help ls-fixnote">上次的問題都改好了。</p>}
-    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={finish}>完成今天這一堂</button>
+    <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} onClick={finish}>{good ? 'Claude 說寫得好，完成今天這一堂 →' : '完成今天這一堂'}</button>
   </section>
 }
