@@ -6,15 +6,15 @@ export { unitPackOpen } from './bridge'
  *  page. The main menu lists them under 英文練習 (the sidebar on a computer or tablet); on a phone the 英文練習 page itself
  *  (#library) is that list. The speaking page (#speaking) is listed with them. */
 export type LibraryMode = 'words' | 'listen' | 'quiz' | 'case' | 'screen' | 'translate' | 'passage' | 'reading' | 'writing' | 'unit'
-  | 'nlisten' | 'nread' | 'nwords' | 'grammar' | 'story' | 'sound' | 'theme'
+  | 'nlisten' | 'nread' | 'nwords' | 'grammar' | 'story' | 'sound' | 'theme' | 'pastexam'
 /** An entry of the 英文練習 menu: a kind of practice, or the speaking page. */
 export type MenuId = LibraryMode | 'speaking'
 export type LibraryGroup = 'main' | 'words' | 'nursing'
 
-export const libraryModes: LibraryMode[] = ['listen', 'translate', 'story', 'reading', 'writing', 'unit', 'quiz', 'words', 'screen', 'passage',
+export const libraryModes: LibraryMode[] = ['listen', 'translate', 'story', 'reading', 'pastexam', 'writing', 'unit', 'quiz', 'words', 'screen', 'passage',
   'grammar', 'theme', 'sound', 'nlisten', 'nread', 'nwords', 'case']
 const labels: Record<MenuId, string> = {
-  listen: '句子跟讀', translate: '中翻英', story: '短文讀聽', reading: '閱讀理解', writing: '寫作階梯', unit: '單元讀聽說寫', quiz: '選擇題',
+  listen: '句子跟讀', translate: '中翻英', story: '短文讀聽', reading: '閱讀理解', pastexam: '歷屆考題閱讀', writing: '寫作階梯', unit: '單元讀聽說寫', quiz: '選擇題',
   words: '單字複習', screen: '單字快篩', passage: '7000 單短文', grammar: '文法講解', theme: '主題總複習', sound: '發音課',
   nlisten: '護理聽力', nread: '護理閱讀', nwords: '護理單字', case: '臨床情境', speaking: '英文口說',
 }
@@ -25,6 +25,7 @@ const notes: Record<MenuId, string> = {
   listen: '聽一句英文，跟著念',
   story: '分級短文：讀、聽、聽寫',
   reading: '讀一篇文章，回答問題',
+  pastexam: '會考、學測、指考和國家考試的閱讀題，照 A1–B2 排好',
   writing: '從一句寫到一整篇，一階一階變難',
   unit: '這個單元的聽、讀、說、寫和回測',
   quiz: '英文和護理英文的選擇題',
@@ -47,7 +48,7 @@ export interface MenuGroup { id: LibraryGroup; title: string; entries: MenuEntry
 
 /** The menu's order: 中翻英 and 英文口說 first, then the other kinds of practice; words and nursing English each in a group. */
 const groups: { id: LibraryGroup; title: string; ids: MenuId[] }[] = [
-  { id: 'main', title: '聽說讀寫', ids: ['translate', 'speaking', 'listen', 'story', 'reading', 'writing', 'unit', 'quiz', 'grammar', 'theme', 'sound'] },
+  { id: 'main', title: '聽說讀寫', ids: ['translate', 'speaking', 'listen', 'story', 'reading', 'pastexam', 'writing', 'unit', 'quiz', 'grammar', 'theme', 'sound'] },
   { id: 'words', title: '單字', ids: ['words', 'screen', 'passage'] },
   { id: 'nursing', title: '護理英文', ids: ['nlisten', 'nread', 'nwords', 'case'] },
 ]

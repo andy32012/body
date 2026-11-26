@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
 import { applyMemory, useMemory } from '../lib/memory'
 import {
-  appsScriptCode, archiveFolderUrl, cloudArchive, cloudCas, cloudConflict, cloudHistory, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
+  appsScriptCode, archiveFolderUrl, cloudArchive, cloudAtomic, cloudCas, cloudConflict, cloudHistory, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
   importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type DriveMemory, type HistoryEntry,
 } from '../lib/drive'
 import { keepThisCopy, mergeWithCloud, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
@@ -49,7 +49,7 @@ function CloudHistory({ onStatus }: { onStatus: (message: string) => void }) {
     <summary>雲端歷史版本（最多留 30 份，可以還原）</summary>
     <p>雲端的進度要被蓋掉之前，雲端小程式會先把舊的那份留下來（最多每小時一份，兩台選版本或還原時一定會留）。不小心選錯、資料怪怪的，就從這裡回到之前的某一份。</p>
     {busy && <p>處理中……</p>}
-    {list === null && <p className="set-warn">你的雲端小程式還是舊版，換成最新的 v4 才會開始留歷史版本：照下面「更新雲端小程式」的步驟做一次。</p>}
+    {list === null && <p className="set-warn">你的雲端小程式還是舊版，換成最新的 v5 才會開始留歷史版本：照下面「更新雲端小程式」的步驟做一次。</p>}
     {list && !list.length && <p>還沒有歷史版本：下次雲端的進度被更新時，會開始留。</p>}
     {list && list.length > 0 && <div className="set-list">{list.map(h => <div key={h.id}>
       <span>{label(h)}<small> · {Math.max(1, Math.round(h.size / 1024))} KB</small></span>
@@ -120,7 +120,7 @@ export default function MemoryPanel() {
     <h3 className="set-subhead">雲端硬碟</h3>
     {drive ? <>
       <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存：「記憶」是她們記住的事、「進度」是整份學習進度（課表、單字、複習卡、勾選、作答紀錄），有變動 5 秒後自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>
-      <p>手機只留最近的紀錄：太舊的複習紀錄、每天的小紀錄、舊課的批改全文，會先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了才從手機拿掉，封存的檔案不會被刪{cloudArchive() ? '。' : '（雲端小程式要 v4，照下面「更新雲端小程式」做一次）。'}{archiveFolderUrl() && <> <a href={archiveFolderUrl()} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</p>
+      <p>手機只留最近的紀錄：太舊的複習紀錄、每天的小紀錄、舊課的批改全文，會先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了才從手機拿掉，封存的檔案不會被刪{cloudArchive() ? '。' : '（雲端小程式要 v4 以上，照下面「更新雲端小程式」做一次）。'}{archiveFolderUrl() && <> <a href={archiveFolderUrl()} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</p>
       {conflict && <div className="set-warn" role="alert">
         <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。按「兩份合併」兩台做過的都會留下（課表接在比較後面那一天）；也可以只留一份：</p>
         <div className="set-actions">
@@ -142,7 +142,11 @@ export default function MemoryPanel() {
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
       <CloudHistory onStatus={setStatus} />
       <details className="set-details">
-        <summary>{cloudArchive() ? '雲端小程式是最新的 v4（會檢查兩台的進度、留歷史版本，舊紀錄也會封存到雲端）' : cloudHistory() ? '更新雲端小程式到 v4（新增：舊紀錄先封存到雲端硬碟，一筆都不會丟）' : cloudCas() ? '更新雲端小程式到 v4（新增：歷史版本可以還原、舊紀錄封存到雲端）' : '更新雲端小程式到 v4（建議：兩台不會互相蓋掉，還會留歷史版本、封存舊紀錄）'}</summary>
+        <summary>{cloudAtomic() ? '雲端小程式是最新的 v5（存到一半失敗也不會弄壞雲端那份、會檢查兩台的進度、留歷史版本、封存舊紀錄）'
+          : cloudArchive() ? '更新雲端小程式到 v5（新增：先寫好、確認完整才換過去，存到一半失敗也不會弄壞雲端那份）'
+          : cloudHistory() ? '更新雲端小程式到 v5（新增：存檔更安全、舊紀錄先封存到雲端硬碟）'
+          : cloudCas() ? '更新雲端小程式到 v5（新增：存檔更安全、歷史版本可以還原、舊紀錄封存到雲端）'
+          : '更新雲端小程式到 v5（建議：存檔安全、兩台不會互相蓋掉，還會留歷史版本、封存舊紀錄）'}</summary>
         <ol>
           <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
           <li>上面的函式選單選「setupHistory」，按「執行」（會在雲端硬碟開「夢想藍圖・歷史版本」和「夢想藍圖・封存」兩個資料夾）。如果跳出要你允許存取雲端硬碟：選你的帳號 →「進階」→「前往（不安全）」→「允許」。</li>

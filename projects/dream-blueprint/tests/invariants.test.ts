@@ -32,6 +32,10 @@ import cosmosG from '../src/data/cosmos-g.json' with { type: 'json' }
 import cosmosN from '../src/data/cosmos-n.json' with { type: 'json' }
 import cosmosP from '../src/data/cosmos-p.json' with { type: 'json' }
 import cosmosS from '../src/data/cosmos-s.json' with { type: 'json' }
+import examA1 from '../src/data/exam-reading-a1.json' with { type: 'json' }
+import examA2 from '../src/data/exam-reading-a2.json' with { type: 'json' }
+import examB1 from '../src/data/exam-reading-b1.json' with { type: 'json' }
+import examB2 from '../src/data/exam-reading-b2.json' with { type: 'json' }
 
 /**
  * Content only grows, and IDs never change: review cards, history, evidence and notes point at them, so a renamed
@@ -45,6 +49,7 @@ const baselineFile = new URL('./fixtures/content-baseline.json', import.meta.url
 
 const idsOf = (list: readonly { id: string | number }[]) => list.map(x => String(x.id))
 const total = <T>(list: readonly T[], field: (x: T) => readonly unknown[] | undefined) => list.reduce((n, x) => n + (field(x)?.length ?? 0), 0)
+const exams = [...examA1, ...examA2, ...examB1, ...examB2] as { id: string; qs: unknown[] }[]
 const units = curriculum.units as { unit: number; days: { id: string }[]; checkpoint: { id: string }[]; backup: { id: string }[]; retrySentences: { id: string }[] }[]
 
 function current(): Baseline {
@@ -77,6 +82,7 @@ function current(): Baseline {
       photos: [...cosmosD, ...cosmosG, ...cosmosN, ...cosmosP, ...cosmosS].map(p => p.id),
       rivals: idsOf(rivals.rivals),
       'content updates': idsOf(contentUpdates),
+      'past exam reading': idsOf(exams),
     },
     counts: {
       'lesson dialogue lines': total(lessons, l => l.dialogue),
@@ -98,6 +104,7 @@ function current(): Baseline {
       'scenario steps': total(scenarios, s => s.steps),
       'GEPT speaking questions': total([...gept.elementary, ...gept.intermediate], s => s.questions),
       'GEPT read-aloud sentences': total([...gept.elementary, ...gept.intermediate], s => s.readSentences),
+      'past exam reading questions': total(exams, e => e.qs),
     },
   }
 }

@@ -1,4 +1,6 @@
 import { PracticeCover } from "../components/PracticeCover";
+import HomographNote from "../components/HomographNote";
+import { useTapGuard } from "../lib/tapGuard";
 import examSubjects from "../data/exam-subjects.json";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Headphones, Check, PenLine, Volume2 } from "lucide-react";
@@ -52,6 +54,7 @@ import UseWord from "../components/UseWord";
 import EmmaWordLink from "../components/EmmaWordLink";
 import { speakEnglish } from "../lib/tts";
 import ReadingPath from "../components/ReadingPath";
+import PastExamReading from "../components/PastExamReading";
 import WritingLadder from "../components/WritingLadder";
 import UnitPack from "../components/UnitPack";
 import GrammarTeach, { GrammarBook, GrammarExplain } from "../components/GrammarTeach";
@@ -1048,8 +1051,10 @@ function Extras({
     return cards.slice(0, limit);
   });
   const word = deck[offset];
+  // 記得 / 不記得 stay in the same place for the next card: a double tap must not score that one too.
+  const wordReady = useTapGuard(offset);
   function scoreWord(remembered: boolean) {
-    if (!word) return;
+    if (!word || !wordReady()) return;
     const id = "word:" + wordKey(word.en);
     onActivity((prev) => {
       const existing = prev.cards.find((c) => c.id === id);
@@ -1106,6 +1111,7 @@ function Extras({
               <button type="button" className="ws-mini" aria-label={"聽發音：" + word.en} onClick={() => void speakEnglish(word.en, state.settings.speechRate)}><Volume2 size={16} /></button>
             </h3>
             {see && <p>{word.zh}</p>}
+            {see && <HomographNote en={word.en} side="everyday" />}
             <div className="ws-tools"><AskWord en={word.en} zh={see ? word.zh : undefined} label="問問 Claude" />
               <EmmaWordLink en={word.en} zh={word.zh} where="單字複習" part="read" seen={see} others={deck.slice(offset + 1, offset + 6).map((w) => w.en)} />
               {see && <UseWord key={word.en} en={word.en} zh={word.zh}
@@ -1219,6 +1225,7 @@ function Extras({
       {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
+      {mode === "pastexam" && <PastExamReading state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
       {mode === "nwords" && <NursingWords state={state} onActivity={onActivity} date={date} />}

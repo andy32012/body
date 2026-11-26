@@ -28,10 +28,14 @@ async function post(body: object) {
   const res = await fetch(d.url, { method: 'POST', body: JSON.stringify({ ...body, token: d.token }) })
   const json = await res.json()
   // "stale" is an answer, not a failure: the cloud has a newer snapshot than the one this device started from.
-  if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
+  if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。'
+    : json.error === 'write' ? '雲端這次沒有存完整，雲端還是原本那一份'
+    : json.error === 'history' ? '雲端硬碟沒辦法先留一份備份，這次先不蓋掉雲端那份'
+    : '雲端硬碟回傳錯誤')
   if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
   if (json.cas) markCas()
   if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
+  if (json.atomic) markAtomic()
   return json
 }
 /** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
@@ -134,6 +138,10 @@ function markArchive(folder: string) {
   try { if (folder || localStorage.getItem(ARCHIVE) === null) localStorage.setItem(ARCHIVE, folder || '1') } catch { /* optional */ }
 }
 export function cloudArchive() { try { return !!localStorage.getItem(ARCHIVE) } catch { return false } }
+/** Whether the deployed script saves safely (v5): the new copy is written apart and checked before it replaces the old. */
+const ATOMIC = 'dream-blueprint.cloud-atomic'
+function markAtomic() { try { localStorage.setItem(ATOMIC, '1') } catch { /* optional */ } }
+export function cloudAtomic() { try { return localStorage.getItem(ATOMIC) === '1' } catch { return false } }
 export function archiveFolderUrl() { try { const v = localStorage.getItem(ARCHIVE) || ''; return v.startsWith('https://') ? v : '' } catch { return '' } }
 /** Saves old records as a file in the Drive archive folder. True only when the script confirms it kept them
  *  (an older script answers ok without keeping anything). */
@@ -236,11 +244,12 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶 v4（貼到 script.google.com 的專案，部署成網頁應用程式）
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v5（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 // v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
 // v4：手機要整理掉的舊紀錄（兩個月前的複習紀錄、幾週前的每日小紀錄、四個月前上完的課的批改全文）先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了手機才拿掉；封存的檔案不會被刪。
-// 換成 v3 或 v4：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
+// v5：存進度時先寫到另一張工作表，整份讀回來確認一模一樣才換過去用；存到一半失敗（斷線、逾時），雲端還是原本完整的那份。要先留備份時，備份沒存成功就不蓋掉。
+// 換成 v3 以上：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
   var id=props().getProperty('SHEET');
@@ -257,14 +266,31 @@ function allowed(t){
   if(!saved){props().setProperty('TOKEN',t);return true}
   return saved===t;
 }
-function out(o){o.cas=true;o.archive=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function out(o){o.cas=true;o.archive=true;o.atomic=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
 function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
 function column(name){var sh=tab(name),n=sh.getLastRow()-1;return n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[]}
 function setColumn(name,head,list){var sh=tab(name);sh.clear();sh.getRange(1,1).setValue(head);var rows=(list||[]).map(function(x){return [String(x)]});if(rows.length)sh.getRange(2,1,rows.length,1).setValues(rows)}
-function readState(){
-  var p=tab('進度'),rows=p.getLastRow()-1;
+// The progress lives on one of two sheets; STATE_SLOT says which one is current (the first one before v5).
+var SLOTS=['進度','進度・另一份'];
+function activeSlot(){var s=props().getProperty('STATE_SLOT');return SLOTS.indexOf(s)>=0?s:SLOTS[0]}
+function readSlot(name){
+  var p=tab(name),rows=p.getLastRow()-1;
   var parts=rows>0?p.getRange(2,1,rows,1).getValues().map(function(r){return String(r[0]).slice(1)}):[];
-  return {ok:true,state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0};
+  return {state:parts.join('')||null,savedAt:Number(p.getRange(1,2).getValue())||0};
+}
+function readState(){var s=readSlot(activeSlot());return {ok:true,state:s.state,savedAt:s.savedAt}}
+// Writes the new copy on the other sheet, reads it back, and only then makes it the current one.
+function writeState(state,savedAt){
+  var target=activeSlot()===SLOTS[0]?SLOTS[1]:SLOTS[0],p=tab(target);
+  p.clear();
+  p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',savedAt]]);
+  var chunks=[];for(var i=0;i<state.length;i+=45000)chunks.push(['~'+state.slice(i,i+45000)]);
+  if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
+  SpreadsheetApp.flush();
+  var back=readSlot(target);
+  if(back.state!==state||back.savedAt!==savedAt)return false;
+  props().setProperty('STATE_SLOT',target);
+  return true;
 }
 function readMemory(){return {ok:true,notes:column('記憶'),deleted:column('已刪除的記憶'),url:book().getUrl()}}
 function historyFolder(){
@@ -327,18 +353,17 @@ function doPost(e){
     }
     if(d.type==='memory'){setColumn('記憶','記住的事',d.notes);setColumn('已刪除的記憶','刪掉的記憶（別台裝置不會再加回來）',d.deleted)}
     if(d.type==='state'&&typeof d.state==='string'){
-      var p=tab('進度'),current=Number(p.getRange(1,2).getValue())||0;
-      if(typeof d.base==='number'&&current>d.base)return out({ok:false,error:'stale',savedAt:current});
-      // The copy about to be replaced goes into the history first (at most once an hour, always when asked).
-      var old=readState(),last=Number(props().getProperty('LAST_VERSION'))||0;
-      if(old.state&&old.state!==d.state&&(d.snapshot===true||Date.now()-last>3600000)){
-        try{keepVersion('progress',old.state,old.savedAt);props().setProperty('LAST_VERSION',String(Date.now()))}catch(err){}
-      }
-      p.clear();
-      p.getRange(1,1,1,2).setValues([['學習進度（網站自動同步，請勿手動修改）',Number(d.savedAt)||Date.now()]]);
-      var chunks=[];for(var i=0;i<d.state.length;i+=45000)chunks.push(['~'+d.state.slice(i,i+45000)]);
-      if(chunks.length)p.getRange(2,1,chunks.length,1).setNumberFormat('@').setValues(chunks);
-      return out({ok:true,state:true,history:true,url:ss.getUrl()});
+      var old=readState();
+      if(typeof d.base==='number'&&old.savedAt>d.base)return out({ok:false,error:'stale',savedAt:old.savedAt});
+      // The copy about to be replaced goes into the history first (at most once an hour, always when asked). A chosen
+      // overwrite whose copy could not be kept does not overwrite.
+      var last=Number(props().getProperty('LAST_VERSION'))||0,kept=false;
+      var want=old.state&&old.state!==d.state&&(d.snapshot===true||Date.now()-last>3600000);
+      if(want){try{keepVersion('progress',old.state,old.savedAt);props().setProperty('LAST_VERSION',String(Date.now()));kept=true}catch(err){}}
+      if(want&&!kept&&d.snapshot===true)return out({ok:false,error:'history'});
+      var written=false;try{written=writeState(d.state,Number(d.savedAt)||Date.now())}catch(err){written=false}
+      if(!written)return out({ok:false,error:'write'});
+      return out({ok:true,state:true,history:true,kept:kept,url:ss.getUrl()});
     }
     return out({ok:true,url:ss.getUrl()});
   }finally{lock.releaseLock()}

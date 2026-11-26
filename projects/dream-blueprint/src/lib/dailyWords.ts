@@ -61,6 +61,19 @@ export function changeSorted<S extends Sortable>(prev: S, k: string, known: bool
   }
 }
 
+/** Words of the 7000-word table (their keys) put into the word review from a reading: each becomes a learning word with a new
+ *  card for tomorrow. A word already in the review keeps its card; one sorted as 認得 before moves to the words being learned. */
+export function addWordsToReview<S extends Sortable>(prev: S, keys: readonly string[], day: string): S {
+  const have = new Set(prev.cards.map(c => c.id))
+  const fresh = [...new Set(keys.map(wordKey))].filter(k => !have.has('word:' + k))
+  if (!fresh.length) return prev
+  const moved = new Set(fresh)
+  return { ...prev,
+    knownWords: prev.knownWords.filter(w => !moved.has(wordKey(w))),
+    learningWords: [...new Set([...prev.learningWords, ...fresh])],
+    cards: [...prev.cards, ...fresh.map(k => newCard('word:' + k, day))] }
+}
+
 /** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */
 export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0) {
   const chosen = Number(notes[countKey])

@@ -1,0 +1,229 @@
+[
+ {
+  "id": "ex-cap-114-1",
+  "level": "A1",
+  "band": "hard",
+  "kind": "cap",
+  "source": "114 會考",
+  "exam": "114年國中教育會考英語科（閱讀）",
+  "first": 20,
+  "last": 21,
+  "words": 128,
+  "paras": [
+   "Rex is a dog that lives at the bakery next to our school. He is cute and friendly. Every morning, he stands in front of the school to welcome everybody. We all see Rex as one of us. But one Monday morning, I was surprised that Rex was not there to say hello to us. “Rex is in the hospital. He was hit by a car last night,” my classmate told me. We went to see Rex in the hospital that day after school. Two weeks later, Rex was much better, and we decided to take him for a walk every evening. Because of the exercise, Rex became healthier and stronger. Soon he could happily run and jump again. He is now as handsome and strong as before!"
+  ],
+  "qs": [
+   {
+    "n": 20,
+    "q": "What happened to Rex?",
+    "options": [
+     "He got lost.",
+     "He got hurt.",
+     "He bit people.",
+     "He ate too much."
+    ],
+    "answer": 1
+   },
+   {
+    "n": 21,
+    "q": "How did the writer help Rex?",
+    "options": [
+     "By calling the police.",
+     "By making him exercise.",
+     "By taking him to see a doctor.",
+     "By looking for a new home for him."
+    ],
+    "answer": 1
+   }
+  ]
+ },
+ {
+  "id": "ex-cap-109-1",
+  "level": "A1",
+  "band": "hard",
+  "kind": "cap",
+  "source": "109 會考",
+  "exam": "109年國中教育會考英語科（閱讀）",
+  "first": 16,
+  "last": 17,
+  "words": 101,
+  "paras": [
+   "When it arrives, Everyone cheers.",
+   "The shirts and shorts dance On the clothesline, The trees and flowers wave Like they’re saying hi, And the clouds are so excited To have a running race.",
+   "When it comes, Dad’s face falls. His coat and jeans jump Off the clothesline Into the pond.",
+   "The tree leaves hop off And have a party on his new car.",
+   "When it gets here, A lot of fun things I notice: The pond’s face, Sad and old with lines; Mrs. Smith’s bread, Delicious and freshly baked. But what smell is it? Oh, no, it’s from Mr. Brown’s feet!"
+  ],
+  "gloss": [
+   {
+    "en": "leaf (leaves)",
+    "zh": "葉子"
+   }
+  ],
+  "qs": [
+   {
+    "n": 16,
+    "q": "What is it in the reading?",
+    "options": [
+     "The sun.",
+     "The rain.",
+     "The wind.",
+     "The rainbow."
+    ],
+    "answer": 2
+   },
+   {
+    "n": 17,
+    "q": "How does Dad feel“when it comes”?",
+    "options": [
+     "He is scared.",
+     "He is excited.",
+     "He is not happy.",
+     "He is not interested."
+    ],
+    "answer": 2
+   }
+  ]
+ },
+ {
+  "id": "ex-cap-107-5",
+  "level": "A1",
+  "band": "hard",
+  "kind": "cap",
+  "source": "107 會考",
+  "exam": "107年國中教育會考英語科（閱讀）",
+  "first": 27,
+  "last": 28,
+  "words": 74,
+  "paras": [
+   "The sky is turning bright and clear. The earth is wearing red and green. Winter is gone; spring has come. The air smells fresh and sweet.",
+   "The summer heat is not yet here; A little fox comes out to play. A bird is busy in a tree Waking a daisy from her sleep.",
+   "Little daisy, little daisy, People call the flower the “day’s eye.” When she opens her eye, The springtime brings us cheer."
+  ],
+  "gloss": [
+   {
+    "en": "poem",
+    "zh": "詩"
+   }
+  ],
+  "qs": [
+   {
+    "n": 27,
+    "q": "Which season is this poem about?",
+    "options": [
+     "Spring.",
+     "Summer.",
+     "Autumn.",
+     "Winter."
+    ],
+    "answer": 0
+   },
+   {
+    "n": 28,
+    "q": "What is a daisy?",
+    "options": [
+     "A body part.",
+     "A kind of bird.",
+     "A kind of flower.",
+     "A kind of smell."
+    ],
+    "answer": 2
+   }
+  ]
+ },
+ {
+  "id": "ex-cap-105-1",
+  "level": "A1",
+  "band": "hard",
+  "kind": "cap",
+  "source": "105 會考",
+  "exam": "105年國中教育會考英語科（閱讀）",
+  "first": 16,
+  "last": 17,
+  "words": 101,
+  "paras": [
+   "Our Pinky Street, one of the oldest streets in the world, was almost lost to a big fire last night. Most of the old houses on Pinky were burned down. The living history we are proud of is dying. But we should never give up. Pinky is like a parent, always there caring for our town. Now we must do something together to get the old Pinky back. There will be a meeting at 2:00 this Saturday afternoon at Town Office. Anyone who wants to help is welcome. Let’s see what we can do.",
+   "Adam Bolton, Town Office",
+   "March 9"
+  ],
+  "qs": [
+   {
+    "n": 16,
+    "q": "What is the reading for?",
+    "options": [
+     "Finding out why the old street was on fire.",
+     "Inviting people to do business on the old street.",
+     "Getting people to find ways to save the old street.",
+     "Asking for help for people who got hurt in the fire."
+    ],
+    "answer": 2
+   },
+   {
+    "n": 17,
+    "q": "Which is NOT used in the reading to talk about the old street?",
+    "options": [
+     "A good friend.",
+     "The old Pinky.",
+     "A parent.",
+     "A living history."
+    ],
+    "answer": 0
+   }
+  ]
+ },
+ {
+  "id": "ex-cap-104-1",
+  "level": "A1",
+  "band": "hard",
+  "kind": "cap",
+  "source": "104 會考",
+  "exam": "104年國中教育會考英語科（閱讀）",
+  "first": 13,
+  "last": 15,
+  "words": 120,
+  "paras": [
+   "From: Lisa Clyne (lisaclyne@mail.com)",
+   "To: Mary Faber (maryfaber@mail.com)",
+   "Date: Thursday, April 2, 2015",
+   "Subject: Welcome Dear Mary, Uncle Billy and I are excited about your visit. The weather has {{13}} these days. Like today, it was sunny in the morning, but rained heavily at noon. So we’ve {{14}}: If the weather is nice, I’m going to take you to Smith Farm. They’re having a special horse show this week. I’m sure you’ll like it. And {{15}}. We can go shopping at Mimi’s Department Store; there we can walk around without getting wet. Rain or shine, we hope you will have a good time here. See you tomorrow at the train station at 9:00 a.m. Love, Aunt Lisa"
+  ],
+  "qs": [
+   {
+    "n": 13,
+    "q": "",
+    "options": [
+     "got better",
+     "been warm",
+     "changed a lot",
+     "become wet and cold"
+    ],
+    "answer": 2,
+    "blank": true
+   },
+   {
+    "n": 14,
+    "q": "",
+    "options": [
+     "made two plans for you",
+     "worried about your trip to here",
+     "decided to take you to a nice place",
+     "prepared everything you’ve asked for"
+    ],
+    "answer": 0,
+    "blank": true
+   },
+   {
+    "n": 15,
+    "q": "",
+    "options": [
+     "we’ll agree with each other",
+     "don’t worry if it rains",
+     "we all love animals very much",
+     "don’t forget to check the weather"
+    ],
+    "answer": 1,
+    "blank": true
+   }
+  ]
+ }
+]

@@ -5,6 +5,7 @@ import { activePeriod, addDays, newCard, reviewEnergy } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
+import HomographNote from './HomographNote'
 import { markSkill } from '../lib/wordSkills'
 import { useTapGuard } from '../lib/tapGuard'
 import { paintSky, seedOf } from '../lib/starfield'
@@ -105,6 +106,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
               ? <ul className="daily-word-forms">{formLines(word).map(f => <li key={f.en}><b lang="en">{f.en}</b> <small>{f.pos}</small> {f.zh}</li>)}</ul>
               : <p className="daily-word-meaning">{meaningLine(word)}</p>
             : <button type="button" className="daily-word-reveal" onClick={() => setReveal(true)}>先想一下，再看中文</button>}
+          {(reveal || past) && <HomographNote en={word.en} side="everyday" />}
           <div className="daily-word-tools"><button type="button" className="daily-word-listen" onClick={speak}><Volume2 size={15} />聽發音</button><AskWord en={word.en} zh={reveal || past ? word.zh : undefined} label="問問 Claude" />{(reveal || past) && <UseWord key={word.en} en={word.en} zh={word.zh}
             onGood={() => update(prev => ({ ...prev, notes: markSkill(prev.notes, wordKey(word.en), 'write', today) }))} />}</div>
           {silent && <small className="daily-word-note">這台裝置現在沒有聲音，先用看的。</small>}

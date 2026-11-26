@@ -1,5 +1,6 @@
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
+import HomographNote from './HomographNote'
 import { markSkill } from '../lib/wordSkills'
 import { useTapGuard } from '../lib/tapGuard'
 import { useMemo, useState } from 'react'
@@ -112,7 +113,7 @@ export default function VocabScreen({state, update}: PageProps) {
           placeholder="輸入遇到的字" /></label>
         {lookupLevel >= 5 && !term ? <p>第 5、6 級只挑讀護理題或準備檢定時遇到的字。輸入一個字開始找。</p> :
           !lookup.length ? <p>這個級別沒有找到。可以切換級別或在設定匯入自己的單字。</p> :
-            <ul className="vocab-results">{lookup.map(word => <li key={word.en}><span><b lang="en">{word.en}</b> · {shownMeaning(word)} <AskWord en={word.en} zh={word.zh} /></span>
+            <ul className="vocab-results">{lookup.map(word => <li key={word.en}><span><b lang="en">{word.en}</b> · {shownMeaning(word)} <AskWord en={word.en} zh={word.zh} /><HomographNote en={word.en} side="everyday" /></span>
               <button type="button" disabled={classified.has(wordKey(word.en))} onClick={() => {
                 const key = wordKey(word.en)
                 update(prev => [...prev.knownWords,...prev.learningWords].some(w => wordKey(w) === key) ? prev :

@@ -1,0 +1,408 @@
+{
+ "note": "同一個拼法、在一般英文和護理裡意思不同的字（像 pupil：學生／瞳孔），以及護理單字裡容易搞混的字。護理單字遇到前一種，練習紀錄跟一般單字分開記。",
+ "same": [
+  {
+   "en": "pupil",
+   "nurse": "瞳孔",
+   "everyday": "學生、門生",
+   "nurseEx": {
+    "en": "Her pupils are equal and react to light.",
+    "zh": "她的兩邊瞳孔一樣大，對光有反應。"
+   },
+   "everydayEx": {
+    "en": "The teacher has thirty pupils.",
+    "zh": "這位老師有三十個學生。"
+   }
+  },
+  {
+   "en": "positive",
+   "nurse": "陽性（檢驗結果）",
+   "everyday": "肯定的、積極的",
+   "nurseEx": {
+    "en": "His flu test is positive.",
+    "zh": "他的流感快篩是陽性。"
+   },
+   "everydayEx": {
+    "en": "She always stays positive.",
+    "zh": "她一直保持樂觀積極。"
+   }
+  },
+  {
+   "en": "negative",
+   "nurse": "陰性（檢驗結果）",
+   "everyday": "負面的、否定的",
+   "nurseEx": {
+    "en": "The COVID test came back negative.",
+    "zh": "新冠檢測的結果是陰性。"
+   },
+   "everydayEx": {
+    "en": "Try not to be so negative.",
+    "zh": "試著不要那麼負面。"
+   }
+  },
+  {
+   "en": "admission",
+   "nurse": "住院、入院",
+   "everyday": "入場（費）、入學許可",
+   "nurseEx": {
+    "en": "He needs admission to the hospital tonight.",
+    "zh": "他今晚需要住院。"
+   },
+   "everydayEx": {
+    "en": "Admission to the museum is free.",
+    "zh": "博物館免費入場。"
+   }
+  },
+  {
+   "en": "discharge",
+   "nurse": "出院；（傷口的）分泌物",
+   "everyday": "排出、放出（字表也有「出院」）",
+   "nurseEx": {
+    "en": "There is yellow discharge from the wound.",
+    "zh": "傷口有黃色的分泌物。"
+   },
+   "everydayEx": {
+    "en": "The factory discharged dirty water into the river.",
+    "zh": "工廠把髒水排進河裡。"
+   }
+  },
+  {
+   "en": "gown",
+   "nurse": "隔離衣；病人服",
+   "everyday": "禮服、長袍",
+   "nurseEx": {
+    "en": "Put on a gown and gloves before you go in.",
+    "zh": "進去之前先穿隔離衣、戴手套。"
+   },
+   "everydayEx": {
+    "en": "She wore a long gown to the party.",
+    "zh": "她穿長禮服去參加派對。"
+   }
+  },
+  {
+   "en": "turn",
+   "nurse": "翻身（幫病人翻身）",
+   "everyday": "轉；輪到",
+   "nurseEx": {
+    "en": "Let's turn him onto his left side.",
+    "zh": "我們幫他翻成左側躺。"
+   },
+   "everydayEx": {
+    "en": "It's your turn.",
+    "zh": "輪到你了。"
+   }
+  },
+  {
+   "en": "order",
+   "nurse": "醫囑",
+   "everyday": "點餐；順序；命令",
+   "nurseEx": {
+    "en": "Is there an order for pain medicine?",
+    "zh": "有止痛藥的醫囑嗎？"
+   },
+   "everydayEx": {
+    "en": "Can I take your order?",
+    "zh": "可以幫您點餐了嗎？"
+   }
+  },
+  {
+   "en": "alert",
+   "nurse": "意識清醒的",
+   "everyday": "警覺的、靈敏的",
+   "nurseEx": {
+    "en": "She is alert and oriented.",
+    "zh": "她意識清醒、定向感正常。"
+   },
+   "everydayEx": {
+    "en": "Stay alert when you drive at night.",
+    "zh": "晚上開車要保持警覺。"
+   }
+  },
+  {
+   "en": "restraint",
+   "nurse": "約束（約束帶）",
+   "everyday": "克制、限制",
+   "nurseEx": {
+    "en": "We need a doctor's order to use restraints.",
+    "zh": "使用約束要有醫囑。"
+   },
+   "everydayEx": {
+    "en": "He showed great restraint.",
+    "zh": "他非常克制。"
+   }
+  },
+  {
+   "en": "isolation",
+   "nurse": "隔離（防止感染的措施）",
+   "everyday": "孤立、隔絕",
+   "nurseEx": {
+    "en": "The patient is in contact isolation.",
+    "zh": "這位病人採接觸隔離。"
+   },
+   "everydayEx": {
+    "en": "Some older people live in isolation.",
+    "zh": "有些老人過著孤立的生活。"
+   }
+  },
+  {
+   "en": "oral",
+   "nurse": "口服的",
+   "everyday": "口頭的；口腔的",
+   "nurseEx": {
+    "en": "These are oral tablets. Swallow them with water.",
+    "zh": "這是口服藥錠，配水吞下去。"
+   },
+   "everydayEx": {
+    "en": "We have an oral test tomorrow.",
+    "zh": "我們明天有口試。"
+   }
+  },
+  {
+   "en": "confusion",
+   "nurse": "意識混亂",
+   "everyday": "混亂、搞混",
+   "nurseEx": {
+    "en": "New confusion in an older patient can be a sign of infection.",
+    "zh": "長者突然出現意識混亂，可能是感染的徵兆。"
+   },
+   "everydayEx": {
+    "en": "There was some confusion about the time.",
+    "zh": "大家對時間有點搞混。"
+   }
+  },
+  {
+   "en": "stroke",
+   "nurse": "中風",
+   "everyday": "一筆、一劃；輕撫",
+   "nurseEx": {
+    "en": "Sudden weakness on one side of the body can be a stroke.",
+    "zh": "身體一側突然無力，可能是中風。"
+   },
+   "everydayEx": {
+    "en": "She stroked the cat.",
+    "zh": "她輕輕摸貓。"
+   }
+  },
+  {
+   "en": "chart",
+   "nurse": "病歷",
+   "everyday": "圖表",
+   "nurseEx": {
+    "en": "Write it in the patient's chart.",
+    "zh": "把它寫進病人的病歷。"
+   },
+   "everydayEx": {
+    "en": "Look at the chart on page 5.",
+    "zh": "看第 5 頁的圖表。"
+   }
+  },
+  {
+   "en": "resident",
+   "nurse": "住院醫師",
+   "everyday": "居民",
+   "nurseEx": {
+    "en": "I'll call the resident on duty.",
+    "zh": "我會打給值班的住院醫師。"
+   },
+   "everydayEx": {
+    "en": "The residents of this town are friendly.",
+    "zh": "這個鎮的居民很友善。"
+   }
+  },
+  {
+   "en": "critical",
+   "nurse": "病危的、危急的",
+   "everyday": "愛批評的；關鍵的",
+   "nurseEx": {
+    "en": "He is in critical condition.",
+    "zh": "他的病況危急。"
+   },
+   "everydayEx": {
+    "en": "Don't be so critical of yourself.",
+    "zh": "別對自己那麼挑剔。"
+   }
+  },
+  {
+   "en": "tablet",
+   "nurse": "藥錠",
+   "everyday": "平板電腦",
+   "nurseEx": {
+    "en": "Take one tablet twice a day.",
+    "zh": "一次一錠，一天兩次。"
+   },
+   "everydayEx": {
+    "en": "I read e-books on my tablet.",
+    "zh": "我用平板看電子書。"
+   }
+  },
+  {
+   "en": "dressing",
+   "nurse": "敷料",
+   "everyday": "沙拉醬；穿衣",
+   "nurseEx": {
+    "en": "I'll change your dressing now.",
+    "zh": "我現在幫你換敷料。"
+   },
+   "everydayEx": {
+    "en": "Do you want dressing on your salad?",
+    "zh": "你的沙拉要加醬嗎？"
+   }
+  },
+  {
+   "en": "patient",
+   "nurse": "病人",
+   "everyday": "有耐心的",
+   "nurseEx": {
+    "en": "The patient in Room 5 needs help.",
+    "zh": "5 號房的病人需要幫忙。"
+   },
+   "everydayEx": {
+    "en": "Please be patient.",
+    "zh": "請耐心一點。"
+   }
+  },
+  {
+   "en": "culture",
+   "nurseWord": "blood culture",
+   "nurse": "（細菌）培養：blood culture 血液培養",
+   "everyday": "文化",
+   "nurseEx": {
+    "en": "We took two sets of blood cultures.",
+    "zh": "我們抽了兩套血液培養。"
+   },
+   "everydayEx": {
+    "en": "I love learning about Japanese culture.",
+    "zh": "我喜歡認識日本文化。"
+   }
+  },
+  {
+   "en": "contrast",
+   "nurseWord": "contrast dye",
+   "nurse": "顯影劑（contrast dye）",
+   "everyday": "對比、對照",
+   "nurseEx": {
+    "en": "Are you allergic to contrast dye?",
+    "zh": "你對顯影劑過敏嗎？"
+   },
+   "everydayEx": {
+    "en": "There is a big contrast between the two cities.",
+    "zh": "這兩個城市的差別很大。"
+   }
+  },
+  {
+   "en": "code",
+   "nurseWord": "code blue",
+   "nurse": "急救代碼（code blue：病人心跳或呼吸停止，啟動急救）",
+   "everyday": "密碼、代碼、程式碼",
+   "nurseEx": {
+    "en": "Call a code blue in Room 8!",
+    "zh": "8 號房啟動急救（code blue）！"
+   },
+   "everydayEx": {
+    "en": "Enter the code to open the door.",
+    "zh": "輸入密碼開門。"
+   }
+  },
+  {
+   "en": "charge",
+   "nurseWord": "charge nurse",
+   "nurse": "負責（charge nurse：當班的負責護理師）",
+   "everyday": "收費；充電；指控",
+   "nurseEx": {
+    "en": "Ask the charge nurse about the beds.",
+    "zh": "床位的事去問當班負責護理師。"
+   },
+   "everydayEx": {
+    "en": "I need to charge my phone.",
+    "zh": "我要幫手機充電。"
+   }
+  },
+  {
+   "en": "complain",
+   "nurseWord": "complain of",
+   "nurse": "說自己有（某個症狀）、主訴",
+   "everyday": "抱怨",
+   "nurseEx": {
+    "en": "He complains of chest pain.",
+    "zh": "他主訴胸痛。"
+   },
+   "everydayEx": {
+    "en": "She always complains about the food.",
+    "zh": "她總是抱怨食物。"
+   }
+  },
+  {
+   "en": "fast",
+   "nurseWord": "fasting",
+   "nurse": "禁食、空腹（fasting）",
+   "everyday": "快的",
+   "nurseEx": {
+    "en": "You need to be fasting for this blood test.",
+    "zh": "這個抽血檢查要空腹。"
+   },
+   "everydayEx": {
+    "en": "He runs very fast.",
+    "zh": "他跑得很快。"
+   }
+  },
+  {
+   "en": "sharp",
+   "nurseWord": "sharps container",
+   "nurse": "sharps：用過的針頭等尖銳物（sharps container 尖銳物收集筒）",
+   "everyday": "尖的、鋒利的",
+   "nurseEx": {
+    "en": "Put the used needle in the sharps container.",
+    "zh": "用過的針頭丟進尖銳物收集筒。"
+   },
+   "everydayEx": {
+    "en": "Be careful, the knife is sharp.",
+    "zh": "小心，刀子很利。"
+   }
+  }
+ ],
+ "confusable": [
+  {
+   "words": [
+    "dementia",
+    "delirium"
+   ],
+   "tip": "dementia 失智症：慢慢變差、持續很久；delirium 譫妄：突然出現，一天裡時好時壞，常找得到原因（感染、藥物、脫水），處理後可以改善。"
+  },
+  {
+   "words": [
+    "heart attack",
+    "heart failure"
+   ],
+   "tip": "heart attack 心肌梗塞：供應心臟的血管突然塞住；heart failure 心衰竭：心臟長期打血打不夠力。"
+  },
+  {
+   "words": [
+    "intravenous",
+    "intramuscular",
+    "subcutaneous"
+   ],
+   "tip": "intravenous 靜脈注射（IV）、intramuscular 肌肉注射（IM）、subcutaneous 皮下注射（SC／SubQ）：前面的字根說打到哪裡。"
+  },
+  {
+   "words": [
+    "nausea",
+    "vomiting"
+   ],
+   "tip": "nausea 噁心（想吐）；vomiting 嘔吐（真的吐出來）。"
+  },
+  {
+   "words": [
+    "numbness",
+    "tingling"
+   ],
+   "tip": "numbness 麻木（摸起來沒感覺）；tingling 刺麻感（像針在刺）。"
+  },
+  {
+   "words": [
+    "sodium",
+    "potassium"
+   ],
+   "tip": "sodium 鈉（Na）；potassium 鉀（K）：兩個都是電解質，名字跟化學符號對不太起來，要分開記。"
+  }
+ ]
+}

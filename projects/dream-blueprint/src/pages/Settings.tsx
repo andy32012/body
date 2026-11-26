@@ -232,7 +232,7 @@ export default function Settings(props: PageProps) {
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
       {(()=>{const mb=JSON.stringify(state).length/1e6; const folder=archiveFolderUrl(); return <p className={mb>3.5?'set-warn':undefined}>進度檔大小：{mb<0.1?'不到 0.1':mb.toFixed(1)} MB（手機的瀏覽器大約能存 5 MB）。{
         driveConnected()&&cloudArchive()?<>兩個月以前的複習紀錄、幾週前的每天小紀錄、四個月前上完的課的批改全文，會先存進你雲端硬碟的「夢想藍圖・封存」資料夾，雲端說收到了才從這台拿掉，一筆都不會丟。{folder&&<> <a href={folder} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</>
-        :driveConnected()?'舊紀錄會先留在這台，等雲端小程式更新到 v4，就會先存進雲端硬碟再從這台整理掉（步驟在上面「雲端硬碟」那一區）。'
+        :driveConnected()?'舊紀錄會先留在這台，等雲端小程式更新到最新的 v5（v4 以上都可以），就會先存進雲端硬碟再從這台整理掉（步驟在上面「雲端硬碟」那一區）。'
         :'兩個月以前的複習紀錄會整理成統計，每天的小紀錄幾週後清掉，所以會一直維持在安全範圍。連上雲端硬碟的話，整理掉之前會先存一份到雲端。'}{mb>3.5?' 現在偏大了，請跟 Claude 說要把進度改存到 IndexedDB。':''}</p>})()}
       <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void readFile(e.target.files?.[0],'backup');e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>

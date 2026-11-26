@@ -84,7 +84,7 @@ The build is deterministic. CI fails when `dream/` differs from a fresh build of
 - Clinical content must stay correct for nursing; check facts against reliable sources and say which.
 - Keep each data file's formatting so diffs stay small (Python: `json.dumps(data, ensure_ascii=False, indent=N)`, plus a final newline where the file has one):
   - indent 2 + newline: curriculum, curriculumSchedule, cosmos-d/g/p/s, gept-speaking, medical-parts, plan, quiz, reading, rivals, roadmap, school, sentences, words; indent 2, no newline: cosmos-n
-  - indent 1 + newline: bridge, cue-cards, exam-subjects, lessons, scenarios, topics, writing; indent 1, no newline: content-updates, grammar, pronunciation, starters, word-parts
+  - indent 1 + newline: bridge, cue-cards, exam-reading-a1/a2/b1/b2, exam-subjects, homographs, lessons, scenarios, topics, writing; indent 1, no newline: content-updates, grammar, pronunciation, starters, word-parts
   - one line (`separators=(',', ':')`), no newline: levels, passages
   - hand formatted — edit in place, never re-dump: nursing-listening, nursing-reading, nursing-words
   - Windows line endings (CRLF), keep them: cosmos-d/g/n/p, rivals. Python's text mode hides `\r`; open these with `newline=''`.

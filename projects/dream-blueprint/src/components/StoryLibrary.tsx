@@ -5,11 +5,10 @@ import type { Passage } from '../lib/passages'
 import { useTaskContext } from '../lib/taskContext'
 import { useTapGuard } from '../lib/tapGuard'
 import { logSkill } from '../lib/bridge'
-import { newCard } from '../lib/progress'
-import { levelEntry, wordKey } from '../lib/vocab'
 import { useDialogueVoice } from './LessonParts'
-import { storyLevelsOpen, dictationPatch, dictationScore, dictationTotal, lookupWord, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
-  storyTabs, type Lookup, type StoryTab } from '../lib/story'
+import { LookedUp, TapWords, useLookup } from './WordLookup'
+import { storyLevelsOpen, dictationPatch, dictationScore, dictationTotal, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
+  storyTabs, type StoryTab } from '../lib/story'
 import { openAt } from '../lib/unlock'
 import './story.css'
 
@@ -30,8 +29,7 @@ function Sentences({ list, playing, onPlay, onWord, picked, detail, detailLine }
   return <ol className="st-lines">
     {list.map((s, i) => <li key={i} data-playing={playing === i}>
       {onPlay && <button type="button" className="st-say" aria-label={'播放這一句：' + s} onClick={() => onPlay(i)}><Volume2 size={14} /></button>}
-      <p lang="en">{s.split(/([A-Za-z][A-Za-z'’-]*)/).map((t, j) => j % 2 && onWord
-        ? <button key={j} type="button" className="st-w" data-on={detailLine === i && picked === t.toLowerCase()} onClick={() => onWord(t, i)}>{t}</button> : t)}</p>
+      <p lang="en"><TapWords text={s} line={i} onWord={onWord} picked={picked} pickedLine={detailLine} /></p>
       {onWord && detailLine === i && detail}
     </li>)}
   </ol>
@@ -96,53 +94,6 @@ export default function StoryLibrary({ state, onActivity, date, initialTab = 're
 
 type PartProps = { passage: Passage; state: PageProps['state']; onActivity: PageProps['update']; date: string; onNext: () => void }
 const label = (p: Passage) => '第 ' + p.level + ' 級 · ' + p.letter + ' ' + String(p.n).padStart(2, '0')
-
-/** Words looked up while reading: each can go into the word review. Only words of the 7000-word table become cards. */
-function LookedUp({ items, state, onActivity, date }: { items: Lookup[]; state: PageProps['state']; onActivity: PageProps['update']; date: string }) {
-  const cards = new Set(state.cards.map(c => c.id))
-  const able = items.filter(l => levelEntry(l.en))
-  if (!items.length) return null
-  function add(list: Lookup[]) {
-    onActivity(prev => {
-      const have = new Set(prev.cards.map(c => c.id))
-      const keys = [...new Set(list.map(l => wordKey(l.en)))].filter(k => !have.has('word:' + k))
-      if (!keys.length) return prev
-      const known = new Set(keys)
-      return { ...prev,
-        knownWords: prev.knownWords.filter(w => !known.has(wordKey(w))),
-        learningWords: [...new Set([...prev.learningWords, ...keys])],
-        cards: [...prev.cards, ...keys.map(k => newCard('word:' + k, date))] }
-    })
-  }
-  const waiting = able.filter(l => !cards.has('word:' + wordKey(l.en)))
-  return <section className="st-looked">
-    <strong>這段查過的字（{items.length}）</strong>
-    <ul>{items.map(l => <li key={l.form.toLowerCase()}><b lang="en">{l.form}</b>{l.form.toLowerCase() !== l.en.toLowerCase() && <small lang="en">（{l.en}）</small>} {l.zh}
-      {levelEntry(l.en) && cards.has('word:' + wordKey(l.en)) && <small className="st-in">已在單字複習</small>}</li>)}</ul>
-    {waiting.length > 0 && <button type="button" className="pr-link" onClick={() => add(waiting)}>把這 {waiting.length} 個字加進單字複習</button>}
-  </section>
-}
-
-/** The first spelling of a word-table entry: "it (its, itself)" → it, "airplane/plane" → airplane. */
-const headword = (en: string) => en.split(/[\s(/]/)[0].toLowerCase()
-function useLookup(passage: Passage) {
-  const [picked, setPicked] = useState<Lookup | { form: string; miss: true }>()
-  const [seen, setSeen] = useState<Lookup[]>([])
-  const [line, setLine] = useState<number>()
-  function tap(word: string, at: number) {
-    setLine(at)
-    const found = lookupWord(word, passage)
-    if (!found) { setPicked({ form: word, miss: true }); return }
-    setPicked(found)
-    setSeen(list => list.some(l => l.form.toLowerCase() === found.form.toLowerCase()) ? list : [...list, found])
-  }
-  const box = picked && <p className="st-lookup" role="status">
-    <b lang="en">{picked.form}</b>
-    {'miss' in picked ? <span>字表裡沒有這個字（可能是名字、數字或字表以外的字），可以按「問問 Claude」。</span>
-      : <><span>{picked.zh}</span><small>{picked.from === 'passage' ? '這段裡的意思' : picked.from === 'extra' ? '常用字的說明（不在 7000 單字表裡）' : '字表的意思' + (picked.form.toLowerCase() !== headword(picked.en) ? '（原形 ' + headword(picked.en) + '）' : '')}</small></>}
-  </p>
-  return { tap, box, line, seen, pickedForm: picked?.form.toLowerCase() }
-}
 
 function StoryRead({ passage, all, state, onActivity, date, onNext }: PartProps & { all: Passage[] }) {
   const sentences = useMemo(() => splitSentences(passage.en ?? ''), [passage])

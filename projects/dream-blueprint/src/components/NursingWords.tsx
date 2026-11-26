@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { markSkill, skillSummary, skills, type Skill } from '../lib/wordSkills'
-import { wordKey } from '../lib/vocab'
+import { nurseSkillKey } from '../lib/homographs'
 import { countNurseWord, nurseWordsOn, type NurseWord } from '../lib/nursing'
 import WordSkills from './WordSkills'
 
@@ -22,7 +22,8 @@ export default function NursingWords({ state, onActivity, date }: Pick<PageProps
   if (!all) return <p className="ls-help">載入護理單字……</p>
   const areas = [ALL, ...new Set(all.map(w => w.area))]
   const list = area === ALL ? all : all.filter(w => w.area === area)
-  const count = skillSummary(state.notes, list.map(w => wordKey(w.en)))
+  // pupil (瞳孔) is practised apart from the everyday pupil (學生): nurseSkillKey keeps their records separate.
+  const count = skillSummary(state.notes, list.map(w => nurseSkillKey(w.en)))
   const today = nurseWordsOn(state.notes, date)
   return <div className="pr-stack ws-head">
     <div className="pr-options qz-tabs" role="group" aria-label="單字能力">
@@ -39,7 +40,7 @@ export default function NursingWords({ state, onActivity, date }: Pick<PageProps
       {today > 0 && <span>今天過關 {today} 個</span>}
     </p>
     <WordSkills key={skill + area} skill={skill} words={list} distractors={list.length >= 6 ? list : all} notes={state.notes}
-      keyOf={w => wordKey(w.en)} rate={state.settings.speechRate} where="護理單字"
-      onPass={w => onActivity(prev => ({ ...prev, notes: countNurseWord(markSkill(prev.notes, wordKey(w.en), skill, date), date) }))} />
+      keyOf={w => nurseSkillKey(w.en)} rate={state.settings.speechRate} where="護理單字" side="nurse"
+      onPass={w => onActivity(prev => ({ ...prev, notes: countNurseWord(markSkill(prev.notes, nurseSkillKey(w.en), skill, date), date) }))} />
   </div>
 }

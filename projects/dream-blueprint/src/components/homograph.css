@@ -1,0 +1,4 @@
+.hg-note { display: grid; gap: .35rem; margin: .2rem 0 0; padding: .55rem .7rem; border-radius: 10px; border: 1px dashed currentColor; border-color: color-mix(in srgb, currentColor 30%, transparent); font-size: .9rem; line-height: 1.55; }
+.hg-note p { margin: 0; }
+.hg-note small { display: block; opacity: .82; }
+.hg-tag { display: inline-block; padding: 0 .4rem; margin-right: .15rem; border-radius: 6px; font-size: .78rem; background: color-mix(in srgb, currentColor 12%, transparent); }

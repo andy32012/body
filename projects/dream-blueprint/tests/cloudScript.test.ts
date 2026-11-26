@@ -10,11 +10,18 @@ type Cell = string | number
 function google() {
   let clock = Date.parse('2026-11-24T10:00:00Z')
   const props = new Map<string, string>()
+  // Ways to make Google fail, for the tests of a save that breaks halfway.
+  const fail = { rows: false, truncate: false, files: false }
   class Range {
     constructor(private sheet: Sheet, private row: number, private col: number, private rows = 1, private cols = 1) {}
     getValues() { return Array.from({ length: this.rows }, (_, r) => Array.from({ length: this.cols }, (_, c) => this.sheet.cells.get((this.row + r) + ':' + (this.col + c)) ?? '')) }
     getValue() { return this.getValues()[0][0] }
-    setValues(v: Cell[][]) { v.forEach((row, r) => row.forEach((x, c) => this.sheet.cells.set((this.row + r) + ':' + (this.col + c), x))); return this }
+    setValues(v: Cell[][]) {
+      // The progress rows (row 2 on): a lost connection after the first row, or rows silently cut short.
+      if (this.row >= 2 && fail.rows) { this.sheet.cells.set(this.row + ':' + this.col, v[0][0]); throw new Error('Service timed out') }
+      const rows = this.row >= 2 && fail.truncate ? v.map(r => r.map(x => typeof x === 'string' ? x.slice(0, 5) : x)) : v
+      rows.forEach((row, r) => row.forEach((x, c) => this.sheet.cells.set((this.row + r) + ':' + (this.col + c), x))); return this
+    }
     setValue(x: Cell) { return this.setValues([[x]]) }
     setNumberFormat() { return this }
   }
@@ -40,7 +47,7 @@ function google() {
   function makeFolder(id: string, name: string) {
     return {
       getId: () => id, getName: () => name, isTrashed: () => false, getUrl: () => 'https://drive.google.com/drive/folders/' + id,
-      createFile: (fileName: string, content: string) => { files.push({ id: 'f' + files.length, name: fileName, created: clock, content, trashed: false, folder: id }) },
+      createFile: (fileName: string, content: string) => { if (fail.files) throw new Error('Drive quota'); files.push({ id: 'f' + files.length, name: fileName, created: clock, content, trashed: false, folder: id }) },
       getFiles: () => { const live = files.filter(f => !f.trashed && f.folder === id); let i = 0; return { hasNext: () => i < live.length, next: () => fileApi(live[i++]) } },
     }
   }
@@ -51,7 +58,7 @@ function google() {
   })
   const services = {
     PropertiesService: { getScriptProperties: () => ({ getProperty: (k: string) => props.get(k) ?? null, setProperty: (k: string, v: string) => { props.set(k, v) } }) },
-    SpreadsheetApp: { create: () => book, openById: () => book },
+    SpreadsheetApp: { create: () => book, openById: () => book, flush: () => {} },
     DriveApp: {
       createFolder: (name: string) => { const f = makeFolder('folder' + (folders.size + 1), name); folders.set(f.getId(), f); return f },
       getFolderById: (id: string) => { const f = folders.get(id); if (!f) throw new Error('missing'); return f },
@@ -70,7 +77,7 @@ function google() {
   const run = new Function(...Object.keys(services), 'Date', appsScriptCode + '\nreturn { doPost, setupHistory }')(...Object.values(services), Date_)
   const post = (body: object) => run.doPost({ postData: { contents: JSON.stringify({ token: 't', ...body }) } })
   const inFolder = (name: string) => files.filter(f => !f.trashed && folders.get(f.folder)?.getName() === name)
-  return { post, files, setup: run.setupHistory as () => void, folders, inFolder, tick: (ms: number) => { clock += ms }, live: () => files.filter(f => !f.trashed) }
+  return { post, files, setup: run.setupHistory as () => void, folders, inFolder, tick: (ms: number) => { clock += ms }, live: () => files.filter(f => !f.trashed), fail, props, sheets }
 }
 
 test('雲端小程式 v3：蓋掉舊進度前先留一份，最多每小時一份；選版本時一定留', () => {
@@ -89,7 +96,7 @@ test('雲端小程式 v3：蓋掉舊進度前先留一份，最多每小時一�
   g.tick(3_700_000)
   g.post({ type: 'state', state: '{"v":5}', savedAt: 500, base: 400 })
   assert.equal(g.live().length, 3, '過了一小時又會留')
-  assert.deepEqual(g.post({ type: 'state', state: '{"v":6}', savedAt: 600, base: 100 }), { ok: false, error: 'stale', savedAt: 500, cas: true, archive: true }, '舊的出發點還是會被擋')
+  assert.deepEqual(g.post({ type: 'state', state: '{"v":6}', savedAt: 600, base: 100 }), { ok: false, error: 'stale', savedAt: 500, cas: true, archive: true, atomic: true }, '舊的出發點還是會被擋')
 })
 
 test('雲端小程式 v3：列出歷史版本、讀回某一份、另外加一份；最多留 30 份', () => {
@@ -140,4 +147,73 @@ test('網站這邊：v4 確認收到才算封存好；舊版小程式回 ok 但�
   assert.equal(await archiveToDrive('{"old":2}'), false, 'v3 不認得 archive-add')
   reply = () => { throw new Error('offline') }
   assert.equal(await archiveToDrive('{"old":3}'), false, '沒連上也不算')
+})
+
+test('雲端小程式 v5：存到一半斷線或寫不完整，雲端還是原本完整的那一份；寫好、讀回來一樣才換過去', () => {
+  const g = google()
+  const big = JSON.stringify({ text: 'x'.repeat(120_000) })
+  assert.equal(g.post({ type: 'state', state: big, savedAt: 100, base: 0 }).state, true)
+  assert.deepEqual([g.post({ type: 'state-get' }).state, g.post({ type: 'state-get' }).savedAt], [big, 100])
+  // The connection drops after the first row of the new copy.
+  g.fail.rows = true
+  const broken = g.post({ type: 'state', state: big + ' ', savedAt: 200, base: 100 })
+  assert.deepEqual([broken.ok, broken.error], [false, 'write'])
+  g.fail.rows = false
+  assert.deepEqual([g.post({ type: 'state-get' }).state, g.post({ type: 'state-get' }).savedAt], [big, 100], '原本那份完整留著，時間也沒變')
+  // Rows silently cut short: the read-back check catches it.
+  g.fail.truncate = true
+  assert.equal(g.post({ type: 'state', state: '{"v":2}', savedAt: 300, base: 100 }).error, 'write')
+  g.fail.truncate = false
+  assert.equal(g.post({ type: 'state-get' }).state, big)
+  // A good save after that works, and the next device starts from it.
+  assert.equal(g.post({ type: 'state', state: '{"v":3}', savedAt: 400, base: 100 }).state, true)
+  assert.deepEqual([g.post({ type: 'state-get' }).state, g.post({ type: 'state-get' }).savedAt], ['{"v":3}', 400])
+  assert.equal(g.post({ type: 'state-get' }).atomic, true, '每個回答都說自己是 v5')
+})
+
+test('雲端小程式 v5：要先留備份的覆蓋（還原、選版本），備份存不了就不蓋掉；回答照實說這次有沒有留', () => {
+  const g = google()
+  g.post({ type: 'state', state: '{"v":1}', savedAt: 100, base: 0 })
+  g.tick(3_700_000)
+  const kept = g.post({ type: 'state', state: '{"v":2}', savedAt: 200, base: 100 })
+  assert.deepEqual([kept.state, kept.kept], [true, true], '留了一份')
+  g.tick(60_000)
+  assert.equal(g.post({ type: 'state', state: '{"v":3}', savedAt: 300, base: 200 }).kept, false, '一小時內沒有再留，照實說')
+  g.fail.files = true
+  const refused = g.post({ type: 'state', state: '{"v":4}', savedAt: 400, snapshot: true })
+  assert.deepEqual([refused.ok, refused.error], [false, 'history'])
+  assert.equal(g.post({ type: 'state-get' }).state, '{"v":3}', '備份存不了，雲端那份沒有被蓋掉')
+  g.tick(3_700_000)
+  const plain = g.post({ type: 'state', state: '{"v":5}', savedAt: 500, base: 300 })
+  assert.deepEqual([plain.state, plain.kept], [true, false], '一般存檔照存，但說沒有留到備份')
+})
+
+test('雲端小程式 v5：從 v4 換過來，原本「進度」工作表裡的進度照樣讀得到；之後兩張輪流用', () => {
+  const g = google()
+  // What a v4 script left: the progress on the 進度 sheet, no slot recorded.
+  const sheet = g.post({ type: 'state', state: '{"old":1}', savedAt: 50, base: 0 })
+  assert.equal(sheet.state, true)
+  g.props.delete('STATE_SLOT')
+  const v4 = g.sheets.find(x => x.name === '進度')!
+  v4.clear()
+  v4.getRange(1, 1, 1, 2).setValues([['學習進度', 77]])
+  v4.getRange(2, 1, 1, 1).setValues([['~{"from":"v4"}']])
+  assert.deepEqual([g.post({ type: 'state-get' }).state, g.post({ type: 'state-get' }).savedAt], ['{"from":"v4"}', 77])
+  assert.equal(g.post({ type: 'state', state: '{"v":5}', savedAt: 90, base: 77 }).state, true)
+  assert.equal(g.props.get('STATE_SLOT'), '進度・另一份')
+  assert.equal(g.post({ type: 'state', state: '{"v":6}', savedAt: 95, base: 90 }).state, true)
+  assert.equal(g.props.get('STATE_SLOT'), '進度')
+  assert.equal(g.post({ type: 'state-get' }).state, '{"v":6}')
+})
+
+test('網站這邊：v5 的錯誤說清楚是哪一種，雲端那份沒壞', async () => {
+  const { saveDriveState, cloudStatus, cloudAtomic } = await import('../src/lib/drive')
+  store.set('dream-blueprint.drive', JSON.stringify({ url: 'https://script.google.com/macros/s/x/exec', token: 't' }))
+  store.set('dream-blueprint.cloud-cas', '1')
+  store.delete('dream-blueprint.cloud-conflict')
+  Object.assign(globalThis, { window: { dispatchEvent() {} } })
+  Object.assign(globalThis, { fetch: async () => ({ json: async () => ({ ok: false, error: 'write', cas: true, archive: true, atomic: true }) }) })
+  await saveDriveState('{"x":1}', 1000, 0)
+  assert.match(cloudStatus()?.message ?? '', /沒有存完整，雲端還是原本那一份/)
+  assert.equal(cloudAtomic(), true)
 })
