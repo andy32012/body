@@ -49,7 +49,10 @@ function Chunks({ pack, rate }: { pack: Pack; rate: number }) {
 
 /** Listen without the text, answer, then read along. Questions open after one complete play; a play that cannot be
  *  confirmed still lets him answer, but it is not recorded as understood by ear. */
-export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: number; last: ListenRecord | null; onSave: (r: Omit<ListenRecord, 'day'>) => void }) {
+export function PackListen({ l, rate, last, onSave, review }: { l: PackListening; rate: number; last: ListenRecord | null
+  onSave: (r: Omit<ListenRecord, 'day'>, byEar: boolean) => void
+  review?: { alreadyRead: boolean; onPreview: () => void }
+}) {
   useVoiceList()
   const voice = useDialogueVoice(rate, l.accent)
   const hasAccent = accentVoices(l.accent).length > 0
@@ -57,16 +60,17 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   const [checked, setChecked] = useState(false)
   const [showZh, setShowZh] = useState(false)
   const [noVoice, setNoVoice] = useState(false)
+  const [readAlong, setReadAlong] = useState(false)
   const [unsure, setUnsure] = useState(false)
   const [started, setStarted] = useState(0)
   // A redo starts a new round: plays finished before it do not open its questions.
   const [playsBefore, setPlaysBefore] = useState(0)
-  // The transcript and the answers were seen in this visit (a saved record means they were seen before): a redo is
-  // practice, not understanding by ear (listenAttempt).
-  const [seenText, setSeenText] = useState(false)
+  const [reviewRound, setReviewRound] = useState(false)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
   const heard = voice.completed > playsBefore
-  const open = heard || unsure || noVoice
+  const usingText = readAlong || (!review && noVoice)
+  const open = heard || unsure || usingText
+  const seenBefore = reviewRound || !!last || !!review?.alreadyRead
   const correct = l.questions.filter((q, i) => answers[i] === q.answer).length
   function playAll() {
     if (voice.playing !== null) { voice.stop(); return }
@@ -75,18 +79,37 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
   }
   function check() {
     voice.stop(); setChecked(true)
-    onSave(listenAttempt(last, { correct, total: l.questions.length, played: heard && !unsure, textShown: noVoice || seenText, plays: voice.completed - playsBefore }))
+    const byEar = heard && !unsure && !usingText
+    onSave(listenAttempt(last, { correct, total: l.questions.length, played: byEar, textShown: seenBefore, plays: voice.completed - playsBefore }), byEar)
+  }
+  function restart() {
+    voice.stop()
+    setPlaysBefore(voice.completed)
+    setReviewRound(true)
+    setAnswers([])
+    setChecked(false)
+    setUnsure(false)
+    setShowZh(false)
+    setNoVoice(false)
+    setReadAlong(false)
+    setStarted(0)
   }
   return <section className="ls-listen up-section">
     <div className="pr-label">聽力 · {l.scene}</div>
     <h3 lang="en" className="up-title">{l.title}</h3>
     <p className="ls-help">電腦語音（不是真人錄音）：{hasAccent ? accentNames[l.accent] + '口音' : '這台裝置沒有' + accentNames[l.accent] + '語音，先用其他英文語音'}。先不看字完整聽一到兩次，再回答。
-      {last ? ' 上次 ' + last.correct + ' / ' + last.total + (last.heard ? '' : '（重做、看過字或沒有確認聽完，不算只聽也懂）') + '。' : ''}</p>
+      {last ? ' 上次 ' + last.correct + ' / ' + last.total + (last.heard ? '（首次只聽）' : '（練習）') + '。' : ''}</p>
     <button type="button" className="ls-play" onClick={playAll}>
       {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />播放對話{voice.completed ? '（完整聽過 ' + voice.completed + ' 次）' : ''}</>}
     </button>
-    {noVoice && <p className="ls-help">這個瀏覽器沒辦法播放語音，看下面的對話作答；這次不算「只聽也懂」。</p>}
-    {(seenText || last) && !checked && <p className="ls-help">{seenText ? '剛剛看過全文和答案：這次重做是練習，先再完整聽一次才能作答，' : '這段之前做過、對過答案：這次是練習，'}成績不算「只聽也懂」（之前的最好成績會留著）。要再算只聽也懂，就換一段還沒聽過的。</p>}
+    {noVoice && !checked && (review
+      ? <p className="ls-help">語音這次沒有播完。可以重播，也可以看稿練習。{!usingText && <button type="button" className="pr-link"
+        onClick={() => { review.onPreview(); setReadAlong(true) }}>看稿練習</button>}</p>
+      : <p className="ls-help">這個瀏覽器沒辦法播放語音，看下面的對話作答；這次不算「只聽也懂」。</p>)}
+    {review && usingText && !checked && <p className="ls-help">看稿作答會存成練習。要用這段重聽過關，請關掉文稿，再從頭完整聽一次。</p>}
+    {seenBefore && !checked && <p className="ls-help">{review
+      ? '這段之前已做過或看過全文。重聽時先遮住文稿，完整聽完再作答，答對至少七成可算本級過關。原有首次成績照樣保留。'
+      : '這段已做過，這次成績算練習。原有首次只聽的成績照樣保留。'}</p>}
     {!checked && <ol className="ls-qs">
       {l.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
@@ -101,11 +124,11 @@ export function PackListen({ l, rate, last, onSave }: { l: PackListening; rate: 
       {l.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}><span lang="en">{q.q}</span><b lang="en">{answers[i] === q.answer ? '✓ ' : '✗ '}{q.options[q.answer]}</b>
         <AskWhy q={{ source: '聽力', passage: l.dialogue.map(d => d.who + ': ' + d.en).join(' / '), stem: q.q, options: q.options, picked: answers[i] === undefined ? '' : q.options[answers[i]], answer: q.options[q.answer], right: answers[i] === q.answer }} /></li>)}
     </ul>}
-    {(checked || noVoice) && <>
+    {(checked || usingText) && <>
       <Transcript lines={l.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(l.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        {checked && <button type="button" className="pr-link" onClick={() => { voice.stop(); setPlaysBefore(voice.completed); setSeenText(true); setAnswers([]); setChecked(false); setUnsure(false); setShowZh(false) }}>再做一次（不看字先聽）</button>}
+        {(checked || (review && usingText)) && <button type="button" className="pr-link" onClick={restart}>{review ? '關掉文稿，重聽作答' : '再做一次（不看字先聽）'}</button>}
       </div>
     </>}
   </section>
@@ -134,50 +157,64 @@ function HeldReading({ passage: data, done, onSubmit }: { passage: ReadPassage; 
   </article>
 }
 
-function HeldListening({ l, rate, done, onSubmit }: { l: PackListening; rate: number; done?: HeldPart; onSubmit: (picks: number[], correct: number, heard: boolean) => void }) {
+function HeldListening({ l, rate, done, onPractice, onSubmit }: { l: PackListening; rate: number; done?: HeldPart
+  onPractice: () => void; onSubmit: (picks: number[], correct: number) => void
+}) {
   useVoiceList()
   const voice = useDialogueVoice(rate, l.accent)
   const hasAccent = accentVoices(l.accent).length > 0
   const [picks, setPicks] = useState<number[]>(done?.picks ?? [])
   const [plays, setPlays] = useState(0)
   const [noVoice, setNoVoice] = useState(false)
-  const [unsure, setUnsure] = useState(false)
   const [showZh, setShowZh] = useState(false)
   useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
   const finished = !!done
-  const open = finished || voice.completed > 0 || unsure || noVoice
+  const heard = voice.completed > 0
   const ready = l.questions.every((_, i) => picks[i] !== undefined)
   const left = 2 - plays
   function playAll() {
     if (voice.playing !== null) { voice.stop(); return }
     if (!finished && left <= 0) return
     if (!voice.play(l.dialogue)) { setNoVoice(true); return }
+    setNoVoice(false)
     if (!finished) setPlays(n => n + 1)
   }
+  function tryAgain() {
+    voice.stop()
+    setPlays(0)
+    setNoVoice(false)
+  }
   return <article className="up-held">
-    <header><strong>沒聽過的聽力</strong><small>{l.questions.length} 題 · 電腦語音（{hasAccent ? accentNames[l.accent] + '口音' : '這台裝置沒有' + accentNames[l.accent] + '語音'}） · {done ? '第一次成績 ' + done.correct + ' / ' + done.total + (done.heard ? '' : '（沒有確認聽完）') + '（' + md(done.day) + '）' : '最多播兩次，不看字'}</small></header>
+    <header><strong>沒聽過的聽力</strong><small>{l.questions.length} 題 · 電腦語音（{hasAccent ? accentNames[l.accent] + '口音' : '這台裝置沒有' + accentNames[l.accent] + '語音'}） · {done ? (done.heard === true ? '第一次成績 ' : '舊紀錄，未確認聽完：') + done.correct + ' / ' + done.total + '（' + md(done.day) + '）' : '最多播兩次，不看字'}</small></header>
     <p className="ls-help">情境：{l.scene}</p>
     <button type="button" className="ls-play" onClick={playAll} disabled={!finished && left <= 0 && voice.playing === null}>
       {voice.playing !== null ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />{finished ? '再聽一次' : left > 0 ? '播放（還能播 ' + left + ' 次）' : '兩次都播完了'}</>}
     </button>
-    {noVoice && !finished && <p className="ls-help">這個瀏覽器沒辦法播放語音，只能看文字作答；這次會記成「沒有聲音」，不算聽力成績。</p>}
-    {!open && plays > 0 && voice.playing === null && <button type="button" className="pr-link" onClick={() => setUnsure(true)}>播完了，但題目沒有打開？</button>}
-    {(noVoice || finished) && <Transcript lines={l.dialogue} playing={voice.playing} showZh={finished && showZh} onPlayLine={i => voice.play(l.dialogue, i, true)} />}
+    {!finished && !heard && (noVoice || (plays > 0 && voice.playing === null)) && <div className="pr-hint">
+      <p>這次沒確認語音完整播放，回測機會仍保留。若目前無法播出，可以先用這個單元的其他對話看稿練習。</p>
+      <div className="pr-actions">
+        {left <= 0 && <button type="button" className="pr-link" onClick={tryAgain}>重新嘗試播放</button>}
+        <button type="button" className="pr-link" onClick={onPractice}>用其他對話練習</button>
+      </div>
+    </div>}
+    {finished && <Transcript lines={l.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(l.dialogue, i, true)} />}
     <ol className="ls-qs">
       {l.questions.map((q, i) => <li key={i}>
         <p lang="en">{q.q}</p>
-        <div className="pr-options rd-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={picks[i] === j} disabled={finished || !open}
+        <div className="pr-options rd-options">{q.options.map((o, j) => <button key={j} type="button" lang="en" aria-pressed={picks[i] === j} disabled={finished || !heard}
           onClick={() => { const n = [...picks]; n[i] = j; setPicks(n) }}>{o}</button>)}</div>
         {finished && <p className="up-why" data-ok={picks[i] === q.answer}>{picks[i] === q.answer ? '✓ 對' : '✗ 答案是「' + q.options[q.answer] + '」'}</p>}
         {finished && <AskWhy q={{ source: '單元聽力', passage: l.dialogue.map(d => d.who + ': ' + d.en).join(' / '), stem: q.q, options: q.options, picked: picks[i] === undefined ? '' : q.options[picks[i]], answer: q.options[q.answer], right: picks[i] === q.answer }} />}
       </li>)}
     </ol>
-    {!finished && <button type="button" className="pr-main" disabled={!open || !ready} onClick={() => { voice.stop(); onSubmit(picks, l.questions.filter((q, i) => picks[i] === q.answer).length, voice.completed > 0 && !unsure && !noVoice) }}>交卷（只有這一次）</button>}
+    {!finished && <button type="button" className="pr-main" disabled={!heard || !ready} onClick={() => { voice.stop(); onSubmit(picks, l.questions.filter((q, i) => picks[i] === q.answer).length) }}>交卷（只有這一次）</button>}
     {finished && <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>}
   </article>
 }
 
-function HeldTest({ pack, state, onActivity, date }: { pack: Pack; state: PageProps['state']; onActivity: PageProps['update']; date: string }) {
+function HeldTest({ pack, state, onActivity, date, onPractice }: { pack: Pack; state: PageProps['state']
+  onActivity: PageProps['update']; date: string; onPractice: () => void
+}) {
   const open = heldOpen(state.curriculum, pack.unit)
   const rec = readHeld(state.notes, pack.unit)
   const [passage, setPassage] = useState<ReadPassage | null>(null)
@@ -195,22 +232,23 @@ function HeldTest({ pack, state, onActivity, date }: { pack: Pack; state: PagePr
   // Practice passages (best attempts) next to the unseen one: the gap shows whether the skill carries over.
   const train = pack.reading.map(id => readRecord(state.notes, id)).filter(r => r !== null)
   const trainRight = train.reduce((a, r) => a + (r.best ?? r).correct, 0), trainTotal = train.reduce((a, r) => a + (r.best ?? r).total, 0)
-  const save = (part: 'reading' | 'listening', p: HeldPart) => onActivity(prev => ({
-    ...prev, notes: logSkill(saveHeld(prev.notes, pack.unit, part, p), part === 'reading' ? 'read' : 'listen', date),
-  }))
+  const save = (part: 'reading' | 'listening', p: HeldPart) => onActivity(prev => {
+    const notes = saveHeld(prev.notes, pack.unit, part, p)
+    return notes === prev.notes ? prev : { ...prev, notes: logSkill(notes, part === 'reading' ? 'read' : 'listen', date) }
+  })
   return <section className="up-section">
     <p className="ls-help">沒看過的閱讀和聽力各一份，各只有一次機會：成績只記第一次，交卷後才看得到答案和解釋。照考試的方式做——不看中文、不查字典。</p>
     {(rec.reading || rec.listening) && <p className="up-compare">
       {rec.reading && <span>閱讀：練習文章 {trainTotal ? pct(trainRight, trainTotal) : '還沒做'} → 沒看過的 {pct(rec.reading.correct, rec.reading.total)}</span>}
-      {rec.listening && <span>聽力：沒聽過的 {pct(rec.listening.correct, rec.listening.total)}{rec.listening.heard ? '' : '（沒有確認聽完）'}</span>}
+      {rec.listening && <span>{rec.listening.heard === true ? '聽力：沒聽過的 ' + pct(rec.listening.correct, rec.listening.total) : '聽力：舊紀錄未確認完整聽過，不納入比較'}</span>}
     </p>}
     {passage ? <HeldReading passage={passage} done={rec.reading}
       onSubmit={(picks, correct) => save('reading', { day: date, picks, correct, total: passage.qs.length })} />
       : readFailed ? <div className="pr-hint" role="alert"><strong>回測的閱讀沒有下載到</strong><p>可能是網路斷了；回測還沒做，機會還在。連上網路後按「重新載入」。下面的聽力可以先做。</p>
         <div className="pr-actions"><button type="button" className="pr-main" onClick={() => location.reload()}>重新載入</button></div></div>
       : <p>載入中……</p>}
-    <HeldListening l={pack.heldListen} rate={state.settings.speechRate} done={rec.listening}
-      onSubmit={(picks, correct, heard) => save('listening', { day: date, picks, correct, total: pack.heldListen.questions.length, heard })} />
+    <HeldListening l={pack.heldListen} rate={state.settings.speechRate} done={rec.listening} onPractice={onPractice}
+      onSubmit={(picks, correct) => save('listening', { day: date, picks, correct, total: pack.heldListen.questions.length, heard: true })} />
   </section>
 }
 
@@ -256,7 +294,7 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
     listen: pack.listen.every((_, i) => readListen(notes, unit, i)) ? '✓' : '',
     write: tasks.filter(t => taskDone(readWrite(notes, t.id), false)).length + '/' + tasks.length,
     speak: pack.speak.filter((_, i) => notes[speakKey(unit, i)]).length + '/' + pack.speak.length,
-    test: held.reading && held.listening ? '✓' : heldOpen(cur, unit) ? '可以做' : '第 6 天',
+    test: held.reading && held.listening ? (held.listening.heard === true ? '✓' : '舊聽力未確認') : heldOpen(cur, unit) ? '可以做' : '第 6 天',
   }
   return <div className="pr-stack up">
     <header className="up-head">
@@ -296,6 +334,6 @@ export default function UnitPack({ state, onActivity, date }: Pick<PageProps, 's
         <a className="up-go" href={'#speaking/pack-' + unit + '-' + i}>跟 Emma 練</a>
       </article>)}
     </section>}
-    {tab === 'test' && <HeldTest key={unit} pack={pack} state={state} onActivity={onActivity} date={date} />}
+    {tab === 'test' && <HeldTest key={unit} pack={pack} state={state} onActivity={onActivity} date={date} onPractice={() => setTab('listen')} />}
   </div>
 }

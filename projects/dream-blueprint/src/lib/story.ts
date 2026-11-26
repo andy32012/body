@@ -11,9 +11,8 @@ export const storyTabs: [StoryTab, string][] = [['read', '閱讀'], ['listen', '
 /** r, l, d: the day it was read, listened to, written from dictation. q: meaning questions right / asked.
  *  dq: dictation words right / total. zh: the Chinese was opened before the questions. u: how much was understood by ear (1–3). */
 export interface StoryRecord { r?: string; l?: string; d?: string; q?: [number, number]; dq?: [number, number]; zh?: boolean; u?: 1 | 2 | 3
-  /** Dictation stopped early (今天寫到這裡): the sentence to go on from next time, and the words right / total so far.
-   *  The passage counts as dictated (`d`) only once its last sentence is done. */
-  dn?: number; dqp?: [number, number]
+  /** Dictation stopped early: the next sentence and current round's score, independent of past completion (`d`). */
+  dn?: number; dqp?: [number, number]; dAt?: number
   /** Played but not heard to the end (no voice, or the play failed): read along from the text that day; not listening. */
   lt?: string }
 const field: Record<StoryTab, 'r' | 'l' | 'd'> = { read: 'r', listen: 'l', dictate: 'd' }
@@ -25,6 +24,21 @@ export function readStory(notes: Record<string, string>, id: string): StoryRecor
 }
 export function saveStory(notes: Record<string, string>, id: string, patch: StoryRecord) {
   return { ...notes, [storyKey(id)]: JSON.stringify({ ...readStory(notes, id), ...patch }) }
+}
+
+/** Retain completed modes from either device and the active dictation from the latest dictation-specific change. */
+export function mergeStory(older: StoryRecord, newer: StoryRecord): StoryRecord {
+  const out = { ...older, ...newer }
+  for (const field of ['r', 'l', 'd'] as const) {
+    const a = older[field], b = newer[field]
+    out[field] = a && b ? (a < b ? a : b) : a ?? b
+  }
+  const newerHasDictation = newer.dn !== undefined || !!newer.d
+  const dictation = (older.dAt ?? 0) > (newer.dAt ?? 0) || !newerHasDictation ? older : newer
+  out.dn = dictation.dn
+  out.dqp = dictation.dqp
+  out.dAt = dictation.dAt
+  return out
 }
 
 const titles = /\b(Mr|Mrs|Ms|Dr|St|Prof|No|vs)\.$/i
@@ -62,7 +76,10 @@ export function storyOrder(all: readonly Passage[], level: number, checks: Recor
 export function nextStory(all: readonly Passage[], level: number, checks: Record<string, boolean>, notes: Record<string, string>, tab: StoryTab, skipped: readonly string[] = []) {
   const order = storyOrder(all, level, checks, notes, tab).filter(p => !skipped.includes(p.id))
   // A dictation stopped halfway comes back first, at the sentence where it stopped.
-  const started = tab === 'dictate' ? order.find(p => { const r = readStory(notes, p.id); return !r.d && r.dn !== undefined }) : undefined
+  const started = tab === 'dictate' ? order.find(p => {
+    const { dn } = readStory(notes, p.id)
+    return dn !== undefined && dn > 0 && dn < splitSentences(p.en ?? '').length
+  }) : undefined
   return started ?? order.find(p => !readStory(notes, p.id)[field[tab]]) ?? order[0]
 }
 export function storyProgress(all: readonly Passage[], level: number, notes: Record<string, string>, tab: StoryTab) {
@@ -199,7 +216,7 @@ export function dictationScore(answer: string, sentence: string) {
 /** What a dictation saves. `start`: the sentence it began at (after an earlier stop); `stop`: stopped before the last
  *  sentence, so the passage is not done and the next visit goes on from there. Words right / total add up across visits. */
 export function dictationPatch(before: StoryRecord, start: number, parts: readonly { right: number; total: number }[], stop: boolean, day: string): StoryRecord {
-  const sofar = start && before.dqp ? before.dqp : [0, 0]
+  const sofar = start && start === before.dn && before.dqp ? before.dqp : [0, 0]
   const sum: [number, number] = [sofar[0] + parts.reduce((n, p) => n + p.right, 0), sofar[1] + parts.reduce((n, p) => n + p.total, 0)]
   return stop ? { dn: start + parts.length, dqp: sum } : { d: day, dq: sum, dn: undefined, dqp: undefined }
 }

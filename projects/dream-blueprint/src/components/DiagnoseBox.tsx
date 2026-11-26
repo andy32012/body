@@ -13,8 +13,10 @@ export default function DiagnoseBox({ id, context, question, options, answer, pi
   /** Records why it went wrong; the learner's own choice is kept if already made. */
   onCause: (cause: string) => void; cause?: string
 }) {
-  const cached = (() => { const v = notes[diagKey(id)]; return v ? parseDiagnosis(v, options.length) : null })()
-  const [diag, setDiag] = useState<Diagnosis | null>(cached)
+  const [diag, setDiag] = useState<Diagnosis | null>(() => {
+    const saved = notes[diagKey(id)]
+    return saved ? parseDiagnosis(saved, options.length) : null
+  })
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -32,7 +34,7 @@ export default function DiagnoseBox({ id, context, question, options, answer, pi
       const user = [context ? '情境：' + context : '', '題目：' + question, '選項：' + options.map((o, i) => (i + 1) + '. ' + o).join(' / '), '正確答案：第 ' + (answer + 1) + ' 個'].filter(Boolean).join('\n')
       const reply = await askTutor(system, [{ role: 'user', content: user }])
       const d = parseDiagnosis(reply, options.length)
-      if (!d) { setError('拆解的格式怪怪的，再按一次試試。'); return }
+      if (!d) { setError('這次拆解缺少翻譯、關鍵字或選項說明，請再試一次。'); return }
       setDiag(d); onSave(diagKey(id), JSON.stringify(d))
     } catch (e) { setError(e instanceof Error ? e.message : String(e)) }
     finally { setBusy(false) }

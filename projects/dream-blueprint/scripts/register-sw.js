@@ -1,0 +1,93 @@
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  const scriptUrl = new URL("./sw.js", document.baseURI);
+  const version = document.querySelector('meta[name="dream-release"]')?.content;
+  navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" }).then(registration => {
+    let activeVersion;
+    let switchingTo;
+    const removeUpdate = () => document.getElementById("dream-update")?.remove();
+    const showUpdate = () => {
+      const ready = registration.waiting || (activeVersion && version && activeVersion !== version);
+      if (!ready) {
+        if (!switchingTo) removeUpdate();
+        return;
+      }
+      if (!document.body || document.getElementById("dream-update")) return;
+      const button = document.createElement("button");
+      button.id = "dream-update";
+      button.type = "button";
+      button.textContent = "新版已就緒，做完練習再更新";
+      button.setAttribute("style", "position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top));z-index:9999;white-space:normal;" +
+        "border:0;border-radius:999px;padding:11px 20px;font:600 15px/1.3 system-ui,sans-serif;color:#1d1440;background:#d9ccff;" +
+        "box-shadow:0 6px 24px rgba(0,0,0,.35);cursor:pointer;max-width:calc(100vw - 32px)");
+      button.addEventListener("click", () => {
+        if (!window.confirm("更新會重新開啟這一頁。已做完目前的練習了嗎？")) return;
+        const waiting = registration.waiting;
+        if (!waiting) { window.location.reload(); return; }
+        switchingTo = waiting;
+        button.disabled = true;
+        button.textContent = "正在切換新版…";
+        const recover = () => {
+          if (switchingTo !== waiting) return;
+          switchingTo = undefined;
+          button.disabled = false;
+          button.textContent = "還沒切換，點一下重試更新";
+        };
+        try { waiting.postMessage({ type: "ACTIVATE_UPDATE" }); }
+        catch { recover(); return; }
+        window.setTimeout(recover, 15000);
+      });
+      document.body.appendChild(button);
+    };
+    navigator.serviceWorker.addEventListener("message", event => {
+      if (event.source !== navigator.serviceWorker.controller || event.data?.type !== "APP_SHELL") return;
+      activeVersion = event.data.version;
+      showUpdate();
+    });
+    const watchInstalling = () => {
+      const worker = registration.installing;
+      worker?.addEventListener("statechange", showUpdate);
+      showUpdate();
+    };
+    registration.addEventListener("updatefound", watchInstalling);
+    watchInstalling();
+
+    const primeCover = () => {
+      const controller = navigator.serviceWorker.controller;
+      if (!controller) return;
+      controller.postMessage({ type: "PRIME_COVER", version });
+      // Photos can finish loading before this first visit comes under worker control.
+      const viewed = performance.getEntriesByType("resource")
+        .filter(entry => entry.initiatorType === "img" && entry.name.startsWith(new URL("cosmos/", scriptUrl).href))
+        .map(entry => {
+          const url = new URL(entry.name);
+          url.search = "";
+          return url.href;
+        });
+      if (viewed.length) controller.postMessage({ type: "SAVE_VIEWED_PHOTOS", version, urls: viewed });
+    };
+    navigator.serviceWorker.ready.then(primeCover);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (switchingTo && navigator.serviceWorker.controller === switchingTo) {
+        window.location.reload();
+        return;
+      }
+      // Other open tabs keep their own answers. Only the person who pressed Update reloads this page.
+      primeCover();
+    });
+    let lastCheck = Date.now();
+    const checkUpdate = () => registration.update().then(showUpdate).catch(() => {});
+    const check = () => {
+      if (document.visibilityState === "visible" && Date.now() - lastCheck >= 60000) {
+        lastCheck = Date.now();
+        primeCover();
+        checkUpdate();
+      }
+    };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("online", checkUpdate);
+    window.setInterval(check, 30 * 60000);
+    window.setTimeout(checkUpdate, 15000);
+  }).catch(() => {
+    // Private browsing can block offline storage. Online practice stays available.
+  });
+}

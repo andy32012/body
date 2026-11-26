@@ -13,8 +13,13 @@ export default function SyncPaused() {
   useEffect(() => {
     const on = () => setConflict(cloudConflict())
     window.addEventListener('dream-blueprint:cloud', on)
+    window.addEventListener('storage', on)
     window.addEventListener('focus', on)
-    return () => { window.removeEventListener('dream-blueprint:cloud', on); window.removeEventListener('focus', on) }
+    return () => {
+      window.removeEventListener('dream-blueprint:cloud', on)
+      window.removeEventListener('storage', on)
+      window.removeEventListener('focus', on)
+    }
   }, [])
   if (message) return <p className="sync-paused sync-done" role="status">{message}<button type="button" onClick={() => setMessage('')}>好</button></p>
   if (!conflict || !driveConnected()) return null
@@ -29,7 +34,7 @@ export default function SyncPaused() {
     <CloudAlert size={20} aria-hidden="true" />
     <div>
       <b>雲端同步暫停了</b>
-      <small>另一台裝置在 {stamp(conflict.remoteAt)} 存了進度，這台之後也有改動。按「兩份合併」兩台做過的都會留下，課表接在比較後面那一天。</small>
+      <small>另一台裝置在 {stamp(conflict.remoteAt)} 存了進度，這台也有改動。按「兩份合併」會保留兩台的作答和應補強的課程。</small>
     </div>
     <button type="button" className="sync-merge" disabled={busy} onClick={() => void merge()}>{busy ? '合併中……' : '兩份合併'}</button>
   </section>

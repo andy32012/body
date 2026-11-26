@@ -10,7 +10,11 @@ import { dayKey, daysBetween } from './progress'
 export const weakKey = 'weak.v1'
 export type WeakSource = 'tutor' | 'self' | 'drill' | 'speak' | 'write' | 'review' | 'gept'
 export interface WeakExample { w: string; r: string; src: WeakSource }
-export interface WeakItem { k: string; n: number; first: string; last: string; ex: WeakExample[] }
+export interface WeakItem {
+  k: string; n: number; first: string; last: string; lastAt?: number; ex: WeakExample[]
+  /** An older date-only deletion this device had already observed before the mistake came back. */
+  afterRemoval?: string
+}
 
 /** English names of the course's grammar, for Emma (her instructions are in English). Unit number → name. */
 const grammarEn: Record<number, string> = {
@@ -82,7 +86,12 @@ export function readWeak(notes: Record<string, string>): WeakItem[] {
     const list = JSON.parse(notes[weakKey] || '[]') as unknown
     if (!Array.isArray(list)) return []
     return list.filter((x): x is WeakItem => !!x && typeof x.k === 'string' && typeof x.n === 'number' && typeof x.last === 'string')
-      .map(x => ({ ...x, first: typeof x.first === 'string' ? x.first : x.last, ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [] }))
+      .map(x => ({
+        ...x,
+        first: typeof x.first === 'string' ? x.first : x.last,
+        lastAt: Number.isSafeInteger(x.lastAt) ? x.lastAt : undefined,
+        ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [],
+      }))
   } catch { return [] }
 }
 /** The list stays under 30,000 characters (it was sized when each saved note was capped at 50,000; the cap is now the
@@ -105,17 +114,23 @@ export function weakScore(item: WeakItem, today: string) {
 }
 const MAX_ITEMS = 30
 const clip = (s: string, n = 140) => s.trim().replace(/\s+/g, ' ').slice(0, n)
+const removalTime = (mark: string | undefined) => Number(mark?.split('@')[1]) || 0
+const nextWeakTime = (item: WeakItem | undefined, mark: string | undefined) =>
+  Math.max(Date.now(), (item?.lastAt ?? 0) + 1, removalTime(mark) + 1)
 
 /** Records a mistake. Labels outside the list are ignored, so a teacher cannot fill the list with free text. */
 export function addWeak(notes: Record<string, string>, rawLabel: string, day: string, example?: { w: string; r: string }, src: WeakSource = 'tutor') {
   const k = normalizeLabel(rawLabel)
   if (!k) return notes
-  const list = readWeak(notes)
+  const removed = readRemoved(notes)[k]
+  const list = readWeak(notes).filter(item => item.k !== k || weakAfterRemoval(item, removed))
   const ex = example && example.r.trim() ? [{ w: clip(example.w) || '（沒寫）', r: clip(example.r), src }] : []
   const old = list.find(i => i.k === k)
+  const lastAt = nextWeakTime(old, removed)
   const item: WeakItem = old
-    ? { ...old, n: old.n + 1, last: day > old.last ? day : old.last, ex: [...ex, ...old.ex.filter(e => !ex.some(x => squash(x.w) === squash(e.w)))].slice(0, 3) }
-    : { k, n: 1, first: day, last: day, ex }
+    ? { ...old, n: old.n + 1, last: day > old.last ? day : old.last, lastAt, ex: [...ex, ...old.ex.filter(e => !ex.some(x => squash(x.w) === squash(e.w)))].slice(0, 3) }
+    : { k, n: 1, first: day, last: day, lastAt, ex }
+  if (removed && !removalTime(removed)) item.afterRemoval = removed
   const rest = list.filter(i => i.k !== k)
   const next = [item, ...rest]
   if (next.length > MAX_ITEMS) next.splice(0, next.length, ...next.sort((a, b) => weakScore(b, day) - weakScore(a, day)).slice(0, MAX_ITEMS))
@@ -135,14 +150,33 @@ export function easeWeak(notes: Record<string, string>, rawLabel: string) {
 /** Deleted by the learner. A new mistake of the same kind starts it again from one. */
 export function removeWeak(notes: Record<string, string>, label: string, day = dayKey()) {
   const list = readWeak(notes)
-  if (!list.some(i => i.k === label)) return notes
-  // Remembered with its day, so a copy merged from another device does not bring it back.
-  return { ...write(notes, list.filter(i => i.k !== label)), [weakRemovedKey]: JSON.stringify({ ...readRemoved(notes), [label]: day }) }
+  const item = list.find(i => i.k === label)
+  if (!item) return notes
+  const removed = readRemoved(notes)
+  const mark = day + '@' + nextWeakTime(item, removed[label])
+  return { ...write(notes, list.filter(i => i.k !== label)), [weakRemovedKey]: JSON.stringify({ ...removed, [label]: mark }) }
 }
-/** Weak points removed by hand, and the day: merging keeps them removed unless the mistake came back later. */
+/** Weak points removed by hand, with the day and (in newer records) a timestamp. */
 export const weakRemovedKey = 'weak.removed'
 export function readRemoved(notes: Record<string, string>): Record<string, string> {
-  try { const v = JSON.parse(notes[weakRemovedKey] || '{}'); return v && typeof v === 'object' && !Array.isArray(v) ? v : {} } catch { return {} }
+  try {
+    const value: unknown = JSON.parse(notes[weakRemovedKey] || '{}')
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+    return Object.fromEntries(Object.entries(value).filter((entry): entry is [string, string] =>
+      typeof entry[1] === 'string' && /^\d{4}-\d{2}-\d{2}(?:@\d{1,15})?$/.test(entry[1])))
+  } catch { return {} }
+}
+export function laterWeakRemoval(first: string | undefined, second: string) {
+  if (!first) return second
+  const a = removalTime(first), b = removalTime(second)
+  if (a && b) return b > a ? second : first
+  return second > first ? second : first
+}
+export function weakAfterRemoval(item: WeakItem, mark: string | undefined) {
+  if (!mark) return true
+  const removedAt = removalTime(mark)
+  if (removedAt && item.lastAt) return item.lastAt > removedAt
+  return (!removedAt && item.afterRemoval === mark) || item.last > mark.slice(0, 10)
 }
 
 /** The strongest weak points now. Points that faded below half a miss are not shown. */

@@ -242,11 +242,11 @@
     "q": "The doctor spoke ___ a calm voice.",
     "options": [
      "in",
-     "with",
+     "on",
      "by"
     ],
     "answer": 0,
-    "why": "in a calm voice 用平靜的聲音。"
+    "why": "in a calm voice 表示用平靜的聲音。with a calm voice 也可以。"
    },
    {
     "k": "fix",
@@ -607,7 +607,7 @@
    },
    {
     "t": "also 和 too 的位置",
-    "p": "also 放在一般動詞前、be 動詞後：She also speaks Japanese.／He is also a nurse. too、as well 放句尾。",
+    "p": "沒有特別強調時，also 放在一般動詞前、be 動詞後最自然，例如 She also speaks Japanese.／He is also a nurse. too、as well 放在句尾。",
     "ex": [
      {
       "en": "She also speaks Japanese.",
@@ -636,9 +636,9 @@
   ],
   "mistakes": [
    {
-    "bad": "I also am a student.",
+    "bad": "I am a also student.",
     "good": "I am also a student.",
-    "why": "also 放在 be 動詞後面。"
+    "why": "a student 是一組，also 不插在 a 和 student 中間。這裡把 also 放在 am 後面。"
    }
   ],
   "drills": [
@@ -667,10 +667,11 @@
    {
     "k": "fix",
     "q": "He also is a nursing student.",
+    "instruction": "只調整 also 的位置，改成沒有特別強調時最常見的語序。",
     "accept": [
      "He is also a nursing student."
     ],
-    "why": "also 放在 be 動詞後面。"
+    "why": "沒有特別強調時，also 放在 is 後面最自然。原來的語序也可用於特別強調。"
    }
   ]
  },

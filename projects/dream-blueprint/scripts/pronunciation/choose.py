@@ -1,13 +1,14 @@
 """Decides which candidate pairs each lesson keeps and which take (voice) every clip uses, from the grades in out/f.json and out/m.json.
 A pair is kept only when both words are clear in one and the same voice, for the woman's voice and for the man's.
 Writes chosen.json (read by course.py and pack.py) and recordings.json (the check record of every clip in the course)."""
-import json, os, sys
-from course import parse, slug, lesson_texts, HERE, CHOSEN
+import os, sys
+from course import parse, slug, lesson_texts, HERE, CHOSEN, read_json, write_json
 
 ORDER = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_adam', 'am_fenrir', 'am_michael', 'am_puck']}
 if os.path.exists(CHOSEN): os.remove(CHOSEN)          # start from the pools, not from an earlier choice
-takes = {g: json.load(open(os.path.join(HERE, 'out', g + '.json'))) for g in 'fm'}
-fixed = json.load(open(os.path.join(HERE, 'intonation.json'))) if os.path.exists(os.path.join(HERE, 'intonation.json')) else {}
+takes = {g: read_json(os.path.join(HERE, 'out', g + '.json')) for g in 'fm'}
+fixed_path = os.path.join(HERE, 'intonation.json')
+fixed = read_json(fixed_path) if os.path.exists(fixed_path) else {}
 voices = {'f': {}, 'm': {}}
 ok = {'strict': ('strict',), 'weak': ('strict', 'weak')}
 problems = []
@@ -50,7 +51,7 @@ for l in lessons:
         if len(got) < pool['keep']: problems.append(f"{l['id']}: only {len(got)} of {pool['keep']} pairs are clear in both voices")
         picked += got
     if l['pools']: pairs[l['id']] = picked
-json.dump({'pairs': pairs}, open(CHOSEN, 'w'), ensure_ascii=False, indent=1)
+write_json(CHOSEN, {'pairs': pairs})
 
 # every other clip: the first voice with a clear take, otherwise the clearest one there is
 record = {}
@@ -68,10 +69,10 @@ for l in parse():
             r = have[voices[g][s]]
             if r['grade'] != 'strict': problems.append(f"{l['id']}: {t!r} ({g}, {voices[g][s]}) is {r['grade']}: {r.get('rivals') or r.get('heard')}")
             record.setdefault(l['id'], {}).setdefault(t, {})[g] = {'voice': voices[g][s], **{k: r[k] for k in ('phonemes', 'speed', 'secs', 'grade', 'ahead', 'partner', 'rivals', 'heard', 'pitch') if k in r}}
-json.dump({'pairs': pairs, 'voices': voices}, open(CHOSEN, 'w'), ensure_ascii=False, indent=1)
+write_json(CHOSEN, {'pairs': pairs, 'voices': voices})
 # the long words cut into syllables: what syllables.py made of each (it reads the voices just written, so on a first run
 # this part is empty; run syllables.py and then choose.py again)
-cuts = {g: json.load(open(p)) if os.path.exists(p := os.path.join(HERE, 'out', f'syllables-{g}.json')) else {} for g in 'fm'}
+cuts = {g: read_json(p) if os.path.exists(p := os.path.join(HERE, 'out', f'syllables-{g}.json')) else {} for g in 'fm'}
 for l in parse():
     for word, pieces in l['syll'].items():
         for g in 'fm':
@@ -81,7 +82,7 @@ for l in parse():
             # not a fault, but worth knowing: the slow word did not come back right in the word's own voice
             if c['voice'] != voices[g].get(slug(word)): print(f"note: {word!r} ({g}): the pieces are in {c['voice']}, the whole word in {voices[g].get(slug(word))}")
             record.setdefault(l['id'], {}).setdefault(word, {}).setdefault(g, {})['syllables'] = {k: c[k] for k in ('voice', 'speed', 'stretch', 'heard', 'slow_secs', 'piece_secs', 'slow_sounds', 'piece_sounds', 'vowel_heard')}
-json.dump(record, open(os.path.join(HERE, 'recordings.json'), 'w'), ensure_ascii=False, indent=1)
+write_json(os.path.join(HERE, 'recordings.json'), record)
 for l in parse():
     if l['pools']: print(l['id'], ' '.join('/'.join(p) for p in l['pairs']))
 for g in 'fm':

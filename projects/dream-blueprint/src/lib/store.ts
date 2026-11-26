@@ -6,7 +6,9 @@ import contentUpdates from '../data/content-updates.json'
 import { legacyLadder, migrateWritingProgress, writingMigrationKey } from './writing'
 import { compactState } from './compact'
 import { rescoreExams } from './examKeys'
-import { cloudBase, driveConnected, localStamp } from './drive'
+import { cloudBase, cloudScope, driveConnected, localStamp, setCloudBase } from './drive'
+import { nurseSkillKey } from './homographs'
+import { skillKey } from './wordSkills'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
@@ -19,6 +21,7 @@ const id = z.string().min(1).max(512)
 const day = z.iso.date()
 const weekday = z.number().int().min(0).max(6)
 const natural = z.number().int().nonnegative()
+const safeKey = z.string().min(1).max(512).refine(s => !['__proto__','constructor','prototype'].includes(s))
 const stringList = z.array(str)
 const energy = z.enum(['low', 'normal', 'high'])
 const period = z.enum(['semester', 'exam', 'internship', 'vacation'])
@@ -33,7 +36,8 @@ const schoolSchema = z.object({
   classes:z.array(z.object({id,weekday,start:str,end:str,label:str})),
   study:z.array(z.object({weekday,minutes:natural,time:str})),
   events:z.array(z.object({id,day,label:str,kind:str})),
-  requirements:z.array(z.object({id,group:str,label:str,done:z.boolean()})),
+  requirements:z.array(z.object({id,group:str,label:str,done:z.boolean(),modifiedAt:natural.optional()})),
+  requirementsRemoved:z.record(safeKey,natural).optional(),
 })
 const sessions = z.array(z.object({
   id,day,energy,period,sentenceId:str,feedback:z.enum(['right','much','more']).optional(),
@@ -50,7 +54,6 @@ const settingsSchema = z.object({
   profileRevision:z.union([z.literal(0),z.literal(1)]).default(0),
   internshipSeason:str.default(''),
 })
-const safeKey = z.string().min(1).max(512).refine(s => !['__proto__','constructor','prototype'].includes(s))
 const schema = z.object({
   version:z.literal(2),startedDay:day,settings:settingsSchema,school:schoolSchema,sessions,
   workload:z.object({extraWords:natural,lastAssessment:z.union([day,z.literal('')]),lastReduction:z.union([day,z.literal('')])}).default({extraWords:0,lastAssessment:'',lastReduction:''}),
@@ -105,7 +108,7 @@ export function createInitialState(startedDay=dayKey()):AppState {
     school:JSON.parse(JSON.stringify(defaultSchool)),sessions:[],cards:[],reviewEvents:[],
     curriculum:{unit:1,day:1,retry:0,stableUnits:[]},knownWords:[],learningWords:[],customWords:[],
     // A new start has nothing to reschedule, so every material update counts as already applied.
-    checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1','migrate.exam-keys-r038':'1',[writingMigrationKey]:'[]',...Object.fromEntries((contentUpdates as {id:string}[]).map(u=>['content.'+u.id,'0']))},flagged:[],
+    checks:{},notes:{'migrate.study30':'1','migrate.daily90':'1','migrate.exam-keys-r038':'1',[writingMigrationKey]:'[]',...Object.fromEntries(contentUpdates.flatMap(u=>[['content.'+u.id,'0'],[contentNoticeKey(u.id),'0']]))},flagged:[],
   }
 }
 export function exportBackup(state:AppState):string {
@@ -170,56 +173,100 @@ export function importBackup(raw:string):AppState {
   return compactState(state,dayKey(),undefined,driveConnected())
 }
 
-/** Teaching material corrected after it was learned: the review cards of those words and sentences come due today,
- *  so the corrected version is seen soon. Nothing is reset — boxes, history and stable units stay as they were.
- *  Each update runs once; how many cards it touched is kept in notes['content.'+id] for the notice on the home page. */
+export const contentNoticeKey = (id:string) => 'content.notice.' + id
+
+function savedRecord(raw:string|null|undefined):Record<string,unknown> {
+  try {
+    const record:unknown = JSON.parse(raw ?? '{}')
+    return record && typeof record === 'object' && !Array.isArray(record) ? record as Record<string,unknown> : {}
+  } catch { return {} }
+}
+function recordOnOrBefore(raw:string|undefined, date:string) {
+  const record = savedRecord(raw)
+  const best = record.best as {day?:unknown}|undefined
+  return [record.day, best?.day].some(day => typeof day === 'string' && day <= date)
+}
+
+/** Reschedule affected cards once. Report completed readings, listening and nursing vocabulary separately,
+ *  including on devices that previously recorded a correction with zero affected cards. */
 export function applyContentUpdates(state:AppState, today=dayKey()) {
-  for (const u of contentUpdates as {id:string,words:string[],sentences:string[]}[]) {
+  const updates:readonly {id:string,date:string,words:string[],sentences:string[],passages?:string[],listening?:string[],nursingWords?:string[]}[] = contentUpdates
+  for (const u of updates) {
     const key='content.'+u.id
-    if (state.notes[key]!==undefined) continue
-    const ids=new Set([...u.words.map(w=>'word:'+w),...u.sentences])
-    let touched=0
-    state.cards=state.cards.map(c=>{
-      if (!ids.has(c.id)) return c
-      touched++
-      // A card already practised today cannot come back the same day: it is due tomorrow instead.
-      const due=c.lastDay>=today ? addDays(today,1) : c.due>today ? today : c.due
-      return {...c,due,mastered:false}
-    })
-    state.notes={...state.notes,[key]:String(touched)}
+    if (state.notes[key]===undefined) {
+      const ids=new Set([...u.words.map(w=>'word:'+w),...u.sentences])
+      let touched=0
+      state.cards=state.cards.map(c=>{
+        if (!ids.has(c.id)) return c
+        touched++
+        const due=c.lastDay>=today ? addDays(today,1) : c.due>today ? today : c.due
+        return {...c,due,mastered:false}
+      })
+      state.notes={...state.notes,[key]:String(touched)}
+    }
+    const notice = contentNoticeKey(u.id)
+    if (state.notes[notice]!==undefined) continue
+    const readings = (u.passages ?? []).filter(id =>
+      recordOnOrBefore(state.notes['read.'+id],u.date) || recordOnOrBefore(state.notes['exam.read.'+id],u.date))
+    const dialogues = (u.listening ?? []).filter(id => recordOnOrBefore(state.notes['nurse.listen.'+id],u.date))
+    const nursingWords = (u.nursingWords ?? []).filter(word =>
+      Object.values(savedRecord(state.notes[skillKey(nurseSkillKey(word))])).some(day => typeof day === 'string' && day <= u.date))
+    state.notes={...state.notes,[notice]:String(readings.length + dialogues.length + nursingWords.length)}
   }
   return state
 }
 
 interface Snapshot {state:AppState,storageError:string|null}
+interface StoredProgress {current:string|null, legacy:string|null}
+interface StoredCloud {scope:string, base:number}
 let live:Snapshot | undefined
-let rawLoaded:string|null = null
+let loaded:StoredProgress|undefined
+let modified = 0
+let storedCloud:StoredCloud|null = null
 let dirty = false
 let unreadable = false
 const listeners = new Set<()=>void>()
 const emit = () => listeners.forEach(fn=>fn())
+const unsaved = '瀏覽器未能儲存本次更動。請在關閉前到設定下載備份。'
+export const MODIFIED_KEY = 'dream-blueprint.modified'
+
+function readStored():StoredProgress {
+  const current = localStorage.getItem(STORAGE_KEY)
+  return {current, legacy:current === null ? localStorage.getItem(oldKey) : null}
+}
+const matchesStored = (a:StoredProgress|undefined,b:StoredProgress) => !!a && a.current===b.current && a.legacy===b.legacy
+const validVersion = (value:unknown):value is number => typeof value==='number' && Number.isSafeInteger(value) && value>=0
+function readLegacyModified() {
+  try {
+    const legacy = Number(localStorage.getItem(MODIFIED_KEY))
+    return validVersion(legacy) ? legacy : 0
+  } catch { return 0 }
+}
+function readTracking(raw:string|null) {
+  const meta = savedRecord(raw)
+  const cloud = meta.storageCloud as Partial<StoredCloud>|null|undefined
+  storedCloud = cloud && typeof cloud.scope==='string' && validVersion(cloud.base) ? {scope:cloud.scope,base:cloud.base} : null
+  modified = validVersion(meta.storageModified) ? meta.storageModified : readLegacyModified()
+}
+function currentCloudBase(scope:string|null) {
+  if (scope===null) return 0
+  if (storedCloud) return storedCloud.scope===scope ? storedCloud.base : 0
+  const legacy = cloudBase()
+  return validVersion(legacy) ? legacy : 0
+}
 export function getSnapshot():Snapshot {
   if (live) return live
   const initial = createInitialState()
   try {
-    const current = localStorage.getItem(STORAGE_KEY)
-    const raw = current ?? localStorage.getItem(oldKey)
-    rawLoaded = raw
-    if (raw === null) {
-      const serialized = JSON.stringify(initial)
-      localStorage.setItem(STORAGE_KEY,serialized)
-      rawLoaded=serialized
-      return live = {state:initial,storageError:null}
-    }
-    const state = importBackup(raw)
-    const migrated = JSON.stringify(state)
-    if (current !== migrated) {
-      try { localStorage.setItem(STORAGE_KEY,migrated); rawLoaded=migrated }
-      catch { return live = {state,storageError:'瀏覽器尚未儲存新版進度，請匯出備份。'} }
-    }
+    loaded = readStored()
+    const raw = loaded.current ?? loaded.legacy
+    // Migrations are read-only until the next successful save. Keeping the raw source also preserves v1
+    // progress when v2 has never fit on this device.
+    const state = raw === null ? initial : importBackup(raw)
+    readTracking(loaded.current)
     return live = {state,storageError:null}
   } catch {
-    unreadable = rawLoaded !== null
+    unreadable = loaded !== undefined && (loaded.current !== null || loaded.legacy !== null)
     return live = {state:initial,storageError:unreadable
       ? '原有進度無法讀取，已保留原檔。請到設定匯入有效備份。'
       : '目前無法使用瀏覽器儲存空間，請在關閉前匯出備份。'}
@@ -228,10 +275,12 @@ export function getSnapshot():Snapshot {
 function refreshStorage() {
   if (dirty) return
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw === rawLoaded) return
+    const stored = readStored()
+    if (matchesStored(loaded,stored) && !unreadable && !live?.storageError) return
+    const raw = stored.current ?? stored.legacy
     const next = raw === null ? createInitialState() : importBackup(raw)
-    rawLoaded = raw
+    loaded = stored
+    readTracking(stored.current)
     unreadable = false
     live = {state:next,storageError:null}
   } catch {
@@ -241,7 +290,7 @@ function refreshStorage() {
   emit()
 }
 function onStorage(event:StorageEvent) {
-  if (event.key === null || event.key === STORAGE_KEY) refreshStorage()
+  if (event.key === null || event.key === STORAGE_KEY || event.key === oldKey) refreshStorage()
 }
 function subscribe(fn:()=>void) {
   if (!listeners.size) window.addEventListener('storage',onStorage)
@@ -251,90 +300,116 @@ function subscribe(fn:()=>void) {
     if (!listeners.size) window.removeEventListener('storage',onStorage)
   }
 }
-function commit(updater:(prev:AppState)=>AppState,replace=false) {
+function withStoreLock<T>(run:()=>T):Promise<T> {
+  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request(STORAGE_KEY,run)
+  try { return Promise.resolve(run()) } catch (error) { return Promise.reject(error) }
+}
+function currentSnapshot() {
   getSnapshot()
   refreshStorage()
-  const prev = getSnapshot().state
-  const state = updater(prev)
-  if (prev === state && !dirty) return
-  // A quota failure leaves newer changes in memory. A second tab may have
-  // saved its own changes meanwhile; preserve both versions for recovery.
-  if (dirty && !replace && !unreadable) {
-    try {
-      if (localStorage.getItem(STORAGE_KEY) !== rawLoaded) {
-        live={state,storageError:'另一個分頁已儲存不同進度。本分頁保留在記憶體，請先匯出備份，再選擇要還原的版本。'}
-        emit()
-        return
-      }
-    } catch { /* The write below reports a storage error and preserves memory. */ }
+  return getSnapshot()
+}
+function persist(state:AppState, options:{stamp?:number, cloudBase?:number, replace?:boolean}={}) {
+  if (unreadable && !options.replace)
+    throw new Error('原有資料已保留。請先下載備份，或從設定匯入有效備份。')
+  if (!options.replace) {
+    let sameVersion = false
+    try { sameVersion = matchesStored(loaded,readStored()) } catch { throw new Error(unsaved) }
+    if (!sameVersion)
+      throw new Error('另一個分頁已儲存不同進度。請先下載這台的備份，再選擇要還原的版本。')
   }
-  if (unreadable && !replace) {
-    live = {state,storageError:'原有資料已保留，本次更動暫存在記憶體。請匯出備份，或從設定匯入有效備份。'}
-    dirty=true
-  } else {
-    try {
-      const raw=JSON.stringify(state)
-      localStorage.setItem(STORAGE_KEY,raw)
-      // After the cloud version this device holds, whatever its clock says (a device behind would otherwise stamp a change
-      // made after syncing as older than the sync, and the next sync could take the cloud copy over it).
-      try { localStorage.setItem(MODIFIED_KEY,String(stampOverride ?? localStamp(Date.now(),cloudBase()))) } catch { /* optional */ }
-      stampOverride=null
-      rawLoaded=raw
-      dirty=false
-      unreadable=false
-      live={state,storageError:null}
-    } catch {
-      dirty=true
-      live={state,storageError:'瀏覽器未能儲存本次更動。請在關閉前到設定匯出備份。'}
-    }
-  }
+
+  // Progress, its timestamp and its cloud base share one write. A full disk cannot save only part.
+  const scope = cloudScope()
+  const base = currentCloudBase(scope)
+  const stamp = options.stamp ?? localStamp(Date.now(),Math.max(modified,base))
+  const cloud = scope===null ? null : {scope,base:options.cloudBase ?? base}
+  if (!validVersion(stamp) || (cloud && !validVersion(cloud.base)))
+    throw new Error('進度的版本讀取有誤，請重新開啟網站後再試。')
+  const raw = JSON.stringify({...state,storageModified:stamp,...(cloud ? {storageCloud:cloud} : {})})
+  try { localStorage.setItem(STORAGE_KEY,raw) } catch { throw new Error(unsaved) }
+  try { localStorage.setItem(MODIFIED_KEY,String(stamp)) } catch { /* Compatibility with older pages. */ }
+  if (options.cloudBase !== undefined) setCloudBase(options.cloudBase)
+  loaded = {current:raw,legacy:null}
+  modified = stamp
+  storedCloud = cloud
+  dirty = false
+  unreadable = false
+  live = {state,storageError:null}
   emit()
+  return state
 }
-function apply(updater:(prev:AppState)=>AppState,replace=false) {
-  if (typeof navigator !== 'undefined' && navigator.locks) {
-    void navigator.locks.request(STORAGE_KEY,()=>commit(updater,replace))
-  } else commit(updater,replace)
+
+export function readStoreForCloud() {
+  return withStoreLock(()=>{
+    const snapshot = currentSnapshot()
+    const scope = cloudScope()
+    return {state:snapshot.state,modified,base:currentCloudBase(scope),scope,persisted:!dirty && !unreadable && !snapshot.storageError}
+  })
 }
-export function restoreBackup(raw:string, stamp?:number) {
-  const state=importBackup(raw)
-  if (stamp) stampOverride=stamp
-  apply(()=>state,true)
-}
-/** Takes a whole copy (the cloud's) only if this device's progress hasn't changed since `seen` — its modified time when
- *  the choice to take the cloud copy was made. The check runs inside the same lock that writes, so a change queued in
- *  this or another tab meanwhile is never replaced. False when it changed: then the caller merges instead. */
-export function replaceIfUnchanged(raw:string, stamp:number, seen:number):Promise<boolean> {
-  const state=importBackup(raw)
-  const run=()=>{
-    refreshStorage()
-    if (localModified()!==seen) return false
-    stampOverride=stamp
-    commit(()=>state,true)
+/** Acknowledging the server version must not change which browser snapshot counts as saved. */
+export function recordCloudSave(version:number, sentModified:number, sentBase:number, sentScope?:string|null) {
+  return withStoreLock(()=>{
+    const snapshot = currentSnapshot()
+    const scope = cloudScope()
+    if (dirty || unreadable || snapshot.storageError || currentCloudBase(scope)!==sentBase || modified<sentModified ||
+        (sentScope!==undefined && scope!==sentScope)) return false
+    const stamp = modified===sentModified ? version : Math.max(modified,version+1)
+    persist(snapshot.state,{stamp,cloudBase:version})
     return true
-  }
-  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request(STORAGE_KEY,run)
-  return Promise.resolve(run())
+  })
 }
-/** When this device last changed its progress (ms). 0 means never since cloud sync existed. */
-export const MODIFIED_KEY='dream-blueprint.modified'
-let stampOverride:number|null=null
+export async function restoreBackup(raw:string, stamp?:number, options:{cloudBase?:number, expected?:AppState, scope?:string|null}={}) {
+  const state = importBackup(raw)
+  return withStoreLock(()=>{
+    const {state:current} = currentSnapshot()
+    if (options.scope!==undefined && options.scope!==cloudScope()) throw new Error('雲端連線已經切換，請再試一次。')
+    if (options.expected && current!==options.expected)
+      throw new Error('還原前有新的學習進度，請重新確認再還原。')
+    if (options.expected && !matchesStored(loaded,readStored()))
+      throw new Error('另一個分頁已有新進度。請先下載本分頁的備份，重新開啟後再還原。')
+    return persist(state,{cloudBase:options.cloudBase,stamp,replace:true})
+  })
+}
+/** A cloud pull may replace only the version it observed, after confirming it did not miss unsaved answers. */
+export async function replaceIfUnchanged(raw:string, stamp:number, seen:number, seenBase?:number, seenScope?:string|null):Promise<boolean> {
+  const state=importBackup(raw)
+  return withStoreLock(()=>{
+    const snapshot = currentSnapshot()
+    const scope = cloudScope()
+    if (dirty || unreadable || snapshot.storageError || modified!==seen || (seenBase!==undefined && currentCloudBase(scope)!==seenBase) ||
+        (seenScope!==undefined && scope!==seenScope)) return false
+    persist(state,{stamp,...(seenBase===undefined?{}:{cloudBase:stamp})})
+    return true
+  })
+}
+/** Timestamp of the saved progress. Changes held solely in memory leave it alone. */
 export function localModified() {
-  try { return Number(localStorage.getItem(MODIFIED_KEY)) || 0 } catch { return 0 }
+  currentSnapshot()
+  return modified
 }
-export function setLocalModified(ms:number) {
-  try { localStorage.setItem(MODIFIED_KEY,String(ms)) } catch { /* optional */ }
+export function updateStore(updater:(prev:AppState)=>AppState) {
+  void withStoreLock(()=>{
+    const prev = currentSnapshot().state
+    const state = updater(prev)
+    if (prev===state && !dirty) return
+    try { persist(state) } catch (error) {
+      dirty = true
+      live = {state,storageError:error instanceof Error ? error.message : unsaved}
+      emit()
+    }
+  }).catch(()=>{
+    live = {state:getSnapshot().state,storageError:'無法寫入本次更動，請再試一次。'}
+    emit()
+  })
 }
-export function updateStore(updater:(prev:AppState)=>AppState) { apply(updater) }
-/** A change worked out from the progress as it is when the change is written (not as it was when it was asked for), and
- *  the saved result. A merge uses it, so nothing done on this device while the cloud was being read is lost. */
+/** Run once against the latest local progress and resolve only after a successful browser save. */
 export function updateStoreNow(updater:(prev:AppState)=>AppState, stamp?:number):Promise<AppState> {
-  return new Promise((resolve,reject)=>apply(prev=>{
-    let next:AppState
-    try { next=updater(prev) } catch (e) { reject(e); return prev }
-    if (stamp) stampOverride=stamp
-    resolve(next)
-    return next
-  },true))
+  return withStoreLock(()=>{
+    const {state:prev,storageError}=currentSnapshot()
+    const state=updater(prev)
+    return prev===state && !dirty && !storageError && stamp===undefined ? prev : persist(state,{stamp})
+  })
 }
 export function useAppStore() {
   const snapshot=useSyncExternalStore(subscribe,getSnapshot,getSnapshot)

@@ -1,9 +1,9 @@
 import AskWhy from './AskWhy'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { readReadingProgress, saveReadingProgress, savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
+import { listReadingProgress, readReadingProgress, saveReadingProgress, savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
   moveNote, nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
-  type ReadLevel, type ReadPassage, type ReadStep,
+  type ReadingProgress, type ReadLevel, type ReadPassage, type ReadStep,
 } from '../lib/reading'
 import { examPassed, readExamRecord, type ExamPassage } from '../lib/examReading'
 import { examExtras, nextInBand } from '../lib/readingTest'
@@ -60,20 +60,23 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const [moved, setMoved] = useState<{ from: ReadStep; to: ReadStep } | null>(null)
   // Which list this is, for a passage left halfway: general reading, nursing reading or a unit's pack.
   const progressSet = set === 'nursing' ? 'nursing' : only ? 'unit' : 'general'
+  function resumePassage(target: ReadStep | null, skipped: readonly string[] = [], level?: ReadLevel) {
+    if (!all) return undefined
+    const open = readLevelsOpen(all, state.notes, extras)
+    const inProgress: { p: ReadingProgress; passage?: ReadPassage | ExamPassage }[] =
+      listReadingProgress(state.notes, progressSet).map(p => ({ p, passage: all.find(x => x.id === p.id) }))
+    if (merged) for (const p of listReadingProgress(state.notes, examProgressSet)) {
+      inProgress.push({ p, passage: exams.find(x => x.id === p.id) })
+    }
+    return inProgress.sort((a, b) => (b.p.updatedAt ?? 0) - (a.p.updatedAt ?? 0)).find(({ p, passage }) =>
+      passage && (!level || passage.level === level) && !skipped.includes(p.id) && p.picks.length < passage.qs.length &&
+      (only || (open[readStepKey(passage)] && (!target || sameStep(target, passage)))))?.passage
+  }
   useEffect(() => {
     if (!all || currentId !== undefined) return
-    // A passage left halfway comes back first, at the question where it stopped.
-    const half = readReadingProgress(state.notes, progressSet)
-    const back = half && all.find(p => p.id === half.id)
-    const open = readLevelsOpen(all, state.notes, extras)
-    if (back && (only || open[readStepKey(back)])) {
+    const back = resumePassage(null)
+    if (back) {
       setStep({ level: back.level, band: back.band }); setCurrentId(back.id); return
-    }
-    // A past-exam passage left halfway (also one from before the two pages were merged) comes back too.
-    const examHalf = merged ? readReadingProgress(state.notes, examProgressSet) : null
-    const examBack = examHalf && exams.find(p => p.id === examHalf.id)
-    if (examBack && open[readStepKey(examBack)]) {
-      setStep({ level: examBack.level, band: examBack.band }); setCurrentId(examBack.id); return
     }
     setStep(suggested)
     setCurrentId(nextId(only ? null : suggested, []))
@@ -90,16 +93,20 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     const list = sameStep(target, selected) ? nextSkip : []
     setMoved(!only && !sameStep(target, selected) ? { from: selected, to: target } : null)
     setStep(target); setSkip(list)
-    setCurrentId(nextId(only ? null : target, list))
+    const band = only ? null : target
+    setCurrentId(resumePassage(band, list)?.id ?? nextId(band, list))
   }
   function chooseStep(target: ReadStep) {
     if (!all) return
     if (!only && !readLevelsOpen(all, state.notes, extras)[readStepKey(target)]) return
     setStep(target); setManual(true); setSkip([]); setMoved(null)
-    setCurrentId(nextId(only ? null : target, []))
+    const band = only ? null : target
+    setCurrentId(resumePassage(band)?.id ?? nextId(band, []))
   }
   function chooseLevel(level: ReadLevel) {
     if (!all) return
+    const resume = resumePassage(null, [], level)
+    if (resume) { chooseStep({ level: resume.level, band: resume.band }); return }
     const opened = readLevelsOpen(all, state.notes, extras)
     const candidates = readSteps.filter(s => s.level === level && opened[readStepKey(s)] && [...all, ...exams].some(p => p.level === level && p.band === s.band))
     const target = candidates.find(s => sameStep(s, suggested)) ?? candidates.find(s => {
@@ -117,8 +124,8 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const [redo, setRedo] = useState(false)
   useEffect(() => {
     // Back to a passage left halfway: the answers so far (and whether the Chinese was opened) come back.
-    const half = passage ? readReadingProgress(state.notes, progressSet) : null
-    const resume = half && passage && half.id === passage.id && half.picks.length < passage.qs.length ? half : null
+    const half = passage ? readReadingProgress(state.notes, progressSet, passage.id) : null
+    const resume = half && passage && half.picks.length < passage.qs.length ? half : null
     setPicks(resume?.picks ?? []); setCauses(resume?.causes ?? {}); setZh(false); setSeenZh(!!resume?.zh); setSaved(false); setRedo(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passage?.id])
@@ -224,7 +231,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     if (!passage) return
     const right = passage.qs.filter((x, i) => p[i] === x.answer).length
     // Each day a passage is read counts as a reading day, also when the same passage is read again on a later day.
-    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(saveReadingProgress(prev.notes, progressSet, null), passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
+    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(saveReadingProgress(prev.notes, progressSet, null, passage.id), passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
     setSaved(true)
   }
   function cause(qi: number, c: string) {

@@ -12,6 +12,9 @@
 .ex-list button[data-done] em { color: var(--practice-accent); font-weight: 650; }
 .ex-back { justify-self: start; min-height: 36px; padding: 0; }
 .ex-para { display: grid; gap: .35rem; min-width: 0; }
+.ex-emphasis { font-weight: 700; }
+.practice-page u.ex-emphasis button.st-w { text-decoration: underline; }
+.rd-review .ex-explanation { margin: .25rem 0 .6rem; color: var(--practice-ink); }
 .ex-note { font-size: .8rem; line-height: 1.6; color: var(--practice-secondary); }
 .ex-gloss { margin: 0; display: flex; flex-wrap: wrap; gap: .25rem .9rem; font-size: .88rem; line-height: 1.6; }
 .ex-gloss small { flex-basis: 100%; font-size: .78rem; color: var(--practice-secondary); }

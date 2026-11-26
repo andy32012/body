@@ -13,11 +13,11 @@ Checks: the slow word must come back as the same word when the recogniser writes
 shifted 12 and 25 ms, and the original shifted 25 ms). For each syllable a phoneme recogniser writes down what it hears; whether it heard the syllable's vowel is logged.
 That last number is a rough guide only — a quarter-second fragment is hard for any recogniser — and nobody has listened.
 usage: syllables.py <f|m> [word ...]"""
-import json, os, sys, time
+import os, sys, time
 import numpy as np, soundfile as sf, parselmouth
 from parselmouth.praat import call
 from kokoro_onnx import Kokoro
-from course import parse, slug, derived, HERE, CHOSEN
+from course import parse, slug, derived, HERE, CHOSEN, read_json, write_json
 from lib import MODELS, as_shipped, padded, transcribe, norm, to16k
 import phon
 
@@ -31,10 +31,10 @@ SPEEDS = (0.8, 0.72, 0.88)
 # 0.090 at 0.72; spread about ±0.02). Every boundary is moved back by that much before the quietest spot nearby is looked for.
 LAG = 0.065
 LOG = os.path.join(HERE, 'out', f'syllables-{G}.json')
-chosen = json.load(open(CHOSEN))['voices'][G]
+chosen = read_json(CHOSEN)['voices'][G]
 timed = Kokoro(os.path.join(MODELS, 'kokoro-timed.onnx'), os.path.join(MODELS, 'voices-v1.0.bin'))
 assert timed.has_timings
-log = json.load(open(LOG)) if os.path.exists(LOG) else {}
+log = read_json(LOG) if os.path.exists(LOG) else {}
 
 # What the phoneme recogniser may write for each vowel of the synthesiser (its own symbols; near neighbours count).
 VOWELS = {'i': 'i ɪ', 'ɪ': 'ɪ i ə ɛ', 'ɛ': 'ɛ æ ɪ', 'æ': 'æ ɛ', 'ɑ': 'ɑ ɔ ʌ', 'ɔ': 'ɔ ɑ ow', 'ʌ': 'ʌ ə ɑ', 'ə': 'ə ʌ ɪ ɛ ʊ', 'u': 'u ʊ', 'ʊ': 'ʊ u',
@@ -135,7 +135,7 @@ for l in parse():
         log[key] = {'text': word, 'pieces': pieces, 'voice': b['voice'], 'same_voice': b['voice'] == first, 'speed': b['speed'], 'stretch': STRETCH, 'ok': bool(best[0][0]), 'heard': b['heard'],
                     'slow_secs': round(len(b['whole']) / b['sr'], 2), 'piece_secs': b['secs'], 'slow_sounds': ' '.join(b['slow_sounds']),
                     'piece_sounds': [' '.join(s) for s in b['sounds']], 'vowel_heard': [bool(h) for h in b['hits']]}
-        json.dump(log, open(LOG, 'w'), ensure_ascii=False, indent=1)
+        write_json(LOG, log)
         r = log[key]
         print(f"{'ok ' if r['ok'] else 'BAD'} {word} | {r['voice']}{'' if r['same_voice'] else ' (other voice)'} {r['speed']} | heard {r['heard'][0]!r} | "
               + ' ; '.join(f"{p}({s}s){'✓' if h else '?'}→{snd}" for p, s, h, snd in zip(pieces, r['piece_secs'], r['vowel_heard'], r['piece_sounds'])) + f" | {round(time.time() - t0)} s", flush=True)

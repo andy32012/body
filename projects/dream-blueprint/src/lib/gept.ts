@@ -39,10 +39,14 @@ export const readSeconds: Record<GeptLevel, { silent: number; aloud: number }> =
 
 export const geptKey = (level: GeptLevel, id: string) => 'gept.speak.' + level + '.' + id
 /** d: day last practised; q / p: 回答問題 / 看圖敘述 reference scores (latest); best: the best 回答問題 score ever;
- *  r: words heard of the whole read-aloud part (%), rp: of each of its pieces (sentences, passage…), rr: sentences repeated. */
-export interface GeptRecord { d?: string; q?: number; best?: number; p?: number; r?: number; rp?: number[]; rr?: number }
+ *  r: words heard of the whole read-aloud part (%), rp: of each of its pieces (sentences, passage…).
+ *  rr: sentences repeated (including the legacy count), rrIds: the known, zero-based sentence IDs in this set. */
+export interface GeptRecord { d?: string; q?: number; best?: number; p?: number; r?: number; rp?: number[]; rr?: number; rrIds?: number[] }
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
-  try { return JSON.parse(notes[geptKey(level, id)] || '{}') as GeptRecord } catch { return {} }
+  try {
+    const record = JSON.parse(notes[geptKey(level, id)] || '{}') as GeptRecord | null
+    return record ?? {}
+  } catch { return {} }
 }
 /** 中級 opens once a 初級 round's 回答問題 reached 4 級分 on Claude's reference score — the official pass level. Once
  *  open it stays open: a later, lower try of the same round does not lock it again. */
@@ -53,8 +57,35 @@ export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: rea
 }
 export function saveGept(notes: Record<string, string>, level: GeptLevel, id: string, patch: GeptRecord) {
   const old = readGept(notes, level, id)
-  const best = patch.q !== undefined ? Math.max(bestQ(old), patch.q) : old.best
-  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...(best !== undefined && best >= 0 ? { best } : {}) }) }
+  const best = Math.max(bestQ(old), bestQ(patch))
+  return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...mergedRepeats(old, patch), ...(best >= 0 ? { best } : {}) }) }
+}
+
+function mergedRepeats(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'rr' | 'rrIds'> {
+  const rrIds = [...new Set([...(a.rrIds ?? []), ...(b.rrIds ?? [])])].sort((x, y) => x - y)
+  // A legacy count alone cannot tell which sentences were repeated. Keep it as a floor and never add it to the IDs.
+  const rr = Math.max(a.rr ?? 0, b.rr ?? 0, rrIds.length)
+  return { ...(rr ? { rr } : {}), ...(rrIds.length ? { rrIds } : {}) }
+}
+
+/** Keep each section recorded on either device. The reading percentages belong to one coherent attempt. */
+export function mergeGeptRecords(a: GeptRecord, b: GeptRecord): GeptRecord {
+  const best = Math.max(bestQ(a), bestQ(b))
+  const bestPicture = Math.max(a.p ?? -1, b.p ?? -1)
+  const read = betterReading(a, b) ? a : b
+  return {
+    ...a, ...b, ...mergedRepeats(a, b),
+    ...(best >= 0 ? { best } : {}),
+    ...(bestPicture >= 0 ? { p: bestPicture } : {}),
+    r: read.r,
+    rp: read.rp,
+  }
+}
+
+function betterReading(a: GeptRecord, b: GeptRecord): boolean {
+  const completed = (r: GeptRecord) => r.rp?.filter(n => n >= readPieceDone).length ?? 0
+  const aDone = completed(a), bDone = completed(b)
+  return aDone !== bDone ? aDone > bDone : (a.r ?? -1) > (b.r ?? -1)
 }
 /** A piece of the read-aloud part counts as read when at least this share of its words was heard. */
 export const readPieceDone = 30

@@ -1,37 +1,42 @@
-// The build prepends the verified list of core files and content hashes for gallery photos.
+// The build prepends the verified list of core files and hashes for gallery photos and sound packs.
 const scope = self.registration.scope;
 const absolute = file => new URL(file, scope).href;
 const prefix = "dream-blueprint:" + scope + ":";
-const coreName = prefix + "core-" + config.version;
+const corePrefix = prefix + "core-";
+const coreName = corePrefix + config.version;
 const galleryName = prefix + "photos";
-const coreURLs = new Set(config.core.map(absolute));
-const photos = new Map(Object.entries(config.gallery).map(([file, hash]) => {
-  const url = absolute(file);
-  return [url, url + "?photo=" + hash];
-}));
-const photoKeys = new Set(photos.values());
-// Pronunciation packs: kept the first time a lesson is opened (or all at once from the course page), across app updates.
 const soundName = prefix + "sounds";
-const sounds = new Map(Object.entries(config.sounds || {}).map(([file, hash]) => {
-  const url = absolute(file);
-  return [url, url + "?sound=" + hash];
-}));
-const soundKeys = new Set(sounds.values());
 const shell = absolute("index.html");
-const fallback = absolute(config.fallback);
+const publication = absolute("publication.html");
+const snapshotKey = absolute(".dream-installed-release");
+const activatedKey = absolute(".dream-active-release");
+const coreURLs = new Set(config.core.map(absolute));
+const resourceSets = manifest => ({
+  photos: new Map(Object.entries(manifest.gallery).map(([file, hash]) => [absolute(file), { hash, key: absolute(file) + "?photo=" + hash }])),
+  sounds: new Map(Object.entries(manifest.sounds).map(([file, hash]) => [absolute(file), { hash, key: absolute(file) + "?sound=" + hash }])),
+});
+const currentResources = resourceSets(config);
+const pageVersions = new Map();
 const pending = new Map();
 
-async function savePhoto(url, cache) {
-  const key = photos.get(url);
+async function hasHash(response, hash) {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await response.arrayBuffer()));
+  const hex = Array.from(digest, byte => byte.toString(16).padStart(2, "0")).join("");
+  return hex.startsWith(hash);
+}
+
+async function saveResource(resource, cache, image) {
+  const { key, hash } = resource;
   const cached = await cache.match(key);
   if (cached) return cached;
   if (!pending.has(key)) {
     const download = (async () => {
       const response = await fetch(key, { cache: "no-cache" });
-      if (!response.ok || !response.headers.get("Content-Type")?.startsWith("image/")) {
-        throw new Error("照片尚未下載，請確認網路後再試一次。");
+      if (response.status !== 200 || (image && !response.headers.get("Content-Type")?.startsWith("image/"))
+        || !await hasHash(response.clone(), hash)) {
+        throw new Error("這個檔案尚未下載完成，請連線後再試一次。");
       }
-      // An online photo can still display when the device has exhausted its storage.
+      // Online playback still works when the device is full. The explicit download operation checks cache storage separately.
       await cache.put(key, response.clone()).catch(() => {});
       return response;
     })();
@@ -41,42 +46,108 @@ async function savePhoto(url, cache) {
   return (await pending.get(key)).clone();
 }
 
+async function previousResources(version) {
+  if (!/^[a-f0-9]{16}$/.test(version)) return null;
+  const snapshot = await caches.match(snapshotKey, { cacheName: corePrefix + version });
+  return snapshot ? resourceSets(await snapshot.json()) : null;
+}
+
+async function resourcesFor(version) {
+  return !version || version === config.version ? currentResources : previousResources(version);
+}
+
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const core = await caches.open(coreName);
-    await core.addAll([...coreURLs].map(url => new Request(url, { cache: "reload" })));
-    await self.skipWaiting();
+    // A previously installed copy of these exact bytes can be reused if the site rolls back a release.
+    if (await core.match(snapshotKey)) return;
+    try {
+      await core.addAll(config.core.map(file => new Request(absolute(file), { cache: "reload" })));
+      for (const file of config.core) {
+        const response = await core.match(absolute(file));
+        if (!response || !await hasHash(response, config.coreHashes[file])) {
+          throw new Error("網站還在更新，教材版本不一致。");
+        }
+      }
+      await core.put(snapshotKey, new Response(JSON.stringify({ gallery: config.gallery, sounds: config.sounds })));
+    } catch (error) {
+      await caches.delete(coreName);
+      throw error;
+    }
   })());
 });
 
-// The release just replaced keeps its files until the next update: a page still open on it can load a part it had not
-// opened yet (a lesson's data is loaded when first opened) after the site has stopped publishing those files.
-const earlierCores = async () => (await caches.keys()).filter(name => name.startsWith(prefix + "core-") && name !== coreName);
+const earlierCores = async () => (await caches.keys()).filter(name => name.startsWith(corePrefix) && name !== coreName);
 async function fromEarlierRelease(href) {
   for (const name of await earlierCores()) {
-    const hit = await (await caches.open(name)).match(href);
+    const hit = await caches.match(href, { cacheName: name });
     if (hit) return hit;
   }
-  return undefined;
+}
+
+let cleaning;
+function cleanUnusedReleases() {
+  if (cleaning) return cleaning;
+  cleaning = (async () => {
+    const pages = (await self.clients.matchAll({ type: "window", includeUncontrolled: true }))
+      .filter(client => client.url.startsWith(scope) && client.url.split(/[?#]/, 1)[0] !== publication);
+    const ids = new Set(pages.map(client => client.id));
+    for (const id of pageVersions.keys()) if (!ids.has(id)) pageVersions.delete(id);
+
+    // A legacy page or one that hasn't announced its version may still need any earlier release.
+    if (pages.some(client => !pageVersions.has(client.id))) return;
+    const live = new Set(pages.map(client => corePrefix + pageVersions.get(client.id)));
+    const previous = [];
+    for (const name of (await earlierCores()).reverse()) {
+      const cacheName = { cacheName: name };
+      const activated = await caches.match(activatedKey, cacheName);
+      if (activated) {
+        previous.push(name);
+        continue;
+      }
+      // An installer may be filling a cache right now, or a completed release may be waiting.
+      const installed = await caches.match(snapshotKey, cacheName);
+      if (installed && live.has(name)) {
+        previous.push(name);
+        continue;
+      }
+      if (self.registration.installing || self.registration.waiting) continue;
+      if (installed) {
+        // A waiting release can be replaced by a newer build without ever activating.
+        await caches.delete(name);
+        continue;
+      }
+      if (await caches.match(shell, cacheName)) previous.push(name);
+    }
+    // Keep the last complete release as well. An old worker's interrupted addAll could leave an empty cache.
+    for (const name of previous) {
+      if (await caches.match(shell, { cacheName: name })) {
+        live.add(name);
+        break;
+      }
+    }
+    const kept = [currentResources];
+    for (const name of previous) {
+      if (!live.has(name)) await caches.delete(name);
+      else kept.push(await previousResources(name.slice(corePrefix.length)));
+    }
+    // A release installed before snapshots were introduced does not have a list of its media hashes.
+    if (kept.includes(null)) return;
+    for (const [kind, name] of [["photos", galleryName], ["sounds", soundName]]) {
+      const keys = new Set(kept.flatMap(resources => [...resources[kind].values()].map(resource => resource.key)));
+      const cache = await caches.open(name);
+      for (const request of await cache.keys()) if (!keys.has(request.url)) await cache.delete(request);
+    }
+  })().finally(() => { cleaning = undefined; });
+  return cleaning;
 }
 
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
-    // Cache names come back in the order they were made: the last earlier core is the release just replaced.
-    const cores = await earlierCores();
-    const previous = cores[cores.length - 1];
-    for (const name of await caches.keys()) {
-      if (name.startsWith(prefix) && name !== coreName && name !== previous && name !== galleryName && name !== soundName) await caches.delete(name);
-    }
+    const core = await caches.open(coreName);
+    await core.put(activatedKey, new Response(config.version)).catch(() => {});
     await self.clients.claim();
-    const gallery = await caches.open(galleryName);
-    for (const request of await gallery.keys()) {
-      if (!photoKeys.has(request.url)) await gallery.delete(request);
-    }
-    const kept = await caches.open(soundName);
-    for (const request of await kept.keys()) {
-      if (!soundKeys.has(request.url)) await kept.delete(request);
-    }
+    await cleanUnusedReleases().catch(() => {});
   })());
 });
 
@@ -84,97 +155,103 @@ self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET" || !request.url.startsWith(scope)) return;
   const url = new URL(request.url);
+  const version = url.searchParams.get("release");
   url.search = "";
-  if (photos.has(url.href)) {
+  if (request.mode === "navigate" && (!coreURLs.has(url.href) || url.href === shell)) {
+    // Serve the shell that belongs to this worker. A waiting release has already stored every file before it can activate.
     event.respondWith((async () => {
-      const gallery = await caches.open(galleryName);
-      try { return await savePhoto(url.href, gallery); }
+      const saved = await caches.match(shell, { cacheName: coreName });
+      return saved || fetch(request);
+    })());
+    return;
+  }
+  const image = url.href.startsWith(absolute("cosmos/"));
+  if (image || url.href.startsWith(absolute("pron/"))) {
+    event.respondWith((async () => {
+      const resources = await resourcesFor(version || pageVersions.get(event.clientId));
+      const resource = resources?.[image ? "photos" : "sounds"].get(url.href);
+      if (!resource) return fetch(request);
+      try { return await saveResource(resource, await caches.open(image ? galleryName : soundName), image); }
       catch { return Response.error(); }
     })());
     return;
   }
-  if (sounds.has(url.href)) {
-    event.respondWith((async () => {
-      const key = sounds.get(url.href);
-      const kept = await caches.open(soundName);
-      const cached = await kept.match(key);
-      if (cached) return cached;
-      try {
-        const response = await fetch(key, { cache: "no-cache" });
-        // Only a whole, successful download is kept; a full device still gets to play it this once.
-        if (response.status === 200) await kept.put(key, response.clone()).catch(() => {});
-        return response;
-      } catch { return Response.error(); }
-    })());
+  if (coreURLs.has(url.href)) {
+    event.respondWith((async () => (await caches.match(url.href, { cacheName: coreName })) || fetch(request))());
     return;
   }
-  const key = request.mode === "navigate" && !coreURLs.has(url.href) ? shell : url.href;
-  if (request.mode === "navigate" && key === shell) {
-    // Online opens see the published HTML; offline opens use one fully installed release.
-    event.respondWith((async () => {
-      let response;
-      try {
-        response = await fetch(shell, { cache: "no-cache", signal: AbortSignal.timeout(4000) });
-        if (response.ok && response.headers.get("Content-Type")?.includes("text/html")) return response;
-      } catch { /* Offline or slow connection. */ }
-      return (await (await caches.open(coreName)).match(shell)) || response || Response.error();
-    })());
-    return;
-  }
-  if (coreURLs.has(key)) {
-    event.respondWith((async () => (await (await caches.open(coreName)).match(key)) || fetch(request))());
-    return;
-  }
-  // A file of the release before this one, asked for by a page opened before the update.
   if (url.href.startsWith(absolute("assets/"))) {
     event.respondWith((async () => (await fromEarlierRelease(url.href)) || fetch(request))());
   }
 });
 
-async function manageGallery(download, send) {
-  const cache = await caches.open(galleryName);
+async function manageResources(resources, image, download, send) {
+  const cache = await caches.open(image ? galleryName : soundName);
   const cached = new Set((await cache.keys()).map(request => request.url));
-  const missing = [...photos].filter(([, key]) => !cached.has(key)).map(([url]) => url);
-  const total = photos.size;
+  const missing = [...resources.values()].filter(resource => !cached.has(resource.key));
+  const total = resources.size;
   let done = total - missing.length;
   send({ type: "progress", done, total });
   if (download) {
     const worker = async () => {
       while (missing.length) {
-        const url = missing.pop();
-        await savePhoto(url, cache);
-        if (!await cache.match(photos.get(url))) throw new Error("儲存空間不足。");
+        const resource = missing.pop();
+        await saveResource(resource, cache, image);
+        if (!await cache.match(resource.key)) throw new Error("儲存空間不足。");
         send({ type: "progress", done: ++done, total });
       }
     };
-    // Limit network competition with practice screens; a retry reuses finished photos.
+    // Limit network competition with practice screens. A retry reuses everything already saved.
     const results = await Promise.allSettled([worker(), worker(), worker()]);
-    if (results.some(result => result.status === "rejected")) throw new Error("部分照片還沒存好，請確認網路與裝置空間後接著下載。");
+    if (results.some(result => result.status === "rejected")) {
+      throw new Error(image
+        ? "部分照片還沒存好，請確認網路與裝置空間後接著下載。"
+        : "部分發音還沒存好，請確認網路與裝置空間後接著下載。");
+    }
   }
+  const saved = new Set((await cache.keys()).map(request => request.url));
+  done = [...resources.values()].filter(resource => saved.has(resource.key)).length;
   send({ type: "complete", done, total });
 }
 
 self.addEventListener("message", event => {
   const action = event.data?.type;
-  if (action === "PRIME_COVER" && photos.has(fallback)) {
-    event.source?.postMessage({ type: "APP_SHELL", script: config.entry });
-    event.waitUntil(caches.open(galleryName).then(cache => savePhoto(fallback, cache)).catch(() => {}));
+  if (action === "ACTIVATE_UPDATE") {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+  const version = event.data?.version;
+  if (action === "PRIME_COVER") {
+    // Legacy register scripts automatically reload when told about another version. Leave those pages alone.
+    if (/^[a-f0-9]{16}$/.test(version) && event.source?.id) {
+      pageVersions.set(event.source.id, version);
+      event.source.postMessage({ type: "APP_SHELL", version: config.version });
+    }
+    event.waitUntil((async () => {
+      const resource = (await resourcesFor(version))?.photos.get(absolute(config.fallback));
+      if (resource) await saveResource(resource, await caches.open(galleryName), true);
+    })().catch(() => {}));
+    event.waitUntil(cleanUnusedReleases().catch(() => {}));
     return;
   }
   if (action === "SAVE_VIEWED_PHOTOS" && Array.isArray(event.data.urls)) {
-    const urls = [...new Set(event.data.urls)].filter(url => photos.has(url));
-    event.waitUntil(caches.open(galleryName).then(cache =>
-      Promise.allSettled(urls.map(url => savePhoto(url, cache)))));
+    event.waitUntil((async () => {
+      const photos = (await resourcesFor(version))?.photos;
+      if (!photos) return;
+      const cache = await caches.open(galleryName);
+      const viewed = [...new Set(event.data.urls)].map(url => photos.get(url)).filter(Boolean);
+      await Promise.allSettled(viewed.map(resource => saveResource(resource, cache, true)));
+    })());
     return;
   }
   const port = event.ports[0];
-  if (!port || (action !== "GALLERY_STATUS" && action !== "GALLERY_DOWNLOAD")) return;
+  const gallery = action === "GALLERY_STATUS" || action === "GALLERY_DOWNLOAD";
+  const sounds = action === "SOUNDS_STATUS" || action === "SOUNDS_DOWNLOAD";
+  if (!port || (!gallery && !sounds)) return;
   const send = value => port.postMessage(value);
-  event.waitUntil(manageGallery(action === "GALLERY_DOWNLOAD", send)
-    .catch(error => send({ type: "error", message: error.message })));
+  event.waitUntil((async () => {
+    const resources = await resourcesFor(version || pageVersions.get(event.source?.id));
+    if (!resources) throw new Error("此版本的離線教材尚未就緒。");
+    await manageResources(resources[gallery ? "photos" : "sounds"], gallery, action.endsWith("_DOWNLOAD"), send);
+  })().catch(error => send({ type: "error", message: error.message })));
 });
-
-
-
-
-

@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { PageProps } from "../lib/store";
 import { dayKey } from "../lib/progress";
 import { schoolToday, makeSchoolId } from "../lib/school";
-import { originalPlan, projectCalendar } from "../lib/projection";
+import { originalPlan, planEnd, projectCalendar } from "../lib/projection";
 import { readTopic, topics as lifeTopics } from "../lib/topics";
 import plan from "../data/plan.json";
 import curriculum from "../data/curriculum.json";
@@ -45,26 +45,31 @@ const baseGoals: Goal[] = plan.months.flatMap((m) =>
 
 export type PlanTab = "calendar" | "levels" | "timeline" | "map" | "exam" | "rivals";
 const firstMonth = plan.months[0].month;
-const lastMonth = "2034-12";
-export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
-  const { state, update, navigate } = props;
+const lastMonth = planEnd.slice(0, 7);
+const monthFormat = /^\d{4}-(?:0[1-9]|1[0-2])$/;
+const calendarMonth = (value: string) => monthFormat.test(value) && value >= firstMonth && value <= lastMonth;
+const firstMoveMonth = (source: string) => calendarMonth(source) ? shiftMonth(source, 1) : firstMonth;
+const canMoveTo = (source: string, destination: string) =>
+  calendarMonth(destination) && (!calendarMonth(source) || destination > source);
+export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (tab: PlanTab) => void }) {
+  const { state, update, navigate, tab, onTabChange } = props;
   const today = dayKey();
   const thisMonth = today.slice(0, 7);
-  const [month, setMonth] = useState(thisMonth);
-  const [selected, setSelected] = useState(today);
-  const [tab, setTab] = useState<PlanTab>(props.initialTab === "rivals" && !props.state.settings.rivalsEnabled ? "calendar" : props.initialTab ?? "calendar");
+  const initialMonth = thisMonth < firstMonth ? firstMonth : thisMonth > lastMonth ? lastMonth : thisMonth;
+  const [month, setMonth] = useState(initialMonth);
+  const [selected, setSelected] = useState(() => initialMonth === thisMonth ? today : initialMonth + "-01");
   const [expanded, setExpanded] = useState<number | null>(
     Number(today.slice(0, 4)),
   );
   const [editing, setEditing] = useState(false);
   const [custom, setCustom] = useState("");
   const [track, setTrack] = useState<Track>("school");
-  const [announcement, setAnnouncement] = useState("");
+  const [lastMove, setLastMove] = useState<{ key: string; destination: string; message: string }>();
   const [replanSource, setReplanSource] = useState(
-    thisMonth <= plan.months[0].month ? thisMonth : shiftMonth(thisMonth, -1),
+    initialMonth === firstMonth ? initialMonth : shiftMonth(initialMonth, -1),
   );
   const [replanTo, setReplanTo] = useState(
-    replanSource === thisMonth ? shiftMonth(thisMonth, 1) : thisMonth,
+    firstMoveMonth(replanSource),
   );
   const dates = asDate(month + "-01");
   const days = new Date(dates.getFullYear(), dates.getMonth() + 1, 0).getDate();
@@ -107,8 +112,11 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
   );
   const goals = [...baseGoals, ...customGoals];
   const where = (goal: Goal) => state.notes["move." + goal.id] || goal.source;
+  const recovering = !calendarMonth(replanSource);
+  const earliestMove = firstMoveMonth(replanSource);
+  const canSelectMoveMonth = earliestMove <= lastMonth;
   const openGoals = goals.filter(
-    (g) => where(g) === replanSource && !state.checks[g.id],
+    (g) => where(g) === replanSource && (recovering || !state.checks[g.id]),
   );
   const sourceMonths = [
     ...new Set([
@@ -119,6 +127,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
     .sort()
     .reverse();
   function switchMonth(next: string) {
+    if (!calendarMonth(next)) return;
     setMonth(next);
     setSelected(next === thisMonth ? today : next + "-01");
   }
@@ -126,15 +135,18 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
     update((s) => ({ ...s, checks: { ...s.checks, [id]: !s.checks[id] } }));
   }
   function moveGoal(goal: Goal, destination: string) {
-    update((s) => ({
-      ...s,
-      notes: { ...s.notes, ["move." + goal.id]: destination },
-    }));
-    setAnnouncement(
-      destination === "removed"
+    if (destination !== "removed" && !canMoveTo(replanSource, destination)) return;
+    const key = "move." + goal.id;
+    update((s) => (s.notes[key] || goal.source) === replanSource
+      ? { ...s, notes: { ...s.notes, [key]: destination } }
+      : s);
+    setLastMove({
+      key,
+      destination,
+      message: destination === "removed"
         ? "已從月計畫移除「" + goal.text + "」。"
         : "已排到 " + monthTitle(destination) + "。",
-    );
+    });
   }
   function addGoal() {
     if (!custom.trim()) return;
@@ -195,9 +207,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
           <button
             key={key}
             aria-pressed={tab === key}
-            // The address follows the tab (#plan/map…), so a reload, a bookmark or 上一頁 comes back to it. pushState
-            // does not reload the page; going back changes the address and the app opens that tab.
-            onClick={() => { setTab(key); const hash = "#plan/" + key; if (location.hash !== hash) history.pushState(null, "", hash); }}
+            onClick={() => onTabChange(key)}
           >
             {label}
           </button>
@@ -255,7 +265,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                             key={m.month}
                             onClick={() => {
                               switchMonth(m.month);
-                              setTab("calendar");
+                              onTabChange("calendar");
                             }}
                           >
                             {Number(m.month.slice(-2))} 月
@@ -286,7 +296,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                 >
                   ‹
                 </button>
-                <button onClick={() => switchMonth(thisMonth)}>今天</button>
+                <button disabled={!calendarMonth(thisMonth)} onClick={() => switchMonth(thisMonth)}>今天</button>
                 <button
                   aria-label="下個月"
                   disabled={month >= lastMonth}
@@ -304,10 +314,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                 value={month}
                 min={firstMonth}
                 max={lastMonth}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  if (next >= firstMonth && next <= lastMonth) switchMonth(next);
-                }}
+                onChange={(e) => switchMonth(e.target.value)}
               />
             </label>
             <div className="pl-grid">
@@ -473,27 +480,34 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                   <select
                     value={replanSource}
                     onChange={(e) => {
-                      setReplanSource(e.target.value);
-                      if (replanTo <= e.target.value)
-                        setReplanTo(shiftMonth(e.target.value, 1));
+                      const source = e.target.value;
+                      setReplanSource(source);
+                      if (!canMoveTo(source, replanTo)) {
+                        const first = firstMoveMonth(source);
+                        setReplanTo(first <= lastMonth ? first : "");
+                      }
                     }}
                   >
                     {sourceMonths.map((m) => (
                       <option key={m} value={m}>
-                        {monthTitle(m)}
+                        {monthFormat.test(m) ? monthTitle(m) : m}{!calendarMonth(m) && "（在日曆範圍外）"}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  順延到
+                  {recovering ? "移回日曆月份" : "順延到"}
                   <input
                     type="month"
                     value={replanTo}
-                    min={shiftMonth(replanSource, 1)}
+                    min={canSelectMoveMonth ? earliestMove : undefined}
+                    max={lastMonth}
+                    disabled={!canSelectMoveMonth}
                     onChange={(e) => setReplanTo(e.target.value)}
                   />
                 </label>
+                {!canSelectMoveMonth && <p>這已經是日曆的最後一個月。</p>}
+                {recovering && <p>這些目標原先被排到日曆範圍外，可以選一個月份移回來，已勾的完成狀態會保留。</p>}
                 {openGoals.length === 0 && <p>這個月沒有需要移動的目標。</p>}
                 {openGoals.map((g) => (
                   <div key={g.id} className="pl-replan-row">
@@ -502,10 +516,10 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
                     </span>
                     <div>
                       <button
-                        disabled={!replanTo || replanTo <= replanSource}
+                        disabled={!canMoveTo(replanSource, replanTo)}
                         onClick={() => moveGoal(g, replanTo)}
                       >
-                        順延
+                        {recovering ? "移回月計畫" : "順延"}
                       </button>
                       <button onClick={() => moveGoal(g, "removed")}>
                         移除
@@ -529,7 +543,7 @@ export default function Plan(props: PageProps & {initialTab?: PlanTab}) {
             )}
           </section>
           <p role="status" className="pl-status">
-            {announcement}
+            {lastMove && state.notes[lastMove.key] === lastMove.destination ? lastMove.message : ""}
           </p>
         </>
       )}

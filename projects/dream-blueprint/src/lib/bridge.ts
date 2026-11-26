@@ -35,10 +35,10 @@ export interface HeldRecord { reading?: HeldPart; listening?: HeldPart }
 export function readHeld(notes: Record<string, string>, unit: number): HeldRecord {
   try { return notes[heldKey(unit)] ? JSON.parse(notes[heldKey(unit)]) as HeldRecord : {} } catch { return {} }
 }
-/** Keeps the first attempt: a part that is already recorded is never replaced. */
+/** Keeps the first attempt. Text or unconfirmed audio is practice, and does not create a listening result. */
 export function saveHeld(notes: Record<string, string>, unit: number, part: keyof HeldRecord, rec: HeldPart) {
   const old = readHeld(notes, unit)
-  if (old[part]) return notes
+  if (old[part] || (part === 'listening' && rec.heard !== true)) return notes
   return { ...notes, [heldKey(unit)]: JSON.stringify({ ...old, [part]: rec }) }
 }
 export const heldOpen = (cur: { unit: number; day: number }, unit: number) => cur.unit > unit || (cur.unit === unit && cur.day >= 6)
@@ -47,7 +47,9 @@ export const heldOpen = (cur: { unit: number; day: number }, unit: number) => cu
 export const listenKey = (unit: number, i: number) => 'bridge.listen.' + unit + '.' + i
 export interface ListenRecord { day: string; correct: number; total: number; heard: boolean; plays: number
   /** The best attempt so far: a later redo (after seeing the transcript, or a worse day) never takes back a pass. */
-  best?: ListenAttempt }
+  best?: ListenAttempt
+  /** Nursing dialogue only: best complete re-listen without the text on screen. It does not change the first score. */
+  reviewBest?: ListenAttempt }
 export interface ListenAttempt { day: string; correct: number; total: number; heard: boolean }
 const listenClean = (a: ListenAttempt) => a.heard && a.correct / Math.max(1, a.total) >= 0.7
 /** The new attempt saved as the latest, with the best attempt kept (by ear and 70%+ beats the rest, then the score). */

@@ -1,4 +1,6 @@
 .gp-page { display: grid; gap: 14px; max-width: 760px; margin: 0 auto; padding: 0 16px 40px; box-sizing: border-box; width: 100%; }
+.gp-panel { display: grid; gap: 14px; }
+.gp-panel[hidden] { display: none; }
 .gp-head, .gp-part { display: grid; gap: 10px; padding: 16px 18px; border-radius: 18px; background: var(--glass, var(--panel)); border: 1px solid var(--glass-line, var(--line)); backdrop-filter: blur(12px); min-width: 0; }
 .gp-head h1 { margin: 0; font-size: 22px; }
 .gp-back { color: var(--muted); font-size: 13px; text-decoration: none; }
@@ -15,6 +17,7 @@
 .gp-part header small { color: var(--muted); font-size: 13px; }
 .gp-open, .gp-play, .gp-stop, .gp-link { display: inline-flex; align-items: center; gap: 6px; justify-self: start; border-radius: 10px; min-height: 42px; padding: 6px 14px; font: inherit; font-size: 14px; cursor: pointer; }
 .gp-open { border: 0; background: var(--lav); color: #1c1530; font-weight: 650; }
+:root[data-theme="light"] .gp-open { color: #fff; }
 .gp-open:disabled { opacity: .5; cursor: not-allowed; }
 .gp-play { border: 1px solid var(--lav); background: transparent; color: var(--lav); }
 .gp-stop { border: 0; background: #ef8b7d; color: #2a1410; font-weight: 650; }
@@ -23,6 +26,7 @@
 .gp-list > li { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-line, var(--line)); min-width: 0; }
 .gp-list > li:last-child { border-bottom: 0; padding-bottom: 0; }
 .gp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; }
+.gp-done { display: inline-flex; align-items: center; gap: 4px; color: var(--mint); font-size: 13px; }
 .gp-read strong { font-size: 15px; }
 .gp-read { display: grid; gap: 10px; }
 .gp-read-piece { display: grid; gap: 6px; }
@@ -37,8 +41,8 @@
 .gp-qtext { margin: 0; font-size: 16px; line-height: 1.6; }
 .gp-said { margin: 0; display: grid; gap: 2px; font-size: 15px; overflow-wrap: anywhere; }
 .gp-said small { color: var(--muted); font-size: 12.5px; }
-.gp-picture { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-line, var(--line)); background: #fff; }
-.gp-picture img, .gp-scene { display: block; width: 100%; height: auto; }
+.gp-picture { position: relative; width: 100%; margin: 0; padding: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-line, var(--line)); background: #fff; cursor: zoom-in; }
+.gp-picture img, .gp-picture .gp-scene { display: block; width: 100%; height: auto; }
 .gp-feedback { display: grid; gap: 10px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--text) 5%, transparent); }
 .gp-feedback > p { margin: 0; line-height: 1.65; font-size: 14.5px; }
 .gp-score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
@@ -58,7 +62,8 @@
 @media (max-width: 460px) {
   .gp-head, .gp-part { padding: 14px; }
 }
-.gp-picture { position: relative; cursor: zoom-in; }
-.gp-picture figcaption { position: absolute; right: 8px; bottom: 6px; font-size: 11px; color: #555; background: rgba(255,255,255,.75); padding: 1px 6px; border-radius: 6px; }
-.gp-picture.big { position: fixed; inset: 0; z-index: 1000; border: 0; border-radius: 0; background: rgba(10,10,20,.94); display: grid; place-items: center; cursor: zoom-out; padding: 8px; }
-.gp-picture.big img, .gp-picture.big .gp-scene { max-width: 100%; max-height: 100%; width: auto; height: auto; min-width: min(100%, 1100px); background: #fff; border-radius: 8px; }
+.gp-picture > span { position: absolute; right: 8px; bottom: 6px; font-size: 12px; color: #333; background: rgba(255,255,255,.9); padding: 2px 7px; border-radius: 6px; }
+.gp-picture-dialog { position: fixed; inset: 0; box-sizing: border-box; max-width: none; max-height: none; width: 100%; height: 100%; border: 0; margin: 0; padding: 10px; background: #10101c; color: #fff; }
+.gp-picture-dialog > div { display: grid; gap: 10px; justify-items: center; align-content: center; min-height: 100%; }
+.gp-picture-dialog .gp-link { justify-self: end; border-color: #76829d; }
+.gp-picture-dialog img, .gp-picture-dialog .gp-scene { display: block; width: min(100%, 1400px); max-height: calc(100dvh - 76px); height: auto; object-fit: contain; }

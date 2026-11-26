@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, ChevronDown, Expand, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
 import { useSceneFeature } from '../components/ScenePhoto'
+import { readBackgroundPin, setBackgroundPin } from '../lib/backgroundPin'
 import { categories, photos, photoUrl, type AstroPhoto } from '../lib/cosmos'
 import { downloadGalleryOffline, getGalleryOfflineStatus } from '../lib/offlineGallery'
 import type { PageProps } from '../lib/store'
@@ -93,7 +94,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   const [notice, setNotice] = useState('')
   const index = group.findIndex(item => item.id === photo.id)
   const route = destinations.find(([id]) => id === target)!
-  const pinned = state.notes['cosmos.pin.'+target]
+  const pinned = readBackgroundPin(state.notes, target)
   const currentTitle = photos.find(item => item.id === pinned)?.title
   function move(n:number) {
     setNotice('')
@@ -101,12 +102,7 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   }
   function choose(automatic:boolean) {
     closeButton.current?.focus({preventScroll:true})
-    update(prev => {
-      const notes = {...prev.notes}
-      if (automatic) delete notes['cosmos.pin.'+target]
-      else notes['cosmos.pin.'+target] = photo.id
-      return {...prev,notes}
-    })
+    update(prev => ({ ...prev, notes: setBackgroundPin(prev.notes, target, automatic ? null : photo.id) }))
     setNotice(automatic ? route[1]+'背景已恢復自動輪替。' : '已將「'+photo.title+'」設為'+route[1]+'背景。')
   }
   useEffect(() => {

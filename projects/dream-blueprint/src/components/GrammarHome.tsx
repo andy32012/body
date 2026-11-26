@@ -117,8 +117,8 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
     <a className="pr-link gb-back" href="#library/grammar">← 回目錄</a>
     <small className="gb-crumb">{part ? part.title + ' · 第 ' + chapterLabel(index, chapter!.n) + ' 章 ' + chapter!.title : '附錄'}</small>
     <h3 className="gb-head"><span className="gb-id">{label}</span>{section.title}<em className={'gb-lv gb-lv' + section.level}>{levelNames[section.level]}</em></h3>
-    {section.units?.length ? <p className="gb-units">課程單元 {section.units.map((u, i) => <span key={u}>{i ? '、' : ''}{reached(u, state.curriculum.unit)
-      ? <a href={'#library/grammar/' + u}>{u}</a> : <>{u}（上到才打開）</>}</span>)} 也教過這個，裡面有完整講解和 7 題小練習。</p> : null}
+    {section.units?.length ? <p className="gb-units">相關課程單元 {section.units.map((u, i) => <span key={u}>{i ? '、' : ''}{reached(u, state.curriculum.unit)
+      ? <a href={'#library/grammar/' + u}>{u}</a> : <>{u}（上到才打開）</>}</span>)}</p> : null}
     {content === undefined ? <p>載入中……</p>
       : content === null ? <div className="pr-hint"><strong>這一節還在寫</strong><p>想先學的話，按下面的「問 Claude 老師」，請它用白話教你這一節。</p></div>
       : <>

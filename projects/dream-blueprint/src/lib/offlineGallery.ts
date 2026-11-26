@@ -1,3 +1,5 @@
+import { appRelease } from './appRelease'
+
 export interface GalleryProgress { done: number; total: number }
 
 async function galleryCommand(
@@ -40,7 +42,7 @@ async function galleryCommand(
       }
     };
     wait();
-    try { worker.postMessage({ type }, [channel.port2]); }
+    try { worker.postMessage({ type, version: appRelease() }, [channel.port2]); }
     catch { close(); reject(new Error("離線服務已更新，請重新開啟圖鑑。")); }
   });
 }

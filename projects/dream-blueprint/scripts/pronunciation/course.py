@@ -10,6 +10,14 @@ import json, re, sys, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHOSEN = os.path.join(HERE, 'chosen.json')
 
+def read_json(path):
+    with open(path, encoding='utf-8') as source:
+        return json.load(source)
+
+def write_json(path, data):
+    with open(path, 'w', encoding='utf-8') as output:
+        json.dump(data, output, ensure_ascii=False, indent=1)
+
 # How a clip is stored in a pack: 24 kHz mono mp3 at 96 kbit/s, no tags (a clip starts with an audio frame).
 # At 48 kbit/s the recogniser's lead for some close pairs (guess/gas, tree/three, ban/van) shrank to nothing; at 96 it holds.
 MP3 = ['-ac', '1', '-ar', '24000', '-c:a', 'libmp3lame', '-b:a', '96k', '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1', '-f', 'mp3', '-']
@@ -31,7 +39,7 @@ def derived(item):
     return [t + '~slow'] + [f'{t}~{i}' for i in range(1, n + 1)] + [f'{t}~1-{j}' for j in range(2, n)]
 
 def parse(path=os.path.join(HERE, 'course.txt')):
-    chosen = json.load(open(CHOSEN))['pairs'] if os.path.exists(CHOSEN) else {}
+    chosen = read_json(CHOSEN)['pairs'] if os.path.exists(CHOSEN) else {}
     lessons = []
     cur = None
     for raw in open(path, encoding='utf-8'):
@@ -116,5 +124,5 @@ if __name__ == '__main__':
     for l in ls:
         print(' ', l['id'], l['kind'], l['title'], '|', len(lesson_texts(l)), 'clips |', ' '.join('/'.join(p) for p in l['pairs']))
     if len(sys.argv) > 1:
-        json.dump(for_app(ls), open(sys.argv[1], 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+        write_json(sys.argv[1], for_app(ls))
         print('wrote', sys.argv[1])

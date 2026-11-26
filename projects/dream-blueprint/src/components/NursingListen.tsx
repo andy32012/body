@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { logSkill, withBestListen } from '../lib/bridge'
-import { listenPassed, nurseLevels, nurseLevelsOpen, heardWell, nextNurseListening, nurseLastKey, nurseListenKey, nurseSpeakKey, readNurseListen, type NurseListening } from '../lib/nursing'
+import { bestListen, logSkill } from '../lib/bridge'
+import { listenPassed, nurseLevels, nurseLevelsOpen, heardWell, nextNurseListening, nurseLastKey, nurseListenKey, nursePreviewKey, nurseReviewPassed, nurseSpeakKey, readNurseListen, saveNurseListen, type NurseListening } from '../lib/nursing'
 import { levelTarget } from '../lib/unlock'
 import { PackListen } from './UnitPack'
 
@@ -11,7 +11,7 @@ const idFromHash = () => location.hash.startsWith('#library/nlisten/') ? decodeU
 
 /** Nurse–patient dialogues: listen without the text, answer, then the transcript and its Chinese open (the same player
  *  as a unit's listening). After that he can act the scene out with Emma. */
-export default function NursingListen({ state, onActivity, date }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string }) {
+export default function NursingListen({ state, update, onActivity, date }: Pick<PageProps, 'state' | 'update'> & { onActivity: PageProps['update']; date: string }) {
   const [all, setAll] = useState<NurseListening[] | null>(null)
   const [failed, setFailed] = useState(false)
   const [currentId, setCurrentId] = useState<string | undefined>(idFromHash)
@@ -31,7 +31,7 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
   const [shownId, setShownId] = useState<string | null>(null)
   // Every open dialogue was passed over with 下一段: say so and offer a new round, instead of waiting forever.
   const [roundDone, setRoundDone] = useState(false)
-  // B1 opens once A2 has its target of dialogues passed by ear, B2 after B1; dialogues of a locked level aren't offered.
+  // B1 opens once A2 has its target of passed dialogues, B2 after B1; locked levels are not offered.
   const levelOpen = all ? nurseLevelsOpen(all, state.notes) : {}
   useEffect(() => {
     if (!all || shownId) return
@@ -56,7 +56,7 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
       const r = readNurseListen(state.notes, x.id)
       return <li key={x.id}>
         <button type="button" className="pr-link" aria-current={x.id === currentDialogue ? 'true' : undefined} disabled={!levelOpen[x.level]} data-locked={!levelOpen[x.level]} onClick={() => open(x.id)}>{levelOpen[x.level] ? '' : '🔒 '}{x.title}</button>
-        <small> {x.level} · {x.scene}{r ? ' · ' + r.correct + ' / ' + r.total + (r.heard ? '' : '（看過字）') : ''}</small>
+        <small> {x.level} · {x.scene}{r ? ' · ' + r.correct + ' / ' + r.total + (r.heard ? '（首次只聽）' : '（練習）') : ''}{nurseReviewPassed(r) && ' · 重聽已過關'}</small>
       </li>
     })}</ol>
   </details>
@@ -68,21 +68,33 @@ export default function NursingListen({ state, onActivity, date }: Pick<PageProp
     </div>
     {list()}
   </div> : <p className="ls-help">準備對話中……</p>
-  const heard = all.filter(x => readNurseListen(state.notes, x.id)).length
+  const attempted = all.filter(x => readNurseListen(state.notes, x.id)).length
   const good = all.filter(x => heardWell(readNurseListen(state.notes, x.id))).length
+  const last = readNurseListen(state.notes, l.id)
+  const first = bestListen(last)
+  const review = last?.reviewBest
+  const previewKey = nursePreviewKey(l.id)
   const spoke = state.notes[nurseSpeakKey(l.id)]
   return <div className="pr-stack nl">
-    <p className="qz-meta"><span>護理聽力共 {all.length} 段</span><span>聽過 {heard}</span><span>只聽就全對 {good}</span><span>{levelNames[l.level]}（{l.level}）</span></p>
+    <p className="qz-meta"><span>護理聽力共 {all.length} 段</span><span>已作答 {attempted}</span><span>首次只聽全對 {good}</span><span>{levelNames[l.level]}（{l.level}）</span></p>
     <p className="qz-meta nl-levels">{nurseLevels.map((lv, i) => {
       const here = all.filter(x => x.level === lv), ok = here.filter(x => listenPassed(readNurseListen(state.notes, x.id))).length
       const before = nurseLevels[i - 1], beforeHere = before ? all.filter(x => x.level === before) : []
       return <span key={lv}>{levelOpen[lv] ? levelNames[lv] + ' ' + lv + ' 過關 ' + ok + ' / ' + here.length
         : '🔒 ' + levelNames[lv] + ' ' + lv + '：' + before + ' 過關 ' + levelTarget(beforeHere.length) + ' 段才打開'}</span>
     })}</p>
-    <PackListen key={l.id} l={l} rate={state.settings.speechRate} last={readNurseListen(state.notes, l.id)}
-      onSave={r => onActivity(prev => ({ ...prev, notes: logSkill({
+    {(first?.heard || review) && <p className="qz-meta">
+      {first?.heard && <span>首次只聽 {first.correct} / {first.total}</span>}
+      {review && <span>重聽 {review.correct} / {review.total}{nurseReviewPassed(last) ? '（已過關）' : ''}</span>}
+    </p>}
+    <PackListen key={l.id} l={l} rate={state.settings.speechRate} last={last}
+      review={{
+        alreadyRead: Boolean(state.notes[previewKey]),
+        onPreview: () => update(prev => prev.notes[previewKey] ? prev : { ...prev, notes: { ...prev.notes, [previewKey]: date } }),
+      }}
+      onSave={(r, byEar) => onActivity(prev => ({ ...prev, notes: logSkill({
         ...prev.notes,
-        [nurseListenKey(l.id)]: JSON.stringify(withBestListen(readNurseListen(prev.notes, l.id), { ...r, day: date })),
+        [nurseListenKey(l.id)]: JSON.stringify(saveNurseListen(prev.notes, l.id, { ...r, day: date }, byEar)),
         [nurseLastKey]: JSON.stringify({ id: l.id, title: l.title, you: l.you, day: date }),
       }, 'listen', date) }))} />
     <details className="nl-words"><summary>這段的重點字（{l.words.length} 個）</summary>

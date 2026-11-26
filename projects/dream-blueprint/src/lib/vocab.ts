@@ -34,6 +34,11 @@ function spellings(label: string): string[] {
   })
 }
 
+function entrySpellings(entry: Pick<LevelEntry, 'en' | 'forms'>) {
+  const listed = [...spellings(entry.en), ...(entry.forms?.flatMap(f => f.forms) ?? []).map(normalize)]
+  return [...listed, ...listed.filter(x => x.endsWith('.')).map(x => x.slice(0, -1))]
+}
+
 // Keep the full official entry as its key. Homographs may appear in more than one entry.
 const aliasIndex = new Map<string, string>()
 for (const entry of levels) {
@@ -48,8 +53,7 @@ for (const entry of levels) {
 // entry already has keeps that entry, so no existing key changes.
 for (const entry of levels as LevelEntry[]) {
   const canonical = normalize(entry.en)
-  const listed = [...spellings(entry.en), ...(entry.forms?.flatMap(f => f.forms) ?? []).map(normalize)]
-  for (const spelling of [...listed, ...listed.filter(x => x.endsWith('.')).map(x => x.slice(0, -1))]) {
+  for (const spelling of entrySpellings(entry)) {
     if (spelling && !aliasIndex.has(spelling)) aliasIndex.set(spelling, canonical)
   }
 }
@@ -94,10 +98,18 @@ export function getScreeningQueue(known: string[], learning: string[], custom: V
 
 /** 分級找字: words of one level matching what he typed. The word spelt exactly comes first (typing "in" shows in, not
  *  win and meeting), then words starting with it, then the rest; only then are the first `limit` kept. */
-export function lookupWords<T extends { en: string; zh: string; level: number }>(words: readonly T[], level: number, term: string, limit = 12): T[] {
-  const t = term.trim().toLowerCase()
+export function lookupWords<T extends Pick<LevelEntry, 'en' | 'zh' | 'level' | 'forms'>>(words: readonly T[], level: number, term: string, limit = 12): T[] {
+  const t = normalize(term)
   const here = words.filter(w => w.level === level)
   if (!t) return here.slice(0, limit)
-  const rank = (w: T) => { const en = w.en.toLowerCase(); return en === t ? 0 : en.startsWith(t) ? 1 : en.includes(t) ? 2 : w.zh.includes(t) ? 3 : -1 }
+  const rank = (w: T) => {
+    const en = normalize(w.en)
+    if (en === t) return 0
+    const forms = [en, ...entrySpellings(w)]
+    if (forms.includes(t)) return 1
+    if (forms.some(form => form.startsWith(t))) return 2
+    if (forms.some(form => form.includes(t))) return 3
+    return w.zh.includes(t) ? 4 : -1
+  }
   return here.map(w => ({ w, r: rank(w) })).filter(x => x.r >= 0).sort((a, b) => a.r - b.r).slice(0, limit).map(x => x.w)
 }

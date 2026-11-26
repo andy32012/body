@@ -12,7 +12,7 @@ import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import { chartBounds, isTimeSeries } from '../lib/chart'
 import { isProcessChart, isTableChart, type WriteChart } from '../lib/writing'
 import type { SayCard } from '../lib/sayCards'
-import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
+import { issuesFixed, lessonSteps, sentenceFrame, type CorrectionResult, type ExpressRecord, type HeardRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
 import './lesson.css'
 
 /** `pick` lists the earlier steps that can be looked at again; pressing one calls onPick. `review` is the one being looked at. */
@@ -109,26 +109,40 @@ export function Transcript({ lines, playing, onPlayLine, showZh }: { lines: Less
 
 /** Listen first without the text, answer two questions, then read along. Later days: listen and shadow.
  *  The questions open after one complete play. A play that cannot be confirmed (no voice, an error, or a device that never
- *  reports the end) still lets him answer, but the result is not counted as understood by ear (onDone gets -1). */
-export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下一步：句型' }: { lesson: Lesson; firstTime: boolean; rate: number
-  onDone: (correct: number, total: number, plays: number) => void; doneLabel?: string }) {
+ *  reports the end) still lets him read or answer, but the result is not counted as understood by ear. */
+export function LessonListen({ lesson, firstTime, rate, saved, onReveal, onDone, doneLabel = '下一步：句型' }: { lesson: Lesson; firstTime: boolean; rate: number
+  saved?: HeardRecord; onReveal?: (record: Omit<HeardRecord, 'day' | 'lessonDate'>) => void; onDone: () => void; doneLabel?: string }) {
   const voice = useDialogueVoice(rate)
   const mountedAt = useRef(Date.now())
   const ready = () => Date.now() - mountedAt.current > 450
   const [started, setStarted] = useState(0)
-  const [answers, setAnswers] = useState<number[]>([])
+  const [answers, setAnswers] = useState<number[]>(() => Array.isArray(saved?.picks) ? saved.picks : [])
   const [checked, setChecked] = useState(!firstTime)
   const [showZh, setShowZh] = useState(false)
   const [noVoice, setNoVoice] = useState(false)
   const [unsure, setUnsure] = useState(false)
+  const openedTranscript = useRef(false)
   const heard = voice.completed > 0
   const open = heard || unsure
   const counted = firstTime && heard && !unsure && !noVoice
   const correct = lesson.questions.filter((q, i) => answers[i] === q.answer).length
-  useEffect(() => { if (voice.status === 'error') { setNoVoice(true); setChecked(true) } }, [voice.status])
+  function openTranscript(counted: boolean, hasAnswers: boolean) {
+    if (firstTime && !openedTranscript.current) {
+      openedTranscript.current = true
+      onReveal?.({ correct: hasAnswers ? correct : 0, total: hasAnswers ? lesson.questions.length : 0, counted, plays: voice.completed,
+        ...(hasAnswers ? { picks: [...answers] } : {}) })
+    }
+    setChecked(true)
+  }
+  useEffect(() => {
+    if (voice.status === 'error' && !noVoice) {
+      setNoVoice(true)
+      openTranscript(false, false)
+    }
+  }, [voice.status, noVoice, openTranscript])
   function playAll() {
     if (voice.playing !== null) { voice.stop(); return }
-    if (!voice.play(lesson.dialogue)) { setNoVoice(true); setChecked(true); return }
+    if (!voice.play(lesson.dialogue)) { setNoVoice(true); openTranscript(false, false); return }
     setStarted(n => n + 1)
   }
   return <section className="ls-listen">
@@ -150,8 +164,8 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
     {firstTime && !checked && !open && started > 0 && voice.playing === null && <button type="button" className="pr-link" onClick={() => setUnsure(true)}>播完了，但題目沒有打開？</button>}
     {unsure && !heard && !checked && <p className="ls-help">這台裝置沒有回報播放結束，可以作答，但這次不算「只聽也懂」。</p>}
     {firstTime && !checked && <button type="button" className="pr-main" disabled={!open || answers.filter(a => a !== undefined).length < lesson.questions.length}
-      onClick={() => { voice.stop(); setChecked(true) }}>對答案、看全文</button>}
-    {firstTime && checked && !noVoice && <ul className="ls-results">
+      onClick={() => { voice.stop(); openTranscript(counted, true) }}>對答案、看全文</button>}
+    {(firstTime || Array.isArray(saved?.picks)) && checked && !noVoice && <ul className="ls-results">
       {lesson.questions.map((q, i) => <li key={i} data-ok={answers[i] === q.answer}>
         <span lang="en">{q.q}</span><b lang="en">{answers[i] === q.answer ? '✓ ' : '✗ '}{q.options[q.answer]}</b>
         <AskWhy q={{ source: '每日課的聽力', passage: lesson.dialogue.map(d => d.en).join(' / '), stem: q.q, options: q.options, picked: answers[i] === undefined ? '' : q.options[answers[i]], answer: q.options[q.answer], right: answers[i] === q.answer }} />
@@ -161,7 +175,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
       <Transcript lines={lesson.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(lesson.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone(counted ? correct : -1, counted ? lesson.questions.length : 0, voice.completed) }}>{doneLabel}</button>
+        <button type="button" className="pr-main" onClick={() => { voice.stop(); onDone() }}>{doneLabel}</button>
       </div>
     </>}
   </section>
@@ -171,7 +185,7 @@ export function LessonListen({ lesson, firstTime, rate, onDone, doneLabel = '下
 export type { VariationCheck } from '../lib/lesson'
 /** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
  *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
-export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, saved, draftKey, onCheck, onDone }: { item: { zh: string; en: string; alt?: string[] }
+export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, saved, draftKey, onCheck, onDone, alreadyMarked = false }: { item: { zh: string; en: string; alt?: string[] }
   /** The check kept from an earlier visit today, and where to keep it (so leaving and coming back changes nothing). */
   saved?: VariationCheck; onCheck?: (check: VariationCheck) => void
   /** Where the answer being written is kept while he is away. */
@@ -184,8 +198,9 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   peekedBefore?: boolean
   /** Remembers that the answer was shown, so opening the page again cannot hide it. */
   onPeek?: () => void
-  onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => void }) {
-  const [answer, setAnswerNow] = useState(() => draftKey ? readDraft(draftKey) : '')
+  alreadyMarked?: boolean
+  onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => boolean }) {
+  const [answer, setAnswerNow] = useState(() => (draftKey ? readDraft(draftKey) : '') || saved?.answer || saved?.last?.text || saved?.before || '')
   const setAnswer = (text: string) => { setAnswerNow(text); if (draftKey) writeDraft(draftKey, text) }
   const [shown, setShown] = useState(false)
   // Read once: pressing 看答案 now marks the record too, which must not show the "earlier visit" note right away.
@@ -207,7 +222,9 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   const mountedAt = useRef(Date.now())
   const shownAt = useRef(0)
   const ready = () => Date.now() - mountedAt.current > 450
-  const done = (m: 'good' | 'small' | 'again') => { if (Date.now() - shownAt.current > 450) { if (draftKey) clearDraft(draftKey); onDone(m, answer, check) } }
+  const done = (m: 'good' | 'small' | 'again') => {
+    if (Date.now() - shownAt.current > 450 && onDone(m, answer, check) && draftKey) clearDraft(draftKey)
+  }
   const reveal = () => { shownAt.current = Date.now(); setShown(true); setCheck(c => c.before === undefined ? { ...c, before: answer } : c); onPeek?.() }
   const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
   const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)
@@ -225,7 +242,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
     <label className="pr-field">我的英文
       <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
     </label>
-    <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} onRevise={setAnswer}
+    <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} trackWeak={!alreadyMarked}
       onReveal={() => { setCheck(c => ({ ...c, revealed: true })); onPeek?.(); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
         setLatest({ v, text })

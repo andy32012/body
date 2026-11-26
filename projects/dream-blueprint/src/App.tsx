@@ -7,7 +7,8 @@ import {
   Telescope, Mic, House,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { useAppStore, type Page, type PageProps, type AppState } from './lib/store'
+import { contentNoticeKey, useAppStore, type Page, type PageProps, type AppState } from './lib/store'
+import { downloadUnsavedDrafts, useUnsavedDrafts } from './lib/drafts'
 import { activePeriod, addDays, dayKey, daysBetween, weekKey, type Energy } from './lib/progress'
 import planData from './data/plan.json'
 import roadmap from './data/roadmap.json'
@@ -21,7 +22,8 @@ import History from './pages/History'
 import Settings from './pages/Settings'
 import CosmosGallery from './pages/CosmosGallery'
 import { UniverseBackground, useObservatory } from './components/Observatory'
-import { AIAssistant } from './components/AIChat'
+import { readBackgroundPin } from './lib/backgroundPin'
+import { AIAssistant, tutorSettingsEvent } from './components/AIChat'
 import { PairReceive } from './components/PairDevice'
 import SyncReceive from './components/SyncReceive'
 import { clearPairing, pairEvent, pairPrefix, takePairing } from './lib/pairing'
@@ -31,14 +33,14 @@ import GeptSpeaking from './components/GeptSpeaking'
 import Baseline, { TestPrompt } from './components/Baseline'
 import PracticeMenu, { menuIcons } from './components/PracticeMenu'
 import { showTestPrompt } from './lib/baseline'
-import { MemoryContext, applyMemory, readMemory, writeMemory, replaceMemory, mergeMemory, readDeleted, memoryDeletedKey, type MemoryApi } from './lib/memory'
-import { driveConnected, loadDriveMemory, saveDriveMemory, saveDriveState, cloudConflict, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive } from './lib/drive'
-import { getSnapshot, localModified, updateStore } from './lib/store'
+import { MemoryContext, applyMemory, readMemory, replaceMemory, type MemoryApi } from './lib/memory'
+import { driveConnected, cloudConflict, cloudScope, takeSyncLink, clearSyncLink, syncPrefix, driveReadyEvent, cloudArchive, archiveToDrive, noteSyncFailure } from './lib/drive'
+import { getSnapshot, updateStore } from './lib/store'
 import { applyBatch, archiveOld } from './lib/compact'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import SyncPaused from './components/SyncPaused'
-import { autoSettle } from './lib/cloudSync'
+import { autoSettle, syncDriveMemory } from './lib/cloudSync'
 import { seenKey } from './lib/dailyWords'
 import { libraryPage, menuGroups, modeLabel, type MenuId } from './lib/library'
 
@@ -104,14 +106,19 @@ function Week({state,today}:{state:AppState,today:string}) {
     <div className="week-legend"><span><i className="done-key"/>已練習</span><span><i className="today-key"/>今天</span><span><Moon size={11}/>休息日</span></div>
   </section>
 }
-/** Once, after teaching material was corrected: says how many of the learner's cards changed and that they are due today. */
+/** Show corrected study material once, with separate counts for cards and other exercises. */
 function ContentNotice({state,update}:Pick<PageProps,'state'|'update'>) {
-  const pending=(contentUpdates as {id:string,note:string}[]).filter(u=>Number(state.notes['content.'+u.id])>0&&!state.notes['content.seen.'+u.id])
+  const cardCount = (id:string) => Number(state.notes['content.'+id] || 0)
+  const exerciseCount = (id:string) => Number(state.notes[contentNoticeKey(id)] || 0)
+  const pending = contentUpdates.filter(u => !state.notes['content.seen.'+u.id] && (cardCount(u.id)>0 || exerciseCount(u.id)>0))
   if (!pending.length) return null
-  const total=pending.reduce((n,u)=>n+Number(state.notes['content.'+u.id]),0)
+  const cards = pending.reduce((total,u) => total + cardCount(u.id),0)
+  const exercises = pending.reduce((total,u) => total + exerciseCount(u.id),0)
   return <section className="orbit-card content-notice" role="status">
     <strong>教材修正了</strong>
-    <p>{pending.map(u=>u.note).join('；')}。你學過的 {total} 張卡片內容有改，已經排回複習：沒練過的今天就會出現，今天已經練過的明天出現。進度和紀錄都保留。</p>
+    <ul>{pending.map(u=><li key={u.id}>{u.note}</li>)}</ul>
+    {cards>0 && <p>有 {cards} 張學過的卡片已排回複習。已在更正當天練過的卡片從隔天再排。</p>}
+    {exercises>0 && <p>有 {exercises} 筆練過的閱讀、聽力或護理單字教材有更新，可從 <a href="#library">英文練習</a> 開啟新版。</p>}
     <button type="button" onClick={()=>update(prev=>({...prev,notes:{...prev.notes,...Object.fromEntries(pending.map(u=>['content.seen.'+u.id,'1']))}}))}>知道了</button>
   </section>
 }
@@ -156,20 +163,32 @@ function Home(props:PageProps & {today:string, start:(e:Energy)=>void, openWord:
 }
 function App() {
   const {state,update,storageError}=useAppStore()
+  const unsavedDrafts = useUnsavedDrafts()
   const [pairing,setPairing]=useState(takePairing)
   const [syncing,setSyncing]=useState(takeSyncLink)
   // Opened from a scan-to-connect link: the dialog connects and settles the progress itself. Its effect runs before
   // App's own (children first) and writes the connection at once, so App's on-open sync must stay out of the way.
   const openedBySync=useRef(syncing!==null)
   const [route, changeRoute]=useState(readRoute)
+  const [focusTutorSettings,setFocusTutorSettings]=useState(false)
   const [today,changeDay]=useState(dayKey)
   const [wordOpen,setWordOpen]=useState(false)
   const closeWord=()=>{setWordOpen(false);update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})}
   const navigate=(p:Page)=>setView(p==='practice'?'library':p)
   const start=(e:Energy)=>setView('practice',e)
   const page=route.view
+  const speakingLessonDate=route.mode?.match(/^lesson-(\d{4}-\d{2}-\d{2})$/)?.[1]
   const active=page==='practice'?'library':page
-  const sky=useObservatory(page,state.notes['cosmos.pin.'+active])
+  const planTab=route.tab==='rivals'&&!state.settings.rivalsEnabled?'calendar':route.tab
+  const backgroundPage=page==='plan'&&planTab==='rivals'?'rivals':page
+  const sky=useObservatory(backgroundPage,readBackgroundPin(state.notes,backgroundPage==='practice'?'library':backgroundPage))
+  function changePlanTab(tab: PlanTab) {
+    const hash='#plan/'+tab
+    if (location.hash===hash) return
+    // Keep the plan mounted so changing tabs preserves the selected day and calendar month.
+    history.pushState(null,'',hash)
+    changeRoute(readRoute())
+  }
   useEffect(()=>{
     // A QR link opened while the app is already open in this tab arrives as a hash change, not a new load.
     const pair=()=>{if(location.hash.startsWith(pairPrefix)){const p=takePairing();if(p)setPairing(p)}}
@@ -188,6 +207,16 @@ function App() {
     const timer=window.setInterval(clock,15000)
     return ()=>{window.removeEventListener('hashchange',handle);window.removeEventListener('focus',clock);clearInterval(timer)}
   },[])
+  useEffect(()=>{
+    const openSettings=()=>{setFocusTutorSettings(true);setView('settings')}
+    window.addEventListener(tutorSettingsEvent,openSettings)
+    return ()=>window.removeEventListener(tutorSettingsEvent,openSettings)
+  },[])
+  useEffect(()=>{
+    if (page!=='settings'||!focusTutorSettings) return
+    document.getElementById('settings-heading')?.focus()
+    setFocusTutorSettings(false)
+  },[page,focusTutorSettings])
   useEffect(()=>{document.documentElement.dataset.theme=state.settings.theme},[state.settings.theme])
   // Each kind of practice is a page of its own (#library/<mode>) and names the page; #library alone is the 英文練習 list.
   const periodQuiet=['exam','internship'].includes(activePeriod(today,state.settings.periods))
@@ -215,56 +244,75 @@ function App() {
     update:(remember,forget)=>update(s=>({...s,notes:replaceMemory(s.notes,applyMemory(readMemory(s.notes),remember,forget))})),
     remove:i=>update(s=>({...s,notes:replaceMemory(s.notes,readMemory(s.notes).filter((_,j)=>j!==i))})),
     clear:()=>update(s=>({...s,notes:replaceMemory(s.notes,[])}))}
-  const stateJson=JSON.stringify(state)
-  const cloudReady=useRef(false)
-  // A device that connects while the app is open starts saving once it has settled which progress to use.
-  useEffect(()=>{const on=()=>{cloudReady.current=true};window.addEventListener(driveReadyEvent,on);return ()=>window.removeEventListener(driveReadyEvent,on)},[])
+  const requestSync=useRef<((delay: number, reset?: boolean) => void) | null>(null)
   useEffect(()=>{
-    if(!driveConnected()||openedBySync.current)return
-    // Compare with the snapshot this device last synced, not just clocks: if both sides changed, keep both and ask.
-    // Take the cloud copy, save this one, or — both changed — merge them by itself (the banner only if merging fails).
-    autoSettle().catch(()=>{}).finally(()=>{cloudReady.current=true;void archiveOldRecords()})
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
-  // Coming back to the app (another tab, another app, the screen locked): catch up with what other devices saved.
-  useEffect(()=>{
-    let last=Date.now()
-    const back=()=>{
-      if(document.visibilityState!=='visible'||!driveConnected()||!cloudReady.current||Date.now()-last<30000)return
-      last=Date.now()
-      autoSettle().catch(()=>{})
+    let ready=openedBySync.current?null:cloudScope()
+    let active=true, inFlight=false, pending=false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    let due=Infinity, last=0, retries=0
+    let shouldArchive=!!ready
+    const readyToSync=()=>!!ready&&cloudScope()===ready
+    function schedule(delay: number, reset = false) {
+      if(!active||!readyToSync())return
+      if(reset&&!inFlight)retries=0
+      const when=Date.now()+delay
+      if(when>=due)return
+      clearTimeout(timer)
+      due=when
+      timer=setTimeout(run,delay)
     }
-    // A save refused because another device saved meanwhile: merge right away instead of staying paused.
-    const refused=()=>{if(cloudConflict()&&cloudReady.current&&Date.now()-last>=30000){last=Date.now();autoSettle().catch(()=>{})}}
+    async function run() {
+      due=Infinity
+      if(!active||!readyToSync())return
+      if(inFlight||document.visibilityState!=='visible'||!navigator.onLine){pending=true;return}
+      pending=false;inFlight=true;last=Date.now()
+      const scope=ready
+      const progress=await autoSettle().then(()=>null,(e:unknown)=>({e}))
+      const memory=scope===ready&&readyToSync()?await syncDriveMemory().then(()=>null,(e:unknown)=>({e})):null
+      const error=progress??memory
+      inFlight=false
+      if(!active||!readyToSync())return
+      if(scope!==ready){pending=false;schedule(0,true);return}
+      if(error)noteSyncFailure(error.e)
+      const paused=cloudConflict()
+      const waiting=!!paused&&paused.auto!==false
+      if(error||waiting){
+        pending=false
+        clearTimeout(timer);due=Infinity
+        if(retries<3)schedule(15000*2**retries++)
+      }else{
+        retries=0
+        if(pending){pending=false;schedule(0)}
+      }
+      if(shouldArchive){
+        shouldArchive=false
+        void archiveOldRecords()
+      }
+    }
+    const back=()=>{
+      if(document.visibilityState==='visible'&&(pending||Date.now()-last>=30000))schedule(0,true)
+    }
+    const online=()=>schedule(0,true)
+    const connected=()=>{ready=cloudScope();schedule(0,true)}
+    requestSync.current=schedule
     document.addEventListener('visibilitychange',back)
     window.addEventListener('focus',back)
-    window.addEventListener('dream-blueprint:cloud',refused)
-    return ()=>{document.removeEventListener('visibilitychange',back);window.removeEventListener('focus',back);window.removeEventListener('dream-blueprint:cloud',refused)}
+    window.addEventListener('online',online)
+    window.addEventListener(driveReadyEvent,connected)
+    schedule(0)
+    return ()=>{
+      active=false
+      clearTimeout(timer)
+      requestSync.current=null
+      document.removeEventListener('visibilitychange',back)
+      window.removeEventListener('focus',back)
+      window.removeEventListener('online',online)
+      window.removeEventListener(driveReadyEvent,connected)
+    }
   },[])
   useEffect(()=>{
-    if(!cloudReady.current||!driveConnected()||cloudConflict())return
-    const t=setTimeout(()=>void saveDriveState(stateJson,localModified()||Date.now()),5000)
-    return ()=>clearTimeout(t)
-  },[stateJson])
-  const memoryJson=JSON.stringify([memoryNotes,readDeleted(state.notes)])
-  const driveReady=useRef(!driveConnected())
-  useEffect(()=>{
-    if(!driveConnected())return
-    // The scan dialog brings the cloud's memory itself; saving can start right away.
-    if(openedBySync.current){driveReady.current=true;return}
-    loadDriveMemory().then(remote=>{
-      if(remote)update(s=>{
-        const merged=mergeMemory(readMemory(s.notes),readDeleted(s.notes),remote.notes,remote.deleted)
-        return {...s,notes:{...writeMemory(s.notes,merged.notes),[memoryDeletedKey]:JSON.stringify(merged.deleted)}}
-      })
-    }).catch(()=>{}).finally(()=>{driveReady.current=true})
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
-  useEffect(()=>{
-    if(!driveReady.current||!driveConnected())return
-    const t=setTimeout(()=>{const [list,deleted]=JSON.parse(memoryJson);saveDriveMemory(list,deleted)},1500)
-    return ()=>clearTimeout(t)
-  },[memoryJson])
+    requestSync.current?.(5000,true)
+  },[state])
   const available=links
   const date=new Date(today+'T12:00:00')
   const dateText=new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(date)
@@ -298,14 +346,15 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
+      {unsavedDrafts&&<div className="exam-offer"><span role="status">瀏覽器未能儲存草稿。切換練習仍可找回，關閉這個分頁前請先下載。</span> <button type="button" className="pr-link" onClick={downloadUnsavedDrafts}>下載未存草稿</button></div>}
       <SyncPaused/>
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan key={route.tab} {...props} initialTab={route.tab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-mode={libMode??'menu'}><PracticeCover title={pageName}/>{libMode?<PracticeLibrary {...props} mode={libMode}/>:<><LessonBanner state={state} today={today} start={start}/><PracticeMenu state={state} today={today}/></>}</div>:page==='leveltest'?<div className="library-page" data-mode="test"><PracticeCover title={pageName}/><Baseline state={state} update={update}/></div>:page==='history'?<History {...props}/>:page==='speaking'&&route.mode==='gept'?<GeptSpeaking {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined} wordMode={route.mode?.startsWith('word-')?route.mode.slice(5):undefined}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan {...props} tab={planTab} onTabChange={changePlanTab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-mode={libMode??'menu'}><PracticeCover title={pageName}/>{libMode?<PracticeLibrary {...props} mode={libMode}/>:<><LessonBanner state={state} today={today} start={start}/><PracticeMenu state={state} today={today}/></>}</div>:page==='leveltest'?<div className="library-page" data-mode="test"><PracticeCover title={pageName}/><Baseline state={state} update={update}/></div>:page==='history'?<History {...props}/>:page==='speaking'&&route.mode==='gept'?<GeptSpeaking {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'||!!speakingLessonDate} lessonDate={speakingLessonDate} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined} wordMode={route.mode?.startsWith('word-')?route.mode.slice(5):undefined}/>:<Settings {...props}/>}
     </main></div>
     {page==='today'&&!syncing&&!pairing&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {/* The level test stays out of sight until it is due; then it pops up here, after 今日單字. */}
     {page==='today'&&!syncing&&!pairing&&!wordOpen&&!!state.notes[seenKey(today)]&&showTestPrompt(state.notes,today)&&<TestPrompt state={state} update={update} today={today}/>}
     {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
-    {pairing&&<PairReceive payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}
+    {pairing&&<PairReceive key={pairing} payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}
     {syncing&&<SyncReceive code={syncing} onDone={()=>{clearSyncLink();setSyncing(null)}}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>

@@ -11511,6 +11511,11 @@
  },
  {
   "id": "ex-civil-110-08d817",
+  "emphasis": {
+   "phrase": "When they later",
+   "word": "they",
+   "underline": true
+  },
   "level": "B2",
   "band": "mid",
   "kind": "civil",
@@ -11611,7 +11616,8 @@
      "Junior colleges were usually set up by city school systems starting in the 1930s.",
      "Community colleges were renamed from junior colleges as low-cost institutions with a strong component of vocational education."
     ],
-    "answer": 3
+    "answer": 3,
+    "explanation": "第二段說初級學院後來改稱社區學院，第四段說明它們收費低、重視職業教育。這兩點對應官方選項 D。A 的學校數和學生數也出現在首段。原文寫的是二十世紀初，A 只寫了 At the beginning，沒有寫出是哪個時期，所以讀起來仍有解讀空間。"
    },
    {
     "n": 47,
@@ -11633,7 +11639,8 @@
      "Parents and businessmen wanted nearby, low-cost schools in rural or small-town areas to provide training for the growing white-collar labor force.",
      "Many community colleges were located in the center of the fast-growing metropolis to provide more advanced technical jobs in the blue-collar sphere."
     ],
-    "answer": 3
+    "answer": 3,
+    "explanation": "第四段列出的因素是需要附近、收費低的學校，以及需要進階技術訓練。D 對應後一點，但文中沒有明說許多社區學院位於大城市中心。原文提到鄉村或小城鎮時說的是四年制學院。"
    },
    {
     "n": 49,
@@ -14043,6 +14050,10 @@
  },
  {
   "id": "ex-ast-104-3",
+  "emphasis": {
+   "phrase": "Most of this",
+   "word": "this"
+  },
   "level": "B2",
   "band": "hard",
   "kind": "ast",
@@ -14054,8 +14065,7 @@
   "paras": [
    "Imagine two bottlenose dolphins swimming in the Gulf of Mexico. You hear a series of clicks, whistles, and whines coming from each, much like a conversation. We can’t be sure what they are discussing, but scientists do believe dolphins call each other by “name.”",
    "A recent study suggests the marine mammals not only produce their own unique “signature whistles,” but they also recognize and mimic whistles of other dolphins they are close to and want to see again. It seems that dolphins can call those they know by mimicking their distinct whistles. “They’re abstract names,” said Randall Wells, one of the authors of the study.",
-   "To conduct the study, the researchers listened to recordings of about 250 wild bottlenose dolphins made around Florida’s Sarasota Bay from 1984 to 2009, and four captive dolphins at a nearby aquarium.",
-   "Some wild dolphins were briefly captured and held in separate nets by the research team, allowing them to hear but not see each other. Researchers found that dolphins familiar with each other would mimic the whistle of another in that group when they were separated. Most of this took place among mothers and calves, or among males who were close associates, suggesting it was affiliative and not aggressive— somewhat like calling out the name of a missing child or friend. Whistle copying of this sort was not found in dolphins that happened to cross paths in the wild.",
+   "To conduct the study, the researchers listened to recordings of about 250 wild bottlenose dolphins made around Florida’s Sarasota Bay from 1984 to 2009, and four captive dolphins at a nearby aquarium. Some wild dolphins were briefly captured and held in separate nets by the research team, allowing them to hear but not see each other. Researchers found that dolphins familiar with each other would mimic the whistle of another in that group when they were separated. Most of this took place among mothers and calves, or among males who were close associates, suggesting it was affiliative and not aggressive— somewhat like calling out the name of a missing child or friend. Whistle copying of this sort was not found in dolphins that happened to cross paths in the wild.",
    "This use of vocal copying is similar to its use in human language, where the maintenance of social bonds appears to be more important than the immediate defense of resources. This helps differentiate dolphins’ vocal learning from that of birds, which tend to address one another in a more “aggressive context.”",
    "If confirmed, this would be a level of communication rarely found in nature. If dolphins can identify themselves and address friends with just a few squeaks, it’s easy to imagine what else they’re saying. However, as the authors of the study point out, all we can do right now is still imagine."
   ],

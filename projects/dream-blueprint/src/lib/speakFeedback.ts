@@ -1,4 +1,5 @@
 import { weakLabelPrompt } from './weakPoints'
+import { part2AudioNotice, part2FeedbackLabels } from './ieltsSpeaking'
 
 /** After a chat with Emma, Claude reads the transcript and answers in a fixed format, one kind of line each:
  *  how often today's grammar was used, up to three corrections (they go into review by themselves), one sentence for
@@ -32,13 +33,17 @@ export function parseSpeakFeedback(text: string): SpeakFeedback {
     if (!m) { if (line) rest.push(line); continue }
     const parts = m[2].split('|||').map(field)
     if (m[1] === '用了') {
-      const n = Number((parts[0].match(/\d+/) ?? ['0'])[0])
-      out.used = { n, example: /^無$|^none$/i.test(parts[1] ?? '') ? '' : field(parts[1]) }
+      const n = /^\d+$/.test(parts[0]) ? Number(parts[0]) : NaN
+      const example = field(parts[1])
+      const noExample = /^(無|none)$/i.test(example)
+      if (Number.isSafeInteger(n) && parts.length === 2 && (n === 0 ? noExample : !!example && !noExample)) {
+        out.used = { n, example: n === 0 ? '' : example }
+      }
     } else if (m[1] === '卡') {
-      if (parts.length >= 4 && parts[0] && parts[1] && out.fixes.length < 3)
+      if (parts.length >= 4 && parts.slice(0, 4).every(Boolean) && out.fixes.length < 3)
         out.fixes.push({ wrong: parts[0], en: parts[1], zh: parts[2], why: parts[3], ...(parts[4] ? { tag: parts[4] } : {}) })
     } else if (m[1] === '下次') {
-      if (parts[0]) out.next = { en: parts[0], zh: field(parts[1]) }
+      if (parts.length === 2 && parts.every(Boolean)) out.next = { en: parts[0], zh: parts[1] }
     } else if (parts[0]) out.cheer = parts.join(' ')
   }
   out.rest = rest.join('\n')
@@ -51,5 +56,6 @@ export function parseSpeakFeedback(text: string): SpeakFeedback {
 export function speakFeedbackOk(fb: SpeakFeedback, part2: boolean): boolean {
   if (!part2) return !!fb.used && !!fb.next && !!fb.cheer
   const lines = fb.rest.split('\n').map(l => l.trim()).filter(Boolean)
-  return lines.length >= 4 && lines.some(l => l.includes('流暢度和發音'))
+  return part2FeedbackLabels.every(label => lines.some(line => new RegExp('^' + label + '[：:]\\s*\\S').test(line)))
+    && lines.includes(part2AudioNotice)
 }

@@ -22,14 +22,14 @@ interface Input {
 /** The lesson's first listen of each unit's dialogue (the questions answered by ear), newest last. */
 function firstListens(notes: Record<string, string>) {
   return Object.keys(notes).filter(k => /^lesson\.heard\.\d+$/.test(k)).map(k => readHeard(notes, Number(k.slice(13))))
-    .filter((r): r is HeardRecord => !!r && typeof r.day === 'string' && r.total > 0 && Number.isFinite(r.correct))
+    .filter((r): r is HeardRecord => !!r && r.counted !== false && typeof r.day === 'string' && r.total > 0 && Number.isFinite(r.correct))
     .sort((a, b) => a.day.localeCompare(b.day))
 }
 
 function recentEvidence(notes: Record<string, string>) {
   const all: Evidence[] = []
   for (const u of unitsWithEvidence(notes)) all.push(...readEvidence(notes, u))
-  return all.sort((a, b) => a.day.localeCompare(b.day))
+  return all.filter(e => e.source !== 'checkpoint' || !e.item).sort((a, b) => a.day.localeCompare(b.day))
 }
 
 export function nextFocus(input: Input, today: string, energy: 'low' | 'normal' | 'high'): Focus {

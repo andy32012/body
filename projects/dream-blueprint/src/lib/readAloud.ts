@@ -69,6 +69,18 @@ export function compareReading(text: string, heardText: string): ReadResult {
   return { marks, heard, total, ratio: total ? heard / total : 0 }
 }
 
+/** Partition the one alignment for texts.join(' '), so each recognised word contributes to just one piece. */
+export function readingPieceRatios(texts: readonly string[], result: ReadResult): number[] {
+  const tokens = result.marks.filter(mark => /\S/.test(mark.text))
+  let start = 0
+  return texts.map(text => {
+    const end = start + (text.match(/\S+/g)?.length ?? 0)
+    const words = tokens.slice(start, end).filter(mark => mark.word)
+    start = end
+    return words.length ? words.filter(mark => mark.heard).length / words.length : 0
+  })
+}
+
 /** The words that were not heard, once each, for a short list under the text. */
 export function missedWords(result: ReadResult): string[] {
   const seen = new Set<string>()

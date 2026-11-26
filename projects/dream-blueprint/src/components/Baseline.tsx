@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Gauge, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { dayKey, daysBetween } from '../lib/progress'
@@ -8,7 +8,7 @@ import { useModal } from '../lib/modal'
 import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
 import './baseline.css'
 
-import { addResult, cefrOf, emptyCheck, forms, formSeen, laterKey, nextForm, readResults, retestInfo, sectionScore, setResultFeedback, speakingFeedbackOk, wordCount, writingFeedbackOk, type BaselineResult, type Form, type Q } from '../lib/baseline'
+import { addResult, cefrOf, emptyCheck, forms, formSeen, identifiedResults, laterKey, makeBaselineId, nextForm, readResults, retestInfo, sectionScore, setResultFeedback, speakingFeedbackOk, wordCount, writingFeedbackOk, type BaselineResult, type Form, type Q } from '../lib/baseline'
 export type { BaselineResult } from '../lib/baseline'
 
 /** Pops up on the home page when the level test is due. Either button keeps it away for the rest of the day; while it is due,
@@ -85,7 +85,7 @@ function Quiz({ qs, answers, setAnswers }: { qs: Q[]; answers: number[]; setAnsw
 }
 
 export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'update'>) {
-  const results = readResults(state.notes)
+  const results = useMemo(() => identifiedResults(state.notes), [state.notes])
   const formId = nextForm(results)
   const form = forms[formId]
   const retest = retestInfo(results, dayKey())
@@ -109,18 +109,27 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
   // A message (skipped everything, microphone blocked) and saving are kept apart: a message never locks the button.
   const [busy, setBusy] = useState('')
   const [saving, setSaving] = useState(false)
+  const saveInProgress = useRef(false)
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
   const started = useRef(0)
   const alive = useRef(true)
   // Each press of 錄音 is one request; going back a step or finishing cancels a request still waiting for permission.
   const asking = useRef(0)
+  const activeRequest = useRef<number | null>(null)
   const [requesting, setRequesting] = useState(false)
-  const dropRequest = () => { asking.current++; setRequesting(false) }
-  // Leaving the page (or closing the test) turns the microphone off, also when permission comes back after leaving.
+  const dropRequest = () => { activeRequest.current = null; setRequesting(false) }
   useEffect(() => {
     alive.current = true
-    return () => { alive.current = false; try { if (recorder.current?.state === 'recording') recorder.current.stop() } catch { /* already stopped */ } stream.current?.getTracks().forEach(t => t.stop()) }
+    return () => {
+      alive.current = false
+      activeRequest.current = null
+      const current = recorder.current
+      recorder.current = null
+      if (current?.state === 'recording') current.stop()
+      stream.current?.getTracks().forEach(t => t.stop())
+      stream.current = null
+    }
   }, [])
 
   function play() {
@@ -133,34 +142,48 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     setPlays(plays + 1)
   }
   async function record() {
-    if (recording) { recorder.current?.stop(); return }
-    if (requesting) return
+    if (saveInProgress.current || activeRequest.current !== null) return
+    if (recorder.current) {
+      if (recorder.current.state === 'recording') recorder.current.stop()
+      return
+    }
     const mine = ++asking.current
+    activeRequest.current = mine
     setRequesting(true)
     let media: MediaStream | null = null
     try {
       media = await navigator.mediaDevices.getUserMedia({ audio: true })
       // Permission came back after leaving the test, going back a step or finishing: nothing is recorded.
-      if (!alive.current || asking.current !== mine) { media.getTracks().forEach(t => t.stop()); return }
-      setRequesting(false)
-      stream.current = media
+      if (!alive.current || activeRequest.current !== mine || saveInProgress.current) {
+        media.getTracks().forEach(t => t.stop())
+        return
+      }
       const got = media
       const chunks: Blob[] = []
       const r = new MediaRecorder(got)
       r.ondataavailable = e => chunks.push(e.data)
       r.onstop = () => {
         got.getTracks().forEach(t => t.stop())
+        if (!alive.current || recorder.current !== r) return
+        recorder.current = null
         stream.current = null
-        if (!alive.current) return
         setAudio(new Blob(chunks, { type: r.mimeType }))
         setSeconds(Math.round((Date.now() - started.current) / 1000))
         setRecording(false)
       }
-      recorder.current = r; started.current = Date.now(); r.start(); setRecording(true)
+      started.current = Date.now()
+      r.start()
+      recorder.current = r
+      stream.current = got
+      dropRequest()
+      setRecording(true)
     } catch {
       // The microphone opened but the recorder could not start: close it again.
-      media?.getTracks().forEach(t => t.stop()); stream.current = null
-      if (alive.current && asking.current === mine) { setRequesting(false); setBusy('錄音開不起來（麥克風被擋住或這個瀏覽器不能錄），可以先略過口說。') }
+      media?.getTracks().forEach(t => t.stop())
+      if (alive.current && activeRequest.current === mine) {
+        dropRequest()
+        setBusy('錄音開不起來（麥克風被擋住或這個瀏覽器不能錄），可以先略過口說。')
+      }
     }
   }
   async function transcribe(blob: Blob) {
@@ -174,13 +197,19 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     return ((await res.json()).text as string) || ''
   }
   async function finish() {
+    if (saveInProgress.current || recorder.current || activeRequest.current !== null) return
     // Skipped parts are 缺測 (null), not zero; a listening answer without playing the clip is not a listening score.
     const listening = heard ? sectionScore(form.listenQs, listen) : null
     const reading = sectionScore(form.readQs, read)
     if (emptyCheck({ listening, reading, writing: { text: writing, feedback: '' }, speaking: { transcript: '', feedback: '', seconds: audio ? seconds : 0 } })) {
       setBusy('這次每一項都跳過了：沒有存結果，題本也沒有用掉。回上一步補做一項，就可以存。'); return
     }
+    saveInProgress.current = true
+    dropRequest()
+    stream.current?.getTracks().forEach(track => track.stop())
+    stream.current = null
     setSaving(true); setBusy('整理結果中……')
+    const id = makeBaselineId()
     let transcript = '', speakFeedback = '', writeFeedback = ''
     // Each part on its own: a failed transcript or comment never takes the others with it, and the work is saved anyway.
     const missed: string[] = []
@@ -193,13 +222,16 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
       if (transcript) { try { speakFeedback = await speakingFeedback(form, transcript, seconds) } catch { missed.push('口說的 Claude 回饋') } }
     }
     const result: BaselineResult = {
-      form: formId, date: dayKey(), listening, plays: heard, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
+      id, form: formId, date: dayKey(), listening, plays: heard, reading, ...(formSeen(results, formId) ? { repeat: true } : {}),
       writing: { text: writing, feedback: writeFeedback },
       speaking: { transcript, feedback: speakFeedback, seconds },
     }
     update(prev => ({ ...prev, notes: addResult(prev.notes, result) }))
+    saveInProgress.current = false
+    clearDraft(draftKey)
+    if (!alive.current) return
     setBusy(''); setSaving(false); setOpen(false); setStep(0)
-    setListen([]); setRead([]); setWriting(''); clearDraft(draftKey); setAudio(null); setSeconds(0); resetListening()
+    setListen([]); setRead([]); setWriting(''); setAudio(null); setSeconds(0); resetListening()
     setNotice(missed.length ? '結果存好了，但這次沒拿到：' + missed.join('、') + '。Claude 的回饋可以在下面「看每次的聽力稿、作品和回饋」裡按「請 Claude 看」補上。' : '')
   }
 
@@ -207,17 +239,17 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     const shown = results.length <= 4 ? results : [results[0], ...results.slice(-3)]
     const first = results[0], last = results[results.length - 1]
     const sign = (n: number) => (n > 0 ? '+' : '') + n
-    const name = (r: BaselineResult) => r === first ? '起點' : '第 ' + results.indexOf(r) + ' 次回測'
+    const name = (r: (typeof results)[number]) => r === first ? '起點' : '第 ' + results.indexOf(r) + ' 次回測'
     return <section className="bl-card">
       {notice && <p className="bl-note" role="status">{notice}</p>}
       <header><strong>英文程度紀錄</strong><span>{retest.due ? '可以回測了' : '下次回測：' + retest.date + '（還有 ' + retest.days + ' 天）'}</span></header>
       <div className="bl-table-wrap"><table className="bl-table">
-        <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.date + r.form}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}{r.repeat ? '（做過）' : ''}</small></th>)}</tr></thead>
+        <thead><tr><th scope="col"><span className="bl-sr">項目</span></th>{shown.map(r => <th scope="col" key={r.id}>{name(r)}<small>{r.date.slice(5).replace('-', '/')} · 題本 {r.form ?? 'A'}{r.repeat ? '（做過）' : ''}</small></th>)}</tr></thead>
         <tbody>
-          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.date}>{r.listening === null ? '缺測' : r.listening + ' / 3'}{r.plays !== undefined && r.listening !== null && <small>聽了 {r.plays} 次</small>}</td>)}</tr>
-          <tr><th scope="row">閱讀</th>{shown.map(r => <td key={r.date}>{r.reading === null ? '缺測' : r.reading + ' / 3'}</td>)}</tr>
-          <tr><th scope="row">寫作</th>{shown.map(r => <td key={r.date}>{r.writing.text.trim() ? wordCount(r.writing.text) + ' 字' : '缺測'}{cefrOf(r.writing.feedback) && <small>{cefrOf(r.writing.feedback)}</small>}</td>)}</tr>
-          <tr><th scope="row">口說</th>{shown.map(r => <td key={r.date}>{r.speaking.seconds ? r.speaking.seconds + ' 秒' : '缺測'}{r.speaking.transcript && <small>{wordCount(r.speaking.transcript)} 字</small>}</td>)}</tr>
+          <tr><th scope="row">聽力</th>{shown.map(r => <td key={r.id}>{r.listening === null ? '缺測' : r.listening + ' / 3'}{r.plays !== undefined && r.listening !== null && <small>聽了 {r.plays} 次</small>}</td>)}</tr>
+          <tr><th scope="row">閱讀</th>{shown.map(r => <td key={r.id}>{r.reading === null ? '缺測' : r.reading + ' / 3'}</td>)}</tr>
+          <tr><th scope="row">寫作</th>{shown.map(r => <td key={r.id}>{r.writing.text.trim() ? wordCount(r.writing.text) + ' 字' : '缺測'}{cefrOf(r.writing.feedback) && <small>{cefrOf(r.writing.feedback)}</small>}</td>)}</tr>
+          <tr><th scope="row">口說</th>{shown.map(r => <td key={r.id}>{r.speaking.seconds ? r.speaking.seconds + ' 秒' : '缺測'}{r.speaking.transcript && <small>{wordCount(r.speaking.transcript)} 字</small>}</td>)}</tr>
         </tbody>
       </table></div>
       {results.length > 1 && <p className="bl-delta">跟起點比（題目不同，只當參考；缺測的不比）：{[
@@ -227,17 +259,17 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
         first.speaking.seconds && last.speaking.seconds ? '口說 ' + sign(last.speaking.seconds - first.speaking.seconds) + ' 秒' : '',
       ].filter(Boolean).join('、') || '還沒有兩次都做的項目'}{last.repeat ? '。這次的題本以前做過，分數會偏高。' : ''}</p>}
       <details open={last.date === dayKey()}><summary>看每次的聽力稿、作品和回饋</summary>
-        {[...results].reverse().map(r => <div key={r.date + r.form} className="bl-past">
+        {[...results].reverse().map(r => <div key={r.id} className="bl-past">
           <p className="bl-label">{name(r)} · {r.date} · 題本 {r.form ?? 'A'}</p>
           <ListenScript form={forms[r.form ?? 'A']} />
           <p className="bl-label">寫作</p><p lang="en" className="bl-work">{r.writing.text || '（沒寫）'}</p>
           {r.writing.feedback.split('\n').map((l, i) => l.trim() ? <p key={i}>{l}</p> : null)}
           {r.writing.text.trim() && !r.writing.feedback && tutorKey() && <AskAgain label="請 Claude 看這篇寫作" ask={() => writingFeedback(forms[r.form ?? 'A'], r.writing.text)}
-            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r, 'writing', t) }))} />}
+            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r.id, 'writing', t) }))} />}
           <p className="bl-label">口說逐字稿</p><p lang="en" className="bl-work">{r.speaking.transcript || '（沒有逐字稿）'}</p>
           {r.speaking.feedback.split('\n').map((l, i) => l.trim() ? <p key={i}>{l}</p> : null)}
           {r.speaking.transcript.trim() && !r.speaking.feedback && tutorKey() && <AskAgain label="請 Claude 看這段口說" ask={() => speakingFeedback(forms[r.form ?? 'A'], r.speaking.transcript, r.speaking.seconds)}
-            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r, 'speaking', t) }))} />}
+            onSave={t => update(prev => ({ ...prev, notes: setResultFeedback(prev.notes, r.id, 'speaking', t) }))} />}
         </div>)}
       </details>
       {retest.due
@@ -274,13 +306,13 @@ export default function Baseline({ state, update }: Pick<PageProps, 'state' | 'u
     {step === 3 && <>
       <p lang="en"><b>{form.speak}</b></p>
       <p>按下錄音直接講，講完按停止。{openaiKey() ? '會用 OpenAI 轉成文字再請 Claude 給回饋。' : '（沒有 OpenAI 金鑰，只會記下長度。）'}</p>
-      <button type="button" className={'bl-rec' + (recording ? ' on' : '')} disabled={requesting} onClick={record}>{recording ? <><Square size={15} fill="currentColor" />停止</> : requesting ? <><Mic size={16} />等麥克風允許……</> : <><Mic size={16} />{audio ? '重錄' : '錄音'}</>}</button>
+      <button type="button" className={'bl-rec' + (recording ? ' on' : '')} disabled={requesting || saving} onClick={record}>{recording ? <><Square size={15} fill="currentColor" />停止</> : requesting ? <><Mic size={16} />等麥克風允許……</> : <><Mic size={16} />{audio ? '重錄' : '錄音'}</>}</button>
       {audio && !recording && <p>錄好了，約 {seconds} 秒。</p>}
       {recording && <p>講完先按「停止」，再按完成。</p>}
     </>}
     {busy && <p role="status">{busy}</p>}
     <div className="bl-nav">
-      <button type="button" disabled={saving} onClick={() => { dropRequest(); if (recording) recorder.current?.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
+      <button type="button" disabled={saving} onClick={() => { dropRequest(); if (recorder.current?.state === 'recording') recorder.current.stop(); setBusy(''); if (step) setStep(step - 1); else setOpen(false) }}>{step ? '上一步' : '取消'}</button>
       {step < 3
         ? <button type="button" className="bl-main" onClick={() => { setBusy(''); setStep(step + 1) }}>下一步</button>
         : <button type="button" className="bl-main" disabled={saving || recording || requesting} onClick={finish}>{results.length ? '完成，存這次結果' : '完成，存起點'}</button>}

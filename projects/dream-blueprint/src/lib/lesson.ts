@@ -29,12 +29,21 @@ export type LessonStep = typeof lessonSteps[number][0]
 
 /** First listen of a unit's dialogue (with questions) vs. later days (listen and read along). */
 export const heardKey = (unit: number) => 'lesson.heard.' + unit
-export interface HeardRecord { day: string; correct: number; total: number }
+export interface HeardRecord {
+  day: string
+  correct: number
+  total: number
+  counted?: boolean
+  plays?: number
+  at?: number
+  lessonDate?: string
+  picks?: number[]
+}
 export function readHeard(notes: Record<string, string>, unit: number): HeardRecord | null {
   try { return notes[heardKey(unit)] ? JSON.parse(notes[heardKey(unit)]) as HeardRecord : null } catch { return null }
 }
 
-/** One guided lesson, kept under the day it was (last) worked on; it also lets the plan tick 「今天這一堂」.
+/** One guided lesson, kept under the day it was started; it also lets the plan tick 「今天這一堂」.
  *  'lesson.active' points at an unfinished one, so closing the page or coming back tomorrow continues it. */
 export const lessonKey = (day: string) => 'lesson.' + day
 export const activeKey = 'lesson.active'
@@ -186,6 +195,8 @@ export interface LessonRecord {
 /** One variation's check. */
 export interface VariationCheck {
   firstVerdict?: 'good' | 'small' | 'again' | 'changed'; checkedText?: string; revealed?: boolean
+  /** The submission shown when the learner returns to an already-recorded sentence. */
+  answer?: string
   /** What he had written when he pressed 看答案 himself: the answer is judged on this, not on what he copied afterwards. */
   before?: string
   /** Claude's latest verdict and the text it was about (for 「Claude 說對了，下一步」 after coming back). */
@@ -206,18 +217,61 @@ export function mergeVariationCheck(older: VariationCheck, newer: VariationCheck
 /** A checkpoint or review day left halfway (a reload, another page): which sentence it was on and the answers so far,
  *  kept for that day only, so it goes on instead of asking the same sentences again. `levels` are the checkpoint's
  *  judgements so far ('assisted' | 'independent' | 'delayed' | 'pending', or null for not done). */
-export interface RunProgress { unit: number; day: number; pos: number; records: (Attempt & { verified?: boolean })[]; levels: (string | null)[] }
+export interface RunProgress {
+  unit: number
+  day: number
+  pos: number
+  records: (Attempt & { verified?: boolean })[]
+  levels: (string | null)[]
+  retry?: number
+  review?: boolean
+  items?: string[]
+  phase?: 'write' | 'sound'
+  answers?: Record<string, string>
+  spoken?: string[]
+}
 export const runProgressKey = (date: string) => 'progress.' + date
 export function readRunProgress(notes: Record<string, string>, date: string, unit: number, day: number): RunProgress | null {
   try {
     const v = JSON.parse(notes[runProgressKey(date)] || 'null') as RunProgress | null
-    return v && v.unit === unit && v.day === day && Number.isInteger(v.pos) && Array.isArray(v.records) && Array.isArray(v.levels) ? v : null
+    if (!v || v.unit !== unit || v.day !== day || !Number.isInteger(v.pos) || v.pos < 0
+        || !Array.isArray(v.records) || !v.records.every(r => typeof r?.sentenceId === 'string') || !Array.isArray(v.levels)) return null
+    const answers = Object.fromEntries(Object.entries(v.answers ?? {}).filter(([, value]) => typeof value === 'string'))
+    const items = Array.isArray(v.items) ? v.items.filter(id => typeof id === 'string') : undefined
+    const spoken = Array.isArray(v.spoken) ? v.spoken.filter(id => typeof id === 'string') : undefined
+    const phase = v.phase === 'sound' || v.phase === 'write' ? v.phase : undefined
+    return { ...v, answers, items, spoken, phase }
   } catch { return null }
 }
 export function saveRunProgress(notes: Record<string, string>, date: string, p: RunProgress | null) {
   const next = { ...notes }
   if (p) next[runProgressKey(date)] = JSON.stringify(p); else delete next[runProgressKey(date)]
   return next
+}
+/** Keep the first result and its evidence together, even when another device went back to a previous prompt. */
+export function mergeRunProgress(older: RunProgress, newer: RunProgress): RunProgress {
+  if (older.unit !== newer.unit || older.day !== newer.day
+      || (older.review !== undefined && newer.review !== undefined && older.review !== newer.review)
+      || (older.retry !== undefined && newer.retry !== undefined && older.retry !== newer.retry)
+      || (older.items && newer.items && older.items.join('|') !== newer.items.join('|'))) return newer
+  const further = older.pos > newer.pos ? older : newer
+  const records = [...older.records]
+  const levels = records.map((_, i) => older.levels[i] ?? null)
+  const answers = { ...older.answers }
+  newer.records.forEach((record, i) => {
+    const index = records.findIndex(r => r.sentenceId === record.sentenceId)
+    if (index < 0) {
+      records.push(record)
+      levels.push(newer.levels[i] ?? null)
+      if (newer.answers && record.sentenceId in newer.answers) answers[record.sentenceId] = newer.answers[record.sentenceId]
+    } else if (!(record.sentenceId in answers) && newer.answers && record.sentenceId in newer.answers
+      && records[index].rating === record.rating && records[index].revealed === record.revealed
+      && levels[index] === (newer.levels[i] ?? null)) {
+      answers[record.sentenceId] = newer.answers[record.sentenceId]
+    }
+  })
+  return { ...older, ...newer, pos: further.pos, phase: further.phase, records, levels, answers,
+    spoken: unique([...(older.spoken ?? []), ...(newer.spoken ?? [])]) }
 }
 export function readLessonRecord(notes: Record<string, string>, day: string): LessonRecord | null {
   try {

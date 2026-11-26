@@ -1,5 +1,5 @@
 """Shared pieces of the recording tools: the synthesiser, the recogniser used as a checker, loudness and trimming."""
-import json, os, re, subprocess
+import os, re, subprocess
 import numpy as np, cmudict
 from kokoro_onnx import Kokoro
 from faster_whisper import WhisperModel
@@ -9,7 +9,7 @@ from phonemizer.backend.espeak.wrapper import EspeakWrapper
 EspeakWrapper.set_library(espeakng_loader.get_library_path())
 EspeakWrapper.set_data_path(espeakng_loader.get_data_path())
 from misaki import en as misaki_en, espeak as misaki_espeak
-from course import HERE, MP3
+from course import HERE, MP3, read_json
 from phonemes import OVERRIDE
 
 MODELS = os.environ.get('PRON_MODELS', HERE)
@@ -43,7 +43,7 @@ def one_apart(a, b):
     if len(a) > len(b): a, b = b, a
     return any(a == b[:i] + b[i + 1:] for i in range(len(b)))
 common = {}
-for e in json.load(open(LEVELS)):
+for e in read_json(LEVELS):
     for w in re.split(r'[/ ]', re.sub(r'\(.*?\)', '', e['en'])):
         w = w.strip().lower()
         if w.isalpha() and w in CMU: common.setdefault(w, e['level'])

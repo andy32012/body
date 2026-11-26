@@ -206,6 +206,7 @@
    {
     "k": "fix",
     "q": "My brother lost her wallet yesterday.",
+    "instruction": "哥哥弄丟的是他自己的錢包。只換 wallet 前的字，說出是誰的錢包。",
     "accept": [
      "My brother lost his wallet yesterday."
     ],

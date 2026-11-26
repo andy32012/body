@@ -57,7 +57,8 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
     '- 講解用繁體中文，口氣像很熟的朋友，可以吐槽一下但要清楚。要有規則、一兩個例句、常見錯誤。不要用 Markdown 標題，段落短一點。',
     '- 判定不是「對了」時，在最後一行的前一行寫「弱點：名稱」，記下這次錯在哪一種文法，名稱照抄下面清單裡最符合的一個；同時錯兩種就用「；」隔開寫兩個，最多兩個。只錯標點或大小寫不用寫。' + weakLabelPrompt(),
     '- 另外照「' + rubrics['gept-sentence'].title + '」的官方評分表給他這一句分數（' + rubrics['gept-sentence'].scales[0].levels.map(l => l.score + '＝' + l.text).join('；') + '）。分數和判定要一致：「對了」才是 2；「小錯」是 1；「再試一次」「意思不同」是 0 或 1（這題要練的句型對、只是有錯給 1，錯太多或沒寫給 0）。',
-    '- 每次回覆最後兩行固定寫：先一行「得分：0、1 或 2」，最後一行「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
+    '- 開頭是「我的問題：」時，這是提問。就問題給說明或提示，不寫得分、判定或弱點。只有「我的翻譯：」或「我改成：」才是交卷。',
+    '- 批改回覆最後兩行固定寫：先一行「得分：0、1 或 2」，最後一行「判定：對了」「判定：小錯」「判定：意思不同」或「判定：再試一次」四選一。',
     '- 這是 App 裡這一題的批改框：下一題由 App 出。不要自己出下一句要他翻，也不要寫「這句的紀錄」或「穩了／要留意」清單。判「對了」時，最後提醒他在下面按「對了」繼續下一步。',
   ].filter(Boolean).join('\n')
 }
@@ -113,14 +114,31 @@ async function callClaude(system: string, turns: { role: 'user' | 'assistant'; c
   return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
 }
 
-/** The 單句寫作 score (0–2) on the 「得分：」 line, if Claude wrote one. */
-export function sentenceScoreOf(text: string): number | null {
-  const m = text.match(/得分[：:]\s*([012])(?![0-9.])/)
-  return m ? Number(m[1]) : null
+const sentenceVerdicts = { 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' } as const
+
+function feedbackLine(line: string) {
+  const trimmed = line.trim()
+  return trimmed.startsWith('**') && trimmed.endsWith('**') ? trimmed.slice(2, -2).trim() : trimmed
 }
+
+export function isSentenceFeedbackField(line: string) {
+  return /^(判定|弱點|得分)[：:]/.test(feedbackLine(line))
+}
+
+function sentenceField(text: string, name: '得分' | '判定') {
+  const lines = text.split('\n').map(feedbackLine).filter(line => line.startsWith(name + '：') || line.startsWith(name + ':'))
+  return lines.length === 1 ? lines[0].slice(name.length + 1).trim() : ''
+}
+
+/** The 單句寫作 score is a single value on the 「得分」 line. */
+export function sentenceScoreOf(text: string): number | null {
+  const score = sentenceField(text, '得分')
+  return /^[012]$/.test(score) ? Number(score) : null
+}
+
 export function verdictOf(text: string): 'good' | 'small' | 'again' | 'changed' | null {
-  const m = text.match(/判定：\s*(對了|小錯|再試一次|意思不同)/)
-  return m ? (({ 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' }) as const)[m[1] as '對了' | '小錯' | '再試一次' | '意思不同'] : null
+  const verdict = sentenceField(text, '判定')
+  return Object.hasOwn(sentenceVerdicts, verdict) ? sentenceVerdicts[verdict as keyof typeof sentenceVerdicts] : null
 }
 /** A sentence check that counts: the 判定 line, a 0–2 score on the 單句寫作 table and something saying why. A reply missing
  *  any of them (only 「判定：對了」, a score of 3, a chat reply) is no judgement: nothing is marked and he sends it again.
@@ -128,7 +146,7 @@ export function verdictOf(text: string): 'good' | 'small' | 'again' | 'changed' 
 export function sentenceJudgement(reply: string): { verdict: 'good' | 'small' | 'again' | 'changed'; score: number } | null {
   const verdict = verdictOf(reply), score = sentenceScoreOf(reply)
   if (!verdict || score === null) return null
-  const said = reply.split('\n').some(line => line.trim() && !/^(判定|弱點|得分)[：:]/.test(line.trim()))
+  const said = reply.split('\n').some(line => feedbackLine(line) && !isSentenceFeedbackField(line))
   if (!said) return null
   const settled = settleSentence(verdict, score)
   return { verdict: settled.verdict, score: settled.score ?? score }
@@ -152,8 +170,7 @@ export function personaText(id = tutorPersona()) {
   ].join('\n')
 }
 
-/** A message typed in the 「問 Claude」 box that is really a new try at the sentence (English, mostly the same words as
- *  his answer or the reference), so it is graded as 「我改成」 and moves the step on like one. Pure, for testing. */
+/** Compatibility helper for callers that compare word overlap. The question box no longer uses this to submit an answer. */
 export function looksLikeTry(text: string, answer: string, references: readonly string[]) {
   if (/[\u3400-\u9fff]/.test(text)) return false
   const words = (t: string) => t.toLowerCase().match(/[a-z']+/g) ?? []

@@ -100,18 +100,64 @@ export interface CertAttempt {
   otherLevel?: LevelId
 }
 export const certKey = (to: LevelId) => 'cert.' + to
-export function readAttempts(notes: Record<string, string>, to: LevelId): CertAttempt[] {
+const deletedCertKey = (to: LevelId) => 'cert.removed.' + to
+function removedAttempts(notes: Record<string, string>, to: LevelId): string[] {
+  try {
+    const list: unknown = JSON.parse(notes[deletedCertKey(to)] || '[]')
+    return Array.isArray(list) ? list.filter((id): id is string => typeof id === 'string') : []
+  } catch { return [] }
+}
+function readAttemptList(notes: Record<string, string>, to: LevelId): CertAttempt[] {
   try {
     const v = JSON.parse(notes[certKey(to)] || '[]')
     return Array.isArray(v) ? v.filter((a): a is CertAttempt => !!a && typeof a.id === 'string' && typeof a.date === 'string' && typeof a.exam === 'string') : []
   } catch { return [] }
 }
+function uniqueAttempts(list: CertAttempt[], removed: ReadonlySet<string>) {
+  const byId = new Map<string, CertAttempt>()
+  for (const attempt of list) {
+    if (removed.has(attempt.id)) continue
+    const previous = byId.get(attempt.id)
+    // Recording a result completes the same booking. A second device's open booking cannot erase that result.
+    if (previous && !waiting(previous) && waiting(attempt)) continue
+    if (previous?.band && attempt.band) {
+      // IELTS permits filling in any subset of the four part scores. Each device may have a different subset.
+      const band = { ...previous.band, overall: attempt.band.overall }
+      for (const part of ['listening', 'reading', 'writing', 'speaking'] as const) {
+        const score = attempt.band[part]
+        if (score !== undefined) band[part] = score
+      }
+      byId.set(attempt.id, { ...attempt, band })
+    } else {
+      byId.set(attempt.id, attempt)
+    }
+  }
+  return [...byId.values()].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id))
+}
+export function readAttempts(notes: Record<string, string>, to: LevelId): CertAttempt[] {
+  return uniqueAttempts(readAttemptList(notes, to), new Set(removedAttempts(notes, to)))
+}
 export function saveAttempt(notes: Record<string, string>, to: LevelId, attempt: CertAttempt) {
-  const list = readAttempts(notes, to).filter(a => a.id !== attempt.id)
-  return { ...notes, [certKey(to)]: JSON.stringify([...list, attempt].sort((a, b) => a.date.localeCompare(b.date))) }
+  const list = uniqueAttempts([...readAttempts(notes, to), attempt], new Set(removedAttempts(notes, to)))
+  return { ...notes, [certKey(to)]: JSON.stringify(list) }
 }
 export function removeAttempt(notes: Record<string, string>, to: LevelId, id: string) {
-  return { ...notes, [certKey(to)]: JSON.stringify(readAttempts(notes, to).filter(a => a.id !== id)) }
+  const removed = [...new Set([...removedAttempts(notes, to), id])].sort()
+  return { ...notes, [certKey(to)]: JSON.stringify(readAttempts(notes, to).filter(a => a.id !== id)),
+    [deletedCertKey(to)]: JSON.stringify(removed) }
+}
+/** Roll up both copies after all notes have been read, even when one side only has the deletion note. */
+export function mergeCertificates(older: Record<string, string>, newer: Record<string, string>) {
+  const patch: Record<string, string> = {}
+  for (const to of levelIds) {
+    const key = certKey(to)
+    const removed = new Set([...removedAttempts(older, to), ...removedAttempts(newer, to)])
+    if (key in older || key in newer || removed.size) {
+      patch[key] = JSON.stringify(uniqueAttempts([...readAttemptList(older, to), ...readAttemptList(newer, to)], removed))
+    }
+    if (removed.size) patch[deletedCertKey(to)] = JSON.stringify([...removed].sort())
+  }
+  return patch
 }
 
 export type GeptParts = 'lr' | 'sw' | 'both' | 'w' | 's'

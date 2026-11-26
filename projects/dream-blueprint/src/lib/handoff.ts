@@ -103,8 +103,9 @@ function packLine(state: AppState) {
   if (!hasPack(u)) return null
   const h = readHeld(state.notes, u)
   const part = (name: string, p?: HeldPart) => p ? name + ' ' + p.correct + '/' + p.total : null
-  const done = [part('閱讀', h.reading), part('聽力', h.listening)].filter(Boolean)
-  return '- 這是 B1→B2 橋接單元，另有一包讀聽說寫（兩篇閱讀、一段聽力、兩題段落寫作、兩個口說任務）和一次沒看過的回測' + (done.length ? '；回測第一次成績：' + done.join('、') : '（第 6 天開放）') + '。'
+  const done = [part('閱讀', h.reading), part('聽力', h.listening?.heard === true ? h.listening : undefined)].filter(Boolean)
+  const unconfirmed = h.listening && h.listening.heard !== true ? '。舊聽力回測未確認完整播放，不列入比較' : ''
+  return '- 這是 B1→B2 橋接單元，另有一包讀聽說寫（兩篇閱讀、一段聽力、兩題段落寫作、兩個口說任務）和一次沒看過的回測' + (done.length ? '；回測第一次成績：' + done.join('、') : '（第 6 天開放）') + unconfirmed + '。'
 }
 
 /** 「把進度設成這一天」: the course goes on from that unit and day. Units before it that were done elsewhere are not

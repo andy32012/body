@@ -1,4 +1,5 @@
 import { addDays, daysBetween } from './progress'
+import { legacyRecordId } from './recordId'
 
 /** A short level check (listening, reading, writing, speaking), repeated every 12 weeks with a new form of similar difficulty. */
 export type FormId = 'A' | 'B' | 'C'
@@ -6,6 +7,7 @@ export type Q = { q: string; options: string[]; answer: number }
 /** listenZh: the clip in Chinese, shown with the English transcript only after the test is saved. */
 export interface Form { listen: string; listenZh: string; listenQs: Q[]; read: string; readQs: Q[]; write: string; speak: string }
 export interface BaselineResult {
+  id?: string
   form?: FormId
   date: string
   /** null = 缺測 (skipped, or the clip was never played) — never stored as 0, which would look like a drop. */
@@ -77,6 +79,15 @@ export const forms: Record<FormId, Form> = {
   },
 }
 const order: FormId[] = ['A', 'B', 'C']
+type SavedResult = BaselineResult & { id: string }
+
+/** A stable fingerprint of the work and scores, so adding feedback never changes a legacy result's identity. */
+function legacyResultId(result: BaselineResult) {
+  return legacyRecordId(JSON.stringify([
+    result.date, result.form ?? 'A', result.listening, result.plays ?? null, result.reading,
+    result.writing?.text, result.speaking?.transcript, result.speaking?.seconds,
+  ]))
+}
 
 /** Every result, oldest first. The single old result (baseline.v1) counts as form A. */
 export function readResults(notes: Record<string, string>): BaselineResult[] {
@@ -86,18 +97,53 @@ export function readResults(notes: Record<string, string>): BaselineResult[] {
   } catch { /* broken note */ }
   return []
 }
+
+/** Legacy copies share stable identities, including repeated identical attempts. */
+export function identifiedResults(notes: Record<string, string>): SavedResult[] {
+  const list = readResults(notes)
+  const knownIds = new Set(list.map(result => result.id))
+  const occurrences = new Map<string, number>()
+  return list.map(result => {
+    if (result.id) return { ...result, id: result.id }
+    const signature = legacyResultId(result)
+    let occurrence = occurrences.get(signature) ?? 0
+    let id: string
+    do { id = signature + '-' + ++occurrence } while (knownIds.has(id))
+    occurrences.set(signature, occurrence)
+    return { ...result, id }
+  })
+}
+export const makeBaselineId = () => 'baseline-' + (globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2))
+
 export function addResult(notes: Record<string, string>, result: BaselineResult) {
   return { ...notes, [resultsKey]: JSON.stringify([...readResults(notes), result]) }
+}
+
+/** Combine feedback saved on different devices without treating one attempt as two results. */
+export function mergeBaselineResults(older: Record<string, string>, newer: Record<string, string>) {
+  const feedbackFrom = (latest: unknown, previous: unknown) => typeof latest === 'string' && latest.trim() ? latest
+    : typeof previous === 'string' ? previous : ''
+  const byId = new Map(identifiedResults(older).map(result => [result.id, result]))
+  for (const result of identifiedResults(newer)) {
+    const prev = byId.get(result.id)
+    byId.set(result.id, prev ? {
+      ...result,
+      writing: { ...result.writing, feedback: feedbackFrom(result.writing?.feedback, prev.writing?.feedback) },
+      speaking: { ...result.speaking, feedback: feedbackFrom(result.speaking?.feedback, prev.speaking?.feedback) },
+    } : result)
+  }
+  return [...byId.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)))
 }
 /** Claude's comment on the test's writing is kept only in the form asked for: the CEFR line first, then its points. */
 export const writingFeedbackOk = (text: string) => /CEFR/.test(text.trim().split('\n')[0] ?? '') && text.split('\n').filter(l => l.trim()).length >= 3
 /** …and on the speaking transcript only with its fixed first line (a transcript gives no level) and its points. */
 export const speakingFeedbackOk = (text: string) => /^只看逐字稿/.test(text.trim()) && text.split('\n').filter(l => l.trim()).length >= 3
-/** Claude's comment added later to a saved check (asked again after it failed): the check is found by its date and form;
- *  his work and the scores stay as they are. */
-export function setResultFeedback(notes: Record<string, string>, at: { date: string; form?: FormId }, part: 'writing' | 'speaking', feedback: string) {
-  const list = readResults(notes)
-  const i = list.findIndex(r => r.date === at.date && (r.form ?? 'A') === (at.form ?? 'A'))
+/** Claude's comment added later to a specific saved check. The work and scores stay as they are. */
+export function setResultFeedback(notes: Record<string, string>, at: string | { date: string; form?: FormId }, part: 'writing' | 'speaking', feedback: string) {
+  const list = identifiedResults(notes)
+  const matches = list.filter(result => typeof at === 'string' ? result.id === at
+    : result.date === at.date && (result.form ?? 'A') === (at.form ?? 'A'))
+  const i = matches.length === 1 ? list.indexOf(matches[0]) : -1
   if (i < 0) return notes
   list[i] = { ...list[i], [part]: { ...list[i][part], feedback } }
   return { ...notes, [resultsKey]: JSON.stringify(list) }

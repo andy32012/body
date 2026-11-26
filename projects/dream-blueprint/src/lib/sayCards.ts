@@ -46,9 +46,13 @@ export function addSayCard<S extends { notes: Record<string, string>; cards: Rev
 }
 
 /** Takes a saved card out again (its note and its review card), e.g. a correction that came from a misheard word. */
-export function removeSayCard<S extends { notes: Record<string, string>; cards: ReviewCard[] }>(prev: S, en: string): S {
-  const key = sayNoteOf(prev.notes, en)
+export function removeSayCard<S extends { notes: Record<string, string>; cards: ReviewCard[] }>(prev: S, en: string, ownedId?: string): S {
+  const key = ownedId === undefined ? sayNoteOf(prev.notes, en) : sayKey(ownedId)
   if (!key) return prev
+  if (ownedId !== undefined) {
+    const stored = readSayCard(prev.notes[key] ?? '')
+    if (!stored || sayIdentity(stored.en) !== sayIdentity(en)) return prev
+  }
   const notes = { ...prev.notes }
   delete notes[key]
   const id = key.slice('say.'.length)

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import map from '../data/roadmap.json'
 import type { PageProps } from '../lib/store'
+import { updateSchoolRequirement } from '../lib/school'
 import './roadmap.css'
 
 const milestones = ['學校課程', '台灣執照', '紐約申請', '護理考試', '英文檢定', '臨床求職', '職業移民', '抵達美國']
@@ -21,15 +22,8 @@ export default function Roadmap({ state, update, navigate }: PageProps) {
     update(prev => ({ ...prev, checks: { ...prev.checks, [key]: !prev.checks[key] } }))
   }
 
-  function toggleCourse(id: string) {
-    update(prev => ({
-      ...prev,
-      school: {
-        ...prev.school,
-        requirements: prev.school.requirements.map(item =>
-          item.id === id ? { ...item, done: !item.done } : item)
-      }
-    }))
+  function toggleCourse(id: string, done: boolean) {
+    update(prev => ({ ...prev, school: updateSchoolRequirement(prev.school, id, { done }) }))
   }
 
   return <section className="rn-map" aria-label="赴美護理師路線地圖">
@@ -65,7 +59,7 @@ export default function Roadmap({ state, update, navigate }: PageProps) {
           return <details key={group} className="rn-group">
             <summary>{group} <span>{done} ／ {items.length}</span></summary>
             {items.map(item => <label key={item.id} className="rn-check">
-              <input type="checkbox" checked={item.done} onChange={() => toggleCourse(item.id)} />
+              <input type="checkbox" checked={item.done} onChange={e => toggleCourse(item.id, e.currentTarget.checked)} />
               {item.label}
             </label>)}
           </details>

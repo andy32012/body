@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
-import { applyMemory, useMemory } from '../lib/memory'
+import { useMemory } from '../lib/memory'
 import {
-  appsScriptCode, archiveFolderUrl, cloudArchive, cloudAtomic, cloudCas, cloudConflict, cloudHistory, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
-  importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type DriveMemory, type HistoryEntry,
+  appsScriptCode, archiveFolderUrl, cloudArchive, cloudConflict, cloudGuarded, cloudStatus, connectDrive, disconnectDrive, driveConfig, driveLogsOn,
+  importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type HistoryEntry,
 } from '../lib/drive'
 import { keepThisCopy, mergeWithCloud, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
 import './pair.css'
@@ -49,7 +49,7 @@ function CloudHistory({ onStatus }: { onStatus: (message: string) => void }) {
     <summary>雲端歷史版本（最多留 30 份，可以還原）</summary>
     <p>雲端的進度要被蓋掉之前，雲端小程式會先把舊的那份留下來（最多每小時一份，兩台選版本或還原時一定會留）。不小心選錯、資料怪怪的，就從這裡回到之前的某一份。</p>
     {busy && <p>處理中……</p>}
-    {list === null && <p className="set-warn">你的雲端小程式還是舊版，換成最新的 v5 才會開始留歷史版本：照下面「更新雲端小程式」的步驟做一次。</p>}
+    {list === null && <p className="set-warn">你的雲端小程式還是舊版。請照下面的步驟更新到 v6，之後就會保留歷史版本。</p>}
     {list && !list.length && <p>還沒有歷史版本：下次雲端的進度被更新時，會開始留。</p>}
     {list && list.length > 0 && <div className="set-list">{list.map(h => <div key={h.id}>
       <span>{label(h)}<small> · {Math.max(1, Math.round(h.size / 1024))} KB</small></span>
@@ -63,38 +63,36 @@ function CloudHistory({ onStatus }: { onStatus: (message: string) => void }) {
 }
 
 export default function MemoryPanel() {
-  const { notes, update, remove, clear } = useMemory()
+  const { notes, remove, clear } = useMemory()
   const [drive, setDrive] = useState(driveConfig())
   const [url, setUrl] = useState('')
+  const [key, setKey] = useState('')
   const [code, setCode] = useState('')
   const [status, setStatus] = useState('')
   const [conflict, setConflict] = useState(cloudConflict())
   const [logs, setLogs] = useState(driveLogsOn())
   const [busy, setBusy] = useState(false)
   useEffect(() => {
-    const on = () => setConflict(cloudConflict())
+    const on = () => { setConflict(cloudConflict()); setDrive(driveConfig()) }
     window.addEventListener('dream-blueprint:cloud', on)
     return () => window.removeEventListener('dream-blueprint:cloud', on)
   }, [])
 
-  async function connect(fn: () => Promise<DriveMemory | null>) {
+  async function connect(fn: () => Promise<unknown>) {
+    setBusy(true)
     setStatus('連接中……')
-    let list: DriveMemory | null
     try {
-      list = await fn()
+      await fn()
       setDrive(driveConfig())
-    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)); return }
-    try {
-      // Progress first: merging the cloud's memory notes is a change too, and would look like this device's own progress.
-      const r = await settleProgress()
-      setStatus(r.kind === 'pulled' ? '連上了！已經換成雲端硬碟裡最新的學習進度。'
-        : r.kind === 'conflict' ? '連上了。雲端硬碟裡已經有一份進度，這台裝置也有自己的進度：請在下面選要留哪一份。'
-          : '連上了！之後記住的事和學習進度都會存進雲端硬碟。')
-    } catch (e) { setStatus('連上了，但學習進度這次沒同步到（' + (e instanceof Error ? e.message : String(e)) + '），下次打開會再試。') }
-    finally {
-      const add = list ? applyMemory([], list.notes, []).filter(n => !notes.includes(n) && !list!.deleted.includes(n)) : []
-      if (add.length) update(add, [])
-    }
+      setKey(''); setCode('')
+      try {
+        const r = await settleProgress()
+        setStatus(r.kind === 'pulled' ? '連上了！已經換成雲端硬碟裡最新的學習進度。'
+          : r.kind === 'conflict' ? '連上了。這台和雲端都有進度，請在下面選擇合併或使用其中一份。'
+            : '連上了！之後記住的事和學習進度都會存進雲端硬碟。')
+      } catch (e) { setStatus('連上了，但學習進度這次沒同步到（' + (e instanceof Error ? e.message : String(e)) + '）。') }
+    } catch (e) { setStatus(e instanceof Error ? e.message : String(e)) }
+    finally { setBusy(false) }
   }
   async function copyCode() {
     try { await navigator.clipboard.writeText(syncCode()); setStatus('同步碼已複製，貼到手機的這一格就能連上同一份記憶。') }
@@ -111,7 +109,7 @@ export default function MemoryPanel() {
   }
 
   return <>
-    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，按「刪掉」就好；連著雲端硬碟時，刪掉的也會從雲端刪掉，別台裝置不會再加回來（雲端小程式要是新版）。</p>
+    <p>你在「問問 Claude」或英文口說裡講到重要的事，她們會自己記在這裡，之後每次聊天都會先看過。不想被記得的，可以按「刪掉」。雲端小程式 v6 會合併各裝置新增或刪除的記憶。</p>
     {notes.length ? <div className="set-list">
       {notes.map((n, i) => <div key={i + n}><span>{n}</span><button type="button" onClick={() => remove(i)}>刪掉</button></div>)}
     </div> : <p>目前還沒有記住任何事。</p>}
@@ -122,7 +120,7 @@ export default function MemoryPanel() {
       <p>已連上。你自己雲端硬碟裡的「夢想藍圖・記憶」試算表會存：「記憶」是她們記住的事、「進度」是整份學習進度（課表、單字、複習卡、勾選、作答紀錄），有變動 5 秒後自動存上去，換手機也會接上。對話逐字稿只有打開下面的開關才會存。</p>
       <p>手機只留最近的紀錄：太舊的複習紀錄、每天的小紀錄、舊課的批改全文，會先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了才從手機拿掉，封存的檔案不會被刪{cloudArchive() ? '。' : '（雲端小程式要 v4 以上，照下面「更新雲端小程式」做一次）。'}{archiveFolderUrl() && <> <a href={archiveFolderUrl()} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</p>
       {conflict && <div className="set-warn" role="alert">
-        <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置之後也有自己的改動。按「兩份合併」兩台做過的都會留下（課表接在比較後面那一天）；也可以只留一份：</p>
+        <p><b>兩台裝置的進度不一樣，先暫停同步。</b>雲端硬碟裡有另一台裝置在 {stamp(conflict.remoteAt)} 存的進度，這台裝置也有自己的改動。按「兩份合併」會保留兩台的作答和應補強的課程，也可以選擇其中一份。</p>
         <div className="set-actions">
           <button type="button" disabled={busy} onClick={() => choose(mergeWithCloud)}>兩份合併（建議）</button>
           <button type="button" disabled={busy} onClick={() => choose(takeCloudCopy)}>用雲端那份（這台的先下載成備份）</button>
@@ -137,20 +135,16 @@ export default function MemoryPanel() {
       <p>掃了沒反應，或是用加到主畫面的 App 開的？就改用同步碼：按下面的按鈕複製，用 LINE 傳給自己，貼到那台的「貼上同步碼」。</p>
       <div className="set-actions">
         <button type="button" onClick={copyCode}>複製同步碼（給手機用）</button>
-        <button type="button" onClick={() => { disconnectDrive(); setDrive(null); setStatus('這台裝置已中斷雲端硬碟。') }}>這台裝置中斷連線</button>
+        <button type="button" disabled={busy} onClick={() => { void disconnectDrive().then(() => { setDrive(driveConfig()); setStatus('這台裝置已中斷雲端硬碟。') }, (e: unknown) => setStatus(String(e))) }}>這台裝置中斷連線</button>
       </div>
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
       <CloudHistory onStatus={setStatus} />
       <details className="set-details">
-        <summary>{cloudAtomic() ? '雲端小程式是最新的 v5（存到一半失敗也不會弄壞雲端那份、會檢查兩台的進度、留歷史版本、封存舊紀錄）'
-          : cloudArchive() ? '更新雲端小程式到 v5（新增：先寫好、確認完整才換過去，存到一半失敗也不會弄壞雲端那份）'
-          : cloudHistory() ? '更新雲端小程式到 v5（新增：存檔更安全、舊紀錄先封存到雲端硬碟）'
-          : cloudCas() ? '更新雲端小程式到 v5（新增：存檔更安全、歷史版本可以還原、舊紀錄封存到雲端）'
-          : '更新雲端小程式到 v5（建議：存檔安全、兩台不會互相蓋掉，還會留歷史版本、封存舊紀錄）'}</summary>
+        <summary>{cloudGuarded() ? '雲端小程式 v6' : '更新雲端小程式到 v6（進度版本檢查與記憶合併）'}</summary>
         <ol>
           <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
-          <li>上面的函式選單選「setupHistory」，按「執行」（會在雲端硬碟開「夢想藍圖・歷史版本」和「夢想藍圖・封存」兩個資料夾）。如果跳出要你允許存取雲端硬碟：選你的帳號 →「進階」→「前往（不安全）」→「允許」。</li>
-          <li>右上「部署」→「管理部署作業」→ 鉛筆圖示 → 版本選「新版本」→「部署」。網址不會變，不用重新連接。</li>
+          <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。原本的同步密鑰與已存資料會保留。</li>
+          <li>右上選「部署」→「管理部署作業」→ 鉛筆圖示 → 版本選「新版本」→「部署」。原本網址和同步碼可繼續使用。</li>
         </ol>
         <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
         <textarea readOnly rows={6} value={appsScriptCode} aria-label="雲端小程式程式碼" onFocus={e => e.target.select()} />
@@ -158,15 +152,16 @@ export default function MemoryPanel() {
     </> : <>
       <p>連上之後，記住的事和整份學習進度會存進你自己的 Google 雲端硬碟，電腦和手機共用同一份。對話逐字稿預設不存。</p>
       <label className="set-field">網頁應用程式網址<input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/…/exec" /></label>
-      <div className="set-actions"><button type="button" disabled={!url.trim()} onClick={() => connect(() => connectDrive(url))}>連接雲端硬碟</button></div>
+      <label className="set-field">同步密鑰<input type="password" autoComplete="off" value={key} onChange={e => setKey(e.target.value)} placeholder="Apps Script 執行記錄中的密鑰" /></label>
+      <div className="set-actions"><button type="button" disabled={busy || !url.trim() || !key.trim()} onClick={() => void connect(() => connectDrive(url, key))}>連接雲端硬碟</button></div>
       <label className="set-field">已經在別台裝置連過？貼上同步碼<input value={code} onChange={e => setCode(e.target.value)} placeholder="同步碼" /></label>
-      <div className="set-actions"><button type="button" disabled={!code.trim()} onClick={() => connect(() => importSyncCode(code))}>用同步碼連接</button></div>
+      <div className="set-actions"><button type="button" disabled={busy || !code.trim()} onClick={() => void connect(() => importSyncCode(code))}>用同步碼連接</button></div>
       <details className="set-details">
         <summary>還沒有雲端小程式？</summary>
         <ol>
           <li>到 script.google.com 開一個新專案，把下面的程式碼全部貼上，按儲存。</li>
-          <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟（選你的帳號 →「進階」→「前往（不安全）」→「允許」）。</li>
-          <li>「部署」→「新增部署作業」→ 類型選「網頁應用程式」，執行身分選自己、存取權選「所有人」→ 部署，把網址貼到上面。</li>
+          <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。到執行記錄複製「同步密鑰」並貼到上方。</li>
+          <li>「部署」→「新增部署作業」→ 類型選「網頁應用程式」，執行身分選自己、存取權選「所有人」→ 部署，把網址貼到上方，再按「連接雲端硬碟」。</li>
         </ol>
         <div className="set-actions"><button type="button" onClick={copyScript}>複製雲端小程式</button></div>
         <textarea readOnly rows={6} value={appsScriptCode} aria-label="雲端小程式程式碼" onFocus={e => e.target.select()} />

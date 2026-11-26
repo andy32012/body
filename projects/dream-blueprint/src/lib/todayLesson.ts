@@ -41,6 +41,7 @@ export const allSentences: Sentence[] = units
 export const sentenceById = new Map(allSentences.map((s) => [s.id, s]));
 /** Sentences saved from Emma, passages or lessons live in state.notes as "say.<id>". */
 export function syncCustom(notes: Record<string, string>) {
+  for (const id of sentenceById.keys()) if (id.startsWith("say-")) sentenceById.delete(id);
   for (const [k, v] of Object.entries(notes)) {
     if (!k.startsWith("say.")) continue;
     const d = readSayCard(v);

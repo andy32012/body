@@ -46,8 +46,7 @@ function offlineApp(): Plugin {
       return [
         { tag: "link", attrs: { rel: "manifest", href: "./manifest.webmanifest" }, injectTo: "head" },
         { tag: "link", attrs: { rel: "apple-touch-icon", href: "./icon-192.png" }, injectTo: "head" },
-        { tag: "meta", attrs: { name: "theme-color", content: "#10162f" }, injectTo: "head" },
-        { tag: "script", attrs: { defer: true, src: "./register-sw.js" }, injectTo: "body" }
+        { tag: "meta", attrs: { name: "theme-color", content: "#10162f" }, injectTo: "head" }
       ];
     },
     async writeBundle(output) {
@@ -57,24 +56,38 @@ function offlineApp(): Plugin {
       const gallery: Record<string, string> = {};
       // Pronunciation clips (one pack per lesson and voice) are kept as they are used, not downloaded with the app.
       const sounds: Record<string, string> = {};
+      const coreHashes: Record<string, string> = {};
+      const worker = await readFile(path.join(root, "scripts/service-worker.js"), "utf8");
+      const register = await readFile(path.join(root, "scripts/register-sw.js"), "utf8");
       const version = createHash("sha256");
+      version.update(worker).update("\0").update(register).update("\0");
       for (const file of files) {
         const bytes = await readFile(path.join(directory, file));
         version.update(file).update("\0").update(bytes);
+        const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
         if (/^cosmos\/.*\.(?:webp|avif|jpe?g|png)$/i.test(file)) {
-          gallery[file] = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
-        }
-        if (/^pron\/.*\.pack$/.test(file)) sounds[file] = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+          gallery[file] = hash;
+        } else if (/^pron\/.*\.pack$/.test(file)) {
+          sounds[file] = hash;
+        } else coreHashes[file] = hash;
       }
+      const release = version.digest("hex").slice(0, 16);
+      const indexPath = path.join(directory, "index.html");
+      const index = (await readFile(indexPath, "utf8"))
+        .replace("</head>", `<meta name="dream-release" content="${release}">\n</head>`)
+        // Keep update behavior paired with the page even when upgrading through a legacy installed worker.
+        .replace("</body>", () => `<script>\n${register}\n</script>\n</body>`);
+      await writeFile(indexPath, index);
+      coreHashes["index.html"] = createHash("sha256").update(index).digest("hex").slice(0, 16);
       const config = {
         entry: files.find(file => /^assets\/index-[\w-]+\.js$/.test(file)),
-        version: version.digest("hex").slice(0, 16),
-        core: files.filter(file => !(file in gallery) && !(file in sounds)),
+        version: release,
+        core: Object.keys(coreHashes),
+        coreHashes,
         gallery,
         sounds,
         fallback: "cosmos/n01.webp"
       };
-      const worker = await readFile(path.join(root, "scripts/service-worker.js"), "utf8");
       await writeFile(path.join(directory, "sw.js"), "const config = " + JSON.stringify(config) + ";\n" + worker);
     }
   };

@@ -1,6 +1,6 @@
 /** Nursing English for the internship and licensing-exam months (and any day he wants it): listening dialogues with
  *  a transcript, reading passages in the reading format, and a nursing word list drilled like the 7000 words. */
-import { bestListen, type Accent, type ListenRecord, type PackLine, type PackQuestion } from './bridge'
+import { bestListen, betterListen, withBestListen, type Accent, type ListenAttempt, type ListenRecord, type PackLine, type PackQuestion } from './bridge'
 import { levelTarget, openSteps } from './unlock'
 
 export type NurseLevel = 'A2' | 'B1' | 'B2'
@@ -12,6 +12,7 @@ export interface NurseListening {
 export interface NurseWord { en: string; zh: string; area: string; ex: string; exZh: string }
 
 export const nurseListenKey = (id: string) => 'nurse.listen.' + id
+export const nursePreviewKey = (id: string) => 'nurse.listen-preview.' + id
 export const nurseSpeakKey = (id: string) => 'nurse.speak.' + id
 /** The dialogue heard most recently ({ id, title, you, day }), so the day's list can offer to act it out. */
 export const nurseLastKey = 'nurse.last'
@@ -28,12 +29,23 @@ export function readLastHeard(notes: Record<string, string>): LastHeard | null {
 export function readNurseListen(notes: Record<string, string>, id: string): ListenRecord | null {
   try { return notes[nurseListenKey(id)] ? JSON.parse(notes[nurseListenKey(id)]) as ListenRecord : null } catch { return null }
 }
-/** Understood by ear: every answer right after a complete play, without the text (on the best attempt so far). */
+/** Understood by ear the first time: every answer right after a complete play, without seeing the text. */
 export const heardWell = (r: ListenRecord | null) => { const b = bestListen(r); return !!b && b.heard && b.correct === b.total }
 
-/** Listened to without the text and at least 70% right: what counts toward finishing a level. The best attempt counts,
- *  so a redo done after reading the transcript does not lock a level that was already open. */
-export const listenPassed = (r: ListenRecord | null) => { const b = bestListen(r); return !!b && b.heard && b.correct / Math.max(1, b.total) >= 0.7 }
+const passedByEar = (a?: ListenAttempt | null) => !!a?.heard && a.total > 0 && a.correct / a.total >= 0.7
+export const nurseReviewPassed = (r: ListenRecord | null) => passedByEar(r?.reviewBest)
+/** Either a first listen or a no-text re-listen can finish a dialogue, with separate evidence for each. */
+export const listenPassed = (r: ListenRecord | null) => passedByEar(bestListen(r)) || nurseReviewPassed(r)
+
+/** Preserve the first-listen evidence when a saved dialogue is practised again. */
+export function saveNurseListen(notes: Record<string, string>, id: string, rec: ListenRecord, byEar: boolean): ListenRecord {
+  const old = readNurseListen(notes, id)
+  const heard = rec.heard && byEar && !old && !notes[nursePreviewKey(id)]
+  const saved = withBestListen(old, { ...rec, heard })
+  const review: ListenAttempt = { day: rec.day, correct: rec.correct, total: rec.total, heard: byEar }
+  const reviewBest = !heard && byEar && betterListen(review, old?.reviewBest) ? review : old?.reviewBest
+  return { ...saved, reviewBest }
+}
 export const nurseLevels = ['A2', 'B1', 'B2'] as const
 /** Which levels of nursing listening are open: B1 once A2 has its target of passed dialogues (levelTarget), B2 after B1. */
 export function nurseLevelsOpen(list: readonly { id: string; level: string }[], notes: Record<string, string>): Record<string, boolean> {
@@ -43,13 +55,13 @@ export function nurseLevelsOpen(list: readonly { id: string; level: string }[], 
   }))
   return Object.fromEntries(nurseLevels.map((lv, i) => [lv, open[i]]))
 }
-/** Never heard first (in order), then ones not yet understood by ear (oldest first), then the rest (oldest first). */
+/** Never attempted first, then incomplete dialogues (oldest first), then the rest (oldest first). */
 export function nextNurseListening(list: readonly NurseListening[], notes: Record<string, string>, skip: readonly string[] = []) {
   const pool = list.filter(l => !skip.includes(l.id))
   const fresh = pool.find(l => !readNurseListen(notes, l.id))
   if (fresh) return fresh
   const byDay = (a: NurseListening, b: NurseListening) => readNurseListen(notes, a.id)!.day.localeCompare(readNurseListen(notes, b.id)!.day)
-  return pool.filter(l => !heardWell(readNurseListen(notes, l.id))).sort(byDay)[0] ?? [...pool].sort(byDay)[0] ?? null
+  return pool.filter(l => !listenPassed(readNurseListen(notes, l.id))).sort(byDay)[0] ?? [...pool].sort(byDay)[0] ?? null
 }
 
 /** The last dialogue he listened to (for "act it out with Emma"), or null. */

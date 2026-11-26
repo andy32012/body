@@ -31,6 +31,9 @@ export interface Listening {
   engine: ListenEngine
   /** The words heard, once listening has stopped (and, with OpenAI, the recording has been transcribed). */
   done: Promise<string>
+  /** Time spent listening, frozen when recording ends, before any upload or transcription. */
+  readonly durationMs: number
+  readonly recording: boolean
   /** Stop and keep what was said. */
   stop(): void
   /** Stop and throw it away. */
@@ -45,11 +48,18 @@ const micError = (e: unknown) => {
 /** Starts listening. `maxMs` stops by itself (an answer time); `onPartial` gets words as they come (browser only).
  *  `signal`: leaving the page (or the question) cancels it, also while the browser is still asking for the microphone. */
 export async function listen(opts: { maxMs?: number; onPartial?: (text: string) => void; signal?: AbortSignal } = {}): Promise<Listening> {
+  opts.signal?.throwIfAborted()
   const engine = listenEngine()
   if (!engine) throw new Error('這個瀏覽器不能做語音辨識。到口說頁的設定填 OpenAI 金鑰，或改用 Chrome、Safari。')
   const listening = await (engine === 'openai' ? recordAndTranscribe(opts.maxMs, opts.signal) : browserListen(opts.maxMs, opts.onPartial))
-  if (opts.signal?.aborted) { listening.cancel(); throw new DOMException('ended', 'AbortError') }
-  opts.signal?.addEventListener('abort', () => listening.cancel(), { once: true })
+  if (opts.signal) {
+    const signal = opts.signal
+    const cancel = () => listening.cancel()
+    const detach = () => signal.removeEventListener('abort', cancel)
+    void listening.done.then(detach, detach)
+    if (signal.aborted) { cancel(); signal.throwIfAborted() }
+    signal.addEventListener('abort', cancel, { once: true })
+  }
   return listening
 }
 
@@ -65,51 +75,77 @@ async function recordAndTranscribe(maxMs?: number, signal?: AbortSignal): Promis
   try { recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined) }
   catch (e) { release(); throw new Error('這個瀏覽器不能錄音（' + (e instanceof Error ? e.message : String(e)) + '）。') }
   const chunks: Blob[] = []
-  let cancelled = false
+  const request = new AbortController()
+  const startedAt = performance.now()
+  let stoppedAt: number | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
   const done = new Promise<string>((resolve, reject) => {
     recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
     recorder.onerror = () => { clearTimeout(timer); release(); reject(new Error('錄音中斷了，再試一次。')) }
     recorder.onstop = () => {
+      stoppedAt ??= performance.now()
       clearTimeout(timer)
       release()
-      if (cancelled) { resolve(''); return }
+      if (request.signal.aborted) { resolve(''); return }
       const blob = new Blob(chunks, { type: recorder.mimeType || type || 'audio/webm' })
       if (blob.size < 1200) { resolve(''); return }
-      transcribe(blob).then(resolve, reject)
+      transcribe(blob, request.signal).then(resolve, e => {
+        if (request.signal.aborted) resolve('')
+        else reject(e)
+      })
     }
   })
   try { recorder.start(250) }
   catch (e) { release(); throw new Error('錄音開不起來（' + (e instanceof Error ? e.message : String(e)) + '），再試一次。') }
-  const stop = () => { if (recorder.state !== 'inactive') recorder.stop() }
+  const stop = () => {
+    if (recorder.state === 'inactive') return
+    stoppedAt ??= performance.now()
+    clearTimeout(timer)
+    recorder.stop()
+  }
   if (maxMs) timer = setTimeout(stop, maxMs)
-  return { engine: 'openai', done, stop, cancel: () => { cancelled = true; stop() } }
+  return {
+    engine: 'openai', done, stop,
+    get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
+    get recording() { return stoppedAt === undefined },
+    cancel() { request.abort(); stop(); release() },
+  }
 }
 
 /** The current OpenAI file transcription model, with the older one as a fallback while it is still served. */
 const models = ['gpt-transcribe', 'gpt-4o-mini-transcribe']
-export async function transcribe(blob: Blob): Promise<string> {
+export async function transcribe(blob: Blob, signal?: AbortSignal): Promise<string> {
+  signal?.throwIfAborted()
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
   const ext = blob.type.includes('mp4') ? 'mp4' : blob.type.includes('ogg') ? 'ogg' : 'webm'
-  const call = (model: string, language: boolean) => {
+  const call = async (model: string, language: boolean) => {
+    signal?.throwIfAborted()
     const form = new FormData()
     form.append('file', new File([blob], 'speech.' + ext, { type: blob.type || 'audio/webm' }))
     form.append('model', model)
     if (language) form.append('language', 'en')
-    return fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + key }, body: form })
+    const res = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + key }, body: form, signal })
+    signal?.throwIfAborted()
+    const data = await res.json().catch(() => null) as { text?: string; error?: { message?: string } } | null
+    signal?.throwIfAborted()
+    return { res, data }
   }
   let res: Response | null = null
   let data: { text?: string; error?: { message?: string } } | null = null
   try {
     for (const model of models) {
-      res = await call(model, true)
-      data = await res.json().catch(() => null)
+      ({ res, data } = await call(model, true))
       // A field this model does not take: the same model without it. A model that is not there: the next one.
-      if (res.status === 400 && /language/i.test(data?.error?.message ?? '')) { res = await call(model, false); data = await res.json().catch(() => null) }
+      if (res.status === 400 && /language/i.test(data?.error?.message ?? '')) {
+        ({ res, data } = await call(model, false))
+      }
       if (res.ok || !(res.status === 404 || (res.status === 400 && /model/i.test(data?.error?.message ?? '')))) break
     }
-  } catch { throw new Error('連不上 OpenAI：檢查網路後再試一次。') }
+  } catch {
+    signal?.throwIfAborted()
+    throw new Error('連不上 OpenAI：檢查網路後再試一次。')
+  }
   if (!res || !res.ok) {
     if (res?.status === 401) throw new Error('OpenAI 金鑰不對或被停用了，到口說頁的設定重新貼一次。')
     if (res?.status === 429) throw new Error('OpenAI 額度用完或打太快了，等一下再試。')
@@ -127,9 +163,12 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
   r.maxAlternatives = 1
   let finals = ''
   let stopped = false, cancelled = false, failed: Error | null = null
+  const startedAt = performance.now()
+  let stoppedAt: number | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
   const done = new Promise<string>((resolve, reject) => {
     r.onresult = e => {
+      if (cancelled) return
       let interim = ''
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript
@@ -145,13 +184,29 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
     r.onend = () => {
       // The browser stops by itself after a pause: keep listening until asked to stop.
       if (!stopped && !cancelled && !failed) { try { r.start(); return } catch { /* finish below */ } }
+      stoppedAt ??= performance.now()
       clearTimeout(timer)
       if (failed && !finals.trim()) reject(failed)
       else resolve(cancelled ? '' : finals.trim())
     }
   })
   try { r.start() } catch (e) { throw micError(e) }
-  const stop = () => { stopped = true; try { r.stop() } catch { /* already stopped */ } }
+  const stop = () => {
+    stopped = true
+    stoppedAt ??= performance.now()
+    clearTimeout(timer)
+    try { r.stop() } catch { /* already stopped */ }
+  }
   if (maxMs) timer = setTimeout(stop, maxMs)
-  return { engine: 'browser', done, stop, cancel: () => { cancelled = true; stopped = true; try { r.abort() } catch { /* already stopped */ } } }
+  return {
+    engine: 'browser', done, stop,
+    get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
+    get recording() { return stoppedAt === undefined },
+    cancel() {
+      cancelled = true
+      stoppedAt ??= performance.now()
+      clearTimeout(timer)
+      try { r.abort() } catch { /* already stopped */ }
+    },
+  }
 }

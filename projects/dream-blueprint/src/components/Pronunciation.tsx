@@ -7,7 +7,7 @@ import { useTaskContext } from '../lib/taskContext'
 import { logSkill } from '../lib/bridge'
 import { chunkClips, hasQuiz, nextPron, PASS, pronLessons, pronOpen, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
   type PronItem, type PronLesson, type PronQuestion, type PronVoice, type VoiceChoice } from '../lib/pronunciation'
-import { saveAllPacks, usePronPlayer, type Take } from '../lib/pronAudio'
+import { offlinePacks, usePronPlayer, type PackProgress, type Take } from '../lib/pronAudio'
 import { LockLine } from './Locked'
 import './pron.css'
 
@@ -15,7 +15,6 @@ type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date:
   /** Saves a setting without counting the day as practice (choosing a voice is not practising). */
   update?: PageProps['update'] }
 type Player = ReturnType<typeof usePronPlayer>
-const SAVED = 'dream-blueprint.pron-saved'
 /** Size of all the sound packs together (pack.py prints it). */
 const PACKS_MB = 10.5
 const number = (l: PronLesson) => pronLessons.indexOf(l) + 1
@@ -74,24 +73,82 @@ function Index({ state, onOpen }: { state: Props['state']; onOpen: (id: string) 
 
 /** Keeps every clip on this device so the course works without a connection (only where the offline service is running). */
 function SaveAll() {
-  const total = pronLessons.length * 2
-  const [saved, setSaved] = useState(() => { try { return localStorage.getItem(SAVED) === String(total) } catch { return false } })
-  const [progress, setProgress] = useState<number | null>(null)
+  const service = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker
+  const [worker, setWorker] = useState(() => service?.controller ?? null)
+  const [status, setStatus] = useState<PackProgress | null>(null)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  if (typeof navigator === 'undefined' || !navigator.serviceWorker?.controller) return null
+  const lifecycle = useRef<AbortController | null>(null)
+  const downloading = useRef(false)
+  const checkNumber = useRef(0)
+
+  useEffect(() => {
+    if (!service) return
+    const changed = () => { setStatus(null); setWorker(service.controller) }
+    service.addEventListener('controllerchange', changed)
+    if (service.controller !== worker) changed()
+    return () => service.removeEventListener('controllerchange', changed)
+  }, [service, worker])
+
+  useEffect(() => {
+    if (!worker) return
+    const controller = new AbortController()
+    lifecycle.current = controller
+    setSaving(false)
+    setError('')
+    const check = async () => {
+      if (downloading.current || document.visibilityState === 'hidden') return
+      const number = ++checkNumber.current
+      try {
+        const progress = await offlinePacks(worker, false, controller.signal)
+        if (!controller.signal.aborted && number === checkNumber.current) { setStatus(progress); setError('') }
+      } catch (e) {
+        if (!controller.signal.aborted && number === checkNumber.current) {
+          setStatus(null)
+          setError(e instanceof Error ? e.message : '無法確認本機已保存的發音。')
+        }
+      }
+    }
+    void check()
+    window.addEventListener('online', check)
+    document.addEventListener('visibilitychange', check)
+    return () => {
+      controller.abort()
+      lifecycle.current = null
+      downloading.current = false
+      window.removeEventListener('online', check)
+      document.removeEventListener('visibilitychange', check)
+    }
+  }, [worker])
+
+  if (!worker) return null
+  const saved = status && status.total > 0 && status.done === status.total
   async function save() {
+    const signal = lifecycle.current?.signal
+    if (!worker || !signal || downloading.current) return
+    ++checkNumber.current
+    downloading.current = true
+    setSaving(true)
     setError('')
     try {
-      await saveAllPacks(done => setProgress(done))
-      try { localStorage.setItem(SAVED, String(total)) } catch { /* private mode */ }
-      setSaved(true)
-    } catch { setError('有幾堂沒存到，確認網路後再按一次。') }
-    setProgress(null)
+      const progress = await offlinePacks(worker, true, signal, setStatus)
+      if (signal.aborted) return
+      setStatus(progress)
+      if (progress.done < progress.total) setError('仍有發音尚未存好，可以接著下載。')
+    } catch (e) {
+      if (!signal.aborted) setError(e instanceof Error ? e.message : '部分發音尚未存好，請稍後再試。')
+    } finally {
+      if (!signal.aborted) {
+        downloading.current = false
+        setSaving(false)
+      }
+    }
   }
   return <p className="pn-save">
-    {saved ? '全部的發音都存在這台裝置了，沒有網路也能聽。'
-      : progress !== null ? '正在存：' + progress + ' / ' + total
-      : <>上過的課會自動留在這台裝置。想先全部存好（約 {PACKS_MB} MB）：<button type="button" className="pr-link" onClick={save}>全部存起來</button></>}
+    {saving ? '正在存發音' + (status ? ' · ' + status.done + ' / ' + status.total : '…')
+      : saved ? '全部的發音都存在這台裝置了，沒有網路也能聽。'
+      : <>可先保存發音供離線播放（約 {PACKS_MB} MB）{status ? '，已存 ' + status.done + ' / ' + status.total : ''}。
+        <button type="button" className="pr-link" onClick={save}>{status?.done ? '接著下載' : '全部存起來'}</button></>}
     {error && <span role="alert"> {error}</span>}
   </p>
 }

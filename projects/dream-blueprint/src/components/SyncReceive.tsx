@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { applyMemory, useMemory } from '../lib/memory'
-import { importSyncCode, loadDriveMemory, sameDrive } from '../lib/drive'
+import { driveConnected, driveReadyEvent, importSyncCode, sameDrive } from '../lib/drive'
 import { keepThisCopy, settleProgress, stamp, takeCloudCopy, type Settled } from '../lib/cloudSync'
 import { useModal } from '../lib/modal'
 import './pair.css'
@@ -9,7 +8,6 @@ type Phase = 'busy' | 'pulled' | 'pushed' | 'same' | 'conflict' | 'chosen' | 'er
 
 /** On a phone or iPad: opened from the QR code on a connected device; connects to Google Drive by itself. */
 export default function SyncReceive({ code, onDone }: { code: string; onDone: () => void }) {
-  const { notes, update } = useMemory()
   const [phase, setPhase] = useState<Phase>('busy')
   const [msg, setMsg] = useState('')
   const [remoteAt, setRemoteAt] = useState(0)
@@ -21,18 +19,14 @@ export default function SyncReceive({ code, onDone }: { code: string; onDone: ()
     setPhase('busy'); setMsg('')
     try {
       // Already connected with this code: keep its sync state (connecting again would reset it), just catch up.
-      const list = sameDrive(code) ? await loadDriveMemory().catch(() => null) : await importSyncCode(code)
-      // Settle the progress first: merging the cloud's memory notes is a change too, and would look like
-      // this device's own progress (a needless "both changed") on a phone that has nothing yet.
-      let r: Settled
-      try { r = await settleProgress() }
-      finally {
-        const add = list ? applyMemory([], list.notes, []).filter(n => !notes.includes(n) && !list.deleted.includes(n)) : []
-        if (add.length) update(add, [])
-      }
+      if (!sameDrive(code)) await importSyncCode(code)
+      const r: Settled = await settleProgress()
       if (r.kind === 'conflict') { setRemoteAt(r.remoteAt); setPhase('conflict') }
       else setPhase(r.kind === 'none' ? 'same' : r.kind)
-    } catch (e) { setMsg(e instanceof Error ? e.message : String(e)); setPhase('error') }
+    } catch (e) {
+      if (driveConnected()) window.dispatchEvent(new Event(driveReadyEvent))
+      setMsg(e instanceof Error ? e.message : String(e)); setPhase('error')
+    }
   }
   async function choose(pick: () => Promise<string>) {
     setPhase('busy')

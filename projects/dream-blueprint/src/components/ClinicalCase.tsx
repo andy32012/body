@@ -6,13 +6,18 @@ import DiagnoseBox from './DiagnoseBox'
 import './tutor.css'
 import { useTaskContext } from '../lib/taskContext'
 import { caseCauses, causeSummary, nextScenario, saveCase, stepNames, type Scenario, type StepResult } from '../lib/scenarios'
+import { unfinishedItems, writeUnfinished } from '../lib/unfinished'
 
 const all = data as Scenario[]
 /** A case in progress survives leaving the page: which case, which step, and the answers so far. */
 const progressKey = 'case.progress'
-interface Progress { id: string; step: number; results: StepResult[]; zh: boolean; picked?: number }
-function readProgress(notes: Record<string, string>): Progress | null {
-  try { const p = JSON.parse(notes[progressKey] ?? 'null') as Progress | null; return p && all.some(c => c.id === p.id) && p.step < all.find(c => c.id === p.id)!.steps.length ? p : null } catch { return null }
+interface Progress { id: string; step: number; results: StepResult[]; zh: boolean; picked?: number; updatedAt?: number }
+function readProgress(notes: Record<string, string>, pool: readonly Scenario[], exclude?: string): Progress | undefined {
+  return unfinishedItems(notes, progressKey, (value): value is Progress => {
+    const p = value as Progress
+    const c = pool.find(c => c.id === p.id && c.id !== exclude)
+    return !!c && Number.isInteger(p.step) && p.step >= 0 && p.step < c.steps.length && Array.isArray(p.results)
+  })[0]
 }
 
 export default function ClinicalCase({ state, onActivity, date, subject }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string
@@ -20,18 +25,14 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
   subject?: string }) {
   const pool = subject ? all.filter(c => c.subjects?.includes(subject)) : all
   // A case left halfway is resumed, unless a subject was chosen and the case belongs to another one.
-  const [saved] = useState(() => { const p = readProgress(state.notes); return p && pool.some(c => c.id === p.id) ? p : null })
+  const [saved] = useState(() => readProgress(state.notes, pool))
   const [skip, setSkip] = useState<string[]>([])
   const [current, setCurrent] = useState(() => saved ? all.find(c => c.id === saved.id)! : nextScenario(pool.length ? pool : all, state.notes) ?? all[0])
   const [step, setStep] = useState(saved?.step ?? 0)
   const [picked, setPicked] = useState<number | undefined>(saved?.picked)
   const [results, setResults] = useState<StepResult[]>(saved?.results ?? [])
   const [zh, setZh] = useState(saved?.zh ?? false)
-  const keep = (p: Progress | null) => onActivity(prev => {
-    const notes = { ...prev.notes }
-    if (p) notes[progressKey] = JSON.stringify(p); else delete notes[progressKey]
-    return { ...prev, notes }
-  })
+  const keep = (p: Progress) => onActivity(prev => ({ ...prev, notes: writeUnfinished(prev.notes, progressKey, p.id, p) }))
   const summary = causeSummary(all, state.notes)
   const s = current.steps[step]
   const finished = step >= current.steps.length
@@ -51,8 +52,7 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
   function next() {
     const last = step + 1 >= current.steps.length
     if (last) onActivity(prev => {
-      const notes = saveCase(prev.notes, current.id, date, results, zh)
-      delete notes[progressKey]
+      const notes = writeUnfinished(saveCase(prev.notes, current.id, date, results, zh), progressKey, current.id, null)
       return { ...prev, notes }
     })
     else keep({ id: current.id, step: step + 1, results, zh })
@@ -62,8 +62,10 @@ export default function ClinicalCase({ state, onActivity, date, subject }: Pick<
     const nextSkip = [...skip, current.id]
     setSkip(nextSkip)
     const list = pool.length ? pool : all
-    setCurrent(nextScenario(list, state.notes, nextSkip.filter(id => list.some(c => c.id === id)).length >= list.length ? [current.id] : nextSkip) ?? current)
-    setStep(0); setPicked(undefined); setResults([]); setZh(false); keep(null)
+    const resume = readProgress(state.notes, list, current.id)
+    const available = nextSkip.filter(id => list.some(c => c.id === id)).length >= list.length ? [current.id] : nextSkip
+    const next = resume ? list.find(c => c.id === resume.id)! : nextScenario(list, state.notes, available) ?? current
+    setCurrent(next); setStep(resume?.step ?? 0); setPicked(resume?.picked); setResults(resume?.results ?? []); setZh(resume?.zh ?? false)
   }
   const lastCause = results.at(-1)?.cause
   useTaskContext(s && !finished ? {

@@ -6,6 +6,7 @@ import { readDraft, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
 import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
+import { chapterReady, type BookIndex } from '../lib/grammarBook'
 import { LockLine } from './Locked'
 import { levelText, passes, rubrics } from '../lib/rubrics'
 import { speakEnglish, stopSpeaking } from '../lib/tts'
@@ -54,30 +55,45 @@ function Graded({ fb, short }: { fb: WriteFeedback; short?: { words: number; min
 
 /** 寫作階梯: Claude grades each piece by the published table for its stage (全民英檢 or IELTS); IELTS tasks get a timer and a word target. */
 type LadderProps = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }
-/** The bank (1,400 tasks) loads only when this page opens, so it does not slow down every start of the app. */
+/** The writing bank and grammar catalog load only when the ladder opens. */
 export default function WritingLadder(props: LadderProps) {
-  const [stages, setStages] = useState<WriteStage[] | null>(null)
+  const [material, setMaterial] = useState<{ stages: WriteStage[]; index: BookIndex } | null>(null)
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     let alive = true
-    import('../data/writing.json').then(f => { if (alive) setStages(f.default.stages as WriteStage[]) }).catch(() => { if (alive) setFailed(true) })
+    Promise.all([import('../data/writing.json'), import('../data/grammar-book/index.json')])
+      .then(([bank, catalog]) => {
+        if (alive) setMaterial({ stages: bank.default.stages as WriteStage[], index: catalog.default as BookIndex })
+      }).catch(() => { if (alive) setFailed(true) })
     return () => { alive = false }
   }, [])
-  if (failed) return <p>寫作題目載入失敗，重新整理再試一次。</p>
-  if (!stages) return <p>載入中……</p>
-  return <Ladder {...props} stages={stages} />
+  if (failed) return <p>寫作教材載入失敗，重新整理再試一次。</p>
+  if (!material) return <p>載入中……</p>
+  return <Ladder {...props} {...material} />
 }
 
-function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & { stages: WriteStage[] }) {
-  const suggested = suggestedStage(stages, state.notes)
+function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderProps & { stages: WriteStage[]; index: BookIndex }) {
+  // An unsubmitted draft is local. Remember the work available when this page opened, including drafts written before the new grammar requirements.
+  const [drafts] = useState(() => new Map(stages.flatMap(s => {
+    const task = s.tasks.find(t => {
+      const text = readDraft('write.' + t.id).trim()
+      return text !== '' && text !== readWrite(state.notes, t.id)?.last?.answer?.trim()
+    })
+    return task ? [[s.id, task] as const] : []
+  })))
+  const draftStages = useMemo(() => new Set(drafts.keys()), [drafts])
+  const suggested = suggestedStage(stages, state.notes, draftStages)
   const unit = state.curriculum.unit
-  // A stage opens once the one before it has two tasks done; the bridge stage and its tasks open with their units.
-  const openStage = stagesOpen(stages, state.notes, unit)
-  const firstOpenTask = (s: WriteStage) => s.tasks.find(t => writeTaskOpen(t, unit) && !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks.find(t => writeTaskOpen(t, unit)) ?? s.tasks[0]
+  const openStage = stagesOpen(stages, state.notes, unit, { index, draftedStages: draftStages })
+  const firstOpenTask = (s: WriteStage) => {
+    const draft = drafts.get(s.id)
+    if (draft && writeTaskOpen(draft, unit) && readDraft('write.' + draft.id).trim()) return draft
+    return s.tasks.find(t => writeTaskOpen(t, unit) && !taskDone(readWrite(state.notes, t.id), !!s.ielts)) ?? s.tasks.find(t => writeTaskOpen(t, unit)) ?? s.tasks[0]
+  }
   // A task opened from a unit's pack (library/writing/<id>) starts on that task, if it is open.
   const fromPack = initialTask ? stages.find(s => s.tasks.some(t => t.id === initialTask && writeTaskOpen(t, unit))) : undefined
   const [stageId, setStageId] = useState(() => fromPack && openStage[fromPack.id] ? fromPack.id : suggested)
-  const stage = stages.find(s => s.id === stageId && openStage[s.id]) ?? stages.find(s => s.id === suggested)!
+  const stage = stages.find(s => s.id === stageId) ?? stages.find(s => s.id === suggested)!
   const firstOpen = firstOpenTask(stage)
   const [taskId, setTaskId] = useState(() => fromPack && initialTask && fromPack.id === stage.id ? initialTask : firstOpen.id)
   const task = stage.tasks.find(t => t.id === taskId && writeTaskOpen(t, unit)) ?? firstOpen
@@ -127,7 +143,7 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   const checks = checksFor(stage, task)
   // Without Claude he ticks the stage's requirements himself (or each required sentence / IELTS criterion).
   const selfList = checks.length ? checks : parts
-  useTaskContext({ label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n評分表：' + rubric.title + '（官方）' + (checks.length ? '\n這一階的要求：' + checks.join('；') : '') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text })
+  useTaskContext(openStage[stage.id] ? { label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n評分表：' + rubric.title + '（官方）' + (checks.length ? '\n這一階的要求：' + checks.join('；') : '') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text } : null)
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
   const outline = kind ? essays[kind].outline : stage.id === 'task1' ? taskOneOutlines[chartKind(task.chart) ?? 'trend'] : outlines[stage.id]
   const prompt = task.prompt + (task.chart ? '\n圖表資料：' + chartText(task.chart) : '')
@@ -182,34 +198,52 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
   const bestText = rec?.best === undefined || rec.best > (stage.ielts ? 9 : 5) ? ''
     : stage.ielts ? '練習估計 ' + rec.best : sentencePoints ? Math.round(rec.best / 5 * sentencePoints) + ' / ' + sentencePoints + ' 分' : (Number.isInteger(rec.best) ? rec.best : rec.best.toFixed(1)) + ' / 5 級分'
 
+  const missing = bookMissing(stage.id, state.notes, index)
+  const unpublished = missing.some(m => !chapterReady(index, m.chapter))
   const strip = <div ref={stageStrip} className="pr-options wl-stages" role="group" aria-label="寫作階梯">
       {stages.map((s, i) => {
         const before = !s.pack ? stages.slice(0, i).filter(x => !x.pack).at(-1) : undefined
-        return <button key={s.id} type="button" aria-pressed={s.id === stage.id} disabled={!openStage[s.id]} data-locked={!openStage[s.id]} onClick={() => { setStageId(s.id); setTaskId(firstOpenTask(s).id) }}>
+        const chapters = bookMissing(s.id, state.notes, index)
+        const waiting = chapters.filter(m => !chapterReady(index, m.chapter))
+        return <button key={s.id} type="button" aria-pressed={s.id === stage.id} onClick={() => { setStageId(s.id); setTaskId(firstOpenTask(s).id) }}>
           {s.name}{openStage[s.id] ? <small>{stageDone[s.id]} / {s.tasks.length}{s.id === suggested ? ' · 建議' : ''}</small>
             : <LockLine text={s.pack ? '上到單元 ' + packUnits[0] + ' 才打開'
               : before && stageDone[before.id] < stageTarget(before) ? '「' + before.name.replace(/^\S+\s*/, '') + '」做完 ' + stageTarget(before) + ' 題才打開（現在 ' + stageDone[before.id] + '）'
-              : bookMissing(s.id, state.notes).length ? '先讀完文法講解第 ' + bookMissing(s.id, state.notes).map(m => bookChapter(m.chapter).label).join('、') + ' 章才打開'
+              : waiting.length ? '第 ' + waiting.map(m => bookChapter(m.chapter).label).join('、') + ' 章教材尚未上架'
+              : chapters.length ? '先讀完文法講解第 ' + chapters.map(m => bookChapter(m.chapter).label).join('、') + ' 章才打開'
               : '還沒打開'} />}</button>
       })}
     </div>
 
   // The ladder follows 完整文法: a stage whose grammar is not learned yet shows what to read first.
-  const missing = bookMissing(stage.id, state.notes)
   const prevStage = !stage.pack ? stages.slice(0, stages.indexOf(stage)).filter(x => !x.pack).at(-1) : undefined
   if (!openStage[stage.id]) return <div className="pr-stack wl">
     {strip}
-    <section className="wl-locked">
-      <strong>{stage.name}：先讀完文法講解</strong>
-      <p>寫作階梯跟著「文法講解 → 完整文法」一步一步走：這一階用到的文法要先讀完、每一節的三題小練習都做過，才會打開。</p>
-      {missing.length > 0 && <ul>{missing.map(m => <li key={m.chapter}><a href={'#library/grammar/' + firstUndone(state.notes, m.chapter)}>第 {bookChapter(m.chapter).label} 章 {bookChapter(m.chapter).title}</a>（還有 {m.left} 節的小練習沒做）</li>)}</ul>}
+    <section className="wl-locked" aria-live="polite">
+      <strong>{stage.name} · {stage.pack ? '橋接單元尚未解鎖' : unpublished ? '等待文法教材上架' : '先完成這一階的先修'}</strong>
+      {stage.pack && <p>上到單元 {packUnits[0]} 才開始橋接段落。</p>}
+      {missing.length > 0 && <p>做完這一階必讀文法每一節的三題小練習，就符合文法門檻。</p>}
+      {missing.length > 0 && <ul>{missing.map(m => {
+        const chapter = bookChapter(m.chapter)
+        const name = '第 ' + chapter.label + ' 章 ' + chapter.title
+        return <li key={m.chapter}>{chapterReady(index, m.chapter)
+          ? <><a href={'#library/grammar/' + firstUndone(state.notes, m.chapter)}>{name}</a>（還有 {m.left} 節的小練習沒做）</>
+          : <>{name}（教材尚未上架）</>}
+        </li>
+      })}</ul>}
       {prevStage && stageDone[prevStage.id] < stageTarget(prevStage) && <p>也要先把前一階「{prevStage.name}」做完 {stageTarget(prevStage)} 題（現在 {stageDone[prevStage.id]} 題）。</p>}
     </section>
   </div>
   return <div className="pr-stack wl">
     {strip}
     <p className="qz-meta"><span>這一階的目標：{stage.goal}</span>{stage.ielts && <span>正式考試建議 {stage.minutes} 分鐘、至少 {task.min} 字</span>}</p>
-    {stageChapters(stage.id).length > 0 && <p className="wl-book">這一階用到的文法（完整文法）：{stageChapters(stage.id).map((ch, i) => <span key={ch}>{i ? '、' : ''}<a href={'#library/grammar/' + ch + '-1'}>第 {bookChapter(ch).label} 章 {bookChapter(ch).title}</a></span>)}</p>}
+    {stageChapters(stage.id).length > 0 && <p className="wl-book">這一階用到的文法（完整文法）：{stageChapters(stage.id).map((ch, i) => {
+      const chapter = bookChapter(ch)
+      const name = '第 ' + chapter.label + ' 章 ' + chapter.title
+      return <span key={ch}>{i ? '、' : ''}{chapterReady(index, ch)
+        ? <a href={'#library/grammar/' + ch + '-1'}>{name}</a>
+        : name + '（教材尚未上架）'}</span>
+    })}</p>}
     {stage.grammar && <details key={stage.id} className="wl-grammar" open={!stageStarted}>
       <summary>這一階要用的文法</summary>
       <div className="gm-explain">
@@ -310,11 +344,16 @@ function Ladder({ state, onActivity, date, initialTask, stages }: LadderProps & 
       const next = nextWritingTask(stage, task.id, state.notes, unit)
       const label = next ? pages.flatMap(p => p.tasks).find(t => t.task.id === next.id)?.label : undefined
       const passedStage = stageDone[stage.id] >= stageTarget(stage)
-      const following = stages.slice(stages.indexOf(stage) + 1).find(s => !s.pack && openStage[s.id])
+      const later = stages.slice(stages.indexOf(stage) + 1).filter(s => !s.pack)
+      const following = later.find(s => openStage[s.id])
+      const waiting = !following && later[0]
       return <div className="pr-actions wl-next-task">
         {next && <button type="button" className={passedStage && following ? undefined : 'pr-main'} onClick={() => goTo(next.id)}>下一題{label ? '：' + label : ''} →</button>}
         {passedStage && following && <button type="button" className="pr-main" onClick={() => { setStageId(following.id); goTo(firstOpenTask(following).id) }}>這一階過關了，去下一階：{following.name} →</button>}
-        {!next && !(passedStage && following) && <p className="ls-help">這一階開放的題目都過關了。</p>}
+        {passedStage && waiting && <button type="button" className="pr-link" onClick={() => setStageId(waiting.id)}>查看下一階的先修 →</button>}
+        {!next && !(passedStage && following) && <p className="ls-help">{taskDone(readWrite(state.notes, task.id), !!stage.ielts)
+          ? '這一階開放的題目都過關了。'
+          : '這一題還沒過關，可以修改後再批一次。'}</p>}
       </div>
     })()}
   </div>

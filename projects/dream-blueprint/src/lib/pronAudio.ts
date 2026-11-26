@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { clipSlug, packFile, pronLessons, pronVoices, type PronVoice } from './pronunciation'
+import { clipSlug, packFile, pronVoices, type PronVoice } from './pronunciation'
+import { appRelease, withAppRelease } from './appRelease'
 
 /** A pack holds every clip of one lesson in one voice: 4 bytes (little-endian length of the index), the index as JSON
  *  { clip name: [offset, length] }, then the mp3 clips one after another. One request per lesson and voice instead of dozens. */
@@ -10,17 +11,51 @@ export function unpack(buf: ArrayBuffer): Map<string, Blob> {
   return new Map(Object.entries(index).map(([name, [offset, length]]) => [name, new Blob([buf.slice(start + offset, start + offset + length)], { type: 'audio/mpeg' })]))
 }
 async function fetchPack(lessonId: string, voice: PronVoice, signal?: AbortSignal) {
-  const res = await fetch(new URL(packFile(lessonId, voice), document.baseURI), { signal })
+  const url = new URL(withAppRelease(packFile(lessonId, voice)), document.baseURI)
+  const res = await fetch(url, { signal })
   if (!res.ok) throw new Error('pack ' + res.status)
   return res.arrayBuffer()
 }
 
-/** Fetches every pack once so the service worker keeps them: the course then plays without a connection. */
-export async function saveAllPacks(onProgress: (done: number, total: number) => void) {
-  const all = pronLessons.flatMap(l => pronVoices.map(v => [l.id, v] as const))
-  let done = 0
-  onProgress(done, all.length)
-  for (const [id, v] of all) { await fetchPack(id, v); onProgress(++done, all.length) }
+export interface PackProgress { done: number; total: number }
+
+/** Read and download the exact version's packs through the worker that serves them offline. */
+export function offlinePacks(
+  worker: ServiceWorker,
+  download: boolean,
+  signal: AbortSignal,
+  onProgress?: (progress: PackProgress) => void,
+): Promise<PackProgress> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) { reject(signal.reason); return }
+    const channel = new MessageChannel()
+    let timer: ReturnType<typeof setTimeout>
+    const close = () => {
+      clearTimeout(timer)
+      channel.port1.close()
+      signal.removeEventListener('abort', abort)
+    }
+    const fail = (reason: unknown) => { close(); reject(reason) }
+    const abort = () => fail(signal.reason)
+    const wait = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => fail(new Error('離線服務暫時沒有回應，請稍後再試。')), download ? 120000 : 10000)
+    }
+    channel.port1.onmessage = ({ data }) => {
+      if (data.type === 'progress') {
+        onProgress?.({ done: data.done, total: data.total })
+        wait()
+      } else if (data.type === 'complete') {
+        close()
+        resolve({ done: data.done, total: data.total })
+      } else if (data.type === 'error') fail(new Error(data.message))
+    }
+    signal.addEventListener('abort', abort, { once: true })
+    wait()
+    try {
+      worker.postMessage({ type: download ? 'SOUNDS_DOWNLOAD' : 'SOUNDS_STATUS', version: appRelease() }, [channel.port2])
+    } catch { fail(new Error('離線服務正在切換，請稍後再試。')) }
+  })
 }
 
 export interface Take { text: string; voice: PronVoice }

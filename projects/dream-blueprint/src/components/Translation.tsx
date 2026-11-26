@@ -32,18 +32,22 @@ export function Translation({
   onHint,
   label,
   hideTags = false,
+  initialAnswer = "",
+  alreadyMarked = false,
 }: {
   preparation?: ReactNode;
   label?: string;
   /** Leave out the grammar tags above the box, when choosing the grammar is part of the task (主題總複習). */
   hideTags?: boolean;
   sentence: Sentence;
-  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) => void;
+  onMark: (mark: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) => boolean | void;
   checkpoint: boolean;
   saved?: HintUse;
   onHint?: (use: HintUse) => void;
+  initialAnswer?: string;
+  alreadyMarked?: boolean;
 }) {
-  const [answer, setAnswer] = useState(() => readDraft(sentence.id));
+  const [answer, setAnswer] = useState(() => readDraft(sentence.id) || initialAnswer);
   const [hint, setHintLevel] = useState(() => saved?.h ?? 0);
   const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState("");
@@ -80,6 +84,7 @@ export function Translation({
     onHelp: () => askHelp(),
   });
   const mountedAt = useRef(Date.now());
+  const submitted = useRef(false);
   const ready = () => Date.now() - mountedAt.current > 450;
   /** Asked Claude for help on this sentence (「我卡住了」 or the floating chat): not done alone any more. */
   function askHelp() { if (!askedHelp) { setAskedHelp(true); record(hint, seenHint, firstVerdict, true); } }
@@ -87,7 +92,7 @@ export function Translation({
   /** The shared weak-point list, when no Claude verdict did it already: a self-marked miss counts against the
    *  sentence's grammar; written right alone (and matching a reference) takes one miss off it. */
   function noteWeak(mark: Mark, revealed: boolean) {
-    if (firstVerdict) return;
+    if (alreadyMarked || firstVerdict) return;
     const label = sentence.grammar.map((g) => normalizeLabel(g)).find(Boolean);
     if (!label) return;
     const day = dayKey();
@@ -97,6 +102,17 @@ export function Translation({
       updateStore((prev) => ({ ...prev, notes: easeWeak(prev.notes, label) }));
   }
   const setSeenHint = (r: boolean) => record(hint, r);
+  function submit(mark: Mark) {
+    if (!ready() || submitted.current) return;
+    const revealed = seenHint || hint >= 2 || askedHelp;
+    submitted.current = true;
+    if (onMark(mark, revealed, { answer, firstVerdict, checkedText }) === false) {
+      submitted.current = false;
+      return;
+    }
+    clearDraft(sentence.id);
+    noteWeak(mark, revealed);
+  }
   async function copyAnswer() {
     const value =
       sentence.zh +
@@ -149,8 +165,7 @@ export function Translation({
           <StuckButton onUse={askHelp} />
         </div>
       )}
-      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)}
-        onRevise={(t) => { setAnswer(t); writeDraft(sentence.id, t); }}
+      {hint >= 1 && <TutorChat sentence={sentence} answer={answer} autoSend={sendNow} onError={() => setClaudeDown(true)} onReveal={() => setSeenHint(true)} trackWeak={!alreadyMarked}
         onVerdict={(v, attempt, text) => { setLatest({ v, text }); if (attempt === 1 && !firstVerdict) { setFirstVerdict(v); setCheckedText(text); record(hint, seenHint, v, askedHelp, text); } }} />}
       {hint >= 1 && (
         <section className="pr-hint">
@@ -209,7 +224,7 @@ export function Translation({
       )}
       {hint >= 1 && latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark && (
         <div className="pr-actions pr-next-step">
-          <button className="pr-main" onClick={() => { if (!ready()) return; clearDraft(sentence.id); noteWeak("good", seenHint || hint >= 2 || askedHelp); onMark("good", seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}>
+          <button className="pr-main" onClick={() => submit("good")}>
             Claude 說對了，下一步 →
           </button>
           <button className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
@@ -222,7 +237,7 @@ export function Translation({
             <button
               key={mark}
               disabled={mark !== "again" && !answered(answer)}
-              onClick={() => { if (!ready()) return; clearDraft(sentence.id); noteWeak(mark, seenHint || hint >= 2 || askedHelp); onMark(mark, seenHint || hint >= 2 || askedHelp, { answer, firstVerdict, checkedText }); }}
+              onClick={() => submit(mark)}
             >
               {label}
             </button>

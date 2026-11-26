@@ -47,8 +47,8 @@ export function guessQuiz(p: WordPart): PartQuiz {
 /** Review of a learned part: "What does <part> mean?" The wrong choices are the meanings of other parts of the same kind. */
 export function meaningQuiz(p: WordPart, round = 0): PartQuiz {
   const i = wordParts.indexOf(p)
-  const same = wordParts.filter(o => o.type === p.type && o !== p && o.meaning !== p.meaning)
-  const others = shuffled(same, i + 7 + round * 31).slice(0, 2).map(o => o.meaning)
+  const same = new Set(wordParts.filter(o => o.type === p.type && o.meaning !== p.meaning).map(o => o.meaning))
+  const others = shuffled([...same], i + 7 + round * 31).slice(0, 2)
   const options = shuffled([p.meaning, ...others], i + 211 + round * 17)
   return { q: p.part, options, answer: options.indexOf(p.meaning) }
 }

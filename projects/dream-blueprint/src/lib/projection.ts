@@ -57,6 +57,12 @@ export interface ProjectedDay {
 }
 export type PlannedDay = Omit<ProjectedDay, 'original'>
 
+function scheduledLessonDay(day: string, period: Period, weekdays: readonly number[]) {
+  if (period === 'exam' || period === 'internship' || holidayBreak(day)) return false
+  const dow = weekday(day)
+  return period === 'vacation' ? dow !== 0 && !calendarGaps.has(day) : weekdays.includes(dow)
+}
+
 // Count eligible days only. A period of rest has no weight in the next term's forecast.
 function recentPace(input: CalendarInput, weekdays: readonly number[]) {
   // A day's main lesson done counts as attending, a life-topic lesson too: it is saved with advanced:false only so that
@@ -73,8 +79,8 @@ function recentPace(input: CalendarInput, weekdays: readonly number[]) {
   let completed = 0
   for (let day = start > earliest ? start : earliest; day < input.today; day = addDays(day,1)) {
     const period = activePeriod(day,input.ranges)
-    if (period === 'exam' || period === 'internship' || holidayBreak(day)) continue
-    if ((period === 'vacation' ? weekday(day) !== 0 : weekdays.includes(weekday(day)))) eligible++
+    if (!scheduledLessonDay(day, period, weekdays)) continue
+    eligible++
     if (practiced.has(day)) completed++
   }
   // Keep a single opportunity in the forecast even after four quiet weeks.
@@ -136,11 +142,7 @@ function walk(input: CalendarInput): PlannedDay[] {
       // Today's main lesson was a life topic: an extra grammar lesson today is optional, so the calendar does not assume it.
       item.label = '今天已完成生活主題'
     } else {
-      const dow = weekday(day)
-      let regular = period === 'vacation' ? dow !== 0 : weekdays.includes(dow)
-      // The supplied calendar resumes on February 15 after the February 12 lesson.
-      if (period === 'vacation' && calendarGaps.has(day)) regular = false
-      if (regular) {
+      if (scheduledLessonDay(day, period, weekdays)) {
         credit += pace
         if (credit >= 1 - 1e-8) {
           credit = Math.max(0, credit - 1)
@@ -183,7 +185,7 @@ function walk(input: CalendarInput): PlannedDay[] {
           item.kind = 'review'
           item.label = '照最近的上課節奏預估 · 複習或休息（想上課就直接上下一堂）'
         }
-      } else if (!restDays.includes(dow) && period !== 'vacation') {
+      } else if (!restDays.includes(weekday(day)) && period !== 'vacation') {
         item.kind = 'review'
         item.label = '複習 15 分鐘或休息（選做）'
       }

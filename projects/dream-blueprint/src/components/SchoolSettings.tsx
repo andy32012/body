@@ -1,18 +1,18 @@
 import { useState } from 'react'
-import { defaultSchool, makeSchoolId, weekdays, type SchoolClass, type SchoolData } from '../lib/school'
+import { defaultSchool, makeSchoolId, removeSchoolRequirement, updateSchoolRequirement, weekdays, type SchoolClass, type SchoolData } from '../lib/school'
 import './school-settings.css'
 
 type SchoolEvent = SchoolData['events'][number]
-type Requirement = SchoolData['requirements'][number]
+type RequirementDraft = Pick<SchoolData['requirements'][number], 'id' | 'group' | 'label'>
 
 interface Props {
   school: SchoolData
-  onChange: (school: SchoolData) => void
+  onChange: (edit: (school: SchoolData) => SchoolData) => void
   regularDays?: number[]
 }
 const emptyClass = { id: '', weekday: 1, start: '', end: '', label: '' }
 const emptyEvent = { id: '', day: '', label: '', kind: '考試' }
-const emptyRequirement = { id: '', group: '畢業條件', label: '', done: false }
+const emptyRequirement: RequirementDraft = { id: '', group: '畢業條件', label: '' }
 const numberFields = [
   ['requiredCredits', '畢業學分'], ['acceptedCredits', '已採計學分'], ['transferCourses', '抵免科數'],
   ['currentCourses', '本學期科數'], ['currentCredits', '本學期學分'], ['weeklyPeriods', '每週節數']
@@ -34,40 +34,54 @@ function DaySelector({ value, change }: { value: number; change: (value: number)
 export default function SchoolSettings({ school = defaultSchool, onChange }: Props) {
   const [lesson, setLesson] = useState<SchoolClass>(emptyClass)
   const [event, setEvent] = useState<SchoolEvent>(emptyEvent)
-  const [requirement, setRequirement] = useState<Requirement>(emptyRequirement)
+  const [requirement, setRequirement] = useState<RequirementDraft>(emptyRequirement)
   const [studyDay, setStudyDay] = useState(1)
   const slot = school.study.find(s => s.weekday === studyDay) ?? { weekday: studyDay, minutes: 0, time: '' }
-  const setSlot = (patch: Partial<typeof slot>) => onChange({ ...school, study: [
-    ...school.study.filter(s => s.weekday !== studyDay), { ...slot, ...patch }
-  ].sort((a, b) => a.weekday - b.weekday) })
+  const setSlot = (patch: Partial<typeof slot>) => onChange(latest => {
+    const current = latest.study.find(s => s.weekday === studyDay) ?? slot
+    return { ...latest, study: [
+      ...latest.study.filter(s => s.weekday !== studyDay), { ...current, ...patch }
+    ].sort((a, b) => a.weekday - b.weekday) }
+  })
   const groups = Array.from(new Set(school.requirements.map(item => item.group)))
   const invalidTimes = !!(lesson.start && lesson.end && lesson.start >= lesson.end)
   function saveLesson() {
     if (!lesson.label.trim() || invalidTimes) return
-    onChange({ ...school, classes: replaceRow(school.classes, { ...lesson, label: lesson.label.trim() }) })
+    onChange(latest => ({ ...latest, classes: replaceRow(latest.classes, { ...lesson, label: lesson.label.trim() }) }))
     setLesson(emptyClass)
   }
   function saveEvent() {
     if (!event.label.trim() || !event.day) return
-    onChange({ ...school, events: replaceRow(school.events, { ...event, label: event.label.trim() })
-      .sort((a, b) => a.day.localeCompare(b.day)) })
+    onChange(latest => ({ ...latest, events: replaceRow(latest.events, { ...event, label: event.label.trim() })
+      .sort((a, b) => a.day.localeCompare(b.day)) }))
     setEvent(emptyEvent)
   }
   function saveRequirement() {
-    if (!requirement.group.trim() || !requirement.label.trim()) return
-    onChange({ ...school, requirements: replaceRow(school.requirements, {
-      ...requirement, group: requirement.group.trim(), label: requirement.label.trim()
-    }) })
+    const { id } = requirement
+    const group = requirement.group.trim(), label = requirement.label.trim()
+    if (!group || !label) return
+    if (id) {
+      onChange(latest => updateSchoolRequirement(latest, id, { group, label }))
+    } else {
+      const item = { id: makeSchoolId(), group, label, done: false, modifiedAt: Date.now() }
+      onChange(latest => ({ ...latest, requirements: [...latest.requirements, item] }))
+    }
     setRequirement(emptyRequirement)
   }
   return <section className="school-settings" aria-label="學校資料與時段">
     <details><summary>學籍與學分</summary>
       <p>原始資料依 {school.verifiedOn} 的校務系統查詢。可以在這裡更新學期與畢業條件。</p>
       <div className="school-grid">{textFields.map(([field, title]) =>
-        <label key={field}>{title}<input value={school[field]} onChange={e => onChange({ ...school, [field]: e.target.value })}/></label>
+        <label key={field}>{title}<input value={school[field]} onChange={e => {
+          const value = e.currentTarget.value
+          onChange(latest => ({ ...latest, [field]: value }))
+        }}/></label>
       )}{numberFields.map(([field, title]) =>
         <label key={field}>{title}<input type="number" min="0" step="1" value={school[field]}
-          onChange={e => onChange({ ...school, [field]: Math.max(0, Math.floor(Number(e.target.value))) })}/></label>
+          onChange={e => {
+            const value = Math.max(0, Math.floor(Number(e.currentTarget.value)))
+            onChange(latest => ({ ...latest, [field]: value }))
+          }}/></label>
       )}</div>
       <h4>查詢當時的實習安排</h4><ul>{school.notes.map(note => <li key={note}>{note}</li>)}</ul>
     </details>
@@ -76,7 +90,7 @@ export default function SchoolSettings({ school = defaultSchool, onChange }: Pro
       <ul className="school-list">{[...school.classes].sort((a,b) => a.weekday-b.weekday || a.start.localeCompare(b.start)).map(c =>
         <li key={c.id}><span>週{weekdays[c.weekday]} {c.start}{c.end && '–' + c.end} {c.label}</span>
           <button type="button" aria-label={'編輯' + c.label} onClick={() => setLesson(c)}>編輯</button>
-          <button type="button" aria-label={'移除' + c.label} onClick={() => { onChange({ ...school, classes: school.classes.filter(x => x.id !== c.id) }); if (lesson.id === c.id) setLesson(emptyClass) }}>移除</button></li>
+          <button type="button" aria-label={'移除' + c.label} onClick={() => { onChange(latest => ({ ...latest, classes: latest.classes.filter(x => x.id !== c.id) })); if (lesson.id === c.id) setLesson(emptyClass) }}>移除</button></li>
       )}</ul>
       <div className="school-form">
         <h4>{lesson.id ? '修改這堂課' : '新增課程時段'}</h4>
@@ -97,7 +111,7 @@ export default function SchoolSettings({ school = defaultSchool, onChange }: Pro
     <details><summary>考試與學校行事曆</summary>
       <ul className="school-list">{[...school.events].sort((a,b) => a.day.localeCompare(b.day)).map(e =>
         <li key={e.id}><span><time>{e.day}</time> {e.label}</span><button type="button" aria-label={'編輯' + e.label} onClick={() => setEvent(e)}>編輯</button>
-          <button type="button" aria-label={'移除' + e.label} onClick={() => { onChange({ ...school, events: school.events.filter(x => x.id !== e.id) }); if (event.id === e.id) setEvent(emptyEvent) }}>移除</button></li>
+          <button type="button" aria-label={'移除' + e.label} onClick={() => { onChange(latest => ({ ...latest, events: latest.events.filter(x => x.id !== e.id) })); if (event.id === e.id) setEvent(emptyEvent) }}>移除</button></li>
       )}</ul>
       <div className="school-grid"><label>日期<input type="date" value={event.day} onChange={e => setEvent({ ...event, day: e.target.value })}/></label>
         <label>類型<select value={event.kind} onChange={e => setEvent({ ...event, kind: e.target.value })}>{['考試','實習','假期','其他'].map(k => <option key={k}>{k}</option>)}</select></label>
@@ -109,14 +123,17 @@ export default function SchoolSettings({ school = defaultSchool, onChange }: Pro
       <p>勾選結果會同步到航線地圖第一站。學分數可在學籍欄依學校採計結果更新。</p>
       {groups.map(group => <details key={group}><summary>{group} · {school.requirements.filter(item => item.group === group && item.done).length}／{school.requirements.filter(item => item.group === group).length}</summary>
         <ul className="school-list">{school.requirements.filter(item => item.group === group).map(item => <li key={item.id}>
-          <label className="school-check"><input type="checkbox" checked={item.done} onChange={() => onChange({ ...school, requirements: replaceRow(school.requirements, { ...item, done: !item.done }) })}/>{item.label}</label>
-          <button type="button" aria-label={'編輯' + item.label} onClick={() => setRequirement(item)}>編輯</button>
+          <label className="school-check"><input type="checkbox" checked={item.done} onChange={e => {
+            const done = e.currentTarget.checked
+            onChange(latest => updateSchoolRequirement(latest, item.id, { done }))
+          }}/>{item.label}</label>
+          <button type="button" aria-label={'編輯' + item.label} onClick={() => setRequirement({ id: item.id, group: item.group, label: item.label })}>編輯</button>
         </li>)}</ul></details>)}
       <div className="school-grid"><label>所屬分類<input list="school-groups" value={requirement.group} onChange={e => setRequirement({ ...requirement, group: e.target.value })}/></label>
         <datalist id="school-groups">{groups.map(group => <option key={group} value={group}/>)}</datalist>
         <label>科目或條件<input value={requirement.label} onChange={e => setRequirement({ ...requirement, label: e.target.value })}/></label></div>
       <button type="button" disabled={!requirement.label.trim() || !requirement.group.trim()} onClick={saveRequirement}>{requirement.id ? '儲存條件' : '新增條件'}</button>
-      {requirement.id && <><button type="button" onClick={() => { onChange({ ...school, requirements: school.requirements.filter(item => item.id !== requirement.id) }); setRequirement(emptyRequirement) }}>移除此項</button>
+      {requirement.id && <><button type="button" onClick={() => { onChange(latest => removeSchoolRequirement(latest, requirement.id)); setRequirement(emptyRequirement) }}>移除此項</button>
         <button type="button" onClick={() => setRequirement(emptyRequirement)}>取消編輯</button></>}
     </details>
   </section>

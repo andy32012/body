@@ -9,7 +9,7 @@ export interface GrammarStep { t: string; p: string; ex: GrammarExample[] }
 export interface GrammarTable { title: string; head: string[]; rows: string[][] }
 export interface GrammarMistake { bad: string; good: string; why: string }
 export interface ChooseDrill { k: 'choose'; q: string; options: string[]; answer: number; why: string }
-export interface TypeDrill { k: 'fill' | 'fix'; q: string; accept: string[]; why: string }
+export interface TypeDrill { k: 'fill' | 'fix'; q: string; accept: string[]; why: string; instruction?: string }
 export type Drill = ChooseDrill | TypeDrill
 export interface GrammarUnit { unit: number; steps: GrammarStep[]; table?: GrammarTable; mistakes: GrammarMistake[]; drills: Drill[]
   /** A1–A2 items the unit did not teach (checked against the Core Inventory): extra teaching and practice drills, kept

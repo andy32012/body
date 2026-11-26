@@ -13,7 +13,7 @@ import { storyLevelsOpen, dictationPatch, dictationScore, dictationTotal, meanin
 import { openAt } from '../lib/unlock'
 import './story.css'
 
-type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTab?: StoryTab }
+type Props = Pick<PageProps, 'state' | 'update'> & { onActivity: PageProps['update']; date: string; initialTab?: StoryTab }
 const tabNotes: Record<StoryTab, string> = {
   read: '讀一段短文，不會的字點一下看意思，讀完考幾個字。',
   listen: '先不看字完整聽一次，再打開文字一句一句跟著念。',
@@ -36,7 +36,7 @@ function Sentences({ list, playing, onPlay, onWord, picked, detail, detailLine }
   </ol>
 }
 
-export default function StoryLibrary({ state, onActivity, date, initialTab = 'read' }: Props) {
+export default function StoryLibrary({ state, update, onActivity, date, initialTab = 'read' }: Props) {
   const [all, setAll] = useState<Passage[]>()
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<StoryTab>(initialTab)
@@ -63,7 +63,7 @@ export default function StoryLibrary({ state, onActivity, date, initialTab = 're
   const progress = useMemo(() => all ? storyProgress(all, level, state.notes, tab) : { done: 0, total: 0 }, [all, level, state.notes, tab])
   function next() { if (passage) setSkipped(list => [...list, passage.id]) }
   function chooseLevel(n: number) {
-    onActivity(prev => ({ ...prev, notes: { ...prev.notes, [storyLevelKey]: String(n) } }))
+    update(prev => ({ ...prev, notes: { ...prev.notes, [storyLevelKey]: String(n) } }))
     setSkipped([])
   }
   function chooseTab(t: StoryTab, keep = false) {
@@ -224,8 +224,8 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   const sentences = useMemo(() => splitSentences(passage.en ?? ''), [passage])
   const lines = useMemo(() => sentences.map(en => ({ who: '', en, zh: '' })), [sentences])
   const voice = useDialogueVoice(state.settings.speechRate)
-  // A dictation stopped early goes on from where it stopped (unless the passage was done since).
-  const [start] = useState(() => { const r = readStory(state.notes, passage.id); return !r.d && r.dn !== undefined && r.dn < sentences.length ? r.dn : 0 })
+  const [resume] = useState(() => readStory(state.notes, passage.id))
+  const start = resume.dn !== undefined && resume.dn > 0 && resume.dn < sentences.length ? resume.dn : 0
   const [at, setAt] = useState(start)
   const [text, setText] = useState('')
   const [plays, setPlays] = useState(0)
@@ -247,7 +247,11 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   }
   function done(list: typeof results, stop = false) {
     // Stopped early: remember where, the passage is not done yet. The last sentence done: the whole passage counts.
-    onActivity(prev => ({ ...prev, notes: logSkill(saveStory(prev.notes, passage.id, dictationPatch(readStory(prev.notes, passage.id), start, list, stop, date)), 'listen', date) }))
+    onActivity(prev => {
+      const patch = dictationPatch(resume, start, list, stop, date)
+      const dAt = Math.max(Date.now(), (readStory(prev.notes, passage.id).dAt ?? 0) + 1)
+      return { ...prev, notes: logSkill(saveStory(prev.notes, passage.id, { ...patch, dAt }), 'listen', date) }
+    })
     setEarly(stop)
     setFinished(true)
   }

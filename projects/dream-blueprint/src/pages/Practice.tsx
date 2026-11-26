@@ -3,7 +3,6 @@ import HomographNote from "../components/HomographNote";
 import { useTapGuard } from "../lib/tapGuard";
 import examSubjects from "../data/exam-subjects.json";
 import { useEffect, useRef, useState } from "react";
-import { writeDraft } from "../lib/drafts";
 import { ChevronLeft, Headphones, Check, PenLine, Volume2 } from "lucide-react";
 import PassageLibrary from "../components/PassageLibrary";
 import QuizPractice from "../components/QuizPractice";
@@ -23,7 +22,6 @@ import {
   newCard,
   reviewBudget,
   reviewCard,
-  applyAnswer,
   reviewEnergy,
   reviewLoad,
   logSentence,
@@ -67,7 +65,6 @@ import type { LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
 import {
   heardKey,
-  moveLesson,
   readHeard,
   readHints,
   readLessonRecord,
@@ -120,24 +117,24 @@ function PracticeSession({
   // An unfinished lesson continues where it stopped instead of being rebuilt from today's curriculum position.
   const [resumeAt] = useState(() =>
     energy === "low" ? null : resumeTarget(state.notes, state.curriculum, date, !!explicitResume, typeof explicitResume === "string" ? explicitResume : undefined));
-  const [lessonDate] = useState(() =>
-    resumeAt && resumeAt.date !== date && !readLessonRecord(state.notes, date) ? date : resumeAt?.date ?? date);
-  useEffect(() => {
-    if (resumeAt && resumeAt.date !== lessonDate)
-      update((prev) => ({ ...prev, notes: moveLesson(prev.notes, resumeAt.date, lessonDate).notes }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const [current] = useState(() =>
+  // Continuing an old lesson never takes the place of today's separate record.
+  const lessonDate = resumeAt?.date ?? date;
+  const [picked] = useState(() =>
     lesson(state, energy, date, resumeAt ? { unit: resumeAt.rec.unit, day: resumeAt.rec.day } : undefined));
   type Phase = "recall" | "listen" | "write" | "sound" | "vary" | "express" | "done";
   // Normal and high-energy lesson days (not review, not checkpoint) run the guided lesson.
-  const guided = !current.review && !current.checkpoint && energy !== "low";
+  const guided = !picked.review && !picked.checkpoint && energy !== "low";
+  const [retry] = useState(state.curriculum.retry);
   // A checkpoint or review day left halfway goes on at the sentence where it stopped (same day, same sentences).
-  const [run] = useState(() => {
-    if (guided) return null;
-    const p = readRunProgress(state.notes, date, current.unit, current.day);
-    const ids = current.items.map((i) => i.id);
-    return p && p.pos < ids.length && p.records.every((r) => ids.includes(r.sentenceId)) ? p : null;
+  const [{ run, current }] = useState(() => {
+    if (guided) return { run: null, current: picked };
+    const p = readRunProgress(state.notes, date, picked.unit, picked.day);
+    if (!p || (p.review !== undefined && p.review !== picked.review) || (p.retry !== undefined && p.retry !== retry))
+      return { run: null, current: picked };
+    const items = picked.review && p.items ? p.items.flatMap((id) => sentenceById.get(id) ?? []) : picked.items;
+    const ids = items.map((i) => i.id);
+    return p.pos < ids.length && p.records.every((r) => ids.includes(r.sentenceId))
+      ? { run: p, current: { ...picked, items, freshReview: false } } : { run: null, current: picked };
   });
   const [pos, setPos] = useState(run?.pos ?? 0);
   const [lessonData, setLessonData] = useState<Lesson | null | undefined>(guided ? undefined : null);
@@ -153,9 +150,11 @@ function PracticeSession({
     return () => { alive = false; };
   }, [guided, current.unit]);
   const [firstListen] = useState(() => !readHeard(state.notes, current.unit));
+  const heardRecord = readHeard(state.notes, current.unit);
+  const thisLessonHeard = heardRecord?.lessonDate === lessonDate ? heardRecord : undefined;
   const [corrections, setCorrections] = useState(() => resumeAt?.rec.express?.corrections ?? 0);
   const [records, setRecords] = useState<TranslationRecord[]>(() => resumeAt?.rec.records ?? run?.records ?? []);
-  const [spoken, setSpoken] = useState<string[]>([]);
+  const [spoken, setSpoken] = useState<string[]>(run?.spoken ?? []);
   const [feedback, setFeedback] = useState<Session["feedback"]>();
   const [sessionId] = useState(
     () =>
@@ -193,15 +192,16 @@ function PracticeSession({
   // Guided lessons start by recalling: day 5 → days 1–2 (and an older unit), days 2–4 → the day before.
   const guidedRecall = current.day === 5 ? recallItems
     : current.previousDay ? [{ sentence: current.previousDay, label: "回想上一天的句子" }] : [];
-  const [phase, setPhase] = useState<Phase>(() => !guided ? (run?.records.some((r) => r.sentenceId === current.items[run.pos]?.id) ? "sound" : "write")
+  const [phase, setPhase] = useState<Phase>(() => !guided
+    ? run?.phase ?? (run?.records.some((r) => r.sentenceId === current.items[run.pos]?.id) ? "sound" : "write")
     : (resumeAt && resumePhase(resumeAt.rec)) || (guidedRecall.length ? "recall" : "listen"));
   useEffect(() => {
-    if (lessonData === null && phase !== "write" && phase !== "done") setPhase("write");
+    if (guided && lessonData === null && phase !== "sound" && phase !== "write" && phase !== "done") setPhase("write");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonData]);
   const live = guided && !!lessonData;
   const recallNow = guidedRecall[recalls.length];
-  const lessonRecord = readLessonRecord(state.notes, lessonDate) ?? (resumeAt?.date !== lessonDate ? resumeAt?.rec : null) ?? null;
+  const lessonRecord = readLessonRecord(state.notes, lessonDate);
   const stepsDone: LessonStep[] = [...(lessonRecord?.steps ?? []), ...(guidedRecall.length ? [] : ["recall" as const])];
   const stepNow: LessonStep = phase === "recall" ? "recall" : phase === "listen" ? "listen"
     : phase === "express" ? (corrections ? "fix" : "express") : phase === "done" ? "done" : "pattern";
@@ -251,10 +251,14 @@ function PracticeSession({
     update((prev) => ({ ...prev, notes: addEvidence(prev.notes, unit, { day: date, level, ...e, ...keep }) }));
   }
   const checkpointLevels = useRef<(Level | null)[]>((run?.levels ?? []) as (Level | null)[]);
+  const runAnswers = useRef<Record<string, string>>({ ...run?.answers });
   /** Where a checkpoint or review day is, kept for today (cleared when it is finished). */
-  const keepRun = (at: number, list: TranslationRecord[]) => {
+  const keepRun = (at: number, list: TranslationRecord[], phase: "write" | "sound", spokenIds = spoken) => {
     if (guided) return;
-    update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, { unit: current.unit, day: current.day, pos: at, records: list, levels: checkpointLevels.current }) }));
+    const progress = { unit: current.unit, day: current.day, pos: at, retry, review: current.review,
+      items: current.items.map((s) => s.id), records: list, levels: [...checkpointLevels.current], phase,
+      answers: { ...runAnswers.current }, spoken: spokenIds };
+    update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, progress) }));
   };
   const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id] : readHints(state.notes, date)[id];
   const saveHint = (id: string) => (use: HintUse) => {
@@ -265,27 +269,27 @@ function PracticeSession({
     else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
   };
   const item = current.items[pos];
-  // What he wrote for each sentence of a checkpoint or review day, put back into the box by 「← 上一句」.
-  const runAnswers = useRef(new Map<string, string>());
   function backSentence() {
-    const prev = current.items[pos - 1];
-    if (!prev || !settled()) return;
-    const said = runAnswers.current.get(prev.id);
-    if (said) writeDraft(prev.id, said);
+    if (pos === 0 || !settled()) return;
+    keepRun(pos - 1, records, "write");
     setPos(pos - 1); setPhase("write");
   }
-  function mark(value: Mark, revealed: boolean, info?: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
-    if (!settled()) return;
-    if (info?.answer) runAnswers.current.set(item.id, info.answer);
+  function mark(value: Mark, revealed: boolean, info: { answer: string; firstVerdict?: Verdict; checkedText?: string }) {
+    if (!settled()) return false;
     // Each sentence counts once: one already marked (gone back to with 「← 上一句」) only moves on.
-    if (records.some((r) => r.sentenceId === item.id)) { go("sound", { records }); return; }
+    if (records.some((r) => r.sentenceId === item.id)) {
+      keepRun(pos, records, "sound");
+      go("sound", { records });
+      return true;
+    }
+    if (!guided) runAnswers.current[item.id] = info.answer;
     // Nothing written: marking it "correct" cannot count as done alone, so it is kept as done with help.
-    if (!info?.answer?.trim()) revealed = true;
-    const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info?.answer, references: item.reference, firstVerdict: info?.firstVerdict, checkedText: info?.checkedText });
+    if (!info.answer.trim()) revealed = true;
+    const level = judgeWritten({ rating: ratingOf[value], revealed, answer: info.answer, references: item.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText });
     if (current.checkpoint) checkpointLevels.current.push(level);
     else if (guided)
       evidence(current.unit, level, { source: "pattern", skill: "write", item: item.id, hints: hintFor(item.id)?.h,
-        answer: info?.answer, prompt: item.zh, ref: item.reference[0] });
+         answer: info.answer, prompt: item.zh, ref: item.reference[0] });
     const list = [
       ...records,
       {
@@ -297,30 +301,21 @@ function PracticeSession({
       },
     ];
     setRecords(list);
-    keepRun(pos, list);
+    keepRun(pos, list, "sound");
     go("sound", { records: list });
+    return true;
   }
   function finish(skip = false, next: Phase = "done") {
-    if (current.checkpoint && !skip)
-      evidence(current.unit, judgeCheckpoint(checkpointLevels.current), { source: "checkpoint", skill: "write" });
     const results = skip ? [] : [...recalls, ...records];
+    // Two devices can finish separate submissions after resuming the same unfinished checkpoint.
+    const checkpointId = current.checkpoint && !skip ? sessionId : undefined;
     const drawn =
       retention && recalls.find((t) => t.sentenceId === retention.sentence.id);
     const { finished: success, independent } = checkpointOutcome(records);
     update((prev) => {
       if (prev.sessions.some((s) => s.id === sessionId)) return prev;
-      const cards = [...prev.cards];
-      const events = [...prev.reviewEvents];
-      function addCard(t: TranslationRecord) {
-        const i = cards.findIndex((card) => card.id === t.sentenceId);
-        if (i === -1) cards.push(newCard(t.sentenceId, date));
-        else {
-          const { card, event } = applyAnswer(cards[i], date, t);
-          cards[i] = card;
-          if (event) events.push(event);
-        }
-      }
-      results.forEach(addCard);
+      const reviewed = results.reduce((s, answer) => logSentence(s, sessionId, date, answer), prev);
+      const cards = [...reviewed.cards];
       current.newWords.forEach((w) => {
         const id = "word:" + wordKey(w.en);
         if (!cards.some((c) => c.id === id)) cards.push(newCard(id, date));
@@ -373,20 +368,34 @@ function PracticeSession({
         ...prev,
         sessions: [...prev.sessions, entry],
         cards,
-        reviewEvents: events,
+        reviewEvents: reviewed.reviewEvents,
         curriculum: next,
         notes: (() => {
           let notes =
             drawn && retention
               ? recordRetention(
-                  prev.notes,
+                  reviewed.notes,
                   retention.unit,
                   current.unit,
                   drawn.rating,
                   drawn.revealed,
                   drawn.verified === true,
                 )
-              : prev.notes;
+              : reviewed.notes;
+          if (checkpointId) {
+            const checkpointItems = Object.fromEntries(records.map((r, i) => [r.sentenceId, checkpointLevels.current[i] ?? null]));
+            const level = judgeCheckpoint(Object.values(checkpointItems));
+            if (level) notes = addEvidence(notes, current.unit, { day: date, source: "checkpoint", skill: "write",
+              level, checkpointItems, checkpointId, attemptId: checkpointId + ":checkpoint" });
+            for (const sentence of current.items) {
+              const answer = runAnswers.current[sentence.id];
+              if (checkpointItems[sentence.id] === "pending" && answered(answer)) {
+                notes = addEvidence(notes, current.unit, { day: date, source: "checkpoint", skill: "write", level: "pending",
+                  item: sentence.id, answer, prompt: sentence.zh, ref: sentence.reference[0],
+                  checkpointId, attemptId: checkpointId + ":answer:" + sentence.id });
+              }
+            }
+          }
           if (current.checkpoint && success && !independent && !alreadyAdvanced)
             notes = markAssisted(notes, current.unit, date);
           if (current.checkpoint && independent) notes = clearAssisted(notes, current.unit);
@@ -518,14 +527,18 @@ function PracticeSession({
             lesson={lessonData}
             firstTime={firstListen}
             rate={state.settings.speechRate}
-            onDone={(correct, total, plays) => {
-              if (total > 0) {
-                update((prev) => ({ ...prev, notes: { ...prev.notes, [heardKey(current.unit)]: JSON.stringify({ day: date, correct, total, plays }) } }));
-                // Only all-correct after a complete play counts; a miss is just a miss, not "done with help".
-                if (correct === total) evidence(current.unit, "independent", { source: "listen", skill: "listen" });
-              }
-              go("write", {}, "listen");
+            saved={thisLessonHeard}
+            onReveal={(heard) => {
+              const record = { ...heard, day: date, lessonDate, at: Date.now() };
+              update((prev) => {
+                const key = heardKey(current.unit);
+                if (readHeard(prev.notes, current.unit)) return prev;
+                const notes = { ...prev.notes, [key]: JSON.stringify(record) };
+                const understood = heard.counted && heard.total > 0 && heard.correct === heard.total;
+                return { ...prev, notes: understood ? addEvidence(notes, current.unit, { day: date, level: "independent", source: "listen", skill: "listen" }) : notes };
+              });
             }}
+            onDone={() => go("write", {}, "listen")}
           />
         )}
         {live && lessonData && phase === "vary" && (() => {
@@ -547,10 +560,12 @@ function PracticeSession({
               rule={current.rule}
               peekedBefore={!!lessonRecord?.peeked?.includes(at)}
               saved={lessonRecord?.varyChecks?.[at]}
+              alreadyMarked={already}
               draftKey={"vary." + current.unit + "." + current.day + "." + at}
               onCheck={(check) => update((prev) => {
                 const rec = readLessonRecord(prev.notes, lessonDate);
-                return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { varyChecks: { ...(rec?.varyChecks ?? {}), [at]: check } }) };
+                const checks = rec?.varyChecks ?? {};
+                return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { varyChecks: { ...checks, [at]: { ...checks[at], ...check } } }) };
               })}
               onPeek={() => update((prev) => {
                 const rec = readLessonRecord(prev.notes, lessonDate);
@@ -558,28 +573,33 @@ function PracticeSession({
                 return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { peeked: [...(rec?.peeked ?? []), at] }) };
               })}
               onDone={(m, answer, check) => {
-                if (!settled()) return;
+                if (!settled()) return false;
                 if (already) {
                   changedAt.current = Date.now();
                   setVaried(at + 1);
                   requestAnimationFrame(() => pane.current?.scrollIntoView({ block: "start" }));
-                  return;
+                  return true;
                 }
                 const level = judgeVariation(m, answer, [v.en, ...(v.alt ?? [])], check);
                 // Each variation has its own record (two on one day used to share one), judged on what he wrote before looking.
                 evidence(current.unit, level, { source: "vary", skill: "write", item: item.id + "-v" + at, answer: check.before ?? answer, prompt: v.zh, ref: v.en });
                 if (m !== "good" || !level)
                   update((prev) => addSayCard(prev, { zh: v.zh, en: v.en, why: "這課的句型：" + current.title, from: "lesson" }, date));
+                update((prev) => {
+                  const checks = readLessonRecord(prev.notes, lessonDate)?.varyChecks ?? {};
+                  return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { varyChecks: { ...checks, [at]: { ...checks[at], ...check, answer } } }) };
+                });
                 if (at + 1 < todays.length) {
                   // The next sentence is a new screen: a double tap must not mark it too.
                   changedAt.current = Date.now();
                   setVaried(at + 1);
                   save({ varied: at + 1 });
                   requestAnimationFrame(() => pane.current?.scrollIntoView({ block: "start" }));
-                  return;
+                  return true;
                 }
                 finish(false, "express");
                 step("pattern", { phase: "express", varied: todays.length });
+                return true;
               }}
             />
           </>);
@@ -598,7 +618,7 @@ function PracticeSession({
                 corrected ? (rec.fixed ? "fix" : "express") : undefined);
             }}
             onSave={(card) => update((prev) => addSayCard(prev, { ...card, from: "lesson" }, date))}
-            onSpeak={() => { step("express"); location.hash = "speaking/lesson"; }}
+            onSpeak={() => { step("express"); location.hash = "speaking/lesson-" + lessonDate; }}
             onFinish={(answer, rec) => {
               if (!settled()) return;
               // Something written counts as the step done, with or without Claude's correction (the summary said 「今天跳過」).
@@ -671,6 +691,8 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
+                initialAnswer={runAnswers.current[item.id]}
+                alreadyMarked={records.some(r => r.sentenceId === item.id)}
                 saved={hintFor(item.id)}
                 onHint={saveHint(item.id)}
                 preparation={!current.review && current.rule && grammarFor(current.unit) && (current.day === 1 || live) ? (
@@ -718,9 +740,11 @@ function PracticeSession({
               english={item.reference[0]}
               chinese={item.zh}
               rate={state.settings.speechRate}
-              onSpoken={() =>
-                setSpoken((ids) => [...new Set([...ids, item.id])])
-              }
+              onSpoken={() => {
+                const ids = [...new Set([...spoken, item.id])];
+                setSpoken(ids);
+                keepRun(pos, records, "sound", ids);
+              }}
             />
             <div className="pr-end-controls">
               {pos + 1 < current.items.length ? (
@@ -728,7 +752,7 @@ function PracticeSession({
                   className="pr-main"
                   onClick={() => {
                     if (!settled()) return;
-                    keepRun(pos + 1, records);
+                    keepRun(pos + 1, records, "write");
                     setPos(pos + 1);
                     setPhase("write");
                   }}
@@ -752,11 +776,11 @@ function PracticeSession({
             <div className="pr-label">練習已儲存</div>
             <h2 className="pr-question">今天有練，就往前了一點。</h2>
             {live && (() => {
-              const heard = readHeard(state.notes, current.unit);
+              const heard = thisLessonHeard ?? (heardRecord?.day === date ? heardRecord : null);
               const did = (id: LessonStep) => stepsDone.includes(id) && (id !== "recall" || guidedRecall.length > 0);
               const lines: [LessonStep, string][] = [
                 ["recall", guidedRecall.length ? "回想：" + recalls.length + " 句舊句" : "回想：今天沒有要回想的句子"],
-                ["listen", heard?.day === date && heard.total ? "聽懂：對話題目答對 " + heard.correct + " / " + heard.total : "聽懂：聽對話、跟著唸"],
+                ["listen", heard?.total ? "聽懂：對話題目答對 " + heard.correct + " / " + heard.total + (heard.counted === false ? "（未計入獨立聽力）" : "") : "聽懂：聽對話、跟著唸"],
                 ["pattern", "句型：今天的句子和一個變化"],
                 ["express", did("express") ? "表達：用自己的話寫了一段" + (lessonRecord?.corrected ? "，請 Claude 批改過" : "") : "表達：今天跳過"],
                 ["fix", did("fix") ? "訂正：上次指出的問題都改好了" : (lessonRecord?.express?.corrections ?? 0) >= 2 ? "訂正：再批過了，但還有問題沒改好，下次再試" : "訂正：下次試著改完再批一次"],
@@ -767,7 +791,7 @@ function PracticeSession({
               </>;
             })()}
             {(live || current.checkpoint) && (() => {
-              const today = readEvidence(state.notes, current.unit).filter((e) => e.day === date);
+              const today = readEvidence(state.notes, current.unit).filter((e) => e.day === date && !e.wrong && (e.source !== "checkpoint" || !e.item));
               return today.length > 0 && (
                 <div className="ls-evidence">
                   <strong>今天留下的能力紀錄</strong>
@@ -895,8 +919,8 @@ export default PracticeEntry;
 export function PracticeLibrary({ state, update, navigate, mode }: PageProps & { mode: LibraryMode }) {
   const today = dayKey();
   const period = activePeriod(today, state.settings.periods);
-  const energy =
-    period === "exam" || period === "internship" ? "low" : "normal";
+  const shortReview = mode === "words" && location.hash.split("/")[2] === "low";
+  const energy = shortReview ? "low" : reviewEnergy(today, state.settings.periods);
   const id = "library-" + today;
   // Opening the library never counts as a practice session. Save only on an answer or a recall.
   const record: PageProps["update"] = (apply) =>
@@ -920,7 +944,7 @@ export function PracticeLibrary({ state, update, navigate, mode }: PageProps & {
   return (
     <div className="practice-page">
       <Extras
-        key={today + period + mode}
+        key={today + period + mode + energy}
         mode={mode}
         state={state}
         update={update}
@@ -1011,8 +1035,6 @@ function Extras({
   function backRepeat() {
     const prev = translationPool[repeatIndex - 1];
     if (!prev) return;
-    const said = repeatAnswers.current.get(prev.id);
-    if (said) writeDraft(prev.id, said);
     setRepeatIndex(repeatIndex - 1); setRepeatDone(false);
   }
   const [repeatDone, setRepeatDone] = useState(false);
@@ -1253,11 +1275,13 @@ function Extras({
                 key={repeat.id}
                 sentence={repeat}
                 checkpoint={false}
+                initialAnswer={repeatAnswers.current.get(repeat.id)}
+                alreadyMarked={repeatMarked.current.has(repeat.id)}
                 saved={readHints(state.notes, date)[repeat.id]}
                 onHint={(use) => onActivity((prev) => ({ ...prev, notes: writeHint(prev.notes, date, repeat.id, use) }))}
                 onMark={(mark, revealed, info) => {
-                  repeatAnswers.current.set(repeat.id, info.answer);
                   if (repeatMarked.current.has(repeat.id)) { setRepeatDone(true); return; }
+                  repeatAnswers.current.set(repeat.id, info.answer);
                   repeatMarked.current.add(repeat.id);
                   logRepeat(mark, revealed, info);
                 }}
@@ -1269,14 +1293,14 @@ function Extras({
         </div>
       )}
       {mode === "passage" && (
-        <PassageLibrary state={state} onActivity={onActivity} />
+        <PassageLibrary state={state} update={update} onActivity={onActivity} />
       )}
       {mode === "grammar" && <GrammarHome hash={grammarHash} state={state} onActivity={onActivity} date={date} />}
       {mode === "theme" && <ThemeReview state={state} onActivity={onActivity} date={date} sessionId={sessionId} />}
-      {mode === "story" && <StoryLibrary state={state} onActivity={onActivity} date={date} initialTab={storyTab} />}
+      {mode === "story" && <StoryLibrary state={state} update={update} onActivity={onActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
-      {mode === "nlisten" && <NursingListen state={state} onActivity={onActivity} date={date} />}
+      {mode === "nlisten" && <NursingListen state={state} update={update} onActivity={onActivity} date={date} />}
       {mode === "nread" && <ReadingPath key="nursing" set="nursing" state={state} onActivity={onActivity} date={date} />}
       {mode === "nwords" && <NursingWords state={state} onActivity={onActivity} date={date} />}
       {mode === "writing" && <WritingLadder key={writingTask ?? "ladder"} initialTask={writingTask} state={state} onActivity={onActivity} date={date} />}

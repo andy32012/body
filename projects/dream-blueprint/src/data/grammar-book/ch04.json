@@ -205,6 +205,7 @@
    {
     "k": "fix",
     "q": "Please give me a red pen on your desk.",
+    "instruction": "桌上只有一支紅筆。只改紅筆前的冠詞，指明你要的是桌上那一支。",
     "accept": [
      "Please give me the red pen on your desk."
     ],
@@ -723,10 +724,10 @@
     "options": [
      "by",
      "by the",
-     "on the"
+     "with"
     ],
     "answer": 0,
-    "why": "交通方式用 by＋交通工具，不加冠詞。"
+    "why": "說搭公車這種交通方式，用 by bus。也可以說 on the bus。用 by 表示交通方式時，bus 前面省略冠詞。"
    },
    {
     "k": "fix",

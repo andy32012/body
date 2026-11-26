@@ -3,6 +3,7 @@ import galaxies from '../data/cosmos-g.json'
 import planets from '../data/cosmos-p.json'
 import stars from '../data/cosmos-s.json'
 import deepFields from '../data/cosmos-d.json'
+import { withAppRelease } from './appRelease'
 
 export interface AstroPhoto {
   id: string
@@ -33,7 +34,7 @@ const interleaved = Array.from({length: Math.max(...collections.map(c=>c.length)
   collections.flatMap(c=>c[i] ? [c[i].id] : [])).flat()
 export const photos: AstroPhoto[] = [...new Set([...opening,...interleaved])]
   .map(id=>catalogue.find(photo=>photo.id===id)!)
-export const photoUrl = (photo:AstroPhoto) => './'+photo.image
+export const photoUrl = (photo:AstroPhoto) => withAppRelease('./' + photo.image)
 export const firstOfflinePhoto = photos.find(photo=>photo.id==='n01')!
 
 

@@ -1,4 +1,5 @@
 import { levelTarget, openSteps } from './unlock'
+import { unfinishedItems, writeUnfinished } from './unfinished'
 export { levelTarget } from './unlock'
 
 /** Graded reading from A1 up to IELTS-style passages. Each wrong answer asks why, so word, sentence,
@@ -201,20 +202,20 @@ export function shownPicks(shown: readonly ShownQuestion[], saved: readonly numb
 export function savedCauses(shown: readonly ShownQuestion[], causes: Record<number, string>) {
   return Object.fromEntries(Object.entries(causes).map(([k, c]) => [String(shown[Number(k)]?.from ?? k), c]))
 }
-/** A passage left halfway (a reload, another page): the answers so far, as shown, so it goes on at the next question
- *  instead of starting again. One per reading list (general, nursing, a unit's pack); cleared when the passage is done. */
-export interface ReadingProgress { id: string; picks: number[]; causes?: Record<number, string>; zh?: boolean }
+/** The answers so far, in display order, saved separately for every passage. */
+export interface ReadingProgress { id: string; picks: number[]; causes?: Record<number, string>; zh?: boolean; updatedAt?: number }
 export const readingProgressKey = (set: string) => 'reading.progress.' + set
-export function readReadingProgress(notes: Record<string, string>, set: string): ReadingProgress | null {
-  try {
-    const v = JSON.parse(notes[readingProgressKey(set)] || 'null') as ReadingProgress | null
-    return v && typeof v.id === 'string' && Array.isArray(v.picks) && v.picks.every(n => Number.isInteger(n)) ? v : null
-  } catch { return null }
+export function listReadingProgress(notes: Record<string, string>, set: string): ReadingProgress[] {
+  return unfinishedItems(notes, readingProgressKey(set), (value): value is ReadingProgress => {
+    const p = value as ReadingProgress
+    return Array.isArray(p.picks) && p.picks.every(n => Number.isInteger(n))
+  })
 }
-export function saveReadingProgress(notes: Record<string, string>, set: string, p: ReadingProgress | null) {
-  const next = { ...notes }
-  if (p) next[readingProgressKey(set)] = JSON.stringify(p); else delete next[readingProgressKey(set)]
-  return next
+export function readReadingProgress(notes: Record<string, string>, set: string, id?: string): ReadingProgress | null {
+  return listReadingProgress(notes, set).find(p => id === undefined || p.id === id) ?? null
+}
+export function saveReadingProgress(notes: Record<string, string>, set: string, p: ReadingProgress | null, id = p?.id ?? readReadingProgress(notes, set)?.id) {
+  return id ? writeUnfinished(notes, readingProgressKey(set), id, p) : notes
 }
 /** Which question types and causes go wrong most, across everything read. */
 export function readSummary(all: readonly ReadPassage[], notes: Record<string, string>) {

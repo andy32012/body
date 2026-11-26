@@ -1,5 +1,5 @@
 import AskWhy from './AskWhy'
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { readBands, readReadingProgress, saveReadingProgress, type ReadBand } from '../lib/reading'
 import { blankNumbers, blankParts, examPassed, examWords, readExamRecord, saveExamRead, sameWord, type ExamPassage, type ExamQuestion, type ExamWord } from '../lib/examReading'
@@ -23,8 +23,10 @@ const optionText = (q: ExamQuestion, i: number) => '(' + letters[i] + ') ' + q.o
  *  comes back; afterwards its words can be practised (看中文寫英文) and put into the word review. Nothing on screen says
  *  which exam it came from: no exam name, no paper question numbers (blanks are numbered 1, 2, 3 in the text). */
 export default function ExamPassageView({ passage, state, onActivity, date, onNext }: Base & { passage: ExamPassage; onNext: () => void }) {
-  const half = readReadingProgress(state.notes, examProgressSet)
-  const [picks, setPicks] = useState<number[]>(() => half && half.id === passage.id && half.picks.length < passage.qs.length ? half.picks : [])
+  const [picks, setPicks] = useState<number[]>(() => {
+    const half = readReadingProgress(state.notes, examProgressSet, passage.id)
+    return half && half.picks.length < passage.qs.length ? half.picks : []
+  })
   const [saved, setSaved] = useState(false)
   const [redo, setRedo] = useState(false)
   const at = picks.length
@@ -46,7 +48,8 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
     detail: [
       '他在做閱讀測驗（' + where + '），文章裡的空格寫成（1）（2）：\n' + plain,
       last ? '剛做完' + named(last, at - 1) + '：' + (last.blank ? '這一格要填什麼' : last.q) + '\n選項：' + last.options.map((_, i) => optionText(last, i)).join(' / ')
-        + '\n答案：' + optionText(last, last.answer) + '；他選了 ' + optionText(last, lastPick) + '。他問為什麼時，用中文說明，指出文章裡的線索。' : '',
+        + '\n答案：' + optionText(last, last.answer) + '；他選了 ' + optionText(last, lastPick) + '。'
+        + (last.explanation ? '\n本題解析：' + last.explanation : '') + '\n他問為什麼時，用中文說明，指出文章裡的線索。' : '',
       q ? '現在這題（' + named(q, at) + '）：' + (q.blank ? '這一格要填什麼' : q.q) + '\n選項：' + q.options.map((_, i) => optionText(q, i)).join(' / ')
         + '\n答案是 ' + optionText(q, q.answer) + '，他作答前不要說，只帶他回到文章找線索。' : '這篇的題目都做完了。',
       '不要提這篇文章出自哪一種考試或哪一年。',
@@ -60,7 +63,7 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
     if (next.length === passage.qs.length) {
       const right = passage.qs.filter((x, j) => next[j] === x.answer).length
       // Each day a passage is read counts as a reading day. A second try on the same day is practice (saveExamRead).
-      onActivity(prev => ({ ...prev, notes: logSkill(saveExamRead(saveReadingProgress(prev.notes, examProgressSet, null), passage.id, { day: date, picks: next, correct: right, total: passage.qs.length }), 'read', date) }))
+      onActivity(prev => ({ ...prev, notes: logSkill(saveExamRead(saveReadingProgress(prev.notes, examProgressSet, null, passage.id), passage.id, { day: date, picks: next, correct: right, total: passage.qs.length }), 'read', date) }))
       setSaved(true)
     } else if (!redo) {
       onActivity(prev => ({ ...prev, notes: saveReadingProgress(prev.notes, examProgressSet, { id: passage.id, picks: next }) }))
@@ -76,13 +79,25 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
       <small>{nums.get(n) ?? n}</small>{answered ? <span lang="en">{passage.qs[i].options[passage.qs[i].answer]}</span> : null}
     </span>
   }
+  function passageText(text: string, line: number, key: number) {
+    const tapWords = (words: string) => <TapWords text={words} line={line} onWord={look.tap} picked={look.pickedForm} pickedLine={look.line} />
+    const mark = passage.emphasis
+    const start = mark ? text.indexOf(mark.phrase) : -1
+    const offset = mark ? mark.phrase.indexOf(mark.word) : -1
+    if (!mark || start < 0 || offset < 0) return <Fragment key={key}>{tapWords(text)}</Fragment>
+    const from = start + offset
+    const Tag = mark.underline ? 'u' : 'strong'
+    return <Fragment key={key}>
+      {tapWords(text.slice(0, from))}<Tag className="ex-emphasis">{tapWords(mark.word)}</Tag>{tapWords(text.slice(from + mark.word.length))}
+    </Fragment>
+  }
   const rec = saved ? readExamRecord(state.notes, passage.id) : null
   return <div className="pr-stack rd ex">
     <article className="rd-passage">
       <header><h3>{where}</h3><small>{passage.words} 字{before ? ' · 上次 ' + before.correct + ' / ' + before.total : ''}</small></header>
       {passage.paras.map((para, i) => <div key={i} className="ex-para">
         <p lang="en" className="rd-para">{blankParts(para).map((part, j) => 'blank' in part ? blank(part.blank, j)
-          : <TapWords key={j} text={part.text} line={i} onWord={look.tap} picked={look.pickedForm} pickedLine={look.line} />)}</p>
+          : passageText(part.text, i, j))}</p>
         {look.line === i && look.box}
       </div>)}
       <small className="ex-note">{done ? '點文章裡的字看意思、聽發音，也可以問 Claude 老師。' : '不會的字點一下看意思。'}</small>
@@ -91,8 +106,9 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
       {passage.gloss?.length ? <p className="ex-gloss"><small>單字附註</small>{passage.gloss.map(g => <span key={g.en}><b lang="en">{g.en}</b> {g.zh}</span>)}</p> : null}
     </article>
     {last && <div className="pr-hint rd-feedback" data-ok={lastPick === last.answer}>
-      <strong>{lastPick === last.answer ? named(last, at - 1) + '答對了' : named(last, at - 1) + '的答案是 ' + optionText(last, last.answer)}</strong>
-      {lastPick !== last.answer && <p>你選了 {optionText(last, lastPick)}。回文章找一找線索，或請 Claude 說明。</p>}
+      <strong>{lastPick === last.answer ? named(last, at - 1) + '答對了' : named(last, at - 1) + (last.explanation ? '的官方答案是 ' : '的答案是 ') + optionText(last, last.answer)}</strong>
+      {lastPick !== last.answer && <p>你選了 {optionText(last, lastPick)}。{!last.explanation && '回文章找一找線索，或請 Claude 說明。'}</p>}
+      {last.explanation && <p>{last.explanation}</p>}
       <div className="pr-actions"><button type="button" className="pr-link" onClick={() => askClaude(named(last, at - 1) + '為什麼答案是 ' + optionText(last, last.answer) + '？' + (lastPick === last.answer ? '' : '我選了 ' + optionText(last, lastPick) + '。') + '請用中文說明文章裡的線索。')}>問 Claude 為什麼</button></div>
     </div>}
     {q && <section className="rd-q">
@@ -104,7 +120,10 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
     {done && <div className="pr-hint">
       <strong>這篇答對 {correct} / {passage.qs.length}{redo || rec?.practice ? '（今天已經做過這篇：這次是練習，不算新的過關' + (examPassed(rec) ? '；之前的過關留著 ✓' : '') + '）'
         : examPassed(rec) ? '，過關 ✓' : '，七成以上算過關，之後會再排到'}</strong>
-      <ul className="rd-review">{passage.qs.map((x, i) => <li key={x.n} data-ok={picks[i] === x.answer}>{named(x, i)}：{picks[i] === x.answer ? '對' : '錯，答案 (' + letters[x.answer] + ')'}</li>)}</ul>
+      <ul className="rd-review">{passage.qs.map((x, i) => <li key={x.n} data-ok={picks[i] === x.answer}>
+        {named(x, i)}：{picks[i] === x.answer ? '對' : '錯，' + (x.explanation ? '官方答案' : '答案') + ' (' + letters[x.answer] + ')'}
+        {x.explanation && x !== last && <p className="ex-explanation">{x.explanation}</p>}
+      </li>)}</ul>
       <div className="pr-actions">
         <button type="button" className="pr-main" onClick={onNext}>下一篇 →</button>
         <button type="button" className="pr-link" onClick={again}>這篇再做一次（練習）</button>

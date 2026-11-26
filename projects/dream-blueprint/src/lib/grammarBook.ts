@@ -2,13 +2,13 @@
  *  A-1…A-10), every section taught in plain Chinese with examples, common mistakes and three drills, plus a sentence of his
  *  own for Claude to check. The index (src/data/grammar-book/index.json) lists every section; a chapter's teaching is its
  *  own file (ch01.json … ch41.json, appendix.json), written a whole chapter at a time (`ready`). The course units'
- *  teaching (grammar.json, gram.<unit>) stays as it is; sections a unit teaches link to it (`units`). */
+ *  teaching (grammar.json, gram.<unit>) stays as it is; sections can link to related course units (`units`). */
 import { readMarks, saveMark, type Drill, type GrammarMistake, type GrammarRecord, type GrammarStep, type GrammarTable } from './grammar'
 
 export type BookLevel = 1 | 2 | 3
 export const levelNames: Record<BookLevel, string> = { 1: '基礎', 2: '進階', 3: '高階' }
 export interface BookSection { id: string; title: string; level: BookLevel
-  /** The course units that teach this (their 講解 and 7 drills in 課程單元). */
+  /** Related teaching in the course units. */
   units?: number[] }
 export interface BookChapter { n: number; title: string; en: string; sections: BookSection[]
   /** Every section of the chapter is written (its file exists). */

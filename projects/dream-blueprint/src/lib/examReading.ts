@@ -1,6 +1,7 @@
 import type { ReadBand, ReadLevel } from './reading'
 import { baseForms } from './story'
 import { levelEntry, wordKey } from './vocab'
+import { bestExamAttempt, examRatio, type ExamAttempt, type ExamRecord } from './examKeys'
 
 /** Reading passages from Taiwan's public exams (會考, 學測, 指考 and the civil-service exams), with the official answers,
  *  placed on the same steps as the graded reading (A1–B2, 簡單／中等／難). Official exam papers are not protected by
@@ -15,6 +16,8 @@ export interface ExamQuestion {
   options: string[]
   answer: number
   blank?: boolean
+  /** Notes on the official answer, shown after the learner answers. */
+  explanation?: string
 }
 export interface ExamPassage {
   id: string; level: ReadLevel; band: ReadBand; kind: ExamKind
@@ -24,6 +27,8 @@ export interface ExamPassage {
   first: number; last: number; words: number
   /** Paragraphs; a blank is written {{n}} with the question's number. */
   paras: string[]
+  /** Emphasis in the printed passage that a question refers to. The surrounding phrase locates the word. */
+  emphasis?: { phrase: string; word: string; underline?: boolean }
   /** The word notes printed with the passage on the paper. */
   gloss?: { en: string; zh: string }[]
   qs: ExamQuestion[]
@@ -62,8 +67,7 @@ export function blankNumbers(p: Pick<ExamPassage, 'paras'>): Map<number, number>
 
 /** One record per passage, `exam.read.<id>`, apart from the graded reading's `read.<id>`. The latest attempt, plus `best`:
  *  a redo on the same day is practice and never replaces the record; a lower score later never erases a pass. */
-export interface ExamAttempt { day: string; correct: number; total: number }
-export interface ExamRecord extends ExamAttempt { picks: number[]; tries: number; best?: ExamAttempt; practice?: boolean }
+export type { ExamAttempt, ExamRecord } from './examKeys'
 export const examReadKey = (id: string) => 'exam.read.' + id
 /** The list he was looking at (level, band, which exams), so the page opens there again. */
 export const examPlaceKey = 'exam.read.at'
@@ -76,16 +80,18 @@ export function readExamRecord(notes: Record<string, string>, id: string): ExamR
     return r && typeof r.correct === 'number' && typeof r.total === 'number' && r.total > 0 ? r : null
   } catch { return null }
 }
-const ratio = (a: ExamAttempt) => a.correct / Math.max(1, a.total)
 /** Passed at 70% or better, on an attempt that counts. */
-export const examPassed = (r: ExamRecord | null) => !!r && ratio(r.best ?? r) >= 0.7
+export function examPassed(r: ExamRecord | null): boolean {
+  const best = r && bestExamAttempt(r)
+  return !!best && examRatio(best) >= 0.7
+}
 export function saveExamRead(notes: Record<string, string>, id: string, attempt: ExamAttempt & { picks: number[] }) {
   const old = readExamRecord(notes, id)
-  const oldBest = old ? old.best ?? { day: old.day, correct: old.correct, total: old.total } : undefined
+  const oldBest = old ? bestExamAttempt(old) : undefined
   const practice = !!old && old.day === attempt.day
-  const now: ExamAttempt = { day: attempt.day, correct: attempt.correct, total: attempt.total }
-  const best = !practice && (!oldBest || ratio(now) > ratio(oldBest)) ? now : oldBest ?? now
-  const rec: ExamRecord = { ...attempt, tries: (old?.tries ?? 0) + 1, best, ...(practice ? { practice: true } : {}) }
+  const now = { ...attempt, at: Math.max(Date.now(), (old?.at ?? 0) + 1) }
+  const best = !practice && (!oldBest || examRatio(now) > examRatio(oldBest)) ? now : oldBest
+  const rec: ExamRecord = { ...now, tries: (old?.tries ?? 0) + 1, best, ...(practice ? { practice: true } : {}) }
   return { ...notes, [examReadKey(id)]: JSON.stringify(rec) }
 }
 

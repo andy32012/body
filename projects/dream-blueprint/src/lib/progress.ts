@@ -198,6 +198,8 @@ export type WrittenSentence = NonNullable<Session['translations']>[number]
 /** A sentence written in a practice (中翻英, 主題總複習) counts the same wherever it was written: its review card moves on
  *  (or starts), a due card counts toward today's sentence review whatever the mark, and the answer joins the session. */
 export function logSentence(prev: AppState, sessionId: string, day: string, written: WrittenSentence): AppState {
+  // An open drill may still show a card deleted on another tab or device.
+  if (written.sentenceId.startsWith('say-') && !prev.notes['say.' + written.sentenceId]) return prev
   const found = prev.cards.find((c) => c.id === written.sentenceId)
   const result = found ? applyAnswer(found, day, written) : null
   const counted = sentenceReviewKey(day)

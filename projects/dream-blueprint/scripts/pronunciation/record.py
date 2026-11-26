@@ -5,9 +5,9 @@ out/<f|m>.json; choose.py then decides which pairs and which takes go into the c
 A pool of candidate pairs is recorded until it has three clear pairs more than the lesson keeps (the other voice may reject
 some); --all records every candidate.
 usage: record.py <f|m> [--all] [lesson id ...]"""
-import json, os, sys, time
+import os, sys, time
 import soundfile as sf
-from course import parse, clips, slug, HERE
+from course import parse, clips, slug, HERE, read_json, write_json
 from lib import phonemes, speak, check
 
 G = sys.argv[1]
@@ -16,7 +16,7 @@ EVERY = '--all' in sys.argv
 VOICES = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_adam', 'am_fenrir', 'am_michael', 'am_puck']}[G]
 LOG = os.path.join(HERE, 'out', G + '.json')
 os.makedirs(os.path.join(HERE, 'out'), exist_ok=True)
-takes = json.load(open(LOG)) if os.path.exists(LOG) else {}
+takes = read_json(LOG) if os.path.exists(LOG) else {}
 lessons = parse()
 all_clips = clips(lessons)
 t0 = time.time()
@@ -42,7 +42,7 @@ def take(s, voice):
     sf.write(os.path.join(folder, s + '.wav'), x, sr, subtype='PCM_16')
     rec = {'text': c['text'], 'phonemes': ph, 'others': c['others'], 'speed': round(speed, 2), 'secs': round(len(x) / sr, 2), **res}
     takes.setdefault(s, {})[voice] = rec
-    json.dump(takes, open(LOG, 'w'), ensure_ascii=False, indent=1)
+    write_json(LOG, takes)
     made += 1
     return rec
 

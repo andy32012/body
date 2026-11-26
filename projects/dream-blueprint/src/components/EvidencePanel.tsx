@@ -59,7 +59,8 @@ export default function EvidencePanel({ state, update }: Pick<PageProps, 'state'
           <span data-level={write ?? ''}>寫：{write ? levelNames[write] : '還沒有'}</span>
           <span data-level={listen ?? ''}>聽：{listen ? (listen === 'assisted' ? '只聽還沒全對' : '只聽也懂') : '還沒有'}</span>
         </div>
-        {pending.map(({ e, i }) => <Pending key={i + (e.wrong ?? '')} e={e} onCheck={(ref, reply, rewrite) => update(prev => ({ ...prev, notes: checkPending(prev.notes, u, ref, reply, rewrite) }))} />)}
+        {pending.map(({ e, i }) => <Pending key={(e.attemptId ?? i) + ':' + (e.reviewedAt ?? e.wrong ?? '')}
+          e={e} onCheck={(ref, reply, rewrite) => update(prev => ({ ...prev, notes: checkPending(prev.notes, u, ref, reply, rewrite) }))} />)}
       </li>
     })}</ul>
   </section>

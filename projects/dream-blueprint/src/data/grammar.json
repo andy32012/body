@@ -172,8 +172,8 @@
      ]
     },
     {
-     "t": "its 是「它的」，it's 是 it is",
-     "p": "its 沒有一撇，是「它的」；it's 有一撇，是 it is 的縮寫。their（他們的）也不要寫成 there（那裡）或 they're（they are）。",
+     "t": "its 是「它的」，it's 可以是 it is 或 it has",
+     "p": "its 沒有一撇，接名詞表示「它的」。有一撇的 it's 要看後面的字，在 It's cold 裡是 it is，在 It's been cold 裡是 it has。their（他們的）和 there（那裡）、they're（they are）也要分清楚。",
      "ex": [
       {
        "en": "Our teacher is kind.",
@@ -182,6 +182,18 @@
       {
        "en": "Their room is small.",
        "zh": "他們的房間很小。"
+      },
+      {
+       "en": "The cat is in its bed.",
+       "zh": "貓在牠自己的床上。"
+      },
+      {
+       "en": "It's cold today.",
+       "zh": "今天很冷。這裡的 It's 是 It is。"
+      },
+      {
+       "en": "It's been a long day.",
+       "zh": "今天過得很漫長。這裡的 It's 是 It has。"
       }
      ]
     }
@@ -224,6 +236,17 @@
       "He is my friend. His name is Leo."
      ],
      "why": "名詞 name 前面要用 his（他的），不是 he（他）。"
+    },
+    {
+     "k": "choose",
+     "q": "___ been a long day.",
+     "options": [
+      "Its",
+      "It's",
+      "Its'"
+     ],
+     "answer": 1,
+     "why": "It's been 是 It has been 的縮寫，句中需要 has。its 只表示「它的」。"
     }
    ]
   }
@@ -1948,7 +1971,7 @@
    "steps": [
     {
      "t": "已經約好、排進行程的事，用 am／is／are＋V-ing",
-     "p": "跟人約好、已經排好的事，常用現在進行式，而且要加未來的時間（tomorrow、next week），聽的人才知道是在說未來。",
+     "p": "跟人約好、已經排好的事，可以用現在進行式。未來的時間要讓對方聽得出來。可以說出 tomorrow、next week，也可以由前面的對話交代。",
      "ex": [
       {
        "en": "I am meeting Dr. Lin tomorrow.",
@@ -1957,12 +1980,16 @@
       {
        "en": "We are flying to Tokyo next week.",
        "zh": "我們下週要飛東京。"
+      },
+      {
+       "en": "A: What are your plans for tomorrow? B: I'm meeting Amy.",
+       "zh": "A：你明天有什麼安排？B：我要和 Amy 見面。問句已經說了「明天」，回答不用再說一次。"
       }
      ]
     },
     {
      "t": "沒有約好、只是打算或猜，用 be going to 或 will",
-     "p": "打算做的事用 be going to；猜會發生的事用 will。已經約好（有時間、有人、有票）的事，才用 be＋V-ing。",
+     "p": "說自己的打算時，可以用 be going to。說預測時，可以用 will。想突出事情已經約好或排進行程時，用 be＋V-ing。",
      "ex": [
       {
        "en": "I am going to study tonight.",
@@ -1985,7 +2012,7 @@
       "met"
      ],
      "answer": 1,
-     "why": "已經約好的事，用 am＋V-ing，再加未來時間 tomorrow。"
+     "why": "am meeting 表示這次見面已經約好。句中的 tomorrow 交代了時間。"
     },
     {
      "k": "choose",

@@ -1,10 +1,12 @@
 /**
  * Google Drive memory through the learner's own Apps Script web app.
  * The script saves conversations and memory notes into a spreadsheet in their Drive.
- * The web app URL and a random token stay in this browser; the script trusts the first token it sees.
+ * The web app URL and the token configured by the owner stay in this browser.
  */
+import { memoryTimes, type MemoryRecords } from './memory'
+
 const KEY = 'dream-blueprint.drive'
-type Drive = { url: string; token: string; sheet?: string }
+type Drive = { url: string; token: string; sheet?: string; generation?: string }
 
 function read(): Drive | null {
   try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && v.url && v.token ? v : null } catch { return null }
@@ -14,62 +16,117 @@ function write(v: Drive | null) {
 }
 export const driveConfig = read
 export const driveConnected = () => !!read()
-export function disconnectDrive() { write(null) }
-
-function randomToken() {
-  const a = new Uint8Array(24)
-  crypto.getRandomValues(a)
-  return Array.from(a, b => b.toString(16).padStart(2, '0')).join('')
+export const cloudScope = (d = read()) => d ? d.generation ?? d.url : null
+let connectionAttempt = 0
+function withStoreLock<T>(action: () => T): Promise<T> {
+  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request('dream-blueprint.v2', action)
+  return Promise.resolve().then(action)
+}
+export async function disconnectDrive() {
+  connectionAttempt++
+  await withStoreLock(() => {
+    write(null)
+    if (read()) throw new Error('瀏覽器沒有完成中斷連線，請再試一次。')
+    resetCloudTracking()
+  })
 }
 
-async function post(body: object) {
-  const d = read()
+export function sameConnection(d: Drive) {
+  const current = read()
+  return current?.url === d.url && current.token === d.token && cloudScope(current) === cloudScope(d)
+}
+
+function rememberCapabilities(json: { url?: string; cas?: boolean; archive?: boolean; folder?: string; atomic?: boolean; guarded?: boolean }, d: Drive) {
+  if (!sameConnection(d)) return
+  if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
+  if (json.cas) markCas()
+  if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
+  if (json.atomic) markAtomic()
+  try {
+    const guarded = localStorage.getItem(GUARDED) === '1'
+    if (!!json.guarded !== guarded) {
+      if (json.guarded) localStorage.setItem(GUARDED, '1')
+      else localStorage.removeItem(GUARDED)
+      window.dispatchEvent(new Event('dream-blueprint:cloud'))
+    }
+  } catch { /* optional */ }
+}
+
+async function post(body: object, d = read()) {
   if (!d) return null
   const res = await fetch(d.url, { method: 'POST', body: JSON.stringify({ ...body, token: d.token }) })
   const json = await res.json()
   // "stale" is an answer, not a failure: the cloud has a newer snapshot than the one this device started from.
   if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。'
+    : json.error === 'setup' ? '請先在 Apps Script 執行 setupHistory，再用執行記錄裡的同步密鑰連接。'
     : json.error === 'write' ? '雲端這次沒有存完整，雲端還是原本那一份'
     : json.error === 'history' ? '雲端硬碟沒辦法先留一份備份，這次先不蓋掉雲端那份'
     : '雲端硬碟回傳錯誤')
-  if (json.url && json.url !== d.sheet) write({ ...d, sheet: json.url })
-  if (json.cas) markCas()
-  if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
-  if (json.atomic) markAtomic()
+  rememberCapabilities(json, d)
   return json
 }
 /** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
-async function get(type: 'state' | 'memory') {
-  const d = read()
+async function get(type: 'state' | 'memory', d = read()) {
   if (!d) return null
-  const json = await post({ type: type + '-get' })
+  const json = await post({ type: type + '-get' }, d)
   if (json && (type === 'state' ? 'state' in json : Array.isArray(json.notes))) return json
   const res = await fetch(d.url + (type === 'state' ? '?type=state&' : '?') + 'token=' + encodeURIComponent(d.token))
   const old = await res.json()
   if (!old.ok) throw new Error(old.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
-  if (old.url && old.url !== d.sheet) write({ ...d, sheet: old.url })
+  rememberCapabilities(old, d)
   return old
 }
 
-export async function connectDrive(url: string, token = randomToken()) {
+export async function connectDrive(url: string, token: string) {
   const clean = url.trim()
   if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(clean)) throw new Error('網址格式不對，要是 https://script.google.com/macros/s/…/exec')
-  write({ url: clean, token })
-  setCloudBase(0); clearConflict()
-  try { return await loadDriveMemory() } catch (e) { write(null); throw e }
+  const previous = read()
+  const key = token.trim()
+  const same = previous?.url === clean && previous.token === key
+  const generation = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), n => n.toString(16).padStart(2, '0')).join('')
+  const candidate = same ? previous : { url: clean, token: key, generation: generation() }
+  if (!candidate.token) throw new Error('請填入 Apps Script 執行記錄裡的同步密鑰。')
+  const attempt = ++connectionAttempt
+  const response = await get('memory', candidate)
+  if (!response?.ok) throw new Error('雲端硬碟沒有確認連線，請檢查網址和同步密鑰。')
+  await withStoreLock(() => {
+    if (attempt !== connectionAttempt || (previous ? !sameConnection(previous) : read() !== null)) {
+      throw new Error('這台裝置的雲端連線已變更，請重新確認。')
+    }
+    const existing = sameConnection(candidate)
+    if (!existing) write(candidate)
+    if (!sameConnection(candidate)) throw new Error('瀏覽器無法保存雲端連線設定。')
+    if (!existing) resetCloudTracking()
+    rememberCapabilities(response, candidate)
+  })
+  return readDriveMemory(response)
 }
 
-export type DriveMemory = { notes: string[]; deleted: string[] }
-export async function loadDriveMemory(): Promise<DriveMemory | null> {
-  const json = await get('memory')
+export type DriveMemory = MemoryRecords & { revision: number | null }
+function readDriveMemory(json: { notes?: unknown; deleted?: unknown; updated?: unknown; memoryRevision?: unknown }): DriveMemory {
+  return {
+    notes: Array.isArray(json.notes) ? json.notes.map(String) : [],
+    deleted: Array.isArray(json.deleted) ? json.deleted.map(String) : [],
+    updated: memoryTimes(json.updated),
+    revision: typeof json.memoryRevision === 'number' ? json.memoryRevision : null,
+  }
+}
+export async function loadDriveMemory(d = read()): Promise<DriveMemory | null> {
+  if (!d) return null
+  const json = await get('memory', d)
+  if (!sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
+  return json ? readDriveMemory(json) : null
+}
+
+/** The new script merges under its lock. Legacy scripts use the merged copy prepared by the caller. */
+export async function saveDriveMemory(memory: MemoryRecords, revision: number | null, d = read()) {
+  if (!d) return null
+  if (!sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
+  const json = await post({ type: 'memory', ...memory, ...(revision === null ? {} : { memoryBase: revision }) }, d)
+  if (!sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
   if (!json) return null
-  return { notes: Array.isArray(json.notes) ? json.notes.map(String) : [], deleted: Array.isArray(json.deleted) ? json.deleted.map(String) : [] }
-}
-
-/** Deleted notes travel too, so a note removed on one device does not come back from another. */
-export function saveDriveMemory(notes: string[], deleted: string[] = []) {
-  if (!read()) return
-  post({ type: 'memory', notes, deleted }).catch(() => { /* offline: next change retries */ })
+  if (json.error === 'stale' || Array.isArray(json.notes)) return { stale: json.error === 'stale', memory: readDriveMemory(json) }
+  return { stale: false, memory: null }
 }
 
 /** Conversation transcripts go to the sheet only when turned on for this device (off by default). */
@@ -89,6 +146,7 @@ export function cloudStatus(): CloudStatus | null {
 }
 function setStatus(ok: boolean, message: string) {
   try { localStorage.setItem(STATUS, JSON.stringify({ at: Date.now(), ok, message })) } catch { /* optional */ }
+  window.dispatchEvent(new Event('dream-blueprint:cloud'))
 }
 
 /** The cloud snapshot this device last loaded or saved (its savedAt). A save says which snapshot it started from;
@@ -96,21 +154,27 @@ function setStatus(ok: boolean, message: string) {
 const BASE = 'dream-blueprint.cloud-base'
 const CONFLICT = 'dream-blueprint.cloud-conflict'
 const CAS = 'dream-blueprint.cloud-cas'
+const GUARDED = 'dream-blueprint.cloud-guarded'
+export function cloudGuarded() { try { return localStorage.getItem(GUARDED) === '1' } catch { return false } }
+function resetCloudTracking() {
+  try {
+    for (const key of [BASE, CONFLICT, CAS, HISTORY, ARCHIVE, ATOMIC, GUARDED, STATUS]) localStorage.removeItem(key)
+  } catch { /* optional */ }
+  window.dispatchEvent(new Event('dream-blueprint:cloud'))
+}
 export function cloudBase() { try { return Number(localStorage.getItem(BASE)) || 0 } catch { return 0 } }
 export function setCloudBase(at: number) { try { localStorage.setItem(BASE, String(at)) } catch { /* optional */ } }
-export type CloudConflict = { remoteAt: number; found: number }
+export type CloudConflict = { remoteAt: number; found: number; auto?: boolean }
 export function cloudConflict(): CloudConflict | null { try { return JSON.parse(localStorage.getItem(CONFLICT) || 'null') } catch { return null } }
-export function markConflict(remoteAt: number) {
-  try { localStorage.setItem(CONFLICT, JSON.stringify({ remoteAt, found: Date.now() })) } catch { /* optional */ }
+export function markConflict(remoteAt: number, auto = true) {
+  try { localStorage.setItem(CONFLICT, JSON.stringify({ remoteAt, found: Date.now(), auto })) } catch { /* optional */ }
   setStatus(false, '雲端硬碟有另一台裝置存的新進度，這台也有改動：先暫停同步、兩份都保留，請到設定 → 雲端硬碟選要留哪一份。')
-  window.dispatchEvent(new Event('dream-blueprint:cloud'))
 }
 /** A merge that kept meeting newer saves from another device: the merged progress stays on this device, nothing in the
  *  cloud is overwritten, and syncing stays paused until the next merge (when the app opens or comes back). */
 export function markMergeWaiting(remoteAt: number) {
   try { localStorage.setItem(CONFLICT, JSON.stringify({ remoteAt, found: Date.now() })) } catch { /* optional */ }
   setStatus(false, '另一台裝置一直有新進度存進雲端：這台合併好的進度先留在這台，兩份都保留，等一下會自己再合併一次。')
-  window.dispatchEvent(new Event('dream-blueprint:cloud'))
 }
 export function clearConflict() { try { localStorage.removeItem(CONFLICT) } catch { /* optional */ } ; window.dispatchEvent?.(new Event('dream-blueprint:cloud')) }
 function markCas() { try { localStorage.setItem(CAS, '1') } catch { /* optional */ } }
@@ -129,15 +193,17 @@ export async function loadHistory(): Promise<HistoryEntry[] | null> {
   markHistory()
   return (json.history as HistoryEntry[]).filter(h => h && typeof h.id === 'string')
 }
-export async function loadHistoryVersion(id: string): Promise<{ state: string; savedAt: number }> {
+export async function loadHistoryVersion(id: string, d = read()): Promise<{ state: string; savedAt: number }> {
   let json: { state?: unknown; savedAt?: unknown } | null
-  try { json = await post({ type: 'history-get', id }) } catch { json = null }
+  try { json = await post({ type: 'history-get', id }, d) } catch { json = null }
+  if (d && !sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
   if (!json || typeof json.state !== 'string' || !json.state) throw new Error('這個版本讀不到了，換另一份試試。')
   return { state: json.state, savedAt: Number(json.savedAt) || 0 }
 }
 /** Puts a copy into the history without changing the current cloud progress. False when the script cannot. */
-export async function addHistory(state: string, savedAt: number, label: string) {
-  try { const json = await post({ type: 'history-add', state, savedAt, label }); return json?.added === true } catch { return false }
+export async function addHistory(state: string, savedAt: number, label: string, d = read()) {
+  if (!d || !sameConnection(d)) return false
+  try { const json = await post({ type: 'history-add', state, savedAt, label }, d); return json?.added === true } catch { return false }
 }
 /** Whether the deployed script keeps old records in the Drive archive folder (v4); the value is that folder's link once known. */
 const ARCHIVE = 'dream-blueprint.cloud-archive'
@@ -171,61 +237,51 @@ export const saveVersion = (savedAt: number, base: number) => Math.max(savedAt, 
 /** A local change's time, after the cloud version this device holds, so a change made after syncing is always seen as
  *  not yet in the cloud, whatever the clock says. */
 export const localStamp = (now: number, base: number) => Math.max(now, base + 1)
-const MODIFIED = 'dream-blueprint.modified'
 
 /** Whole progress, stored in chunks on the 「進度」 sheet. */
-export async function loadDriveState(): Promise<{ state: string | null; savedAt: number } | null> {
-  const json = await get('state')
+export async function loadDriveState(d = read()): Promise<{ state: string | null; savedAt: number } | null> {
+  const json = await get('state', d)
   if (!json) return null
+  if (d && !sameConnection(d)) throw new Error('雲端連線已經切換，請再試一次。')
   return { state: typeof json.state === 'string' && json.state ? json.state : null, savedAt: Number(json.savedAt) || 0 }
 }
 /** Saves run one at a time. Two saves in flight together used to send the same `base`: the second was refused as stale
  *  by the cloud holding the first one — this device's own save — and syncing paused as a "conflict" with itself. */
 let saving: Promise<void> = Promise.resolve()
-/** Saves only if the cloud still holds the snapshot this device started from (`base`, read when the save runs), unless
- *  `force` (a chosen overwrite). */
-export function saveDriveState(state: string, savedAt: number, base?: number, force = false): Promise<void> {
-  const run = saving.then(() => saveNow(state, savedAt, base ?? cloudBase(), force))
-  saving = run.catch(() => {})
+type WriteRequest = { state: string; modified: number; base: number; backup?: boolean }
+type WriteResult = { kind: 'saved' | 'stale'; savedAt: number }
+/** Bind the cloud revision and local edit timestamp to the specific state that is sent. */
+export function saveDriveState(request: WriteRequest, connection = read()): Promise<WriteResult> {
+  const run = saving.then(() => saveNow(request, connection))
+  saving = run.then(() => {}, () => {})
   return run
 }
-async function saveNow(state: string, savedAt: number, base: number, force: boolean) {
-  if (!read()) return
-  if (cloudConflict() && !force) return
+async function saveNow({ state, modified, base, backup }: WriteRequest, connection: Drive | null): Promise<WriteResult> {
+  if (!connection || !sameConnection(connection)) throw new Error('雲端連線已經中斷或切換。')
   try {
-    // An older script cannot check `base` itself, so look first.
-    if (!force && !cloudCas()) {
-      const remote = await loadDriveState()
-      if (remote?.state && remote.savedAt !== base) { markConflict(remote.savedAt); return }
+    // Earlier scripts cannot check equality under their lock. Verify against their current copy first.
+    if (!cloudGuarded()) {
+      const remote = await loadDriveState(connection)
+      const current = remote?.savedAt ?? 0
+      if (current !== base) return { kind: 'stale', savedAt: current }
     }
-    const version = saveVersion(savedAt, base)
-    // A chosen overwrite asks the script to keep the cloud copy in its history first (v3; older scripts ignore it).
-    const json = await post({ type: 'state', state, savedAt: version, ...(force ? { snapshot: true } : { base }) })
+    const version = saveVersion(modified || Date.now(), base)
+    const json = await post({ type: 'state', state, savedAt: version, base, ...(backup ? { snapshot: true } : {}) }, connection)
+    if (!sameConnection(connection)) throw new Error('雲端連線已經切換，請再試一次。')
     if (json?.history === true) markHistory()
-    // Refused because the cloud holds a copy saved in this browser (another tab, or a save that raced): not a conflict.
-    // When that copy is newer than this one, this one is out of date (the other tab's progress has everything on this
-    // device): it is dropped, never forced over the newer one. When it is older, this one goes on top of it.
-    if (json?.error === 'stale' && ownSaves().includes(Number(json.savedAt)) && !force) {
-      const at = Number(json.savedAt)
-      if (at >= version) { setCloudBase(at); return }
-      return saveNow(state, savedAt, at, false)
-    }
-    if (json?.error === 'stale') { markConflict(Number(json.savedAt) || 0); return }
+    if (json?.error === 'stale') return { kind: 'stale', savedAt: Number(json.savedAt) || 0 }
     if (!json || json.state !== true) throw new Error('雲端小程式還是舊版，需要更新部署')
-    setCloudBase(version)
-    rememberOwnSave(version)
-    // Changes made while this save was on its way are still not in the cloud: keep their time after the new version.
-    try { const local = Number(localStorage.getItem(MODIFIED)) || 0; if (local > savedAt && local <= version) localStorage.setItem(MODIFIED, String(version + 1)) } catch { /* optional */ }
-    setStatus(true, '學習進度已存到雲端硬碟')
+    const storedVersion = Number(json.savedAt) || version
+    return { kind: 'saved', savedAt: storedVersion }
   } catch (e) {
-    setStatus(false, '同步失敗：' + (e instanceof Error ? e.message : String(e)) + '，下次有變動會再試')
+    if (sameConnection(connection)) noteSyncFailure(e)
+    throw e
   }
 }
 export function noteSynced(message: string) { setStatus(true, message) }
-/** The last few save times this device wrote to the cloud, to tell its own saves from another device's. */
-const OWN = 'dream-blueprint.cloud-own'
-export function ownSaves(): number[] { try { const v = JSON.parse(localStorage.getItem(OWN) || '[]'); return Array.isArray(v) ? v.filter((n): n is number => typeof n === 'number') : [] } catch { return [] } }
-function rememberOwnSave(at: number) { try { localStorage.setItem(OWN, JSON.stringify([...ownSaves().filter(n => n !== at), at].slice(-20))) } catch { /* optional */ } }
+export function noteSyncFailure(error: unknown) {
+  setStatus(false, '同步失敗：' + (error instanceof Error ? error.message : String(error)))
+}
 
 /** One string to copy to another device. */
 export function syncCode() {
@@ -271,12 +327,13 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptCode = `// 夢想藍圖・雲端記憶 v5（貼到 script.google.com 的專案，部署成網頁應用程式）
+export const appsScriptCode = `// 夢想藍圖・雲端記憶 v6（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 // v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
 // v4：手機要整理掉的舊紀錄（兩個月前的複習紀錄、幾週前的每日小紀錄、四個月前上完的課的批改全文）先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了手機才拿掉；封存的檔案不會被刪。
 // v5：存進度時先寫到另一張工作表，整份讀回來確認一模一樣才換過去用；存到一半失敗（斷線、逾時），雲端還是原本完整的那份。要先留備份時，備份沒存成功就不蓋掉。
-// 換成 v3 以上：上面選 setupHistory，按「執行」，照畫面允許存取雲端硬碟，再部署新版本。
+// v6：擁有者在編輯器執行 setupHistory 設定同步密鑰。進度在鎖內比對版本，並由雲端發行新版號。
+// setupHistory 保留原有密鑰與資料夾。第一次設定請從 Apps Script 執行記錄複製密鑰，再部署。
 function props(){return PropertiesService.getScriptProperties()}
 function book(){
   var id=props().getProperty('SHEET');
@@ -287,16 +344,14 @@ function book(){
   props().setProperty('SHEET',ss.getId());
   return ss;
 }
-function allowed(t){
-  if(!t)return false;
+function accessError(t){
   var saved=props().getProperty('TOKEN');
-  if(!saved){props().setProperty('TOKEN',t);return true}
-  return saved===t;
+  if(!saved)return 'setup';
+  return typeof t==='string'&&saved===t?'':'token';
 }
-function out(o){o.cas=true;o.archive=true;o.atomic=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
+function out(o){o.cas=true;o.archive=true;o.atomic=true;o.guarded=true;return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}
 function tab(name){var ss=book();return ss.getSheetByName(name)||ss.insertSheet(name)}
 function column(name){var sh=tab(name),n=sh.getLastRow()-1;return n>0?sh.getRange(2,1,n,1).getValues().map(function(r){return String(r[0])}).filter(String):[]}
-function setColumn(name,head,list){var sh=tab(name);sh.clear();sh.getRange(1,1).setValue(head);var rows=(list||[]).map(function(x){return [String(x)]});if(rows.length)sh.getRange(2,1,rows.length,1).setValues(rows)}
 // The progress lives on one of two sheets; STATE_SLOT says which one is current (the first one before v5).
 var SLOTS=['進度','進度・另一份'];
 function activeSlot(){var s=props().getProperty('STATE_SLOT');return SLOTS.indexOf(s)>=0?s:SLOTS[0]}
@@ -319,7 +374,47 @@ function writeState(state,savedAt){
   props().setProperty('STATE_SLOT',target);
   return true;
 }
-function readMemory(){return {ok:true,notes:column('記憶'),deleted:column('已刪除的記憶'),url:book().getUrl()}}
+function readMemory(){
+  var sh=tab('記憶'),n=sh.getLastRow()-1,rev=Number(sh.getRange(1,3).getValue())||0;
+  if(!rev)return {ok:true,notes:column('記憶'),deleted:column('已刪除的記憶'),memoryRevision:0,url:book().getUrl()};
+  var rows=n>0?sh.getRange(2,1,n,5).getValues():[],updated=Object.create(null);
+  rows.forEach(function(r){
+    if(r[0]&&r[3])updated[String(r[0])]=memoryTime(r[3]);
+    if(r[1]&&r[4])updated[String(r[1])]=memoryTime(r[4]);
+  });
+  return {ok:true,notes:rows.map(function(r){return String(r[0])}).filter(String),deleted:rows.map(function(r){return String(r[1])}).filter(String),updated:updated,memoryRevision:rev,url:book().getUrl()};
+}
+function memoryStrings(list){return (Array.isArray(list)?list:[]).filter(function(n){return typeof n==='string'&&n!==''})}
+function memoryTime(value){return Number.isSafeInteger(value)&&value>0?value:0}
+function cellText(value){return value&&value.charAt(0)==='='?"'"+value:value}
+function mergeMemory(d){
+  var old=readMemory();
+  if(typeof d.memoryBase==='number'&&d.memoryBase!==old.memoryRevision){old.ok=false;old.error='stale';return old}
+  var next=new Map();
+  function add(list,deleted,times){
+    list.forEach(function(n){
+      var time=memoryTime(times&&times[n]),prev=next.get(n);
+      if(!prev||time>prev.time||(time===prev.time&&deleted))next.set(n,{deleted:deleted,time:time});
+    });
+  }
+  add(old.notes,false,old.updated);add(old.deleted,true,old.updated);
+  add(memoryStrings(d.notes),false,d.updated);add(memoryStrings(d.deleted),true,d.updated);
+  var notes=[],deleted=[];
+  next.forEach(function(value,n){(value.deleted?deleted:notes).push(n)});
+  function byTime(a,b){return next.get(a).time-next.get(b).time}
+  notes=notes.sort(byTime).slice(-60);deleted=deleted.sort(byTime).slice(-200);
+  var changed=notes.concat(deleted).some(function(n){return next.get(n).time!==memoryTime(old.updated&&old.updated[n])});
+  if(!changed&&JSON.stringify(notes)===JSON.stringify(old.notes)&&JSON.stringify(deleted)===JSON.stringify(old.deleted))return old;
+  var sh=tab('記憶'),rev=old.memoryRevision+1,max=Math.max(sh.getLastRow()-1,notes.length,deleted.length);
+  var rows=[['記住的事','刪掉的記憶（別台裝置不會再加回來）',rev,'記住時間','刪除時間']];
+  for(var i=0;i<max;i++){
+    var note=notes[i],removed=deleted[i];
+    rows.push([cellText(note||''),cellText(removed||''),'',note?next.get(note).time:'',removed?next.get(removed).time:'']);
+  }
+  sh.getRange(1,1,rows.length,5).setValues(rows);
+  SpreadsheetApp.flush();
+  return readMemory();
+}
 function historyFolder(){
   var id=props().getProperty('HISTORY');
   if(id){try{var f=DriveApp.getFolderById(id);if(!f.isTrashed())return f}catch(e){}}
@@ -334,7 +429,15 @@ function archiveFolder(){
   props().setProperty('ARCHIVE',folder.getId());
   return folder;
 }
-function setupHistory(){historyFolder();archiveFolder()}
+function setupHistory(){
+  var lock=LockService.getScriptLock();lock.waitLock(20000);
+  try{
+    historyFolder();archiveFolder();
+    var saved=props().getProperty('TOKEN');
+    if(!saved){saved=Utilities.getUuid()+Utilities.getUuid();props().setProperty('TOKEN',saved)}
+    console.log('同步密鑰（請勿分享）：'+saved);
+  }finally{lock.releaseLock()}
+}
 function stampName(prefix,at){return prefix+'-'+Utilities.formatDate(new Date(at||Date.now()),Session.getScriptTimeZone(),'yyyy-MM-dd-HHmmss')+'.json'}
 function keepVersion(prefix,state,savedAt){
   var folder=historyFolder();
@@ -358,14 +461,19 @@ function readVersion(id){
   return {ok:true,state:String(d.state||''),savedAt:Number(d.savedAt)||0};
 }
 function doGet(e){
-  if(!allowed(e.parameter.token))return out({ok:false,error:'token'});
-  return out(e.parameter.type==='state'?readState():readMemory());
+  var lock=LockService.getScriptLock();lock.waitLock(20000);
+  try{
+    var denied=accessError(e.parameter.token);
+    if(denied)return out({ok:false,error:denied});
+    return out(e.parameter.type==='state'?readState():readMemory());
+  }finally{lock.releaseLock()}
 }
 function doPost(e){
   var d=JSON.parse((e.postData&&e.postData.contents)||'{}');
-  if(!allowed(d.token))return out({ok:false,error:'token'});
   var lock=LockService.getScriptLock();lock.waitLock(20000);
   try{
+    var denied=accessError(d.token);
+    if(denied)return out({ok:false,error:denied});
     var ss=book();
     if(d.type==='state-get')return out(readState());
     if(d.type==='memory-get')return out(readMemory());
@@ -378,19 +486,20 @@ function doPost(e){
       var sh=ss.getSheetByName('對話紀錄'),now=new Date();
       sh.getRange(sh.getLastRow()+1,1,d.rows.length,4).setValues(d.rows.map(function(r){return [now,String(d.source||''),String(r.role||''),String(r.text||'').slice(0,5000)]}));
     }
-    if(d.type==='memory'){setColumn('記憶','記住的事',d.notes);setColumn('已刪除的記憶','刪掉的記憶（別台裝置不會再加回來）',d.deleted)}
+    if(d.type==='memory')return out(mergeMemory(d));
     if(d.type==='state'&&typeof d.state==='string'){
       var old=readState();
-      if(typeof d.base==='number'&&old.savedAt>d.base)return out({ok:false,error:'stale',savedAt:old.savedAt});
+      if(typeof d.base!=='number'||old.savedAt!==d.base)return out({ok:false,error:'stale',savedAt:old.savedAt});
       // The copy about to be replaced goes into the history first (at most once an hour, always when asked). A chosen
       // overwrite whose copy could not be kept does not overwrite.
       var last=Number(props().getProperty('LAST_VERSION'))||0,kept=false;
       var want=old.state&&old.state!==d.state&&(d.snapshot===true||Date.now()-last>3600000);
       if(want){try{keepVersion('progress',old.state,old.savedAt);props().setProperty('LAST_VERSION',String(Date.now()));kept=true}catch(err){}}
       if(want&&!kept&&d.snapshot===true)return out({ok:false,error:'history'});
-      var written=false;try{written=writeState(d.state,Number(d.savedAt)||Date.now())}catch(err){written=false}
+      var savedAt=Math.max(Date.now(),old.savedAt+1);
+      var written=false;try{written=writeState(d.state,savedAt)}catch(err){written=false}
       if(!written)return out({ok:false,error:'write'});
-      return out({ok:true,state:true,history:true,kept:kept,url:ss.getUrl()});
+      return out({ok:true,state:true,history:true,kept:kept,savedAt:savedAt,url:ss.getUrl()});
     }
     return out({ok:true,url:ss.getUrl()});
   }finally{lock.releaseLock()}

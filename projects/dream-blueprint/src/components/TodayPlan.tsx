@@ -95,9 +95,10 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     : state.cards.length ? '今天沒有到期的卡，這一步不用做；想多做可以快篩幾個新字'
     : '第一天還沒有複習卡，這一步先跳過。今天學的字和句子，明天起會出現在這裡'
   // Word cards on 單字複習, sentence cards on 中翻英: two buttons when both are waiting.
+  const wordReview = to(energy === 'low' ? 'library/words/low' : 'library/words')
   const reviewGo: Pick<Task, 'go' | 'goLabel' | 'go2' | 'go2Label'> = shown.words
-    ? { go: to('library/words'), goLabel: '單字卡', ...(shown.sentences ? { go2: to('library/translate'), go2Label: '句子卡' } : {}) }
-    : shown.sentences ? { go: to('library/translate'), goLabel: '句子卡' } : reviewedToday ? { go: to('library/words') } : { go: to('library/screen'), goLabel: '快篩' }
+    ? { go: wordReview, goLabel: '單字卡', ...(shown.sentences ? { go2: to('library/translate'), go2Label: '句子卡' } : {}) }
+    : shown.sentences ? { go: to('library/translate'), goLabel: '句子卡' } : reviewedToday ? { go: wordReview } : { go: to('library/screen'), goLabel: '快篩' }
   const review: Task = { id: 'review', min: 0, title: '複習卡', detail: reviewDetail, auto: left === 0, ...reviewGo }
   const lesson: Task = topic ? { id: 'lesson', min: 0, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
       auto: false, go: () => onStart(energy), goLabel: topic.step > 0 ? '繼續' : '開始' }

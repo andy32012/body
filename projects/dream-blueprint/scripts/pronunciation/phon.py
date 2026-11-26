@@ -1,9 +1,10 @@
 """A second pair of ears for clips that are not words: an English phoneme recogniser (WavLM, CTC).
 It writes down the sounds it hears, so a single syllable can be checked without a dictionary word to compare with."""
-import json, os, numpy as np, onnxruntime as ort
+import os, numpy as np, onnxruntime as ort
+from course import read_json
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIR = os.environ.get('PRON_PHONES', os.path.join(HERE, 'phon'))
-_vocab = {v: k for k, v in json.load(open(os.path.join(DIR, 'vocab.json'))).items()}
+_vocab = {v: k for k, v in read_json(os.path.join(DIR, 'vocab.json')).items()}
 _opts = ort.SessionOptions(); _opts.intra_op_num_threads = int(os.environ.get('PRON_THREADS', '2'))
 _sess = ort.InferenceSession(os.path.join(DIR, 'model.onnx'), _opts, providers=['CPUExecutionProvider'])
 _inputs = [i.name for i in _sess.get_inputs()]

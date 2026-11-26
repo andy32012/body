@@ -1,5 +1,5 @@
 import bookPlan from '../data/writing-book.json'
-import { sectionDone } from './grammarBook'
+import { chapterReady, sectionDone, type BookIndex } from './grammarBook'
 import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
 import { openSteps, reached } from './unlock'
 import { unitPackOpen } from './bridge'
@@ -129,9 +129,9 @@ export function taskDone(r: WriteRecord | null, ielts: boolean) {
 export const selfChecked = (r: WriteRecord | null) => !!r && (r.self ?? 0) >= 1 && typeof r.best !== 'number'
 /** Continue from the furthest stage already practised or preserved during the upgrade, so added earlier steps do not
  *  send a returning learner back to the beginning. Pack stages are opened from their unit, never suggested. */
-export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>) {
+export function suggestedStage(stages: readonly WriteStage[], notes: Record<string, string>, draftedStages?: ReadonlySet<string>) {
   const ladder = stages.filter(s => !s.pack)
-  const from = Math.max(0, writingFrontier(ladder, notes))
+  const from = Math.max(0, writingFrontier(ladder, notes, draftedStages))
   for (const s of ladder.slice(from)) if (!stageComplete(s, notes)) return s.id
   return ladder.at(-1)?.id ?? ''
 }
@@ -295,11 +295,11 @@ function preservedWritingStages(stages: readonly WriteStage[], notes: Record<str
 export function migrateWritingProgress(stages: readonly WriteStage[], notes: Record<string, string>): Record<string, string> {
   return notes[writingMigrationKey] !== undefined ? notes : { ...notes, [writingMigrationKey]: JSON.stringify(preservedWritingStages(stages, notes)) }
 }
-function writingFrontier(ladder: readonly WriteStage[], notes: Record<string, string>) {
+function writingFrontier(ladder: readonly WriteStage[], notes: Record<string, string>, draftedStages?: ReadonlySet<string>) {
   const preserved = new Set(preservedWritingStages(ladder, notes))
   for (let i = ladder.length - 1; i >= 0; i--) {
     const s = ladder[i]
-    if (preserved.has(s.id) || s.tasks.some(t => readWrite(notes, t.id) !== null)) return i
+    if (preserved.has(s.id) || draftedStages?.has(s.id) || stageStarted(s, notes)) return i
   }
   return -1
 }
@@ -325,26 +325,31 @@ export function firstUndone(notes: Record<string, string>, chapter: number): str
 /** The ladder stages that use a chapter (the grammar page links to them). */
 export const stagesUsing = (chapter: number) => bookPlan.stages.filter(s => s.chapters.includes(chapter)).map(s => ({ id: s.stage, name: s.name }))
 /** The chapters of a stage still to learn, with how many sections each has left (empty: the grammar is done). */
-export function bookMissing(stageId: string, notes: Record<string, string>): { chapter: number; left: number }[] {
-  return stageChapters(stageId).map(chapter => ({ chapter, left: chapterLeft(notes, chapter) })).filter(c => c.left > 0)
+export function bookMissing(stageId: string, notes: Record<string, string>, index?: BookIndex): { chapter: number; left: number }[] {
+  return stageChapters(stageId).map(chapter => ({ chapter, left: chapterLeft(notes, chapter) }))
+    .filter(c => c.left > 0 || (index && !chapterReady(index, c.chapter)))
 }
 /** He has written at least one task of the stage. */
 export const stageStarted = (stage: WriteStage, notes: Record<string, string>) => stage.tasks.some(t => readWrite(notes, t.id) !== null)
 /** Which stages are open. A ladder stage: the one before passed (step by step) and the grammar it uses learned in 完整文法
  *  first — up to the furthest stage he already wrote in, nothing is locked again. A unit pack's stage: with the unit packs. */
-export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, string>, unit: number): Record<string, boolean> {
+export function stagesOpen(stages: readonly WriteStage[], notes: Record<string, string>, unit: number,
+  { index, draftedStages }: { index?: BookIndex; draftedStages?: ReadonlySet<string> } = {}): Record<string, boolean> {
   const ladder = stages.filter(s => !s.pack)
-  const frontier = writingFrontier(ladder, notes)
+  const frontier = writingFrontier(ladder, notes, draftedStages)
   const open = openSteps(ladder.map((s, i) => i < frontier || stageComplete(s, notes)))
-  // Everything up to the furthest stage he has written in stays as it was: the grammar lock never closes earlier work.
+  const preserved = new Set(preservedWritingStages(ladder, notes))
+  // Keep old unlocks and drafts usable without waiving grammar for newly inserted stages.
   const furthest = ladder.reduce((far, s, i) => stageStarted(s, notes) ? i : far, -1)
-  return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i] && (i <= furthest || !bookMissing(s.id, notes).length)]),
+  return Object.fromEntries([...ladder.map((s, i): [string, boolean] => [s.id, open[i] && (
+    i <= furthest || preserved.has(s.id) || draftedStages?.has(s.id) === true || bookMissing(s.id, notes, index).length === 0
+  )]),
     ...stages.filter(s => s.pack).map((s): [string, boolean] => [s.id, unitPackOpen(unit)])])
 }
 /** A bridge task opens with its unit; the ladder's tasks are open whenever their stage is. */
 export const writeTaskOpen = (task: Pick<WriteTask, 'unit'>, unit: number) => task.unit === undefined || reached(task.unit, unit)
 /** The task to go on to after `currentId` in the same stage: the next open one never tried, then the next one not passed
- *  yet (from the current one on, wrapping round); null when every open task of the stage is passed. */
+ *  yet (wrapping around); null when all the other open tasks have passed. */
 export function nextWritingTask(stage: WriteStage, currentId: string, notes: Record<string, string>, unit: number): WriteTask | null {
   const open = stage.tasks.filter(t => writeTaskOpen(t, unit))
   const at = open.findIndex(t => t.id === currentId)

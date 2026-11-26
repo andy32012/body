@@ -9,33 +9,51 @@ import MemoryPanel from '../components/MemoryPanel'
 import WeakPanel from '../components/WeakPanel'
 import { topWeak } from '../lib/weakPoints'
 import { useMemory } from '../lib/memory'
+import { wordKey } from '../lib/vocab'
 import quizBank from '../data/quiz.json'
 import './settings.css'
 
 type ImportedWord = { en: string; zh: string; level?: number }
 
+/** Pick a separator for each pasted record, keeping punctuation inside a definition and quoted cells intact. */
 function csvRows(text: string): string[][] {
   const rows: string[][] = []
-  let row: string[] = [], field = '', quoted = false
+  let parts: string[] = [], dividers: string[] = [], field = '', quoted = false
+  function finishRow() {
+    parts.push(field)
+    const spaceSeparated = /^[A-Za-z].*\s+[\u3400-\u9fff]/u.test(parts[0])
+    const separator = dividers.includes('\t') ? '\t' : spaceSeparated ? null : dividers[0]
+    const cells: string[] = []
+    let value = parts[0]
+    for (let i = 0; i < dividers.length; i++) {
+      if (dividers[i] === separator) {
+        cells.push(value.trim())
+        value = parts[i + 1]
+      } else value += dividers[i] + parts[i + 1]
+    }
+    cells.push(value.trim())
+    if (cells.some(Boolean)) rows.push(cells)
+    parts = []
+    dividers = []
+    field = ''
+  }
   for (let index = 0; index < text.length; index++) {
     const char = text[index]
     if (char === '"') {
       if (quoted && text[index + 1] === '"') { field += '"'; index++ }
       else quoted = !quoted
     } else if (!quoted && [',', '\t', '，'].includes(char)) {
-      row.push(field.trim())
+      parts.push(field)
+      dividers.push(char)
       field = ''
-    } else if (!quoted && char === '\n') {
-      row.push(field.trim())
-      rows.push(row)
-      row = []
-      field = ''
-    } else if (char !== '\r') field += char
+    } else if (!quoted && (char === '\n' || char === '\r')) {
+      finishRow()
+      if (char === '\r' && text[index + 1] === '\n') index++
+    } else field += char
   }
   if (quoted) throw new Error('有一格的引號尚未成對，請檢查單字表。')
-  row.push(field.trim())
-  rows.push(row)
-  return rows.filter(cells => cells.some(Boolean))
+  finishRow()
+  return rows
 }
 
 export function parseVocabulary(input: string): ImportedWord[] {
@@ -76,7 +94,7 @@ function Panel({ title, hint, icon: Icon, children }: { title: string; hint?: st
   </details>
 }
 
-import { exportBackup, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
+import { exportBackup, getSnapshot, importBackup, restoreBackup, replacePeriod, type AppState, type PageProps } from '../lib/store'
 import { archiveFolderUrl, cloudArchive, driveConnected } from '../lib/drive'
 import { dayKey, addDays, activePeriod } from '../lib/progress'
 import { noteMoved } from '../lib/wordStates'
@@ -108,11 +126,26 @@ export default function Settings(props: PageProps) {
   const [text, setText] = useState('')
   const [wordMode, setWordMode] = useState<'learn' | 'known'>('learn')
   const [backup, setBackup] = useState<AppState | null>(null)
+  const [restoring, setRestoring] = useState(false)
   const [result, setResult] = useState({area:'', msg:''})
   const announce = (area:string,msg:string) => setResult({area,msg})
   const status = (area:string) => result.area === area ? <p role="status" className="set-status">{result.msg}</p> : null
   const wordInput = useRef<HTMLInputElement>(null)
   const backupInput = useRef<HTMLInputElement>(null)
+
+  async function confirmRestore() {
+    if (!backup || restoring) return
+    setRestoring(true)
+    try {
+      const restored = await restoreBackup(exportBackup(backup),undefined,{expected:getSnapshot().state})
+      setWhy(restored.settings.why)
+      setReply(restored.settings.officeReply)
+      setBackup(null)
+      announce('backup','進度和設定已還原。')
+    } catch (error) {
+      announce('backup',error instanceof Error ? error.message : '還原失敗，請確認瀏覽器可以儲存資料後再試。')
+    } finally { setRestoring(false) }
+  }
 
   function savePeriod() {
     if (!start || !end || end < start) { announce('period', '請填入起訖日期，結束日要在開始日當天或之後。'); return }
@@ -129,14 +162,17 @@ export default function Settings(props: PageProps) {
           const key = w.en.toLowerCase(), old = dict.get(key)
           dict.set(key, {...old, ...w, zh:w.zh || old?.zh || ''})
         }
-        const inputKeys = parsed.map(w => w.en.toLowerCase())
-        const known = new Set(prev.knownWords.map(w => w.toLowerCase()))
-        if (wordMode === 'known') for (const key of inputKeys) known.add(key)
-        const learning = new Set(prev.learningWords.map(w => w.toLowerCase()))
-        if (wordMode === 'learn') for (const key of inputKeys) learning.add(key)
-        // Words moved from 還不熟 to 認得 are recorded, so merging with another device keeps them 認得.
-        const movedToKnown = wordMode === 'known' ? inputKeys.filter(key => learning.has(key)) : []
-        return {...prev, customWords:[...dict.values()], knownWords:[...known], learningWords:[...learning].filter(key=>!known.has(key)), notes:noteMoved(prev.notes, movedToKnown, 'k', dayKey())}
+        const inputKeys = new Set(parsed.map(w => wordKey(w.en)))
+        const known = new Set(prev.knownWords.map(wordKey))
+        const learning = new Set(prev.learningWords.map(wordKey))
+        const [selected, other] = wordMode === 'known' ? [known, learning] : [learning, known]
+        const moved: string[] = []
+        for (const key of inputKeys) {
+          if (other.delete(key)) moved.push(key)
+          selected.add(key)
+        }
+        return {...prev, customWords:[...dict.values()], knownWords:[...known], learningWords:[...learning],
+          notes:noteMoved(prev.notes, moved, wordMode === 'known' ? 'k' : 'l', dayKey())}
       })
       setText('')
       announce('words', '已匯入 ' + parsed.length + ' 個單字，重複的單字已合併。')
@@ -166,7 +202,7 @@ export default function Settings(props: PageProps) {
   return <section className="settings-page" aria-label="設定">
     <header className="set-hero">
       <div className="set-hero-copy">
-        <h1>設定</h1>
+        <h1 id="settings-heading" tabIndex={-1}>設定</h1>
         <div className="set-appearance" role="group" aria-label="外觀">
           <button type="button" aria-pressed={s.theme === 'dark'} onClick={()=>set('theme','dark')}><Moon size={16} aria-hidden="true" />深色</button>
           <button type="button" aria-pressed={s.theme === 'light'} onClick={()=>set('theme','light')}><Sun size={16} aria-hidden="true" />淺色</button>
@@ -218,7 +254,7 @@ export default function Settings(props: PageProps) {
     <Panel icon={Bot} title="交給其他 AI" hint="複製進度和教法，讓別的 AI 接著教">
       <AIHandoff state={state} update={update} />
     </Panel>
-    <Panel icon={GraduationCap} title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings regularDays={s.regularDays} school={state.school} onChange={school=>update(prev=>({...prev,school}))}/></Panel>
+    <Panel icon={GraduationCap} title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings regularDays={s.regularDays} school={state.school} onChange={edit=>update(prev=>({...prev,school:edit(prev.school)}))}/></Panel>
     </section>
     <section className="set-group set-data" aria-labelledby="set-data-heading">
       <h2 id="set-data-heading">單字與資料</h2>
@@ -238,9 +274,9 @@ export default function Settings(props: PageProps) {
         :driveConnected()?'舊紀錄會先留在這台，等雲端小程式更新到最新的 v5（v4 以上都可以），就會先存進雲端硬碟再從這台整理掉（步驟在上面「雲端硬碟」那一區）。'
         :'兩個月以前的複習紀錄會整理成統計，每天的小紀錄幾週後清掉，所以會一直維持在安全範圍。連上雲端硬碟的話，整理掉之前會先存一份到雲端。'}{mb>3.5?' 現在偏大了，請跟 Claude 說要把進度改存到 IndexedDB。':''}</p>})()}
       <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void readFile(e.target.files?.[0],'backup');e.target.value=''}}/>
-      <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
+      <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" disabled={restoring} onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
       {backup && <div className="set-restore"><b>用這份備份取代目前進度？</b><p>還原會包含原本的課表、學習紀錄和設定。</p>
-        <div className="set-actions"><button type="button" onClick={()=>{restoreBackup(exportBackup(backup));setWhy(backup.settings.why);setReply(backup.settings.officeReply);setBackup(null);announce('backup','進度和設定已還原。')}}>確認還原</button><button type="button" onClick={()=>{setBackup(null); announce('backup','已保留目前進度。')}}>取消</button></div></div>}{status('backup')}
+        <div className="set-actions"><button type="button" disabled={restoring} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button><button type="button" disabled={restoring} onClick={()=>{setBackup(null); announce('backup','已保留目前進度。')}}>取消</button></div></div>}{status('backup')}
     </Panel>
     </section>
     <section className="set-group set-preferences" aria-labelledby="set-preferences-heading">

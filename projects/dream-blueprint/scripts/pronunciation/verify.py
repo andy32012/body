@@ -22,7 +22,8 @@ for l in lessons:
         for it in l['items']: want[it['text']] = 'rise' if it['label'] == '↗' else 'fall'
         for q in l['quiz']: want[q['audio']] = 'rise' if q['options'][q['answer']].startswith('上升') else 'fall'
     for g in 'fm':
-        raw = open(os.path.join(src, f"{l['id']}-{g}.pack"), 'rb').read()
+        with open(os.path.join(src, f"{l['id']}-{g}.pack"), 'rb') as pack:
+            raw = pack.read()
         size = struct.unpack('<I', raw[:4])[0]
         index = json.loads(raw[4:4 + size])
         texts = lesson_texts(l)
@@ -43,9 +44,11 @@ for l in lessons:
             if t in want:
                 move = final_move(x, sr, g)
                 right = move is not None and (move >= 2.5 if want[t] == 'rise' else move <= -1.2)
-                note = f" pitch {move:+.1f} st, should {want[t]}"
+                pitch = 'not measured' if move is None else f'{move:+.1f} st'
+                note = f" pitch {pitch}, should {want[t]}"
                 if not right: r['grade'] = 'bad'
             if r['grade'] != 'strict': bad.append(f"{l['id']}-{g} {t!r}: {r['grade']} {r.get('rivals') or r.get('heard')}{note}")
     print(l['id'], 'checked;', total, 'clips so far,', len(bad), 'not clear', flush=True)
 print(f'{total} clips, {secs / 60:.1f} minutes of sound, {len(bad)} not clear ({pieces} of the clips are syllables of long words: present, not graded)')
 for b in bad: print(' -', b)
+sys.exit(1 if bad else 0)

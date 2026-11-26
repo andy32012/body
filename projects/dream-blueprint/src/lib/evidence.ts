@@ -1,3 +1,5 @@
+import { legacyRecordId } from './recordId'
+
 /** What a piece of work shows about a unit's goal. Finishing with help, doing it alone once,
  *  and still doing it later with a new item are different things, and are kept apart.
  *  A self-marked "correct" that no one checked stays 「自評完成・待確認」 instead of counting either way. */
@@ -13,6 +15,13 @@ export const sourceNames: Record<Source, string> = {
 export interface Evidence {
   day: string; level: Level; source: Source; skill: 'write' | 'listen'
   item?: string; hints?: number
+  /** One submission, retained after the teacher's reply removes its original text. */
+  attemptId?: string
+  reviewedAt?: number
+  /** The overall record and its sentences share the ID of the checkpoint they belong to. */
+  checkpointId?: string
+  /** The checkpoint's per-sentence levels. Only the overall record counts toward the unit result. */
+  checkpointItems?: Record<string, Level | null>
   /** Kept only for 待確認, so the answer can be checked later. */
   answer?: string; prompt?: string; ref?: string
   /** Claude checked it and said it is wrong (the reason): it is not done until he rewrites it right. */
@@ -24,16 +33,68 @@ export type Verdict = 'good' | 'small' | 'again' | 'changed'
 export const evidenceKey = (unit: number) => 'evidence.' + unit
 
 export function readEvidence(notes: Record<string, string>, unit: number): Evidence[] {
-  try { return notes[evidenceKey(unit)] ? JSON.parse(notes[evidenceKey(unit)]) as Evidence[] : [] } catch { return [] }
+  try {
+    const list: unknown = JSON.parse(notes[evidenceKey(unit)] ?? '[]')
+    const entries = Array.isArray(list) ? list.filter((e): e is Evidence => !!e && typeof e.day === 'string'
+      && typeof e.level === 'string' && Object.hasOwn(rank, e.level) && typeof e.source === 'string'
+      && Object.hasOwn(sourceNames, e.source)) : []
+    // Older pending work has its text. Derive the same ID on both devices so its first check can sync.
+    return mergeEvidenceRecords([], entries.map(e => !e.attemptId && typeof e.answer === 'string'
+      ? { ...e, attemptId: legacyRecordId(JSON.stringify([e.day, e.source, e.item, e.answer])) }
+      : e))
+  } catch { return [] }
+}
+export const newEvidenceId = () => globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + Math.random().toString(36).slice(2)
+
+/** A check changes the same sample; two independently written answers to the same question keep their own IDs. */
+function evidenceId(e: Evidence) {
+  return e.attemptId ? 'id:' + e.attemptId : JSON.stringify([e.day, e.source, e.item])
+}
+const checkpointSlot = (e: Evidence, item?: string) => JSON.stringify([e.checkpointId ?? e.day, item])
+
+function preferEvidence(previous: Evidence | undefined, next: Evidence) {
+  if (!previous) return true
+  const olderCheck = previous.reviewedAt ?? 0, newerCheck = next.reviewedAt ?? 0
+  if (olderCheck !== newerCheck) return newerCheck > olderCheck
+  return rank[next.level] > rank[previous.level] ||
+    (next.level === previous.level && (!!next.wrong || !previous.wrong))
+}
+
+/** An appraisal can replace a self-mark on another copy of the same exercise. Independent exercises stay separate. */
+export function mergeEvidenceRecords(older: Evidence[], newer: Evidence[]) {
+  const evidence = new Map<string, Evidence>()
+  for (const item of [...older, ...newer]) {
+    const id = evidenceId(item)
+    if (preferEvidence(evidence.get(id), item)) evidence.set(id, item)
+  }
+  const checked = new Map<string, Evidence>()
+  for (const entry of evidence.values()) {
+    if (entry.source !== 'checkpoint' || !entry.item) continue
+    const slot = checkpointSlot(entry, entry.item)
+    if (preferEvidence(checked.get(slot), entry)) checked.set(slot, entry)
+  }
+  return [...evidence.values()].map(overall => {
+    if (overall.source !== 'checkpoint' || overall.item || !overall.checkpointItems) return overall
+    const checklist = { ...overall.checkpointItems }
+    for (const question of Object.keys(checklist)) {
+      const reviewed = checked.get(checkpointSlot(overall, question))
+      if (reviewed) checklist[question] = reviewed.wrong ? null : reviewed.level
+    }
+    const level = judgeCheckpoint(Object.values(checklist))
+    return { ...overall, checkpointItems: checklist, level: level ?? 'pending',
+      wrong: level ? undefined : '還沒有足夠確認的作答' }
+  })
 }
 export function addEvidence(notes: Record<string, string>, unit: number, ev: Evidence) {
-  const list = readEvidence(notes, unit).filter(e => !(e.day === ev.day && e.source === ev.source && e.item === ev.item))
-  return { ...notes, [evidenceKey(unit)]: JSON.stringify([...list, ev].slice(-40)) }
+  const entry = { ...ev, attemptId: ev.attemptId ?? newEvidenceId() }
+  const list = mergeEvidenceRecords(readEvidence(notes, unit), [entry])
+  return { ...notes, [evidenceKey(unit)]: JSON.stringify(list.slice(-40)) }
 }
 export function setEvidenceLevel(notes: Record<string, string>, unit: number, index: number, level: Level) {
   const list = readEvidence(notes, unit)
   if (!list[index]) return notes
-  list[index] = { ...list[index], level, answer: undefined, prompt: undefined, ref: undefined }
+  list[index] = { ...list[index], level, answer: undefined, prompt: undefined, ref: undefined, wrong: undefined,
+    reviewedAt: Math.max(Date.now(), (list[index].reviewedAt ?? 0) + 1) }
   return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }
 /** How Claude's check of a 待確認 answer reads: a 「判定：對」 or 「判定：錯」 line and a 「原因：」 line that says why.
@@ -45,8 +106,8 @@ export function teacherVerdict(reply: string): 'right' | 'wrong' | 'unclear' {
 /** The 原因 line of Claude's check. */
 export const teacherReason = (reply: string) => reply.match(/^\s*原因[：:]\s*(.+)$/m)?.[1].trim() ?? ''
 /** Which 待確認 answer a check was sent for: the item and the exact answer, so a reply never lands on another one. */
-export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer'>
-export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.source, item: e.item, answer: e.answer })
+export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer' | 'attemptId'>
+export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.source, item: e.item, answer: e.answer, attemptId: e.attemptId })
 /** A 待確認 answer after Claude's check. Right the first time → done alone; right after a rewrite (it was wrong before)
  *  → done with help. Wrong → still not done, with the reason, the question and his answer kept so he can rewrite it.
  *  Unclear → nothing changes. The check lands on the answer it was sent for, found by its item and answer (the list may
@@ -54,22 +115,25 @@ export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.
 export function checkPending(notes: Record<string, string>, unit: number, ref: PendingRef, reply: string, rewrite?: string) {
   const verdict = teacherVerdict(reply)
   const list = readEvidence(notes, unit)
-  const index = list.findIndex(e => e.level === 'pending' && e.day === ref.day && e.source === ref.source && e.item === ref.item && e.answer === ref.answer)
+  const index = list.findIndex(e => e.level === 'pending' && e.answer === ref.answer &&
+    (ref.attemptId ? e.attemptId === ref.attemptId : e.day === ref.day && e.source === ref.source && e.item === ref.item))
   const e = list[index]
   if (!e || verdict === 'unclear') return notes
+  const reviewedAt = Math.max(Date.now(), (e.reviewedAt ?? 0) + 1)
   if (verdict === 'right') {
-    list[index] = { ...e, level: e.wrong || rewrite !== undefined ? 'assisted' : 'independent', answer: undefined, prompt: undefined, ref: undefined, wrong: undefined }
+    list[index] = { ...e, level: e.wrong || rewrite !== undefined ? 'assisted' : 'independent', answer: undefined, prompt: undefined, ref: undefined, wrong: undefined, reviewedAt }
   } else {
-    list[index] = { ...e, level: 'pending', wrong: teacherReason(reply) || '還要再改', ...(rewrite !== undefined ? { answer: rewrite } : {}) }
+    list[index] = { ...e, level: 'pending', wrong: teacherReason(reply) || '還要再改', reviewedAt,
+      ...(rewrite !== undefined ? { answer: rewrite } : {}) }
   }
-  return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
+  return { ...notes, [evidenceKey(unit)]: JSON.stringify(mergeEvidenceRecords([], list)) }
 }
 export function unitsWithEvidence(notes: Record<string, string>) {
   return Object.keys(notes).filter(k => k.startsWith('evidence.')).map(k => Number(k.slice(9))).filter(n => n > 0).sort((a, b) => a - b)
 }
 export function bestLevel(list: readonly Evidence[], skill: 'write' | 'listen' = 'write'): Level | null {
   // An answer Claude said is wrong shows nothing yet, not even 自評完成.
-  const own = list.filter(e => e.skill === skill && !e.wrong)
+  const own = list.filter(e => e.skill === skill && !e.wrong && (e.source !== 'checkpoint' || !e.item))
   return own.length ? own.reduce((a, e) => rank[e.level] > rank[a] ? e.level : a, own[0].level) : null
 }
 
@@ -79,9 +143,9 @@ const contractions: [RegExp, string][] = [
   [/\bcan't\b/g, 'cannot'], [/\bwon't\b/g, 'will not'], [/\b(\w+)n't\b/g, '$1 not'],
   [/\b(i|you|we|they|he|she|it|there|that)'ll\b/g, '$1 will'], [/\b(i|you|we|they|who|there)'ve\b/g, '$1 have'], [/\bcan not\b/g, 'cannot'],
 ]
-// 's can be is or has, 'd can be would or had. A reference is read by the word after it; an answer may mean either.
-const sSubject = /\b(it|that|he|she|there|what|where|who|here)'s\b/g
-const dSubject = /\b(i|you|we|they|he|she|it|there)'d\b/g
+// Keep attached single quotes when expanding 's and 'd. Possessives like "the nurse's" stay as written.
+const sSubject = /^('*(?:it|that|he|she|there|what|where|who|here))'s('*)$/
+const dSubject = /^('*(?:i|you|we|they|he|she|it|there))'d('*)$/
 const adverbs = new Set(['never', 'already', 'just', 'ever', 'always', 'not', 'also', 'really', 'still', 'recently', 'often'])
 const participles = new Set(['been', 'gone', 'done', 'seen', 'eaten', 'taken', 'given', 'had', 'made', 'written', 'known', 'got', 'gotten', 'come',
   'become', 'begun', 'broken', 'chosen', 'driven', 'fallen', 'forgotten', 'flown', 'grown', 'hidden', 'left', 'lost', 'met', 'paid', 'put',
@@ -93,44 +157,55 @@ const adjectives = new Set(['tired', 'worried', 'married', 'excited', 'bored', '
   'confused', 'embarrassed', 'disappointed', 'relaxed', 'shocked', 'frightened', 'injured', 'retired', 'located', 'allowed', 'supposed',
   'used', 'required', 'dressed', 'prepared', 'stressed', 'annoyed', 'amazed', 'exhausted', 'qualified', 'related', 'closed', 'crowded',
   'delayed', 'discharged', 'admitted', 'scheduled', 'covered', 'involved', 'concerned', 'dehydrated', 'infected', 'swollen', 'broken'])
-function nextVerb(rest: string) {
-  const words = rest.trim().split(/\s+/)
-  return words.find(w => !adverbs.has(w)) ?? ''
-}
 const isParticiple = (w: string) => !adjectives.has(w) && (participles.has(w) || /ed$/.test(w))
 function base(t: string) {
   let s = t.toLowerCase().replace(/[’‘]/g, "'").normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   for (const [re, to] of contractions) s = s.replace(re, to)
   return s
 }
-const clean = (s: string) => s.replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim()
-/** One reading of a reference: 's / 'd expanded by the word that follows (He's lived → has, He's tired → is, I'd like → would). */
-function referenceForm(t: string) {
-  const s = clean(base(t))
-  return s.replace(sSubject, (_m, who: string, off: number) => who + (isParticiple(nextVerb(s.slice(off + _m.length))) ? ' has' : ' is'))
-    .replace(dSubject, (_m, who: string, off: number, all: string) => {
-      const next = nextVerb(all.slice(off + _m.length))
-      return who + (next === 'better' || isParticiple(next) ? ' had' : ' would')
-    })
-}
-/** Every reading of an answer: a learner's contraction is right if either expansion matches. */
-function answerForms(t: string): string[] {
-  let forms = [clean(base(t))]
-  for (const [re, tos] of [[sSubject, ['is', 'has']], [dSubject, ['would', 'had']]] as const) {
-    forms = forms.flatMap(f => {
-      const parts: string[] = []; const whos: string[] = []; let last = 0
-      f.replace(re, (m: string, who: string, off: number) => { parts.push(f.slice(last, off)); whos.push(who); last = off + m.length; return m })
-      if (!whos.length) return [f]
-      let out = ['']
-      whos.forEach((who, i) => { out = out.flatMap(o => tos.map(to => o + parts[i] + who + ' ' + to)) })
-      return out.map(o => o + f.slice(last))
-    }).slice(0, 16)
+/** A contraction occupies the same two word positions in either reading. Store the alternate verb at its position
+ *  so comparison can try it directly. Commas use these same positions, after every contraction has been expanded. */
+function englishForm(text: string) {
+  const tokens = base(text).match(/[a-z0-9']+|,/g) ?? []
+  const following = new Array<string>(tokens.length)
+  let next = ''
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    following[i] = next
+    if (tokens[i] !== ',' && !adverbs.has(tokens[i])) next = tokens[i]
   }
-  return [...new Set(forms)]
+  const words: string[] = []
+  const alternateVerbs = new Map<number, string>()
+  const commas: number[] = []
+  for (const [i, token] of tokens.entries()) {
+    if (token === ',') {
+      commas.push(words.length)
+      continue
+    }
+    const shortS = token.match(sSubject)
+    const contraction = shortS ?? token.match(dSubject)
+    if (!contraction) {
+      words.push(token)
+      continue
+    }
+    const [first, second] = shortS ? ['is', 'has'] : ['would', 'had']
+    const inferred = isParticiple(following[i]) || (!shortS && following[i] === 'better')
+    const [, subject, quotes] = contraction
+    alternateVerbs.set(words.length + 1, (inferred ? first : second) + quotes)
+    words.push(subject, (inferred ? second : first) + quotes)
+  }
+  return { words, alternateVerbs, commas }
 }
+type EnglishForm = ReturnType<typeof englishForm>
+
+function wordMatches(answer: EnglishForm, position: number, reference: string) {
+  return answer.words[position] === reference || answer.alternateVerbs.get(position) === reference
+}
+const wordsMatch = (ref: EnglishForm, answer: EnglishForm) =>
+  ref.words.length === answer.words.length && ref.words.every((word, i) => wordMatches(answer, i, word))
+
 /** The form used to compare and show word differences. */
 export function normalizeEnglish(t: string) {
-  return referenceForm(t)
+  return englishForm(t).words.join(' ')
 }
 /** Whether an answer is still the text that was checked (by Claude, or before the answer was shown). Case, spacing,
  *  curly quotes, contractions and how a statement ends (. or !) may differ; every other mark counts: taking the commas
@@ -140,43 +215,38 @@ const checkedForm = (t: string) => base(t).replace(/\s+/g, ' ').replace(/\s+([,.
 export const sameEnglish = (a: string, b: string) => checkedForm(a) === checkedForm(b)
 export function matchesReference(answer: string, refs: readonly string[]) {
   if (!answer.trim()) return false
-  const forms = new Set(answerForms(answer))
-  return refs.some(r => forms.has(referenceForm(r)) && clauseCommasMissing(r, answer).length === 0)
+  return referenceMatches(answer, refs).some(missing => missing.length === 0)
 }
 
-/** Where commas fall, counted in words (after contractions are expanded): "my sister, who…" → a comma after word 2. */
-function commaPlaces(t: string) {
-  const tokens = base(t).replace(/[^a-z0-9', ]+/g, ' ').replace(/,/g, ' , ').split(/\s+/).filter(Boolean)
-  const places: { at: number; next: string }[] = []
-  let words = 0
-  tokens.forEach((x, i) => { if (x === ',') places.push({ at: words, next: tokens[i + 1] ?? '' }); else words++ })
-  return places
-}
 const relativeWords = new Set(['who', 'whom', 'which', 'whose', 'where'])
 /** The commas of a non-restrictive clause in a reference (", who is a nurse," / ", which made…") that the answer leaves
  *  out. Without them it is a different sentence (all my sisters vs the one sister), so the words alone are not enough.
  *  Each is "before" (the comma before who / which) or "after" (the one closing the clause). */
 export function clauseCommasMissing(ref: string, answer: string): ('before' | 'after')[] {
-  const r = commaPlaces(ref)
-  if (!r.some(c => relativeWords.has(c.next))) return []
-  const a = new Set(commaPlaces(answer).map(c => c.at))
+  return missingCommas(englishForm(ref), englishForm(answer))
+}
+function missingCommas(ref: EnglishForm, answer: EnglishForm): ('before' | 'after')[] {
+  const present = new Set(answer.commas)
   const missing: ('before' | 'after')[] = []
-  r.forEach((c, i) => {
-    if (!relativeWords.has(c.next)) return
-    if (!a.has(c.at)) missing.push('before')
+  ref.commas.forEach((at, i) => {
+    if (!relativeWords.has(ref.words[at])) return
+    if (!present.has(at)) missing.push('before')
     // The clause closes at the next comma, if the sentence goes on after it.
-    const close = r[i + 1]
-    if (close && !relativeWords.has(close.next) && !a.has(close.at)) missing.push('after')
+    const close = ref.commas[i + 1]
+    if (close !== undefined && !relativeWords.has(ref.words[close]) && !present.has(close)) missing.push('after')
   })
   return missing
+}
+function referenceMatches(answer: string, refs: readonly string[]) {
+  const form = englishForm(answer)
+  return refs.map(englishForm).filter(ref => wordsMatch(ref, form)).map(ref => missingCommas(ref, form))
 }
 /** Said when the words match a reference but the clause commas do not, so he knows why it is not counted as right. */
 export function clauseCommaNote(answer: string, refs: readonly string[]): string | null {
   if (!answer.trim()) return null
-  const forms = new Set(answerForms(answer))
-  const same = refs.filter(r => forms.has(referenceForm(r)))
-  if (!same.length || same.some(r => clauseCommasMissing(r, answer).length === 0)) return null
-  const missing = clauseCommasMissing(same[0], answer)
+  const matching = referenceMatches(answer, refs)
+  if (!matching.length || matching.some(missing => missing.length === 0)) return null
+  const [missing] = matching
   const where = missing.includes('before') && missing.includes('after') ? '前後兩個逗號'
     : missing.includes('before') ? 'who／which／whose／where 前面的逗號' : '補充說明結束的那個逗號'
   return '字都對，但少了' + where + '：補充說明（非限定關係子句）要用逗號隔開，拿掉逗號意思就變了（例如 my sister who is a nurse 聽起來像你有好幾個姊姊）。'
@@ -186,24 +256,31 @@ export function clauseCommaNote(answer: string, refs: readonly string[]): string
  *  `extra` words are not in that reference, `missing` are reference words the answer does not have.
  *  A different wording can still be right — this only points at where to look. */
 export function compareWithReference(answer: string, refs: readonly string[]) {
-  const a = normalizeEnglish(answer).split(' ').filter(Boolean)
-  let best: { ref: string; extra: Set<number>; missing: string[]; score: number } | null = null
+  const form = englishForm(answer)
+  const a = form.words
+  let best: { ref: string; words: { w: string; extra: boolean }[]; missing: string[]; score: number } | null = null
   for (const ref of refs) {
-    const r = normalizeEnglish(ref).split(' ').filter(Boolean)
+    const reference = englishForm(ref)
+    const r = reference.words
+    if (wordsMatch(reference, form)) return { ref, words: r.map(w => ({ w, extra: false })), missing: [], same: true }
     // Longest common subsequence of words.
     const dp = Array.from({ length: a.length + 1 }, () => new Array<number>(r.length + 1).fill(0))
     for (let i = a.length - 1; i >= 0; i--) for (let j = r.length - 1; j >= 0; j--)
-      dp[i][j] = a[i] === r[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
-    const keepA = new Set<number>(), keepR = new Set<number>()
+      dp[i][j] = wordMatches(form, i, r[j]) ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
+    const keepA = new Map<number, string>(), keepR = new Set<number>()
     for (let i = 0, j = 0; i < a.length && j < r.length;) {
-      if (a[i] === r[j]) { keepA.add(i); keepR.add(j); i++; j++ } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++
+      if (wordMatches(form, i, r[j])) { keepA.set(i, r[j]); keepR.add(j); i++; j++ }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) i++
+      else j++
     }
-    const extra = new Set(a.map((_, i) => i).filter(i => !keepA.has(i)))
     const missing = r.filter((_, j) => !keepR.has(j))
-    const score = extra.size + missing.length
-    if (!best || score < best.score) best = { ref, extra, missing, score }
+    const score = a.length - keepA.size + missing.length
+    if (!best || score < best.score) {
+      const words = a.map((word, i) => ({ w: keepA.get(i) ?? word, extra: !keepA.has(i) }))
+      best = { ref, words, missing, score }
+    }
   }
-  return best ? { ref: best.ref, words: a.map((w, i) => ({ w, extra: best!.extra.has(i) })), missing: best.missing, same: best.score === 0 } : null
+  return best ? { ref: best.ref, words: best.words, missing: best.missing, same: false } : null
 }
 
 /** Nothing written is 「未作答」: it leaves no evidence, whichever button was pressed. */

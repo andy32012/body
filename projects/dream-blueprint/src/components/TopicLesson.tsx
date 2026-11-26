@@ -510,7 +510,8 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
   const [met, setMet] = useState<boolean[]>(() => task.conditions.map(() => false))
   const [run, setRun] = useState(0)
   const [result, setResult] = useState<Result>()
-  const [done, setDone] = useState<SpeakRecord | null>(null)
+  const [submitted, setSubmitted] = useState<SpeakRecord | null>(null)
+  const done = submitted ?? (part === 'C' ? rec.review?.speak : rec.speak)
   const ready = useReady()
   useTaskContext({
     label: '口說：' + task.situation,
@@ -556,7 +557,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     if (part === 'C') save(r => ({ review: { level: r.review?.level ?? null, speak: record } }))
     else save({ speak: record })
     clearDraft(draftKey)
-    setDone(record)
+    setSubmitted(record)
   }
   if (done) return <section className="tl-speak-done">
     <div className="pr-label">說 · 這次的紀錄</div>

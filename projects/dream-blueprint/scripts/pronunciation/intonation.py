@@ -6,9 +6,9 @@ The synthesiser lets its voice fall at the end of almost everything, yes/no ques
 Every result is measured again (pitch at the end, harmonics-to-noise ratio, and the words as the recogniser hears them).
 Writes the takes into out/<f|m>.json and the choices into intonation.json.
 usage: intonation.py <lesson id>"""
-import json, os, sys
+import os, sys
 import numpy as np, soundfile as sf
-from course import parse, clips, slug, HERE
+from course import parse, clips, slug, HERE, read_json, write_json
 from lib import phonemes, tts, shape, check
 from pitchwork import final_move, first_clause, rising_end, harmonicity
 
@@ -65,10 +65,10 @@ def rising(c, ph, g):
 lesson = next(l for l in parse() if l['id'] == LESSON)
 all_clips = clips(parse())
 choice_path = os.path.join(HERE, 'intonation.json')
-choice = json.load(open(choice_path)) if os.path.exists(choice_path) else {}
+choice = read_json(choice_path) if os.path.exists(choice_path) else {}
 for g in 'fm':
     log_path = os.path.join(HERE, 'out', g + '.json')
-    takes = json.load(open(log_path))
+    takes = read_json(log_path)
     for text, want in expected(lesson).items():
         s = slug(text)
         c = all_clips[s]
@@ -83,6 +83,6 @@ for g in 'fm':
         sf.write(os.path.join(folder, s + '.wav'), x, sr, subtype='PCM_16')
         takes.setdefault(s, {})[voice] = {'text': text, 'phonemes': ph, 'others': c['others'], 'speed': speed, 'secs': round(len(x) / sr, 2), **res, 'pitch': pitch}
         choice.setdefault(g, {})[s] = voice
-        json.dump(takes, open(log_path, 'w'), ensure_ascii=False, indent=1)
-        json.dump(choice, open(choice_path, 'w'), ensure_ascii=False, indent=1)
+        write_json(log_path, takes)
+        write_json(choice_path, choice)
         print(f'{g} ok {voice} {speed} | {text!r} | {pitch} | tried {len(seen)}', flush=True)
