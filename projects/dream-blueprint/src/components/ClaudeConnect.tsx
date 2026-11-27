@@ -87,14 +87,21 @@ export default function ClaudeConnect() {
       if (!sameCredentials(current, actual)) { refresh(current); return }
       setStatus(message)
     }
+    const deadline = window.setTimeout(() => {
+      if (probe.current !== controller) return
+      controller.abort()
+      finish('金鑰已儲存。等候 Claude 回覆逾時，請再按一次「儲存並測試」。')
+    }, 30_000)
     try {
       const reply = await askTutor('只回一個字：好', [{ role: 'user', content: '測試' }], controller.signal)
-      // Connected means Claude really wrote something back: an empty reply is a failed test, not 連接成功.
-      finish(reply.trim() ? '連接成功。之後中翻英、寫作和短文都可以按「請 Claude 批改」，照官方評分表給分。'
-        : '金鑰收到了，但 Claude 這次沒有回任何文字，還不算連接成功。等一下再按一次「儲存並測試」；一直這樣的話換一個模型試試。')
+      const answered = /^好[。.!！]?$/.test(reply.trim())
+      finish(answered ? '連接成功。之後中翻英、寫作和短文都可以按「請 Claude 批改」，照官方評分表給分。'
+        : '金鑰已儲存。Claude 回覆與驗證要求不符，無法確認連接成功。請再按一次「儲存並測試」。')
     } catch (e) {
       const message = e instanceof Error ? e.message : '連線失敗，請再試一次。'
-      finish(message.split(actual.key).join('…'))
+      finish('金鑰已儲存，尚未通過連線驗證。' + message.split(actual.key).join('…'))
+    } finally {
+      window.clearTimeout(deadline)
     }
   }
   return <>

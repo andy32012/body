@@ -1,7 +1,7 @@
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Mic, Square, Volume2 } from 'lucide-react'
 import { engineNames, listen, listenEngine, type Listening } from '../lib/speech'
-import { compareReading, missedWords, type ReadResult } from '../lib/readAloud'
+import { compareReading, hasReadingWords, missedWords, type ReadResult } from '../lib/readAloud'
 import { speakEnglish, stopSpeaking } from '../lib/tts'
 import { AudioActivityContext } from '../lib/audioActivity'
 import './read-aloud.css'
@@ -66,13 +66,14 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
       if (release) void s.captured.then(release)
       session.current = s
       setPhase('listening')
-      const words = await s.done
+      const transcript = await s.done
       if (controller.signal.aborted) return
       const secs = Math.round(s.durationMs / 1000)
+      const words = hasReadingWords(transcript) ? transcript.trim() : ''
       const r = compareReading(text, words)
       setHeard(words); setResult(r); setSeconds(secs); setPhase('done')
       // Silence leaves the question available for another recording.
-      if (words.trim()) onResult?.(r, words, secs)
+      if (words) onResult?.(r, words, secs)
     } catch (e) {
       if (!controller.signal.aborted) {
         setError(e instanceof Error ? e.message : String(e))
@@ -110,7 +111,7 @@ export default function ReadAloudCheck({ text, rate = 0.9, maxMs = 120000, hideT
     {phase === 'working' && <small className="ra-live">比對中……</small>}
     {error && <p className="ra-error" role="alert">{error}</p>}
     {result && phase !== 'listening' && <div className="ra-result" role="status">
-      {!heard ? <p>沒有聽到聲音。靠近麥克風一點，再念一次。</p> : <>
+      {!heard ? <p>沒有辨識到可比對的文字。靠近麥克風一點，再念一次。</p> : <>
         <p className="ra-text" lang="en">{result.marks.map((m, i) => m.word ? <span key={i} className={m.heard ? 'ok' : 'miss'}>{m.text}</span> : <span key={i}>{m.text}</span>)}</p>
         <p className="ra-sum">聽出 {result.heard} / {result.total} 個字{seconds ? ' · ' + seconds + ' 秒' : ''}{result.ratio >= 0.95 ? '，很清楚' : ''}</p>
         {missed.length > 0 && <div className="ra-missed">

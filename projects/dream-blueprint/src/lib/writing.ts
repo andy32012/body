@@ -1,41 +1,52 @@
 import bookPlan from '../data/writing-book.json'
 import { isTimeSeries } from './chart'
 import { chapterReady, sectionDone, type BookIndex } from './grammarBook'
-import { ieltsOverall, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
+import { ieltsOverall, ieltsShortLimit, rubricPrompt, rubrics, validRubricScore, type Rubric, type RubricId } from './rubrics'
 import { openSteps, reached } from './unlock'
 import { unitPackOpen } from './bridge'
 
-/** A Task 1 picture: numbers over time or across groups (a line or bars), a table with several columns, or the steps of a
- *  process in order. */
+/** A Task 1 picture can show numbers, process steps or a pair of layouts. */
 export interface PointChart { title: string; points: { label: string; value: number }[] }
 export interface TableChart { kind: 'table'; title: string; columns: string[]; rows: { label: string; values: number[] }[] }
-export interface ProcessChart { kind: 'process'; title: string; steps: string[] }
-export type WriteChart = PointChart | TableChart | ProcessChart
+export interface ProcessChart { kind: 'process'; title: string; steps: string[]; cycle?: boolean }
+type LayoutRow = [string, string, string]
+type LayoutPanel = { label: string; rows: [LayoutRow, LayoutRow, LayoutRow] }
+export interface LayoutChart { kind: 'layout'; title: string; panels: [LayoutPanel, LayoutPanel] }
+export type WriteChart = PointChart | TableChart | ProcessChart | LayoutChart
 export const isTableChart = (c: WriteChart): c is TableChart => 'kind' in c && c.kind === 'table'
 export const isProcessChart = (c: WriteChart): c is ProcessChart => 'kind' in c && c.kind === 'process'
+export const isLayoutChart = (c: WriteChart): c is LayoutChart => 'kind' in c && c.kind === 'layout'
+export const layoutColumns = ['West', 'Centre', 'East'] as const
+export const layoutRows = ['North', 'Middle', 'South'] as const
 /** The picture as text, for Claude (who cannot see it). */
 export function chartText(c: WriteChart): string {
   if (isTableChart(c)) return c.title + '（表格）\n' + ['', ...c.columns].join(' | ') + '\n' + c.rows.map(r => [r.label, ...r.values].join(' | ')).join('\n')
-  if (isProcessChart(c)) return c.title + '（流程圖，照順序）：' + c.steps.map((x, i) => (i + 1) + '. ' + x).join(' → ')
+  if (isProcessChart(c)) return c.title + (c.cycle ? '（循環圖）：' : '（流程圖）：') +
+    c.steps.map((x, i) => (i + 1) + '. ' + x).join(' → ') + (c.cycle ? ' → 回到第 1 個階段' : '')
+  if (isLayoutChart(c)) return [c.title, 'Columns (left to right): ' + layoutColumns.join(' | '),
+    ...c.panels.flatMap(panel => [panel.label, ...panel.rows.map((row, i) => layoutRows[i] + ': ' + row.join(' | '))])].join('\n')
   return c.title + ' ' + c.points.map(p => p.label + ' ' + p.value).join(', ')
 }
 /** Task 1's structure hint for each kind of picture. */
-export const taskOneOutlines: Record<'trend' | 'comparison' | 'table' | 'process', string[]> = {
+export const taskOneOutlines: Record<'trend' | 'comparison' | 'table' | 'process' | 'cycle' | 'layout', string[]> = {
   trend: ['Introduction：用自己的話改寫題目', 'Overview：Overall, …（最大的趨勢或特點，不放數字）', 'Body 1：前半段的重要數據和比較', 'Body 2：後半段的重要數據和比較'],
   comparison: ['Introduction：用自己的話說明比較哪些組別、數字的單位與調查期間', 'Overview：Overall, …（最高、最低或最明顯的差別，不放細節數字）', 'Body 1：比較差距明顯的組別，附數字', 'Body 2：把數字相近的組別一起比較，或補充另一個重要差別'],
-  table: ['Introduction：用自己的話改寫題目（表格比較什麼、單位、時間）', 'Overview：Overall, …（最高、最低或最明顯的差別，不放細節數字）', 'Body 1：一組重要的比較，附數字', 'Body 2：另一組比較或例外，附數字；不用每個數字都寫'],
-  process: ['Introduction：用自己的話改寫題目（這是什麼流程）', 'Overview：Overall, 一共幾個步驟、從哪裡開始到哪裡結束（不放細節）', 'Body 1：前半的步驟，照順序寫（First, … Next, …）', 'Body 2：後半的步驟（After that, … Finally, …），每個主要步驟都要寫到'],
+  table: ['Introduction：說明表格比較什麼、數字單位，有標示期間也寫出來', 'Overview：比較組別時抓高低和明顯差距，有時間順序時抓主要變化', 'Body 1：用數字說明一組重要比較', 'Body 2：用數字補充另一組比較或例外'],
+  process: ['Introduction：用自己的話說明這是什麼流程', 'Overview：概括從原料或起點如何走到結果，可以用總步數來組織', 'Body 1：照順序寫前半的主要步驟', 'Body 2：整理後半的主要步驟，交代圖中重要時間或數字'],
+  cycle: ['Introduction：用自己的話說明圖中的循環', 'Overview：概括循環的主要階段和共同特點', 'Body 1：照圖中順序描述各階段，寫出重要時間或數字', 'Body 2：描述後續階段，交代最後如何接回循環的起始階段'],
+  layout: ['Introduction：介紹兩張圖的地點及時間', 'Overview：概述改建規模及主要用途的變化', 'Body 1：按方位比較移動、移除及改作他用的設施', 'Body 2：描述新增設施及原處保留的部分，用 in the north 或 to the east of 等片語定位'],
 }
 export function chartKind(c: WriteChart | undefined) {
   if (!c) return null
   if (isTableChart(c)) return 'table'
-  if (isProcessChart(c)) return 'process'
+  if (isProcessChart(c)) return c.cycle ? 'cycle' : 'process'
+  if (isLayoutChart(c)) return 'layout'
   return isTimeSeries(c.points.map(p => p.label)) ? 'trend' : 'comparison'
 }
 
 /** 寫作階梯：從完整的簡單句逐步練到 IELTS。Claude grades each stage by a published table (see rubricFor). */
 export interface WriteTask { id: string; prompt: string; zh: string; min: number; sample: string; chart?: WriteChart
-  /** Bridge-unit tasks: the unit and its grammar focus, which the first criterion checks. */
+  /** Bridge-unit tasks: the unit and optional grammar reference. Specific requirements are in the task. */
   unit?: number; focus?: string }
 export interface WriteStage { id: string; name: string; goal: string; criteria: string[]; tasks: WriteTask[]; ielts?: boolean; minutes?: number
   grammar?: { title: string; points: string[]; examples: { en: string; zh: string }[]; mistakes?: { bad: string; good: string; why: string }[] }
@@ -59,7 +70,11 @@ export interface WriteFeedback {
   /** When the answer was sent, so order does not depend on which reply finishes first. */
   submittedAt?: number
 }
-export interface WriteRecord { day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number }
+export interface WriteRecord {
+  day: string; words: number; tries: number; best?: number; last?: WriteFeedback; self?: number
+  /** A compact identity for the exact draft that was self-checked. Older records only have the `self` flag. */
+  selfReview?: { draft: string; at: number }
+}
 export const writeKey = (id: string) => 'write.' + id
 
 const latinLetter = /(?=\p{Script=Latin})\p{L}\p{M}*/u.source
@@ -90,6 +105,22 @@ export function mixedIeltsScores(f: WriteFeedback) {
   return mixesZero(f.scores ?? f.criteria)
 }
 
+/** Enforce the printed length rule on the text actually submitted, including when restoring old feedback. */
+export function applyIeltsLengthRule(f: WriteFeedback, words: number): WriteFeedback {
+  if (words > ieltsShortLimit || mixedIeltsScores(f)) return f
+  const lines = f.scores ?? f.criteria
+  const allZero = lines.length > 0 && lines.every(line => line.score === 0)
+  const band = words > 0 && !allZero ? 1 : 0
+  if ((f.band ?? 0) <= band && !lines.some(line => line.score > band)) {
+    return lines.length === 4 && f.band !== band ? { ...f, band } : f
+  }
+  const reason = band ? `原稿只有 ${words} 字。可評的英文作答若是 ${ieltsShortLimit} 字或更少，四項記為 Band 1。`
+    : '原稿沒有計入字數的英文作答，這份練習估計為 0 分。'
+  return { ...f, band, summary: reason,
+    ...(f.scores ? { scores: f.scores.map(line => ({ ...line, score: band, reason })) }
+      : { criteria: f.criteria.map(line => ({ ...line, score: band, comment: reason })) }) }
+}
+
 /** Old records only kept the highest total and the latest report. Exclude a highest
  *  score matching the incorrect total that was stored with a mixed report. New mixed
  *  reports never have a band and valid scores earned on other attempts can stay. */
@@ -102,6 +133,8 @@ export function readWriteRecord(value: unknown): WriteRecord | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null
   const r = { ...value } as WriteRecord
   if (!(typeof r.best === 'number' && r.best >= 0 && r.best <= 9)) r.best = undefined
+  if (!r.selfReview || typeof r.selfReview.draft !== 'string' || !r.selfReview.draft ||
+    !Number.isSafeInteger(r.selfReview.at) || r.selfReview.at <= 0) r.selfReview = undefined
   if (r.last && !(Array.isArray(r.last.criteria) && r.last.criteria.every(c => c && typeof c.name === 'string' && typeof c.score === 'number'))) r.last = undefined
   if (r.last?.scores !== undefined && !(r.last.rubric && r.last.rubric in rubrics && Array.isArray(r.last.scores) && r.last.scores.length
     && r.last.scores.every(x => x && typeof x.name === 'string' && validRubricScore(rubrics[r.last!.rubric!], x.score)))) r.last = undefined
@@ -115,10 +148,21 @@ export function readWriteRecord(value: unknown): WriteRecord | null {
       submittedAt: typeof l.submittedAt === 'number' && l.submittedAt > 0 && Number.isSafeInteger(l.submittedAt) ? l.submittedAt : undefined,
       criteria: l.criteria.map(c => ({ ...c, comment: str(c.comment) ?? '' })) }
   }
-  if (r.last && (r.last.rubric === 'ielts-task1' || r.last.rubric === 'ielts-task2' || typeof r.last.band === 'number')
-    && mixedIeltsScores(r.last)) {
-    if (discardMixedBest(r, true)) r.best = undefined
-    r.last.band = undefined
+  if (r.last && (r.last.rubric === 'ielts-task1' || r.last.rubric === 'ielts-task2' || typeof r.last.band === 'number')) {
+    if (mixedIeltsScores(r.last)) {
+      if (discardMixedBest(r, true)) r.best = undefined
+      r.last.band = undefined
+    } else {
+      if (r.last.band === undefined && r.last.scores?.length === 4) r.last.band = ieltsOverall(r.last.scores.map(line => line.score))
+      if (r.last.answer !== undefined) {
+        const before = r.last.band
+        const corrected = applyIeltsLengthRule(r.last, wordCount(r.last.answer))
+        // A short attempt cannot be a passing score. A best from more than one attempt lacks individual scores.
+        if (r.tries === 1 && typeof before === 'number' && typeof corrected.band === 'number' &&
+          corrected.band < before && before === r.best) r.best = undefined
+        r.last = corrected
+      }
+    }
   }
   return r
 }
@@ -198,7 +242,7 @@ export const essays: Record<Essay, { name: string; outline: string[]; response: 
 export function criteriaFor(stage: WriteStage, task: WriteTask) {
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
   if (kind) return stage.criteria.map((c, i) => i === 0 ? essays[kind].response : c)
-  if (stage.pack && task.focus) return stage.criteria.map((c, i) => i === 0 ? '用到這一課的文法（' + task.focus + '），而且用對' : c)
+  if (stage.pack) return stage.criteria.map((c, i) => i === 0 ? '用對本題指定的句型' : c)
   return stage.criteria
 }
 
@@ -237,10 +281,12 @@ export function gradePrompt(stage: WriteStage, task: WriteTask, prompt: string) 
     ...(task.min ? ['這題要求至少 ' + task.min + ' 字。字數不夠時照評分表給分，並在 next 提醒他要寫到幾個字。'] : []),
     ...(stage.grammar ? ['這一階教過的文法：' + stage.grammar.title + '；' + stage.grammar.points.join('；') + '。他是照這個程度寫的，不要因為沒用到更難的文法扣分；分數仍只照下面的官方評分表，不能另加要求，也不能放寬官方標準。'] : []),
     ...(kind ? ['這題是「' + essays[kind].name + '」題，回應題目要照這種題目該有的結構：' + essays[kind].outline.join('；')] : []),
-    ...(picture === 'process' ? ['這題是流程圖：總覽要說一共幾個步驟、從哪裡開始到哪裡結束；Task Achievement 看主要步驟有沒有都寫到、順序對不對，流程圖沒有數字，不需要數據比較。'] : []),
-    ...(picture === 'table' ? ['這題是表格：總覽要說最高、最低或最明顯的差別；Task Achievement 看有沒有挑出重點來比較，不需要把每個數字都寫出來。'] : []),
+    ...(picture === 'process' ? ['這題是直線流程圖。Task Achievement 看是否概括流程、交代主要步驟和順序，並選用圖上重要數字或時間。列出總步數只是概括的方法之一。'] : []),
+    ...(picture === 'cycle' ? ['這題是循環圖。Task Achievement 看是否概括循環、描述主要階段與最後如何接回起始階段，並報告圖上重要時間或數字。沒有固定終點，也不硬性要求計算總步數。'] : []),
+    ...(picture === 'table' ? ['這題是表格。Task Achievement 看有沒有挑出主要特點和重要比較。表格若比較不同組別，請看數值高低與差距。只有數字按時間排列時，才評估是否說明重要的時間變化。'] : []),
+    ...(picture === 'layout' ? ['這題是地圖或平面圖。兩張圖使用相同方位。請依圖核對增加、移除、移動及留下的設施和位置，並依評分表評估總覽與選取的重點。'] : []),
     ...(picture === 'comparison' ? ['這題的長條比較不同組別。總覽找最高、最低或明顯差別，正文用數字比較組別；橫軸不是時間順序，請勿要求寫時間趨勢。'] : []),
-    ...(task.focus ? ['這一課的文法重點：' + task.focus + '。題目要他用這些句型：有沒有用、用得對不對，算在「題目的要求」裡；沒用到就照表給分並說明要怎麼加。'] : []),
+    ...(task.focus ? ['這一課可參考的文法：' + task.focus + '。是否達成本題句型要求只按上方英中題幹判定。沒有被題幹指定的句型可用來表達，但用不到時不扣分。'] : []),
     ...(r.id === 'gept-sentence' ? ['題目要的每一句各給一個分數：先找出他寫的哪一句是那一句；沒寫到、或沒用到指定的字，那一句就是 0。'] : []),
     rubricPrompt(r, parts),
     ...(checks.length ? ['另外逐項檢查這一階的要求（不給分，只說有沒有做到）：' + checks.join('；')] : []),

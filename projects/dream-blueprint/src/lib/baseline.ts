@@ -10,6 +10,8 @@ export interface BaselineResult {
   id?: string
   form?: FormId
   date: string
+  /** The submission time, when known. Older results only recorded the day. */
+  submittedAt?: number
   /** null = 缺測 (skipped, or the clip was never played) — never stored as 0, which would look like a drop. */
   listening: number | null
   /** How many times the listening clip was played (max 2), so results are compared under the same conditions. */
@@ -34,7 +36,7 @@ export const forms: Record<FormId, Form> = {
       { q: 'Which time is NOT one of the new choices?', options: ['Friday at 2 p.m.', 'Monday at 9 a.m.', 'Thursday at 10 a.m.'], answer: 2 },
       { q: 'When should you call back?', options: ['On Thursday morning', 'Before Wednesday at 5 p.m.', 'Next Monday'], answer: 1 },
     ],
-    read: 'Drinking enough water is important for your health. Most adults need about eight cups of water a day, but people who exercise or live in hot places may need more. If you do not drink enough, you can feel tired, get headaches, or have trouble thinking clearly. Some easy ways to drink more water are to carry a water bottle, drink a glass with every meal, and eat fruits like watermelon and oranges. However, people with some heart or kidney problems should ask their doctor how much water is right for them.',
+    read: 'Drinking enough water is important for your health. The amount of fluid you need changes from person to person. You may need more when you exercise for a long time or spend time in hot weather. Water, other drinks, and foods can all help you get enough fluid. If you do not drink enough, you can feel tired, get headaches, or have trouble thinking clearly. Some easy ways to drink more water are to carry a water bottle, drink a glass with every meal, and eat fruits like watermelon and oranges. However, people with some heart or kidney problems should ask their doctor how much water is right for them.',
     readQs: [
       { q: 'What is the main idea?', options: ['Fruit is better than water', 'Water is good for you, and here is how to drink more', 'Everyone needs exactly the same amount of water'], answer: 1 },
       { q: 'Who may need more water?', options: ['People who sleep a lot', 'Only children', 'People who exercise'], answer: 2 },
@@ -103,14 +105,18 @@ export function identifiedResults(notes: Record<string, string>): SavedResult[] 
   const list = readResults(notes)
   const knownIds = new Set(list.map(result => result.id))
   const occurrences = new Map<string, number>()
+  const seen = new Set<FormId>()
   return list.map(result => {
-    if (result.id) return { ...result, id: result.id }
+    const form = result.form ?? 'A'
+    const repeat = result.repeat || seen.has(form)
+    seen.add(form)
+    if (result.id) return { ...result, id: result.id, repeat }
     const signature = legacyResultId(result)
     let occurrence = occurrences.get(signature) ?? 0
     let id: string
     do { id = signature + '-' + ++occurrence } while (knownIds.has(id))
     occurrences.set(signature, occurrence)
-    return { ...result, id }
+    return { ...result, id, repeat }
   })
 }
 export const makeBaselineId = () => 'baseline-' + (globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2))
@@ -128,24 +134,45 @@ export function mergeBaselineResults(older: Record<string, string>, newer: Recor
     const prev = byId.get(result.id)
     byId.set(result.id, prev ? {
       ...result,
+      submittedAt: result.submittedAt ?? prev.submittedAt,
       writing: { ...result.writing, feedback: feedbackFrom(result.writing?.feedback, prev.writing?.feedback) },
-      speaking: { ...result.speaking, feedback: feedbackFrom(result.speaking?.feedback, prev.speaking?.feedback) },
+      speaking: {
+        ...result.speaking,
+        transcript: feedbackFrom(result.speaking?.transcript, prev.speaking?.transcript),
+        feedback: feedbackFrom(result.speaking?.feedback, prev.speaking?.feedback),
+      },
     } : result)
   }
-  return [...byId.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)))
+  return [...byId.values()].sort((a, b) => String(a.date).localeCompare(String(b.date)) ||
+    (a.submittedAt ?? 0) - (b.submittedAt ?? 0) || (a.submittedAt && b.submittedAt ? a.id.localeCompare(b.id) : 0))
 }
 /** Claude's comment on the test's writing is kept only in the form asked for: the CEFR line first, then its points. */
-export const writingFeedbackOk = (text: string) => /CEFR/.test(text.trim().split('\n')[0] ?? '') && text.split('\n').filter(l => l.trim()).length >= 3
+const feedbackLines = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean)
+const firstFeedbackLine = (text: string) => feedbackLines(text)[0]?.replace(/^\*\*|\*\*$/g, '') ?? ''
+export const writingFeedbackOk = (text: string) => !!cefrOf(text) && feedbackLines(text).length >= 3
 /** …and on the speaking transcript only with its fixed first line (a transcript gives no level) and its points. */
-export const speakingFeedbackOk = (text: string) => /^只看逐字稿/.test(text.trim()) && text.split('\n').filter(l => l.trim()).length >= 3
+export const speakingFeedbackOk = (text: string) => /^只看逐字稿\s*[：:]\s*發音、流暢度和停頓沒有評估[。.]?$/.test(firstFeedbackLine(text)) && feedbackLines(text).length >= 3
 /** Claude's comment added later to a specific saved check. The work and scores stay as they are. */
 export function setResultFeedback(notes: Record<string, string>, at: string | { date: string; form?: FormId }, part: 'writing' | 'speaking', feedback: string) {
+  return reviseResult(notes, at, result => result[part].feedback.trim() ? result
+    : { ...result, [part]: { ...result[part], feedback } })
+}
+
+/** A background transcription can only fill the empty field of the submission that sent it. */
+export function setResultTranscript(notes: Record<string, string>, id: string, transcript: string) {
+  return reviseResult(notes, id, result => result.speaking.transcript.trim() ? result
+    : { ...result, speaking: { ...result.speaking, transcript } })
+}
+
+function reviseResult(notes: Record<string, string>, at: string | { date: string; form?: FormId }, update: (result: SavedResult) => SavedResult) {
   const list = identifiedResults(notes)
   const matches = list.filter(result => typeof at === 'string' ? result.id === at
     : result.date === at.date && (result.form ?? 'A') === (at.form ?? 'A'))
   const i = matches.length === 1 ? list.indexOf(matches[0]) : -1
   if (i < 0) return notes
-  list[i] = { ...list[i], [part]: { ...list[i][part], feedback } }
+  const next = update(list[i])
+  if (next === list[i]) return notes
+  list[i] = next
   return { ...notes, [resultsKey]: JSON.stringify(list) }
 }
 /** Keep all attempts in the history. Choose by the forms completed, not by the number of submissions. */
@@ -179,4 +206,4 @@ export const testDue = (notes: Record<string, string>, today: string) => retestI
 export const showTestPrompt = (notes: Record<string, string>, today: string) => testDue(notes, today) && notes[laterKey] !== today
 export { wordCount } from './writing'
 /** The CEFR guess Claude put on the first line of its feedback, if any. */
-export const cefrOf = (feedback: string) => feedback.match(/\b([ABC][12])\b/)?.[1] ?? ''
+export const cefrOf = (feedback: string) => firstFeedbackLine(feedback).match(/\bCEFR\b.*?\b([ABC][12])\b/i)?.[1]?.toUpperCase() ?? ''

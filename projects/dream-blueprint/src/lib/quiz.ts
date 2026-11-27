@@ -22,6 +22,8 @@ export const causeOptions: Record<QuizSection, string[]> = {
 
 export interface QuizRecord {
   day: string
+  /** Identifies the answer for attaching a later self-reported cause. */
+  at?: number
   picked: number
   correct: boolean
   tries: number
@@ -45,7 +47,7 @@ export function recordQuizAnswer(notes: Record<string, string>, item: QuizItem, 
   const old = readQuizRecord(notes, item.id)
   const correct = picked === item.answerIndex
   const rec: QuizRecord = {
-    day, picked, correct,
+    day, picked, correct, at: Math.max(Date.now(), (old?.at ?? 0) + 1),
     tries: (old?.tries ?? 0) + 1,
     misses: (old?.misses ?? 0) + (correct ? 0 : 1),
     ...(usedZh ? { zh: true } : {}),
@@ -54,14 +56,19 @@ export function recordQuizAnswer(notes: Record<string, string>, item: QuizItem, 
   return { ...notes, [quizRecordKey(item.id)]: JSON.stringify(rec) }
 }
 
-export function recordQuizCause(notes: Record<string, string>, id: string, cause: string) {
+export function recordQuizCause(notes: Record<string, string>, id: string, cause: string, at: number) {
   const old = readQuizRecord(notes, id)
-  if (!old || old.correct) return notes
+  if (!old || old.correct || old.at !== at) throw new Error('這題已有另一份作答，無法把這筆錯因加到那一次。')
   return { ...notes, [quizRecordKey(id)]: JSON.stringify({ ...old, causes: [...(old.causes ?? []), cause] }) }
 }
 
 export const quizPosition = (notes: Record<string, string>, s: QuizSection) => Math.max(0, Math.floor(Number(notes[quizPosKey(s)]) || 0))
-export const advanceQuiz = (notes: Record<string, string>, s: QuizSection) => ({ ...notes, [quizPosKey(s)]: String(quizPosition(notes, s) + 1) })
+/** Advance beyond the answered item, including any recently missed items skipped along the way. */
+export function advanceQuiz(notes: Record<string, string>, s: QuizSection, index: number, listSize: number) {
+  const pos = quizPosition(notes, s)
+  const skipped = (index - pos % listSize + listSize) % listSize
+  return { ...notes, [quizPosKey(s)]: String(pos + skipped + 1) }
+}
 
 /** Questions answered wrong come back after a day, before the next one in order. */
 export function nextQuizItem(items: readonly QuizItem[], section: QuizSection, notes: Record<string, string>, today: string):
@@ -74,8 +81,14 @@ export function nextQuizItem(items: readonly QuizItem[], section: QuizSection, n
     return !!r && !r.correct && r.day <= yesterday
   })
   if (retry) return { item: retry, retry: true, index: list.indexOf(retry), total: list.length }
-  const index = quizPosition(notes, section) % list.length
-  return { item: list[index], retry: false, index, total: list.length }
+  const start = quizPosition(notes, section) % list.length
+  for (let offset = 0; offset < list.length; offset++) {
+    const index = (start + offset) % list.length
+    const item = list[index]
+    const rec = readQuizRecord(notes, item.id)
+    if (!rec || rec.correct || rec.day < today) return { item, retry: false, index, total: list.length }
+  }
+  return null
 }
 
 type SubjectItem = QuizItem & { subjects?: string[] }

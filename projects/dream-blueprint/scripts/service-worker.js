@@ -18,17 +18,19 @@ const resourceSets = manifest => ({
 const currentResources = resourceSets(config);
 const pageVersions = new Map();
 const pending = new Map();
-let galleryNotice;
+const mediaNotices = new Map();
 
-function notifyGalleryChanged() {
-  if (!galleryNotice) {
-    galleryNotice = self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(pages => {
+function notifyMediaChanged(image) {
+  const type = image ? "GALLERY_CACHE_CHANGED" : "SOUNDS_CACHE_CHANGED";
+  if (!mediaNotices.has(type)) {
+    const notice = self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(pages => {
       for (const page of pages) {
-        if (page.url.startsWith(scope)) page.postMessage({ type: "GALLERY_CACHE_CHANGED" });
+        if (page.url.startsWith(scope)) page.postMessage({ type });
       }
-    }).catch(() => {}).finally(() => { galleryNotice = undefined; });
+    }).catch(() => {}).finally(() => { mediaNotices.delete(type); });
+    mediaNotices.set(type, notice);
   }
-  return galleryNotice;
+  return mediaNotices.get(type);
 }
 
 async function hasHash(response, hash) {
@@ -43,15 +45,20 @@ async function saveResource(resource, cache, image) {
   if (cached) return cached;
   if (!pending.has(key)) {
     const download = (async () => {
-      const response = await fetch(key, { cache: "no-cache" });
-      if (response.status !== 200 || (image && !response.headers.get("Content-Type")?.startsWith("image/"))
-        || !await hasHash(response.clone(), hash)) {
-        throw new Error("這個檔案尚未下載完成，請連線後再試一次。");
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 35000);
+      let response;
+      try {
+        response = await fetch(key, { cache: "no-cache", signal: controller.signal });
+        if (response.status !== 200 || (image && !response.headers.get("Content-Type")?.startsWith("image/"))
+          || !await hasHash(response.clone(), hash)) {
+          throw new Error("這個檔案尚未下載完成，請連線後再試一次。");
+        }
+      } finally {
+        clearTimeout(timeout);
       }
       // Online playback still works when the device is full. The explicit download operation checks cache storage separately.
-      await cache.put(key, response.clone()).then(() => {
-        if (image) return notifyGalleryChanged();
-      }).catch(() => {});
+      await cache.put(key, response.clone()).then(() => notifyMediaChanged(image)).catch(() => {});
       return response;
     })();
     pending.set(key, download);
@@ -154,7 +161,7 @@ function cleanUnusedReleases() {
       for (const request of await cache.keys()) {
         if (!keys.has(request.url) && await cache.delete(request)) removed = true;
       }
-      if (kind === "photos" && removed) await notifyGalleryChanged();
+      if (removed) await notifyMediaChanged(kind === "photos");
     }
   })().finally(() => { cleaning = undefined; });
   return cleaning;

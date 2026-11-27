@@ -2,8 +2,8 @@ import config from '../data/rivals.json' with { type: 'json' };
 
 type Rival = typeof config.rivals[number];
 import type { AppState } from './store';
-import { dayKey, activePeriod, addDays as offset, weekKey as monday, daysBetween, type Period } from './progress.ts';
-import { bonusOn } from './compact.ts';
+import { dayKey, activePeriod, addDays as offset, weekKey as monday, daysBetween, reviewBonus, type Period } from './progress.ts';
+import { readArchive } from './compact.ts';
 type WeekData = { score: number; paused: boolean; vacation: boolean };
 export type RankedEntry = { id: string; name: string; score: number; rank: number; rival?: Rival };
 type StandingInput = { week: string; day: number; score: number; average: number; beginner: boolean; vacation: boolean };
@@ -48,32 +48,49 @@ function inTruce(period:Period) {
   return period==='exam' || period==='internship';
 }
 
-function weekData(state:AppState,start:string,end:string):WeekData {
-  const energies = new Map<string,number>();
-  let paused = false;
+function raceWeeks(state: AppState) {
+  const practice = new Map<string,{base:number; paused:boolean}>();
   for(const session of state.sessions) {
-    if(session.day<start || session.day>end) continue;
-    energies.set(session.day,Math.max(energies.get(session.day)??0,dailyRacePoints(session.energy,0)));
-    paused ||= inTruce(session.period);
+    const previous = practice.get(session.day);
+    practice.set(session.day, {
+      base: Math.max(previous?.base ?? 0, dailyRacePoints(session.energy,0)),
+      paused: !!previous?.paused || inTruce(session.period),
+    });
   }
-  let score=0;
-  // Days whose review lines were folded keep their bonus in the archive (compact.ts).
-  for(const [day,base] of energies) score+=base+bonusOn(state,day);
-  paused ||= state.settings.periods.some(range=>inTruce(range.type)&&range.start<=end&&(!range.end||range.end>=start));
-  return {score,paused,vacation:activePeriod(end,state.settings.periods)==='vacation'};
+  const archived = readArchive(state.notes).bonus;
+  const reviews = new Map<string,AppState['reviewEvents']>();
+  for (const event of state.reviewEvents) {
+    if (!practice.has(event.day) || archived[event.day] !== undefined) continue;
+    const daily = reviews.get(event.day);
+    if (daily) daily.push(event);
+    else reviews.set(event.day, [event]);
+  }
+  return (start: string, end: string): WeekData => {
+    let score = 0;
+    let paused = false;
+    for (let day = start; day <= end; day = offset(day,1)) {
+      const entry = practice.get(day);
+      if (!entry) continue;
+      score += entry.base + (archived[day] ?? reviewBonus(reviews.get(day) ?? [], day));
+      paused ||= entry.paused;
+    }
+    paused ||= state.settings.periods.some(range=>inTruce(range.type)&&range.start<=end&&(!range.end||range.end>=start));
+    return {score,paused,vacation:activePeriod(end,state.settings.periods)==='vacation'};
+  };
 }
 
-function lastFour(state:AppState,week:string) {
+function lastFour(firstDay: string, week: string, weekData: ReturnType<typeof raceWeeks>) {
   const scores:number[]=[];
-  const first=monday(state.startedDay);
+  const first=monday(firstDay);
   for(let key=offset(week,-7);key>=first && scores.length<4;key=offset(key,-7)) {
-    const data=weekData(state,key,offset(key,6));
+    const data=weekData(key,offset(key,6));
     if(!data.paused) scores.push(data.score);
   }
   return {average:scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 0, beginner:scores.length<4};
 }
 
 export function raceBoard(state:AppState,now=new Date()) {
+  const weekData = raceWeeks(state);
   const today=dayKey(now);
   const week=monday(today);
   const period=activePeriod(today,state.settings.periods);
@@ -84,9 +101,9 @@ export function raceBoard(state:AppState,now=new Date()) {
       scoringDay=offset(scoringDay,-1);
     }
   }
-  const closing = weekData(state,week,scoringDay);
-  const rows=rankWeek({week,day:Math.max(0,daysBetween(week,scoringDay)),score:closing.score,...lastFour(state,week),vacation:closing.vacation});
-  return {today,week,period,paused,rows,returned:weekData(state,offset(week,-7),offset(week,-1)).paused||closing.paused};
+  const closing = weekData(week,scoringDay);
+  const rows=rankWeek({week,day:Math.max(0,daysBetween(week,scoringDay)),score:closing.score,...lastFour(state.startedDay,week,weekData),vacation:closing.vacation});
+  return {today,week,period,paused,rows,returned:weekData(offset(week,-7),offset(week,-1)).paused||closing.paused};
 }
 
 export function rivalSummary(state:AppState,now=new Date()) {
@@ -99,6 +116,7 @@ export function rivalSummary(state:AppState,now=new Date()) {
 }
 
 export function seasonHistory(state:AppState,now=new Date()) {
+  const weekData = raceWeeks(state);
   const today=dayKey(now);
   const current=monday(today);
   const thisSeason=seasonFor(today,activePeriod(today,state.settings.periods)==='vacation');
@@ -106,7 +124,7 @@ export function seasonHistory(state:AppState,now=new Date()) {
   const scores:number[]=[];
   for(let week=monday(state.startedDay);week<current;week=offset(week,7)) {
     const end=offset(week,6);
-    const data=weekData(state,week,end);
+    const data=weekData(week,end);
     if(data.paused) continue;
     const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:0;
     const rank=rankWeek({week,day:6,average:avg,beginner:scores.length<4,...data}).find(person=>person.id==='self')!.rank;

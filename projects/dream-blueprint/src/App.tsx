@@ -1,5 +1,5 @@
 import { SceneFeatureContext } from './components/ScenePhoto'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import {
   ArrowRight, ArrowUpRight, BookOpen, CalendarDays, ChartNoAxesColumnIncreasing,
   Check, ChevronRight, Compass, Route as RouteIcon,
@@ -39,12 +39,13 @@ import { applyBatch, archiveOld } from './lib/compact'
 import { useRef } from 'react'
 import DailyWord from './components/DailyWord'
 import SyncPaused from './components/SyncPaused'
+import TranscriptNotice from './components/TranscriptNotice'
 import { autoSettle, syncDriveMemory } from './lib/cloudSync'
 import { seenKey } from './lib/dailyWords'
 import { libraryPage, menuGroups, modeLabel, type MenuId } from './lib/library'
 
 type View = Page | 'library' | 'cosmos' | 'speaking' | 'leveltest'
-type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:string}
+type Route = {view: View, energy: Energy, tab: PlanTab, photoId?:string, mode?:string, planDate?:string}
 const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
   {id:'today', title:'今日航行', mobile:'今天', icon:Compass},
   {id:'library', title:'英文練習', mobile:'練習', icon:BookOpen},
@@ -56,11 +57,11 @@ const links: {id: View, title: string, mobile: string, icon: LucideIcon}[] = [
 const extraTitles: Partial<Record<View, string>> = {rivals:'星際排行榜', settings:'設定', cosmos:'宇宙圖鑑', practice:'英文練習', leveltest:'英文程度測驗'}
 const phases = {semester:'一般學期', exam:'考週模式', internship:'實習模式', vacation:'寒暑假模式'}
 function readRoute():Route {
-  const [key, value] = location.hash.slice(1).split('/')
+  const [key, value, detail] = location.hash.slice(1).split('/')
   // The leaderboard now lives inside the plan page.
   if (key === 'rivals') return {view:'plan', tab:'rivals', energy:'low'}
   const view = [...links.map(l => l.id),'practice','settings','cosmos','rivals','leveltest'].includes(key) ? key as View : 'today'
-  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice'||view==='library' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='exam'?'exam':value==='timeline'?'timeline':value==='rivals'?'rivals':value==='levels'?'levels':'calendar'}
+  return {view, photoId:view==='cosmos' ? value : undefined, mode:view==='speaking'||view==='practice'||view==='library'||view==='history' ? value : undefined, energy:value==='high'?'high':value==='normal'||value?.startsWith('resume')?'normal':'low', tab:value==='map'?'map':value==='exam'?'exam':value==='timeline'?'timeline':value==='rivals'?'rivals':value==='levels'?'levels':'calendar', planDate:view==='plan'?detail:undefined}
 }
 function setView(view:View, detail?:Energy|PlanTab) {
   const hash = view + (detail ? '/' + detail : '')
@@ -177,42 +178,103 @@ function App() {
   const {state,update,storageError}=useAppStore()
   const unsavedDrafts = useUnsavedDrafts()
   const [pairing,setPairing]=useState(takePairing)
-  const [syncing,setSyncing]=useState(takeSyncLink)
+  const [syncing,setSyncing]=useState(()=>{
+    const code=pairing ? null : takeSyncLink()
+    return code ? {code,id:0,controller:new AbortController()} : null
+  })
+  const syncRequest=useRef(syncing)
+  const nextSyncRequestId=useRef(0)
   // Opened from a scan-to-connect link: the dialog connects and settles the progress itself. Its effect runs before
   // App's own (children first) and writes the connection at once, so App's on-open sync must stay out of the way.
   const openedBySync=useRef(syncing!==null)
   const [route, changeRoute]=useState(readRoute)
   const [focusTutorSettings,setFocusTutorSettings]=useState(false)
   const [today,changeDay]=useState(dayKey)
-  const [wordOpen,setWordOpen]=useState(false)
-  const closeWord=()=>{setWordOpen(false);update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})}
+  const [wordSession,setWordSession]=useState<{day:string,open:boolean}>()
+  const openWord=()=>setWordSession({day:today,open:true})
+  const closeWord=()=>{
+    setWordSession({day:today,open:false})
+    update(s=>s.notes[seenKey(today)]?s:{...s,notes:{...s.notes,[seenKey(today)]:'1'}})
+  }
   const navigate=(p:Page)=>setView(p==='practice'?'library':p)
   const start=(e:Energy)=>setView('practice',e)
   const page=route.view
-  const speakingLessonDate=route.mode?.match(/^lesson-(\d{4}-\d{2}-\d{2})$/)?.[1]
+  const wordOpen=page==='today'&&!syncing&&!pairing&&
+    !!(wordSession?.open||(wordSession?.day!==today&&!state.notes[seenKey(today)]))
+  useLayoutEffect(()=>{
+    // A synced "seen" flag cannot dismiss a card the learner already has open.
+    if(wordOpen&&wordSession?.day!==today)setWordSession({day:today,open:true})
+  },[wordOpen,wordSession?.day,today])
+  const speakingLessonDate=route.mode?.startsWith('lesson-')?route.mode.slice(7):undefined
   const active=page==='practice'?'library':page
   const planTab=route.tab==='rivals'&&!state.settings.rivalsEnabled?'calendar':route.tab
   const backgroundPage=page==='plan'&&planTab==='rivals'?'rivals':page
   const sky=useObservatory(backgroundPage,readBackgroundPin(state.notes,backgroundPage==='practice'?'library':backgroundPage))
-  function changePlanTab(tab: PlanTab) {
-    const hash='#plan/'+tab
+  function changePlanTab(tab: PlanTab, selectedDate: string, replaceDate = false) {
+    const hash='#plan/'+tab+'/'+selectedDate
     if (location.hash===hash) return
-    // Keep the plan mounted so changing tabs preserves the selected day and calendar month.
-    history.pushState(null,'',hash)
+    // Keep the view on screen while recording the date for reload and browser history.
+    if (replaceDate) history.replaceState(null,'',hash)
+    else history.pushState(null,'',hash)
+    changeRoute(readRoute())
+  }
+  const closingGallery = useRef(false)
+  function changeGalleryPhoto(id?: string, fromList = false) {
+    const hash = id ? '#cosmos/' + id : '#cosmos'
+    if (location.hash === hash || closingGallery.current) return
+    if (id && fromList) {
+      // Old or incomplete photo links also show the list. Back must return to it.
+      if (location.hash !== '#cosmos') history.replaceState(null, '', '#cosmos')
+      history.pushState({fromGalleryList:true}, '', hash)
+    } else if (!id && history.state?.fromGalleryList) {
+      closingGallery.current = true
+      history.back()
+      return
+    } else {
+      // Swiping replaces the current photo; a direct link closes onto the gallery.
+      history.replaceState(id ? history.state : null, '', hash)
+    }
     changeRoute(readRoute())
   }
   useEffect(()=>{
     // A QR link opened while the app is already open in this tab arrives as a hash change, not a new load.
-    const pair=()=>{if(location.hash.startsWith(pairPrefix)){const p=takePairing();if(p)setPairing(p)}}
-    const sync=()=>{if(location.hash.startsWith(syncPrefix)){const c=takeSyncLink();if(c)setSyncing(c)}}
-    const fromSettings=(e:Event)=>setPairing(String((e as CustomEvent).detail))
+    function showPairing(code: string) {
+      if (syncRequest.current) {
+        syncRequest.current.controller.abort()
+        syncRequest.current=null
+        clearSyncLink()
+        setSyncing(null)
+        if (readyCloudScope()) window.dispatchEvent(new Event(driveReadyEvent))
+      }
+      setPairing(code)
+    }
+    const pair=()=>{if(location.hash.startsWith(pairPrefix)){const p=takePairing();if(p)showPairing(p)}}
+    const sync=()=>{
+      if (!location.hash.startsWith(syncPrefix)) return
+      const code=takeSyncLink()
+      if (!code || syncRequest.current?.code===code) return
+      syncRequest.current?.controller.abort()
+      const request={code,id:++nextSyncRequestId.current,controller:new AbortController()}
+      syncRequest.current=request
+      clearPairing()
+      setPairing(null)
+      setSyncing(request)
+    }
+    const fromSettings=(e:Event)=>showPairing(String((e as CustomEvent).detail))
     window.addEventListener('hashchange',pair)
     window.addEventListener('hashchange',sync)
     window.addEventListener(pairEvent,fromSettings)
     return ()=>{window.removeEventListener('hashchange',pair);window.removeEventListener('hashchange',sync);window.removeEventListener(pairEvent,fromSettings)}
   },[])
   useEffect(()=>{
-    const handle=()=>{if(location.hash.startsWith(pairPrefix)||location.hash.startsWith(syncPrefix))return;changeRoute(readRoute());window.scrollTo(0,0)}
+    const handle=(event:HashChangeEvent)=>{
+      closingGallery.current=false
+      if(location.hash.startsWith(pairPrefix)||location.hash.startsWith(syncPrefix))return
+      const nextRoute = readRoute()
+      changeRoute(nextRoute)
+      const fromGallery = new URL(event.oldURL).hash.split('/')[0] === '#cosmos'
+      if (!fromGallery || nextRoute.view !== 'cosmos') window.scrollTo(0,0)
+    }
     const clock=()=>changeDay(dayKey())
     window.addEventListener('hashchange',handle)
     window.addEventListener('focus',clock)
@@ -400,16 +462,23 @@ function App() {
       <button className="icon-control theme-switch" aria-label={state.settings.theme==='dark'?'切換淺色':'切換深色'} title={state.settings.theme==='dark'?'切換淺色':'切換深色'} onClick={()=>update(s=>({...s,settings:{...s.settings,theme:s.settings.theme==='dark'?'light':'dark'}}))}>{state.settings.theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button></div>
       </header>
       {storageError&&<p className="exam-offer" role="status">{storageError}</p>}
+      <TranscriptNotice/>
       {unsavedDrafts&&<div className="exam-offer"><span role="status">瀏覽器未能儲存草稿。切換練習仍可找回，關閉這個分頁前請先下載。</span> <button type="button" className="pr-link" onClick={downloadUnsavedDrafts}>下載未存草稿</button></div>}
       <SyncPaused/>
-      {page==='cosmos'?<CosmosGallery {...props} initialPhotoId={route.photoId} onViewerClose={()=>{if(route.photoId)location.replace('#cosmos')}}/>:page==='today'?<Home {...props} today={today} start={start} openWord={()=>setWordOpen(true)}/>:page==='plan'?<Plan {...props} tab={planTab} onTabChange={changePlanTab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-mode={libMode??'menu'}><PracticeCover title={pageName}/>{libMode?<PracticeLibrary {...props} mode={libMode}/>:<><LessonBanner state={state} today={today} start={start}/><PracticeMenu state={state} today={today}/></>}</div>:page==='leveltest'?<div className="library-page" data-mode="test"><PracticeCover title={pageName}/><Baseline state={state} update={update}/></div>:page==='history'?<History {...props}/>:page==='speaking'&&route.mode==='gept'?<GeptSpeaking {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'||!!speakingLessonDate} lessonDate={speakingLessonDate} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined} wordMode={route.mode?.startsWith('word-')?route.mode.slice(5):undefined}/>:<Settings {...props}/>}
+      {page==='cosmos'?<CosmosGallery {...props} photoId={route.photoId} onPhotoChange={changeGalleryPhoto}/>:page==='today'?<Home {...props} today={today} start={start} openWord={openWord}/>:page==='plan'?<Plan {...props} tab={planTab} selectedDate={route.planDate} onTabChange={changePlanTab}/>:page==='practice'?<Practice key={today+route.energy+(route.mode?.startsWith('resume')?':'+route.mode:'')} {...props} energy={route.energy} resume={route.mode==='resume'||(route.mode?.startsWith('resume-')?route.mode.slice(7):false)}/>:page==='library'?<div className="library-page" data-mode={libMode??'menu'}><PracticeCover title={pageName}/>{libMode?<PracticeLibrary {...props} mode={libMode}/>:<><LessonBanner state={state} today={today} start={start}/><PracticeMenu state={state} today={today}/></>}</div>:page==='leveltest'?<div className="library-page" data-mode="test"><PracticeCover title={pageName}/><Baseline state={state} update={update}/></div>:page==='history'?<History {...props} initialTarget={route.mode?.startsWith('day-')?route.mode.slice(4):undefined}/>:page==='speaking'&&route.mode==='gept'?<GeptSpeaking {...props}/>:page==='speaking'?<Speaking key={route.mode||'chat'} {...props} lessonMode={route.mode==='lesson'||speakingLessonDate!==undefined} lessonDate={speakingLessonDate} ieltsMode={route.mode==='ielts'} topicMode={route.mode?.startsWith('topic-')?route.mode.slice(6):undefined} packMode={route.mode?.startsWith('pack-')?route.mode.slice(5):undefined} nurseMode={route.mode?.startsWith('nurse-')?route.mode.slice(6):undefined} wordMode={route.mode?.startsWith('word-')?route.mode.slice(5):undefined}/>:<Settings {...props}/>}
     </main></div>
-    {page==='today'&&!syncing&&!pairing&&(wordOpen||!state.notes[seenKey(today)])&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
+    {wordOpen&&<DailyWord state={state} update={update} today={today} onClose={closeWord}/>}
     {/* The level test stays out of sight until it is due; then it pops up here, after 今日單字. */}
     {page==='today'&&!syncing&&!pairing&&!wordOpen&&!!state.notes[seenKey(today)]&&showTestPrompt(state.notes,today)&&<TestPrompt state={state} update={update} today={today}/>}
-    {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today)}/>}
+    {page!=='speaking'&&<AIAssistant key={pairing===null?'k':'p'} progress={handoffText(state,today,'assistant')}/>}
     {pairing&&<PairReceive key={pairing} payload={pairing} onDone={()=>{clearPairing();setPairing(null)}}/>}
-    {syncing&&<SyncReceive code={syncing} onDone={()=>{clearSyncLink();setSyncing(null)}}/>}
+    {syncing&&<SyncReceive key={syncing.id} code={syncing.code} signal={syncing.controller.signal} onDone={()=>{
+      if (syncRequest.current!==syncing) return
+      syncing.controller.abort()
+      syncRequest.current=null
+      clearSyncLink()
+      setSyncing(null)
+    }}/>}
     <nav className="mobile-nav" aria-label="行動導覽">{available.map(l=>titleNav(l,true))}</nav>
   </div></SceneFeatureContext.Provider></MemoryContext.Provider>
 }

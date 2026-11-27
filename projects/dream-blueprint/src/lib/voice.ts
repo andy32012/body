@@ -17,11 +17,22 @@ function write(name: string, value: string) {
 }
 export const openaiKey = () => read(KEY)
 export const setOpenaiKey = (v: string) => write(KEY, v.trim())
-export const voiceName = () => read(VOICE) || 'marin'
-export const setVoiceName = (v: string) => write(VOICE, v)
+export const voiceName = () => {
+  const value = read(VOICE)
+  return voices.includes(value) ? value : voices[0]
+}
+export const setVoiceName = (v: string) => voices.includes(v) && write(VOICE, v)
 /** On unless switched off: with speakers her own voice reaches the microphone and she stops after a word. */
 export const echoGuard = () => read(GUARD) !== 'off'
 export const setEchoGuard = (on: boolean) => write(GUARD, on ? '' : 'off')
+
+export function onVoicePreferencesChanged(refresh: () => void) {
+  function onStorage(event: StorageEvent) {
+    if (event.key === VOICE || event.key === GUARD || event.key === null) refresh()
+  }
+  window.addEventListener('storage', onStorage)
+  return () => window.removeEventListener('storage', onStorage)
+}
 
 export type Line = { role: 'user' | 'assistant'; text: string }
 export type VoiceSession = { stop: () => void }
@@ -43,6 +54,7 @@ export async function startVoice(opts: {
 }): Promise<VoiceSession> {
   const key = openaiKey()
   if (!key) throw new Error('還沒有 OpenAI 金鑰。')
+  const voice = voiceName()
   opts.onState('connecting')
   // iPad / iPhone Safari only lets sound start inside the tap, so the player and the level meter are set up
   // before the first await (asking for the microphone ends the tap).
@@ -50,13 +62,17 @@ export async function startVoice(opts: {
   audio.autoplay = true
   audio.setAttribute('playsinline', '')
   let ctx: AudioContext | null = null
-  try { ctx = new AudioContext(); void ctx.resume() } catch { ctx = null }
+  try { ctx = new AudioContext(); void ctx.resume().catch(() => {}) } catch { ctx = null }
   let mic: MediaStream
   try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
   catch (e) { ctx?.close().catch(() => {}); throw e }
   // Before the call is set up, any way out (ended while asking, a browser that cannot open the connection) releases the
   // microphone and the sound at once.
-  const release = (pc?: RTCPeerConnection) => { mic.getTracks().forEach(t => t.stop()); try { pc?.close() } catch { /* already closed */ } ; ctx?.close().catch(() => {}); opts.onState('closed') }
+  const release = (pc?: RTCPeerConnection) => {
+    mic.getTracks().forEach(t => t.stop())
+    try { pc?.close() } catch { /* already closed */ }
+    ctx?.close().catch(() => {})
+  }
   if (opts.signal?.aborted) { release(); throw new DOMException('ended', 'AbortError') }
   let pc: RTCPeerConnection
   try { pc = new RTCPeerConnection() } catch (e) { release(); throw e }
@@ -74,7 +90,7 @@ export async function startVoice(opts: {
   }
   if (ctx) {
     try {
-      if (ctx.state === 'suspended') void ctx.resume()
+      if (ctx.state === 'suspended') void ctx.resume().catch(() => {})
       youAnalyser = ctx.createAnalyser()
       youAnalyser.fftSize = 512
       ctx.createMediaStreamSource(mic).connect(youAnalyser)
@@ -107,6 +123,9 @@ export async function startVoice(opts: {
   // Without a working level meter both simply stay out of the way: the microphone stays open, and the quiet watch
   // goes by the transcript alone.
   let live = false
+  const handshake = new AbortController()
+  const abortSetup = () => stop()
+  const connectLimit = setTimeout(() => stop('等不到口說連線。請檢查網路，再試一次。'), 45_000)
   let guard = guardStart()
   let quiet = quietStart(performance.now())
   let nudging = !!opts.quiet
@@ -132,17 +151,19 @@ export async function startVoice(opts: {
   const stop = (detail?: string) => {
     if (closed) return
     closed = true
+    clearTimeout(connectLimit)
+    handshake.abort()
+    opts.signal?.removeEventListener('abort', abortSetup)
     try { if (events.readyState === 'open') events.send(JSON.stringify({ type: 'session.close' })) } catch { /* ignore */ }
-    setTimeout(() => pc.close(), 300)
-    mic.getTracks().forEach(t => t.stop())
+    if (live) setTimeout(() => { try { pc.close() } catch { /* already closed */ } }, 300)
+    release(live ? undefined : pc)
     audio.srcObject = null
     cancelAnimationFrame(frame)
     clearInterval(watch)
-    ctx?.close().catch(() => {})
     opts.onLevel?.(0, 0)
     opts.onState('closed', detail)
   }
-  opts.signal?.addEventListener('abort', () => stop(), { once: true })
+  opts.signal?.addEventListener('abort', abortSetup, { once: true })
   const append = (role: Line['role'], delta: string) => opts.onLine(prev => {
     const last = prev[prev.length - 1]
     if (last && last.role === role) return [...prev.slice(0, -1), { role, text: last.text + delta }]
@@ -153,7 +174,12 @@ export async function startVoice(opts: {
     if (closed) return
     let msg: { type?: string; delta?: string; error?: { message?: string; client_event_id?: string }; message?: string }
     try { msg = JSON.parse(e.data) } catch { return }
-    if (msg.type === 'session.started') { live = true; quiet = quietStart(performance.now()); opts.onState('live') }
+    if (msg.type === 'session.started' && !live) {
+      clearTimeout(connectLimit)
+      live = true
+      quiet = quietStart(performance.now())
+      opts.onState('live')
+    }
     else if (msg.type === 'session.input_transcript.delta' && msg.delta) { quiet = quietHeard(quiet, 'user', performance.now()); append('user', msg.delta) }
     else if (msg.type === 'session.output_transcript.delta' && msg.delta) { quiet = quietHeard(quiet, 'assistant', performance.now()); append('assistant', msg.delta) }
     else if (msg.type === 'session.closed') stop()
@@ -162,35 +188,39 @@ export async function startVoice(opts: {
     // Any other provider error ends the session the same way as hanging up: microphone off, connection closed.
     else if (msg.type === 'error') stop(msg.error?.message || msg.message || '連線出錯了')
   }
-  pc.onconnectionstatechange = () => { if (['failed', 'disconnected'].includes(pc.connectionState)) stop() }
-  const aborted = () => { if (opts.signal?.aborted) throw new DOMException('ended', 'AbortError') }
+  pc.onconnectionstatechange = () => {
+    if (['failed', 'disconnected'].includes(pc.connectionState)) stop('口說連線中斷了。請檢查網路，再試一次。')
+  }
 
   // Every failure while connecting (no network, an HTTP error, a bad answer) goes through the same clean-up.
   try {
+    handshake.signal.throwIfAborted()
     const offer = await pc.createOffer()
+    handshake.signal.throwIfAborted()
     await pc.setLocalDescription(offer)
     // Ending the call also cancels a request on its way, and no second request is sent after it ended.
     const create = (opening?: string) => fetch('https://api.openai.com/v1/live/sessions', {
-      method: 'POST', signal: opts.signal,
+      method: 'POST', signal: handshake.signal,
       headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         session: {
-          model: 'gpt-live-1.1', instructions: opts.instructions, audio: { output: { voice: voiceName() } },
+          model: 'gpt-live-1.1', instructions: opts.instructions, audio: { output: { voice } },
           ...(opening ? { input: [{ type: 'message', role: 'developer', content: [{ type: 'input_text', text: opening }] }] } : {}),
         },
         transport: { type: 'webrtc', sdp: offer.sdp },
       }),
     })
-    aborted()
+    handshake.signal.throwIfAborted()
     let res = await create(opts.opening)
-    aborted()
+    handshake.signal.throwIfAborted()
     let data = await res.json().catch(() => null)
-    aborted()
+    handshake.signal.throwIfAborted()
     // The opening message is an extra: if the service does not take the request with it, the call starts without it.
     if (opts.opening && (res.status === 400 || res.status === 422)) {
       res = await create()
+      handshake.signal.throwIfAborted()
       data = await res.json().catch(() => null)
-      aborted()
+      handshake.signal.throwIfAborted()
     }
     if (!res.ok) {
       const msg = data?.error?.message ?? res.statusText
@@ -199,11 +229,13 @@ export async function startVoice(opts: {
       throw new Error('OpenAI 連線失敗：' + msg)
     }
     if (!data?.transport?.sdp) throw new Error('OpenAI 回傳的連線資料不完整，等一下再試。')
-    aborted()
+    handshake.signal.throwIfAborted()
     await pc.setRemoteDescription({ type: 'answer', sdp: data.transport.sdp })
+    handshake.signal.throwIfAborted()
   } catch (e) {
-    stop()
-    throw e instanceof TypeError ? new Error('連不上 OpenAI：檢查網路後再試一次。') : e
+    const error = e instanceof TypeError ? new Error('連不上 OpenAI：檢查網路後再試一次。') : e
+    stop(error instanceof Error ? error.message : String(error))
+    throw error
   }
   return { stop }
 }

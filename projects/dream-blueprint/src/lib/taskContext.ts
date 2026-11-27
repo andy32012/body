@@ -15,7 +15,9 @@ export interface TaskContext {
 // Every task on screen, newest opened last: a box opened inside a page (用它寫一句 inside a reading) is the task until it
 // is closed, and then the page's own task is the task again.
 const open = new Map<symbol, { ctx: TaskContext; at: number }>()
+const taskChatTab = globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 let opened = 0
+let activity = 0
 let current: TaskContext | null = null
 let owner: symbol | null = null
 const subs = new Set<() => void>()
@@ -28,10 +30,15 @@ function settle() {
   const same = owner === (top?.[0] ?? null) && current?.label === next?.label && current?.detail === next?.detail && !current?.onHelp === !next?.onHelp
   current = next ? { ...next } : null
   owner = top?.[0] ?? null
-  if (!same) emit()
+  if (!same) {
+    activity += 1
+    emit()
+  }
 }
 
 export function currentTask() { return current }
+/** Share context only as long as the same activity stays on screen. Draft edits keep its scope. */
+export function currentTaskChatScope() { return 'task:' + taskChatTab + ':' + activity }
 /** A queued question can mark help only on the exercise whose button opened it. */
 export function captureTaskHelp() {
   const id = owner

@@ -64,6 +64,10 @@ App 不需要這個資料夾就能跑；只有要改發音課的內容或重錄�
 
 `intonation.py` 會等男女聲每句都找到合格的候選才更新檔案。如果有句子錄不到，指令會列出句子及各個候選的結果，原錄音和選擇會保留。重新選音前需要完整的男女聲製作清單。要用 `regrade.py` 重新評分時，程式會先列出製作清單裡讀不到的音檔，等全部分數算完才更新清單。
 
+`syllables.py` 重跑時會逐個讀取舊的慢速整字、各音節及組合音檔。少一段或讀到損壞的音檔，就重錄那個字。錄不到能辨識的慢速整字時，會保留該字原有的檔案並報錯。`choose.py` 會先核對候選音檔，有缺失時會使用可用候選，選不齊課程需要的對比字則保留原選音清單。
+
+`pack.py` 將所有音包寫到暫存資料夾並檢查索引後，再替換正式檔。若後段的檔案無法替換或移除，會還原前面已更動的檔案。`verify.py` 成品驗音時會核對語調課的試聽、測驗與跟讀句。音訊轉換失敗會直接指出失敗的轉換步驟。
+
 需要 Python 3.11+、ffmpeg，以及 `kokoro-onnx`、`misaki`（加 spaCy 的 `en_core_web_sm`）、`faster-whisper`、`cmudict`、`praat-parselmouth`、`soundfile`；切音節另外要 `onnx`、`onnxruntime`，和音素辨識模型 `onnx-community/wavlm-large-english-phoneme-ONNX` 的 `onnx/model.onnx`、`vocab.json`（放在這個資料夾的 `phon/`，或用 `PRON_PHONES` 指到別處；約 1.3 GB，跑的時候要 3 GB 左右的記憶體，女聲、男聲不要同時跑）。Kokoro 的 `kokoro-v1.0.onnx` 和 `voices-v1.0.bin`（kokoro-onnx 的 GitHub release）放在這個資料夾，或用環境變數 `PRON_MODELS` 指到別處。
 
 ```

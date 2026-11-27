@@ -1,12 +1,12 @@
-import { answered, clauseCommaNote, compareWithReference } from '../lib/evidence'
+import { answered, clauseCommaNote, compareWithReference, questionMarkNote } from '../lib/evidence'
 
 /** His answer held against the reference without showing it: his own words, the ones the reference does not have
  *  marked, and how many words he has not written yet (not which). Matching it says so. */
 export default function OwnCheck({ answer, references }: { answer: string; references: readonly string[] }) {
   if (!answered(answer)) return <p className="pr-compare"><small>先把想到的英文寫上去，再對照哪裡不一樣。</small></p>
+  const punctuation = questionMarkNote(answer, references) || clauseCommaNote(answer, references)
+  if (punctuation) return <p className="pr-compare"><small>{punctuation}</small></p>
   const diff = compareWithReference(answer, references)
-  const commas = clauseCommaNote(answer, references)
-  if (commas) return <p className="pr-compare"><small>{commas}</small></p>
   if (!diff || diff.same) return <p className="pr-compare"><small>跟參考句一樣 ✓</small></p>
   return <p className="pr-compare">
     <small>你寫的：</small>{' '}

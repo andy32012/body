@@ -79,13 +79,15 @@ export function mergeMemoryNotes(local: Record<string, string>, remote: Record<s
     [memoryTimesKey]: JSON.stringify(records.updated ?? {}) }
 }
 
-export function memoryPrompt(list: string[]) {
+export function memoryPrompt(list: string[], canUpdate = true) {
   return [
     '',
     '【你記得的事】（之前聊天時記下來的，回答時自然用上，不要逐條唸出來）',
     ...(list.length ? list.map(n => '- ' + n) : ['- 目前還沒有']),
     '',
-    '【記憶規則】如果他這次說了值得長期記住的事（例如考試或重要日期、常搞錯的字或文法、喜歡或討厭的東西、目標、心情狀況），在回覆的最後另起一行，寫「[記住] 一句話的內容」，可以寫好幾行。已經記過的不要重複。他說「忘掉某件事」時，寫「[忘記] 那件事的關鍵字」。這幾行他看不到。',
+    canUpdate
+      ? '【記憶規則】如果他這次說了值得長期記住的事（例如考試或重要日期、常搞錯的字或文法、喜歡或討厭的東西、目標、心情狀況），在回覆的最後另起一行，寫「[記住] 一句話的內容」，可以寫好幾行。已經記過的不要重複。他說「忘掉某件事」時，寫「[忘記] 那件事的關鍵字」。這幾行他看不到。'
+      : '這段是題目討論，只能使用已有的記憶，請勿新增或刪除長期記憶。',
   ].join('\n')
 }
 

@@ -30,7 +30,7 @@ export const unitRule = (unit: number) => curriculum.units.find(u => u.id === un
 
 // ── Held-out test: one attempt per part, opened on the unit's last day (its checkpoint) or once it is finished.
 export const heldKey = (unit: number) => 'bridge.held.' + unit
-export interface HeldPart { day: string; correct: number; total: number; picks: number[]; heard?: boolean; at?: number }
+export interface HeldPart { day: string; correct: number; total: number; picks: number[]; heard?: boolean; at?: number; questionRevisions?: Record<number, number> }
 export interface HeldRecord { reading?: HeldPart; listening?: HeldPart }
 export function readHeld(notes: Record<string, string>, unit: number): HeldRecord {
   try { return notes[heldKey(unit)] ? JSON.parse(notes[heldKey(unit)]) as HeldRecord : {} } catch { return {} }

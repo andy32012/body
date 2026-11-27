@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { chooseDraft, draftVersions, watchDraft, writeDraft } from '../lib/drafts'
 
 /** Each version stays available after closing a tab, until the learner explicitly chooses one. */
-export default function DraftVersions({ id, text, onChoose, disabled = false, legacyId, onChooseLegacy }: {
+export default function DraftVersions({ id, text, onChoose, disabled = false, keepBlank = false, legacyId, onChooseLegacy }: {
   id: string; text: string; onChoose: (text: string) => void; disabled?: boolean
+  keepBlank?: boolean
   legacyId?: string; onChooseLegacy?: () => void
 }) {
   const [saved, setSaved] = useState(() => ({
@@ -23,7 +24,7 @@ export default function DraftVersions({ id, text, onChoose, disabled = false, le
   const legacy = [...new Set(saved.legacy.map(v => v.text))]
     .filter(value => value !== text && !alternatives.includes(value))
   function select(value: string) {
-    chooseDraft(id, value, saved.versions)
+    chooseDraft(id, value, saved.versions, keepBlank)
     onChoose(value)
   }
   function restore(value: string) {
@@ -35,9 +36,9 @@ export default function DraftVersions({ id, text, onChoose, disabled = false, le
     {alternatives.length > 0 && <details className="pr-reference">
       <summary>這一題有其他分頁的草稿，查看並選擇</summary>
       <p>選定後會把選的文字放進作答欄，並取代這裡列出的其他版本。</p>
-      {text.trim() && <button type="button" className="pr-link" disabled={disabled} onClick={() => select(text)}>保留作答欄的版本</button>}
+      {(keepBlank || !!text.trim()) && <button type="button" className="pr-link" disabled={disabled} onClick={() => select(text)}>保留作答欄的版本</button>}
       {alternatives.map(value => <section key={value}>
-        <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} lang="en">{value}</p>
+        {value.trim() ? <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} lang="en">{value}</p> : <p>這份草稿是空白的。</p>}
         <button type="button" className="pr-link" disabled={disabled} onClick={() => select(value)}>使用上面這版草稿</button>
       </section>)}
     </details>}

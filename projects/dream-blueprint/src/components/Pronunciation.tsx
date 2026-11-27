@@ -1,6 +1,6 @@
 import AskWhy from './AskWhy'
 import ReadAloudCheck from './ReadAloudCheck'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronLeft, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { useTaskContext } from '../lib/taskContext'
@@ -13,7 +13,7 @@ import { stopSpeaking } from '../lib/tts'
 import { LockLine } from './Locked'
 import './pron.css'
 
-type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string
+type Props = Pick<PageProps, 'state'> & { onSavedActivity: (apply: (prev: PageProps['state']) => PageProps['state']) => Promise<void>; date: string
   /** Saves a setting without counting the day as practice (choosing a voice is not practising). */
   update?: PageProps['update'] }
 type Player = ReturnType<typeof usePronPlayer> & { blocked: boolean }
@@ -26,7 +26,7 @@ const voicesOf = (choice: VoiceChoice): PronVoice[] => choice === 'both' ? ['f',
 const takes = (texts: string[], choice: VoiceChoice): Take[] => voicesOf(choice).flatMap(voice => texts.map(text => ({ text, voice })))
 
 /** The pronunciation course in the practice library: the list of lessons, or one lesson. */
-export default function Pronunciation({ state, onActivity, update, date }: Props) {
+export default function Pronunciation({ state, onSavedActivity, update, date }: Props) {
   const [openId, setOpenId] = useState<string | null>(null)
   const lesson = pronLessons.find(l => l.id === openId)
   const top = useRef<HTMLDivElement>(null)
@@ -38,7 +38,7 @@ export default function Pronunciation({ state, onActivity, update, date }: Props
   }
   return <div className="pr-stack pn" ref={top}>
     {lesson
-      ? <Lesson key={lesson.id} lesson={lesson} state={state} onActivity={onActivity} update={update} date={date} onBack={() => open(null)} onOpen={open} />
+      ? <Lesson key={lesson.id} lesson={lesson} state={state} onSavedActivity={onSavedActivity} update={update} date={date} onBack={() => open(null)} onOpen={open} />
       : <Index state={state} onOpen={open} />}
   </div>
 }
@@ -83,6 +83,7 @@ function SaveAll() {
   const lifecycle = useRef<AbortController | null>(null)
   const downloading = useRef(false)
   const checkNumber = useRef(0)
+  const refreshStatus = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     if (!service) return
@@ -93,35 +94,54 @@ function SaveAll() {
   }, [service, worker])
 
   useEffect(() => {
-    if (!worker) return
+    if (!service || !worker) return
     const controller = new AbortController()
+    let refresh: ReturnType<typeof setTimeout> | undefined
     lifecycle.current = controller
     setSaving(false)
     setError('')
-    const check = async () => {
+    const check = async (keepDownloadError = false) => {
       if (downloading.current || document.visibilityState === 'hidden') return
       const number = ++checkNumber.current
       try {
         const progress = await offlinePacks(worker, false, controller.signal)
-        if (!controller.signal.aborted && number === checkNumber.current) { setStatus(progress); setError('') }
-      } catch (e) {
         if (!controller.signal.aborted && number === checkNumber.current) {
+          setStatus(progress)
+          if (!keepDownloadError || (progress.total > 0 && progress.done === progress.total)) setError('')
+        }
+      } catch (e) {
+        if (!keepDownloadError && !controller.signal.aborted && number === checkNumber.current) {
           setStatus(null)
           setError(e instanceof Error ? e.message : '無法確認本機已保存的發音。')
         }
       }
     }
-    void check()
-    window.addEventListener('online', check)
-    document.addEventListener('visibilitychange', check)
+    const cacheChanged = (event: MessageEvent) => {
+      if (event.source !== worker || event.data?.type !== 'SOUNDS_CACHE_CHANGED') return
+      clearTimeout(refresh)
+      refresh = setTimeout(() => void check(true), 150)
+    }
+    const recheck = () => void check()
+    refreshStatus.current = () => void check(true)
+    recheck()
+    window.addEventListener('online', recheck)
+    window.addEventListener('focus', recheck)
+    window.addEventListener('pageshow', recheck)
+    document.addEventListener('visibilitychange', recheck)
+    service.addEventListener('message', cacheChanged)
     return () => {
       controller.abort()
       lifecycle.current = null
       downloading.current = false
-      window.removeEventListener('online', check)
-      document.removeEventListener('visibilitychange', check)
+      refreshStatus.current = null
+      clearTimeout(refresh)
+      window.removeEventListener('online', recheck)
+      window.removeEventListener('focus', recheck)
+      window.removeEventListener('pageshow', recheck)
+      document.removeEventListener('visibilitychange', recheck)
+      service.removeEventListener('message', cacheChanged)
     }
-  }, [worker])
+  }, [service, worker])
 
   if (!worker) return null
   const saved = status && status.total > 0 && status.done === status.total
@@ -143,6 +163,7 @@ function SaveAll() {
       if (!signal.aborted) {
         downloading.current = false
         setSaving(false)
+        refreshStatus.current?.()
       }
     }
   }
@@ -155,10 +176,24 @@ function SaveAll() {
   </p>
 }
 
-function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Props & { lesson: PronLesson; onBack: () => void; onOpen: (id: string) => void }) {
+function usePronSave() {
+  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle')
+  const waiting = useRef(false)
+  async function save(write: () => Promise<void>) {
+    if (waiting.current) return
+    waiting.current = true
+    setStatus('saving')
+    try { await write(); setStatus('saved') } catch { setStatus('failed') }
+    finally { waiting.current = false }
+  }
+  return { status, save, reset: () => setStatus('idle') }
+}
+
+function Lesson({ lesson, state, onSavedActivity, update, date, onBack, onOpen }: Props & { lesson: PronLesson; onBack: () => void; onOpen: (id: string) => void }) {
   const audio = useAudioActivity()
+  const tableSave = usePronSave()
   const player: Player = { ...usePronPlayer(lesson.id, () => !audio.isBusy()), blocked: audio.busy }
-  function beginRecording(signal: AbortSignal) {
+  function beginAudio(signal: AbortSignal) {
     const release = audio.acquire(signal)
     if (!release) return
     player.stop()
@@ -178,10 +213,10 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       lesson.pairs ? '這堂的對比字：' + lesson.pairs.map(p => p.join(' / ')).join('、') : '', '你聽不到他的聲音，不要評他的發音；可以解釋嘴型、舌頭位置和中文裡最接近的音。'].filter(Boolean).join('\n'),
   })
   const say = (texts: string[], voice: VoiceChoice = choice) => player.play(takes(texts, voice), rate)
-  const setVoice = (v: VoiceChoice) => (update ?? onActivity)(prev => ({ ...prev, notes: { ...prev.notes, [voiceKey]: v } }))
+  const setVoice = (v: VoiceChoice) => (update ?? onSavedActivity)(prev => ({ ...prev, notes: { ...prev.notes, [voiceKey]: v } }))
   const speaking = (text: string) => player.now?.text === text
   const finish = (patch: { d?: string; q?: [number, number]; s?: string }, spoke = false) =>
-    onActivity(prev => { const notes = savePron(prev.notes, lesson.id, patch); return { ...prev, notes: spoke ? logSkill(notes, 'speak', date) : notes } })
+    onSavedActivity(prev => { const notes = savePron(prev.notes, lesson.id, patch); return { ...prev, notes: spoke ? logSkill(notes, 'speak', date) : notes } })
 
   return <>
     <button type="button" className="pr-link pn-back" onClick={onBack}><ChevronLeft size={16} />全部 {pronLessons.length} 堂</button>
@@ -235,7 +270,10 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       </ul>}
       {lesson.kind === 'table' && <div className="pn-done">
         {rec.d ? <p role="status">{short(rec.d)} 聽過、念過一輪了。之後每一堂都會再細教其中幾個音。</p>
-          : <button type="button" className="pr-main" onClick={() => finish({ d: date, s: date }, true)}>每個都聽過、跟著念過了</button>}
+          : <button type="button" className="pr-main" disabled={tableSave.status === 'saving'} onClick={() => void tableSave.save(() => finish({ d: date, s: date }, true))}>
+            {tableSave.status === 'saving' ? '正在儲存進度' : tableSave.status === 'failed' ? '重試儲存進度' : '每個都聽過、跟著念過了'}
+          </button>}
+        {tableSave.status === 'failed' && <p role="alert">練習進度還沒儲存，可以再試一次。</p>}
       </div>}
     </section>
 
@@ -246,9 +284,9 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
 
     {lesson.sentences && <section className="pn-sec" aria-label="跟著念句子">
       <h4><i aria-hidden="true">{hasQuiz(lesson) ? 4 : 3}</i>放進句子裡，跟著念</h4>
-      <AudioActivityContext.Provider value={audio}>
+      <AudioActivityContext.Provider value={{ ...audio, acquire: beginAudio }}>
         <Shadow lesson={lesson} speaking={speaking} onSay={t => say([t])} saidOn={rec.s} today={date} onDone={() => finish({ s: date }, true)}
-          audioBusy={audio.busy} beginRecording={beginRecording} />
+          audioBusy={audio.busy} beginAudio={beginAudio} />
       </AudioActivityContext.Provider>
     </section>}
 
@@ -298,7 +336,7 @@ function Stress({ label }: { label: string }) {
 
 /** One attempt: hear a clip, choose. The questions are fixed when the attempt starts; the score is saved at the end. */
 function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLesson; player: Player; choice: VoiceChoice; rate: number; best?: [number, number]
-  onDone: (right: number, total: number) => void }) {
+  onDone: (right: number, total: number) => Promise<void> }) {
   const [questions, setQuestions] = useState<PronQuestion[] | null>(null)
   const [at, setAt] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
@@ -307,6 +345,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
   // The question whose sound played to the end: a cut-off or failed play cannot open its choices.
   const [heardQ, setHeardQ] = useState(-1)
   const [noSound, setNoSound] = useState(false)
+  const resultSave = usePronSave()
   const request = useRef(0)
   const q = questions?.[at]
   async function playQ(n: number, text: string, voice: PronVoice) {
@@ -323,6 +362,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
   // Starting and moving on happen inside a tap, so the clip of the new question can play at once.
   function start() {
     const list = quizFor(lesson, Date.now())
+    resultSave.reset()
     setQuestions(list); setAt(0); setPicked(null); setRights([]); setPlays(1); setHeardQ(-1); setNoSound(false)
     void playQ(0, list[0].audio, voiceAt(0))
   }
@@ -337,9 +377,12 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
       setAt(at + 1); setPicked(null); setPlays(1)
       void playQ(at + 1, questions[at + 1].audio, voiceAt(at + 1))
     } else {
-      onDone(rights.filter(Boolean).length, rights.length)
       setAt(questions.length)
+      saveResult()
     }
+  }
+  function saveResult() {
+    void resultSave.save(() => onDone(rights.filter(Boolean).length, rights.length))
   }
   if (!questions) return <div className="pn-quiz">
     <p className="ls-help">{best ? '最好成績 ' + best[0] + ' / ' + best[1] + (best[0] / best[1] >= PASS ? '，已經過關；想再測可以再來一次。' : '，對 ' + Math.ceil(best[1] * PASS) + ' 題過關。') : '只用耳朵聽，選出聽到的是哪一個。答對八成就過關，可以重測。'}</p>
@@ -348,9 +391,14 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
   if (!q) {
     const right = rights.filter(Boolean).length, ok = right / rights.length >= PASS
     return <div className="pn-quiz gm-feedback" data-ok={ok} role="status">
-      <strong>{rights.length} 題對 {right} 題{ok ? '，過關' : ''}</strong>
+      <strong>{rights.length} 題對 {right} 題{ok && resultSave.status === 'saved' ? '，過關' : ''}</strong>
       <small>{ok ? '耳朵分得出來了。接著把下面的句子跟著念出聲。' : '還分不太出來很正常。回到上面「比一比」多聽幾次，再測一次。'}</small>
-      <button type="button" className={ok ? 'pr-link' : 'pr-main'} onClick={start}>再測一次</button>
+      {resultSave.status === 'saving' && <small>正在儲存成績。</small>}
+      {resultSave.status === 'failed' && <>
+        <small role="alert">這次的成績還沒儲存。</small>
+        <button type="button" className="pr-link" onClick={saveResult}>重試儲存這次成績</button>
+      </>}
+      {resultSave.status === 'saved' && <button type="button" className={ok ? 'pr-link' : 'pr-main'} onClick={start}>再測一次</button>}
     </div>
   }
   const answered = picked !== null
@@ -380,68 +428,96 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
 }
 
 /** The lesson's sentences: listen, say each one aloud (recording yourself is optional), tick it. All ticked = a speaking day. */
-function Shadow({ lesson, speaking, onSay, saidOn, today, onDone, audioBusy, beginRecording }: {
+function Shadow({ lesson, speaking, onSay, saidOn, today, onDone, audioBusy, beginAudio }: {
   lesson: PronLesson; speaking: (t: string) => boolean; onSay: (t: string) => void
-  saidOn?: string; today: string; onDone: () => void; audioBusy: boolean
-  beginRecording: (signal: AbortSignal) => (() => void) | undefined
+  saidOn?: string; today: string; onDone: () => Promise<void>; audioBusy: boolean
+  beginAudio: (signal: AbortSignal) => (() => void) | undefined
 }) {
   const list = lesson.sentences ?? []
   const [said, setSaid] = useState<boolean[]>(() => list.map(() => false))
-  const [finished, setFinished] = useState(false)
+  const progress = usePronSave()
   function tick(i: number) {
     const nextSaid = said.map((v, j) => j === i ? !v : v)
     setSaid(nextSaid)
-    if (!finished && nextSaid.every(Boolean)) { setFinished(true); onDone() }
+    if (progress.status !== 'saved' && nextSaid.every(Boolean)) void progress.save(onDone)
   }
   return <>
     <small className="pn-hint">先聽，再自己念出聲，念過就打勾。可以錄下來跟示範比一比（錄音只留在這個畫面），或按「念念看，幫我比對」看哪些字語音辨識沒聽出來。</small>
     <ol className="pn-lines">
       {list.map((s, i) => <li key={s.en} data-on={speaking(s.en)}>
         <button type="button" className="st-say" aria-label={'聽這一句：' + s.en} disabled={audioBusy} onClick={() => onSay(s.en)}><Volume2 size={14} /></button>
-        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder audioBusy={audioBusy} beginRecording={beginRecording} /><ReadAloudCheck text={s.en} compact maxMs={20000} /></div>
-        <button type="button" className="pn-tick" aria-pressed={said[i]} aria-label={(said[i] ? '取消：' : '我念過了：') + s.en} onClick={() => tick(i)}>
+        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder audioBusy={audioBusy} beginAudio={beginAudio} /><ReadAloudCheck text={s.en} compact maxMs={20000} /></div>
+        <button type="button" className="pn-tick" disabled={progress.status === 'saving'} aria-pressed={said[i]} aria-label={(said[i] ? '取消：' : '我念過了：') + s.en} onClick={() => tick(i)}>
           {said[i] ? <Check size={14} strokeWidth={3} /> : '念了'}</button>
       </li>)}
     </ol>
-    {finished ? <p className="pn-ok" role="status">{list.length} 句都念過了，今天的口說算一天。</p>
+    {progress.status === 'saved' ? <p className="pn-ok" role="status">{list.length} 句都念過了，今天的口說算一天。</p>
       : saidOn && <p className="ls-help">{saidOn === today ? '今天念過這一堂的句子了。' : '上次 ' + short(saidOn) + ' 念過。'}</p>}
+    {progress.status === 'saving' && <small role="status">正在儲存跟讀進度。</small>}
+    {progress.status === 'failed' && said.every(Boolean) && <>
+      <small role="alert">跟讀進度還沒儲存。</small>
+      <button type="button" className="pr-link" onClick={() => void progress.save(onDone)}>重試儲存跟讀進度</button>
+    </>}
   </>
 }
 
 /** Optional: record yourself and listen back. The clip stays on this screen. */
-function Recorder({ audioBusy, beginRecording }: {
-  audioBusy: boolean; beginRecording: (signal: AbortSignal) => (() => void) | undefined
+type BeginAudio = (signal: AbortSignal) => (() => void) | undefined
+
+function Recorder({ audioBusy, beginAudio }: {
+  audioBusy: boolean; beginAudio: BeginAudio
 }) {
-  const [recording, setRecording] = useState(false)
+  const [phase, setPhase] = useState<'idle' | 'asking' | 'recording' | 'stopping'>('idle')
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const recorder = useRef<MediaRecorder | null>(null)
   const request = useRef<AbortController | null>(null)
   const microphone = useRef<MediaStream | null>(null)
-  useEffect(() => () => {
+  useLayoutEffect(() => () => {
     request.current?.abort()
     request.current = null
-    if (recorder.current?.state === 'recording') recorder.current.stop()
+    const r = recorder.current
+    if (r) r.ondataavailable = r.onerror = r.onstop = null
     microphone.current?.getTracks().forEach(t => t.stop())
   }, [])
   useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
   const supported = useMemo(() => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== 'undefined', [])
   if (!supported) return null
   async function toggle() {
-    if (recorder.current?.state === 'recording') { recorder.current.stop(); return }
+    if (recorder.current?.state === 'recording') {
+      try {
+        recorder.current.stop()
+        setPhase('stopping')
+      } catch {
+        request.current?.abort()
+        request.current = recorder.current = null
+        microphone.current?.getTracks().forEach(t => t.stop())
+        microphone.current = null
+        setPhase('idle')
+        setError('無法停止錄音，請再錄一次。')
+      }
+      return
+    }
+    if (phase === 'asking') {
+      request.current?.abort()
+      request.current = null
+      setPhase('idle')
+      return
+    }
     if (request.current) return
     const controller = new AbortController()
-    const release = beginRecording(controller.signal)
+    const release = beginAudio(controller.signal)
     if (!release) return
     request.current = controller
-    function finish() {
+    setPhase('asking')
+    const finish = () => {
       if (request.current !== controller) return false
       microphone.current?.getTracks().forEach(t => t.stop())
       microphone.current = null
       request.current = null
       recorder.current = null
-      release?.()
-      setRecording(false)
+      release()
+      setPhase('idle')
       return true
     }
     const failed = () => {
@@ -455,19 +531,76 @@ function Recorder({ audioBusy, beginRecording }: {
       microphone.current = stream
       const chunks: Blob[] = []
       const r = new MediaRecorder(stream)
-      r.ondataavailable = e => chunks.push(e.data)
+      r.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
       r.onerror = failed
       r.onstop = () => {
-        if (finish()) setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType })))
+        if (!finish()) return
+        if (chunks.length) setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType })))
+        else setError('這次沒有錄到聲音，請再錄一次。')
       }
-      recorder.current = r; r.start(); setRecording(true)
+      recorder.current = r
+      r.start()
+      setPhase('recording')
     } catch {
       failed()
     }
   }
   return <div className="pn-rec">
-    <button type="button" className="pr-link" disabled={audioBusy && !recording} onClick={toggle}>{recording ? <><Square size={13} />停止錄音</> : <><Mic size={13} />{url ? '重錄' : '錄自己的聲音'}</>}</button>
-    {url && <audio controls src={url} />}
+    <button type="button" className="pr-link" disabled={phase === 'stopping' || (audioBusy && phase === 'idle')} onClick={toggle}>
+      {phase === 'recording' ? <><Square size={13} />停止錄音</> : phase === 'asking' ? '取消錄音' : phase === 'stopping' ? '正在儲存錄音' : <><Mic size={13} />{url ? '重錄' : '錄自己的聲音'}</>}
+    </button>
+    {url && <RecordedClip key={url} url={url} audioBusy={audioBusy} beginAudio={beginAudio} />}
     {error && <small role="alert">{error}</small>}
   </div>
+}
+
+function RecordedClip({ url, audioBusy, beginAudio }: { url: string; audioBusy: boolean; beginAudio: BeginAudio }) {
+  const element = useRef<HTMLAudioElement>(null)
+  const playback = useRef<AbortController | null>(null)
+  const [playing, setPlaying] = useState(false)
+  const [error, setError] = useState(false)
+  useLayoutEffect(() => {
+    const audio = element.current
+    return () => {
+      audio?.pause()
+      playback.current?.abort()
+      playback.current = null
+    }
+  }, [])
+  function finish() {
+    if (!playback.current) return
+    element.current?.pause()
+    playback.current.abort()
+    playback.current = null
+    setPlaying(false)
+  }
+  async function toggle() {
+    const audio = element.current
+    if (!audio) return
+    if (playback.current) { finish(); return }
+    const controller = new AbortController()
+    if (!beginAudio(controller.signal)) return
+    playback.current = controller
+    setPlaying(true)
+    setError(false)
+    try { await audio.play() } catch {
+      if (playback.current === controller) {
+        finish()
+        setError(true)
+      }
+    }
+  }
+  return <>
+    <audio ref={element} src={url} hidden onEnded={() => {
+      if (element.current?.ended) finish()
+    }} onPause={() => {
+      if (element.current?.paused) finish()
+    }} onError={() => {
+      if (playback.current) { finish(); setError(true) }
+    }} />
+    <button type="button" className="pr-link" disabled={audioBusy && !playing} onClick={() => void toggle()}>
+      {playing ? <><Square size={13} />暫停我的錄音</> : <><Volume2 size={13} />聽我的錄音</>}
+    </button>
+    {error && <small role="alert">無法播放錄音，請再試一次。</small>}
+  </>
 }

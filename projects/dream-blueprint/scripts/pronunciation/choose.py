@@ -2,9 +2,11 @@
 A pair is kept only when both words are clear in one and the same voice, for the woman's voice and for the man's.
 Writes chosen.json (read by course.py and pack.py) and recordings.json (the check record of every clip in the course)."""
 import os
+from functools import lru_cache
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from course import parse, slug, lesson_texts, HERE, CHOSEN, read_json, write_json, publish_recording_files
+from recorded_take import read_take
 
 ORDER = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_adam', 'am_fenrir', 'am_michael', 'am_puck']}
 takes = {g: read_json(os.path.join(HERE, 'out', g + '.json')) for g in 'fm'}
@@ -15,12 +17,25 @@ ok = {'strict': ('strict',), 'weak': ('strict', 'weak')}
 problems = []
 missing = []
 
+
+@lru_cache(maxsize=None)
+def usable_take(g, clip, voice):
+    rec = takes[g].get(clip, {}).get(voice)
+    if not rec:
+        return None
+    try:
+        read_take(Path(HERE) / 'out' / g / voice / (clip + '.wav'), rec.get('secs'))
+    except (OSError, RuntimeError, ValueError):
+        return None
+    return rec
+
+
 def pair_voice(g, a, b, level):
     """The voice in which both words of a pair are clear (the one with the widest margin; an earlier voice wins a near tie)."""
     best = None
     for v in ORDER[g]:
         if voices[g].get(a, v) != v or voices[g].get(b, v) != v: continue     # a word already in the course keeps its voice
-        ta, tb = takes[g].get(a, {}).get(v), takes[g].get(b, {}).get(v)
+        ta, tb = usable_take(g, a, v), usable_take(g, b, v)
         if ta and tb and ta['grade'] in ok[level] and tb['grade'] in ok[level]:
             margin = min(ta['value'], tb['value'])
             if best is None or margin > best[0] + 0.5: best = (margin, v)
@@ -50,7 +65,8 @@ for l in lessons:
         for a, b in sorted(pool['pairs'], key=margin, reverse=True): take_pair(a, b, 'strict', -99)
         for a, b in pool['pairs']: take_pair(a, b, 'weak', -99)
         got.sort(key=pool['pairs'].index)
-        if len(got) < pool['keep']: problems.append(f"{l['id']}: only {len(got)} of {pool['keep']} pairs are clear in both voices")
+        if len(got) < pool['keep']:
+            missing.append(f"{l['id']}: only {len(got)} of {pool['keep']} required pairs have readable and suitable recordings in both voices")
         picked += got
     if l['pools']:
         pairs[l['id']] = picked
@@ -65,14 +81,14 @@ for l in lessons:
         if '~' in t: continue          # the pieces of a long word are cut by syllables.py and follow the word (below)
         s = slug(t)
         for g in 'fm':
-            have = takes[g].get(s, {})
+            have = {v: r for v in takes[g].get(s, {}) if (r := usable_take(g, s, v))}
             if not have:
                 missing.append(f"{l['id']}: no recording of {t!r} ({g})")
                 continue
             if s not in voices[g]:
                 forced = fixed.get(g, {}).get(s)
                 clear = [v for v in ORDER[g] if have.get(v, {}).get('grade') == 'strict']
-                voices[g][s] = forced or (clear[0] if clear else max(have, key=lambda v: have[v]['value']))
+                voices[g][s] = forced or (clear[0] if clear else max(have, key=lambda v: (have[v]['grade'] != 'bad', have[v]['value'])))
             r = have.get(voices[g][s])
             if r is None:
                 missing.append(f"{l['id']}: no recording of {t!r} in the selected voice {voices[g][s]}")

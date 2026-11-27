@@ -4,8 +4,9 @@ import { Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { hasDraft, readDraft, savedDraftTexts, writeDraft } from '../lib/drafts'
-import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, mixedIeltsScores, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteRecord, type WriteStage } from '../lib/writing'
+import { legacyRecordId } from '../lib/recordId'
+import { askClaude, useTaskContext } from '../lib/taskContext'
+import { applyIeltsLengthRule, chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, mixedIeltsScores, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteRecord, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { chapterReady, type BookIndex } from '../lib/grammarBook'
 import { LockLine } from './Locked'
@@ -56,12 +57,40 @@ function Graded({ fb, short }: { fb: WriteFeedback; short?: { words: number; min
   </>
 }
 
+function FeedbackQuestion({ fb, prompt, requirement, rubric, checks }: {
+  fb: WriteFeedback; prompt: string; requirement: string; rubric: string; checks: readonly string[]
+}) {
+  const [question, setQuestion] = useState('')
+  return <form className="pr-stack" onSubmit={event => {
+    event.preventDefault()
+    if (!question.trim()) return
+    const context = {
+      題目: prompt, 中文要求: requirement, 評分表: rubric, 檢查項目: checks,
+      被批改的原稿: fb.answer ?? '舊紀錄未留下原稿',
+      分數: fb.band, 分項: fb.scores ?? fb.criteria, 本題是否符合要求: fb.checks,
+      評語: fb.summary, 下次建議: fb.next, 訂正: fb.fixes, 修改版: fb.revised,
+    }
+    askClaude(question.trim(), { general: true, hidden: [
+      '學生在問這次已保存的寫作評語。請用中文回答他的追問，能對照原稿或評語時指出具體片段。',
+      '原稿若沒有保存，就按現有評語解釋，並說明無法核對的地方。保留這次評分，只解釋及指導。',
+      JSON.stringify(context),
+    ].join('\n') })
+    setQuestion('')
+  }}>
+    <label className="pr-field">想追問這版評語的什麼地方？
+      <input type="text" value={question} onChange={event => setQuestion(event.target.value)} />
+    </label>
+    <div className="pr-actions"><button type="submit" className="pr-link" disabled={!question.trim()}>問 Claude 這版評語</button></div>
+  </form>
+}
+
 /** 寫作階梯: Claude grades each piece by the published table for its stage (全民英檢 or IELTS); IELTS tasks get a timer and a word target. */
-type LadderProps = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; initialTask?: string }
+type LadderProps = Pick<PageProps, 'state'> & { onSavedActivity: (update: Parameters<PageProps['update']>[0]) => Promise<void>; date: string; initialTask?: string }
 
 // Keep a check attached to the task even if changing practice modes unmounts the ladder.
 type PaidGrade = { feedback: WriteFeedback; best?: number; words: number; day: string }
 type WritingCheck = { busy: true } | { busy: false; error: string; claudeDown?: boolean; unsaved?: PaidGrade }
+type SelfForm = { key: string; text: string; ticks: boolean[]; pending?: boolean; error?: string }
 const writingChecks = new Map<string, WritingCheck>()
 const checkListeners = new Set<() => void>()
 function subscribeToChecks(listener: () => void) {
@@ -91,7 +120,7 @@ export default function WritingLadder(props: LadderProps) {
   return <Ladder {...props} {...material} />
 }
 
-function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderProps & { stages: WriteStage[]; index: BookIndex }) {
+function Ladder({ state, onSavedActivity, date, initialTask, stages, index }: LadderProps & { stages: WriteStage[]; index: BookIndex }) {
   // An unsubmitted draft is local. Remember the work available when this page opened, including drafts written before the new grammar requirements.
   const [drafts] = useState(() => {
     const savedTexts = savedDraftTexts('write.')
@@ -131,12 +160,15 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
   const claudeDown = checking?.busy === false && checking.claudeDown
   const rec = readWrite(state.notes, task.id)
   const fb = rec?.last
+  const gradedAnswer = fb?.answer
   const [showRevised, setShowRevised] = useState(false)
   const [showSample, setShowSample] = useState(false)
-  const [ticks, setTicks] = useState<boolean[]>([])
-  // The self-check was saved just now (without Claude): say so, and offer the next task.
-  const [savedSelf, setSavedSelf] = useState(false)
-  const [endAt, setEndAt] = useState<number>()
+  const [selfForm, setSelfForm] = useState<SelfForm>()
+  const currentSelf = selfForm?.key === draftKey && selfForm.text === text ? selfForm : undefined
+  const selfDraft = useMemo(() => text.trim() ? legacyRecordId(text) : undefined, [text])
+  const savedSelf = selfDraft !== undefined && rec?.selfReview?.draft === selfDraft
+  const [timers, setTimers] = useState<Record<string, number>>({})
+  const endAt = timers[task.id]
   const [now, setNow] = useState(Date.now())
   const stageStrip = useRef<HTMLDivElement>(null)
   const stageStarted = stage.tasks.some(t => readWrite(state.notes, t.id) !== null)
@@ -148,15 +180,11 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
     strip.scrollLeft += selected.getBoundingClientRect().left - strip.getBoundingClientRect().left - (strip.clientWidth - selected.offsetWidth) / 2
   }, [stage.id])
   useEffect(() => () => stopSpeaking(), [stage.id])
-  // Each task keeps its own timer: going to another task and back finds it where it was (still running, or run out).
-  const timers = useRef(new Map<string, number>())
-  const timerTask = useRef(task.id)
-  useEffect(() => { if (endAt) timers.current.set(timerTask.current, endAt); else timers.current.delete(timerTask.current) }, [endAt])
+  // Each task keeps its own deadline, including while another task is open.
   useEffect(() => {
     setDraft({ key: draftKey, text: readDraft(draftKey) })
-    setShowRevised(false); setShowSample(false); setTicks([]); setSavedSelf(false)
-    timerTask.current = task.id
-    setEndAt(timers.current.get(task.id))
+    setShowRevised(false); setShowSample(false); setSelfForm(undefined)
+    setNow(Date.now())
   }, [task.id, draftKey])
   useEffect(() => { if (!endAt) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t) }, [endAt])
   const words = wordCount(text)
@@ -183,32 +211,45 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
   const outline = kind ? essays[kind].outline : stage.id === 'task1' ? taskOneOutlines[chartKind(task.chart) ?? 'trend'] : outlines[stage.id]
   const sentencePoints = rubric.id === 'gept-sentence' ? rubric.max * parts.length : 0
 
+  function editDraft(value: string) {
+    if (text !== value) setSelfForm(undefined)
+    setDraft({ key: draftKey, text: value })
+  }
   async function save(patch: Partial<WriteRecord>, id = task.id, count = words, day = date) {
-    let applied = false
-    await onActivity(prev => {
+    await onSavedActivity(prev => {
       const old = readWrite(prev.notes, id)
       const best = patch.best === undefined ? old?.best : Math.max(old?.best ?? 0, patch.best)
-      // An older submission still counts as a try but cannot replace a newer draft's feedback.
-      const olderFeedback = (old?.last?.submittedAt ?? 0) > (patch.last?.submittedAt ?? Infinity)
+      // An older submission still counts as a try but cannot replace a newer draft's feedback or word count.
+      const keepFeedback = !!old?.last && (!patch.last || (old.last.submittedAt ?? 0) > (patch.last.submittedAt ?? 0))
       const next = { ...old, ...patch, best, tries: (old?.tries ?? 0) + (patch.last ? 1 : 0),
-        last: olderFeedback ? old?.last : patch.last ?? old?.last,
-        day: old?.day && old.day > day ? old.day : day, words: olderFeedback ? old?.words ?? count : count }
+        last: keepFeedback ? old.last : patch.last,
+        day: old?.day && old.day > day ? old.day : day, words: keepFeedback ? old.words : count,
+        ...(patch.selfReview ? { selfReview: { ...patch.selfReview, at: Math.max(patch.selfReview.at, (old?.selfReview?.at ?? 0) + 1) } } : {}) }
       // Every day he hands in writing counts as a writing day, even when the same task is redone on a later day.
       const notes = logSkill({ ...prev.notes, [writeKey(id)]: JSON.stringify(next) }, 'write', day)
-      applied = true
       return { ...prev, notes }
     })
-    return applied
+  }
+  const selfReady = !!currentSelf && selfList.length > 0 && selfList.every((_, i) => currentSelf.ticks[i])
+  async function saveSelf() {
+    if (!currentSelf || !selfReady || currentSelf.pending || !selfDraft || savedSelf) return
+    const pending = { ...currentSelf, pending: true, error: undefined }
+    setSelfForm(pending)
+    try {
+      await save({ self: 1, selfReview: { draft: selfDraft, at: Date.now() } })
+      setSelfForm(current => current === pending ? undefined : current)
+    } catch {
+      setSelfForm(current => current === pending ? { ...pending, pending: false, error: '這份自評還沒存下來。勾選已保留，可以再試一次。' } : current)
+    }
   }
   async function saveGrade(grade: PaidGrade) {
-    let saved = false
     try {
-      saved = await save({ last: grade.feedback, best: grade.best }, task.id, grade.words, grade.day)
+      await save({ last: grade.feedback, best: grade.best }, task.id, grade.words, grade.day)
+      setWritingCheck(task.id)
     } catch {
       // Keep the reply available for another local save attempt.
+      setWritingCheck(task.id, { busy: false, unsaved: grade, error: '已收到批改，暫時無法寫入練習紀錄。可以再按一次儲存這份回覆。' })
     }
-    setWritingCheck(task.id, saved ? undefined
-      : { busy: false, unsaved: grade, error: '已收到批改，暫時無法寫入練習紀錄。可以再按一次儲存這份回覆。' })
   }
   function retrySave() {
     const active = writingChecks.get(task.id)
@@ -220,6 +261,10 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
     const answer = text.trim()
     const active = writingChecks.get(task.id)
     if (!answer || active?.busy || active?.unsaved) return
+    if (stage.ielts && !words) {
+      setWritingCheck(task.id, { busy: false, error: '先寫一點和題目有關的英文，才能送出批改。' })
+      return
+    }
     const submittedAt = Math.max(Date.now(), (rec?.last?.submittedAt ?? 0) + 1)
     setWritingCheck(task.id, { busy: true })
     setShowRevised(false)
@@ -235,7 +280,8 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
         failure = { busy: false, error: '評分失敗：回傳的批改項目、理由或分數不符評分表，請再按一次批改。' }
         return
       }
-      const graded: WriteFeedback = { ...f, answer, submittedAt }
+      const feedback: WriteFeedback = { ...f, answer, submittedAt }
+      const graded = stage.ielts ? applyIeltsLengthRule(feedback, words) : feedback
       grade = { feedback: graded, best: countedBest(graded, !!stage.ielts, words, task), words, day: date }
     } catch (e) {
       const error = controller.signal.aborted ? '等候批改逾時。草稿已保留，可以重新送出。'
@@ -344,7 +390,7 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
       <div className="wl-tasks" role="group" aria-label="題目">{taskPage?.tasks.map(({ task: t, label }) => {
         const open = writeTaskOpen(t, unit)
         return <button key={t.id} type="button" aria-pressed={t.id === task.id} disabled={!open} data-locked={!open} title={open ? t.zh : '上到單元 ' + t.unit + ' 才打開'} onClick={() => setTaskId(t.id)}>
-          {!open && '🔒 '}{label}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 自評' : ''}</button>
+          {!open && '🔒 '}{label}{taskDone(readWrite(state.notes, t.id), !!stage.ielts) ? ' ✓' : selfChecked(readWrite(state.notes, t.id)) ? ' · 曾自評' : ''}</button>
       })}</div>
     </section>}
     {(() => {
@@ -367,35 +413,50 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
     </section>
     <label className="pr-field">我的英文
       <textarea lang="en" rows={rubric.id === 'gept-sentence' ? 4 : stage.ielts ? 14 : 8} value={text} spellCheck={false} autoComplete="off" readOnly={busy}
-        onChange={e => { setDraft({ key: draftKey, text: e.target.value }); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
+        onChange={e => { editDraft(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder={rubric.id === 'gept-sentence' ? '一句一行也可以' : '先照文法介紹和題目要求寫，寫不出來的地方先留空'} />
     </label>
-    <DraftVersions id={draftKey} text={text} onChoose={value => setDraft({ key: draftKey, text: value })} disabled={busy} />
+    <DraftVersions id={draftKey} text={text} onChoose={editDraft} disabled={busy} />
     <div className="wl-bar">
       <span data-ok={words >= task.min}>{words} / {task.min} 字</span>
       {stage.ielts && (endAt ? <span data-ok={left > 0}>{left > 0 ? '剩 ' + Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0') : '時間到（可以繼續寫完）'}</span>
-        : <button type="button" className="pr-link" onClick={() => { setEndAt(Date.now() + (stage.minutes ?? 20) * 60000); setNow(Date.now()) }}>開始計時 {stage.minutes} 分鐘</button>)}
+        : <button type="button" className="pr-link" onClick={() => {
+          const start = Date.now()
+          setTimers(current => ({ ...current, [task.id]: start + (stage.minutes ?? 20) * 60000 }))
+          setNow(start)
+        }}>開始計時 {stage.minutes} 分鐘</button>)}
       {bestText && <span>最佳：{bestText}</span>}
     </div>
     {stage.ielts && <small className="wl-count">英文字和數字各算一個（well-known、don't、37.5 都算一個）。中文和標點不計入字數，這裡的字數供練習參考。</small>}
     <div className="pr-actions">
       {unsaved ? <button type="button" className="pr-main" onClick={retrySave}>儲存已收到的批改</button>
         : keyed || busy ? <button type="button" className="pr-main" disabled={!text.trim() || busy} onClick={check}>{busy ? 'Claude 批改中……' : fb ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表批改'}</button>
-        : <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setTicks(selfList.map(() => false))}>自己對照評分表檢查</button>}
+        : !savedSelf && <button type="button" className="pr-main" disabled={!selfDraft || !!currentSelf} onClick={() => setSelfForm({ key: draftKey, text, ticks: selfList.map(() => false) })}>自己對照評分表檢查</button>}
       <StuckButton />
       {/* With Claude connected there is no model essay: Claude grades and teaches. It opens only if Claude can't be reached. */}
       {task.sample && (!keyed || claudeDown) && <button type="button" className="pr-link" onClick={() => setShowSample(!showSample)}>{showSample ? '收起參考範文' : '看參考範文'}</button>}
     </div>
     {error && <p className="tu-error" role="alert">{error}</p>}
     {showSample && (!keyed || claudeDown) && <section className="pr-reference"><small>參考範文（只是一種寫法；看完先自己改，不要照抄）</small>{task.sample.split('\n').map((l, i) => l.trim() ? <p key={i} lang="en">{l}</p> : null)}</section>}
-    {!keyed && ticks.length > 0 && <section className="wl-self">
-      <strong>逐項檢查，做到就打勾</strong>
-      {selfList.map((c, i) => <label key={c}><input type="checkbox" checked={!!ticks[i]} onChange={e => { const n = [...ticks]; n[i] = e.target.checked; setTicks(n) }} /> {c}</label>)}
-      {savedSelf ? <p className="wl-saved" role="status">記下來了 ✓（自評完成・待確認）</p>
-        : <button type="button" disabled={!ticks.length || ticks.some(x => !x)} onClick={() => { void save({ self: 1, day: date, words }); setSavedSelf(true) }}>都做到了，記下來</button>}
-      <small>還沒連接 Claude，這一題會記成「自評完成・待確認」，不算過關；連上 Claude 照評分表批改過才算。</small>
+    {!keyed && (savedSelf || currentSelf) && <section className="wl-self">
+      {savedSelf ? <p className="wl-saved" role="status">這一版已記下 ✓（自評完成・待確認）</p>
+        : currentSelf && <>
+          <strong>逐項檢查，做到就打勾</strong>
+          {selfList.map((c, i) => <label key={c}><input type="checkbox" checked={!!currentSelf.ticks[i]} disabled={currentSelf.pending}
+            onChange={e => { const ticks = [...currentSelf.ticks]; ticks[i] = e.target.checked; setSelfForm({ ...currentSelf, ticks }) }} /> {c}</label>)}
+          {currentSelf.error && <p className="tu-error" role="alert">{currentSelf.error}</p>}
+          <button type="button" disabled={!selfReady || currentSelf.pending} onClick={() => void saveSelf()}>{currentSelf.pending ? '正在儲存自評……' : '都做到了，記下來'}</button>
+        </>}
+      <small>這一版的自評會記成「自評完成・待確認」。通過這題要由 Claude 照評分表批改。</small>
     </section>}
     {fb && <section className="wl-fb" aria-live="polite">
-      {fb.answer !== undefined && fb.answer.trim() !== text.trim() && <details className="wl-old"><summary>這是你改之前那一版的批改；改過的這一版還沒批改</summary><p lang="en">{fb.answer}</p></details>}
+      {gradedAnswer !== undefined && gradedAnswer.trim() !== text.trim() && <details className="wl-old">
+        <summary>{text.trim() ? '這是你改之前那一版的批改；改過的這一版還沒批改' : '查看這份批改的原稿'}</summary>
+        <p lang="en">{gradedAnswer}</p>
+        {!text.trim() && !busy && <button type="button" className="pr-link" onClick={() => {
+          editDraft(gradedAnswer)
+          writeDraft(draftKey, gradedAnswer)
+        }}>從這版原稿接著改</button>}
+      </details>}
       {fb.rubric && fb.scores ? <Graded fb={fb} short={fb.answer !== undefined && wordCount(fb.answer) < task.min ? { words: wordCount(fb.answer), min: task.min } : undefined} /> : <>
         {/* Feedback saved before the published tables. */}
         <div className="wl-fb-head"><strong>批改</strong>{stage.ielts && fb.band !== undefined && <span className="wl-band">IELTS 練習估計分數 {fb.band}</span>}</div>
@@ -409,6 +470,7 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
       {fb.revised && <button type="button" className="pr-link" onClick={() => setShowRevised(!showRevised)}>{showRevised ? '收起修改版' : '看修改後的全文（先自己改過再看）'}</button>}
       {showRevised && fb.revised && <section className="pr-reference">{fb.revised.split('\n').map((l, i) => l.trim() ? <p key={i} lang="en">{l}</p> : null)}</section>}
       {stage.ielts && <small className="wl-note">分數是照官方 band descriptors 的練習估計，跟正式考官評分可能有差距。</small>}
+      <FeedbackQuestion key={task.id + '/' + legacyRecordId(JSON.stringify(fb))} fb={fb} prompt={prompt} requirement={task.zh} rubric={rubric.title} checks={checks} />
     </section>}
     {(fb || savedSelf) && (() => {
       // Done with this task: the way on is right here, not back up in the list.

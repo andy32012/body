@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import type { AppState, PageProps } from '../lib/store'
+import { useRef, useState } from 'react'
+import { updateStoreNow, type AppState } from '../lib/store'
 import { DrillCard } from './GrammarTeach'
 import { Translation } from './Translation'
 import { drillAnswer, drillNames, saveDrill } from '../lib/grammar'
 import { addWeak, labelOfUnit } from '../lib/weakPoints'
-import { answered, judgeWritten, levelNames, type Level } from '../lib/evidence'
+import { answered, judgeWritten, levelNames, newEvidenceId, type Level } from '../lib/evidence'
 import { logSentence } from '../lib/progress'
 import { useTaskContext } from '../lib/taskContext'
 import {
@@ -13,7 +13,7 @@ import {
 } from '../lib/themes'
 import './theme-review.css'
 
-type Props = { state: AppState; onActivity: PageProps['update']; date: string; sessionId: string }
+type Props = { state: AppState; onSavedActivity: (apply: (prev: AppState) => AppState) => Promise<void>; date: string; sessionId: string }
 const ratingOf = { good: 'correct', small: 'minor', again: 'again' } as const
 const shortDay = (day: string) => Number(day.slice(5, 7)) + '/' + Number(day.slice(8))
 
@@ -39,8 +39,9 @@ export default function ThemeReview(props: Props) {
 }
 
 type Phase = 'intro' | 'drills' | 'sentences' | 'done'
+type DrillSave = { kind: 'first'; right: boolean; said: string } | { kind: 'correction' }
 
-function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain }: Props & {
+function Round({ state, onSavedActivity, date, sessionId, run, done, onPick, onAgain }: Props & {
   run: ThemeRun; done: ThemeRun[]; onPick: (id: string) => void; onAgain: () => void
 }) {
   const scope = themeScope(run)
@@ -48,16 +49,44 @@ function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain 
   const [items] = useState(() => themeQuiz(run, state.notes))
   const [sentences] = useState(() => themeSentences(run))
   const [before] = useState(() => readThemeResult(state.notes, run.id))
+  const [roundId] = useState(newEvidenceId)
   const [phase, setPhase] = useState<Phase>('intro')
   const [at, setAt] = useState(0)
   const [rights, setRights] = useState<boolean[]>([])
-  const [written, setWritten] = useState<{ id: string; level: Level | null }[]>([])
+  const committingDrill = useRef(false)
+  const [savingDrill, setSavingDrill] = useState(false)
+  const [failedDrill, setFailedDrill] = useState<{ attempt: DrillSave; message: string } | null>(null)
+  const [written, setWritten] = useState<{ id: string; level: Level | null; attempted: boolean }[]>([])
   const [sentenceAt, setSentenceAt] = useState(0)
+  const [savingSentence, setSavingSentence] = useState(false)
   const item = items[at]
   const answeredNow = rights.length > at
   const correct = rights.filter(Boolean).length
   const wrong = items.filter((_, i) => rights[i] === false)
   const what = run.theme.family === 'tense' ? '時態' : '文法'
+  async function saveDrillAnswer(attempt: DrillSave) {
+    if (!item || committingDrill.current) return
+    committingDrill.current = true
+    setSavingDrill(true)
+    setFailedDrill(null)
+    const first = attempt.kind === 'first'
+    const next = first ? [...rights, attempt.right] : rights
+    try {
+      await onSavedActivity(prev => {
+        let notes = saveDrill(prev.notes, item.unit, item.index, first ? attempt.right : true, date)
+        const label = labelOfUnit(item.unit)
+        if (first && !attempt.right && label) notes = addWeak(notes, label, date, { w: attempt.said, r: drillAnswer(item.drill) }, 'review')
+        if (first && next.length === items.length) notes = saveThemeResult(notes, run.id, items, next, date, roundId)
+        return { ...prev, notes }
+      })
+      if (first) setRights(next)
+    } catch (error) {
+      setFailedDrill({ attempt, message: error instanceof Error ? error.message : '這題尚未儲存，請再試一次。' })
+    } finally {
+      committingDrill.current = false
+      setSavingDrill(false)
+    }
+  }
   useTaskContext(phase === 'drills' && item ? {
     label: '主題總複習（' + drillNames[item.drill.k] + '）：' + item.drill.q,
     detail: ['主題總複習：' + scope.title + '，題目混在一起出，他作答前不知道是哪一課。', '題目：' + item.drill.q,
@@ -92,22 +121,18 @@ function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain 
   if (phase === 'drills' && item) return <section className="tr" aria-label={'主題總複習：' + scope.title}>
     <div className="tr-head"><strong>第一部分：文法題混在一起</strong><small>{drillNames[item.drill.k]} · 第 {at + 1} / {items.length} 題</small></div>
     <div className="tr-bar" aria-hidden="true"><i style={{ width: (rights.length / items.length) * 100 + '%' }} /></div>
-    <DrillCard key={at} drill={item.drill} onCorrected={() => onActivity(prev => ({
-      ...prev, notes: saveDrill(prev.notes, item.unit, item.index, true, date),
-    }))} onDone={(right, said) => {
-      const next = [...rights, right]
-      setRights(next)
-      onActivity(prev => {
-        // The unit's own drill record (first try counts), the shared weak points, and — after the last question — the result.
-        let notes = saveDrill(prev.notes, item.unit, item.index, right, date)
-        const label = labelOfUnit(item.unit)
-        if (!right && label) notes = addWeak(notes, label, date, { w: said, r: drillAnswer(item.drill) }, 'review')
-        if (next.length === items.length) notes = saveThemeResult(notes, run.id, items, next, date)
-        return { ...prev, notes }
-      })
-    }} />
+    <fieldset className="tr-drill-storage" disabled={savingDrill || !!failedDrill}>
+      <DrillCard key={at} drill={item.drill}
+        onCorrected={() => void saveDrillAnswer({ kind: 'correction' })}
+        onDone={(right, said) => void saveDrillAnswer({ kind: 'first', right, said })} />
+    </fieldset>
+    {savingDrill && <p role="status">正在儲存這題…</p>}
+    {failedDrill && <div className="pr-actions">
+      <p role="alert">{failedDrill.message}</p>
+      <button type="button" className="pr-link" onClick={() => void saveDrillAnswer(failedDrill.attempt)}>重試儲存這題</button>
+    </div>}
     {answeredNow && <p className="tr-from">這題考的是：單元 {item.unit}．{scope.units.concat(scope.earlier).find(u => u.unit === item.unit)?.title}</p>}
-    {answeredNow && <button type="button" className="pr-main gm-next" onClick={() => {
+    {answeredNow && <button type="button" className="pr-main gm-next" disabled={savingDrill || !!failedDrill} onClick={() => {
       if (at + 1 < items.length) setAt(at + 1)
       else setPhase(sentences.length ? 'sentences' : 'done')
     }}>{at + 1 < items.length ? '下一題' : sentences.length ? '接著寫 ' + sentences.length + ' 句中翻英' : '看結果'}</button>}
@@ -119,20 +144,35 @@ function Round({ state, onActivity, date, sessionId, run, done, onPick, onAgain 
     return <section className="tr tr-write" aria-label={'主題總複習：' + scope.title}>
       <div className="tr-head"><strong>第二部分：中翻英</strong><small>第 {sentenceAt + 1} / {sentences.length} 句</small></div>
       <Translation key={sentence.id} sentence={sentence} checkpoint={false} hideTags label={'自己判斷要用哪個' + what + '（上面不標文法）'}
-        onMark={(m, revealed, info) => {
-          if (written.some(w => w.id === sentence.id)) return
-          if (!answered(info.answer)) revealed = true
+        draftKey={'theme.' + run.id + '.' + sentence.id} alreadyMarked={!!mark}
+        onMark={async (m, revealed, info) => {
+          if (mark || savingSentence) return false
+          const attempted = answered(info.answer)
+          if (!attempted) revealed = true
           const level = judgeWritten({ rating: ratingOf[m], revealed, answer: info.answer, references: sentence.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText })
-          setWritten([...written, { id: sentence.id, level }])
-          onActivity(prev => {
-            const logged = logSentence(prev, sessionId, date, { sentenceId: sentence.id, rating: ratingOf[m], grammar: sentence.grammar, revealed, verified: level === 'independent' })
-            return { ...logged, notes: saveThemeSentence(logged.notes, run.id, sentence.id, level) }
-          })
+          setSavingSentence(true)
+          try {
+            const write = attempted ? onSavedActivity : updateStoreNow
+            await write(prev => {
+              const current = readThemeResult(prev.notes, run.id)
+              if ((items.length || written.some(item => item.attempted)) && current?.roundId !== roundId)
+                throw new Error('這一輪的文法紀錄已被另一輪更新。這句英文還留在草稿裡。')
+              const alreadyStarted = current?.roundId === roundId
+              const notes = !attempted || alreadyStarted ? prev.notes : saveThemeResult(prev.notes, run.id, items, rights, date, roundId)
+              const logged = logSentence(notes === prev.notes ? prev : { ...prev, notes }, sessionId, date, {
+                sentenceId: sentence.id, rating: ratingOf[m], grammar: sentence.grammar, revealed, verified: level === 'independent', attempted,
+              })
+              if (!attempted && !alreadyStarted) return logged
+              return { ...logged, notes: saveThemeSentence(logged.notes, run.id, sentence.id, level) }
+            })
+            setWritten(previous => [...previous, { id: sentence.id, level, attempted }])
+            return true
+          } finally { setSavingSentence(false) }
         }} />
       <div className="pr-actions tr-next">
         {mark
           ? <button type="button" className="pr-main" onClick={() => sentenceAt + 1 < sentences.length ? setSentenceAt(sentenceAt + 1) : setPhase('done')}>{sentenceAt + 1 < sentences.length ? '下一句' : '看結果'}</button>
-          : <button type="button" className="pr-link" onClick={() => sentenceAt + 1 < sentences.length ? setSentenceAt(sentenceAt + 1) : setPhase('done')}>這句先跳過（不算作答）</button>}
+          : <button type="button" className="pr-link" disabled={savingSentence} onClick={() => sentenceAt + 1 < sentences.length ? setSentenceAt(sentenceAt + 1) : setPhase('done')}>這句先跳過（不算作答）</button>}
       </div>
     </section>
   }

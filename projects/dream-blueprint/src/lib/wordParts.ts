@@ -1,4 +1,5 @@
 import data from '../data/word-parts.json'
+import { readDailyCount } from './dailyCounts'
 
 /** Everyday prefixes, roots and suffixes (un-, port, -ful …): what a part means, words that show it, and one word to guess.
  *  The order of the list is the order they are learned in: the most common and most recognisable first. */
@@ -14,7 +15,7 @@ export const moreKey = (day: string) => 'word-part.more.' + day
 
 export const isLearned = (checks: Record<string, boolean>, p: WordPart) => !!checks[learnedKey(p.id)]
 export const learnedParts = (checks: Record<string, boolean>) => wordParts.filter(p => isLearned(checks, p))
-export const learnedToday = (notes: Record<string, string>, day: string) => Number(notes[dayCountKey(day)]) || 0
+export const learnedToday = (notes: Record<string, string>, day: string) => readDailyCount(notes, dayCountKey(day))
 /** Today's allowance: three, plus three for every time he asked for more. */
 export const allowance = (notes: Record<string, string>, day: string) => PARTS_A_DAY * (1 + (Number(notes[moreKey(day)]) || 0))
 
@@ -39,8 +40,8 @@ export interface PartQuiz { q: string; options: string[]; answer: number }
 /** "What does <guess word> mean?" The wrong choices are the guess words of other parts of the same kind. */
 export function guessQuiz(p: WordPart): PartQuiz {
   const i = wordParts.indexOf(p)
-  const same = wordParts.filter(o => o.type === p.type && o !== p)
-  const others = shuffled(same, i + 1).slice(0, 2).map(o => o.guess.zh)
+  const same = new Set(wordParts.filter(o => o.type === p.type && o.guess.zh !== p.guess.zh).map(o => o.guess.zh))
+  const others = shuffled([...same], i + 1).slice(0, 2)
   const options = shuffled([p.guess.zh, ...others], i + 101)
   return { q: p.guess.en, options, answer: options.indexOf(p.guess.zh) }
 }

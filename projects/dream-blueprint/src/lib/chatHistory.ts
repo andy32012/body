@@ -1,7 +1,7 @@
 import type { TutorTurn } from './tutor'
 
-export type ChatTurn = TutorTurn & { id: string }
-export type ChatExchange = { id: string; question: string; reply: string }
+export type ChatTurn = TutorTurn & { id: string; scope?: string }
+export type ChatExchange = { id: string; question: string; reply: string; scope?: string }
 export type ChatHistory = { generation: string; turns: ChatTurn[] }
 
 const legacy = 'legacy'
@@ -27,11 +27,11 @@ function oldTurns(key: string): ChatTurn[] {
     return [{ role: turn.role, content: turn.content, id: 'old-' + index }]
   })
 }
-export function createChatExchange(question: string, reply: string): ChatExchange {
-  return { id: Date.now().toString().padStart(16, '0') + '-' + newId(), question, reply }
+export function createChatExchange(question: string, reply: string, scope: string): ChatExchange {
+  return { id: Date.now().toString().padStart(16, '0') + '-' + newId(), question, reply, scope }
 }
-export function exchangeTurns({ id, question, reply }: ChatExchange): ChatTurn[] {
-  return [{ id: id + '/q', content: question, role: 'user' }, { id: id + '/a', content: reply, role: 'assistant' }]
+export function exchangeTurns({ id, question, reply, scope }: ChatExchange): ChatTurn[] {
+  return [{ id: id + '/q', content: question, role: 'user', scope }, { id: id + '/a', content: reply, role: 'assistant', scope }]
 }
 
 function historyFor(key: string, generation: string): ChatHistory {
@@ -41,7 +41,8 @@ function historyFor(key: string, generation: string): ChatHistory {
   for (const file of exchanges) {
     const saved = readJSON(file) as Partial<ChatExchange> | null
     if (typeof saved?.question === 'string' && typeof saved.reply === 'string') {
-      turns.push(...exchangeTurns({ id: file.slice(prefix.length), question: saved.question, reply: saved.reply }))
+      turns.push(...exchangeTurns({ id: file.slice(prefix.length), question: saved.question, reply: saved.reply,
+        scope: typeof saved.scope === 'string' ? saved.scope : undefined }))
     }
   }
   return { generation, turns: turns.slice(-40) }
@@ -58,7 +59,7 @@ export function appendChatExchange(key: string, generation: string, entry: ChatE
   if (chatGeneration(key) !== generation) return false
   const prefix = generationPrefix(key, generation)
   const itemKey = prefix + entry.id
-  localStorage.setItem(itemKey, JSON.stringify({ question: entry.question, reply: entry.reply }))
+  localStorage.setItem(itemKey, JSON.stringify({ question: entry.question, reply: entry.reply, scope: entry.scope }))
   if (chatGeneration(key) !== generation) {
     try { localStorage.removeItem(itemKey) } catch { /* The cleared generation stays hidden. */ }
     return false

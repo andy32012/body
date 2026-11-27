@@ -1,20 +1,22 @@
 import DraftVersions from './DraftVersions'
-import { useEffect, useMemo, useState } from 'react'
-import type { PageProps } from '../lib/store'
-import CorrectBox, { type Result as Feedback } from './CorrectBox'
-import { checkApplies, type Judged } from '../lib/checks'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { updateStoreNow, type AppState, type PageProps } from '../lib/store'
+import CorrectBox, { correctionBlocked, useCorrectionBlocked, useCorrectionPending, type Result as Feedback } from './CorrectBox'
+import { checkApplies } from '../lib/checks'
+import { answered } from '../lib/evidence'
 import { MessageCircleQuestion } from 'lucide-react'
 import { openClaude, useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
-import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
+import { captureDraftCleanup, readDraft, writeDraft } from '../lib/drafts'
 import { AskWord } from './AIChat'
 import ContextMeaning from './ContextMeaning'
 import { passageLevelsOpen, doneKey, levelKey, levelProgress, nextPassage, passageRound, redoDue, redoKey, type Passage } from '../lib/passages'
 import { openAt } from '../lib/unlock'
 import { dayKey } from '../lib/progress'
-import { addSayCard } from '../lib/sayCards'
+import { addSayCards } from '../lib/sayCards'
+import { correctionKey, correctionOrder, readCorrection, readCorrections, storeCorrection } from '../lib/correctionHistory'
 
-type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update'] }
+type Props = Pick<PageProps, 'state'> & { onSavedActivity: (apply: (prev: AppState) => AppState) => Promise<void> }
 const marks = [['good', '對了'], ['small', '小錯'], ['again', '不會，明天再來']] as const
 
 // Short passages written around the 7000-word list. One passage at a time, in book order.
@@ -28,11 +30,12 @@ function HintWord({ word }: { word: { en: string; form?: string } }) {
   return <><span lang="en">{form}</span>{!same && <small className="passage-lemma">（<span lang="en">{word.en}</span>）</small>}</>
 }
 
-export default function PassageLibrary({ state, update, onActivity }: Props & Pick<PageProps, 'update'>) {
+export default function PassageLibrary({ state, update, onSavedActivity }: Props & Pick<PageProps, 'update'>) {
   const [all, setAll] = useState<Passage[]>()
   const [failed, setFailed] = useState(false)
   const [skipped, setSkipped] = useState<string[]>([])
   const [letter, setLetter] = useState('')
+  const [showHistory, setShowHistory] = useState(false)
   const stored = Math.min(6, Math.max(1, Number(state.notes[levelKey]) || 1))
 
   useEffect(() => {
@@ -69,7 +72,11 @@ export default function PassageLibrary({ state, update, onActivity }: Props & Pi
         {letters.map(l => <option key={l} value={l}>{l}</option>)}
       </select></label>
       <span className="passage-count">已完成 <b>{progress.done}</b> / {progress.total}</span>
+      <button type="button" className="pr-link" aria-expanded={showHistory} onClick={() => setShowHistory(open => !open)}>
+        {showHistory ? '收起批改紀錄' : '看批改紀錄'}
+      </button>
     </div>
+    {showHistory && <PassageCorrections passages={all} notes={state.notes} />}
     {!passage ? (() => {
       const round = passageRound(all, level, state.checks, state.notes, skipped, letter)
       const where = letter ? '字母 ' + letter + ' ' : '第 ' + level + ' 級'
@@ -80,67 +87,112 @@ export default function PassageLibrary({ state, update, onActivity }: Props & Pi
         {round.waiting > 0 && <p>{round.waiting} 段今天按了「不會」，明天再出現。</p>}
         {round.skipped > 0 && <div className="pr-actions"><button type="button" className="pr-main" onClick={() => setSkipped([])}>把略過的拿回來</button></div>}
       </div>
-    })() : <PassagePractice key={passage.id} passage={passage} state={state} onActivity={onActivity}
+    })() : <PassagePractice key={passage.id} passage={passage} state={state} onSavedActivity={onSavedActivity}
       onSkip={() => setSkipped(list => [...list, passage.id])} />}
   </div>
 }
 
+function PassageCorrections({ passages, notes }: { passages: Passage[]; notes: Record<string, string> }) {
+  const [selected, setSelected] = useState('')
+  const history = useMemo(() => passages.flatMap(passage => readCorrections(notes[correctionKey('passage.' + passage.id)])
+    .map(grade => ({ passage, grade }))).sort((a, b) => correctionOrder(b.grade, a.grade)), [passages, notes])
+  const rowId = (row: typeof history[number]) => row.passage.id + ':' + row.grade.id
+  const row = history.find(entry => rowId(entry) === selected) ?? history[0]
+  return <section className="pr-reference">
+    <h2>短文批改紀錄</h2>
+    {!row ? <p>還沒有已儲存的短文批改。</p> : <>
+      <label className="pr-field">選擇作答
+        <select value={rowId(row)} onChange={event => setSelected(event.target.value)}>
+          {history.map(entry => <option key={rowId(entry)} value={rowId(entry)}>
+            第 {entry.passage.level} 級 · {entry.passage.letter} {entry.passage.n} · {entry.grade.answer.slice(0, 55)}
+          </option>)}
+        </select>
+      </label>
+      <p>{row.passage.zh}</p>
+      <p lang="en">{row.grade.answer}</p>
+      <CorrectBox key={rowId(row)} run={0} zh={row.passage.zh} reference={row.passage.en} words={row.passage.words?.map(word => word.en)}
+        rubric="gept-translation" answer={row.grade.answer} restore={row.grade} archiveOnly />
+    </>}
+  </section>
+}
+
 /** A selected passage owns its draft, feedback and requests. A sync picking the next passage mounts a fresh instance. */
-function PassagePractice({ passage, state, onActivity, onSkip }: Props & { passage: Passage; onSkip: () => void }) {
+function PassagePractice({ passage, state, onSavedActivity, onSkip }: Props & { passage: Passage; onSkip: () => void }) {
   const draftKey = 'passage.' + passage.id
   const [answer, setAnswer] = useState(() => readDraft(draftKey))
   const [show, setShow] = useState<'none' | 'words'>('none')
   const [byHand, setByHand] = useState(false)
   const [unreachable, setUnreachable] = useState(false)
   const [run, setRun] = useState(0)
-  const [last, setLast] = useState<Feedback>()
-  const [judged, setJudged] = useState<Judged>()
   const [checking, setChecking] = useState(false)
   const [previous, setPrevious] = useState<Feedback>()
+  const gradeKey = correctionKey(draftKey)
+  const grade = readCorrection(state.notes, gradeKey, answer)
+  const last = grade?.result
+  const grading = useCorrectionPending(gradeKey)
+  const blocked = useCorrectionBlocked(gradeKey)
+  const marking = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(false)
   useTaskContext({
     label: '短文中翻英：' + passage.zh.slice(0, 40) + (passage.zh.length > 40 ? '…' : ''),
     detail: ['短文中翻英，題目：' + passage.zh, passage.words?.length ? '會用到的單字：' + passage.words.map(w => w.en + '（' + w.zh + '）').join('、') : '',
       passage.en ? '參考翻譯（只供你判斷，他沒說要看前不要整段給）：' + passage.en : ''].filter(Boolean).join('\n'),
     draft: answer,
   })
-  function mark(result: typeof marks[number][0]) {
+  async function mark(result: typeof marks[number][0]) {
+    const attempted = answered(answer)
+    if (marking.current || correctionBlocked(gradeKey) || (result !== 'again' && !attempted)) return
     const id = passage.id
-    onActivity(prev => {
-      const notes = { ...prev.notes }
-      if (result === 'again') notes[redoKey(id)] = dayKey()
-      else delete notes[redoKey(id)]
-      return { ...prev, notes, checks: result === 'again' ? prev.checks : { ...prev.checks, [doneKey(id)]: true } }
-    })
-    if (result === 'again') onSkip()
-    clearDraft(draftKey)
+    const clearSubmitted = captureDraftCleanup(draftKey, answer)
+    marking.current = true
+    setSaving(true)
+    setSaveError(false)
+    try {
+      const write = attempted ? onSavedActivity : updateStoreNow
+      await write(prev => {
+        const notes = { ...prev.notes }
+        if (result === 'again') notes[redoKey(id)] = dayKey()
+        else delete notes[redoKey(id)]
+        return { ...prev, notes, checks: result === 'again' ? prev.checks : { ...prev.checks, [doneKey(id)]: true } }
+      })
+      clearSubmitted()
+      if (result === 'again') onSkip()
+    } catch { setSaveError(true) }
+    finally { marking.current = false; setSaving(false) }
   }
   const keyed = !!tutorKey()
-  const current = !!last && checkApplies(judged, passage.id, answer)
+  const current = !!grade && checkApplies({ id: passage.id, answer: grade.answer }, passage.id, answer)
   const passed = current && (last?.verdict === 'good' || last?.verdict === 'small')
   return <>
       <div className="pr-label">7000 單短文 · 第 {passage.level} 級 · {passage.letter} {String(passage.n).padStart(2, '0')}</div>
       {redoDue(state.notes, passage.id) && <p className="passage-again">這段之前按了「不會」，隔一天再試一次。寫不出來的地方先空著，批改後把錯的加入複習。</p>}
       <p className="passage-text">{passage.zh}</p>
       <label className="pr-field" htmlFor="passage-answer">我的英文翻譯</label>
-      <textarea id="passage-answer" rows={5} lang="en" value={answer} placeholder="一句一句翻，寫不出來的先空著"
-        onChange={event => { setAnswer(event.target.value); writeDraft(draftKey, event.target.value) }} />
-      <DraftVersions id={draftKey} text={answer} onChoose={setAnswer} />
+      <textarea id="passage-answer" rows={5} lang="en" value={answer} readOnly={saving || blocked} placeholder="一句一句翻，寫不出來的先空著"
+        onChange={event => { setRun(0); setAnswer(event.target.value); writeDraft(draftKey, event.target.value) }} />
+      <DraftVersions id={draftKey} text={answer} onChoose={text => { setRun(0); setAnswer(text) }} disabled={saving || blocked} />
       <div className="pr-actions">
-        {keyed && <button className={passed ? undefined : 'pr-main'} disabled={!answer.trim() || checking} onClick={() => { setPrevious(last); setUnreachable(false); setRun(n => n + 1) }}>{checking ? 'Claude 批改中……' : run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
+        {keyed && <button className={passed ? undefined : 'pr-main'} disabled={!answered(answer) || checking || blocked || saving} onClick={() => { if (correctionBlocked(gradeKey)) return; setPrevious(last); setUnreachable(false); setRun(n => n + 1) }}>{checking || grading ? 'Claude 批改中……' : last ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
         {keyed && <button className="passage-ask" onClick={openClaude}><MessageCircleQuestion size={16} aria-hidden="true" />問問 Claude</button>}
         {passage.words && passage.words.length > 0 &&
           <button className="pr-link" onClick={() => setShow(show === 'words' ? 'none' : 'words')}>這段會用到的單字</button>}
-        <button className="pr-link" onClick={onSkip}>換一段</button>
+        <button className="pr-link" disabled={saving} onClick={onSkip}>換一段</button>
       </div>
       {keyed && !run && <p className="passage-note">寫不出來的地方先空著，按「請 Claude 批改」；卡住或想知道某個字怎麼說，按「問問 Claude」。</p>}
       {!keyed && <p className="passage-note">這一頁是請 Claude 批改的：到 <a href="#settings">設定 → 連接 Claude</a> 貼上金鑰就能用。{!byHand && <> <button className="pr-link" onClick={() => setByHand(true)}>先自己對答案</button></>}</p>}
-      <CorrectBox run={run} rubric="gept-translation" zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
-        selfFix previous={previous} onBusy={setChecking} onResult={(_, __, r, text) => { setLast(r); setJudged({ id: passage.id, answer: text }) }} onError={() => setUnreachable(true)}
-        onSave={card => onActivity(prev => addSayCard(prev, card, dayKey()))} />
+      {!run && grading && <p className="passage-note" role="status">Claude 正在批改，回覆會留在這一段。</p>}
+      <CorrectBox key={run ? 'grading' : grade?.id ?? 'ungraded'} run={run} rubric="gept-translation" zh={passage.zh} reference={passage.en} words={passage.words?.map(w => w.en)} answer={answer}
+        selfFix previous={previous} onBusy={setChecking} restore={!run && grade ? { ...grade, showFull: false } : undefined} onError={() => setUnreachable(true)}
+        backgroundGrade={{ id: gradeKey, save: (result, text, submission) => updateStoreNow(prev => ({
+          ...prev, notes: storeCorrection(prev.notes, gradeKey, { ...submission, answer: text, result }),
+        })) }}
+        onSave={cards => updateStoreNow(prev => addSayCards(prev, cards, dayKey()))} />
+      {saveError && <p className="tu-error" role="alert">這次沒有存進短文紀錄。草稿仍在，可以再儲存一次。</p>}
       {last && !current && <p className="passage-note">批改之後你改了答案：改過的這一版請 Claude 再批一次，才算完成。</p>}
-      {last && <div className="pr-actions passage-next">
-        {passed ? <button className="pr-main" onClick={() => mark(last.verdict === 'good' ? 'good' : 'small')}>完成，下一段</button>
-          : <button className="pr-link" onClick={() => mark('again')}>今天先到這裡，明天再來這段</button>}
+      {last && current && <div className="pr-actions passage-next">
+        {passed ? <button className="pr-main" disabled={saving || blocked} onClick={() => void mark(last.verdict === 'good' ? 'good' : 'small')}>完成，下一段</button>
+          : <button className="pr-link" disabled={saving || blocked} onClick={() => void mark('again')}>今天先到這裡，明天再來這段</button>}
         {passed && last.verdict === 'small' && <small>小地方改一改再批一次也可以。</small>}
       </div>}
       {keyed && unreachable && !byHand && <p className="passage-note">Claude 現在連不上。<button className="pr-link" onClick={() => setByHand(true)}>先自己對答案</button></p>}
@@ -148,7 +200,7 @@ function PassagePractice({ passage, state, onActivity, onSkip }: Props & { passa
         {passage.words.map(word => <span key={word.en + (word.form ?? '')}><HintWord word={word} /> · {word.zh}{' '}
           <ContextMeaning word={word.form && word.form.toLowerCase() !== word.en.toLowerCase() ? word.form + '（' + word.en + '）' : word.en} context={(passage.en ?? '') + '\n' + passage.zh}
             cacheKey={'ctx.' + passage.id + '.' + word.en + '.' + (word.form ?? '') + '.' + word.zh}
-            notes={state.notes} onSave={(k, v) => onActivity(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} />{' '}
+            notes={state.notes} onSave={(k, v) => updateStoreNow(prev => ({ ...prev, notes: { ...prev.notes, [k]: v } }))} />{' '}
           <AskWord en={word.en} zh={word.zh} /></span>)}
       </div>}
       {byHand && <>
@@ -158,8 +210,8 @@ function PassagePractice({ passage, state, onActivity, onSkip }: Props & { passa
         </section> : <p className="passage-note">這一級還沒有參考翻譯，要連上 Claude 才能批改。</p>}
         <fieldset className="pr-marks">
           <legend>我的自評</legend>
-          {marks.map(([key, label]) => <button key={key} disabled={key !== 'again' && !answer.trim()} onClick={() => mark(key)}>{label}</button>)}
-          {!answer.trim() && <p className="pr-blank-note">還沒寫翻譯：寫下來才能自評「對了／小錯」，沒寫的不算完成。</p>}
+          {marks.map(([key, label]) => <button key={key} disabled={saving || blocked || (key !== 'again' && (!answered(answer) || !passage.en))} onClick={() => void mark(key)}>{label}</button>)}
+          {!answered(answer) && <p className="pr-blank-note">寫下英文後才能自評「對了」或「小錯」。</p>}
         </fieldset>
       </>}
   </>

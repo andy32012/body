@@ -217,5 +217,26 @@
    "ex-civil-110-c08cec",
    "ex-ast-104-3"
   ]
+ },
+ {
+  "id": "2026-11-27-clinical-language",
+  "date": "2026-11-27",
+  "note": "護理英文教材已更新。出院聽力對齊個別照護計畫的體重門檻，夜間混亂加入詢問變化及通報練習，NCLEX 閱讀改為按累計作答與考試大綱選題。另修正呼吸困難、鼻導管、血液培養和結核病的英語例句。",
+  "words": [],
+  "sentences": [],
+  "passages": [
+   "n-b2-nclex"
+  ],
+  "listening": [
+   "nl-17",
+   "nl-19",
+   "nl-24"
+  ],
+  "nursingWords": [
+   "shortness of breath",
+   "nasal cannula",
+   "blood culture",
+   "tuberculosis"
+  ]
  }
 ]

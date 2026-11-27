@@ -4,7 +4,7 @@ import type { AppState } from './store'
 import { judgeCheckpoint, judgeExpress, levelNames, sameEnglish, type Level, type Verdict } from './evidence'
 import { courseMovedOn, readLessonRecord } from './lesson'
 import { isKnownWord, levelEntry, wordKey } from './vocab'
-import type { CorrectionSubmission } from './correctionHistory'
+import { correctionOrder, type CorrectionSubmission } from './correctionHistory'
 
 /** Life topics: each one is three short sessions on different days.
  *  A 理解 — words in context, the pattern, listening (gist → details → transcript → shadow → retell) and reading;
@@ -42,7 +42,7 @@ export const partSteps = {
 export const REVIEW_GAP = 3
 
 export type Rating = 'correct' | 'minor' | 'again'
-export interface ItemResult { level: Level | null; rating: Rating; revealed: boolean }
+export interface ItemResult { level: Level | null; rating: Rating; revealed: boolean; attempted?: boolean }
 export interface SpeakRecord {
   /** Speaking itself: null when it was only typed (typing is not speech) or skipped. */
   level: Level | null
@@ -55,10 +55,14 @@ export interface SpeakRecord {
   /** One or two things to work on next time. Pronunciation is never judged from a transcript. */
   goals: string[]
 }
+export type ListenStage = 'gist' | 'details' | 'text' | 'shadow' | 'retell'
 export interface ListenRecord {
+  stage?: ListenStage
   /** First time, before the text: gist and details answered from listening alone. */
   gist?: boolean
+  gistPick?: number
   details?: number
+  detailPicks?: number[]
   total?: number
   /** Plays before the questions were checked, and plays after (with or without the text). */
   plays?: number
@@ -75,12 +79,12 @@ export interface TopicRecord {
   done: Partial<Record<TopicPart, string>>
   /** A part that was started and not finished: where to continue. */
   cur?: { part: TopicPart; step: number; day: string }
-  words?: { correct: number; total: number }
+  words?: { correct: number; total: number; picks?: number[] }
   items?: Record<string, ItemResult>
   listen?: ListenRecord
-  read?: { correct: number; total: number; missed: ReadSkill[] }
+  read?: { correct: number; total: number; missed: ReadSkill[]; picks?: number[] }
   speak?: SpeakRecord
-  write?: { level: Level | null; sentences: number; covered?: number; help: string[]; firstVerdict?: Verdict }
+  write?: { level: Level | null; sentences: number; covered?: number; help: string[]; firstVerdict?: Verdict; answer?: string }
   review?: { level: Level | null; speak?: SpeakRecord }
   /** Help and Claude's first check while a speaking or writing task is still open (kept across a reload). */
   open?: Record<string, OpenCheck>
@@ -115,6 +119,48 @@ export function readTopic(notes: Record<string, string>, id: string): TopicRecor
     const rec = raw ? JSON.parse(raw) as TopicRecord : null
     return rec && typeof rec === 'object' && rec.done && typeof rec.done === 'object' ? rec : { done: {} }
   } catch { return { done: {} } }
+}
+
+const listenStages: ListenStage[] = ['gist', 'details', 'text', 'shadow', 'retell']
+export function listenStage(record: ListenRecord): ListenStage {
+  if (record.stage && listenStages.includes(record.stage)) return record.stage
+  return record.shadowed !== undefined ? 'retell' : record.noVoice || record.details !== undefined
+    ? 'text' : record.gist !== undefined ? 'details' : 'gist'
+}
+
+/** Preserve a confirmed section when the other device stopped earlier in the same section. */
+export function mergeTopicListening(older?: ListenRecord, newer?: ListenRecord): ListenRecord | undefined {
+  if (!older || !newer) return newer ?? older
+  const stage = listenStages[Math.max(listenStages.indexOf(listenStage(older)), listenStages.indexOf(listenStage(newer)))]
+  const gist = newer.gist !== undefined && (older.gist === undefined || !older.plays || newer.plays) ? newer : older
+  const details = newer.details !== undefined && (older.details === undefined || !older.plays || newer.plays) ? newer : older
+  return {
+    ...older, ...newer, stage,
+    gist: gist.gist, plays: gist.plays, gistPick: gist.gistPick, unsure: gist.unsure,
+    details: details.details, detailPicks: details.detailPicks, total: details.total, replays: details.replays,
+    noVoice: !gist.plays ? older.noVoice || newer.noVoice : undefined,
+    transcript: older.transcript || newer.transcript,
+    shadowed: older.shadowed || (newer.shadowed ?? older.shadowed),
+    retell: newer.retell ?? (older.retell ?? (newer.retell === null ? null : older.retell)),
+  }
+}
+
+export function mergeTopicOpen(older?: TopicRecord['open'], newer?: TopicRecord['open']) {
+  if (!older || !newer) return newer ?? older
+  const open = { ...older, ...newer }
+  for (const key of Object.keys(older)) {
+    const left = older[key], right = newer[key]
+    if (!left || !right) continue
+    const first = left.firstVerdict && (!right.firstVerdict || !left.firstSubmission ||
+      (right.firstSubmission && correctionOrder(left.firstSubmission, right.firstSubmission) <= 0)) ? left : right
+    open[key] = {
+      ...left, ...right, firstVerdict: first.firstVerdict, checkedText: first.checkedText,
+      firstSubmission: first.firstSubmission, help: [...new Set([
+        ...(Array.isArray(left.help) ? left.help : []), ...(Array.isArray(right.help) ? right.help : []),
+      ])],
+    }
+  }
+  return open
 }
 export function writeTopic(notes: Record<string, string>, id: string, patch: Partial<TopicRecord>): Record<string, string> {
   return { ...notes, [topicKey(id)]: JSON.stringify({ ...readTopic(notes, id), ...patch }) }
@@ -200,14 +246,14 @@ export function completePart(prev: AppState, topic: Topic, part: TopicPart, toda
   const sentences = part === 'A' ? topic.practice : part === 'C' ? topic.review.practice : []
   const translations = sentences.flatMap(s => {
     const r = rec.items?.[s.id]
-    return r ? [{ sentenceId: s.id, rating: r.rating, grammar: s.grammar, revealed: r.revealed, verified: r.level === 'independent' }] : []
+    return r ? [{ sentenceId: s.id, rating: r.rating, grammar: s.grammar, revealed: r.revealed, verified: r.level === 'independent', attempted: r.attempted }] : []
   })
   const cards = [...prev.cards]
   const events = [...prev.reviewEvents]
   for (const t of translations) {
     const i = cards.findIndex(c => c.id === t.sentenceId)
     if (i === -1) cards.push(newCard(t.sentenceId, today))
-    else {
+    else if (t.attempted !== false) {
       const { card, event } = applyAnswer(cards[i], today, t)
       cards[i] = card
       if (event) events.push(event)
@@ -223,7 +269,8 @@ export function completePart(prev: AppState, topic: Topic, part: TopicPart, toda
     ...prev,
     cards,
     reviewEvents: events,
-    sessions: [...prev.sessions, { id: sessionId, day: today, energy, period, sentenceId: 'topic:' + topic.id + ':' + part, words, advanced: false, translations }],
+    sessions: [...prev.sessions, { id: sessionId, day: today, energy, period, sentenceId: 'topic:' + topic.id + ':' + part, words, advanced: false,
+      translations: translations.filter(t => t.attempted !== false) }],
     notes: { ...prev.notes, [topicKey(topic.id)]: JSON.stringify({ ...kept, done: { ...rec.done, [part]: today } }) },
   }
 }

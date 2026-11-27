@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Mic, Square, Settings2, X } from 'lucide-react'
 import { updateStoreNow, type AppState, type PageProps } from '../lib/store'
-import { echoGuard, openaiKey, setEchoGuard, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
+import { echoGuard, onVoicePreferencesChanged, openaiKey, setEchoGuard, setOpenaiKey, setVoiceName, startVoice, voiceName, voices, type Line, type VoiceSession } from '../lib/voice'
 import { EMMA, emmaInstructions, emmaOpening, emmaStudy, quietNudge } from '../lib/emmaPrompt'
 import { askTutor, tutorKey } from '../lib/tutor'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
-import { driveLog } from '../lib/drive'
+import { driveLog, logConsent } from '../lib/drive'
 import { dayKey } from '../lib/progress'
 import { addSayCard, removeSayCard, sayIdentity } from '../lib/sayCards'
 import { checkSequence } from '../lib/checks'
 import { addWeak, easeWeak, labelOfUnit, normalizeLabel, readRemoved, readWeak, weakAfterRemoval, weakLinesEn } from '../lib/weakPoints'
 import { parseSpeakFeedback, speakFeedbackOk, speakFeedbackPrompt, type SpeakFeedback, type SpeakFix } from '../lib/speakFeedback'
-import { speakEnglish } from '../lib/tts'
+import { speakEnglish, stopSpeaking } from '../lib/tts'
 import curriculum from '../data/curriculum.json'
 import { emmaLesson, emmaLessonInstructions } from '../lib/emmaLesson'
 import { topicById, topicInstructions, type TopicPart } from '../lib/topics'
 import { cueKey, nextCueCard, part2FeedbackPrompt, part2Instructions, type CueCard } from '../lib/ieltsSpeaking'
 import cueCards from '../data/cue-cards.json'
-import { markLessonStep, promptFor, readLessonRecord, type Lesson } from '../lib/lesson'
+import { lessonTarget, markLessonStep, parseLessonTarget, promptFor, selectLessonRecord, type Lesson } from '../lib/lesson'
 import VoiceWave, { type Levels } from '../components/VoiceWave'
 import { emmaLevel } from '../lib/cefr'
 import { hasPack, logSkill, packInstructions, speakKey, unitTitle, type Pack } from '../lib/bridge'
@@ -30,6 +30,7 @@ const NAME = EMMA
 
 type Fix = SpeakFix & { key: string; status: 'active' | 'removed' | 'unsaved'; cardId?: string; weak?: { day: string; at: number } }
 type Focus = { label: string; rule: string }
+type LessonVoice = { target: string; date: string; turns: number; words: number }
 type Attempt = {
   id: number
   focus: Focus
@@ -37,11 +38,41 @@ type Attempt = {
   review: string
   fixes: Fix[]
   feedback?: SpeakFeedback
+  unverifiedFixes?: number
   noting?: boolean
   fixing?: boolean
   error?: string
+  lessonVoice?: LessonVoice
+  savingLessonVoice?: boolean
+  lessonVoiceError?: string
 }
 type CardWork = { prepNotes?: string; prepEnd?: number; attempt?: Attempt }
+type CardWorks = Record<string, CardWork>
+
+// Keep the latest pages' work in this browser tab's memory. Nothing here is saved to disk or sent on navigation.
+function newSpeakingWork() {
+  let cards: CardWorks = {}
+  const listeners = new Set<() => void>()
+  return {
+    snapshot: () => cards,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener)
+      return () => { listeners.delete(listener) }
+    },
+    edit: (apply: (prev: CardWorks) => CardWorks) => {
+      const next = apply(cards)
+      if (next === cards) return
+      cards = next
+      listeners.forEach(listener => listener())
+    },
+    pending: new Set<number>(),
+    selectedCard: undefined as string | undefined,
+    skipped: [] as string[],
+  }
+}
+const recentSpeakingWork = new Map<string, ReturnType<typeof newSpeakingWork>>()
+let nextSpeakingAttempt = 0
+
 type SceneLoad<T> = { status: 'loading' | 'missing' | 'failed' } | { status: 'ready'; value: T }
 const sceneStatus = {
   loading: '載入中……',
@@ -62,22 +93,50 @@ function keepFix(prev: AppState, fix: SpeakFix & { key: string }, day: string): 
 }
 const clock = (ms: number) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0')
 
+/** Speaker labels are kept in the editable transcript. Never use Emma's replies to verify the learner's words. */
+function learnerTurns(transcript: string) {
+  const turns: string[] = []
+  let active: string[] | undefined
+  for (const line of transcript.split('\n')) {
+    const prefix = /^([^：:]+)[：:]\s*(.*)$/.exec(line.trim())
+    if (prefix?.[1] === '玄燁' || prefix?.[1] === NAME) {
+      if (active) turns.push(sayIdentity(active.join(' ')))
+      active = prefix[1] === '玄燁' ? [prefix[2]] : undefined
+    } else if (active) active.push(line.trim())
+  }
+  if (active) turns.push(sayIdentity(active.join(' ')))
+  return turns
+}
+
 export default function Speaking({ state, update, lessonMode = false, lessonDate, ieltsMode = false, topicMode, packMode, nurseMode, wordMode }: PageProps & { lessonMode?: boolean; lessonDate?: string; ieltsMode?: boolean; topicMode?: string; packMode?: string; nurseMode?: string; wordMode?: string }) {
   const memory = useMemory()
   // Lessons stay tied to the day they belong to, including when an older lesson is resumed.
-  const [courseDate] = useState(() => lessonDate ?? dayKey())
-  const [lesson, setLesson] = useState(() => lessonMode && (!lessonDate || readLessonRecord(state.notes, courseDate)) ? emmaLesson(state, courseDate) : null)
+  const [wantedTarget] = useState(() => lessonDate ?? dayKey())
+  const courseDate = parseLessonTarget(wantedTarget)?.date
+  function loadCourse() {
+    if (!lessonMode) return null
+    const selection = selectLessonRecord(state.notes, wantedTarget)
+    if (lessonDate !== undefined && !selection) return null
+    const target = selection ? lessonTarget(selection.date, selection.rec) : wantedTarget
+    const lesson = emmaLesson(state, target)
+    return lesson ? { target, lesson } : null
+  }
+  const [course, setCourse] = useState(loadCourse)
   useEffect(() => {
     // The lesson can arrive just after navigation, from a queued local save or from sync.
-    if (lessonMode && lessonDate && !lesson && readLessonRecord(state.notes, courseDate)) {
-      setLesson(emmaLesson(state, courseDate))
+    if (!course) {
+      const next = loadCourse()
+      if (next) setCourse(next)
     }
-  }, [courseDate, lesson, lessonDate, lessonMode, state])
+  }, [course, wantedTarget, lessonDate, lessonMode, state])
+  const courseRecord = course && selectLessonRecord(state.notes, course.target)
+  const lesson = course?.lesson
+  const courseDone = courseRecord?.rec.steps.includes('done')
   // "t1-B": role-play the speaking situation of a life topic.
   const [topic] = useState(() => {
-    const [id, part] = (topicMode ?? '').split('-')
-    const t = id ? topicById(id) : undefined
-    return t && ['A', 'B', 'C'].includes(part) ? { topic: t, part: part as TopicPart } : null
+    const match = topicMode?.match(/^(.+)-([ABC])$/)
+    const t = match ? topicById(match[1]) : undefined
+    return t && match ? { topic: t, part: match[2] as TopicPart } : null
   })
   // "43-0": the first speaking task of bridge unit 43's pack.
   const [packRef] = useState(() => { const m = (packMode ?? '').match(/^(\d+)-(\d+)$/); return m ? { unit: Number(m[1]), i: Number(m[2]) } : null })
@@ -107,35 +166,52 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
     return () => { alive = false }
   }, [nurseMode])
   const nurse = nurseLoad.status === 'ready' ? nurseLoad.value : null
-  const lessonUnavailable = lessonMode && !lesson
-  const sceneUnavailable = lessonUnavailable || (packMode !== undefined && !packTask) || (nurseMode !== undefined && !nurse)
+  const lessonUnavailable = lessonMode && (!course || (lessonDate !== undefined && !courseRecord))
   const packStatus = packRef ? packLoad.status : 'missing'
   const nurseStatus = nurseMode ? nurseLoad.status : 'missing'
   // From a word card: chat about that word; Emma knows the list, the drill and the other words of the round.
   const [wordChat] = useState(() => readWordChat(wordMode))
+  const topicUnavailable = topicMode !== undefined && !topic
+  const wordUnavailable = wordMode !== undefined && !wordChat
+  const sceneUnavailable = lessonUnavailable || topicUnavailable || wordUnavailable ||
+    (packMode !== undefined && !packTask) || (nurseMode !== undefined && !nurse)
+  const [routeHash] = useState(() => location.hash)
+  const workRoute = lessonMode ? 'lesson/' + (course?.target ?? wantedTarget) : routeHash
+  const work = useMemo(() => recentSpeakingWork.get(workRoute) ?? newSpeakingWork(), [workRoute])
+  useLayoutEffect(() => {
+    recentSpeakingWork.delete(workRoute)
+    recentSpeakingWork.set(workRoute, work)
+    if (recentSpeakingWork.size > 6) {
+      const oldest = recentSpeakingWork.keys().next().value
+      if (oldest !== undefined) recentSpeakingWork.delete(oldest)
+    }
+  }, [work, workRoute])
   const [task, setTask] = useState<string>()
-  const [cardSkip, setCardSkip] = useState<string[]>([])
+  const [cardSkip, setCardSkip] = useState(() => work.skipped)
   // The card is chosen once and kept: the call, the notes, the transcript and the feedback all belong to it. Saving
   // the card as done must not swap the title above the feedback; only 換一張 / 下一張 moves on.
-  const [cardId, setCardId] = useState(() => ieltsMode ? nextCueCard(cueCards as CueCard[], state.notes, [])?.id : undefined)
+  const [cardId, setCardId] = useState(() => ieltsMode ? work.selectedCard ?? nextCueCard(cueCards as CueCard[], state.notes, [])?.id : undefined)
   const card = ieltsMode ? (cueCards as CueCard[]).find(c => c.id === cardId) ?? nextCueCard(cueCards as CueCard[], state.notes, cardSkip) : null
+  useLayoutEffect(() => { work.selectedCard = card?.id }, [work, card])
   // The request writes back to its own card and transcript, even if a different card is open.
-  const [cardWork, setCardWork] = useState<Record<string, CardWork>>({})
+  const cardWork = useSyncExternalStore(work.subscribe, work.snapshot)
   const workKey = card?.id ?? 'chat'
   const { prepNotes = '', prepEnd, attempt } = cardWork[workKey] ?? {}
-  const { lines = [], review = '', noting = false, fixes = [], feedback, error: fbError, fixing = false } = attempt ?? {}
+  const { lines = [], review = '', noting = false, fixes = [], feedback, unverifiedFixes = 0, error: fbError, fixing = false } = attempt ?? {}
   function editCard(key: string, edit: (prev: CardWork) => CardWork) {
-    setCardWork(prev => ({ ...prev, [key]: edit(prev[key] ?? {}) }))
+    work.edit(prev => ({ ...prev, [key]: edit(prev[key] ?? {}) }))
   }
   function editAttempt(key: string, id: number, edit: (prev: Attempt) => Attempt) {
-    setCardWork(prev => {
-      const work = prev[key]
-      if (work?.attempt?.id !== id) return prev
-      return { ...prev, [key]: { ...work, attempt: edit(work.attempt) } }
+    work.edit(prev => {
+      const card = prev[key]
+      if (card?.attempt?.id !== id) return prev
+      return { ...prev, [key]: { ...card, attempt: edit(card.attempt) } }
     })
   }
   function moveCard(to: string | undefined, skip: string[]) {
     if (!card) return
+    work.skipped = skip
+    work.selectedCard = to
     setCardSkip(skip)
     setCardId(to)
     setStatus(to && cardWork[to]?.attempt?.review ? 'closed' : 'idle')
@@ -166,9 +242,15 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   const [key, setKey] = useState(openaiKey())
   const [settings, setSettings] = useState(!openaiKey())
   const [keyError, setKeyError] = useState('')
-  const [voice, setVoice] = useState(voiceName())
+  const [voice, setVoice] = useState(voiceName)
   const [guard, setGuard] = useState(echoGuard)
-  const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>('idle')
+  const [voiceSaveFailed, setVoiceSaveFailed] = useState(false)
+  const [guardSaveFailed, setGuardSaveFailed] = useState(false)
+  useEffect(() => onVoicePreferencesChanged(() => {
+    setVoice(voiceName())
+    setGuard(echoGuard())
+  }), [])
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>(() => review ? 'closed' : 'idle')
   const [error, setError] = useState('')
   const levels = useRef<Levels>({ her: 0, you: 0 })
   const [who, setWho] = useState<'' | 'her' | 'you'>('')
@@ -183,8 +265,17 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   const setup = useRef<AbortController | null>(null)
   // Call setup and audio events belong to the newest call. The grading result belongs to its transcript.
   const attempts = useRef(checkSequence())
-  const pending = useRef(new Set<number>())
-  useEffect(() => () => { setup.current?.abort(); session.current?.stop() }, [])
+  const pending = work.pending
+  const pageOpen = useRef(false)
+  useLayoutEffect(() => {
+    pageOpen.current = true
+    return () => {
+      pageOpen.current = false
+      stopSpeaking()
+      setup.current?.abort()
+      session.current?.stop()
+    }
+  }, [])
   // Keys that arrive from the computer (QR pairing) fill in here without a reload.
   useEffect(() => {
     const on = () => {
@@ -220,17 +311,19 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   }
 
   async function start() {
-    if (sceneUnavailable || setup.current || (attempt && pending.current.has(attempt.id))) return
+    if (sceneUnavailable || setup.current || (attempt && pending.has(attempt.id))) return
     if (!openaiKey()) { setSettings(true); return }
+    stopSpeaking()
     setError(''); setYouMs(0); setYouFrom(undefined); setLiveAt(undefined); setTick(Date.now())
     const mine = attempts.current.start()
-    const recording: Attempt = { id: mine, focus, lines: [], fixes: [], review: '' }
+    const recording: Attempt = { id: ++nextSpeakingAttempt, focus, lines: [], fixes: [], review: '' }
     editCard(workKey, work => ({ ...work, attempt: recording }))
     const mineNow = () => attempts.current.isCurrent(mine)
     const controller = new AbortController()
     setup.current = controller
     let ended = false
     let said: Line[] = []
+    const transcriptConsent = logConsent()
     const extra = card ? part2Instructions(card, prepNotes) : pack && packRef && packTask ? packInstructions(pack, packRef.i) : nurse ? nurseInstructions(nurse) : topic ? topicInstructions(topic.topic, topic.part) : lesson ? emmaLessonInstructions(lesson, task) : wordChat ? wordChatInstructions(wordChat) : ''
     try {
       const started = await startVoice({
@@ -248,21 +341,23 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           if (!mineNow() || ended) return
           const current = change(said)
           said = current
-          editAttempt(workKey, mine, prev => ({ ...prev, lines: current }))
+          editAttempt(workKey, recording.id, prev => ({ ...prev, lines: current }))
         },
         signal: controller.signal,
         onLevel: (her, you) => { if (mineNow()) levels.current = { her, you } },
         onState: (s, detail) => {
           if (!mineNow()) return
-          setStatus(s)
-          if (s === 'live') { const now = Date.now(); setLiveAt(now); setTick(now) }
-          if (detail) setError(detail)
+          if (pageOpen.current) {
+            setStatus(s)
+            if (s === 'live') { const now = Date.now(); setLiveAt(now); setTick(now) }
+            if (detail) setError(detail)
+          }
           if (s === 'closed' && !ended) {
             ended = true
             session.current = null
             setup.current = null
-            setLiveAt(undefined)
-            wrapUp(recording, said)
+            if (pageOpen.current) setLiveAt(undefined)
+            wrapUp(recording, said, transcriptConsent, !detail)
           }
         },
       })
@@ -270,8 +365,9 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
       if (controller.signal.aborted || !mineNow() || ended) { started.stop(); return }
       session.current = started
     } catch (e) {
-      if (!mineNow()) return
+      if (!mineNow() || !pageOpen.current) return
       setup.current = null
+      if (ended) return
       setStatus('idle')
       if (controller.signal.aborted) return
       const msg = e instanceof Error ? e.message : String(e)
@@ -279,41 +375,79 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
     }
   }
 
-  function wrapUp(recording: Attempt, said: Line[]) {
+  function hangUp() {
+    if (session.current) { session.current.stop(); return }
+    const controller = setup.current
+    if (!controller) return
+    controller.abort()
+    // A native permission prompt may still be unanswered. Its eventual result belongs to the old call.
+    if (setup.current === controller) {
+      setup.current = null
+      attempts.current.start()
+      setStatus('idle')
+    }
+  }
+
+  async function saveLessonVoice(recording: Attempt, activity: LessonVoice) {
+    editAttempt(workKey, recording.id, prev => ({ ...prev, lessonVoice: activity, savingLessonVoice: true, lessonVoiceError: '' }))
+    try {
+      await updateStoreNow(prev => {
+        const saved = selectLessonRecord(prev.notes, activity.target)
+        if (!saved) throw new Error('找不到這次口說所屬的每日課，請同步後再存。')
+        const notes = logSkill(prev.notes, 'speak', activity.date)
+        return { ...prev, notes: markLessonStep(notes, saved.date, saved.rec.unit, saved.rec.day, 'express', {
+          sentenceId: saved.rec.sentenceId, retry: saved.rec.retry,
+          voiceExpression: { date: activity.date, turns: activity.turns, words: activity.words },
+        }) }
+      })
+      editAttempt(workKey, recording.id, prev => ({ ...prev, lessonVoice: undefined }))
+    } catch (error) {
+      editAttempt(workKey, recording.id, prev => ({ ...prev,
+        lessonVoiceError: error instanceof Error ? error.message : '原課口說無法儲存，可以重存這次的紀錄。',
+      }))
+    } finally {
+      editAttempt(workKey, recording.id, prev => ({ ...prev, savingLessonVoice: false }))
+    }
+  }
+
+  function wrapUp(recording: Attempt, said: Line[], transcriptConsent: string | null, finishedNormally: boolean) {
     const day = dayKey()
-    driveLog('英文口說', said.map(l => ({ role: l.role === 'user' ? 'user' : NAME, text: l.text })))
+    driveLog('英文口說', said.map(l => ({ role: l.role === 'user' ? 'user' : NAME, text: l.text })), transcriptConsent)
     // One long answer (a Part 2 monologue arrives as one line) counts as much as a back-and-forth.
     const userLines = said.filter(l => l.role === 'user')
-    const userWords = userLines.map(l => l.text).join(' ').split(/\s+/).filter(Boolean).length
-    const spoke = userLines.length >= 2 || userWords >= 15
+    const wordsPerTurn = userLines.map(l => l.text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu)?.length ?? 0).filter(Boolean)
+    const userWords = wordsPerTurn.reduce((total, count) => total + count, 0)
+    const spoke = wordsPerTurn.length >= 2 || userWords >= 15
     const transcript = said.map(l => (l.role === 'user' ? '玄燁：' : NAME + '：') + l.text).join('\n')
     // Even one short sentence stays on screen, to correct and send by hand (「請 Claude 批改」).
     if (userLines.length) editAttempt(workKey, recording.id, prev => ({ ...prev, review: transcript }))
     if (!spoke) return
     // Speaking counts toward the week's balance of skills, whatever the mode.
-    update(prev => {
+    if (courseRecord && course) void saveLessonVoice(recording, { target: course.target, date: day, turns: wordsPerTurn.length, words: userWords })
+    else update(prev => {
       const marked = packRef && packTask ? { ...prev.notes, [speakKey(packRef.unit, packRef.i)]: day }
         : nurse ? { ...prev.notes, [nurseSpeakKey(nurse.id)]: day }
         : card ? { ...prev.notes, [cueKey(card.id)]: day } : prev.notes
-      const notes = logSkill(marked, 'speak', day)
-      const rec = lesson && readLessonRecord(notes, courseDate)
-      return { ...prev, notes: lesson && rec && rec.unit === lesson.unit && rec.day === lesson.day
-        ? markLessonStep(notes, courseDate, rec.unit, rec.day, 'express') : notes }
+      return { ...prev, notes: logSkill(marked, 'speak', day) }
     })
-    // A longer call is sent by itself, as before; a short one waits for his press.
-    if (tutorKey()) void grade(transcript, recording)
+    // A normal longer call can be graded here. A failed call leaves what was said for manual review.
+    if (finishedNormally && pageOpen.current && tutorKey()) void grade(transcript, recording)
   }
 
   /** Claude's feedback on a transcript (the call's own, or the one he corrected). Only a complete reply counts: then
    *  the corrections go into review and onto the weak-point list; an error or a broken reply keeps the transcript and
    *  says what happened, so the same transcript can be sent again. */
   async function grade(transcript: string, recording: Attempt) {
-    if (pending.current.has(recording.id) || !transcript.trim()) return
-    pending.current.add(recording.id)
+    if (pending.has(recording.id) || !transcript.trim()) return
+    pending.add(recording.id)
     editAttempt(workKey, recording.id, prev => ({ ...prev, noting: true, error: '' }))
+    const controller = new AbortController()
+    const wait = setTimeout(() => controller.abort(), 120_000)
     try {
       const raw = await askTutor((card ? part2FeedbackPrompt + '\n題目卡：' + card.topic : speakFeedbackPrompt(recording.focus, NAME)) + '\n' + memoryPrompt(memory.notes),
-        [{ role: 'user', content: transcript }])
+        [{ role: 'user', content: transcript }], controller.signal)
+      controller.signal.throwIfAborted()
+      clearTimeout(wait)
       const { clean, remember, forget } = extractMemory(raw)
       const fb = parseSpeakFeedback(clean)
       if (!speakFeedbackOk(fb, !!card)) throw new Error('Claude 的回饋格式不完整，這次不算，什麼都沒有記。可以用同一份逐字稿再批一次。')
@@ -321,8 +455,15 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
       // Preserve each correction's status across regrading, including mistakes the learner already dismissed.
       const fixes = [...recording.fixes]
       const seen = new Set(fixes.map(f => f.key))
+      const userTurns = learnerTurns(transcript)
+      let unverifiedFixes = 0
       const fresh = fb.fixes.flatMap(f => {
-        const key = sayIdentity(f.wrong) || sayIdentity(f.en) || f.wrong
+        const key = sayIdentity(f.wrong)
+        if (key && key === sayIdentity(f.en)) return []
+        if (!key || !userTurns.some(turn => (' ' + turn + ' ').includes(' ' + key + ' '))) {
+          unverifiedFixes++
+          return []
+        }
         if (seen.has(key)) return []
         seen.add(key)
         return [{ ...f, key }]
@@ -347,18 +488,20 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
         }
       }
       if (remember.length || forget.length) memory.update(remember, forget)
-      editAttempt(workKey, recording.id, prev => ({ ...prev, feedback: fb, fixes, error }))
+      editAttempt(workKey, recording.id, prev => ({ ...prev, feedback: fb, fixes, unverifiedFixes, error }))
     } catch (e) {
-      editAttempt(workKey, recording.id, prev => ({ ...prev, error: e instanceof Error ? e.message : String(e) }))
+      const reason = controller.signal.aborted ? '等不到 Claude 回覆。逐字稿已保留，可以手動再試。' : e instanceof Error ? e.message : String(e)
+      editAttempt(workKey, recording.id, prev => ({ ...prev, error: reason }))
     } finally {
-      pending.current.delete(recording.id)
+      clearTimeout(wait)
+      pending.delete(recording.id)
       editAttempt(workKey, recording.id, prev => ({ ...prev, noting: false }))
     }
   }
 
   async function toggleFix(recording: Attempt, fix: Fix) {
-    if (pending.current.has(recording.id)) return
-    pending.current.add(recording.id)
+    if (pending.has(recording.id)) return
+    pending.add(recording.id)
     editAttempt(workKey, recording.id, prev => ({ ...prev, fixing: true, error: '' }))
     try {
       let updated = fix
@@ -381,7 +524,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
     } catch (e) {
       editAttempt(workKey, recording.id, prev => ({ ...prev, error: e instanceof Error ? e.message : String(e) }))
     } finally {
-      pending.current.delete(recording.id)
+      pending.delete(recording.id)
       editAttempt(workKey, recording.id, prev => ({ ...prev, fixing: false }))
     }
   }
@@ -400,15 +543,17 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
       </header>
 
       <div className="sp-body">
-        {lesson && <div className="sp-lesson">
+        {lesson && !lessonUnavailable && <div className="sp-lesson">
           <small>{lessonDate && courseDate !== dayKey() ? '接續 ' + courseDate + ' 的課' : '今天這一堂'} · 單元 {lesson.unit}</small>
           <strong>{lesson.cando || lesson.title}</strong>
           <span>Emma 會照今天的句型跟你聊，講錯一兩個地方會請你再說一次。</span>
-          {lessonDate && <a href={'#practice/resume-' + lessonDate}>回這堂課</a>}
+          {course && lessonDate && <a href={courseDone ? '#history/day-' + course.target : '#practice/resume-' + course.target}>
+            {courseDone ? '查看這堂課的紀錄' : '回這堂課'}
+          </a>}
           <a href="#speaking">改回一般聊天</a>
         </div>}
         {lessonUnavailable && <div className="sp-lesson">
-          <strong role="status">{lessonDate ? '這台裝置找不到 ' + courseDate + ' 的每日課紀錄' : '目前找不到可接續的每日課'}</strong>
+          <strong role="status">{courseDate && lessonDate ? '這台裝置找不到 ' + courseDate + ' 的每日課紀錄' : '目前找不到可接續的每日課'}</strong>
           <span>可返回英文練習選課。若紀錄從另一台裝置同步過來，這頁會接上原本的口說練習。</span>
           <a href="#library">回到英文練習</a>
           <a href="#speaking">前往一般聊天</a>
@@ -425,7 +570,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
         {nurseMode !== undefined && <div className="sp-lesson">
           <small>護理英文 · 演一段{nurse ? ' · ' + nurse.level : ''}</small>
           {nurse ? <strong lang="en">{nurse.title}</strong> : nurseStatus !== 'ready' && <strong role="status">{sceneStatus[nurseStatus]}</strong>}
-          {nurse && <span>{nurse.scene}。你演 {nurse.you}，Emma 演 {nurse.emma}。她聽的是語音辨識的文字，不會評你的發音。</span>}
+          {nurse && <span>{nurse.scene}。你演 {nurse.you}，Emma {nurse.handoff ? "先演 " + nurse.emma + "，接著演 " + nurse.handoff.colleague : "演 " + nurse.emma}。她聽的是語音辨識的文字，不會評你的發音。</span>}
           {nurseStatus === 'failed' && <button type="button" className="sp-link" onClick={() => location.reload()}>重新下載口說教材</button>}
           <a href={nurse ? '#library/nlisten/' + nurse.id : '#library/nlisten'}>{nurse ? '回到這段聽力' : '回到護理聽力選一段'}</a>
         </div>}
@@ -473,18 +618,31 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           <span>Emma 知道你在複習這個字，會找你用它說幾句；想問意思、用法，或這一輪的其他字{wordChat.others.length ? '（' + wordChat.others.join('、') + '）' : ''}，直接問她。</span>
           <a href={wordChatBack(wordChat)}>回到{wordChat.where}</a>
         </div>}
-        {!card && !lessonMode && !topic && packMode === undefined && nurseMode === undefined && !wordChat && <div className="sp-links">
+        {(topicUnavailable || wordUnavailable) && <div className="sp-lesson">
+          <strong role="status">{topicUnavailable ? '找不到這個生活情境' : '找不到這張單字的口說題目'}</strong>
+          <a href={topicUnavailable ? '#practice/normal' : '#library/words'}>{topicUnavailable ? '回到生活主題' : '回到單字複習'}</a>
+          <a href="#speaking">前往一般聊天</a>
+        </div>}
+        {!card && !lesson && !topic && !packTask && !nurse && !wordChat && !sceneUnavailable && <div className="sp-links">
           <a className="sp-ielts-link" href="#speaking/gept">練全民英檢口說（朗讀、回答問題、看圖敘述）→</a>
           <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>
         </div>}
 
         {settings && <div className="sp-settings">
           <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => { setKey(e.target.value); setKeyError('') }} placeholder="sk-..." /></label>
-          <label>聲音<select value={voice} onChange={e => { setVoice(e.target.value); setVoiceName(e.target.value) }}>
+          <label>聲音<select value={voice} onChange={e => {
+            setVoiceSaveFailed(!setVoiceName(e.target.value))
+            setVoice(voiceName())
+          }}>
             {voices.map(v => <option key={v} value={v}>{v}</option>)}
           </select></label>
-          <label className="sp-check"><input type="checkbox" checked={guard} onChange={e => { setGuard(e.target.checked); setEchoGuard(e.target.checked) }} />
+          {voiceSaveFailed && <small role="alert">聲音設定沒有儲存，畫面已恢復這台裝置目前使用的聲音。</small>}
+          <label className="sp-check"><input type="checkbox" checked={guard} onChange={e => {
+            setGuardSaveFailed(!setEchoGuard(e.target.checked))
+            setGuard(echoGuard())
+          }} />
             <span>防回音：{NAME} 說話的時候先不收你的聲音<small>用喇叭時開著，她才不會聽到自己的聲音就停下來。戴耳機、想在她說話時插話，再關掉。</small></span></label>
+          {guardSaveFailed && <small role="alert">防回音設定沒有儲存，畫面已恢復這台裝置目前使用的設定。</small>}
           <button type="button" onClick={saveVoiceKey}>儲存</button>
           {keyError && <small role="alert">{keyError}</small>}
           <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
@@ -509,7 +667,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
       <footer className="sp-bar">
         <button type="button" className={'sp-mic' + (live ? ' on' : '')}
           disabled={!live && (sceneUnavailable || noting || fixing)}
-          onClick={() => live ? (session.current ? session.current.stop() : setup.current?.abort()) : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
+          onClick={() => live ? hangUp() : void start()} aria-label={live ? '結束通話' : '開始聊天'}>
           {live ? <Square size={18} fill="currentColor" /> : <Mic size={22} />}
         </button>
       </footer>
@@ -517,7 +675,14 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
 
     {!live && attempt && review && <section className="sp-notes sp-review">
       <strong>這次的逐字稿</strong>
-      <p>語音辨識聽錯的字可以先改，再請 Claude 批改。{noting ? '批改中……' : feedback ? '這份已經批改過了。' : '還沒批改。'}</p>
+      {attempt.savingLessonVoice && <p role="status">正在將口說存回原本的每日課……</p>}
+      {attempt.lessonVoice && attempt.lessonVoiceError && <div>
+        <p className="sp-error" role="alert">{attempt.lessonVoiceError}</p>
+        <button type="button" className="pr-link" disabled={attempt.savingLessonVoice} onClick={() => {
+          if (attempt.lessonVoice && !attempt.savingLessonVoice) void saveLessonVoice(attempt, attempt.lessonVoice)
+        }}>重存這次的口說紀錄</button>
+      </div>}
+      <p>語音辨識聽錯的字可以先改，請保留每一段前面的名字。{noting ? '批改中……' : feedback ? '這份已經批改過了。' : '還沒批改。'}</p>
       <textarea rows={6} value={review} lang="en" spellCheck={false} autoComplete="off" readOnly={noting} onChange={e => {
         const text = e.target.value
         editAttempt(workKey, attempt.id, prev => ({ ...prev, review: text }))
@@ -526,6 +691,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
         {fbError ? '用同一份逐字稿再批一次' : feedback ? '改好了，再批一次' : '請 Claude 批改'}</button></div>
         : <p>連接 Claude 之後（設定 → 連接 Claude）就能批改這份逐字稿。</p>}
       {fbError && <p className="sp-error" role="alert">{fbError}</p>}
+      {unverifiedFixes > 0 && <p role="status">有 {unverifiedFixes} 句修正對不到你在逐字稿裡說的話，已略過這些複習卡。</p>}
     </section>}
 
     {attempt && (noting || feedback) && <section className="sp-notes sp-feedback" aria-live="polite">

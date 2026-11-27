@@ -23,15 +23,18 @@ export function wordChatHash(c: WordChat) {
   const data = { en: clip(c.en, 60), zh: clip(c.zh, 60), w: clip(c.where, 12), p: c.part, s: c.seen ? 1 : 0, o: c.others.map(o => clip(o, 40)).filter(o => o && o !== c.en).slice(0, 5) }
   return 'speaking/word-' + encodeURIComponent(JSON.stringify(data))
 }
-/** Reads the part after "word-" (still URI-encoded); anything broken gives null and the page is the ordinary chat. */
+/** Reads the part after "word-" (still URI-encoded); an invalid exercise link gives null. */
 export function readWordChat(raw: string | undefined): WordChat | null {
   if (!raw) return null
   try {
     const d = JSON.parse(decodeURIComponent(raw)) as { en?: unknown; zh?: unknown; w?: unknown; p?: unknown; s?: unknown; o?: unknown }
-    if (typeof d.en !== 'string' || !d.en.trim()) return null
-    const part = typeof d.p === 'string' && d.p in partNames ? d.p as Skill : 'read'
+    if (typeof d.en !== 'string') return null
+    const en = clip(d.en, 60)
+    if (!en.split('/').some(form => form.trim())) return null
+    if (d.p !== undefined && (typeof d.p !== 'string' || !Object.hasOwn(partNames, d.p))) return null
+    const part = typeof d.p === 'string' ? d.p as Skill : 'read'
     return {
-      en: clip(d.en, 60), zh: typeof d.zh === 'string' ? clip(d.zh, 60) : '', where: typeof d.w === 'string' && d.w ? clip(d.w, 12) : '單字複習',
+      en, zh: typeof d.zh === 'string' ? clip(d.zh, 60) : '', where: (typeof d.w === 'string' && clip(d.w, 12)) || '單字複習',
       part, seen: d.s !== 0, others: Array.isArray(d.o) ? d.o.filter((o): o is string => typeof o === 'string').map(o => clip(o, 40)).slice(0, 5) : [],
     }
   } catch { return null }

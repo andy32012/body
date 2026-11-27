@@ -1,8 +1,9 @@
 import AskWhy from './AskWhy'
-import { Fragment, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { PageProps } from '../lib/store'
-import { readBands, readReadingProgress, saveReadingProgress, type ReadBand } from '../lib/reading'
-import { blankNumbers, blankParts, examPassed, examWords, readExamRecord, saveExamRead, sameWord, type ExamPassage, type ExamQuestion, type ExamWord } from '../lib/examReading'
+import type { SaveActivity, useActivitySave } from '../lib/activitySave'
+import { readBands, readReadingProgress, readingVersion, saveReadingProgress, type ReadBand } from '../lib/reading'
+import { blankNumbers, blankParts, examPassed, examReadKey, examWords, hasExamSubmission, readExamRecord, saveExamRead, sameWord, type ExamPassage, type ExamQuestion, type ExamRecord, type ExamWord } from '../lib/examReading'
 import { addWordsToReview } from '../lib/dailyWords'
 import { logSkill } from '../lib/bridge'
 import { markSkill } from '../lib/wordSkills'
@@ -22,12 +23,17 @@ const optionText = (q: ExamQuestion, i: number) => '(' + letters[i] + ') ' + q.o
 /** One past-exam passage inside 閱讀測驗: one question at a time with the answer shown right after; a passage left halfway
  *  comes back; afterwards its words can be practised (看中文寫英文) and put into the word review. Nothing on screen says
  *  which exam it came from: no exam name, no paper question numbers (blanks are numbered 1, 2, 3 in the text). */
-export default function ExamPassageView({ passage, state, onActivity, date, onNext }: Base & { passage: ExamPassage; onNext: () => void }) {
-  const [picks, setPicks] = useState<number[]>(() => {
+export default function ExamPassageView({ passage, state, onActivity, onSavedActivity, date, onNext, save, saving, error, clearError }:
+  Base & { passage: ExamPassage; onNext: () => void; onSavedActivity: SaveActivity } & ReturnType<typeof useActivitySave>) {
+  function resumeDraft() {
     const half = readReadingProgress(state.notes, examProgressSet, passage.id)
     return half && half.picks.length < passage.qs.length ? half.picks : []
-  })
-  const [saved, setSaved] = useState(false)
+  }
+  function draftVersion(notes: typeof state.notes) { return readingVersion(notes, examProgressSet, passage.id, examReadKey(passage.id)) }
+  const [picks, setPicks] = useState<number[]>(resumeDraft)
+  const revision = useRef(draftVersion(state.notes))
+  const [saved, setSaved] = useState<ExamRecord | null>(null)
+  const [practice, setPractice] = useState(false)
   const [redo, setRedo] = useState(false)
   const at = picks.length
   const done = at >= passage.qs.length
@@ -55,21 +61,43 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
       '不要提這篇文章出自哪一種考試或哪一年。',
     ].filter(Boolean).join('\n'),
   })
+  function confirmDraft(notes: typeof state.notes) {
+    if (draftVersion(notes) !== revision.current) throw new Error('這篇已有另一份練習進度，先讀取最新進度再繼續。')
+  }
   function pick(i: number) {
     // The next question appears under the finger: a double tap must not answer it too.
     if (done || !ready()) return
     const next = [...picks, i]
-    setPicks(next)
-    if (next.length === passage.qs.length) {
-      const right = passage.qs.filter((x, j) => next[j] === x.answer).length
-      // Each day a passage is read counts as a reading day. A second try on the same day is practice (saveExamRead).
-      onActivity(prev => ({ ...prev, notes: logSkill(saveExamRead(saveReadingProgress(prev.notes, examProgressSet, null, passage.id), passage.id, { day: date, picks: next, correct: right, total: passage.qs.length }), 'read', date) }))
-      setSaved(true)
-    } else if (!redo) {
-      onActivity(prev => ({ ...prev, notes: saveReadingProgress(prev.notes, examProgressSet, { id: passage.id, picks: next }) }))
-    }
+    void save(async () => {
+      if (next.length === passage.qs.length) {
+        const right = passage.qs.filter((x, j) => next[j] === x.answer).length
+        let record: ExamRecord | null = null
+        let sameDay = false
+        // A second try on the same day is practice. Do not remove a separately saved first attempt's draft.
+        await onSavedActivity(prev => {
+          if (!redo) confirmDraft(prev.notes)
+          sameDay = hasExamSubmission(readExamRecord(prev.notes, passage.id), date)
+          const cleared = redo ? prev.notes : saveReadingProgress(prev.notes, examProgressSet, null, passage.id)
+          const notes = saveExamRead(cleared, passage.id, { day: date, picks: next, correct: right, total: passage.qs.length })
+          record = readExamRecord(notes, passage.id)
+          return { ...prev, notes: logSkill(notes, 'read', date) }
+        })
+        setSaved(record)
+        setPractice(sameDay)
+      } else if (!redo) {
+        let version = ''
+        await onSavedActivity(prev => {
+          confirmDraft(prev.notes)
+          const notes = saveReadingProgress(prev.notes, examProgressSet, { id: passage.id, picks: next })
+          version = draftVersion(notes)
+          return { ...prev, notes }
+        })
+        revision.current = version
+      }
+      setPicks(next)
+    })
   }
-  function again() { setPicks([]); setSaved(false); setRedo(true) }
+  function again() { clearError(); setPicks([]); setSaved(null); setRedo(true) }
   const blankNow = q?.blank ? q.n : null
   /** A blank of the passage: its number on screen, and once answered the answer written in. */
   function blank(n: number, key: number) {
@@ -80,19 +108,19 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
     </span>
   }
   function passageText(text: string, line: number, key: number) {
-    const tapWords = (words: string) => <TapWords text={words} line={line} onWord={look.tap} picked={look.pickedForm} pickedLine={look.line} />
     const mark = passage.emphasis
     const start = mark ? text.indexOf(mark.phrase) : -1
     const offset = mark ? mark.phrase.indexOf(mark.word) : -1
-    if (!mark || start < 0 || offset < 0) return <Fragment key={key}>{tapWords(text)}</Fragment>
-    const from = start + offset
-    const Tag = mark.underline ? 'u' : 'strong'
-    return <Fragment key={key}>
-      {tapWords(text.slice(0, from))}<Tag className="ex-emphasis">{tapWords(mark.word)}</Tag>{tapWords(text.slice(from + mark.word.length))}
-    </Fragment>
+    const emphasis = mark && start >= 0 && offset >= 0
+      ? { from: start + offset, to: start + offset + mark.word.length, underline: mark.underline }
+      : undefined
+    return <TapWords key={key} text={text} line={line} segment={key} onWord={look.tap}
+      pickedIndex={look.index} pickedLine={look.line} pickedSegment={look.segment} emphasis={emphasis} />
   }
-  const rec = saved ? readExamRecord(state.notes, passage.id) : null
+  const rec = saved
   return <div className="pr-stack rd ex">
+    {error && !done && !redo && draftVersion(state.notes) !== revision.current &&
+      <button type="button" className="pr-link" onClick={() => { clearError(); revision.current = draftVersion(state.notes); setPicks(resumeDraft()) }}>讀取這篇最新的進度</button>}
     <article className="rd-passage">
       <header><h3>{where}</h3><small>{passage.words} 字{before ? ' · 上次 ' + before.correct + ' / ' + before.total : ''}</small></header>
       {passage.paras.map((para, i) => <div key={i} className="ex-para">
@@ -109,24 +137,33 @@ export default function ExamPassageView({ passage, state, onActivity, date, onNe
       <strong>{lastPick === last.answer ? named(last, at - 1) + '答對了' : named(last, at - 1) + (last.explanation ? '的官方答案是 ' : '的答案是 ') + optionText(last, last.answer)}</strong>
       {lastPick !== last.answer && <p>你選了 {optionText(last, lastPick)}。{!last.explanation && '回文章找一找線索，或請 Claude 說明。'}</p>}
       {last.explanation && <p>{last.explanation}</p>}
-      <div className="pr-actions"><button type="button" className="pr-link" onClick={() => askClaude(named(last, at - 1) + '為什麼答案是 ' + optionText(last, last.answer) + '？' + (lastPick === last.answer ? '' : '我選了 ' + optionText(last, lastPick) + '。') + '請用中文說明文章裡的線索。')}>問 Claude 為什麼</button></div>
+      <div className="pr-actions"><button type="button" className="pr-link" onClick={() => askClaude(
+        named(last, at - 1) + '為什麼答案是 ' + optionText(last, last.answer) + '？'
+          + (lastPick === last.answer ? '' : '我選了 ' + optionText(last, lastPick) + '。') + '請用中文說明文章裡的線索。',
+        { general: true, hidden: ['閱讀文章：\n' + plain,
+          '已作答的題目：' + (last.blank ? named(last, at - 1) + '要填什麼' : last.q),
+          '選項：' + last.options.map((_, i) => optionText(last, i)).join(' / '),
+          last.explanation ? '本題解析：' + last.explanation : '',
+          '只解說這一題，不提文章出自哪一種考試或哪一年。'].filter(Boolean).join('\n') },
+      )}>問 Claude 為什麼</button></div>
     </div>}
     {q && <section className="rd-q">
       <p className="rd-qmeta">第 {at + 1} / {passage.qs.length} 題{redo ? ' · 再做一次（練習）' : ''}</p>
       <h4 lang="en" className="ex-stem">{q.blank ? <span lang="zh-TW">文章裡{named(q, at)}，填哪一個最好？</span> : q.q}</h4>
-      <div className="pr-options rd-options">{q.options.map((o, i) => <button key={i} type="button" lang="en" onClick={() => pick(i)}><b>({letters[i]})</b> {o}</button>)}</div>
+      <div className="pr-options rd-options">{q.options.map((o, i) => <button key={i} type="button" lang="en" disabled={saving} onClick={() => pick(i)}><b>({letters[i]})</b> {o}</button>)}</div>
     </section>}
-    {!done && at === 0 && <button type="button" className="pr-link" onClick={onNext}>換一篇</button>}
+    {!done && at === 0 && <button type="button" className="pr-link" disabled={saving} onClick={onNext}>換一篇</button>}
     {done && <div className="pr-hint">
-      <strong>這篇答對 {correct} / {passage.qs.length}{redo || rec?.practice ? '（今天已經做過這篇：這次是練習，不算新的過關' + (examPassed(rec) ? '；之前的過關留著 ✓' : '') + '）'
-        : examPassed(rec) ? '，過關 ✓' : '，七成以上算過關，之後會再排到'}</strong>
+      <strong>這篇答對 {correct} / {passage.qs.length}{practice ? '（今天已經做過這篇：這次是練習，不算新的過關' + (examPassed(rec) ? '；之前的過關留著 ✓' : '') + '）'
+        : rec && correct / passage.qs.length >= 0.7 ? '，過關 ✓'
+        : '，七成以上算過關' + (examPassed(rec) ? '（保留之前的過關紀錄）' : '，之後會再排到')}</strong>
       <ul className="rd-review">{passage.qs.map((x, i) => <li key={x.n} data-ok={picks[i] === x.answer}>
         {named(x, i)}：{picks[i] === x.answer ? '對' : '錯，' + (x.explanation ? '官方答案' : '答案') + ' (' + letters[x.answer] + ')'}
         {x.explanation && x !== last && <p className="ex-explanation">{x.explanation}</p>}
       </li>)}</ul>
       <div className="pr-actions">
-        <button type="button" className="pr-main" onClick={onNext}>下一篇 →</button>
-        <button type="button" className="pr-link" onClick={again}>這篇再做一次（練習）</button>
+        <button type="button" className="pr-main" disabled={saving} onClick={onNext}>下一篇 →</button>
+        <button type="button" className="pr-link" disabled={saving} onClick={again}>這篇再做一次（練習）</button>
       </div>
     </div>}
     {done && <ExamWords passage={passage} state={state} onActivity={onActivity} date={date} />}

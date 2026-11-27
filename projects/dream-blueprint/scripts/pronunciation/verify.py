@@ -2,8 +2,11 @@
 as it is and shifted by 12 ms (two of the three measurements made when recording; for the intonation lesson also the direction
 of the pitch at the end).
 usage: verify.py <public/pron directory> [lesson id ...]"""
-import argparse, json, os, struct, subprocess, sys
-from course import parse, clips, slug, lesson_texts
+import argparse, sys
+from pathlib import Path
+from course import parse, clips, slug, lesson_texts, intonation_directions
+from audio_codec import decode_mp3
+from pack import read_pack
 
 parser = argparse.ArgumentParser(description='Verify the published pronunciation packs.')
 parser.add_argument('directory', help='directory containing the pronunciation packs')
@@ -24,34 +27,41 @@ from lib import check_once, ORDER, padded, transcribe, norm
 from pitchwork import final_move
 
 all_clips = clips(course)
-def decode(mp3):
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'mp3', '-i', '-', '-f', 'f32le', '-ac', '1', '-ar', '24000', '-'], input=mp3, capture_output=True, check=True).stdout
-    return np.frombuffer(p, dtype=np.float32), 24000
+sr = 24000
+lead = np.zeros(sr * 12 // 1000, dtype=np.float32)
 bad, total, secs, pieces = [], 0, 0.0, 0
 for l in lessons:
-    want = {}
-    if l['kind'] == 'listen' and any(i['label'] in ('↗', '↘') for i in l['items']):
-        for it in l['items']: want[it['text']] = 'rise' if it['label'] == '↗' else 'fall'
-        for q in l['quiz']: want[q['audio']] = 'rise' if q['options'][q['answer']].startswith('上升') else 'fall'
+    want = intonation_directions(l)
+    texts = lesson_texts(l)
     for g in 'fm':
-        with open(os.path.join(args.directory, f"{l['id']}-{g}.pack"), 'rb') as pack:
-            raw = pack.read()
-        size = struct.unpack('<I', raw[:4])[0]
-        index = json.loads(raw[4:4 + size])
-        texts = lesson_texts(l)
-        assert sorted(index) == sorted(slug(t) for t in texts), l['id']
+        path = Path(args.directory) / f"{l['id']}-{g}.pack"
+        try:
+            index, payload = read_pack(path)
+        except (OSError, ValueError) as error:
+            bad.append(f'{path.name}: {error}')
+            continue
+        expected = {slug(text) for text in texts}
+        if index.keys() != expected:
+            bad.append(f'{path.name}: missing {sorted(expected - index.keys())}, unexpected {sorted(index.keys() - expected)}')
+            continue
         for t in texts:
             off, length = index[slug(t)]
-            x, sr = decode(raw[4 + size + off:4 + size + off + length])
+            try:
+                x = np.frombuffer(decode_mp3(payload[off:off + length], sr), dtype='<f4')
+                if not np.isfinite(x).all() or not np.any(x):
+                    raise ValueError('decoded to invalid or silent audio')
+            except (RuntimeError, ValueError) as error:
+                bad.append(f"{path.name} {t!r}: {error}")
+                continue
             total += 1; secs += len(x) / sr
             if '~' in t:
                 # a long word's slow version must come back as the word; its syllables are too short to grade (see syllables.py)
                 if t.endswith('~slow'):
-                    heard = [transcribe(padded(a, sr)) for a in (x, np.concatenate([np.zeros(288, dtype=np.float32), x]))]
+                    heard = [transcribe(padded(a, sr)) for a in (x, np.concatenate([lead, x]))]
                     if not all(norm(h) == norm(t.split('~')[0]) for h in heard): bad.append(f"{l['id']}-{g} {t!r}: heard {heard}")
                 else: pieces += 1
                 continue
-            r = min((check_once(all_clips[slug(t)], a, sr) for a in (x, np.concatenate([np.zeros(288, dtype=np.float32), x]))), key=lambda r: ORDER[r['grade']])
+            r = min((check_once(all_clips[slug(t)], a, sr) for a in (x, np.concatenate([lead, x]))), key=lambda r: ORDER[r['grade']])
             note = ''
             if t in want:
                 move = final_move(x, sr, g)

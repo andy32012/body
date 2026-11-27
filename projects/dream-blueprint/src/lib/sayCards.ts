@@ -45,6 +45,10 @@ export function addSayCard<S extends { notes: Record<string, string>; cards: Rev
   return { ...prev, notes: { ...prev.notes, [sayKey(id)]: JSON.stringify(card) }, cards: [...prev.cards, newCard(id, day)] }
 }
 
+export function addSayCards<S extends { notes: Record<string, string>; cards: ReviewCard[] }>(state: S, cards: SayCard[], day: string, from?: SayCard['from']): S {
+  return cards.reduce((prev, card) => addSayCard(prev, from ? { ...card, from } : card, day), state)
+}
+
 /** Takes a saved card out again (its note and its review card), e.g. a correction that came from a misheard word. */
 export function removeSayCard<S extends { notes: Record<string, string>; cards: ReviewCard[] }>(prev: S, en: string, ownedId?: string): S {
   const key = ownedId === undefined ? sayNoteOf(prev.notes, en) : sayKey(ownedId)

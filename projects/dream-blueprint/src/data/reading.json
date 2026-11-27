@@ -1532,8 +1532,9 @@
         "evidence": "Patients who cannot walk will stay in their rooms, and a team will help them."
       },
       {
+        "revision": 1,
         "type": "detail",
-        "q": "A nurse is on a break at 9:30. What should she do?",
+        "q": "A nurse's break includes the 10 a.m. drill. What should she do?",
         "options": [
           "Go to the stairs at 10:30.",
           "Come back to the ward by 9:50.",
@@ -1541,7 +1542,7 @@
         ],
         "answer": 1,
         "why": "If you are on a break at that time, please come back to the ward by 9:50.",
-        "evidence": "please come back to the ward by 9:50"
+        "evidence": "If you are on a break at that time, please come back to the ward by 9:50."
       },
       {
         "type": "vocab",
@@ -2894,15 +2895,16 @@
         "why": "第四段說當時被拒絕，後來才被認可。"
       },
       {
+        "revision": 1,
         "type": "tfng",
-        "q": "Statement: More mothers died in the first clinic than in the second clinic.",
+        "q": "Statement: More mothers died of childbed fever in the first clinic than in the second clinic.",
         "options": [
           "True",
           "False",
           "Not Given"
         ],
         "answer": 0,
-        "why": "第一段：many more mothers died … in the first clinic than in the second. 跟敘述一致 → True。",
+        "why": "第一段直接比較兩間診所死於產褥熱的人數，第一間較多。",
         "evidence": "many more mothers died of childbed fever in the first clinic than in the second"
       },
       {
@@ -2975,6 +2977,32 @@
         "answer": 2,
         "why": "文章明確指出，部分醫師被「自己造成死亡」的暗示冒犯；並未提到薪資或關閉病房。",
         "evidence": "Some were offended by the suggestion that they themselves were causing deaths, and germ theory had not yet been developed to explain the findings."
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The death of a colleague helped lead Semmelweis to form his theory.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第三段交代同事因解剖時被刀割傷，染上類似產褥熱的疾病而過世。這件事促使他提出解釋。",
+        "evidence": "When a colleague died after being cut by a student's knife during an autopsy, with an illness similar to childbed fever, Semmelweis formed a theory.",
+        "additional": true
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Germ theory had already been developed when doctors first rejected his findings.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "末段說醫師反對他時，當時尚未發展出可解釋結果的微生物致病理論。",
+        "evidence": "germ theory had not yet been developed to explain the findings.",
+        "additional": true
       }
     ],
     "band": "mid"
@@ -3087,6 +3115,19 @@
         ],
         "answer": 2,
         "why": "這裡接在沒有穩定網路的家庭後面，表示可能無法參與或使用遠距服務。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The passage reports concerns about the privacy of health information sent online.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第三段把個人健康資訊在線上傳送時的隱私和取得設備的障礙一起列為限制。",
+        "evidence": "There are also concerns about privacy when personal health information is sent online.",
+        "additional": true
       }
     ],
     "band": "easy"
@@ -3199,6 +3240,19 @@
         "answer": 0,
         "why": "作者把培養新人和留住資深人員分開談；資深人員離職也會帶走多年累積的技能。",
         "evidence": "When nurses leave the profession early, hospitals lose skills that took years to build."
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The hospitals described have also offered programmes to nurses planning to retire.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "第四段點名新畢業護理師的導師計畫和一般支援服務，全文沒提退休前的計畫。",
+        "evidence": "Measures include safer staffing levels, mentoring programs for new graduates, flexible scheduling, and support services for staff wellbeing.",
+        "additional": true
       }
     ],
     "band": "easy"
@@ -3436,6 +3490,19 @@
         "answer": 0,
         "why": "最後一段直接說 very little money，並解釋她的事業失敗。",
         "evidence": "When the war ended, Seacole returned to London with very little money, as her business had failed."
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Seacole never left the British Hotel to visit the battlefield.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "第四段說她常親自騎馬到戰場，並帶著藥品和食物。",
+        "evidence": "She often rode out to the battlefield itself, carrying medicine and food.",
+        "additional": true
       }
     ],
     "band": "mid"
@@ -3505,16 +3572,17 @@
         "evidence": "My phone battery was almost dead, because I had been studying on it all morning."
       },
       {
+        "revision": 1,
         "type": "tfng",
-        "q": "Statement: The nurse on the ward was angry that the writer was late.",
+        "q": "Statement: The nurse told the writer that the morning handover had already started.",
         "options": [
           "True",
           "False",
           "Not Given"
         ],
         "answer": 1,
-        "why": "接電話的護理師很冷靜（calm），還稱讚她早點打電話 → False。",
-        "evidence": "The nurse who answered was calm."
+        "why": "她說早班交接要到七點半才開始，與交接已經開始的敘述相反。",
+        "evidence": "said that the morning handover would not start until half past seven."
       },
       {
         "type": "heading",
@@ -3660,6 +3728,19 @@
         "answer": 0,
         "why": "帶教者期待學生發問，因此不確定時提問是預期的學習活動。",
         "evidence": "Your mentor will be expecting you to ask questions, so please do not be shy."
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Students will discuss their progress with their mentors on the last day.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "末段說實習的最後一天，學生會與指導護理師討論自己的進步。",
+        "evidence": "On the last day, you and your mentor will be meeting to discuss your progress.",
+        "additional": true
       }
     ],
     "band": "easy"
@@ -4662,16 +4743,17 @@
         "evidence": "because I was afraid of looking stupid"
       },
       {
+        "revision": 1,
         "type": "tfng",
-        "q": "Statement: The writer has back pain because she used to lift patients without help.",
+        "q": "Statement: The writer has back pain almost every day and wishes she had asked for help when lifting patients.",
         "options": [
           "True",
           "False",
           "Not Given"
         ],
         "answer": 0,
-        "why": "used to lift… without help → 現在五十四歲天天背痛；If only I had used the lifting equipment 也表示她後悔 → True。",
-        "evidence": "I used to lift patients without help because I wanted to finish quickly."
+        "why": "第三段說她現在幾乎天天背痛，也說當初要是用了移位設備、請人幫忙就好了。",
+        "evidence": "Now, at fifty-four, I have back pain almost every day. If only I had used the lifting equipment and asked for a hand."
       },
       {
         "type": "vocab",
@@ -4731,6 +4813,19 @@
         "answer": 2,
         "why": "第一段說在病房工作三十年，未說是否都在同一家醫院。",
         "evidence": "Dear Young Nurse, I am writing this after thirty years on the wards, and I wish someone had written a letter like this to me when I started."
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The writer’s senior noticed the pump problem before it was too late.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第二段說作者不懂裝置就用猜的，幸好資深同事及時發現。",
+        "evidence": "Luckily, she noticed in time.",
+        "additional": true
       }
     ],
     "band": "easy"
@@ -5224,17 +5319,17 @@
     "level": "B2",
     "title": "Virginia Apgar and the Ten-Point Score",
     "topic": "橋接 48：非限定關係子句",
-    "words": 276,
+    "words": 290,
     "unit": 53,
     "held": true,
     "paras": [
-      "One minute after birth, almost every baby born in a modern hospital is given its first test. The test, which takes only a few seconds, is called the Apgar score. It was named after Virginia Apgar, an American doctor whose simple idea has helped to save a great many newborn lives.",
+      "One minute after birth, almost every baby born in a modern hospital is assessed using the Apgar score, which takes only a few seconds. It was named after Virginia Apgar, an American doctor whose simple idea has helped to save a great many newborn lives.",
       "Apgar, who was born in 1909, originally wanted to be a surgeon. However, she was advised to choose anaesthesia instead, a field in which few doctors worked at the time. She went on to become a leading anaesthesiologist in New York, where she worked closely with mothers giving birth.",
       "In the early 1950s, Apgar noticed a problem. Doctors and nurses had no quick, standard way to decide whether a newborn baby needed help. Babies who were having trouble breathing were sometimes not noticed until it was too late. In 1952 she proposed a simple scoring system, which she published the following year.",
-      "The score looks at five signs: the baby's skin colour, heart rate, reflexes, muscle tone and breathing. Each sign is given 0, 1 or 2 points, so the total is between 0 and 10. The test is done at one minute and again at five minutes after birth. A low score tells the team, quickly and clearly, that the baby may need help, such as support with breathing.",
+      "The score looks at five signs: the baby's skin colour, heart rate, reflexes, muscle tone and breathing. Each sign is given 0, 1 or 2 points, so the total is between 0 and 10. The test is done at one minute and again at five minutes after birth. The score helps the team describe the newborn’s condition and response to any resuscitation. If the baby needs help to breathe at birth, the team assesses breathing and heart rate immediately and starts any needed support without waiting for the score.",
       "Later, the five signs were turned into a memory aid that uses the letters of her name: Appearance, Pulse, Grimace, Activity and Respiration. Apgar, who later worked on preventing birth defects, died in 1974. Her score, which is still used around the world, remains one of the simplest and most useful tools in medicine."
     ],
-    "zh": "在現代醫院出生的嬰兒，出生一分鐘時幾乎都會做第一個檢查：只要幾秒鐘的亞培格評分。它以美國醫師維吉妮亞．亞培格命名，她的簡單點子救了很多新生兒。她 1909 年出生，原本想當外科醫師，卻被建議改走麻醉——當時很少醫師投入的領域；後來她成為紐約頂尖的麻醉科醫師，和生產中的媽媽密切合作。1950 年代初她發現一個問題：醫護人員沒有快速、標準的方法判斷新生兒需不需要幫助，有呼吸困難的嬰兒有時太晚才被發現。1952 年她提出簡單的評分系統，隔年發表。評分看五個徵象：膚色、心跳、反射、肌肉張力和呼吸，每項 0、1 或 2 分，總分 0 到 10；在出生後一分鐘和五分鐘各做一次，分數低就清楚快速地告訴團隊寶寶可能需要幫助，例如呼吸支持。後來這五項被做成用她名字字母的口訣：Appearance、Pulse、Grimace、Activity、Respiration。她後來投入預防出生缺陷，1974 年過世；她的評分至今仍在全世界使用。",
+    "zh": "在現代醫院出生的嬰兒，出生一分鐘時幾乎都會做亞培格評分，只要幾秒鐘便能完成。它以美國醫師維吉妮亞．亞培格命名，她的簡單點子救了很多新生兒。她 1909 年出生，原本想當外科醫師，卻被建議改走麻醉——當時很少醫師投入的領域；後來她成為紐約頂尖的麻醉科醫師，和生產中的媽媽密切合作。1950 年代初她發現一個問題：醫護人員沒有快速、標準的方法判斷新生兒需不需要幫助，有呼吸困難的嬰兒有時太晚才被發現。1952 年她提出簡單的評分系統，隔年發表。評分看五個徵象：膚色、心跳、反射、肌肉張力和呼吸，每項 0、1 或 2 分，總分 0 到 10；在出生後一分鐘和五分鐘各做一次，評分協助團隊描述新生兒的狀況及對復甦的反應。新生兒出生時若需要呼吸協助，團隊會立即評估呼吸與心率，直接開始所需的處置。後來這五項被做成用她名字字母的口訣：Appearance、Pulse、Grimace、Activity、Respiration。她後來投入預防出生缺陷，1974 年過世；她的評分至今仍在全世界使用。",
     "qs": [
       {
         "type": "main",
@@ -5296,6 +5391,7 @@
         "evidence": "Her score, which is still used around the world"
       },
       {
+        "revision": 1,
         "type": "heading",
         "q": "Which heading best fits paragraph D (paragraph 4)?",
         "options": [
@@ -5304,7 +5400,7 @@
           "The signs, timing and purpose of the score"
         ],
         "answer": 2,
-        "why": "第四段交代五個項目、分數範圍、施測時間與提示需要協助的用途。"
+        "why": "第四段交代五個項目、分數範圍、施測時間，以及它如何協助描述狀況和復甦反應。"
       },
       {
         "type": "vocab",
@@ -5318,16 +5414,17 @@
         "why": "文中欠缺的是快速、一致的方法；standard 指共通標準。"
       },
       {
+        "revision": 1,
         "type": "evidence",
         "q": "What is a practical purpose of summarising the signs in a score?",
         "options": [
           "It predicts the exact occupation the child will have.",
-          "It helps the team recognise quickly that a baby may need assistance.",
+          "It helps the team describe the newborn’s condition and response to any resuscitation.",
           "It makes further observation unnecessary in every case."
         ],
         "answer": 1,
-        "why": "低分向團隊快速傳達可能需要協助，文章沒有說可預測長期人生或取代後續觀察。",
-        "evidence": "A low score tells the team, quickly and clearly, that the baby may need help, such as support with breathing."
+        "why": "第四段說評分能協助描述新生兒的狀況及復甦反應。是否開始呼吸支持，要依出生時的即時評估。",
+        "evidence": "The score helps the team describe the newborn’s condition and response to any resuscitation."
       },
       {
         "type": "tfng",
@@ -9324,10 +9421,11 @@
         "evidence": "At the appointment, the pharmacist reviewed the list and checked the unclear container."
       },
       {
+        "revision": 1,
         "type": "evidence",
         "q": "What shows that Ning supported her father's participation?",
         "options": [
-          "She let him explain his routine before speaking for him.",
+          "She let him describe his own routine first.",
           "She hid the list from him.",
           "She told him to stop asking questions."
         ],
@@ -11044,7 +11142,7 @@
           "Not Given"
         ],
         "answer": 2,
-        "why": "文中只說可免重印更新，沒有提供成本比較。",
+        "why": "文章說電子地圖可以免重印就更新，也能放大文字；全文都沒有提供電子地圖與紙本指標的成本比較。",
         "evidence": "The map could be updated without printing another page, and users could enlarge the text."
       },
       {
@@ -11421,7 +11519,7 @@
           "Not Given"
         ],
         "answer": 2,
-        "why": "文章介紹推出應用程式，未提誰開發或公司的所在地；這句只能證明有推出服務。",
+        "why": "文章交代圖書館推出預約用 App，全文都沒說由哪家公司開發，或開發者是不是本地業者。",
         "evidence": "At a fictional nursing college, the library introduced an app for reserving books."
       },
       {
@@ -11469,6 +11567,19 @@
         ],
         "answer": 0,
         "why": "全文從成功使用者以外的人出發，說明多管道與更完整評估的重要。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Students could return the paper form without writing their names.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第三段說紙本或 App 表格都可以不署名。",
+        "evidence": "Students could leave either form unsigned if they preferred.",
+        "additional": true
       }
     ]
   },
@@ -11580,6 +11691,19 @@
         ],
         "answer": 0,
         "why": "全文同時談能力範圍、成果分類與參與障礙，不能只看修好件數。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Transport for heavy objects had already been arranged for the next event.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "末段說下一次可事先打電話問問題，但搬運支援仍沒找到解法。",
+        "evidence": "The next event offered advance questions by telephone, although transport support was still unresolved.",
+        "additional": true
       }
     ]
   },
@@ -11691,6 +11815,19 @@
         ],
         "answer": 1,
         "why": "全文從宣傳轉向實際能否使用，也保留多面向評估。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Student volunteers would set the same water intake target for all visitors.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "第三段說學生志工不會給每位訪客固定的飲水目標。",
+        "evidence": "they would not change medicines or give each visitor a fixed drinking target.",
+        "additional": true
       }
     ]
   },
@@ -11802,6 +11939,19 @@
         ],
         "answer": 1,
         "why": "文章把正確、可找到、可理解與可行動連在一起，並反對只求短。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: All readers in the group had already used an earlier version of the leaflet.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "文章交代志工看草稿的方式，全文沒交代他們以前有沒有用過舊版。",
+        "evidence": "Next, volunteers read the draft and explained the next steps in their own words.",
+        "additional": true
       }
     ]
   },
@@ -11904,15 +12054,29 @@
         "evidence": "Instead of submitting a screenshot showing that the video had played, they explained one choice they had made."
       },
       {
+        "revision": 1,
         "type": "main",
         "q": "What approach does the passage support?",
         "options": [
           "Use recordings together with activities that reveal understanding.",
-          "Judge learning only through the number of minutes online.",
-          "Replace every interaction with longer recordings."
+          "Use replay data to decide which ideas students have mastered.",
+          "Improve recordings by making accurate captions the principal measure of learning."
         ],
         "answer": 0,
-        "why": "文章保留錄影的便利，同時用提問與新作答檢查理解。"
+        "why": "全文介紹錄影的便利和字幕品質，也強調觀看紀錄看不出理解程度，須透過提問與運用內容的新作答來確認。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Learners with limited internet access could obtain printed outlines.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第二段明確寫到印好的大綱可供網路不便的學生。",
+        "evidence": "Printed outlines were available for students with limited internet access.",
+        "additional": true
       }
     ]
   },
@@ -12024,6 +12188,19 @@
         ],
         "answer": 2,
         "why": "全文談資料更新、紙本與預測差別，以及如何揭露不確定。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The new warning was also issued in a second language.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "文章提及有新提醒，也問乘客看不看得懂，沒有提是否發布第二種語言。",
+        "evidence": "They also asked passengers whether the new warning was understandable.",
+        "additional": true
       }
     ]
   },
@@ -12147,6 +12324,19 @@
         ],
         "answer": 2,
         "why": "全文把合適用藥與溝通、症狀處理及必要治療連在一起。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The clinic invites patients to ask about both the benefits and possible harms.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "最後一段明確交代診所邀請病人了解抗生素的好處與風險。",
+        "evidence": "They also invite patients to ask about benefits and possible harms.",
+        "additional": true
       }
     ]
   },
@@ -12270,6 +12460,19 @@
         ],
         "answer": 1,
         "why": "最後一句交代注意力從已交付資訊，轉為資訊能否支持實際行動。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The student included information that could identify the patient in the learning record.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "末段說學生寫下學習重點，但沒有記下能識別病人的資訊。",
+        "evidence": "The student records a learning point without including identifying patient details.",
+        "additional": true
       }
     ]
   },
@@ -12393,6 +12596,19 @@
         ],
         "answer": 2,
         "why": "全文重點是說明證據範圍與觀點來源，並讓新證據可以修正說法。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The museum offers every visitor only one account of the box.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "展品旁有精簡說明，附近另有較詳盡的版本。",
+        "evidence": "The museum keeps a concise summary beside the box and offers a longer account nearby",
+        "additional": true
       }
     ]
   },
@@ -12516,6 +12732,19 @@
         ],
         "answer": 0,
         "why": "全文把熱鬧的種植當天與維護、責任、後續成果連起來。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The first group of trees included more than one species.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "原文交代第一批數量較少及如何維護，全文沒說樹種數量。",
+        "evidence": "The council therefore chooses a smaller initial group and assigns responsibility for inspections and ongoing care.",
+        "additional": true
       }
     ]
   },
@@ -12640,6 +12869,19 @@
         ],
         "answer": 2,
         "why": "全文把維修與價值拆成可查核的安排，沒有預設一定選哪款。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: In the final recommendation, the price at purchase is still a consideration.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "最後一段保留買入價格，和持續取得支援、修理資訊等條件一起考量。",
+        "evidence": "Purchase price remains important, but it is considered alongside continued access, usable repair information and realistic support.",
+        "additional": true
       }
     ]
   },
@@ -12764,6 +13006,32 @@
         ],
         "answer": 2,
         "why": "最後一段明說核心承諾是改善使用機會，而不是維護原班表。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The college will compare the trial’s results with the staff time it required.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "末段明說試辦結束後要對照成果、人力與白天服務受到的影響。",
+        "evidence": "At the end of the trial, the college will compare what was achieved with the staff time required and the effects on daytime access.",
+        "additional": true
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Moving the session is ruled out when the trial ends.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "試辦之後仍可保留、移動時段，或用另一種方式提供部分支援。",
+        "evidence": "Keeping the session, moving it or replacing part of it with another form of support will all remain possible.",
+        "additional": true
       }
     ]
   },
@@ -12888,6 +13156,19 @@
         ],
         "answer": 1,
         "why": "全文主張保留調查用途，同時理解代表性、措辭與限制。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The final report identifies how responses were collected.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "最後報告說明資料來自哪一群人、回覆如何收集、資料缺少什麼。",
+        "evidence": "The final report therefore names the responding group, explains how replies were collected and states important gaps.",
+        "additional": true
       }
     ]
   },
@@ -13024,6 +13305,19 @@
         ],
         "answer": 0,
         "why": "結尾是較謙抑的程序改善，不是完美排班或單一數字保證公平。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The rota is reviewed before the first month of the trial is complete.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "末段明說這項班表試行滿一個月後才評估。",
+        "evidence": "The trial is reviewed after a month.",
+        "additional": true
       }
     ]
   },
@@ -13160,6 +13454,19 @@
         ],
         "answer": 0,
         "why": "結尾將核准對象界定為完整安排，而非單一數字。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The route for raising concerns includes an anonymous option.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "最後一段明說員工和受影響的病人都能反映顧慮，全文沒有交代是否可匿名。",
+        "evidence": "It also requires a route for staff and affected patients to raise concerns.",
+        "additional": true
       }
     ]
   },
@@ -13287,15 +13594,29 @@
         "evidence": "An unclear label is a reason to request a definition, not sufficient evidence that an official deliberately invented a result."
       },
       {
+        "revision": 1,
         "type": "main",
         "q": "What is the passage chiefly teaching?",
         "options": [
           "How to establish what percentage comparisons can legitimately show",
-          "Why every environmental report should avoid all numbers",
-          "Which real town has the best recycling policy"
+          "How to use the amount accepted by processors to rank towns’ recycling performance",
+          "Why a decline in total waste collection is the main explanation for changes in recycling rates"
         ],
         "answer": 0,
-        "why": "結尾明說沒有裁定哪個鎮較好，而是教讀者先釐清定義與範圍。"
+        "why": "處理後可用量與收集量都可能影響比率，全文提醒比較前須核對計量階段、範圍和期間，現在的例子不足以替城鎮排名或確定變動原因。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The student asks the authorities to state the period covered by their figures.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "第四段說要交代涵蓋期間，才有辦法比較。",
+        "evidence": "The student therefore asks both authorities to state the waste included, the period covered and the stage at which material is measured.",
+        "additional": true
       }
     ]
   },
@@ -13432,6 +13753,19 @@
         ],
         "answer": 0,
         "why": "全文強調簽名紀錄背後的溝通與選擇，沒有否定書面紀錄本身。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: In the classroom exercise, the procedure begins before the team has clarified what the patient agreed to.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "第四段明說，團隊還在釐清病人同意的內容時，不會開始處置。",
+        "evidence": "In this invented exercise, no procedure begins while the team is still clarifying what the patient has agreed to.",
+        "additional": true
       }
     ]
   },
@@ -13568,6 +13902,32 @@
         ],
         "answer": 2,
         "why": "全文針對不同用途蒐集相應證據，既不盲目採用也不一例否定所有工具。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Students in the trial need a personal subscription in order to receive feedback.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "最後一段明說，學校提供不需自己訂閱也能得到回饋的管道。",
+        "evidence": "the college provides a route for obtaining feedback without a personal subscription.",
+        "additional": true
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The agreement between the reviewers had improved by the end of the trial.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 2,
+        "why": "文中說教師比較回饋、討論評分差異，沒有提到彼此的一致性是否隨時間提升。",
+        "evidence": "Teachers compare the feedback with the stated rubric and discuss disagreements.",
+        "additional": true
       }
     ]
   },
@@ -13704,6 +14064,19 @@
         ],
         "answer": 0,
         "why": "全文把承諾轉成可追蹤的對象、時程、使用及維持條件。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: Feedback will be collected on barriers identified beyond the first phase.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 0,
+        "why": "末段說第一階段還碰不到的需求也會納入蒐集意見，不只詢問現有使用者。",
+        "evidence": "Public feedback will examine those gaps as well as satisfaction among current users.",
+        "additional": true
       }
     ]
   },
@@ -13831,15 +14204,29 @@
         "evidence": "It examines unresolved enquiries, difficulty finding documents and whether users understand the available support."
       },
       {
+        "revision": 1,
         "type": "main",
         "q": "Which idea best captures the passage’s view of access?",
         "options": [
           "It is an opportunity that needs clear boundaries, support and privacy safeguards.",
-          "It should be removed whenever a record contains an unfamiliar term.",
-          "It is sufficient by itself to ensure complete and accurate understanding."
+          "Its main value is to show patients which follow-up decisions have already been made.",
+          "Its benefits depend chiefly on how many records each provider adds to the portal."
         ],
         "answer": 0,
-        "why": "全文保留資訊開放的價值，同時要求範圍、支援與隱私清楚。"
+        "why": "全文說明開放資料能促進對話，也要講清楚資料範圍、查詢與更正管道，並保護下載副本的隱私。單靠畫面沒有某份文件不能判斷是否有後續計畫。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The clinic asked the patient to silently rewrite the clinical record.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "診所安排查核並說明回應方式，沒有要求病人自行改寫紀錄。",
+        "evidence": "It does not ask the patient to silently rewrite the clinical record",
+        "additional": true
       }
     ]
   },
@@ -13976,6 +14363,19 @@
         ],
         "answer": 2,
         "why": "全文利用虛構資料區分描述差異與推論原因，並提出改善評估的方向。"
+      },
+      {
+        "type": "tfng",
+        "q": "Statement: The final report says the grant cannot have made any difference at all.",
+        "options": [
+          "True",
+          "False",
+          "Not Given"
+        ],
+        "answer": 1,
+        "why": "結尾說資料不足以確定津貼造成全部差異，也不能據此認定津貼毫無效果。",
+        "evidence": "Nor does the uncertainty prove that the grant had no effect.",
+        "additional": true
       }
     ]
   }

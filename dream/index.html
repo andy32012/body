@@ -3,18 +3,53 @@
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="description" content="玄燁的護理學習與赴美 RN 夢想藍圖，依照生活電量安排每一步。" />
 <link rel="icon" href="./icon-192.png" /><title>夢想藍圖 · 今日航行</title>
-  <script type="module" crossorigin src="./assets/index-2o9Qh0W_.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-pDXaiSQt.css">
+  <script type="module" crossorigin src="./assets/index-DzrQuFDb.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CnXqs9wv.css">
   <link rel="license" href="./publication.html">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="theme-color" content="#10162f">
-<meta name="dream-release" content="5d2f911d4fd54757">
+<meta name="dream-release" content="71ac63e7c683a069">
 </head><body><div id="root"></div><script>
 if ("serviceWorker" in navigator && window.isSecureContext) {
   const scriptUrl = new URL("./sw.js", document.baseURI);
   const version = document.querySelector('meta[name="dream-release"]')?.content;
-  navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" }).then(registration => {
+  const register = () => navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" });
+  function registerWhenAvailable() {
+    return new Promise(resolve => {
+      let inFlight = false;
+      let reconnectDuringAttempt = false;
+      let canWaitAndRetry = true;
+      let timer;
+      async function attempt() {
+        if (inFlight) {
+          reconnectDuringAttempt = true;
+          return;
+        }
+        clearTimeout(timer);
+        inFlight = true;
+        try {
+          const registration = await register();
+          window.removeEventListener("online", attempt);
+          resolve(registration);
+        } catch {
+          if (reconnectDuringAttempt) {
+            reconnectDuringAttempt = false;
+            timer = window.setTimeout(attempt, 0);
+          } else if (canWaitAndRetry && navigator.onLine) {
+            // The browser may report a local connection before it can reach the site.
+            canWaitAndRetry = false;
+            timer = window.setTimeout(attempt, 10000);
+          }
+        } finally {
+          inFlight = false;
+        }
+      }
+      window.addEventListener("online", attempt);
+      void attempt();
+    });
+  }
+  registerWhenAvailable().then(registration => {
     let activeVersion;
     let switchingTo;
     const removeUpdate = () => document.getElementById("dream-update")?.remove();

@@ -1,13 +1,13 @@
 import { Check } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { reviewEnergy, reviewLoad, sentenceReviewKey, type Energy } from '../lib/progress'
+import { reviewEnergy, reviewedSentenceCount, reviewLoad, type Energy } from '../lib/progress'
 import { answeredOn, quizSectionKey, sectionOf, type QuizItem } from '../lib/quiz'
 import { casesFinishedOn } from '../lib/scenarios'
 import quizData from '../data/quiz.json'
 import { activeLesson, lessonFinished, mainLessonDone } from '../lib/lesson'
 import { dueTopic, partNumber, partPlan, topicDoneToday } from '../lib/topics'
 import type { Focus } from '../lib/nextFocus'
-import { dayBudget, planBlocks, type BlockId } from '../lib/dailyPlan'
+import { dayBudget, planBlocks, readTaskMark, writeTaskMark, type BlockId } from '../lib/dailyPlan'
 import { newWordPlan, readDailyDone } from '../lib/dailyWords'
 import { certStatus, exams, officialLevel, steps } from '../lib/cefr'
 import { hasPack, heldOpen, practisedOn, readHeld, weekCounts } from '../lib/bridge'
@@ -21,10 +21,6 @@ const nursingIds = new Set((quizData as QuizItem[]).filter(q => sectionOf(q) ===
 
 type Task = { id: string; min: number; title: string; detail: string; auto: boolean; go?: () => void; goLabel?: string; go2?: () => void; go2Label?: string }
 const to = (hash: string) => () => { location.hash = hash }
-/** Something saved today under notes '<prefix>.<id>' (a reading or a writing record). */
-const savedToday = (notes: Record<string, string>, prefix: string, today: string) =>
-  Object.entries(notes).some(([k, v]) => k.startsWith(prefix) && v.includes('"day":"' + today + '"'))
-
 /** Today's list. Its minutes come from the day's plan — the same numbers as the choices above — and add up to them.
  *  During exams and internship it is a short nursing-English plan and the curriculum does not move: review, then listen
  *  or read a nursing text (whichever was done on fewer days this week), then one slot that takes turns day by day —
@@ -35,10 +31,13 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const total = budget.minutes[energy] ?? budget.minutes.normal ?? 30
   // Today's review: word cards up to the day's cap and a few sentence cards; only word cards beyond the cap hold back new words.
   const load = reviewLoad(state, today, reviewEnergy(today, state.settings.periods))
-  // On a 累爆 day the list asks for the short review (50 word cards); the rest simply waits, it does not change new words.
-  const shown = energy === 'low' ? reviewLoad(state, today, 'low') : load
+  const cardEnergy = energy === 'low' ? 'low' : reviewEnergy(today, state.settings.periods)
+  const available = cardEnergy === 'low' ? reviewLoad(state, today, cardEnergy) : load
+  const blocks = mode === 'regular' ? planBlocks(total, focus?.action ? focus.minutes : 0, available.minutes) : []
+  const reviewTime = mode === 'nursing' ? (energy === 'low' ? total : Math.round(total / 3)) : blocks.find(b => b.id === 'review')?.min ?? 0
+  const shown = reviewLoad(state, today, cardEnergy, reviewTime)
   const left = shown.words + shown.sentences
-  const reviewedToday = state.reviewEvents.some(e => e.day === today) || Number(state.notes[sentenceReviewKey(today)]) > 0
+  const reviewedToday = state.reviewEvents.some(e => e.day === today) || reviewedSentenceCount(state.notes, today) > 0
   const key = (id: string) => 'plan.' + today + '.' + id
   // Only nursing questions count toward the nursing plan; an English question is not nursing practice.
   const quizToday = answeredOn(state.notes, today, nursingIds)
@@ -53,7 +52,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   const wordsDone = readDailyDone(state.notes, today)
   // A reading record saved today, or graded passages read today (logged as a reading day).
   const readToday = practisedOn(state.notes, state.sessions, 'read', today)
-  const wroteToday = savedToday(state.notes, 'write.', today)
+  const wroteToday = practisedOn(state.notes, state.sessions, 'write', today)
   const listenedToday = practisedOn(state.notes, state.sessions, 'listen', today)
   const spokeToday = practisedOn(state.notes, state.sessions, 'speak', today)
   // Four skills over the week: the "listen or read" and "speak or write" slots point at whichever was done on fewer days;
@@ -85,20 +84,27 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
 
   // 「先補強」 is done once its practice happened today: five words heard and matched, or two more sentences written in the library.
   const heardToday = focus?.kind === 'listen' ? state.learningWords.filter(w => readSkills(state.notes, w).listen === today).length : 0
-  const extraSentences = state.sessions.find(x => x.id === 'library-' + today)?.translations?.length ?? 0
+  const extraSentences = state.sessions.find(x => x.id === 'library-' + today)?.translations?.filter(t => t.attempted !== false).length ?? 0
   const focusDone = focus?.kind === 'listen' ? heardToday >= 5 : focus?.kind === 'contrast' || focus?.kind === 'produce' ? extraSentences >= 2 : false
   const queued = shown.queued ? '另有 ' + shown.queued + ' 句句子卡排在之後的日子' : ''
+  const backlogDetail = [
+    shown.backlog ? shown.backlog + ' 張單字卡' : '',
+    shown.queued ? shown.queued + ' 句句子卡' : '',
+  ].filter(Boolean).join('、')
   const reviewDetail = left
     ? [shown.words ? '單字卡 ' + shown.words + ' 張' : '', shown.sentences ? '句子卡 ' + shown.sentences + ' 句（中翻英）' : ''].filter(Boolean).join('、') + '，先不看答案回想'
-      + (shown.backlog ? '；單字卡另外 ' + shown.backlog + ' 張排到明天' : '') + (queued ? '（' + queued + '）' : '')
-    : reviewedToday ? '今天的複習做完了' + (queued ? '（' + queued + '，想多做可以再開中翻英）' : '')
+      + (shown.backlog ? '；另外 ' + shown.backlog + ' 張單字卡留待下次複習' : '') + (queued ? '（' + queued + '）' : '')
+    : backlogDetail ? (reviewedToday ? '已完成這次安排。' : '這次安排沒有再分配複習時間。') + '剩餘 ' + backlogDetail + ' 留待下次複習'
+    : reviewedToday ? '今天的複習做完了'
     : state.cards.length ? '今天沒有到期的卡，這一步不用做；想多做可以快篩幾個新字'
     : '第一天還沒有複習卡，這一步先跳過。今天學的字和句子，明天起會出現在這裡'
   // Word cards on 單字複習, sentence cards on 中翻英: two buttons when both are waiting.
-  const wordReview = to(energy === 'low' ? 'library/words/low' : 'library/words')
+  const reviewRoute = '/review-' + reviewTime + '-' + cardEnergy
+  const wordReview = to('library/words' + reviewRoute)
+  const sentenceReview = to('library/translate' + reviewRoute)
   const reviewGo: Pick<Task, 'go' | 'goLabel' | 'go2' | 'go2Label'> = shown.words
-    ? { go: wordReview, goLabel: '單字卡', ...(shown.sentences ? { go2: to('library/translate'), go2Label: '句子卡' } : {}) }
-    : shown.sentences ? { go: to('library/translate'), goLabel: '句子卡' } : reviewedToday ? { go: wordReview } : { go: to('library/screen'), goLabel: '快篩' }
+    ? { go: wordReview, goLabel: '單字卡', ...(shown.sentences ? { go2: sentenceReview, go2Label: '句子卡' } : {}) }
+    : shown.sentences ? { go: sentenceReview, goLabel: '句子卡' } : reviewedToday ? { go: wordReview } : { go: to('library/screen'), goLabel: '快篩' }
   const review: Task = { id: 'review', min: 0, title: '複習卡', detail: reviewDetail, auto: left === 0, ...reviewGo }
   const lesson: Task = topic ? { id: 'lesson', min: 0, title: '生活主題：' + topic.topic.title, detail: '第 ' + partNumber(topic.part) + ' 次（共 3 次）：' + partPlan[topic.part],
       auto: false, go: () => onStart(energy), goLabel: topic.step > 0 ? '繼續' : '開始' }
@@ -143,7 +149,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
   }
   let tasks: Task[]
   if (mode === 'nursing') {
-    const nReview: Task = { id: 'n-review', min: total, title: '複習', detail: left || reviewedToday ? reviewDetail : '今天沒有到期的卡，這步跳過',
+    const nReview: Task = { id: 'n-review', min: total, title: '複習', detail: reviewDetail,
       auto: left === 0, ...(left ? reviewGo : {}) }
     const third = Math.round(total / 3)
     const rest = total - 2 * third
@@ -169,16 +175,18 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
         goLabel: '題目', go2: to('library/case'), go2Label: '情境' }
     tasks = energy === 'low' ? [nReview] : [{ ...nReview, min: third }, nInput, nSlot]
   } else {
-    tasks = planBlocks(total, focus?.action ? focus.minutes : 0, shown.minutes).map(b =>
+    tasks = blocks.map(b =>
       b.id === 'review' ? { ...review, min: b.min } : b.id === 'lesson' ? { ...lesson, min: b.min } : { ...catalog[b.id], min: b.min })
   }
-  const isDone = (t: Task) => t.auto || state.notes[key(t.id)] === '1'
-  const finished = tasks.filter(isDone).length
-  const toggle = (id: string) => update(prev => {
-    const notes = { ...prev.notes }
-    if (notes[key(id)] === '1') delete notes[key(id)]; else notes[key(id)] = '1'
-    return { ...prev, notes }
-  })
+  const isDone = (t: Task) => readTaskMark(state.notes[key(t.id)])?.done ?? t.auto
+  const finished = tasks.filter(task => isDone(task)).length
+  function toggle(task: Task) {
+    const done = !isDone(task)
+    const id = key(task.id)
+    return update(prev => readTaskMark(prev.notes[id])?.done === done
+      ? prev
+      : { ...prev, notes: { ...prev.notes, [id]: writeTaskMark(prev.notes[id], done) } })
+  }
   const title = mode === 'nursing' ? '今天的護理英文 ' + budget.labels[energy] : '今天的 ' + budget.labels[energy]
   return <section className="tp-card" aria-label={title}>
     <header><strong>{title}</strong><span>{finished} / {tasks.length}</span></header>
@@ -186,7 +194,7 @@ export default function TodayPlan({ state, update, today, energy, onStart, onWor
     <ol>
       {tasks.map(t => <li key={t.id} className={isDone(t) ? 'done' : ''}>
         <button type="button" className="tp-check" aria-pressed={isDone(t)} aria-label={(isDone(t) ? '取消完成：' : '標記完成：') + t.title}
-          disabled={t.auto} onClick={() => toggle(t.id)}>{isDone(t) && <Check size={14} strokeWidth={3} />}</button>
+          onClick={() => toggle(t)}>{isDone(t) && <Check size={14} strokeWidth={3} />}</button>
         <div className="tp-text"><b>{t.title}<small>{t.min} 分鐘</small></b><span>{t.detail}</span></div>
         <div className="tp-go">
           {t.go && <button type="button" onClick={t.go}>{t.goLabel ?? '去做'}</button>}

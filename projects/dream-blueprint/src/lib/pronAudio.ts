@@ -11,11 +11,21 @@ export function unpack(buf: ArrayBuffer): Map<string, Blob> {
   const start = 4 + size
   return new Map(Object.entries(index).map(([name, [offset, length]]) => [name, new Blob([buf.slice(start + offset, start + offset + length)], { type: 'audio/mpeg' })]))
 }
-async function fetchPack(lessonId: string, voice: PronVoice, signal?: AbortSignal) {
+async function fetchPack(lessonId: string, voice: PronVoice, signal: AbortSignal) {
   const url = new URL(withAppRelease(packFile(lessonId, voice)), document.baseURI)
-  const res = await fetch(url, { signal })
-  if (!res.ok) throw new Error('pack ' + res.status)
-  return res.arrayBuffer()
+  const request = new AbortController()
+  const abort = () => request.abort(signal.reason)
+  const limit = setTimeout(() => request.abort(), 40000)
+  signal.addEventListener('abort', abort, { once: true })
+  try {
+    if (signal.aborted) abort()
+    const res = await fetch(url, { signal: request.signal })
+    if (!res.ok) throw new Error('pack ' + res.status)
+    return await res.arrayBuffer()
+  } finally {
+    clearTimeout(limit)
+    signal.removeEventListener('abort', abort)
+  }
 }
 
 export interface PackProgress { done: number; total: number }

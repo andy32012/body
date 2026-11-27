@@ -58,5 +58,6 @@ print(len(out), 'parts:', {k: sum(p['type'] == k for p in out) for k in ('字首
 print(len(words), 'example words,', len(inlist), 'in the 6-level word list;', sum(levels[w.lower()] <= 2 for w in inlist), 'of them level 1-2')
 if problems:
     print('\n'.join(problems)); sys.exit(1)
-json.dump(out, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+with open(OUT, 'w', encoding='utf-8', newline='\n') as target:
+    json.dump(out, target, ensure_ascii=False, indent=1)
 print('wrote', os.path.relpath(OUT))

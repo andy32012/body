@@ -1,7 +1,7 @@
 import DraftVersions from './DraftVersions'
 import { chapterLeft, stagesUsing } from '../lib/writing'
 import { useEffect, useMemo, useState } from 'react'
-import type { PageProps } from '../lib/store'
+import type { AppState, PageProps } from '../lib/store'
 import { bookRoute, chapterFile, chapterLabel, chapterOf, chapterReady, findSection, flatSections, levelNames, neighbors, saveBookDrill, sectionDone, sectionLabel, shownParts,
   type BookIndex, type ChapterContent, type SectionContent } from '../lib/grammarBook'
 import { openClaude, useTaskContext } from '../lib/taskContext'
@@ -10,13 +10,13 @@ import { tutorKey } from '../lib/tutor'
 import { reached } from '../lib/unlock'
 import { DrillRun, ExplainBody, GrammarBook } from './GrammarTeach'
 import CorrectBox, { useCorrectionBlocked, useCorrectionPending } from './CorrectBox'
-import { correctionKey, readCorrection, requireCorrectionSave, storeCorrection } from '../lib/correctionHistory'
+import { correctionKey, readCorrection, storeCorrection } from '../lib/correctionHistory'
 import { PetIcon } from './PixelPet'
 import './grammar.css'
 import './grammar-book.css'
 import './ai-chat.css'
 
-type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; hash: string }
+type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; onSavedActivity: (apply: (prev: AppState) => AppState) => Promise<void>; date: string; hash: string }
 // Each chapter's teaching is its own download, fetched when a section of it opens.
 const files = import.meta.glob<{ default: ChapterContent }>('../data/grammar-book/*.json')
 const loadChapter = (id: string) => files['../data/grammar-book/' + chapterFile(chapterOf(id)) + '.json']?.().then(f => f.default) ?? Promise.resolve(null)
@@ -34,7 +34,7 @@ function GrammarLoadError({ section = false }: { section?: boolean }) {
 }
 
 /** 文法講解: 完整文法 (the whole catalog, section by section) and 課程單元 (the course units' teaching, as before). */
-export default function GrammarHome({ state, onActivity, date, hash }: Props) {
+export default function GrammarHome({ state, onActivity, onSavedActivity, date, hash }: Props) {
   const [index, setIndex] = useState<BookIndex | null>(null)
   const [failed, setFailed] = useState(false)
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function GrammarHome({ state, onActivity, date, hash }: Props) {
     </div>
     {route.kind === 'unit' ? <GrammarBook key={route.unit} initialUnit={route.unit} state={state} onActivity={onActivity} date={date} />
       : route.kind === 'units' ? <GrammarBook state={state} onActivity={onActivity} date={date} />
-      : route.kind === 'section' ? <SectionView key={route.id} index={index} id={route.id} state={state} onActivity={onActivity} date={date} />
+      : route.kind === 'section' ? <SectionView key={route.id} index={index} id={route.id} state={state} onActivity={onActivity} onSavedActivity={onSavedActivity} date={date} />
       : <Catalog index={index} notes={state.notes} />}
   </div>
 }
@@ -101,7 +101,7 @@ function Catalog({ index, notes }: { index: BookIndex; notes: Record<string, str
 }
 
 /** One section: where it sits, the teaching, three drills, a sentence of his own for Claude, and the way to the next one. */
-function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'> & { index: BookIndex; id: string }) {
+function SectionView({ index, id, state, onActivity, onSavedActivity, date }: Omit<Props, 'hash'> & { index: BookIndex; id: string }) {
   const found = findSection(index, id)!
   const { section, chapter, part } = found
   const ready = chapterReady(index, chapterOf(id))
@@ -162,9 +162,8 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
           <CorrectBox key={run ? 'grading' : graded?.id ?? 'ungraded'} run={run} mode="open" rubric="gept-sentence" selfFix zh={'用這一節的文法「' + name + '」自己寫一句英文'}
             reference={content.points[0]?.ex[0]?.en} words={[section.title]} answer={text}
             restore={!run && graded ? { ...graded, showFull: false } : undefined}
-            backgroundGrade={{ id: gradeKey, save: (result, answer, submission) => requireCorrectionSave(applied => onActivity(prev => {
-              applied()
-              return { ...prev, notes: storeCorrection(prev.notes, gradeKey, { ...submission, result, answer }) }
+            backgroundGrade={{ id: gradeKey, save: (result, answer, submission) => onSavedActivity(prev => ({
+              ...prev, notes: storeCorrection(prev.notes, gradeKey, { ...submission, result, answer }),
             })) }} />
         </section>
       </>}

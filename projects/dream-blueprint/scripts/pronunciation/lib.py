@@ -1,5 +1,5 @@
 """Shared pieces of the recording tools: the synthesiser, the recogniser used as a checker, loudness and trimming."""
-import os, re, subprocess
+import os, re
 import numpy as np, cmudict
 from kokoro_onnx import Kokoro
 from faster_whisper import WhisperModel
@@ -10,6 +10,7 @@ EspeakWrapper.set_library(espeakng_loader.get_library_path())
 EspeakWrapper.set_data_path(espeakng_loader.get_data_path())
 from misaki import en as misaki_en, espeak as misaki_espeak
 from course import HERE, MP3, read_json
+from audio_codec import convert_audio, decode_mp3
 from phonemes import OVERRIDE
 
 MODELS = os.environ.get('PRON_MODELS', HERE)
@@ -31,11 +32,17 @@ def phonemes(c):
     return ph
 def speak(ph, voice, speed):
     x, sr = tts.create(ph, voice=voice, speed=speed, lang='en-us', is_phonemes=True)
-    # 16-bit steps, as the take will be saved: what is graded is exactly what is packed
-    x = (np.round(shape(x, sr) * 32767) / 32767).astype(np.float32)
-    if not np.any(x):
-        raise SilentTake('silent waveform after 16-bit conversion')
-    return x, sr
+    return pcm16(shape(x, sr)), sr
+
+
+def pcm16(audio):
+    # Grade the same signed 16-bit samples write_take stores, scaled back to [-1, 1].
+    if not np.isfinite(audio).all():
+        raise SilentTake('invalid waveform before 16-bit conversion')
+    samples = np.clip(np.rint(audio * 32768), -32768, 32767).astype(np.float32) / 32768
+    if not np.any(samples):
+        raise SilentTake('invalid or silent waveform after 16-bit conversion')
+    return samples
 
 # ── words that differ by one sound
 CMU = cmudict.dict()
@@ -68,9 +75,13 @@ def written(w):
     return forms
 
 def to16k(x, sr):
-    p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(sr), '-ac', '1', '-i', '-', '-f', 's16le', '-ac', '1', '-ar', '16000', '-'],
-                       input=x.astype(np.float32).tobytes(), capture_output=True).stdout
-    return np.frombuffer(p, dtype=np.int16).astype(np.float32) / 32768.0
+    data = convert_audio(
+        ['-f', 'f32le', '-ar', str(sr), '-ac', '1', '-i', '-', '-f', 's16le', '-ac', '1', '-ar', '16000', '-'],
+        operation='Convert to 16 kHz', audio=x.astype('<f4').tobytes(),
+    )
+    if len(data) % 2:
+        raise RuntimeError('Convert to 16 kHz: ffmpeg returned an incomplete audio sample')
+    return np.frombuffer(data, dtype='<i2').astype(np.float32) / 32768.0
 def padded(x, sr):
     pad = np.zeros(int(sr * 0.3), dtype=np.float32)
     return to16k(np.concatenate([pad, x.astype(np.float32), pad]), sr)
@@ -149,9 +160,14 @@ def lead(mine, other, own_word, other_word, word=True):
 STRICT, WEAK = (1.0, 2.5), (0.0, 1.2)   # how far ahead (in nats, bias taken out) of: words one sound away, the pair partner
 def as_shipped(x, sr):
     """The clip after the same mp3 encoding the packs use, decoded again: what the learner's device will play."""
-    enc = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(sr), '-ac', '1', '-i', '-'] + MP3, input=x.astype(np.float32).tobytes(), capture_output=True, check=True).stdout
-    dec = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'mp3', '-i', '-', '-f', 'f32le', '-ac', '1', '-ar', str(sr), '-'], input=enc, capture_output=True, check=True).stdout
-    return np.frombuffer(dec, dtype=np.float32)
+    encoded = convert_audio(
+        ['-f', 'f32le', '-ar', str(sr), '-ac', '1', '-i', '-', *MP3],
+        operation='Encode MP3', audio=x.astype('<f4').tobytes(),
+    )
+    decoded = np.frombuffer(decode_mp3(encoded, sr), dtype='<f4')
+    if not np.isfinite(decoded).all() or not np.any(decoded):
+        raise SilentTake('MP3 decoded to invalid or silent audio')
+    return decoded
 ORDER = {'bad': 0, 'weak': 1, 'strict': 2}
 def check(c, x, sr):
     """Grades one take. One measurement moves by a nat or two when the clip is merely shifted by 10 ms or goes through mp3,

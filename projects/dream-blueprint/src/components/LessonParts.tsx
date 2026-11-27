@@ -6,13 +6,13 @@ import { Check, Pause, Play, Volume2 } from 'lucide-react'
 import CorrectBox, { correctionBlocked, useCorrectionBlocked, useCorrectionPending } from './CorrectBox'
 import { mergeCorrectionFollowUps, requireCorrectionSave, type CorrectionSubmission } from '../lib/correctionHistory'
 import TutorChat from './TutorChat'
-import { sameEnglish } from '../lib/evidence'
+import { answered, clauseCommaNote, questionMarkNote, sameEnglish } from '../lib/evidence'
 import StuckButton from './StuckButton'
 import { useTaskContext } from '../lib/taskContext'
 import { tutorKey } from '../lib/tutor'
-import { clearDraft, readDraft, writeDraft } from '../lib/drafts'
+import { captureDraftCleanup, readDraft, writeDraft } from '../lib/drafts'
 import { chartBounds, isTimeSeries } from '../lib/chart'
-import { isProcessChart, isTableChart, type WriteChart } from '../lib/writing'
+import { isLayoutChart, isProcessChart, isTableChart, layoutColumns, layoutRows, type WriteChart } from '../lib/writing'
 import type { SayCard } from '../lib/sayCards'
 import { issuesFixed, lessonSteps, mergeExpress, sentenceFrame, type CorrectionResult, type ExpressRecord, type HeardRecord, type Lesson, type LessonLine, type LessonPrompt, type LessonStep, type VariationCheck } from '../lib/lesson'
 import './lesson.css'
@@ -62,8 +62,8 @@ export function useDialogueVoice(rate: number, accent = 'en-US') {
     run.current++; window.speechSynthesis?.cancel(); setPlaying(null)
     setStatus(s => s === 'playing' ? 'stopped' : s)
   }
-  function play(lines: LessonLine[], start = 0, only = false) {
-    if (!('speechSynthesis' in window)) return false
+  function play(lines: LessonLine[], start = 0, only = false, events?: { started?: () => void; completed?: () => void }) {
+    if (!('speechSynthesis' in window) || !lines[start]) return false
     run.current++; window.speechSynthesis.cancel()
     const id = run.current
     const full = start === 0 && !only
@@ -71,11 +71,17 @@ export function useDialogueVoice(rate: number, accent = 'en-US') {
     const english = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'))
     const matching = accentVoices(accent)
     const voices = matching.length ? matching : english
+    let started = false
+    const markStarted = () => {
+      if (id !== run.current || started) return
+      started = true
+      events?.started?.()
+    }
     const say = (i: number) => {
       if (id !== run.current) return
       if (i >= lines.length || (only && i > start)) {
         setPlaying(null)
-        if (full) { setCompleted(n => n + 1); setStatus('done') } else setStatus('idle')
+        if (full) { setCompleted(n => n + 1); setStatus('done'); events?.completed?.() } else setStatus('idle')
         return
       }
       const u = new SpeechSynthesisUtterance(lines[i].en)
@@ -84,14 +90,16 @@ export function useDialogueVoice(rate: number, accent = 'en-US') {
       u.rate = Math.max(0.5, Math.min(1.4, rate))
       if (voices.length > 1 || matching.length) u.voice = voices[who % 2 === 0 ? 0 : Math.min(voices.length - 1, 1)]
       u.pitch = who % 2 === 0 ? 1 : 1.25
-      u.onend = () => say(i + 1)
+      u.onstart = markStarted
+      u.onend = () => { markStarted(); say(i + 1) }
       u.onerror = e => {
         if (id !== run.current) return
         setPlaying(null)
         setStatus(e.error === 'interrupted' || e.error === 'canceled' ? 'stopped' : 'error')
       }
       setPlaying(i)
-      speechSynthesis.speak(u)
+      try { speechSynthesis.speak(u) }
+      catch { setPlaying(null); setStatus('error') }
     }
     setStatus(full ? 'playing' : 'idle')
     say(start)
@@ -187,11 +195,11 @@ export function LessonListen({ lesson, firstTime, rate, saved, onReveal, onDone,
 export type { VariationCheck } from '../lib/lesson'
 /** One more sentence with the same pattern, written from Chinese. With Claude connected the teacher can check it first
  *  (hints before the answer, as in the main sentence); the reference opens on 看答案 or once the teacher says it is right. */
-export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, saved, draftKey, onCheck, onDone, alreadyMarked = false }: { item: { zh: string; en: string; alt?: string[] }
+export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBefore, onPeek, saved, draftKey, legacyDraftKey, onCheck, onDone, alreadyMarked = false }: { item: { zh: string; en: string; alt?: string[] }
   /** The check kept from an earlier visit today, and where to keep it (so leaving and coming back changes nothing). */
   saved?: VariationCheck; onCheck?: (check: VariationCheck) => void
   /** Where the answer being written is kept while he is away. */
-  draftKey?: string
+  draftKey?: string; legacyDraftKey?: string
   /** Which of today's variations this is, and how many there are. */
   count?: [number, number]
   /** The id of today's sentence, so the teacher knows the unit and its rule. */
@@ -201,7 +209,7 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   /** Remembers that the answer was shown, so opening the page again cannot hide it. */
   onPeek?: () => void
   alreadyMarked?: boolean
-  onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => boolean }) {
+  onDone: (mark: 'good' | 'small' | 'again', answer: string, check: VariationCheck) => Promise<boolean> }) {
   const [answer, setAnswerNow] = useState(() => (draftKey ? readDraft(draftKey) : '') || saved?.answer || saved?.last?.text || saved?.before || '')
   const setAnswer = (text: string) => { setAnswerNow(text); if (draftKey) writeDraft(draftKey, text) }
   const [shown, setShown] = useState(false)
@@ -223,12 +231,30 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
   const [claudeDown, setClaudeDown] = useState(false)
   const mountedAt = useRef(Date.now())
   const shownAt = useRef(0)
+  const submitting = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const ready = () => Date.now() - mountedAt.current > 450
-  const done = (m: 'good' | 'small' | 'again') => {
-    if (Date.now() - shownAt.current > 450 && onDone(m, answer, check) && draftKey) clearDraft(draftKey)
+  const hasAnswer = answered(answer)
+  const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
+  const punctuationNote = shown ? questionMarkNote(answer, sentence.reference) || clauseCommaNote(answer, sentence.reference) : null
+  const acceptedByClaude = latest?.v === 'good' && sameEnglish(latest.text, answer) && !punctuationNote
+  const done = async (m: 'good' | 'small' | 'again') => {
+    if ((m !== 'again' && !hasAnswer) || (m === 'good' && punctuationNote) || Date.now() - shownAt.current <= 450 || submitting.current) return
+    const cleanup = draftKey ? captureDraftCleanup(draftKey, answer) : undefined
+    submitting.current = true
+    setSaving(true)
+    setSaveError('')
+    try {
+      if (await onDone(m, answer, check)) cleanup?.()
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : '這次作答未儲存，請再試一次。')
+    } finally {
+      submitting.current = false
+      setSaving(false)
+    }
   }
   const reveal = () => { shownAt.current = Date.now(); setShown(true); setCheck(c => c.before === undefined ? { ...c, before: answer } : c); onPeek?.() }
-  const sentence = { id: tutorId ?? 'variation', zh: item.zh, reference: [item.en, ...(item.alt ?? [])], grammar: pattern ? [pattern] : [], hints: [], why: rule ?? '', newWords: [] }
   const edited = check.checkedText !== undefined && !sameEnglish(check.checkedText, answer)
   useTaskContext({
     label: '換個說法：' + item.zh,
@@ -242,9 +268,11 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
     <h2 className="pr-question">{item.zh}</h2>
     {peekedAtStart && <p className="ls-help">上次已經看過這題的答案了：這次寫對會記成有提示完成。</p>}
     <label className="pr-field">我的英文
-      <textarea lang="en" rows={2} value={answer} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
+      <textarea lang="en" rows={2} value={answer} disabled={saving} spellCheck={false} autoComplete="off" onChange={e => setAnswer(e.target.value)} placeholder="先自己寫，再請 Claude 批改" />
     </label>
-    {draftKey && <DraftVersions id={draftKey} text={answer} onChoose={setAnswerNow} />}
+    {draftKey && <DraftVersions id={draftKey} text={answer} onChoose={setAnswerNow} disabled={saving} legacyId={legacyDraftKey} />}
+    {saving && <p role="status">正在儲存這次作答……</p>}
+    {saveError && <p role="alert" className="ls-help">{saveError}</p>}
     <TutorChat sentence={sentence} answer={answer} onError={() => setClaudeDown(true)} trackWeak={!alreadyMarked}
       onReveal={() => { setCheck(c => ({ ...c, revealed: true })); onPeek?.(); if (keyed && !shown) reveal() }}
       onVerdict={(v, attempt, text) => {
@@ -256,23 +284,23 @@ export function LessonVariation({ item, count, tutorId, pattern, rule, peekedBef
     {!shown ? <>
       {(!keyed || claudeDown) && <div className="pr-actions"><button type="button" className={keyed ? undefined : 'pr-main'} onClick={() => { if (ready()) reveal() }}>跟答案對照</button></div>}
       {/* A way on from the very first screen: a blank answer cannot be sent to Claude, and he may not know where to start. */}
-      {keyed && !claudeDown && <div className="pr-actions ls-skip"><span className="ls-help">{check.firstVerdict ? '照 Claude 的提示改好再批一次；真的不會，按「再給我一個提示」，或' : answer.trim() ? '寫好就請 Claude 批改；想不出來也可以' : '連第一個字都想不到？可以'}</span><button type="button" className="pr-link" onClick={() => done('again')}>{check.firstVerdict ? '先跳過這題（加入複習）→' : '不會，先跳過（加入複習）→'}</button></div>}
+      {keyed && !claudeDown && <div className="pr-actions ls-skip"><span className="ls-help">{check.firstVerdict ? '照 Claude 的提示改好再批一次；真的不會，按「再給我一個提示」，或' : hasAnswer ? '寫好就請 Claude 批改；想不出來也可以' : '連第一個字都想不到？可以'}</span><button type="button" className="pr-link" onClick={() => done('again')}>{check.firstVerdict ? '先跳過這題（加入複習）→' : '不會，先跳過（加入複習）→'}</button></div>}
     </> : <>
-      {latest?.v === 'good' && sameEnglish(latest.text, answer)
+      {acceptedByClaude
         ? <section className="pr-reference"><small>你的答案（Claude 確認過）</small><p lang="en">{answer}</p></section>
         : <section className="pr-reference"><small>跟答案對照（不顯示答案）</small><OwnCheck answer={answer} references={[item.en, ...(item.alt ?? [])]} /></section>}
-      {latest?.v === 'good' && sameEnglish(latest.text, answer) && !selfMark ? <div className="pr-actions pr-next-step">
-        <button type="button" className="pr-main" onClick={() => done('good')}>Claude 說對了，{count && count[0] < count[1] ? '下一題' : '下一步'} →</button>
+      {acceptedByClaude && !selfMark ? <div className="pr-actions pr-next-step">
+        <button type="button" className="pr-main" disabled={saving} onClick={() => void done('good')}>Claude 說對了，{count && count[0] < count[1] ? '下一題' : '下一步'} →</button>
         <button type="button" className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
-      </div> : <fieldset className="pr-marks"><legend>我寫得…（按一個就到{count && count[0] < count[1] ? '下一題' : '下一步'}）</legend>
-        <button type="button" disabled={!answer.trim()} onClick={() => done('good')}>對了</button>
-        <button type="button" disabled={!answer.trim()} onClick={() => done('small')}>差一點（加入複習）</button>
-        <button type="button" onClick={() => done('again')}>不會（加入複習）</button>
+      </div> : <fieldset className="pr-marks" disabled={saving}><legend>我寫得…（按一個就到{count && count[0] < count[1] ? '下一題' : '下一步'}）</legend>
+        <button type="button" disabled={!hasAnswer || !!punctuationNote} onClick={() => void done('good')}>對了</button>
+        <button type="button" disabled={!hasAnswer} onClick={() => void done('small')}>差一點（加入複習）</button>
+        <button type="button" onClick={() => void done('again')}>不會（加入複習）</button>
       </fieldset>}
-      {!answer.trim() && <p className="ls-help">沒有寫答案只能按「不會」：沒寫的題目不算完成。</p>}
-      {answer.trim() && check.before !== undefined && !check.before.trim() && <p className="ls-help">還沒寫就先按了對照：這題不算完成，會加入複習；明天再自己寫一次。</p>}
-      {answer.trim() && check.before?.trim() && !sameEnglish(check.before, answer) && <p className="ls-help">對照以後改過：記成有提示完成（對照前就寫對的話，還是算你自己完成）。</p>}
-      {answer.trim() && check.firstVerdict && <p className="ls-help">
+      {!hasAnswer && <p className="ls-help">寫下英文後才能自評。想先略過，可以按「不會」。</p>}
+      {hasAnswer && check.before !== undefined && !answered(check.before) && <p className="ls-help">還沒寫就先按了對照。這題會加入複習，明天再自己寫一次。</p>}
+      {hasAnswer && check.before !== undefined && answered(check.before) && !sameEnglish(check.before, answer) && <p className="ls-help">對照以後改過：記成有提示完成（對照前就寫對的話，還是算你自己完成）。</p>}
+      {hasAnswer && check.firstVerdict && !punctuationNote && <p className="ls-help">
         {check.revealed ? '老師已經把答案告訴你了：按「對了」會記成有提示完成。'
           : check.firstVerdict !== 'good' ? '老師指出過要改的地方：改好後按「對了」，這次記成有提示完成。'
           : edited ? '你在老師確認之後又改了答案：按「對了」會拿你現在寫的跟參考句比。'
@@ -318,6 +346,17 @@ export function ChartView({ chart }: { chart: WriteChart }) {
   if (isProcessChart(chart)) return <figure className="ls-chart ls-process">
     <figcaption lang="en">{chart.title}</figcaption>
     <ol lang="en">{chart.steps.map((step, i) => <li key={i}><b aria-hidden="true">{i + 1}</b><span>{step}</span></li>)}</ol>
+    {chart.cycle && <p className="ls-help" lang="en">↻ The cycle repeats from step 1.</p>}
+  </figure>
+  if (isLayoutChart(chart)) return <figure className="ls-chart ls-table ls-layout" lang="en">
+    <figcaption>{chart.title}</figcaption>
+    {chart.panels.map(panel => <table key={panel.label}>
+      <caption>{panel.label}</caption>
+      <thead><tr><td />{layoutColumns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead>
+      <tbody>{panel.rows.map((row, i) => <tr key={layoutRows[i]}>
+        <th scope="row">{layoutRows[i]}</th>{row.map((cell, j) => <td key={layoutColumns[j]}>{cell}</td>)}
+      </tr>)}</tbody>
+    </table>)}
   </figure>
   return <MiniChart chart={chart} />
 }
@@ -327,8 +366,8 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftK
   /** The open task is today's (promptFor), not always the unit's first. */
   lessonId: string; lesson: Lesson; prompt: LessonPrompt; draftKey: string; pattern: string; saved?: ExpressRecord
   legacyDraftKey?: string
-  onRecord: (apply: (rec: ExpressRecord) => ExpressRecord, corrected: boolean) => void | Promise<void>
-  onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
+  onRecord: (apply: (rec: ExpressRecord) => ExpressRecord, corrected: boolean, confirmSave?: boolean) => void | Promise<unknown>
+  onSave: (cards: SayCard[]) => Promise<unknown>; onSpeak: () => Promise<void>; onFinish: (answer: string, rec: ExpressRecord) => Promise<boolean>
 }) {
   const [answer, setAnswer] = useState(() => readDraft(draftKey) || saved?.lastAnswer || '')
   const [run, setRun] = useState(0)
@@ -355,24 +394,37 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftK
   const [previous, setPrevious] = useState<CorrectionResult>()
   // While Claude checks, the answer and the button wait: the check belongs to the text that was sent.
   const [checking, setChecking] = useState(false)
+  const saving = useRef(false)
+  const [savingAction, setSavingAction] = useState(false)
+  const [saveProblem, setSaveProblem] = useState('')
   const requestId = 'lesson-grade:' + lessonId
   const pending = useCorrectionPending(requestId)
   const blocked = useCorrectionBlocked(requestId)
-  const waiting = checking || blocked
+  const waiting = checking || blocked || savingAction
   const submission = useRef<ExpressRecord | undefined>(undefined)
   const submitted = submission.current
-  const waitingForGrade = blocked || !!submitted
+  const waitingForGrade = blocked || !!submitted || savingAction
   /** The first answer is kept the moment it is sent, so a failed request still leaves a record. */
-  function submit() {
-    if (!answer.trim() || submission.current || correctionBlocked(requestId)) return
+  async function submit() {
+    if (!answer.trim() || submission.current || saving.current || correctionBlocked(requestId)) return
+    setSaveProblem('')
     setPrevious(rec.last)
-    const first = { first: answer, firstHelp: [...rec.help] }
+    const first = { first: answer.trim(), firstHelp: [...shown] }
     submission.current = rec.first ? rec : { ...rec, ...first }
     setChecking(true)
-    if (!rec.first) {
-      onRecord(current => current.first ? current : { ...current, ...first }, false)
+    try {
+      await requireCorrectionSave(applied => onRecord(current => {
+        applied()
+        if (!current.first) return { ...current, ...first }
+        if (!rec.first && current.first !== first.first) throw new Error('另一個分頁先送出了不同答案。你的草稿仍在作答欄。')
+        return current
+      }, false, true))
+      setRun(n => n + 1)
+    } catch (error) {
+      submission.current = undefined
+      setChecking(false)
+      setSaveProblem(error instanceof Error ? error.message : '這份作答未儲存，請再試一次。')
     }
-    setRun(n => n + 1)
   }
   function result(r: CorrectionResult, sent: string, grade: CorrectionSubmission) {
     if (!submitted) throw new Error('找不到原作答的紀錄。')
@@ -389,11 +441,21 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftK
         return mergeExpress(current, next)
       return { ...next, help: [...new Set([...next.help, ...current.help])],
         revealed: next.revealed || current.revealed, others: current.others, discussion: current.discussion }
-    }, true))
+    }, true, true))
+  }
+  async function saveAction(run: () => Promise<unknown>) {
+    if (saving.current || submission.current || correctionBlocked(requestId)) return
+    saving.current = true
+    setSavingAction(true)
+    setSaveProblem('')
+    try { await run() }
+    catch (error) { setSaveProblem(error instanceof Error ? error.message : '這份作答未儲存，請再試一次。') }
+    finally { saving.current = false; setSavingAction(false) }
   }
   function finish() {
-    const next = !rec.first && answer.trim() ? { ...rec, first: answer, firstHelp: [...rec.help] } : rec
-    onFinish(answer, next)
+    const next = !rec.first && answer.trim() ? { ...rec, first: answer.trim(), firstHelp: [...shown] } : rec
+    const cleanup = captureDraftCleanup(draftKey, answer)
+    void saveAction(async () => { if (await onFinish(answer, next)) cleanup() })
   }
   const sees = (kind: string) => shown.includes(kind)
   // Claude says what is in the box now is good: finishing is the way on, not another check.
@@ -420,9 +482,11 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftK
     {sees('cue') && <p className="ls-help">這課的句型：<b>{pattern}</b>{lesson.cando ? '。目標：' + lesson.cando : ''}</p>}
     {sees('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
     <div className="pr-actions">
-      {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim() || waiting} onClick={submit}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
-      <button type="button" className="pr-link" disabled={waitingForGrade} onClick={onSpeak}>改用說的：跟 Emma 練</button>
+      {keyed && <button type="button" className={good ? 'pr-link' : 'pr-main'} disabled={!answer.trim() || waiting} onClick={() => void submit()}>{corrected ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button>}
+      <button type="button" className="pr-link" disabled={waitingForGrade} onClick={() => void saveAction(onSpeak)}>改用說的：跟 Emma 練</button>
     </div>
+    {savingAction && <p role="status" className="ls-help">正在儲存這堂課……</p>}
+    {saveProblem && <p role="alert" className="ls-help">{saveProblem}</p>}
     {!keyed && <p className="ls-help">還沒連接 Claude，先自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
     {pending && !checking && <p role="status" className="ls-help">Claude 正在批改這份作答，回覆會保存在這一堂。</p>}
     <CorrectBox key={run ? 'checking' : 'saved-' + (rec.lastGradeId ?? rec.corrections + '-' + (rec.lastAnswer ?? ''))} run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
@@ -432,7 +496,7 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftK
       discussion={{ id: lessonId, saved: rec.discussion, save: turn => requireCorrectionSave(applied => onRecord(current => {
         applied()
         return { ...current, discussion: mergeCorrectionFollowUps(current.discussion ?? [], [turn]) }
-      }, false)) }}
+      }, false, true)) }}
       onSave={onSave} onBusy={busy => { if (!busy) submission.current = undefined; setChecking(busy) }}
       backgroundGrade={{ id: requestId, save: result }} />
     {corrected && !rec.fixed && !good && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，請 Claude 再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}

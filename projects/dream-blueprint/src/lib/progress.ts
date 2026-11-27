@@ -1,4 +1,6 @@
+import { readDailyCount, recordDailyItem } from './dailyCounts'
 import type { AppState, Session } from './store'
+import { effectiveReviews } from './reviewMerge'
 export type Energy = 'low' | 'normal' | 'high'
 export type Period = 'semester' | 'exam' | 'internship' | 'vacation'
 export type Feedback = 'right' | 'much' | 'more'
@@ -52,6 +54,8 @@ export interface ReviewCard {
    *  not been reviewed since FSRS came in; its current interval stands in for the stability then. */
   s?: number
   d?: number
+  /** Time of the graded answer that produced this schedule, when known. */
+  reviewedAt?: number
 }
 export interface ReviewEvent {
   id: string
@@ -59,6 +63,8 @@ export interface ReviewEvent {
   gap: number
   remembered: boolean
   shownAnswer: boolean
+  at?: number
+  attempt?: string
 }
 export function newCard(id: string, day: string): ReviewCard {
   return { id, box: 1, lastDay: day, due: addDays(day, 1), mastered: false }
@@ -129,6 +135,8 @@ export function reviewCard(
   const gap = daysBetween(card.lastDay, day)
   const { s, d } = fsrsStep(card, gap, g)
   const interval = nextInterval(s)
+  const at = Date.now()
+  const attempt = at.toString(36) + '-' + Math.random().toString(36).slice(2)
   return {
     card: {
       ...card,
@@ -139,15 +147,16 @@ export function reviewCard(
       mastered: card.mastered || (g >= 3 && card.box >= 5),
       s: Math.round(s * 1000) / 1000,
       d: Math.round(d * 1000) / 1000,
+      reviewedAt: at,
     },
-    event: { id: card.id, day, gap, remembered, shownAnswer },
+    event: { id: card.id, day, gap, remembered, shownAnswer, at, attempt },
   }
 }
 /** A self-marked "correct" nobody could check: the card neither climbs nor drops, and no recall is recorded. */
 export function holdCard(card: ReviewCard, day: string): ReviewCard {
   if (day <= card.lastDay || day < card.due) return card
   const interval = card.s !== undefined ? nextInterval(card.s) : intervals[card.box - 1]
-  return { ...card, lastDay: day, due: addDays(day, interval) }
+  return { ...card, lastDay: day, due: addDays(day, interval), reviewedAt: undefined }
 }
 /** A written answer applied to its review card: checked and correct climbs, a small mistake is a hard recall, wrong or
  *  seen drops, correct but unchecked (自評完成・待確認) holds — self-marking alone never makes a card look learned. */
@@ -168,13 +177,9 @@ export function wordForecast(cards: readonly ReviewCard[], day: string, days = 7
 }
 /** How well word cards were recalled in the last two weeks (cards that waited at least two days). */
 export function recentRecall(events: readonly ReviewEvent[], day: string) {
-  const seen = new Set<string>()
   let n = 0, ok = 0
-  for (const e of events) {
+  for (const e of effectiveReviews(events)) {
     if (!e.id.startsWith('word:') || e.gap < 2 || e.day > day || daysBetween(e.day, day) >= 14) continue
-    const key = e.day + '/' + e.id
-    if (seen.has(key)) continue
-    seen.add(key)
     n++
     if (e.remembered && !e.shownAnswer) ok++
   }
@@ -192,21 +197,31 @@ export const reviewEnergy = (day: string, periods: readonly PeriodRange[]): Ener
  *  each, so the daily review takes a few of them; the rest wait their turn, oldest first. */
 export const SENTENCE_QUOTA = 5
 export const sentenceReviewKey = (day: string) => 'review.sentences.' + day
+export const reviewedSentenceCount = (notes: Record<string, string>, day: string) =>
+  readDailyCount(notes, sentenceReviewKey(day))
 const isDue = (c: ReviewCard, day: string) => c.due <= day && c.lastDay < day
 /** One written sentence, the way a practice session keeps it. */
 export type WrittenSentence = NonNullable<Session['translations']>[number]
+/** An open drill may still show a custom sentence deleted on another tab or device. */
+export const availableSentence = (notes: Record<string, string>, id: string) => !id.startsWith('say-') || !!notes['say.' + id]
+
+/** A blank skip queues another chance. An existing card keeps its current schedule and memory state. */
+export function queueSentence(prev: AppState, id: string, day: string): AppState {
+  if (!availableSentence(prev.notes, id) || prev.cards.some(card => card.id === id)) return prev
+  return { ...prev, cards: [...prev.cards, newCard(id, day)] }
+}
 /** A sentence written in a practice (中翻英, 主題總複習) counts the same wherever it was written: its review card moves on
  *  (or starts), a due card counts toward today's sentence review whatever the mark, and the answer joins the session. */
 export function logSentence(prev: AppState, sessionId: string, day: string, written: WrittenSentence): AppState {
-  // An open drill may still show a card deleted on another tab or device.
-  if (written.sentenceId.startsWith('say-') && !prev.notes['say.' + written.sentenceId]) return prev
+  if (!availableSentence(prev.notes, written.sentenceId)) return prev
+  if (written.attempted === false) return queueSentence(prev, written.sentenceId, day)
   const found = prev.cards.find((c) => c.id === written.sentenceId)
   const result = found ? applyAnswer(found, day, written) : null
   const counted = sentenceReviewKey(day)
   return {
     ...prev,
     cards: result ? prev.cards.map((c) => (c.id === written.sentenceId ? result.card : c)) : [...prev.cards, newCard(written.sentenceId, day)],
-    notes: found && isDue(found, day) ? { ...prev.notes, [counted]: String((Number(prev.notes[counted]) || 0) + 1) } : prev.notes,
+    notes: found && isDue(found, day) ? recordDailyItem(prev.notes, counted, written.sentenceId) : prev.notes,
     reviewEvents: result?.event ? [...prev.reviewEvents, result.event] : prev.reviewEvents,
     sessions: prev.sessions.map((s) => (s.id === sessionId ? { ...s, translations: [...(s.translations ?? []), written] } : s)),
   }
@@ -233,12 +248,21 @@ export function reviewLoad(
   s: { cards: readonly ReviewCard[]; reviewEvents: readonly ReviewEvent[]; notes: Record<string, string> },
   day: string,
   energy: Energy,
+  budgetMinutes?: number,
 ): ReviewLoad {
   let wordsDue = 0, sentencesDue = 0
   for (const c of s.cards) if (isDue(c, day)) { if (isWordCard(c.id)) wordsDue++; else sentencesDue++ }
   const wordsReviewed = new Set(s.reviewEvents.filter((e) => e.day === day && isWordCard(e.id)).map((e) => e.id)).size
-  const words = Math.min(wordsDue, Math.max(0, reviewBudget(energy) - wordsReviewed))
-  const sentences = Math.min(sentencesDue, Math.max(0, SENTENCE_QUOTA - (Number(s.notes[sentenceReviewKey(day)]) || 0)))
+  const sentencesReviewed = reviewedSentenceCount(s.notes, day)
+  // Reserve up to half a timed session for sentences when both types of card are due. Include completed
+  // cards in that split so opening the word and sentence queues in a different order gives the same quotas.
+  const minutes = budgetMinutes ?? Infinity
+  const sentenceShare = wordsDue + wordsReviewed ? Math.floor(minutes / 2) : minutes
+  const sentenceGoal = Math.min(SENTENCE_QUOTA, sentencesDue + sentencesReviewed, sentenceShare)
+  const sentenceLimit = Math.min(sentenceGoal, minutes - Math.ceil(wordsReviewed / 5))
+  const wordLimit = Math.min(reviewBudget(energy), (minutes - Math.max(sentenceGoal, sentencesReviewed)) * 5)
+  const words = Math.min(wordsDue, Math.max(0, wordLimit - wordsReviewed))
+  const sentences = Math.min(sentencesDue, Math.max(0, sentenceLimit - sentencesReviewed))
   return { words, backlog: wordsDue - words, sentences, queued: sentencesDue - sentences, minutes: Math.ceil(words / 5) + sentences }
 }
 export function dueCards<T extends ReviewCard>(
@@ -310,20 +334,8 @@ export function workloadDecision(
     countDays(demanding) < 4
   )
     return 'keep'
-  const seen = new Set<string>()
-  const eligible = events.filter((e) => {
-    if (
-      e.gap < 4 ||
-      e.shownAnswer ||
-      e.day > day ||
-      daysBetween(e.day, day) >= 14
-    )
-      return false
-    const key = e.day + '/' + e.id
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+  const eligible = effectiveReviews(events).filter(e =>
+    e.gap >= 4 && !e.shownAnswer && e.day <= day && daysBetween(e.day, day) < 14)
   return eligible.length &&
     eligible.filter((e) => e.remembered).length / eligible.length >= 0.7
     ? 'offer'
@@ -338,10 +350,10 @@ export function reviewBonus(
   events: readonly ReviewEvent[],
   day: string,
 ): number {
-  const valid = events.filter(
-    (e) => e.day === day && e.gap >= 4 && e.remembered && !e.shownAnswer,
+  const valid = effectiveReviews(events.filter(event => event.day === day)).filter(
+    e => e.gap >= 4 && e.remembered && !e.shownAnswer,
   )
-  return Math.min(10, 2 * new Set(valid.map((e) => e.id)).size)
+  return Math.min(10, 2 * valid.length)
 }
 export function attendance(
   sessions: readonly Pick<WorkSession, 'day'>[],

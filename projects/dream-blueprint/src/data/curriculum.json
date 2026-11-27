@@ -1687,7 +1687,7 @@
             "Are those pills yours?",
             "Are those your medicines?"
           ],
-          "why": "those 是複數，用 are 提問；your 已經限定 pills。",
+          "why": "those 指複數，用 are 提問。pills 指一顆顆藥丸，medicines 也可指不同藥物。",
           "newWords": [
             {
               "en": "pill",
@@ -1755,7 +1755,7 @@
                 "Are those pills yours?",
                 "Are those your medicines?"
               ],
-              "why": "those 是複數，用 are 提問；your 已經限定 pills。",
+              "why": "those 指複數，用 are 提問。pills 指一顆顆藥丸，medicines 也可指不同藥物。",
               "newWords": []
             }
           ],
@@ -12097,7 +12097,7 @@
       "unit": 14,
       "stage": "A",
       "title": "可數與不可數名詞",
-      "rule": "數得出來的名詞用 many、a few，數不出來的（water、blood、medicine、pain、time）用 much、a little。some 通常用在肯定句，any 通常用在否定句和問句；但請別人吃喝東西或提出邀請時，問句也常用 some（Would you like some water?）。a lot of 兩種名詞都能用。",
+      "rule": "數得出來的名詞用 many、a few，當作總量的名詞如 water、blood 用 much、a little。medicine 泛指藥物時可說 some medicine，指不同藥物可說 two different medicines。pain 可表示整體的疼痛（in pain）或一陣疼痛（a sharp pain）。some 常用在肯定句，也用在提供東西或邀請的問句（Would you like some water?）。any 常用在否定句和問句。a lot of 兩種名詞都能用。",
       "examples": [
         "How much water did you drink?",
         "I have a few questions.",
@@ -27004,7 +27004,7 @@
       "unit": 33,
       "stage": "B",
       "title": "轉述",
-      "rule": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+      "rule": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
       "examples": [
         "The patient says he feels dizzy.",
         "She told me that she was tired."
@@ -27029,7 +27029,7 @@
             "He says he is tired.",
             "He says that he is tired."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [
             {
               "en": "say",
@@ -27082,7 +27082,7 @@
                 "He says he is tired.",
                 "He says that he is tired."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27113,7 +27113,7 @@
             "She told me that she lived in Taichung.",
             "She told me she lives in Taichung."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [
             {
               "en": "think",
@@ -27166,7 +27166,7 @@
                 "She told me that she lived in Taichung.",
                 "She told me she lives in Taichung."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27200,7 +27200,7 @@
           "reference": [
             "What did the doctor say?"
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [
             {
               "en": "report",
@@ -27252,7 +27252,7 @@
               "reference": [
                 "What did the doctor say?"
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27287,7 +27287,7 @@
             "The patient says he feels dizzy.",
             "The patient reports that he feels dizzy."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [
             {
               "en": "deny",
@@ -27340,7 +27340,7 @@
                 "The patient says he feels dizzy.",
                 "The patient reports that he feels dizzy."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27375,7 +27375,7 @@
             "The patient complains of chest pain and says the pain started this morning.",
             "The patient complains of chest pain and says that it started this morning."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [
             {
               "en": "onset",
@@ -27428,7 +27428,7 @@
                 "The patient complains of chest pain and says the pain started this morning.",
                 "The patient complains of chest pain and says that it started this morning."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27463,7 +27463,7 @@
             "She says she is not hungry.",
             "She said she was not hungry."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": [],
           "words": [],
           "sentences": [
@@ -27482,7 +27482,7 @@
                 "She says she is not hungry.",
                 "She said she was not hungry."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             },
             {
@@ -27500,7 +27500,7 @@
                 "He told me that he did not sleep last night.",
                 "He told me he didn't sleep last night."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             },
             {
@@ -27518,7 +27518,7 @@
                 "He says he does not like coffee.",
                 "He says that he doesn't like coffee."
               ],
-              "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+              "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
               "newWords": []
             }
           ],
@@ -27555,7 +27555,7 @@
             "She says she is not hungry.",
             "She said she was not hungry."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27573,7 +27573,7 @@
             "He told me that he did not sleep last night.",
             "He told me he didn't sleep last night."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27591,7 +27591,7 @@
             "He says he does not like coffee.",
             "He says that he doesn't like coffee."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         }
       ],
@@ -27611,7 +27611,7 @@
             "My mother says I should rest.",
             "My mom said I should rest."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27629,7 +27629,7 @@
             "My mom told me not to come home late.",
             "Mom told me not to come home late."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27645,9 +27645,10 @@
           ],
           "reference": [
             "He says he will come tomorrow.",
-            "He said he would come tomorrow."
+            "He said he would come tomorrow.",
+            "He said he will come tomorrow."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27659,13 +27660,13 @@
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "said 後面的動詞往過去退一步。"
+            "這裡可以用 was 說出她當時的看法。"
           ],
           "reference": [
             "She said the movie was good.",
             "She said that the movie was great."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27683,7 +27684,7 @@
             "The family says he fell yesterday.",
             "His family said he fell yesterday."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         }
       ],
@@ -27703,7 +27704,7 @@
             "My mother says I should rest.",
             "My mom said I should rest."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27721,7 +27722,7 @@
             "My mom told me not to come home late.",
             "Mom told me not to come home late."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27737,9 +27738,10 @@
           ],
           "reference": [
             "He says he will come tomorrow.",
-            "He said he would come tomorrow."
+            "He said he would come tomorrow.",
+            "He said he will come tomorrow."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27751,13 +27753,13 @@
           ],
           "hints": [
             "先找出是誰說的，再找出他說的內容。",
-            "said 後面的動詞往過去退一步。"
+            "這裡可以用 was 說出她當時的看法。"
           ],
           "reference": [
             "She said the movie was good.",
             "She said that the movie was great."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         },
         {
@@ -27775,7 +27777,7 @@
             "The family says he fell yesterday.",
             "His family said he fell yesterday."
           ],
-          "why": "轉述別人說的話用 say (that) 或 tell 加人 (that)。現在轉述、內容仍然成立時，子句可以用現在式；用 said 轉述過去說的話時，子句的動詞通常往過去退一步。交班常用 The patient says、reports、denies、complains of。",
+          "why": "轉述可用 say (that) 或 tell 加人 (that)。用 said 或 told 轉述先前的話時，可以將時態往過去退一步。內容現在仍成立、仍相關或事情還沒發生時，也可以保留原時態。交班常用 The patient says、reports、denies、complains of。",
           "newWords": []
         }
       ],
@@ -29765,9 +29767,9 @@
             },
             {
               "en": "shortness of breath",
-              "zh": "呼吸急促",
+              "zh": "呼吸困難（覺得喘）",
               "example": "He has shortness of breath.",
-              "exampleZh": "他呼吸急促。",
+              "exampleZh": "他覺得喘，呼吸有困難。",
               "source": "nursing",
               "level": 4
             }
@@ -29783,9 +29785,9 @@
             },
             {
               "en": "shortness of breath",
-              "zh": "呼吸急促",
+              "zh": "呼吸困難（覺得喘）",
               "example": "He has shortness of breath.",
-              "exampleZh": "他呼吸急促。",
+              "exampleZh": "他覺得喘，呼吸有困難。",
               "source": "nursing",
               "level": 4
             }

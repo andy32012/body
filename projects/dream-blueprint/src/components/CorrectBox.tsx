@@ -51,23 +51,24 @@ async function retryReply(id: string) {
 
 /** One button: Claude rewrites the answer correctly underneath, then the learner can ask follow-ups.
  *  With onSave, each fix can become a review card so the mistake comes back later. */
-export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, onBusy, backgroundGrade, discussion, mode = 'translate', restore, previous, selfFix = false, rubric }: {
+export default function CorrectBox({ zh, reference, words, answer, run, onSave, onResult, onReveal, onError, onBusy, backgroundGrade, discussion, mode = 'translate', restore, previous, selfFix = false, archiveOnly = false, rubric }: {
   zh: string; reference?: string; words?: string[]; answer: string; run: number
   /** The published table Claude grades by (全民英檢): a score with its level is shown, and the verdict follows it. */
   rubric?: RubricId
   /** `judged`: the exact text Claude judged, so the caller can tell when the answer was changed afterwards. Only the
    *  latest check of a box that is still on screen reports; a slower reply to an earlier check is dropped. */
-  onSave?: (card: SayCard) => void; onResult?: (verdict: Result['verdict'], fixes: number, result: Result, judged: string) => void; mode?: 'translate' | 'open'
+  onSave?: (cards: SayCard[]) => Promise<unknown>; onResult?: (verdict: Result['verdict'], fixes: number, result: Result, judged: string) => void; mode?: 'translate' | 'open'
   /** While Claude is checking (the caller can hold its button, so one press is one check). */
   onBusy?: (busy: boolean) => void
   /** An exercise with persistent grading can save its initial result after the box leaves the page. */
   backgroundGrade?: {
-    id?: string; save: (result: Result, judged: string, submission: CorrectionSubmission) => void | Promise<void>
+    id?: string; save: (result: Result, judged: string, submission: CorrectionSubmission) => void | Promise<unknown>
   }
   /** A daily lesson keeps questions and replies attached to the exact correction they discuss. */
   discussion?: { id: string; saved?: readonly CorrectionFollowUp[]; save: (turn: CorrectionFollowUp) => void | Promise<void> }
   /** Feedback saved earlier (shown again after a reload, without asking Claude again). */
   restore?: { answer: string; result: Result; id?: string; showFull?: boolean }
+  archiveOnly?: boolean
   /** The feedback on the earlier try, so Claude can say which of those issues are now fixed. */
   previous?: Result
   /** Show one issue at a time (where, and why) before the full correction. */
@@ -77,6 +78,9 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   onError?: () => void
 }) {
   const [saved, setSaved] = useState<number[]>([])
+  const [savingCards, setSavingCards] = useState(false)
+  const [cardSaveError, setCardSaveError] = useState(false)
+  const savingCardsRef = useRef(false)
   const [turns, setTurns] = useState<TutorTurn[]>(() => restore ? [{ role: 'user', content: '我的翻譯：' + restore.answer }, { role: 'assistant', content: JSON.stringify(restore.result) }] : [])
   const [result, setResult] = useState<Result | null>(() => restore?.result ?? null)
   // Feedback shown again after a reload may be from before the tables: only a fresh check without a score gets the note.
@@ -168,6 +172,7 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
   useEffect(() => {
     if (!run || inFlight.current || (backgroundGrade?.id && correctionBlocked(backgroundGrade.id))) return
     setResult(null); setGradeId(undefined); setQuestion(''); setTurns([]); setError(''); setRaw(''); setSaved([]); setHints(selfFix ? 1 : -1)
+    setCardSaveError(false)
     if (!tutorKey()) { setError('還沒連接 Claude：到「設定 → 連接 Claude」貼上 API 金鑰就能用。'); onBusy?.(false); return }
     if (!answer.trim()) { setError('先寫一點英文再按批改。'); onBusy?.(false); return }
     const first: TutorTurn[] = [{ role: 'user', content: '我的翻譯：' + answer.trim() }]
@@ -185,6 +190,26 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
     setQuestion('')
     const base = discussion ? [...turns.slice(0, 2), ...followUps] : turns
     void send([...base, { role: 'user', content: q }], false, lastCheck.current, grade ? { grade, question: q } : undefined)
+  }
+  const availableCards = onSave ? result?.fixes.flatMap((fix, index) => {
+    const card = fixToCard(fix)
+    return card && !saved.includes(index) ? [{ index, card }] : []
+  }) ?? [] : []
+  async function addCards(entries: typeof availableCards) {
+    if (!onSave || savingCardsRef.current || !entries.length) return
+    const check = lastCheck.current
+    savingCardsRef.current = true
+    setSavingCards(true)
+    setCardSaveError(false)
+    try {
+      await onSave(entries.map(entry => entry.card))
+      if (checks.current.isCurrent(check)) setSaved(list => [...list, ...entries.map(entry => entry.index)])
+    } catch {
+      if (checks.current.isCurrent(check)) setCardSaveError(true)
+    } finally {
+      savingCardsRef.current = false
+      setSavingCards(false)
+    }
   }
   return <section className="tu-box" aria-live="polite">
     {busy && !result && <p className="tu-wait">{rubric ? 'Claude 照評分表批改中……' : 'Claude 批改中……'}</p>}
@@ -226,25 +251,23 @@ export default function CorrectBox({ zh, reference, words, answer, run, onSave, 
           return <li key={i}>
             <span lang="en"><s>{f.wrong || '（漏寫）'}</s> → <b>{f.right}</b></span>
             <small>{f.why}</small>
-            {card && <button type="button" className="tu-save" disabled={saved.includes(i)}
-              onClick={() => { onSave?.(card); setSaved(list => [...list, i]) }}>{saved.includes(i) ? '已加入複習' : '加入複習'}</button>}
+            {card && <button type="button" className="tu-save" disabled={savingCards || saved.includes(i)}
+              onClick={() => void addCards([{ index: i, card }])}>{saved.includes(i) ? '已加入複習' : '加入複習'}</button>}
           </li>
         })}
       </ul>}
-      {onSave && result.fixes.length > 1 && saved.length < result.fixes.length &&
-        <button type="button" className="tu-save tu-save-all" onClick={() => {
-          result.fixes.forEach((f, i) => { const card = fixToCard(f); if (card && !saved.includes(i)) onSave(card) })
-          setSaved(result.fixes.map((_, i) => i))
-        }}>全部加入複習</button>}
+      {availableCards.length > 1 &&
+        <button type="button" className="tu-save tu-save-all" disabled={savingCards} onClick={() => void addCards(availableCards)}>全部加入複習</button>}
+      {cardSaveError && <p className="tu-error" role="alert">這次沒有存進複習卡。原本的批改仍在，可以再按一次加入。</p>}
       {result.note && <p className="tu-note">{result.note}</p>}
       {followUps.map((t, i) => <div key={i} className={'tu-turn tu-' + t.role}>
         {t.content.split('\n').map((line, j) => line.trim() ? <p key={j}>{line}</p> : null)}
       </div>)}
       {(busy || discussionPending) && <p className="tu-wait">等 Claude 回覆……</p>}
-      <form className="tu-ask" onSubmit={e => { e.preventDefault(); askFollowUp(question.trim()) }}>
+      {!archiveOnly && <form className="tu-ask" onSubmit={e => { e.preventDefault(); askFollowUp(question.trim()) }}>
         <input value={question} onChange={e => setQuestion(e.target.value)} placeholder="有問題就問，例如：為什麼用 were？" />
         <button type="submit" disabled={busy || discussionPending || !!saveFailure || !question.trim()}>問</button>
-      </form>
+      </form>}
     </>}
   </section>
 }

@@ -23,7 +23,7 @@ def write_json(path, data):
 
 
 def publish_recording_files(files, staging):
-    """Publish prepared files, restoring earlier replacements if a later one fails."""
+    """Replace prepared files or remove obsolete ones (source=None), rolling back on an I/O failure."""
     previous = []
     for index, (source, target) in enumerate(files):
         saved = None
@@ -34,7 +34,10 @@ def publish_recording_files(files, staging):
     published = []
     try:
         for source, target, saved in previous:
-            source.replace(target)
+            if source is None:
+                target.unlink()
+            else:
+                source.replace(target)
             published.append((target, saved))
     except OSError as publish_error:
         failed_to_restore = []
@@ -78,6 +81,33 @@ def derived(item):
     """The extra clips of a syllable item: slow, every piece, and the growing word (two pieces … all but the last)."""
     n, t = len(item['kk']), item['text']
     return [t + '~slow'] + [f'{t}~{i}' for i in range(1, n + 1)] + [f'{t}~1-{j}' for j in range(2, n)]
+
+
+WH_QUESTION = re.compile(r"^(?:who|whom|whose|what|where|when|why|how|which)\b", re.I)
+
+
+def intonation_directions(lesson):
+    """Use the same explicit intonation and follow-up reading rules for recording and for checking the packs."""
+    if lesson['kind'] != 'listen' or not any(item['label'].endswith(('↗', '↘')) for item in lesson['items']):
+        return {}
+
+    directions = {}
+
+    def set_direction(text, direction):
+        if directions.setdefault(text, direction) != direction:
+            raise ValueError(f"{lesson['id']}: conflicting directions for {text!r}")
+
+    for item in lesson['items']:
+        if item['label'].endswith(('↗', '↘')):
+            set_direction(item['text'], 'rise' if item['label'].endswith('↗') else 'fall')
+    for quiz in lesson['quiz']:
+        answer = quiz['options'][quiz['answer']]
+        if not answer.startswith(('上升', '下降')):
+            raise ValueError(f"{lesson['id']}: missing intonation in the answer for {quiz['audio']!r}")
+        set_direction(quiz['audio'], 'rise' if answer.startswith('上升') else 'fall')
+    for text in [item['text'] for item in lesson['items']] + [sentence['en'] for sentence in lesson['sentences']]:
+        directions.setdefault(text, 'rise' if text.endswith('?') and not WH_QUESTION.match(text) else 'fall')
+    return directions
 
 def parse(path=os.path.join(HERE, 'course.txt'), *, chosen_pairs=None):
     chosen = chosen_pairs

@@ -123,7 +123,7 @@ S Please save a seat for me. = 請幫我留一個位子。
 
 #L p10 | endings | -ed 和 -s 的三種念法 | [t] [d] [ɪd]、[s] [z] [ɪz]
 H -ed：前面是無聲的音（p、k、f、s、sh、ch）念 [t]；前面是有聲的音（母音、b、g、l、m、n、v、z）念 [d]；前面是 t 或 d 時多一個音節，念 [ɪd]。
-H -s 也一樣：無聲的後面念 [s]，有聲的後面念 [z]；s、z、sh、ch、x 後面多一個音節，念 [ɪz]。
+H -s／-es 要聽字尾最後一個音。[s]、[z]、[ʃ]、[ʒ]、[tʃ]、[dʒ] 後面多一個音節 [ɪz]，像 boxes 和 bandages。其他無聲子音後念 [s]，其他有聲的音（也包括母音）後念 [z]。
 T 最常見的錯：把 walked 念成兩個音節（walk-id）。只有 t、d 後面才多一個音節。
 W [t] | walked | walk 的 k 無聲
 W [t] | washed | sh 無聲
@@ -145,7 +145,7 @@ W [z] | bags | g 有聲
 W [z] | pills | l 有聲
 W [ɪz] | nurses | s 後面
 W [ɪz] | watches | ch 後面
-W [ɪz] | boxes | x 後面
+W [ɪz] | boxes | 字尾 x 念 [ks]，最後一個音是 [s]
 S She walked to the ward and checked the beds. = 她走到病房，檢查了床位。
 S He needed help, so I called the doctor. = 他需要幫忙，所以我打給醫師。
 S The nurses washed their hands. = 護理師們洗了手。
@@ -182,8 +182,8 @@ S A cup of tea, please. = 請給我一杯茶。
 S Take it twice a day. = 一天吃兩次。
 
 #L p13 | listen | 連音：check it out | 連音
-H 前一個字的字尾是子音、後一個字的開頭是母音時，兩個字會連在一起念：check it out 聽起來像 che-ki-tout。
-H 美式英文裡，夾在兩個母音中間的 t 會變成很輕的、像 d 的音：water、better、a lot of。
+H 說話沒有停頓時，前一個字的字尾子音常會接到下一個字的開頭母音。check it out 聽起來像 che-ki-tout。
+H 美式英文裡，t 夾在母音之間，從重讀母音接到輕讀音節時，常念成舌尖快速輕點的閃音 [ɾ]，聽起來像很輕的 d。water、better 和連念的 a lot of 都能聽到。attack 的第二音節重讀，t 仍讀 [t]。
 T 聽不懂常常不是單字不會，而是連音之後認不出來。先聽，再跟著連起來念。
 W a-napple | an apple | 一顆蘋果
 W tur-ni-toff | turn it off | 把它關掉
@@ -205,23 +205,24 @@ S Drink a lot of water. = 多喝水。
 S I will check it out in an hour. = 我一小時後去看一下。
 
 #L p14 | listen | 語調：問句上升還是下降 | 語調
-H 用 yes／no 回答的問句，句尾音調上升 ↗：Are you okay?
-H 用 what、where、when、why、how 開頭的問句，句尾音調下降 ↘：Where does it hurt? 這跟中文問句的習慣不一樣，最容易念錯。
-H 一般的句子和請對方做事的句子，句尾也是下降 ↘：I feel much better.、Please sit down.
-T 把 wh 問句念成上升，聽起來會像你不確定自己在問什麼。句尾往下，問題才清楚。
-W ↗ | Are you okay? | yes／no 問句，句尾上升
-W ↗ | Do you have any pain? | yes／no 問句，句尾上升
-W ↗ | Can you walk? | yes／no 問句，句尾上升
-W ↘ | Where does it hurt? | wh 問句，句尾下降
-W ↘ | What is your name? | wh 問句，句尾下降
-W ↘ | I feel much better. | 一般句子，句尾下降
-W ↘ | Please sit down. | 請對方做事，句尾下降
-Q Are you okay? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 用 yes／no 回答的問句，句尾上升。
-Q Where does it hurt? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | wh 開頭的問句，句尾下降。
-Q Do you take any medicine? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 用 yes／no 回答的問句，句尾上升。
-Q What time is it? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | wh 開頭的問句，句尾下降。
-Q I feel much better. | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | 一般的句子，句尾下降。
-Q Are you ready? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 用 yes／no 回答的問句，句尾上升。
+H 第一次問對方、想知道 yes 或 no 時，句尾常上升 ↗，例如 Are you okay?
+H 用 what、where、when、why、how 問新資訊時，尾音常下降 ↘，例如第一次問痛的位置 Where does it hurt?
+H 說完一個陳述或給一個清楚指示時，尾音常下降 ↘，例如 I feel much better. 和 Please sit down.
+H 語調也會跟著用意變化。第一次問 Where does it hurt? 常念下降 ↘。如果剛才沒聽清楚，再問 Where did you say it hurt? 可以念上升 ↗ 或先降再升 ↘↗。
+T 本課音檔先練最常見的問法。聽力題請照這一段錄音的尾音作答。
+W ↗ | Are you okay? | 這段錄音用上升示範 yes／no 問句
+W ↗ | Do you have any pain? | 這段錄音用上升示範 yes／no 問句
+W ↗ | Can you walk? | 這段錄音用上升示範 yes／no 問句
+W ↘ | Where does it hurt? | 這段錄音用下降示範 wh 問句
+W ↘ | What is your name? | 這段錄音用下降示範 wh 問句
+W ↘ | I feel much better. | 這段錄音用下降示範陳述句
+W ↘ | Please sit down. | 這段錄音用下降示範給指示
+Q Are you okay? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 錄音的尾音上升。第一次問對方要 yes／no 答覆時常這樣念。
+Q Where does it hurt? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | 錄音的尾音下降。第一次問對方痛的位置時常這樣念。
+Q Do you take any medicine? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 錄音的尾音上升。第一次問對方要 yes／no 答覆時常這樣念。
+Q What time is it? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | 錄音的尾音下降。第一次問現在幾點時常這樣念。
+Q I feel much better. | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 1 | 這段錄音在說完現在的感受時，把尾音往下放。
+Q Are you ready? | 這句的句尾是上升還是下降？ | 上升 ↗ ; 下降 ↘ | 0 | 錄音的尾音上升。第一次問對方要 yes／no 答覆時常這樣念。
 S Are you allergic to any medicine? = 你對任何藥物過敏嗎？
 S When did the pain start? = 什麼時候開始痛的？
 S Please take a deep breath. = 請深呼吸。

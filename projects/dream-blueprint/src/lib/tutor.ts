@@ -63,7 +63,7 @@ export function tutorSystem(sentence: TutorSentence, learned: string[], weak: st
     '- 先判斷意思，再看文法。分三種：意思對而且自然 → 對了（就算跟參考答案不一樣）；意思大致清楚但文法或用字有錯 → 小錯或再試一次，指出問題讓他自己改；意思變了（例如把「換貨」寫成退款、把「起床」寫成醒來、把「不可以」寫成不應該、主角或時間換了）→ 意思不同，要說清楚題目是什麼意思、他寫的變成什麼意思，就算他的英文本身沒有文法錯。',
     '- 你自己也不確定他的意思對不對時，不要判「對了」，判「再試一次」並說你不確定的地方，讓他寫清楚一點。',
     '- 錯的地方照規則分層提示：他第一次錯只說錯的類型和大概位置；同一個錯第二次再錯，說清楚一點；第三次還錯或他說不會，給更具體的提示（例如那個字的第一個字母、該用的句型或句子開頭），還是不要給整句答案，讓他自己寫出來；他寫對了再完整講原因。',
-    '- 只錯標點或大小寫，算小錯，直接指出就好。',
+    '- 只錯標點或大小寫，算小錯，直接指出就好。直接問句的句尾需要問號；改變關係子句意思的逗號則依原意是否改變判定。',
     '- 講解用繁體中文，口氣像很熟的朋友，可以吐槽一下但要清楚。要有規則、一兩個例句、常見錯誤。不要用 Markdown 標題，段落短一點。',
     '- 判定不是「對了」時，在最後一行的前一行寫「弱點：名稱」，記下這次錯在哪一種文法，名稱照抄下面清單裡最符合的一個；同時錯兩種就用「；」隔開寫兩個，最多兩個。只錯標點或大小寫不用寫。' + weakLabelPrompt(),
     '- 另外照「' + rubrics['gept-sentence'].title + '」的官方評分表給他這一句分數（' + rubrics['gept-sentence'].scales[0].levels.map(l => l.score + '＝' + l.text).join('；') + '）。分數和判定要一致：「對了」才是 2；「小錯」是 1；「再試一次」「意思不同」是 0 或 1（這題要練的句型對、只是有錯給 1，錯太多或沒寫給 0）。',
@@ -120,8 +120,13 @@ async function callClaude(system: string, turns: { role: 'user' | 'assistant'; c
   const stop: unknown = data?.stop_reason
   if (stop === 'refusal') throw new ClaudeIncomplete('Claude 這次沒有回答（被它的安全檢查擋下來了），換個說法再試一次。')
   if (stop === 'max_tokens' || stop === 'model_context_window_exceeded') throw new ClaudeIncomplete('Claude 這次想太久，回答還沒寫完就停了，這一次不算，再試一次就好。')
-  // Thinking blocks come first (empty by default); only the text blocks are the answer.
-  return (data?.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('\n').trim() as string
+  // Thinking blocks are not the answer. Only a readable text reply can count as a successful request.
+  const content: unknown = data?.content
+  const text = Array.isArray(content)
+    ? content.flatMap(block => block?.type === 'text' && typeof block.text === 'string' ? [block.text] : []).join('\n').trim()
+    : ''
+  if (!text) throw new ClaudeIncomplete('Claude 這次沒有回覆文字，請再試一次。')
+  return text
 }
 
 const sentenceVerdicts = { 對了: 'good', 小錯: 'small', 再試一次: 'again', 意思不同: 'changed' } as const

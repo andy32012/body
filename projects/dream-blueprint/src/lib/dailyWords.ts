@@ -18,6 +18,10 @@ export const DAILY_CHOICES = [5, 8, 10, 15, 20, 25, 30] as const
  *  Sorting a word takes seconds; only the unknown ones become cards, and the review cap and the new-word brake keep the load in hand. */
 export const DEFAULT_DAILY = 20
 export const countKey = 'daily-word.count'
+export function chosenDailyCount(notes: Record<string, string>) {
+  const chosen = Number(notes[countKey])
+  return DAILY_CHOICES.find(option => option === chosen) ?? DEFAULT_DAILY
+}
 export const doneKey = (day: string) => 'daily-word.done.' + day
 export const seenKey = (day: string) => 'daily-word.seen.' + day
 export const moreKey = (day: string) => 'daily-word.more.' + day
@@ -59,10 +63,13 @@ export function readDailyDone(notes: Record<string, string>, day: string) {
   const count = Number(notes[doneKey(day)])
   return Math.max(Number.isSafeInteger(count) ? count : 0, readSorted(notes, day).length)
 }
-export function reconcileDailyCounts(notes: Record<string, string>) {
+export function reconcileDailyCounts(notes: Record<string, string>, ...copies: Record<string, string>[]) {
   for (const key of Object.keys(notes)) {
     const day = sortedDayPattern.exec(key)?.[1]
-    if (day) notes[doneKey(day)] = String(readDailyDone(notes, day))
+    if (!day) continue
+    // A pre-history count has no individual words. Keep it once alongside the merged, identified entries.
+    const legacy = Math.max(0, ...copies.map(copy => readDailyDone(copy, day) - readSorted(copy, day).length))
+    notes[doneKey(day)] = String(legacy + readSorted(notes, day).length)
   }
 }
 /** Adds a word to today's order; a word already there keeps its place and takes the new choice. */
@@ -122,11 +129,9 @@ export function addWordsToReview<S extends Sortable>(prev: S, keys: readonly str
 
 /** `backlog`: word cards due beyond what today's review can take (reviewLoad in progress.ts). */
 export function dailyTarget(notes: Record<string, string>, quiet: boolean, day: string, backlog = 0) {
-  const chosen = Number(notes[countKey])
-  const full = DAILY_CHOICES.includes(chosen as (typeof DAILY_CHOICES)[number]) ? chosen : DEFAULT_DAILY
   // Exam and internship days show one word unless the learner asks for the full set.
   if (quiet && notes[moreKey(day)] !== '1') return 1
-  return Math.min(full, newWordAllowance(backlog))
+  return Math.min(chosenDailyCount(notes), newWordAllowance(backlog))
 }
 
 export interface WordPlan { target: number; backlog: number; reason: string; short: string }
@@ -135,8 +140,7 @@ export interface WordPlan { target: number; backlog: number; reason: string; sho
  *  what a day's review can take; and a poor recall rate over the last two weeks (new words wait until the old stick). */
 export function newWordPlan(s: { notes: Record<string, string>; cards: readonly ReviewCard[]; reviewEvents: readonly ReviewEvent[] }, day: string, quiet: boolean, energy: Energy): WordPlan {
   const { backlog } = reviewLoad(s, day, energy)
-  const chosen = Number(s.notes[countKey])
-  const full = DAILY_CHOICES.includes(chosen as (typeof DAILY_CHOICES)[number]) ? chosen : DEFAULT_DAILY
+  const full = chosenDailyCount(s.notes)
   if (quiet && s.notes[moreKey(day)] !== '1') return { target: 1, backlog, reason: '', short: '' }
   let target = Math.min(full, newWordAllowance(backlog))
   let reason = backlog > 30 ? '單字卡積了 ' + backlog + ' 張今天複習不完，新字先' + (target === 0 ? '暫停' : '減少到 ' + target + ' 個') + '；積的卡消下去，新字就會加回來。' : ''

@@ -49,7 +49,7 @@
    {
     "bad": "I tired.",
     "good": "I am tired.",
-    "why": "英文句子一定要有動詞，形容詞前面要放 be 動詞。"
+    "why": "這裡要用 am 把主詞 I 和描述狀態的 tired 接起來。tired 是形容詞，不能自己當這句話的動詞。"
    },
    {
     "bad": "She are a student.",
@@ -636,7 +636,7 @@
   "steps": [
    {
     "t": "講習慣、常做的事，用現在式",
-    "p": "每天、常常、固定會做的事，動詞用原形就好。",
+    "p": "用現在簡單式說反覆的習慣。I、you、we、they 的肯定句用動詞原形，下一步看 he、she、it 怎麼變。",
     "ex": [
      {
       "en": "I drink water every day.",
@@ -673,6 +673,20 @@
      {
       "en": "She has a fever.",
       "zh": "她發燒。"
+     }
+    ]
+   },
+   {
+    "t": "否定用 do not 或 does not，後面的動詞用原形",
+    "p": "I、you、we、they 配 do not（don't）。he、she、it 配 does not（doesn't）。看 she works 變成 she does not work：does 已經表示第三人稱單數，work 不再加 s。",
+    "ex": [
+     {
+      "en": "She works in the morning. She does not work at night.",
+      "zh": "她早上工作。她晚上不工作。"
+     },
+     {
+      "en": "They do not visit on Sundays.",
+      "zh": "他們週日不來訪。"
      }
     ]
    }
@@ -1027,7 +1041,7 @@
    },
    {
     "t": "加 ing 的小規則",
-    "p": "大部分直接加；字尾是不發音的 e，去掉 e 再加（write → writing）；短母音 + 一個子音結尾，子音多寫一次（run → running、sit → sitting）。",
+    "p": "加 -ing 多半直接加。不發音的 e 先去掉（write → writing）。以美式拼法為例，末音節有重音，字尾是一個短母音加一個子音字母時，常把子音寫兩次，例如 run → running、sit → sitting、begin → beginning。字尾的 w、x、y 照原樣寫，例如 fix → fixing。open 和 visit 的重音在前面，寫 opening 和 visiting。",
     "ex": [
      {
       "en": "He is writing a note.",
@@ -1152,9 +1166,19 @@
      "take → taking"
     ],
     [
-     "短母音 + 一個子音",
+     "末音節重讀，短母音加一個子音字母結尾（w、x、y 除外）",
      "子音多寫一次",
-     "sit → sitting、run → running"
+     "run → running、begin → beginning"
+    ],
+    [
+     "重音在前面的多音節字",
+     "這兩例直接加 -ing",
+     "open → opening、visit → visiting"
+    ],
+    [
+     "字尾是 w、x、y",
+     "保留原本的子音字母",
+     "fix → fixing"
     ]
    ]
   }
@@ -1334,7 +1358,7 @@
    },
    {
     "t": "加 ed 的小規則",
-    "p": "e 結尾只加 d；子音 + y 改成 ied；短母音 + 一個子音結尾（重音在最後），子音多寫一次。",
+    "p": "規則動詞以 e 結尾只加 -d，子音字母加 y 結尾把 y 改成 -ied。以美式拼法為例，末音節重讀且以短母音加一個子音字母結尾時，常雙寫子音再加 -ed，例如 stop → stopped、admit → admitted。fix → fixed 的 x 不雙寫，visit → visited 的重音不在末音節。",
     "ex": [
      {
       "en": "He lived in Tainan.",
@@ -1464,9 +1488,9 @@
      "study → studied"
     ],
     [
-     "短母音 + 一個子音",
-     "子音多寫一次",
-     "stop → stopped、plan → planned"
+     "末音節重讀，短母音加一個子音字母結尾",
+     "常雙寫子音（w、x 不雙寫，y 看上一列）",
+     "stop → stopped、admit → admitted、fix → fixed"
     ]
    ]
   }
@@ -2366,7 +2390,7 @@
   "steps": [
    {
     "t": "數得出來和數不出來",
-    "p": "apple、pill、nurse 可以一個一個數（可數）；water、blood、medicine、rice、time、money 不能直接數（不可數），不加 s，也不加 a。",
+    "p": "apple、pill、nurse 可以一個一個數。water、blood、rice 和 money 在這裡表示總量，當不可數名詞。依意思選用法。medicine 泛指藥物時可以說 some medicine，指不同藥物可以說 two different medicines。pain 泛指疼痛時可以說 in pain，描述一陣刺痛可以說 a sharp pain。",
     "ex": [
      {
       "en": "I ate two apples.",
@@ -2463,11 +2487,12 @@
    },
    {
     "k": "fill",
-    "q": "She drank ___ little water.（填一個字）",
+    "q": "She drank ___ little water.",
+    "instruction": "她喝了一點水。填一個字。",
     "accept": [
      "a"
     ],
-    "why": "a little 配不可數名詞。"
+    "why": "a little water 是「一點水」。too little water 是「水量太少」，意思不同。"
    },
    {
     "k": "fix",
@@ -2522,7 +2547,7 @@
   "steps": [
    {
     "t": "兩個比：形容詞 + er + than",
-    "p": "短的字加 -er；e 結尾加 -r；子音 + y 改 ier；短母音 + 一個子音，子音多寫一次（big → bigger）。",
+    "p": "短形容詞通常加 -er。以 e 結尾只加 -r，子音字母加 y 結尾把 y 改成 -ier。像 big、hot 這類單音節、以短母音加一個子音字母結尾的字，先雙寫再加 -er。字尾 w、x 照原樣，例如 low → lower、lax → laxer。",
     "ex": [
      {
       "en": "He is taller than me.",
@@ -4162,6 +4187,7 @@
    {
     "k": "fill",
     "q": "They ___ (watch) TV at eight last night.",
+    "instruction": "請用過去進行式，描述八點當下正在做的事。",
     "accept": [
      "were watching"
     ],
@@ -5561,8 +5587,8 @@
     ]
    },
    {
-    "t": "用 said／told 轉述過去說的話，動詞往過去退一步",
-    "p": "am／is 變 was、are 變 were、will 變 would、can 變 could、現在式變過去式。",
+    "t": "用 said／told 轉述時，按時間和語境決定要不要退移時態",
+    "p": "需要退移時，am／is 用 was、are 用 were、will 用 would、can 用 could，現在式改成過去式。內容現在仍成立、仍相關，或事情還沒發生時，也可以保留原時態。",
     "ex": [
      {
       "en": "He said he felt dizzy.",
@@ -5570,12 +5596,16 @@
      },
      {
       "en": "She said she would come.",
-      "zh": "她說她會來。"
+      "zh": "她說她會來。（will 退移成 would。）"
+     },
+     {
+      "en": "She said she will come tonight.",
+      "zh": "她說她今晚會來。（現在還沒到今晚，可以保留 will。）"
      }
     ]
    },
    {
-    "t": "現在轉述、內容還成立，可以用現在式",
+    "t": "轉述當下的病人說法",
     "p": "交班常用 says、reports、denies（否認）、complains of（主訴）。",
     "ex": [
      {
@@ -5622,15 +5652,16 @@
      "be"
     ],
     "answer": 1,
-    "why": "轉述昨天說的話，動詞退成過去式 was。"
+    "why": "他今天已經不累了。這裡描述的是他昨天說的當時狀態，用 was。"
    },
    {
     "k": "fill",
-    "q": "She said she ___ (will) call me later.",
+    "q": "Earlier she said she ___ (will) call me tonight. It is still afternoon.",
     "accept": [
-     "would"
+     "would",
+     "will"
     ],
-    "why": "轉述時 will 變成 would。"
+    "why": "用 would 是時態退移。現在還沒到今晚，用 will 保留原時態也成立。"
    },
    {
     "k": "choose",
@@ -5645,7 +5676,7 @@
    },
    {
     "k": "fill",
-    "q": "He ___ (tell) me that he was hungry.",
+    "q": "Yesterday he ___ (tell) me that he was hungry.",
     "accept": [
      "told"
     ],
@@ -5670,10 +5701,10 @@
    }
   ],
   "table": {
-   "title": "轉述時動詞怎麼退",
+   "title": "時態退移範例",
    "head": [
     "他原本說的",
-    "轉述（said）"
+    "轉述並退移時（said）"
    ],
    "rows": [
     [
@@ -7994,10 +8025,11 @@
    {
     "k": "fill",
     "q": "While I ___ (cook), my brother was doing his homework.",
+    "instruction": "請用過去進行式，描述兩件事在當時同時進行。",
     "accept": [
      "was cooking"
     ],
-    "why": "while 後面接正在進行的動作。"
+    "why": "這題要描述當時仍在進行的動作。I 搭配 was cooking。"
    },
    {
     "k": "fix",

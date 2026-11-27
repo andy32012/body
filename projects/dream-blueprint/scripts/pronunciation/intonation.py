@@ -10,35 +10,23 @@ import argparse, sys
 from math import isfinite
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from course import parse, clips, slug, HERE, read_json, write_json, publish_recording_files
+from course import parse, clips, slug, intonation_directions, HERE, read_json, write_json, publish_recording_files
 
 parser = argparse.ArgumentParser(description='Record all rising and falling clips in an intonation lesson.')
 parser.add_argument('lesson_id')
 args = parser.parse_args()
 course = parse()
 lesson = next((l for l in course if l['id'] == args.lesson_id), None)
-if not lesson or not any(it['label'].endswith(('↗', '↘')) for it in lesson['items']):
+directions = intonation_directions(lesson) if lesson else {}
+if not directions:
     parser.error(f'{args.lesson_id!r} is not an intonation lesson')
 
-import soundfile as sf
-from lib import SilentTake, phonemes, tts, shape, check
+from lib import SilentTake, phonemes, tts, shape, pcm16, check
 from pitchwork import final_move, first_clause, rising_end, harmonicity
+from recorded_take import write_take
 
 VOICES = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_michael', 'am_adam', 'am_fenrir', 'am_puck']}
 RISE, FALL = 3.0, -1.5      # semitones between the end of the sentence and the stretch before it
-
-def expected(l):
-    out = {}
-    wh = ('what', 'where', 'when', 'why', 'how', 'who', 'which')
-    for it in l['items']: out[it['text']] = 'rise' if it['label'].endswith('↗') else 'fall'
-    for q in l['quiz']:
-        want = 'rise' if q['options'][q['answer']].startswith('上升') else 'fall'
-        assert out.get(q['audio'], want) == want, q['audio']
-        out[q['audio']] = want
-    for s in l['sentences']:
-        t = s['en']
-        out.setdefault(t, 'rise' if t.endswith('?') and not t.lower().startswith(wh) else 'fall')
-    return out
 
 def falling(c, ph, g):
     seen = []
@@ -46,7 +34,7 @@ def falling(c, ph, g):
         for speed in (0.9, 1.0, 0.82):
             x, sr = tts.create(ph, voice=voice, speed=speed, lang='en-us', is_phonemes=True)
             try:
-                x = shape(x, sr)
+                x = pcm16(shape(x, sr))
             except SilentTake as error:
                 seen.append(f'{voice} {speed}: {error}')
                 continue
@@ -56,7 +44,11 @@ def falling(c, ph, g):
                 continue
             seen.append(f'{voice} {speed}: {move:+.1f}')
             if move > FALL: continue
-            res = check(c, x, sr)
+            try:
+                res = check(c, x, sr)
+            except SilentTake as error:
+                seen[-1] += f' ({error})'
+                continue
             if res['grade'] == 'strict': return voice, speed, x, sr, res, f'falls {move:+.1f} st (as synthesised)', seen
             seen[-1] += ' (words not clear)'
     return None, seen
@@ -77,7 +69,7 @@ def rising(c, ph, g):
             y, start = rising_end(part, sr, g)
             if y is None: seen.append(f'{voice} {speed}: no voicing'); continue
             try:
-                y = shape(y, sr)
+                y = pcm16(shape(y, sr))
             except SilentTake as error:
                 seen.append(f'{voice} {speed}: resynthesis: {error}')
                 continue
@@ -93,7 +85,11 @@ def rising(c, ph, g):
             rough = after_hnr - before_hnr
             seen.append(f'{voice} {speed}: {move:+.1f} st, HNR {rough:+.1f} dB')
             if move < RISE or rough < -3: continue
-            res = check(c, y, sr)
+            try:
+                res = check(c, y, sr)
+            except SilentTake as error:
+                seen[-1] += f' ({error})'
+                continue
             if res['grade'] == 'strict':
                 original = final_move(part, sr, g)
                 original_pitch = f'{original:+.1f} st' if original is not None and isfinite(original) else 'not measured'
@@ -109,7 +105,6 @@ choice = read_json(choice_path) if choice_path.exists() else {}
 logs = {g: read_json(output / (g + '.json')) for g in 'fm'}
 produced = {}
 missing = 0
-directions = expected(lesson)
 for g in 'fm':
     for text, want in directions.items():
         s = slug(text)
@@ -135,7 +130,7 @@ with TemporaryDirectory(prefix='.intonation-', dir=output) as temporary:
     for name, (audio, rate) in produced.items():
         path = staged / name
         path.parent.mkdir(parents=True, exist_ok=True)
-        sf.write(path, audio, rate, subtype='PCM_16')
+        write_take(path, audio, rate)
     for g, takes in logs.items():
         write_json(staged / (g + '.json'), takes)
     write_json(staged / choice_path.name, choice)

@@ -10439,11 +10439,11 @@
   {
    "id": "task1",
    "name": "⑪ 雅思 Task 1",
-   "goal": "描述圖表：總覽＋重點數據＋比較",
+   "goal": "描述圖表或布局：總覽＋主要特徵＋比較",
    "criteria": [
-    "Task Achievement：有總覽（overview），挑出重要數據並比較",
+    "Task Achievement：有總覽（overview），挑出主要特徵，有適合的比較時說清楚",
     "Coherence & Cohesion：段落清楚、用對連接詞",
-    "Lexical Resource：描述趨勢的用字多樣（rise、drop、remain stable）",
+    "Lexical Resource：用字適合題目，如描述趨勢、步驟或方位",
     "Grammatical Range & Accuracy：句型有變化、錯誤少"
    ],
    "ielts": true,
@@ -14131,7 +14131,7 @@
     {
      "id": "t1-103",
      "prompt": "The table shows the percentage of first-year and third-year nursing students at a fictional school who did different types of weekly exercise (students could choose more than one type). Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
-     "zh": "教學模擬資料（表格）：一年級和三年級護理系學生每週做哪些運動（可複選）的百分比。寫至少 150 字：比較兩個年級，挑出最常見、變多和變少的。",
+     "zh": "教學模擬資料（表格）：一年級和三年級護理系學生每週做哪些運動（可複選）的百分比。寫至少 150 字，找出兩組最常做的運動，再比較比例差距最明顯的項目。",
      "min": 150,
      "chart": {
       "kind": "table",
@@ -14178,7 +14178,7 @@
        }
       ]
      },
-     "sample": "The table compares the kinds of exercise that first-year and third-year nursing students at a fictional school did each week. The figures are percentages, and students could choose more than one activity.\n\nOverall, walking was the most common form of exercise in both year groups. However, third-year students were less likely to walk, run or swim, and more of them used the gym or did no regular exercise at all.\n\nWalking was reported by 62% of first-year students, compared with 48% of third-year students, a difference of 14 percentage points. Running followed the same pattern, falling from 25% to 18%, while swimming was the least popular activity in both groups, at 12% and 9%.\n\nThe only activity that became more popular was gym training. It was chosen by 20% of first-year students but by 31% of third-year students, an increase of 11 points, which made it the second most common activity among older students. Meanwhile, the proportion of students who did no regular exercise rose from 15% to 22%."
+     "sample": "The table compares the kinds of exercise that first-year and third-year nursing students at a fictional school did each week. The figures are percentages, and students could choose more than one activity.\n\nOverall, walking was the most common form of exercise in both year groups. Third-year students were more likely than first-year students to report gym training or no regular exercise. By contrast, the first-year percentages were higher for walking, running and swimming.\n\nWalking showed the largest gap between the groups, at 62% for first-year students and 48% for third-year students, a difference of 14 percentage points. Running was reported by 25% and 18%, respectively. Swimming was the least commonly reported form of exercise in both groups, at 12% and 9%.\n\nGym training was reported by 31% of third-year students and 20% of first-year students, an 11-point difference. It was the second most common form of exercise in the third-year group. The proportion reporting no regular exercise was 22% among third-year students, compared with 15% among first-year students."
     },
     {
      "id": "t1-104",
@@ -14609,10 +14609,11 @@
     {
      "id": "t1-116",
      "prompt": "The diagram shows the life cycle of an Aedes mosquito. Summarise the information by selecting and reporting the main features.",
-     "zh": "流程圖：埃及斑蚊（Aedes）的生命週期，依美國 CDC 的說明簡化。寫至少 150 字：總覽說有幾個階段、哪些在水裡，再照順序描述；這是一個循環。",
+     "zh": "循環圖：斑蚊（Aedes）的生命週期，依美國 CDC 的說明簡化。寫至少 150 字，概括主要階段和水中活動，照順序說明下一輪如何開始，並交代圖上的發育時間。",
      "min": 150,
      "chart": {
       "kind": "process",
+      "cycle": true,
       "title": "The life cycle of an Aedes mosquito (about 7–10 days from egg to adult)",
       "steps": [
        "Eggs laid on the inside wall of a container, just above the water",
@@ -14702,15 +14703,74 @@
       ]
      },
      "sample": "The diagram shows the main stages in the production of black tea, from picking the leaves to packing the finished product.\n\nOverall, the process involves six steps. During these stages, fresh green leaves gradually lose water and change colour until they become dry, dark tea that is ready to be sold.\n\nFirst, the tea leaves are picked by hand. They are then spread out so that they can wither and lose some of their water. After this, the leaves are rolled, which breaks their surface. This prepares them for the most important change in the process.\n\nIn the fourth stage, the rolled leaves are left to oxidise, and during this time they turn dark. Next, the leaves are dried with hot air, which stops the change and removes most of the remaining water. Finally, the tea is sorted according to the size of the pieces and packed. At the end of the process, the leaves look very different from the fresh leaves that were picked at the beginning."
+    },
+    {
+     "id": "t1-121",
+     "prompt": "The maps show a neighbourhood park in 2005 and 2025. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+     "zh": "概述公園二十年間的變化。比較遊憩設施、南側的變化及保留的區域。依圖上的相對位置描述，不用估算距離。至少 150 字。",
+     "min": 150,
+     "chart": {
+      "kind": "layout",
+      "title": "A neighbourhood park",
+      "panels": [
+       {
+        "label": "2005",
+        "rows": [
+         ["Woodland", "Pond", "Open lawn"],
+         ["West path", "Flower beds", "East path"],
+         ["West gate", "Open lawn", "Car park"]
+        ]
+       },
+       {
+        "label": "2025",
+        "rows": [
+         ["Woodland", "Pond", "Playground"],
+         ["West path", "Picnic area", "East path"],
+         ["West gate", "Cycle parking", "Car park"]
+        ]
+       }
+      ]
+     },
+     "sample": "The two maps compare the layout of a neighbourhood park in 2005 and 2025. Overall, the park gained several facilities for visitors, while the main paths and some of its original natural features remained in the same locations. Both areas of open lawn were replaced, and the central area also changed its use.\n\nIn the northern part of the park, woodland occupied the western area and a pond lay immediately to its east in 2005. Both were still present in 2025. In contrast, the open lawn to the east of the pond was replaced by a playground. The flower beds in the middle of the park made way for a picnic area, which lies between the same two paths shown in the earlier map.\n\nOn the southern side, the other open lawn was turned into cycle parking. It is located between the western gate and the car park. The gate in the south-west and the car park in the south-east remained in their original positions."
+    },
+    {
+     "id": "t1-122",
+     "prompt": "The plans show the ground floor of a public library before and after a renovation. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+     "zh": "概述圖書館改建前後的用途差異。請按北側、東側及入口附近的位置比較，寫出哪些設施保留。至少 150 字。",
+     "min": 150,
+     "chart": {
+      "kind": "layout",
+      "title": "Public library ground floor",
+      "panels": [
+       {
+        "label": "Before renovation",
+        "rows": [
+         ["Quiet reading", "Reference shelves", "Staff office"],
+         ["General shelves", "Aisle", "Group tables"],
+         ["Magazine rack", "Entrance", "Information desk"]
+        ]
+       },
+       {
+        "label": "After renovation",
+        "rows": [
+         ["Quiet reading", "Study booths", "Staff office"],
+         ["General shelves", "Aisle", "Children’s area"],
+         ["Returns machine", "Entrance", "Information desk"]
+        ]
+       }
+      ]
+     },
+     "sample": "The plans show the ground floor of a public library before and after renovation. Overall, the central aisle and the main entrance stayed in place. The changes mostly involved replacing existing facilities with ones intended for different uses, while the staff office and the information desk were retained.\n\nIn the north, the reference shelves between the quiet reading area and the staff office were removed. Study booths now occupy that space. The reading area remains on the west side of the northern section, and the staff office is still to the east of the booths. In the middle section, the general shelves on the west side of the aisle were also retained, but the group tables to the east of the aisle were replaced by a children’s area.\n\nThe entrance is still in the middle of the southern side. Just west of it, the magazine rack has been replaced by a returns machine. The information desk remains on the opposite side of the entrance."
     }
    ],
    "grammar": {
-    "title": "Task 1：先寫總覽，再用數據支持",
+    "title": "Task 1：先寫總覽，再挑重點比較",
     "points": [
      "第一段用自己的話說圖表的對象、單位和時間，不要逐字照抄題目；overview（總覽）用一兩句說最大趨勢、最高最低或主要差別，不要只列數字，也不要加入個人意見或猜原因。",
      "細節段挑關鍵數字比較：from…to… 寫起終點，by… 寫差額，higher／lower than 比高低；表格不用每格都寫，挑最高、最低和明顯差別，用 while／whereas、twice as many 對照。",
      "The chart shows 用現在式介紹圖；描述已經發生的變化用過去式，例如 rose、fell、remained stable，全文時間要一致。",
-     "流程圖（process）：總覽說一共幾個步驟、從哪裡開始到哪裡結束；步驟多用被動語態（is collected、are washed），照順序用 First、Next、After that、Finally 連起來，每個主要步驟都要寫到。"
+     "流程圖（process）：總覽說主要步驟和過程的重點；步驟多用被動語態（is collected、are washed），照順序用 First、Next、After that、Finally 連起來。循環圖也要交代最後怎麼接回前面的階段。",
+     "地圖與平面圖：總覽說布局的主要改變。按方位比較改作他用、新增、移除及原處保留的設施，例如 to the east of、in the south-west、was replaced by 和 remained in the same location。"
     ],
     "examples": [
      {

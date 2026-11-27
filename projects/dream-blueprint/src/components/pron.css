@@ -90,7 +90,6 @@
 .practice-page button.pn-tick[aria-pressed="true"] { color: var(--practice-accent); border-color: var(--practice-accent); background: var(--practice-accent-wash); }
 .pn-rec { display: grid; gap: .3rem; justify-items: start; }
 .practice-page .pn-rec .pr-link { display: inline-flex; align-items: center; gap: .3rem; min-height: 32px; padding: 0; font-size: .84rem; color: var(--practice-secondary); }
-.pn-rec audio { width: 100%; max-width: 20rem; height: 36px; }
 
 /* 長單字拆開念 */
 .pn-chunk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }

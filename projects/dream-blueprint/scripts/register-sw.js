@@ -1,7 +1,42 @@
 if ("serviceWorker" in navigator && window.isSecureContext) {
   const scriptUrl = new URL("./sw.js", document.baseURI);
   const version = document.querySelector('meta[name="dream-release"]')?.content;
-  navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" }).then(registration => {
+  const register = () => navigator.serviceWorker.register(scriptUrl, { updateViaCache: "none" });
+  function registerWhenAvailable() {
+    return new Promise(resolve => {
+      let inFlight = false;
+      let reconnectDuringAttempt = false;
+      let canWaitAndRetry = true;
+      let timer;
+      async function attempt() {
+        if (inFlight) {
+          reconnectDuringAttempt = true;
+          return;
+        }
+        clearTimeout(timer);
+        inFlight = true;
+        try {
+          const registration = await register();
+          window.removeEventListener("online", attempt);
+          resolve(registration);
+        } catch {
+          if (reconnectDuringAttempt) {
+            reconnectDuringAttempt = false;
+            timer = window.setTimeout(attempt, 0);
+          } else if (canWaitAndRetry && navigator.onLine) {
+            // The browser may report a local connection before it can reach the site.
+            canWaitAndRetry = false;
+            timer = window.setTimeout(attempt, 10000);
+          }
+        } finally {
+          inFlight = false;
+        }
+      }
+      window.addEventListener("online", attempt);
+      void attempt();
+    });
+  }
+  registerWhenAvailable().then(registration => {
     let activeVersion;
     let switchingTo;
     const removeUpdate = () => document.getElementById("dream-update")?.remove();

@@ -3,11 +3,12 @@
 // and the new-word brake (dailyWords.ts). Run: npm run words:pace
 // The learner model is an assumption: about 40% of level-1 words unknown (60/80/90% for the higher levels),
 // 85% of word cards and 80% of sentence cards recalled, a lesson on every regular and winter day (every published unit).
-// The dates in cefr.ts (wordsBy) and the README come from the first line of output.
+// These results illustrate the learner model above. They are not an individual deadline.
 import { dayBudget } from '../src/lib/dailyPlan.ts'
 import { createInitialState } from '../src/lib/store.ts'
 import { addDays, newCard, reviewBudget, reviewCard, reviewEnergy, reviewLoad, sentenceReviewKey, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
-import { countKey, dailyTarget } from '../src/lib/dailyWords.ts'
+import { countKey, newWordPlan, spotCheck } from '../src/lib/dailyWords.ts'
+import { officialWords, wordKey } from '../src/lib/vocab.ts'
 import curriculum from '../src/data/curriculum.json' with { type: 'json' }
 
 // All the units the course has (53 now), not a number written in here.
@@ -35,10 +36,11 @@ function run(label: string, sundays: boolean, seed = 7) {
     cards[cards.indexOf(c)] = res.card
     if (res.event) events.push(res.event)
   }
-  while (seen < 6012 && day < '2032-01-01') {
+  while (seen < officialWords.length && day < '2032-01-01') {
     const b = dayBudget(day, settings)
     const studies = sundays || !(b.kind === 'rest' || b.kind === 'light')
-    events = events.filter(e => e.day >= addDays(day, -1))
+    const recallCutoff = addDays(day, -13)
+    events = events.filter(e => e.day >= recallCutoff)
     const cap = reviewEnergy(day, settings.periods)
     let words = 0, sentences = 0
     if (studies) {
@@ -61,14 +63,14 @@ function run(label: string, sundays: boolean, seed = 7) {
       minutes += words / 5 + sentences; studyDays++
       peak = Math.max(peak, words / 5 + sentences)
     }
-    const backlog = reviewLoad({ cards, reviewEvents: events, notes }, day, cap).backlog
-    const target = studies ? dailyTarget(notes, b.quiet, day, backlog) : 0
-    for (let i = 0; i < target && seen < 6012; i++) {
-      const level = Math.floor(seen / 1002) + 1
-      if (rand() < unknown[level]) cards.push(newCard('word:' + seen, day))
-      else if (rand() < 0.25) cards.push({ id: 'word:' + seen, box: 4, lastDay: day, due: addDays(day, 14), mastered: false })
+    const target = studies ? newWordPlan({ cards, reviewEvents: events, notes }, day, b.quiet, cap).target : 0
+    for (let i = 0; i < target && seen < officialWords.length; i++) {
+      const { en, level } = officialWords[seen]
+      const key = wordKey(en)
+      if (rand() < (unknown[level] ?? 0.9)) cards.push(newCard('word:' + key, day))
+      else if (spotCheck(key)) cards.push({ id: 'word:' + key, box: 4, lastDay: day, due: addDays(day, 14), mastered: false })
       seen++
-      if (seen % 1002 === 0) done.push('第 ' + seen / 1002 + ' 級 ' + day.slice(0, 7))
+      if (officialWords[seen]?.level !== level) done.push('第 ' + level + ' 級 ' + day.slice(0, 7))
     }
     day = addDays(day, 1)
   }

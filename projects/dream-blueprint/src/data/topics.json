@@ -1715,7 +1715,7 @@
     "當主詞用 I、you、he、she、it、we、they；放在動詞或介系詞後面（受詞）要換成 me、you、him、her、it、us、them：She helped me. This is for him.（不能說 help I、for he）",
     "後面接名詞用 my、your、his、her、its、our、their（我的……）：my phone、her bag；後面不接名詞、自己就代表「我的那個」用 mine、yours、his、hers、ours、theirs：This phone is mine. Is this yours?",
     "對自己做的事用 myself、yourself、himself、herself、ourselves、themselves：I cut myself.（我割到自己）；by myself 是「自己一個人、靠自己」：I did it by myself.",
-    "容易錯：its 是「它的」，it's 是 it is；問「誰的」用 Whose：Whose bag is this? — It's mine."
+    "its 表示「它的」。it's 要看後面的字。It's mine. 是 It is mine. 的縮寫。It's been raining. 是 It has been raining. 的縮寫。問「誰的」用 Whose，例如 Whose bag is this?"
    ],
    "examples": [
     {
@@ -2147,7 +2147,7 @@
     "形容詞形容名詞，或放在 be 動詞後面：a slow walk、He is careful.；說「動作怎麼做」要用副詞：He walks slowly. Drive carefully.",
     "大部分副詞是形容詞加 ly：slow → slowly、careful → carefully、quiet → quietly、deep → deeply；y 結尾改成 ily：easy → easily、happy → happily。",
     "特別的：good 的副詞是 well（He swims well.）；fast、hard、late 本身就是副詞：She works hard.（hardly 是「幾乎不」，意思完全不一樣）",
-    "feel、look、sound、smell、taste 後面接形容詞，不接副詞：I feel good. You look tired. It smells bad.（因為說的是狀態，不是動作怎麼做）"
+    "feel、look、sound、smell、taste 用來描述主詞的狀態時，可以接形容詞，例如 I feel good.、You look tired.、It smells bad.。look 用作「看」這個動作時，也能用副詞描述怎麼看，例如 Look carefully at the label."
    ],
    "examples": [
     {
@@ -2289,7 +2289,7 @@
      "look + 形容詞"
     ],
     "hints": [
-     "look 是「看起來」，後面接形容詞。",
+     "這裡的 look 是「看起來」，後面用形容詞描述狀態。",
      "You look tired today."
     ],
     "reference": [
@@ -2298,7 +2298,7 @@
      "Today you look tired.",
      "You look really tired today."
     ],
-    "why": "look、feel 說的是狀態，後面接形容詞 tired，不能用副詞。",
+    "why": "這裡的 look 指「看起來」。用形容詞 tired 描述人的狀態。",
     "newWords": []
    }
   ],
@@ -2539,7 +2539,7 @@
       "smell + 形容詞"
      ],
      "hints": [
-      "smell 後面接形容詞，不接副詞。",
+      "這裡的 smell 表示「聞起來」，用形容詞描述湯的氣味。",
       "This soup smells good."
      ],
      "reference": [
@@ -2847,8 +2847,8 @@
      "zh": "店很小，會很擠，所以不太適合很多人一起來。"
     },
     {
-     "en": "It isn't cheap, but it's worth it.",
-     "zh": "不便宜，但很值得。"
+     "en": "I would order the soup again. It isn't cheap, but it's worth it.",
+     "zh": "我還會再點這碗湯。不便宜，但很值得。"
     }
    ],
    "questions": [
@@ -2873,7 +2873,7 @@
      "skill": "細節"
     },
     {
-     "q": "In \"It isn't cheap, but it's worth it\", what does \"it\" mean?",
+     "q": "In \"It isn't cheap, but it's worth it\", what does the first \"It\" refer to?",
      "options": [
       "The train",
       "The line",

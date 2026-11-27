@@ -1,12 +1,12 @@
-import { readLessonRecord } from './lesson'
+import { selectLessonRecord } from './lesson'
 import { readSayCard } from './sayCards'
 import { lessonSentence, units } from './todayLesson'
 
 export interface EmmaLesson { unit: number; day: number; title: string; rule: string; cando: string; sentence: string; words: string[]; mistakes: string[] }
 
 /** The lesson Emma should help with: the one finished or started today, else where the curriculum stands. */
-export function emmaLesson(state: { notes: Record<string, string>; curriculum: { unit: number; day: number } }, today: string): EmmaLesson | null {
-  const rec = readLessonRecord(state.notes, today)
+export function emmaLesson(state: { notes: Record<string, string>; curriculum: { unit: number; day: number } }, target: string): EmmaLesson | null {
+  const rec = selectLessonRecord(state.notes, target)?.rec
   const unitId = rec?.unit ?? state.curriculum.unit
   const day = Math.min(6, Math.max(1, rec?.day ?? state.curriculum.day))
   const unit = units.find(u => u.id === unitId)

@@ -86,36 +86,71 @@ async function recordAndTranscribe(maxMs?: number, signal?: AbortSignal): Promis
   const startedAt = performance.now()
   let stoppedAt: number | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
-  const done = new Promise<string>((resolve, reject) => {
-    recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
-    recorder.onerror = () => { clearTimeout(timer); release(); reject(new Error('錄音中斷了，再試一次。')) }
-    recorder.onstop = () => {
-      stoppedAt ??= performance.now()
-      clearTimeout(timer)
-      release()
-      if (request.signal.aborted) { resolve(''); return }
-      const blob = new Blob(chunks, { type: recorder.mimeType || type || 'audio/webm' })
-      if (blob.size < 1200) { resolve(''); return }
-      transcribe(blob, request.signal).then(resolve, e => {
-        if (request.signal.aborted) resolve('')
-        else reject(e)
-      })
-    }
-  })
+  let uploadTimer: ReturnType<typeof setTimeout> | undefined
+  let resolveDone: (text: string) => void
+  let rejectDone: (error: Error) => void
+  const done = new Promise<string>((resolve, reject) => { resolveDone = resolve; rejectDone = reject })
+  function finishCapture() {
+    stoppedAt ??= performance.now()
+    clearTimeout(timer)
+    recorder.ondataavailable = recorder.onerror = recorder.onstop = null
+    release()
+  }
+  function failCapture() {
+    // A recorder error may be followed by final data and a stop event. Neither belongs in a transcription.
+    request.abort()
+    chunks.length = 0
+    finishCapture()
+    rejectDone(new Error('錄音中斷了，再試一次。'))
+  }
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
+  recorder.onerror = failCapture
+  recorder.onstop = () => {
+    finishCapture()
+    if (request.signal.aborted) { resolveDone(''); return }
+    const blob = new Blob(chunks, { type: recorder.mimeType || type || 'audio/webm' })
+    chunks.length = 0
+    if (blob.size < 1200) { resolveDone(''); return }
+    uploadTimer = setTimeout(() => {
+      rejectDone(new Error('等不到 OpenAI 語音辨識結果。請檢查網路，再試一次。'))
+      request.abort()
+    }, 45_000)
+    void transcribe(blob, request.signal).then(text => {
+      clearTimeout(uploadTimer)
+      resolveDone(text)
+    }, e => {
+      clearTimeout(uploadTimer)
+      if (request.signal.aborted) resolveDone('')
+      else rejectDone(e)
+    })
+  }
   try { recorder.start(250) }
-  catch (e) { release(); throw new Error('錄音開不起來（' + (e instanceof Error ? e.message : String(e)) + '），再試一次。') }
+  catch (e) {
+    finishCapture()
+    throw new Error('錄音開不起來（' + (e instanceof Error ? e.message : String(e)) + '），再試一次。')
+  }
   const stop = () => {
     if (recorder.state === 'inactive') return
     stoppedAt ??= performance.now()
     clearTimeout(timer)
-    recorder.stop()
+    try { recorder.stop() } catch { failCapture() }
+  }
+  function cancel() {
+    clearTimeout(uploadTimer)
+    request.abort()
+    chunks.length = 0
+    // Cancel can also run after capture ended while the network request is still pending.
+    finishCapture()
+    resolveDone('')
+    if (recorder.state !== 'inactive') {
+      try { recorder.stop() } catch { /* The stream is already closed. */ }
+    }
   }
   if (maxMs) timer = setTimeout(stop, maxMs)
   return {
-    engine: 'openai', captured, done, stop,
+    engine: 'openai', captured, done, stop, cancel,
     get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
     get recording() { return stoppedAt === undefined },
-    cancel() { request.abort(); stop(); release() },
   }
 }
 
@@ -173,9 +208,19 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
   const startedAt = performance.now()
   let stoppedAt: number | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
+  let endTimer: ReturnType<typeof setTimeout> | undefined
+  let finish: () => void
   const done = new Promise<string>((resolve, reject) => {
+    finish = () => {
+      stoppedAt ??= performance.now()
+      clearTimeout(timer)
+      clearTimeout(endTimer)
+      r.onresult = r.onerror = r.onend = null
+      if (failed && !cancelled) reject(failed)
+      else resolve(cancelled ? '' : finals.trim())
+    }
     r.onresult = e => {
-      if (cancelled) return
+      if (cancelled || failed) return
       let interim = ''
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript
@@ -185,24 +230,46 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
       onPartial?.((finals + interim).trim())
     }
     r.onerror = e => {
+      if (cancelled || e.error === 'no-speech') return
+      stoppedAt ??= performance.now()
+      clearTimeout(timer)
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') failed = micError(new Error('not-allowed'))
       else if (e.error === 'network') failed = new Error('瀏覽器的語音辨識要連網路，檢查網路後再試。')
+      else if (e.error === 'audio-capture') failed = new Error('瀏覽器無法使用麥克風，請確認麥克風再試一次。')
+      else failed = new Error('瀏覽器的語音辨識中斷了，再試一次。')
+      endIfStalled()
     }
     r.onend = () => {
       // The browser stops by itself after a pause: keep listening until asked to stop.
-      if (!stopped && !cancelled && !failed) { try { r.start(); return } catch { /* finish below */ } }
-      stoppedAt ??= performance.now()
-      clearTimeout(timer)
-      if (failed && !finals.trim()) reject(failed)
-      else resolve(cancelled ? '' : finals.trim())
+      if (!stopped && !cancelled && !failed) {
+        try { r.start(); return } catch (e) { failed = micError(e) }
+      }
+      finish()
     }
   })
   try { r.start() } catch (e) { throw micError(e) }
+  function abortCapture() {
+    try { r.abort() } catch { /* The recognizer may already have disconnected. */ }
+  }
+  function endIfStalled() {
+    clearTimeout(endTimer)
+    endTimer = setTimeout(() => {
+      abortCapture()
+      if (!cancelled) failed ??= new Error('瀏覽器的語音辨識沒有結束，再試一次。')
+      finish()
+    }, 8000)
+  }
   const stop = () => {
+    if (stopped || cancelled || failed || !r.onend) return
     stopped = true
     stoppedAt ??= performance.now()
     clearTimeout(timer)
-    try { r.stop() } catch { /* already stopped */ }
+    endIfStalled()
+    try { r.stop() } catch {
+      failed = new Error('無法停止瀏覽器的語音辨識，再試一次。')
+      abortCapture()
+      finish()
+    }
   }
   if (maxMs) timer = setTimeout(stop, maxMs)
   const captured = done.then(() => undefined, () => undefined)
@@ -211,10 +278,12 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
     get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
     get recording() { return stoppedAt === undefined },
     cancel() {
+      if (cancelled || !r.onend) return
       cancelled = true
       stoppedAt ??= performance.now()
       clearTimeout(timer)
-      try { r.abort() } catch { /* already stopped */ }
+      endIfStalled()
+      abortCapture()
     },
   }
 }

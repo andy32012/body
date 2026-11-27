@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { askTutor, ClaudeIncomplete, isSentenceFeedbackField, sentenceJudgement, tutorKey, tutorSystem, type TutorSentence, type TutorTurn } from '../lib/tutor'
 import { RubricScore } from './RubricTable'
-import { sameEnglish } from '../lib/evidence'
+import { answered, questionMarkNote, sameEnglish } from '../lib/evidence'
 import { updateStore, useAppStore } from '../lib/store'
 import { dayKey } from '../lib/progress'
 import { addWeak, easeWeak, takeWeakLines, weakLines } from '../lib/weakPoints'
@@ -40,7 +40,7 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
   // The units before the current one are the rules he has learned: those get layered hints, the rest are taught directly.
   const { state } = useAppStore()
   useEffect(() => {
-    if (!autoSend || sentOnOpen.current || !tutorKey() || !answer.trim()) return
+    if (!autoSend || sentOnOpen.current || !tutorKey() || !answered(answer)) return
     sentOnOpen.current = true
     void send('我的翻譯：' + answer.trim(), true)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,6 +52,13 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
 
   async function send(content: string, submission = false) {
     if (!content.trim() || busy || sending.current) return
+    const text = submissionText(content)
+    if (submission && !answered(text)) return
+    const punctuation = submission ? questionMarkNote(text, sentence.reference) : null
+    if (punctuation) {
+      setError(punctuation)
+      return
+    }
     sending.current = true
     const next: ChatTurn[] = [...turns, { role: 'user', content, submission }]
     setTurns(next); setBusy(true); setError('')
@@ -75,7 +82,6 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
       setTurns([...next, { role: 'assistant', content: reply, submission }])
       const tries = next.filter(isTry).length
       const v = judgement?.verdict ?? null
-      const text = submissionText(content)
       if (v) onVerdict?.(v, tries, text)
       // The shared weak-point list: what this try got wrong, or — written right the first time — one miss lighter.
       if (v && trackWeak) {
@@ -116,8 +122,8 @@ export default function TutorChat({ sentence, answer, onReveal, onVerdict, onErr
     {noted.length > 0 && <p className="tu-weak">記進「我的弱點」：{noted.join('、')}<small>（Emma 和之後的批改都會特別注意）</small></p>}
     <div className="pr-actions">
       {attempts === 0
-        ? <button type="button" className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我的翻譯：' + answer.trim(), true)}>請 Claude 批改</button>
-        : <button type="button" className="pr-main" disabled={busy || !answer.trim()} onClick={() => send('我改成：' + answer.trim(), true)}>改好了，請 Claude 再批一次</button>}
+        ? <button type="button" className="pr-main" disabled={busy || !answered(answer)} onClick={() => send('我的翻譯：' + answer.trim(), true)}>請 Claude 批改</button>
+        : <button type="button" className="pr-main" disabled={busy || !answered(answer)} onClick={() => send('我改成：' + answer.trim(), true)}>改好了，請 Claude 再批一次</button>}
       {attempts > 0 && verdict !== 'good' && <button className="pr-link" disabled={busy} onClick={() => { onReveal?.(); void send('我還是不會，再給我一個更清楚的提示（不要給整句答案）。') }}>再給我一個提示</button>}
     </div>
     {attempts > 0 && <form className="tu-ask" onSubmit={e => {

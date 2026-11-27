@@ -6,7 +6,7 @@ import { dayBudget } from '../lib/dailyPlan'
 import { certifiedLevel, courseProgress, exams } from '../lib/cefr'
 import { schoolToday } from '../lib/school'
 import { rivalSummary } from '../lib/rivals'
-import { activeLesson, coreSaved, mainLessonDone, pendingLessons, resumePhase, stepLabel } from '../lib/lesson'
+import { activeLesson, coreSaved, lessonTarget, mainLessonDone, pendingLessons, resumePhase, resumeTarget, stepLabel } from '../lib/lesson'
 import { getLessonPreview } from '../lib/todayLesson'
 import { nextFocus } from '../lib/nextFocus'
 import { dueTopic, partNumber, partPlan, skipKey, topicDoneToday, topicGoal } from '../lib/topics'
@@ -58,7 +58,8 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const topicDone = topicDoneToday(state.notes, today)
   const skipTopic = () => update(prev => ({ ...prev, notes: { ...prev.notes, [skipKey(today)]: '1' } }))
   // An unfinished lesson: today (continue it), or an earlier day whose 表達 is still open (offered on the side).
-  const active = !quiet && energy !== 'low' ? activeLesson(state.notes) : null
+  const active = !quiet && energy !== 'low' ? resumeTarget(state.notes, state.curriculum, today) ?? activeLesson(state.notes) : null
+  const activeTarget = active ? lessonTarget(active.date, active.rec) : undefined
   const resume = !active ? null : coreSaved(active.rec)
     ? (active.date === today ? 'same' : 'later')
     : state.curriculum.unit === active.rec.unit && state.curriculum.day === active.rec.day ? 'core' : null
@@ -66,7 +67,7 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
   const lesson = getLessonPreview(state, energy, today, at)
   const finished = mainLessonDone(state, today)
   // Other earlier lessons still missing 表達 (the active pointer only remembers the latest one).
-  const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => p.date !== today && p.date !== (resume === 'later' ? active?.date : '')) : []
+  const others = !quiet && energy !== 'low' ? pendingLessons(state.notes).filter(p => lessonTarget(p.date, p.rec) !== activeTarget) : []
   const nextStep = !topic && active && resume && resume !== 'later' ? stepLabel[resumePhase(active.rec) ?? 'recall'] : ''
   const focus = quiet ? null : nextFocus(state, today, energy)
   // A grammar theme taught over several units just finished: the rest day after it tests the whole theme, mixed with the
@@ -116,12 +117,13 @@ export function TodayLesson({ state, update, today, start, openWord, days, weekC
             : <button type="button" className="launch" onClick={() => start(energy)}><Play size={16} fill="currentColor" />{topic ? (topic.step > 0 ? '繼續生活主題' : '開始生活主題') : nextStep ? '繼續這一堂（從' + nextStep + '接著做）' : finished ? '再上一次' : topicDone && energy !== 'low' ? '加練：上文法課' : practised && lesson.review ? '再複習一句' : energy === 'low' ? (optional ? '選做：' + low : '開始 ' + low) : '開始這一堂'}<ArrowRight size={16} /></button>}
           <button type="button" className="word-chip" onClick={openWord}><Star size={14} />今日單字</button>
         </div>
-        {!topic && resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume' }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
+        {!topic && resume === 'later' && active && <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume-' + activeTarget }}>上次那堂（單元 {active.rec.unit} 第 {active.rec.day} 天）還差「表達」，先補完？</button>}
         {others.length > 0 && <details className="lesson-pending">
           <summary>還有 {others.length} 堂沒做完「表達」</summary>
-          <ul>{others.slice(0, 6).map(p => <li key={p.date}>
-            <button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume-' + p.date }}>{p.date.slice(5).replace('-', '/')} · 單元 {p.rec.unit} 第 {p.rec.day} 天，補完表達</button>
-          </li>)}</ul>
+          <ul>{others.slice(0, 6).map(p => {
+            const target = lessonTarget(p.date, p.rec)
+            return <li key={target}><button type="button" className="lesson-resume" onClick={() => { location.hash = 'practice/resume-' + target }}>{p.date.slice(5).replace('-', '/')} · 單元 {p.rec.unit} 第 {p.rec.day} 天，補完表達</button></li>
+          })}</ul>
         </details>}
         <p className="lesson-stats">{topicDone ? '今天的生活主題完成了 ✓ · ' : ''}{finished ? '今天這一堂完成了 ✓ · ' : ''}累計 {days} 天 · 本週 {weekCount} / 7 天</p>
         <button type="button" className="lesson-level" onClick={() => { location.hash = 'plan/levels' }}>

@@ -1,19 +1,27 @@
 import { useState } from 'react'
 import type { PageProps } from '../lib/store'
 import { AskWord } from './AIChat'
+import AskWhy from './AskWhy'
 import { dayKey } from '../lib/progress'
-import { PARTS_A_DAY, dayCountKey, guessQuiz, isLearned, learnedKey, learnedParts, learnedToday, meaningQuiz, moreKey, partsForToday, reviewRound, wordParts, type PartQuiz, type WordPart } from '../lib/wordParts'
+import { recordDailyItem } from '../lib/dailyCounts'
+import { PARTS_A_DAY, allowance, dayCountKey, guessQuiz, isLearned, learnedKey, learnedParts, learnedToday, meaningQuiz, moreKey, partsForToday, reviewRound, wordParts, type PartQuiz, type WordPart } from '../lib/wordParts'
 
 const kinds = ['字首', '字根', '字尾'] as const
 
 /** Three choices; a wrong one is crossed out and he tries again, so the right answer is always found by himself. */
-function Choices({ quiz, onRight, lang }: { quiz: PartQuiz; onRight: (firstTry: boolean) => void; lang?: string }) {
+function Choices({ quiz, part, onRight }: { quiz: PartQuiz; part: WordPart; onRight: (firstTry: boolean) => void }) {
   const [wrong, setWrong] = useState<number[]>([])
   const [right, setRight] = useState(false)
-  return <div className="wp-options" role="group">
-    {quiz.options.map((o, i) => <button type="button" key={o} lang={lang} disabled={right || wrong.includes(i)} data-state={right && i === quiz.answer ? 'right' : wrong.includes(i) ? 'wrong' : undefined}
-      onClick={() => { if (i === quiz.answer) { setRight(true); onRight(wrong.length === 0) } else setWrong(w => [...w, i]) }}>{o}</button>)}
-  </div>
+  const picked = right ? quiz.answer : wrong.at(-1)
+  return <>
+    <div className="wp-options" role="group">
+      {quiz.options.map((option, i) => <button type="button" key={option} disabled={right || wrong.includes(i)}
+        data-state={right && i === quiz.answer ? 'right' : wrong.includes(i) ? 'wrong' : undefined}
+        onClick={() => { if (i === quiz.answer) { setRight(true); onRight(wrong.length === 0) } else setWrong(w => [...w, i]) }}>{option}</button>)}
+    </div>
+    {picked !== undefined && <AskWhy q={{ source: part.type + '練習', stem: '「' + quiz.q + '」是什麼意思？',
+      options: quiz.options, picked: quiz.options[picked], answer: quiz.options[quiz.answer], right }} />}
+  </>
 }
 
 function PartCard({ part, n, total, onLearned }: { part: WordPart; n: number; total: number; onLearned: () => void }) {
@@ -28,7 +36,7 @@ function PartCard({ part, n, total, onLearned }: { part: WordPart; n: number; to
     </li>)}</ul>
     <div className="wp-guess">
       <p>猜猜看：<b lang="en">{part.guess.en}</b> 是什麼意思？</p>
-      <Choices quiz={guessQuiz(part)} onRight={() => setGuessed(true)} />
+      <Choices part={part} quiz={guessQuiz(part)} onRight={() => setGuessed(true)} />
       {guessed && <p className="wp-ok" role="status">對，<span lang="en">{part.guess.en}</span>＝{part.guess.zh}。<AskWord en={part.guess.en} zh={part.guess.zh} /></p>}
     </div>
     <button type="button" className="wp-next" disabled={!guessed} onClick={onLearned}>記下這個{part.type}{n < total ? '，下一個' : ''}</button>
@@ -37,25 +45,35 @@ function PartCard({ part, n, total, onLearned }: { part: WordPart; n: number; to
 
 function Review({ checks }: Pick<PageProps['state'], 'checks'>) {
   const [round, setRound] = useState(0)
-  const [open, setOpen] = useState(false)
+  // Keep the questions and order fixed until this round ends, even if another device learns more parts.
+  const [items, setItems] = useState<WordPart[]>()
   const [at, setAt] = useState(0)
   const [firstTries, setFirstTries] = useState(0)
   const [answered, setAnswered] = useState(false)
-  const items = reviewRound(checks, round)
-  if (!items.length) return null
-  if (!open) return <button type="button" onClick={() => { setOpen(true); setAt(0); setFirstTries(0); setAnswered(false) }}>複習已學的（{items.length} 題）</button>
+  function start(next: number) {
+    const questions = reviewRound(checks, next)
+    setRound(next)
+    setItems(questions.length ? questions : undefined)
+    setAt(0)
+    setFirstTries(0)
+    setAnswered(false)
+  }
+  if (!items) {
+    const available = reviewRound(checks, round)
+    return available.length > 0 && <button type="button" onClick={() => start(round)}>複習已學的（{available.length} 題）</button>
+  }
   const part = items[at]
   if (!part) return <div className="wp-card">
     <p role="status">複習完了：{items.length} 題裡有 {firstTries} 題一次就對。</p>
     <div className="vocab-tabs">
-      <button type="button" onClick={() => { setRound(r => r + 1); setAt(0); setFirstTries(0); setAnswered(false) }}>再來一輪</button>
-      <button type="button" onClick={() => setOpen(false)}>先到這裡</button>
+      <button type="button" onClick={() => start(round + 1)}>再來一輪</button>
+      <button type="button" onClick={() => setItems(undefined)}>先到這裡</button>
     </div>
   </div>
   return <article className="wp-card">
     <small>複習第 {at + 1} 題／{items.length} · {part.type}</small>
     <p><b className="vocab-term" lang="en">{part.part}</b>是什麼意思？</p>
-    <Choices key={part.id + round} quiz={meaningQuiz(part, round)} onRight={first => { setAnswered(true); if (first) setFirstTries(n => n + 1) }} />
+    <Choices key={part.id + round} part={part} quiz={meaningQuiz(part, round)} onRight={first => { setAnswered(true); if (first) setFirstTries(n => n + 1) }} />
     {answered && <>
       <p className="wp-ok" role="status">{part.examples.slice(0, 2).map(e => e.en + '（' + e.zh + '）').join('、')} <AskWord en={part.part} zh={part.type + '：' + part.meaning} /></p>
       <button type="button" className="wp-next" onClick={() => { setAt(at + 1); setAnswered(false) }}>{at + 1 < items.length ? '下一題' : '看結果'}</button>
@@ -71,9 +89,20 @@ export default function WordParts({ state, update }: Pick<PageProps, 'state' | '
   const doneToday = learnedToday(state.notes, today)
   const left = wordParts.length - learned.length
   function learn(p: WordPart) {
-    update(prev => prev.checks[learnedKey(p.id)] ? prev : {
-      ...prev, checks: { ...prev.checks, [learnedKey(p.id)]: true },
-      notes: { ...prev.notes, [dayCountKey(today)]: String(learnedToday(prev.notes, today) + 1) },
+    const key = dayCountKey(today)
+    update(prev => {
+      if (dayKey() !== today || isLearned(prev.checks, p) || learnedToday(prev.notes, today) >= allowance(prev.notes, today)) return prev
+      return {
+        ...prev, checks: { ...prev.checks, [learnedKey(p.id)]: true },
+        notes: recordDailyItem(prev.notes, key, p.id),
+      }
+    })
+  }
+  function askForMore() {
+    update(prev => {
+      if (dayKey() !== today || partsForToday(prev.checks, prev.notes, today).length || learnedParts(prev.checks).length >= wordParts.length) return prev
+      const key = moreKey(today)
+      return { ...prev, notes: { ...prev.notes, [key]: String((Number(prev.notes[key]) || 0) + 1) } }
     })
   }
   return <div className="wp">
@@ -81,7 +110,7 @@ export default function WordParts({ state, update }: Pick<PageProps, 'state' | '
     {parts[0] ? <PartCard key={parts[0].id} part={parts[0]} n={doneToday + 1} total={doneToday + parts.length} onLearned={() => learn(parts[0])} />
       : left ? <div className="wp-card">
         <p role="status">今天的 {doneToday} 個學完了。</p>
-        <button type="button" onClick={() => update(prev => ({ ...prev, notes: { ...prev.notes, [moreKey(today)]: String((Number(prev.notes[moreKey(today)]) || 0) + 1) } }))}>再學 {Math.min(PARTS_A_DAY, left)} 個</button>
+        <button type="button" onClick={askForMore}>再學 {Math.min(PARTS_A_DAY, left)} 個</button>
       </div> : <p role="status">{wordParts.length} 個都學過了。</p>}
     <Review checks={state.checks} />
     <details className="wp-all"><summary>全部 {wordParts.length} 個（學過的打勾）</summary>

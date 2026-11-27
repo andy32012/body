@@ -124,3 +124,57 @@ export function quietLabel(kind: DayKind) {
 }
 /** What a busy day shrinks to in a planned maintenance period. */
 export const busyMinutes = (kind: DayKind) => kind === 'sprint' ? 5 : kind === 'internship' ? 10 : 15
+
+type TaskMark = { done: boolean; at: number }
+const nextEditTime = (previous: number) => Math.max(Date.now(), previous + 1)
+export const goalMarkKey = (id: string) => 'plan.checked.' + id
+export const isPlanMarkKey = (key: string) => key.startsWith('plan.checked.') || /^plan\.\d{4}-\d{2}-\d{2}\.[^.]+$/.test(key)
+
+export function readTaskMark(raw: string | undefined): TaskMark | undefined {
+  if (raw === '1' || raw === '0') return { done: raw === '1', at: 0 }
+  if (!raw) return undefined
+  try {
+    const mark: Partial<TaskMark> | null = JSON.parse(raw)
+    if (mark && typeof mark.done === 'boolean' && typeof mark.at === 'number' && Number.isSafeInteger(mark.at) && mark.at > 0)
+      return { done: mark.done, at: mark.at }
+  } catch { /* Revert to the automatic check when a saved mark cannot be read. */ }
+  return undefined
+}
+
+export function mergeTaskMark(older: string, newer: string): string {
+  const first = readTaskMark(older), second = readTaskMark(newer)
+  if (!first) return newer
+  if (!second || first.at > second.at) return older
+  if (second.at > first.at) return newer
+  // Identical timestamps can come from simultaneous edits on different devices.
+  return first.done ? newer : older
+}
+
+export function writeTaskMark(raw: string | undefined, done: boolean): string {
+  return JSON.stringify({ done, at: nextEditTime(readTaskMark(raw)?.at ?? 0) })
+}
+
+type GoalMove = { destination: string; at: number }
+function readGoalMove(raw: string | undefined): GoalMove {
+  if (raw?.startsWith('{')) {
+    try {
+      const move: Partial<GoalMove> | null = JSON.parse(raw)
+      if (move && typeof move.destination === 'string' && typeof move.at === 'number' && Number.isSafeInteger(move.at) && move.at > 0)
+        return { destination: move.destination, at: move.at }
+    } catch { /* A saved move may be an older destination string. */ }
+  }
+  return { destination: raw ?? '', at: 0 }
+}
+
+export const goalMoveKey = (id: string) => 'move.' + id
+export const goalDestination = (raw: string | undefined) => readGoalMove(raw).destination
+export const writeGoalMove = (raw: string | undefined, destination: string) =>
+  JSON.stringify({ destination, at: nextEditTime(readGoalMove(raw).at) })
+
+export function mergeGoalMove(older: string, newer: string): string {
+  const first = readGoalMove(older), second = readGoalMove(newer)
+  if (first.at !== second.at) return first.at > second.at ? older : newer
+  // Keep legacy merge behavior when neither copy recorded the move time.
+  if (!first.at) return newer
+  return first.destination > second.destination ? older : newer
+}

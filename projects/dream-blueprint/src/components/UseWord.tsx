@@ -12,7 +12,7 @@ export default function UseWord({ en, zh, example, onGood, onSave }: {
   en: string; zh?: string; example?: string
   /** Called when the sentence is judged correct (marks the word's 寫出 skill). */
   onGood?: () => void
-  onSave?: (card: SayCard) => void
+  onSave?: (cards: SayCard[]) => Promise<unknown>
 }) {
   const [open, setOpen] = useState(false)
   const [answer, setAnswer] = useState('')

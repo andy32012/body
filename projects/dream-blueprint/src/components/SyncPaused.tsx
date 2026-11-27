@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CloudAlert } from 'lucide-react'
-import { cloudConflict, driveConnected } from '../lib/drive'
+import { cloudConflict } from '../lib/drive'
 import { mergeWithCloud, stamp } from '../lib/cloudSync'
 import './sync-paused.css'
 
@@ -22,13 +22,14 @@ export default function SyncPaused() {
     }
   }, [])
   if (message) return <p className="sync-paused sync-done" role="status">{message}<button type="button" onClick={() => setMessage('')}>好</button></p>
-  if (!conflict || !driveConnected()) return null
+  if (!conflict) return null
   async function merge() {
+    if (!conflict) return
     setBusy(true)
     // Read again afterwards: a merge that kept meeting newer saves stays paused and merges again later.
-    try { setMessage(await mergeWithCloud()); setConflict(cloudConflict()) }
-    catch (e) { setMessage('合併失敗：' + (e instanceof Error ? e.message : String(e)) + '。網路好了再按一次，兩份都還在。') }
-    finally { setBusy(false) }
+    try { setMessage(await mergeWithCloud(false, conflict)) }
+    catch (e) { setMessage('合併未完成。' + (e instanceof Error ? e.message : String(e))) }
+    finally { setConflict(cloudConflict()); setBusy(false) }
   }
   return <section className="sync-paused" role="alert">
     <CloudAlert size={20} aria-hidden="true" />

@@ -3,7 +3,7 @@
  *  passage of a level; reading and listening start from the last one, so the English is not seen before it is asked for. */
 import { compareWithReference, normalizeEnglish } from './evidence'
 import { doneKey, type Passage } from './passages'
-import { levelEntry, meaningLine } from './vocab'
+import { levelEntry, meaningForForm, wordKey } from './vocab'
 import { levelDone, openSteps } from './unlock'
 import { legacyRecordId } from './recordId'
 
@@ -12,21 +12,70 @@ export const storyTabs: [StoryTab, string][] = [['read', '閱讀'], ['listen', '
 /** r, l, d: the day it was read, listened to, written from dictation. q: meaning questions right / asked.
  *  dq: dictation words right / total. zh: the Chinese was opened before the questions. u: how much was understood by ear (1–3). */
 export interface StoryRecord { r?: string; l?: string; d?: string; q?: [number, number]; dq?: [number, number]; zh?: boolean; u?: 1 | 2 | 3
+  /** The latest word-meaning quiz may predate a reread that did not ask any questions. */
+  qDay?: string
   /** Active dictation round: next sentence, score so far, and the last dictation edit. */
-  dn?: number; dqp?: [number, number]; dAt?: number; dRound?: string
+  dn?: number; dqp?: [number, number]; dAt?: number; dRound?: string; dWritten?: boolean
   /** Latest finished round. The completion day (`d`) still counts toward level progress. */
   dDoneAt?: number; dDoneRound?: string
+  /** Earlier finished rounds that must not be reopened by a stale copy. */
+  dClosedRounds?: string[]
+  /** Viewing every answer ends this copy of a round without closing another device's submitted work. */
+  dReviewedRounds?: string[]
   /** Played but not heard to the end (no voice, or the play failed): read along from the text that day; not listening. */
   lt?: string }
 const field: Record<StoryTab, 'r' | 'l' | 'd'> = { read: 'r', listen: 'l', dictate: 'd' }
 export const storyKey = (id: string) => 'story.' + id
 export const storyLevelKey = 'story.level'
 
+const recordDay = (value: unknown) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined
+const recordCount = (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : undefined
+const roundId = (value: unknown): value is string => typeof value === 'string' && value.length > 0
+const recordFlag = (value: unknown) => typeof value === 'boolean' ? value : undefined
+
+function wordScore(value: unknown): [number, number] | undefined {
+  if (!Array.isArray(value) || value.length !== 2) return
+  const right = recordCount(value[0]), total = recordCount(value[1])
+  if (right !== undefined && total !== undefined && right <= total) return [right, total]
+}
+
+function roundIds(value: unknown) {
+  if (!Array.isArray(value)) return
+  const ids = value.filter(roundId)
+  return ids.length ? ids : undefined
+}
+
+function normalizeStory(raw: unknown): StoryRecord {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+  const value = raw as Record<string, unknown>
+  return {
+    ...value,
+    r: recordDay(value.r), l: recordDay(value.l), d: recordDay(value.d), lt: recordDay(value.lt),
+    q: wordScore(value.q), qDay: recordDay(value.qDay), zh: recordFlag(value.zh),
+    u: value.u === 1 || value.u === 2 || value.u === 3 ? value.u : undefined,
+    dq: wordScore(value.dq), dqp: wordScore(value.dqp), dn: recordCount(value.dn),
+    dAt: recordCount(value.dAt), dDoneAt: recordCount(value.dDoneAt),
+    dRound: roundId(value.dRound) ? value.dRound : undefined,
+    dDoneRound: roundId(value.dDoneRound) ? value.dDoneRound : undefined,
+    dClosedRounds: roundIds(value.dClosedRounds), dReviewedRounds: roundIds(value.dReviewedRounds),
+    dWritten: recordFlag(value.dWritten),
+  }
+}
+
 export function readStory(notes: Record<string, string>, id: string): StoryRecord {
-  try { const v = notes[storyKey(id)]; return v ? JSON.parse(v) as StoryRecord : {} } catch { return {} }
+  try {
+    const value = notes[storyKey(id)]
+    return value ? normalizeStory(JSON.parse(value)) : {}
+  } catch { return {} }
 }
 export function saveStory(notes: Record<string, string>, id: string, patch: StoryRecord) {
   return { ...notes, [storyKey(id)]: JSON.stringify({ ...readStory(notes, id), ...patch }) }
+}
+
+export function saveStoryRead(notes: Record<string, string>, id: string, day: string, chineseFirst: boolean, quiz?: [number, number]) {
+  const before = readStory(notes, id)
+  const q = quiz ?? before.q
+  return saveStory(notes, id, { r: day, zh: chineseFirst, q, qDay: q ? (quiz ? day : before.qDay ?? before.r) : undefined })
 }
 
 function completedAt(record: StoryRecord) {
@@ -37,27 +86,68 @@ function completedAt(record: StoryRecord) {
   return record.d ? Date.parse(record.d + 'T00:00:00Z') || 0 : 0
 }
 
-/** A newer reading or listening activity cannot replace the most recent completed dictation score. */
-export function mergeStory(older: StoryRecord, newer: StoryRecord): StoryRecord {
+/** Keep the completed score and the resumable position from their respective rounds. */
+export function mergeStory(first: unknown, second: unknown): StoryRecord {
+  const older = normalizeStory(first), newer = normalizeStory(second)
   const out = { ...older, ...newer }
-  for (const field of ['r', 'l', 'd'] as const) {
-    const a = older[field], b = newer[field]
-    out[field] = a && b ? (a < b ? a : b) : a ?? b
-  }
+  const lastRead = !newer.r || (older.r && older.r > newer.r) ? older : newer
+  const lastListen = !newer.l || (older.l && older.l > newer.l) ? older : newer
+  const lastQuiz = !newer.q || (older.q && (older.qDay ?? older.r ?? '') > (newer.qDay ?? newer.r ?? '')) ? older : newer
+  out.r = lastRead.r
+  out.zh = lastRead.zh
+  out.q = lastQuiz.q
+  out.qDay = lastQuiz.q ? lastQuiz.qDay ?? lastQuiz.r : undefined
+  out.l = lastListen.l
+  out.u = lastListen.u
+  out.d = older.d && newer.d ? (older.d < newer.d ? older.d : newer.d) : older.d ?? newer.d
   const result = !newer.dq || (older.dq && completedAt(older) > completedAt(newer)) ? older : newer
   out.dq = result.dq
   out.dDoneAt = completedAt(result) || undefined
   out.dDoneRound = result.dDoneRound
 
-  const newerHasDictation = newer.dn !== undefined || !!newer.d
-  const latest = (older.dAt ?? 0) > (newer.dAt ?? 0) || !newerHasDictation ? older : newer
-  const closed = latest.dRound !== undefined && (latest.dRound === older.dDoneRound || latest.dRound === newer.dDoneRound)
-  out.dn = closed ? undefined : latest.dn
-  out.dqp = closed ? undefined : latest.dqp
-  out.dRound = closed ? undefined : latest.dRound
-  out.dAt = latest.dAt
+  const closed = completedRounds(older, newer)
+  const previousRounds = [...closed].filter(id => id !== out.dDoneRound).sort()
+  out.dClosedRounds = previousRounds.length ? previousRounds : undefined
+  const reviews = new Set([...(older.dReviewedRounds ?? []), ...(newer.dReviewedRounds ?? [])].filter(id => !closed.has(id)))
+  out.dReviewedRounds = reviews.size ? [...reviews].sort() : undefined
+
+  let active: StoryRecord | undefined
+  for (const candidate of [older, newer]) {
+    if (!candidate.dn) continue
+    if (candidate.dRound && (closed.has(candidate.dRound) ||
+      (reviews.has(candidate.dRound) && !hasWrittenInRound(candidate)))) continue
+    if (active) {
+      const sameRound = active.dRound && active.dRound === candidate.dRound
+      const position = sameRound
+        ? Number(hasWrittenInRound(active)) - Number(hasWrittenInRound(candidate)) || (active.dn ?? 0) - candidate.dn
+        : 0
+      if (position > 0 || (position === 0 && (active.dAt ?? 0) > (candidate.dAt ?? 0))) continue
+    }
+    active = candidate
+  }
+  // The open position, subtotal and timestamp must describe the very same snapshot.
+  out.dn = active?.dn
+  out.dqp = active?.dqp
+  out.dRound = active?.dRound
+  out.dWritten = active?.dWritten
+  const newestEdit = Math.max(older.dAt ?? 0, newer.dAt ?? 0, out.dDoneAt ?? 0)
+  out.dAt = active ? active.dAt : newestEdit || undefined
   return out
 }
+
+function completedRounds(...records: StoryRecord[]) {
+  const rounds = new Set<string>()
+  for (const record of records) {
+    if (typeof record.dDoneRound === 'string') rounds.add(record.dDoneRound)
+    if (Array.isArray(record.dClosedRounds)) {
+      for (const id of record.dClosedRounds) if (typeof id === 'string') rounds.add(id)
+    }
+  }
+  return rounds
+}
+
+/** Legacy partial scores prove a submission only when at least one word was correct. */
+const hasWrittenInRound = (record: StoryRecord) => record.dWritten ?? !!record.dqp?.[0]
 
 const titles = /\b(Mr|Mrs|Ms|Dr|St|Prof|No|vs)\.$/i
 const clockForms = /\b(a\.m|p\.m|e\.g|i\.e)\.$/i
@@ -91,13 +181,19 @@ export function storyOrder(all: readonly Passage[], level: number, checks: Recor
   return [...order.filter(met), ...order.filter(p => !met(p))]
 }
 /** The next passage for a tab: one not done in that tab yet; when all are done, the round starts again. */
-export function nextStory(all: readonly Passage[], level: number, checks: Record<string, boolean>, notes: Record<string, string>, tab: StoryTab, skipped: readonly string[] = []) {
+export function nextStory(all: readonly Passage[], level: number, checks: Record<string, boolean>, notes: Record<string, string>,
+  tab: StoryTab, skipped: readonly string[] = [], hasDictationDraft?: (passage: Passage, record: StoryRecord, at: number) => boolean) {
   const order = storyOrder(all, level, checks, notes, tab).filter(p => !skipped.includes(p.id))
-  // A dictation stopped halfway comes back first, at the sentence where it stopped.
-  const started = tab === 'dictate' ? order.find(p => {
-    const { dn } = readStory(notes, p.id)
-    return dn !== undefined && dn > 0 && dn < splitSentences(p.en ?? '').length
-  }) : undefined
+  let started: Passage | undefined
+  if (tab === 'dictate') {
+    for (const passage of order) {
+      const record = readStory(notes, passage.id)
+      if (!record.dn && !hasDictationDraft) continue
+      const at = dictationStart(record, splitSentences(passage.en ?? '').length)
+      if (hasDictationDraft?.(passage, record, at)) return passage
+      if (at > 0) started ??= passage
+    }
+  }
   return started ?? order.find(p => !readStory(notes, p.id)[field[tab]]) ?? order[0]
 }
 export function storyProgress(all: readonly Passage[], level: number, notes: Record<string, string>, tab: StoryTab) {
@@ -176,22 +272,61 @@ export interface Lookup { form: string; en: string; zh: string; from: 'passage' 
 /** A passage line cut into text and words (odd positions are words). Letters with accents (Café, naïvely, Röckel) stay
  *  inside their word, so a tap, a lookup and reading aloud get the whole word. */
 export const wordParts = (text: string) => text.split(/(\p{Script=Latin}[\p{Script=Latin}\p{M}'’-]*)/u)
-export function lookupWord(raw: string, passage: Pick<Passage, 'words'>): Lookup | null {
+export type WordPosition = { text: string; index: number; segment: number }
+const wordText = (text: string) => text.normalize('NFC').toLowerCase().replace(/’/g, "'")
+
+function positionedWords(text: string) {
+  let index = 0
+  return wordParts(text).flatMap((part, i) => {
+    const start = index
+    index += part.length
+    return i % 2 ? [{ text: wordText(part), start }] : []
+  })
+}
+
+function passageHint(low: string, hints: NonNullable<Passage['words']>, position?: WordPosition) {
+  if (position) {
+    const words = positionedWords(position.text)
+    const tapped = words.findIndex(w => w.start === position.index)
+    if (tapped >= 0) {
+      const spellings = new Set(baseForms(low).map(wordKey))
+      let best: typeof hints = [], longest = 1
+      for (const hint of hints) {
+        const phrase = positionedWords(hint.form ?? '').map(w => w.text)
+        const head = positionedWords(hint.en)[0]?.text
+        if (phrase.length < longest || phrase.length < 2 ||
+          (!spellings.has(wordKey(hint.en)) && (!head || !spellings.has(wordKey(head))))) continue
+        const matches = phrase.some((word, i) => word === low &&
+          phrase.every((token, offset) => words[tapped - i + offset]?.text === token))
+        if (!matches) continue
+        if (phrase.length > longest) { best = []; longest = phrase.length }
+        best.push(hint)
+      }
+      if (best.length) return best.every(h => h.zh === best[0].zh) ? best[0] : undefined
+    }
+  }
+  const exact = hints.filter(h => wordText(h.form ?? h.en) === low)
+  return exact.length && exact.every(h => h.zh === exact[0].zh) ? exact[0] : undefined
+}
+
+export function lookupWord(raw: string, passage: Pick<Passage, 'words'>, position?: WordPosition): Lookup | null {
   const form = raw.replace(/^[^\p{Script=Latin}]+|[^\p{Script=Latin}\p{M}]+$/gu, '')
   if (!form) return null
-  const low = form.toLowerCase()
-  const hint = passage.words?.find(w => (w.form ?? w.en).toLowerCase() === low) ?? passage.words?.find(w => w.en.toLowerCase() === low)
+  const low = wordText(form)
+  const hint = passage.words?.length ? passageHint(low, passage.words, position) : undefined
   if (hint) return { form, en: hint.en, zh: hint.zh, from: 'passage' }
   // café → cafe: the word table spells words without accents.
-  const exact = levelEntry(low) ?? levelEntry(low.normalize('NFD').replace(/\p{M}/gu, ''))
+  const unaccented = low.normalize('NFD').replace(/\p{M}/gu, '')
+  const direct = levelEntry(low)
+  const exact = direct ?? levelEntry(unaccented)
   // "left" is a word of its own and also the past of "leave": show both, the table cannot tell which one the sentence means.
   const other = irregular[low] ? levelEntry(irregular[low]) : undefined
   if (exact) return { form, en: exact.en, from: 'table',
-    zh: meaningLine(exact) + (other && other !== exact ? '；也可能是 ' + other.en + ' 的變化形：' + meaningLine(other) : '') }
+    zh: meaningForForm(exact, direct ? low : unaccented) + (other && other !== exact ? '；也可能是 ' + other.en + ' 的變化形：' + meaningForForm(other, irregular[low]) : '') }
   if (extraWords[low]) return { form, en: low, zh: extraWords[low], from: 'extra' }
   for (const b of baseForms(form).slice(1)) {
     const entry = levelEntry(b)
-    if (entry) return { form, en: entry.en, zh: meaningLine(entry), from: 'table' }
+    if (entry) return { form, en: entry.en, zh: meaningForForm(entry, b), from: 'table' }
   }
   return null
 }
@@ -231,6 +366,8 @@ export function dictationScore(answer: string, sentence: string) {
   const extra = diff.words.filter(w => w.extra).length
   return { right: Math.max(0, total - Math.max(diff.missing.length, extra)), total, words: diff.words, missing: diff.missing, extra }
 }
+
+export const hasDictationAnswer = (answer: string) => /[a-z0-9]/.test(normalizeEnglish(answer))
 /** What a dictation saves. `start`: the sentence it began at (after an earlier stop); `stop`: stopped before the last
  *  sentence, so the passage is not done and the next visit goes on from there. Words right / total add up across visits. */
 export function dictationPatch(before: StoryRecord, start: number, parts: readonly { right: number; total: number }[], stop: boolean, day: string): StoryRecord {
@@ -245,14 +382,39 @@ export function dictationRound(id: string, record: StoryRecord, start: number) {
   return globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 }
 
+export function dictationStart(record: StoryRecord, count: number) {
+  const at = record.dn
+  return at !== undefined && Number.isInteger(at) && at > 0 && at < count ? at : 0
+}
+
+export const dictationDraftPrefix = 'story-dictate/'
+export function dictationDraftKey(id: string, record: StoryRecord, at: number, round?: string) {
+  // Before the first submitted sentence, a freshly mounted editor has no saved round yet.
+  const scope = at === 0
+    ? 'after/' + (record.dDoneRound ?? completedAt(record))
+    : 'round/' + (round ?? dictationRound(id, record, at))
+  return dictationDraftPrefix + id + '/' + scope + '/' + at
+}
+
 /** Add just the sentence being checked, using the live saved subtotal for this round. */
 export function advanceDictation(before: StoryRecord, cursor: { at: number; stamp?: number; round: string },
-  result: { right: number; total: number }, finish: boolean, day: string): StoryRecord | undefined {
+  result: { right: number; total: number }, finish: boolean, day: string, submitted: boolean): StoryRecord | undefined {
   if (cursor.stamp !== before.dAt || (cursor.at > 0 && cursor.at !== before.dn)) return
+  const closed = completedRounds(before)
+  if ((cursor.at > 0 && before.dRound !== undefined && before.dRound !== cursor.round) || closed.has(cursor.round)) return
   const dAt = Math.max(Date.now(), (before.dAt ?? 0) + 1, completedAt(before) + 1)
+  const dWritten = submitted || (cursor.at > 0 && hasWrittenInRound(before))
+  if (finish && !dWritten) {
+    const reviewed = new Set([...(before.dReviewedRounds ?? []), cursor.round])
+    return { dn: undefined, dqp: undefined, dRound: undefined, dWritten: undefined,
+      dAt, dDoneAt: completedAt(before) || undefined, dReviewedRounds: [...reviewed].sort() }
+  }
   const patch = dictationPatch(before, cursor.at, [result], !finish, day)
-  if (!finish) return { ...patch, dAt, dRound: cursor.round }
-  return { ...patch, dAt, dRound: undefined, dDoneAt: dAt, dDoneRound: cursor.round }
+  if (!finish) return { ...patch, dAt, dRound: cursor.round, dWritten }
+  const previousRounds = [...closed].sort()
+  const reviewed = before.dReviewedRounds?.filter(id => id !== cursor.round)
+  return { ...patch, dAt, dRound: undefined, dWritten: undefined, dDoneAt: dAt, dDoneRound: cursor.round,
+    dClosedRounds: previousRounds.length ? previousRounds : undefined, dReviewedRounds: reviewed?.length ? reviewed : undefined }
 }
 /** Whole-passage dictation result from its sentences. */
 export const dictationTotal = (parts: readonly { right: number; total: number }[]): [number, number] =>

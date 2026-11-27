@@ -84,7 +84,7 @@ wp077 | 字根 | therm | 熱 | thermometer=溫度計=therm 熱＋meter 量 ; the
 wp078 | 字根 | meter／metr | 測量 | meter=公尺 ; thermometer=溫度計 ; centimeter=公分=centi 百分之一＋meter | speedometer=速度表
 wp079 | 字根 | cent | 一百 | cent=分（一百分之一元） ; century=世紀（一百年） ; percent=百分之…=per 每＋cent 一百 | centennial=一百週年
 wp080 | 字根 | man／manu | 手 | manual=手動的、手冊 ; manage=管理（原本是用手操控） ; manufacture=製造=manu 手＋fact 做 | manicure=修指甲
-wp081 | 字根 | ped | 腳 | pedal=踏板 ; pedestrian=行人 ; pedicure=足部保養 | centipede=蜈蚣（一百隻腳）
+wp081 | 字根 | ped | 腳 | pedal=踏板 ; pedestrian=行人 ; pedicure=足部保養 | centipede=蜈蚣（字面是「百足」，實際腿數依種類而異）
 wp082 | 字根 | mov／mot／mob | 動 | move=移動 ; motion=動作 ; mobile=行動的、可移動的 | remove=移除
 wp083 | 字根 | duc／duct | 引導 | educate=教育=e 出＋duc 引導 ; introduce=介紹=intro 向內＋duce 引 ; produce=生產=pro 向前＋duce 引 | reduce=減少
 wp084 | 字根 | mit／miss | 送 | admit=承認、准許進入=ad 向＋mit 送 ; permit=允許=per 通過＋mit 送 ; mission=任務 | transmit=傳送
@@ -97,7 +97,7 @@ wp090 | 字根 | rupt | 破 | interrupt=打斷=inter 之間＋rupt 破 ; erupt=�
 wp091 | 字根 | viv／vit | 生命 | survive=存活=sur 超過＋vive 活 ; vitamin=維他命 ; vital=生命的、極重要的 | revive=甦醒、復活
 wp092 | 字根 | med | 治療 | medicine=藥、醫學 ; medical=醫療的 ; medication=藥物 | remedy=療法
 wp093 | 字根 | spir | 呼吸 | respiration=呼吸=re 再＋spir 呼吸 ; inspire=鼓舞（原本是吸氣）=in 進＋spire 呼吸 ; spirit=精神（原本是氣息） | respirator=呼吸器
-wp094 | 字根 | mem | 記憶 | memory=記憶 ; remember=記得=re 再＋member 記 ; memorize=背起來 | memorial=紀念碑、紀念的
+wp094 | 字根 | mem | 記憶 | memory=記憶 ; remember=記得=和 memory 同源，來自表示「記起」的拉丁語 rememorari ; memorize=背起來 | memorial=紀念碑、紀念的
 wp095 | 字根 | cred | 相信 | credit=信用 ; incredible=難以置信的=in 不＋cred 相信＋ible ; credit card=信用卡 | credible=可信的
 wp096 | 字根 | loc | 地方 | local=當地的 ; location=位置 ; locate=找出位置 | relocate=搬遷
 wp097 | 字根 | sign | 記號 | sign=標誌、簽名 ; signal=信號 ; signature=簽名 | significant=有意義的、顯著的

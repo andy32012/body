@@ -1,9 +1,11 @@
 import AskWhy from './AskWhy'
-import { Fragment, useEffect, useMemo, useState } from 'react'
-import type { PageProps } from '../lib/store'
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { updateStoreNow, type AppState, type PageProps } from '../lib/store'
+import { useActivitySave, type SaveActivity } from '../lib/activitySave'
 import { listReadingProgress, readReadingProgress, saveReadingProgress, savedCauses, savedPicks, shownPassage, readBands, readLevelsOpen, readSteps, readStepKey, readStepName, readStepProgress, previousReadStep,
   moveNote, nextReading, passed, readCauses, readLevels, readRecord, readSummary, saveRead, suggestedLevel, typeNames,
-  type ReadingProgress, type ReadLevel, type ReadPassage, type ReadStep,
+  hasReadSubmission, prepareReadingDraft, readKey, readingVersion, savedQuestionRevisions,
+  type ReadingProgress, type ReadLevel, type ReadPassage, type ReadRecord, type ReadStep, type ShownQuestion,
 } from '../lib/reading'
 import { examPassed, readExamRecord, type ExamPassage } from '../lib/examReading'
 import { examExtras, nextInBand } from '../lib/readingTest'
@@ -27,7 +29,9 @@ const examFiles = () => Promise.all([import('../data/exam-reading-a1.json'), imp
  *  `only`: just these passages (a unit's pack), without the level picker. Held-out test passages are never listed here.
  *  `set="nursing"`: the nursing passages (護理閱讀) instead of the graded reading; only the levels they have are offered.
  *  Neither of those two gets the past-exam passages. */
-export default function ReadingPath({ state, onActivity, date, only, set }: Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string; only?: readonly string[]; set?: 'nursing' }) {
+export default function ReadingPath({ state, onActivity, onSavedActivity, date, only, set }: Pick<PageProps, 'state'> & {
+  onActivity: PageProps['update']; onSavedActivity: SaveActivity; date: string; only?: readonly string[]; set?: 'nursing'
+}) {
   const [all, setAll] = useState<ReadPassage[] | null>(null)
   const [exams, setExams] = useState<readonly ExamPassage[]>([])
   const [failed, setFailed] = useState(false)
@@ -58,6 +62,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const [currentId, setCurrentId] = useState<string | null | undefined>(undefined)
   // The band 下一篇 moved away from, and to (said once under the level buttons).
   const [moved, setMoved] = useState<{ from: ReadStep; to: ReadStep } | null>(null)
+  const { saving, error, save, clearError } = useActivitySave()
   // Which list this is, for a passage left halfway: general reading, nursing reading or a unit's pack.
   const progressSet = set === 'nursing' ? 'nursing' : only ? 'unit' : 'general'
   function resumePassage(target: ReadStep | null, skipped: readonly string[] = [], level?: ReadLevel) {
@@ -87,7 +92,8 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   // Shown with its options shuffled (the same way every time); answers are saved in the data's own order.
   const passage = useMemo(() => data && shownPassage(data), [data])
   function moveOn(nextSkip: string[]) {
-    if (!all) return
+    if (!all || saving) return
+    clearError()
     // The suggestion applies here, when moving on — unless a level was picked by hand.
     const target = manual ? selected : suggestedLevel(all, state.notes, extras)
     const list = sameStep(target, selected) ? nextSkip : []
@@ -97,8 +103,9 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     setCurrentId(resumePassage(band, list)?.id ?? nextId(band, list))
   }
   function chooseStep(target: ReadStep) {
-    if (!all) return
+    if (!all || saving) return
     if (!only && !readLevelsOpen(all, state.notes, extras)[readStepKey(target)]) return
+    clearError()
     setStep(target); setManual(true); setSkip([]); setMoved(null)
     const band = only ? null : target
     setCurrentId(resumePassage(band)?.id ?? nextId(band, []))
@@ -117,24 +124,47 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   }
   const [picks, setPicks] = useState<number[]>([])
   const [causes, setCauses] = useState<Record<number, string>>({})
-  // zh: the Chinese is open now; seenZh: it was opened for this passage (kept on a redo, so the record stays honest).
+  // zh: the Chinese is open now; seenZh: it was opened before submitting this attempt.
   const [zh, setZh] = useState(false)
   const [seenZh, setSeenZh] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState<ReadRecord | null>(null)
+  const [practice, setPractice] = useState(false)
   const [redo, setRedo] = useState(false)
-  useEffect(() => {
+  const revision = useRef('')
+  function restoreDraft() {
     // Back to a passage left halfway: the answers so far (and whether the Chinese was opened) come back.
     const half = passage ? readReadingProgress(state.notes, progressSet, passage.id) : null
-    const resume = half && passage && half.picks.length < passage.qs.length ? half : null
-    setPicks(resume?.picks ?? []); setCauses(resume?.causes ?? {}); setZh(false); setSeenZh(!!resume?.zh); setSaved(false); setRedo(false)
+    const draft = half && passage ? prepareReadingDraft(half, passage.qs) : null
+    const resume = draft && passage && draft.picks.length < passage.qs.length ? draft : null
+    revision.current = passage ? readingVersion(state.notes, progressSet, passage.id, readKey(passage.id)) : ''
+    setPicks(resume?.picks ?? []); setCauses(resume?.causes ?? {}); setZh(false); setSeenZh(!!resume?.zh); setSaved(null); setPractice(false); setRedo(false)
+  }
+  useLayoutEffect(() => {
+    restoreDraft()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passage?.id])
   const at = picks.length
   const ready = useTapGuard(passage?.id + ':' + at)
+  function draftVersion(notes: typeof state.notes) {
+    return passage ? readingVersion(notes, progressSet, passage.id, readKey(passage.id)) : ''
+  }
+  function confirmDraft(notes: typeof state.notes) {
+    if (draftVersion(notes) !== revision.current) throw new Error('這篇已有另一份練習進度，先讀取最新進度再繼續。')
+  }
   /** The answers so far, kept until the passage is done (a redo is practice and is not kept). */
-  const keep = (p: number[], c: Record<number, string>, z: boolean) => {
+  const keep = async (p: number[], c: Record<number, string>, z: boolean, answered: boolean) => {
     if (!passage || redo) return
-    onActivity(prev => ({ ...prev, notes: saveReadingProgress(prev.notes, progressSet, { id: passage.id, picks: p, ...(Object.keys(c).length ? { causes: c } : {}), ...(z ? { zh: true } : {}) }) }))
+    let version = ''
+    const apply = (prev: AppState) => {
+      confirmDraft(prev.notes)
+      const notes = saveReadingProgress(prev.notes, progressSet, { id: passage.id, picks: p, questionRevisions: savedQuestionRevisions(passage.qs),
+        ...(Object.keys(c).length ? { causes: c } : {}), ...(z ? { zh: true } : {}) })
+      version = draftVersion(notes)
+      return { ...prev, notes }
+    }
+    if (answered) await onSavedActivity(apply)
+    else await updateStoreNow(apply)
+    revision.current = version
   }
   const q = passage?.qs[at]
   useTaskContext(passage ? {
@@ -164,7 +194,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
       const ok = here.filter(p => passed(readRecord(state.notes, p.id))).length + hereExams.filter(p => examPassed(readExamRecord(state.notes, p.id))).length
       const available = readSteps.filter(s => s.level === l.id && [...here, ...hereExams].some(p => p.band === s.band))
       const isOpen = available.some(s => opened[readStepKey(s)])
-      return <button key={l.id} type="button" aria-pressed={l.id === selected.level} disabled={!isOpen} data-locked={!isOpen} onClick={() => chooseLevel(l.id)}>
+      return <button key={l.id} type="button" aria-pressed={l.id === selected.level} disabled={saving || !isOpen} data-locked={!isOpen} onClick={() => chooseLevel(l.id)}>
         <span>{l.id}</span><small>{l.name.slice(3)}</small>
         <small>過關 {ok} / {here.length + hereExams.length}</small>
         {!isOpen && <LockLine text={lockText(available[0])} />}
@@ -176,7 +206,7 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
         const target = { level: selected.level, band: b.id }
         const progress = readStepProgress(all, target, state.notes, extras)
         const isOpen = opened[readStepKey(target)] && progress.total > 0
-        return <button key={b.id} type="button" aria-pressed={b.id === selected.band} disabled={!isOpen} data-locked={!isOpen} onClick={() => chooseStep(target)}>
+        return <button key={b.id} type="button" aria-pressed={b.id === selected.band} disabled={saving || !isOpen} data-locked={!isOpen} onClick={() => chooseStep(target)}>
           <span>{b.name}</span><small>過關 {progress.ok} / {progress.total}{sameStep(target, suggested) ? ' · 建議' : ''}</small>
           {!isOpen && <LockLine text={progress.total ? lockText(target) : '這一小級還沒有文章'} />}
         </button>
@@ -195,12 +225,15 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
     {summary.weakest && <span>最弱題型：{typeNames[summary.weakest]}</span>}
     {summary.topCause && <span>最常卡在：{summary.topCause}</span>}
   </p>
+  const saveNotice = saving ? <p role="status">正在儲存練習紀錄……</p> : error ? <p className="tu-error" role="alert">{error}</p> : null
   // A past-exam passage: its own view, under the same level buttons; 下一篇 and 換一篇 go on in the same band.
   if (exam) return <div className="pr-stack rd">
     {levelButtons}
     {movedNote}
     {meta}
-    <ExamPassageView key={exam.id} passage={exam} state={state} onActivity={onActivity} date={date} onNext={() => moveOn([...skip, exam.id])} />
+    {saveNotice}
+    <ExamPassageView key={exam.id} passage={exam} state={state} onActivity={onActivity} onSavedActivity={onSavedActivity}
+      save={save} saving={saving} error={error} clearError={clearError} date={date} onNext={() => moveOn([...skip, exam.id])} />
   </div>
   if (!passage) {
     const nextStep = readSteps.slice(readSteps.findIndex(s => sameStep(s, selected)) + 1).find(s => [...all, ...exams].some(p => p.level === s.level && p.band === s.band))
@@ -218,76 +251,126 @@ export default function ReadingPath({ state, onActivity, date, only, set }: Pick
   const done = at >= passage.qs.length
   const correct = passage.qs.filter((x, i) => picks[i] === x.answer).length
   const last = at > 0 ? passage.qs[at - 1] : null
-  const lastWrong = last && picks[at - 1] !== last.answer
+  // In B2 reading, revealing one judgement can give away another.
+  const defer = (item: ShownQuestion) => passage.level === 'B2' && item.type === 'tfng'
+  const immediate = last && !defer(last) ? last : null
   function pick(i: number) {
     // The next question appears under the finger: a double tap must not answer it too.
     if (!passage || done || !ready()) return
     const next = [...picks, i]
-    setPicks(next)
-    if (next.length === passage.qs.length) finish(next, causes)
-    else keep(next, causes, seenZh)
+    void save(async () => {
+      if (next.length === passage.qs.length) await finish(next, causes)
+      else await keep(next, causes, seenZh, true)
+      setPicks(next)
+    })
   }
-  function finish(p: number[], c: Record<number, string>) {
+  async function finish(p: number[], c: Record<number, string>) {
     if (!passage) return
     const right = passage.qs.filter((x, i) => p[i] === x.answer).length
     // Each day a passage is read counts as a reading day, also when the same passage is read again on a later day.
-    onActivity(prev => ({ ...prev, notes: logSkill(saveRead(saveReadingProgress(prev.notes, progressSet, null, passage.id), passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length, ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) }), 'read', date) }))
-    setSaved(true)
+    let record: ReadRecord | null = null
+    let sameDay = false
+    await onSavedActivity(prev => {
+      if (!redo) confirmDraft(prev.notes)
+      sameDay = hasReadSubmission(readRecord(prev.notes, passage.id), date)
+      const cleared = redo ? prev.notes : saveReadingProgress(prev.notes, progressSet, null, passage.id)
+      const notes = saveRead(cleared, passage.id, { day: date, picks: savedPicks(passage.qs, p), correct: right, total: passage.qs.length,
+        questionRevisions: savedQuestionRevisions(passage.qs), ...(Object.keys(c).length ? { causes: savedCauses(passage.qs, c) } : {}), ...(seenZh ? { zh: true } : {}) })
+      record = readRecord(notes, passage.id)
+      return { ...prev, notes: logSkill(notes, 'read', date) }
+    })
+    setSaved(record)
+    setPractice(sameDay)
   }
   function cause(qi: number, c: string) {
-    if (causes[qi]) return
+    if (!passage || causes[qi]) return
     const next = { ...causes, [qi]: c }
-    setCauses(next)
-    if (!saved) keep(picks, next, seenZh)
-    if (saved && passage) onActivity(prev => {
-      const r = readRecord(prev.notes, passage.id)
-      return r ? { ...prev, notes: { ...prev.notes, ['read.' + passage.id]: JSON.stringify({ ...r, causes: savedCauses(passage.qs, next) }) } } : prev
+    if (done && practice) { setCauses(next); return }
+    void save(async () => {
+      if (saved) {
+        await updateStoreNow(prev => {
+          const r = readRecord(prev.notes, passage.id)
+          if (!r || saved.day !== date || r.day !== saved.day || r.at !== saved.at || JSON.stringify(r.picks) !== JSON.stringify(saved.picks)) {
+            throw new Error('已有另一份較新的作答，無法把這筆錯因加到那一次。')
+          }
+          return { ...prev, notes: { ...prev.notes, [readKey(passage.id)]: JSON.stringify({
+            ...r, causes: { ...r.causes, ...savedCauses(passage.qs, { [qi]: c }) },
+          }) } }
+        })
+      } else {
+        await keep(picks, next, seenZh, false)
+      }
+      setCauses(next)
     })
   }
-  const marks = last && at > 0 ? [last.evidence ?? ''] : []
+  const evidence = immediate?.evidence
+  const marks = evidence ? [evidence] : []
+  const article = passage.paras.join(' ')
+  function answerFeedback(item: ShownQuestion, i: number, afterFinish = false) {
+    const chosen = picks[i]
+    const right = chosen === item.answer
+    const answer = item.options[item.answer]
+    const notGiven = item.type === 'tfng' && answer === 'Not Given'
+    const label = right ? '第 ' + (i + 1) + ' 題答對了' + (afterFinish ? ' · ' + answer : '')
+      : '第 ' + (i + 1) + ' 題答案是「' + answer + '」'
+    const body = <>
+      {afterFinish && <p lang="en">{item.q}</p>}
+      <p>{item.why}</p>
+      {item.evidence && (afterFinish ? <blockquote lang="en">{item.evidence}</blockquote> : !notGiven && <small>文章裡標起來的句子可以用來核對答案。</small>)}
+      {notGiven && <small>{item.evidence ? (afterFinish ? '引句只是相關線索。' : '文章裡標起來的是相關線索。') : ''}選 Not Given 要確認全文都沒有提供題目所問的資訊。</small>}
+      <AskWhy q={{ source: '閱讀', passage: article, stem: item.q, options: item.options, picked: item.options[chosen] ?? '', answer, right }} />
+      {!right && <div className="qz-cause"><small>卡在哪？選一個，之後會看哪一種最常出現。</small>
+        <div className="pr-options">{readCauses.map(c => <button key={c} type="button" aria-pressed={causes[i] === c} disabled={saving || !!causes[i]} onClick={() => cause(i, c)}>{c}</button>)}</div>
+      </div>}
+    </>
+    return afterFinish
+      ? <details key={item.from} className="pr-hint rd-feedback" data-ok={right}><summary>{label}</summary>{body}</details>
+      : <div className="pr-hint rd-feedback" data-ok={right}><strong>{label}</strong>{body}</div>
+  }
   const prevRec = readRecord(state.notes, passage.id)
   return <div className="pr-stack rd">
     {levelButtons}
     {movedNote}
     {meta}
+    {saveNotice}
+    {error && !done && !redo && draftVersion(state.notes) !== revision.current &&
+      <button type="button" className="pr-link" onClick={() => { clearError(); restoreDraft() }}>讀取這篇最新的進度</button>}
     <article className="rd-passage">
       <header><h3 lang="en">{passage.title}</h3><small>{passage.topic} · {passage.words} 字{prevRec ? ' · 上次 ' + prevRec.correct + ' / ' + prevRec.total : ''}</small></header>
       {passage.paras.map((p, i) => <Fragment key={i}>
-        <p lang="en" className="rd-para">{passage.ielts && <b className="rd-letter">{letters[i]}</b>}<TapWords text={p} line={i} onWord={look.tap} picked={look.pickedForm} pickedLine={look.line} marks={marks} /></p>
+        <p lang="en" className="rd-para">{passage.ielts && <b className="rd-letter">{letters[i]}</b>}<TapWords text={p} line={i} onWord={look.tap} pickedIndex={look.index} pickedLine={look.line} marks={marks} /></p>
         {look.line === i && look.box}
       </Fragment>)}
-      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" onClick={() => { setZh(true); if (!done) { setSeenZh(true); keep(picks, causes, true) } }}>{done ? '看中文大意' : seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
+      {zh ? <p className="rd-zh">{passage.zh}</p> : <button type="button" className="pr-link" disabled={saving} onClick={() => {
+        if (done || seenZh) { setZh(true); return }
+        void save(async () => { await keep(picks, causes, true, false); setSeenZh(true); setZh(true) })
+      }}>{done ? '看中文大意' : seenZh ? '再看一次中文大意' : '真的看不懂？看中文大意（這篇會記成「看過中文」）'}</button>}
     </article>
-    {last && <div className="pr-hint rd-feedback" data-ok={!lastWrong}>
-      <strong>{lastWrong ? '第 ' + at + ' 題答案是「' + last.options[last.answer] + '」' : '第 ' + at + ' 題答對了'}</strong>
-      <p>{last.why}</p>
-      {last.evidence && <small>文章裡標起來的那一句就是證據。</small>}
-      <AskWhy q={{ source: '閱讀', passage: passage.paras.join(' '), stem: last.q, options: last.options, picked: picks[at - 1] === undefined ? '' : last.options[picks[at - 1]], answer: last.options[last.answer], right: !lastWrong }} />
-      {lastWrong && <div className="qz-cause"><small>卡在哪？選一個，之後會看哪一種最常出現。</small>
-        <div className="pr-options">{readCauses.map(c => <button key={c} type="button" aria-pressed={causes[at - 1] === c} disabled={!!causes[at - 1] && causes[at - 1] !== c} onClick={() => cause(at - 1, c)}>{c}</button>)}</div>
-      </div>}
-    </div>}
+    {immediate && answerFeedback(immediate, at - 1)}
     {q && <section className="rd-q">
       <p className="rd-qmeta">第 {at + 1} / {passage.qs.length} 題 · {typeNames[q.type]}{q.type === 'tfng' ? '（True 文章這樣說；False 文章說相反；Not Given 文章沒提到）' : ''}</p>
       <h4 lang="en">{q.q}</h4>
-      <div className="pr-options rd-options">{q.options.map((o, i) => <button key={o} type="button" lang="en" onClick={() => pick(i)}>{o}</button>)}</div>
+      <div className="pr-options rd-options">{q.options.map((o, i) => <button key={i} type="button" lang="en" disabled={saving} onClick={() => pick(i)}>{o}</button>)}</div>
+      {defer(q) && <small>完成這篇後可以查看是非題的答案和原因。</small>}
     </section>}
     {done && <div className="pr-hint">
       <strong>這篇答對 {correct} / {passage.qs.length}{(() => {
         // Said from what was actually saved: a second try on the same day is practice whichever way it was reached.
-        const rec = saved ? readRecord(state.notes, passage.id) : null
-        if (redo || rec?.practice) return '（今天已經做過這篇：這次是練習，不算新的過關' + (passed(rec) ? '；之前的過關留著 ✓' : '') + '）'
-        if (passed(rec)) return '，過關 ✓'
-        return seenZh ? '（看過中文，下次不看中文再試一次）' : '，70% 以上算過關，之後會再出現'
+        const rec = saved
+        if (practice) return '（今天已經做過這篇：這次是練習，不算新的過關' + (passed(rec) ? '；之前的過關留著 ✓' : '') + '）'
+        if (rec && !seenZh && correct / passage.qs.length >= 0.7) return '，過關 ✓'
+        const earlier = passed(rec) ? '（保留之前的過關紀錄）' : ''
+        return (seenZh ? '（看過中文，下次不看中文再試一次）' : '，70% 以上算過關，之後會再出現') + earlier
       })()}</strong>
       <ul className="rd-review">{passage.qs.map((x, i) => <li key={i} data-ok={picks[i] === x.answer}>{typeNames[x.type]}：{picks[i] === x.answer ? '對' : '錯' + (causes[i] ? '（' + causes[i] + '）' : '')}</li>)}</ul>
+      {passage.qs.map((item, i) => defer(item) ? answerFeedback(item, i, true) : null)}
       <div className="pr-actions">
-        <button type="button" className="pr-main" onClick={() => moveOn([...skip, passage.id])}>下一篇</button>
-        <button type="button" className="pr-link" onClick={() => { setPicks([]); setCauses({}); setSaved(false); setZh(false); setRedo(true) }}>這篇再做一次（練習）</button>
+        <button type="button" className="pr-main" disabled={saving} onClick={() => moveOn([...skip, passage.id])}>下一篇</button>
+        <button type="button" className="pr-link" disabled={saving} onClick={() => { clearError(); setPicks([]); setCauses({}); setSaved(null); setZh(false); setSeenZh(false); setRedo(true) }}>這篇再做一次（練習）</button>
       </div>
       <p className="rd-words">點文章裡的字，可以看意思、聽發音，也可以問 Claude 老師。</p>
     </div>}
-    {!done && at === 0 && <button type="button" className="pr-link" onClick={() => moveOn([...skip, passage.id])}>換一篇</button>}
+    {!done && at === 0 && <button type="button" className="pr-link" disabled={saving} onClick={() => moveOn([...skip, passage.id])}>換一篇</button>}
     <LookedUp items={look.seen} state={state} onActivity={onActivity} date={date} />
   </div>
 }

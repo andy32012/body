@@ -230,17 +230,15 @@ function Viewer({ photo, group, change, close, state, update }: PageProps & {
   </dialog>
 }
 
-type GalleryProps = PageProps & {initialPhotoId?:string; onViewerClose?:()=>void}
+type GalleryProps = PageProps & {photoId?:string; onPhotoChange:(id?:string, fromList?:boolean)=>void}
 
 export default function CosmosGallery(props:GalleryProps) {
   const feature = useSceneFeature()
   const [category,setCategory] = useState('')
-  const [selected,setSelected] = useState<AstroPhoto | undefined>(() => photos.find(photo => photo.id === props.initialPhotoId))
+  const selected = photos.find(photo => photo.id === props.photoId)
   useLayoutEffect(() => {
-    const requested = photos.find(photo => photo.id === props.initialPhotoId)
-    if (requested) setCategory('')
-    setSelected(requested)
-  }, [props.initialPhotoId])
+    if (selected && category && selected.category !== category) setCategory('')
+  }, [selected, category])
   const collection = feature ? [feature, ...photos.filter(photo => photo.id !== feature.id)] : photos
   const group = category ? photos.filter(photo => photo.category === category) : collection
   return <section className="cg-gallery">
@@ -248,11 +246,11 @@ export default function CosmosGallery(props:GalleryProps) {
     <div className="cg-filters" role="group" aria-label="影像分類">{['',...categories].map(cat =>
       <button type="button" key={cat} aria-pressed={category === cat} onClick={() => setCategory(cat)}>{cat || '全部'}</button>)}</div>
     <div className="cg-grid">{group.map((photo,i) => <button type="button" className={'cg-card'+(i===0?' cg-lead':'')}
-      key={photo.id} onClick={() => setSelected(photo)} aria-label={'放大查看'+photo.title}>
+      key={photo.id} onClick={() => props.onPhotoChange(photo.id, true)} aria-label={'放大查看'+photo.title}>
       <span className="cg-image"><GalleryImage key={photo.id} photo={photo} eager={i===0}/></span>
       <span className="cg-card-caption">{i===0 && <small>{photo.category}</small>}<strong>{photo.title}</strong></span>
       {i===0 && <span className="cg-zoom" aria-hidden="true"><Expand size={16}/></span>}
     </button>)}</div>
-    {selected && <Viewer {...props} photo={selected} group={group} change={setSelected} close={() => {setSelected(undefined);props.onViewerClose?.()}}/>}
+    {selected && <Viewer {...props} photo={selected} group={group} change={photo => props.onPhotoChange(photo.id)} close={() => props.onPhotoChange()}/>}
   </section>
 }

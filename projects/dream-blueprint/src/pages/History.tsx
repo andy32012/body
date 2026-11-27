@@ -7,7 +7,11 @@ import type { PageProps } from "../lib/store";
 import { getRetentionStatus, grammarStars } from "../lib/grammarRetention";
 import EvidencePanel from "../components/EvidencePanel";
 import { levelNames, type Level } from "../lib/evidence";
+import { lessonTarget, parseLessonTarget, readDayLessons, resumePhase, stepLabel, type LessonRecord } from "../lib/lesson";
+import { sentenceById, units } from "../lib/todayLesson";
 import { readTopic, topicStatus, topics } from "../lib/topics";
+import { wordKey } from "../lib/vocab";
+import { isSortedKey, mergeSortedWords } from "../lib/dailyWords";
 import "./history.css";
 
 const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
@@ -30,15 +34,58 @@ function changeMonth(key: string, offset: number) {
   return calendarDate(date).slice(0, 7);
 }
 
-function PracticeCalendar({ sessions, today }: { sessions: Sessions; today: string }) {
-  const [selected, select] = useState(today);
-  const [month, setMonth] = useState(today.slice(0, 7));
+function LessonDetails({ record, target, expanded }: { record: LessonRecord; target: string; expanded: boolean }) {
+  const done = record.steps.includes("done");
+  const title = units.find(unit => unit.id === record.unit)?.title;
+  const corrections = record.express;
+  const attempts = [...(record.recalls ?? []), ...(record.records ?? [])];
+  const vary = Object.entries(record.varyChecks ?? {}).filter(([, check]) => check.answer || check.last?.text || check.before);
+  return <details open={expanded || undefined}>
+    <summary>單元 {record.unit} 第 {record.day} 天{title ? " · " + title : ""} · {done ? "已完成" : "目前進度「" + stepLabel[resumePhase(record) ?? "recall"] + "」"}</summary>
+    {!done && <p><a href={"#practice/resume-" + target}>繼續這堂課</a></p>}
+    {record.heard && <p>聽懂 · {record.heard.counted ? `${record.heard.correct} / ${record.heard.total}` : "有提示的練習"}</p>}
+    {record.voiceExpression && <p>表達口說 · 與 Emma 練習 {record.voiceExpression.turns} 段</p>}
+    {attempts.length > 0 && <ul>{attempts.map((attempt, index) => {
+      const hint = record.hints?.[attempt.sentenceId];
+      const sentence = sentenceById.get(attempt.sentenceId);
+      return <li key={`${attempt.sentenceId}.${index}`}>{sentence?.zh ?? "中翻英作答"} · {ratings[attempt.rating]}
+        {(attempt.revealed || !!hint?.r || !!hint?.c) && "（有提示）"}
+        {attempt.answer && <p lang="en">{attempt.answer}</p>}
+      </li>;
+    })}</ul>}
+    {vary.length > 0 && <ul>{vary.map(([index, check]) => <li key={index}>
+      換個說法 {Number(index) + 1}{check.revealed && "（有提示）"}<p lang="en">{check.answer || check.last?.text || check.before}</p>
+    </li>)}</ul>}
+    {corrections && <div>
+      {corrections.first && <p>表達初稿 <span lang="en">{corrections.first}</span></p>}
+      {corrections.lastAnswer && <p>最近一次作答 <span lang="en">{corrections.lastAnswer}</span></p>}
+      {corrections.finalAnswer && corrections.finalAnswer !== (corrections.lastAnswer || corrections.first) &&
+        <p>完成時的文字 <span lang="en">{corrections.finalAnswer}</span></p>}
+      {corrections.firstResult && <p>批改結果 <span lang="en">{corrections.firstResult.corrected}</span></p>}
+      {corrections.last && <p>最近一次批改 <span lang="en">{corrections.last.corrected}</span></p>}
+      {corrections.others?.map((answer, index) => <p key={index}>其他裝置的作答 <span lang="en">{answer.finalAnswer || answer.lastAnswer || answer.first}</span></p>)}
+      {corrections.discussion?.map(reply => <div key={reply.id}><p>追問 {reply.question}</p><p>{reply.reply}</p></div>)}
+    </div>}
+    {record.slim && <p>這堂舊課已整理，這裡保留作答摘要。</p>}
+  </details>;
+}
+
+function PracticeCalendar({ sessions, notes, today, initialDate, initialTarget }: {
+  sessions: Sessions; notes: Record<string, string>; today: string; initialDate: string; initialTarget?: string;
+}) {
+  const [selected, select] = useState(initialDate);
+  const [month, setMonth] = useState(initialDate.slice(0, 7));
   const first = localDate(month + "-01");
   const offset = (first.getDay() + 6) % 7;
   const length = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
   const dates = new Set(sessions.map(session => session.day));
+  for (const key of Object.keys(notes)) {
+    const date = /^lesson\.(\d{4}-\d{2}-\d{2})$/.exec(key)?.[1];
+    if (date && readDayLessons(notes, date).length) dates.add(date);
+  }
   const activeDays = [...dates].filter(date => date.startsWith(month)).length;
   const activeSessions = sessions.filter(session => session.day === selected);
+  const lessons = readDayLessons(notes, selected);
   function move(amount: number) {
     const next = changeMonth(month, amount);
     setMonth(next);
@@ -67,8 +114,12 @@ function PracticeCalendar({ sessions, today }: { sessions: Sessions; today: stri
     </div>
     <div className="history-day-note" aria-live="polite">
       {Number(selected.slice(5, 7))} 月 {Number(selected.slice(8))} 日 · {activeSessions.length ?
-        activeSessions.map(s => battery[s.energy]).join("、") + "練習" : "這天沒有練習紀錄。"}
+        activeSessions.map(s => battery[s.energy]).join("、") + "練習" : lessons.length ? "每日課" : "這天沒有練習紀錄。"}
     </div>
+    {lessons.map(record => {
+      const target = lessonTarget(selected, record);
+      return <LessonDetails key={target} record={record} target={target} expanded={initialTarget === target || (initialTarget === selected && lessons.length === 1)} />;
+    })}
   </section>;
 }
 
@@ -124,13 +175,17 @@ function TopicHistory({ state }: { state: PageProps["state"] }) {
   </section>;
 }
 
-export default function History({ state }: PageProps) {
+export default function History({ state, initialTarget }: PageProps & { initialTarget?: string }) {
   const today = dayKey();
+  const date = initialTarget && parseLessonTarget(initialTarget)?.date;
+  const selectedDate = date && date <= today && calendarDate(localDate(date)) === date ? date : today;
   const { sessions, cards, settings } = state;
   const days = new Set(sessions.map(s => s.day)).size;
-  const words = new Set(sessions.flatMap(session => session.words).map(word => word.trim().toLowerCase()).filter(Boolean)).size;
+  const dailyLearned = Object.entries(state.notes).flatMap(([key, value]) =>
+    isSortedKey(key) ? mergeSortedWords(undefined, value).filter(word => !word.known).map(word => word.k) : []);
+  const words = new Set([...sessions.flatMap(session => session.words), ...dailyLearned].map(wordKey).filter(Boolean)).size;
   const spoken = sessions.reduce((total, s) => total + (s.spokenIds?.length ?? 0), 0);
-  const translated = sessions.reduce((total, s) => total + (s.translations?.length ?? 0), 0);
+  const translated = sessions.reduce((total, s) => total + (s.translations?.filter(t => t.attempted !== false).length ?? 0), 0);
   const wordCards = cards.filter(card => card.id.startsWith("word:"));
   // Older review lines are folded into totals (compact.ts); the numbers include them.
   const { delayed: delayedCount, recalled } = delayedRecall(state);
@@ -150,7 +205,7 @@ export default function History({ state }: PageProps) {
       </dl>
     </header>
     <div className="history-grid">
-    <PracticeCalendar sessions={sessions} today={today} />
+    <PracticeCalendar key={initialTarget} sessions={sessions} notes={state.notes} today={today} initialDate={selectedDate} initialTarget={initialTarget} />
     <WeeklyChart sessions={sessions} today={today} />
     <EvidencePanel state={state} />
     <GrammarHistory sessions={sessions} />
@@ -162,7 +217,7 @@ export default function History({ state }: PageProps) {
         {delayedCount > 0 && <strong> {Math.round(recalled / delayedCount * 100)}%</strong>}</p>
       <h3>單字卡現在隔幾天複習</h3><p className="history-note">用 FSRS 依每張卡的記憶狀態排：記得越穩，隔得越久（最長一年）；忘了就縮短，不會從頭來。</p><div className="history-boxes">{intervals.map((interval, index) =>
         <div key={interval}><b>{wordCards.filter(card => card.box === index + 1).length}</b><small>{interval === 1 ? '1 天' : '≥' + interval + ' 天'}</small></div>)}</div>
-      <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 快篩已認得 {state.knownWords.length} 個字</p>
+      <p className="history-note">曾經學會 {wordCards.filter(card => card.mastered).length} 個字 · 已標成認得 {new Set(state.knownWords.map(wordKey)).size} 個字</p>
     </section>
     {settings.rivalsEnabled && pastSeason && <section className="history-section"><h2>上一季 · {pastSeason.label}</h2>
       <p>競賽 {pastSeason.weeks} 週，第一名 {pastSeason.firsts} 次，平均第 {pastSeason.averageRank.toFixed(1)} 名。</p></section>}

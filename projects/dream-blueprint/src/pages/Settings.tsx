@@ -39,7 +39,7 @@ function csvRows(text: string): string[][] {
   }
   for (let index = 0; index < text.length; index++) {
     const char = text[index]
-    if (char === '"') {
+    if (char === '"' && (quoted || !field.trim())) {
       if (quoted && text[index + 1] === '"') { field += '"'; index++ }
       else quoted = !quoted
     } else if (!quoted && [',', '\t', '，'].includes(char)) {
@@ -58,14 +58,19 @@ function csvRows(text: string): string[][] {
 
 export function parseVocabulary(input: string): ImportedWord[] {
   const rows = csvRows(input.replace(/^\uFEFF/, ''))
-  const headers = rows[0]?.map(field => field.toLowerCase()) ?? []
-  const enCol = headers.findIndex(s => ['英文','單字','word','en','english'].includes(s))
-  const zhCol = headers.findIndex(s => ['中文','意思','翻譯','zh','chinese','meaning'].includes(s))
-  const levelCol = headers.findIndex(s => ['級別','等級','level'].includes(s))
+  const first = rows[0]?.map(field => field.toLowerCase()) ?? []
+  const english = first.findIndex(s => ['英文','單字','word','en','english'].includes(s))
+  const chinese = first.findIndex(s => ['中文','意思','翻譯','zh','chinese','meaning'].includes(s))
+  const levelColumn = first.findIndex(s => ['級別','等級','level'].includes(s))
+  // A common English header by itself is also a real word. Only skip it with another named column.
+  const hasHeader = english >= 0 && (chinese >= 0 || levelColumn >= 0 || /[^\x00-\x7f]/.test(first[english]))
+  const enCol = hasHeader ? english : 0
+  const zhCol = hasHeader ? chinese : 1
+  const levelCol = hasHeader ? levelColumn : 2
   const words = new Map<string, ImportedWord>()
-  for (const cells of rows.slice(enCol < 0 ? 0 : 1)) {
-    let en = cells[enCol < 0 ? 0 : enCol] ?? ''
-    let zh = cells[enCol < 0 ? 1 : zhCol] ?? ''
+  for (const cells of rows.slice(hasHeader ? 1 : 0)) {
+    let en = cells[enCol] ?? ''
+    let zh = cells[zhCol] ?? ''
     if (cells.length === 1) {
       const pair = en.match(/^(.+?)\s+([\u3400-\u9fff].*)$/u)
       if (pair) { en = pair[1]; zh = pair[2] }
@@ -74,7 +79,7 @@ export function parseVocabulary(input: string): ImportedWord[] {
     if (!en) continue
     if (en.length > 512 || zh.length > 50000) throw new Error('單列內容太長，請檢查單字是否已分行。')
     if (!/^[a-zA-Z]/.test(en) || /[\u3400-\u9fff]/u.test(en)) throw new Error('每一列請先放英文，再放中文。兩欄可用逗號或空格隔開。')
-    const levelText = cells[enCol < 0 ? 2 : levelCol] ?? ''
+    const levelText = cells[levelCol] ?? ''
     const level = levelText ? Number(levelText) : undefined
     if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > 6)) throw new Error('級別請填 1 到 6，或留白。')
     words.set(en.toLowerCase(), { en, zh: zh.trim(), ...(level ? {level} : {}) })
@@ -98,7 +103,7 @@ import { exportBackup, getSnapshot, readBackup, restoreBackup, replacePeriod, up
 import { archiveFolderUrl, cloudArchive, driveConnected } from '../lib/drive'
 import { dayKey, addDays, activePeriod } from '../lib/progress'
 import { noteMoved } from '../lib/wordStates'
-import { DAILY_CHOICES, DEFAULT_DAILY, countKey } from '../lib/dailyWords'
+import { DAILY_CHOICES, DEFAULT_DAILY, chosenDailyCount, countKey } from '../lib/dailyWords'
 
 type SettingsData = AppState['settings']
 type PeriodType = SettingsData['periods'][number]['type']
@@ -139,14 +144,18 @@ export default function Settings(props: PageProps) {
   const [text, setText] = useState('')
   const [wordFile, setWordFile] = useState<File | null>(null)
   const [wordMode, setWordMode] = useState<'learn' | 'known'>('learn')
+  const [wordSaving, setWordSaving] = useState(false)
+  const [periodSaving, setPeriodSaving] = useState(false)
   const [backup, setBackup] = useState<BackupSelection | null>(null)
   const [restoring, setRestoring] = useState(false)
-  const [result, setResult] = useState({area:'', msg:''})
-  const announce = (area:string,msg:string) => setResult({area,msg})
-  const clearStatus = (area:string) => setResult(current => current.area === area ? {area:'',msg:''} : current)
-  const status = (area:string) => result.area === area && result.msg ? <p role="status" className="set-status">{result.msg}</p> : null
+  const [results, setResults] = useState<Record<string, string>>({})
+  const announce = (area:string,msg:string) => setResults(current => ({...current, [area]:msg}))
+  const clearStatus = (area:string) => announce(area, '')
+  const status = (area:string) => results[area] ? <p role="status" className="set-status">{results[area]}</p> : null
   const wordInput = useRef<HTMLInputElement>(null)
   const wordRead = useRef(0)
+  const wordPending = useRef(false)
+  const periodPending = useRef(false)
   const backupInput = useRef<HTMLInputElement>(null)
   const backupRead = useRef(0)
   const restorePending = useRef(false)
@@ -191,7 +200,8 @@ export default function Settings(props: PageProps) {
   }
 
   async function confirmRestore() {
-    if (backup?.phase !== 'ready' || backup.id !== backupRead.current || restorePending.current || officeSaving || whySaving) return
+    if (backup?.phase !== 'ready' || backup.id !== backupRead.current || restorePending.current || officeSaving || whySaving ||
+        wordPending.current || periodPending.current) return
     restorePending.current = true
     setRestoring(true)
     try {
@@ -206,17 +216,50 @@ export default function Settings(props: PageProps) {
     } finally { restorePending.current = false; setRestoring(false) }
   }
 
-  function savePeriod() {
-    if (!start || !end || end < start) { announce('period', '請填入起訖日期，結束日要在開始日當天或之後。'); return }
-    if (s.periods.some(p => p.start === start && p.end === end && p.type === period)) { announce('period', '這段期間已經排好了。'); return }
-    update(prev=>({...prev,settings:{...prev.settings,periods:replacePeriod(prev.settings.periods,{type:period,start,end})}}))
-    announce('period','已加入時期，當天會自動切換。')
+  function samePeriod(a: SettingsData['periods'][number], b: SettingsData['periods'][number]) {
+    return a.start === b.start && a.end === b.end && a.type === b.type
   }
-  function saveVocabulary() {
-    if (wordFile) return
+  async function changePeriods(edit: (periods: SettingsData['periods']) => SettingsData['periods'], success: string, unchanged: string) {
+    if (periodPending.current || restorePending.current) return
+    periodPending.current = true
+    setPeriodSaving(true)
+    let changed = false
+    try {
+      await updateStoreNow(prev => {
+        const periods = edit(prev.settings.periods)
+        changed = periods !== prev.settings.periods
+        return changed ? {...prev, settings: {...prev.settings, periods}} : prev
+      })
+      announce('period', changed ? success : unchanged)
+    } catch (error) {
+      announce('period', error instanceof Error ? error.message : '時期安排儲存失敗，請再試一次。')
+    } finally { periodPending.current = false; setPeriodSaving(false) }
+  }
+  function savePeriod() {
+    const date = /^\d{4}-\d{2}-\d{2}$/
+    if (!date.test(start) || !date.test(end) || end < start) {
+      announce('period', '請填入起訖日期（年份四位），結束日要在開始日當天或之後。')
+      return
+    }
+    const chosen = {type:period, start, end}
+    void changePeriods(periods => periods.some(p => samePeriod(p, chosen)) ? periods : replacePeriod(periods, chosen),
+      '已加入時期，當天會自動切換。', '這段期間已經排好了。')
+  }
+  function removePeriod(range: SettingsData['periods'][number]) {
+    const today = dayKey()
+    void changePeriods(periods => {
+      if (!periods.some(p => samePeriod(p, range))) return periods
+      return periods.flatMap(p => !samePeriod(p, range) ? [p] : p.start < today ? [{...p, end:addDays(today,-1)}] : [])
+    }, range.start < today ? '已結束此時期。' : '已移除此時期。', '這段時期已更新，請確認目前的日期。')
+  }
+  async function saveVocabulary() {
+    if (wordFile || wordPending.current || restorePending.current) return
+    wordPending.current = true
+    setWordSaving(true)
+    clearStatus('words')
     try {
       const parsed = parseVocabulary(text)
-      update(prev => {
+      await updateStoreNow(prev => {
         const dict = new Map(prev.customWords.map(w => [w.en.toLowerCase(), w]))
         for (const w of parsed) {
           const key = w.en.toLowerCase(), old = dict.get(key)
@@ -226,17 +269,18 @@ export default function Settings(props: PageProps) {
         const known = new Set(prev.knownWords.map(wordKey))
         const learning = new Set(prev.learningWords.map(wordKey))
         const [selected, other] = wordMode === 'known' ? [known, learning] : [learning, known]
-        const moved: string[] = []
         for (const key of inputKeys) {
-          if (other.delete(key)) moved.push(key)
+          other.delete(key)
           selected.add(key)
         }
         return {...prev, customWords:[...dict.values()], knownWords:[...known], learningWords:[...learning],
-          notes:noteMoved(prev.notes, moved, wordMode === 'known' ? 'k' : 'l', dayKey())}
+          notes:noteMoved(prev.notes, [...inputKeys], wordMode === 'known' ? 'k' : 'l', dayKey())}
       })
       setText('')
       announce('words', '已匯入 ' + parsed.length + ' 個單字，重複的單字已合併。')
-    } catch (e) { announce('words', (e as Error).message) }
+    } catch (error) {
+      announce('words', error instanceof Error ? error.message : '單字未儲存，請保留清單並再試一次。')
+    } finally { wordPending.current = false; setWordSaving(false) }
   }
   function download() {
     const file = new Blob([exportBackup(state,new Date())], {type:'application/json'})
@@ -251,7 +295,7 @@ export default function Settings(props: PageProps) {
     announce('backup','已建立備份，請收好下載的檔案。')
   }
   async function readWordFile(file: File | undefined) {
-    if (!file) return
+    if (!file || wordPending.current || restorePending.current) return
     const id = ++wordRead.current
     setWordFile(file)
     clearStatus('words')
@@ -268,12 +312,14 @@ export default function Settings(props: PageProps) {
   }
 
   function cancelWordRead() {
+    if (wordPending.current) return
     wordRead.current++
     setWordFile(null)
     clearStatus('words')
   }
 
   function editWordText(value: string) {
+    if (wordPending.current) return
     cancelWordRead()
     setText(value)
   }
@@ -332,15 +378,13 @@ export default function Settings(props: PageProps) {
         }}><option value="normal">普通</option><option value="low">累爆</option><option value="rest">休息</option></select></label>
       )}</div></div>
       <div><h3>時期安排</h3><p>藍圖暫排 2028 年 2 月到 2029 年 1 月維持實習節奏，接著到 7 月維持國考節奏。兩段期間都只複習舊內容。</p><p>系辦確認日期後，可新增實際時期覆蓋重疊日期。想在一段時間恢復新課，請選「一般學期」。</p>
-        <div className="set-list">{s.periods.map((range, i)=><div key={range.type+'-'+range.start+'-'+range.end+'-'+i}><span><b>{periodNames[range.type]}</b><small>{range.start} 至 {range.end || '另訂'}</small></span>{(!range.end || range.end >= today) && <button type="button" onClick={()=>{
-          const periods=s.periods.flatMap((p,j) => j!==i ? [p] : p.start<today ? [{...p,end:addDays(today,-1)}] : [])
-          set('periods',periods)
-        }} aria-label={(range.start<today?'結束':'移除')+range.start+periodNames[range.type]}>{range.start<today?'今天結束':'移除'}</button>}</div>)}</div>
-        <label>新增時期<select value={period} onChange={e=>setPeriod(e.target.value as PeriodType)}>{(['semester','exam','internship','vacation'] as const).map(p=><option key={p} value={p}>{periodNames[p]}</option>)}</select></label>
-        <div className="set-dates"><label>開始日期<input type="date" value={start} onChange={e=>setStart(e.target.value)} /></label><label>結束日期<input type="date" min={start} value={end} onChange={e=>setEnd(e.target.value)} /></label></div>
-        <button type="button" onClick={savePeriod}>加入時期</button>{status('period')}
+        <div className="set-list">{s.periods.map((range, i)=><div key={range.type+'-'+range.start+'-'+range.end+'-'+i}><span><b>{periodNames[range.type]}</b><small>{range.start} 至 {range.end || '另訂'}</small></span>{(!range.end || range.end >= today) && <button type="button" disabled={periodSaving || restoring} onClick={()=>removePeriod(range)}
+          aria-label={(range.start<today?'結束':'移除')+range.start+periodNames[range.type]}>{range.start<today?'今天結束':'移除'}</button>}</div>)}</div>
+        <label>新增時期<select disabled={periodSaving || restoring} value={period} onChange={e=>{setPeriod(e.target.value as PeriodType);clearStatus('period')}}>{(['semester','exam','internship','vacation'] as const).map(p=><option key={p} value={p}>{periodNames[p]}</option>)}</select></label>
+        <div className="set-dates"><label>開始日期<input type="date" disabled={periodSaving || restoring} max="9999-12-31" value={start} onChange={e=>{setStart(e.target.value);clearStatus('period')}} /></label><label>結束日期<input type="date" disabled={periodSaving || restoring} min={start} max="9999-12-31" value={end} onChange={e=>{setEnd(e.target.value);clearStatus('period')}} /></label></div>
+        <button type="button" disabled={periodSaving || restoring} onClick={savePeriod}>{periodSaving ? '儲存中……' : '加入時期'}</button>{status('period')}
       </div>
-      <label>今日單字每天看幾個<select value={Number(state.notes[countKey]) || DEFAULT_DAILY} onChange={e=>update(prev=>({...prev,notes:{...prev.notes,[countKey]:e.target.value}}))}>{DAILY_CHOICES.map(n=><option key={n} value={n}>{n} 個{n===DEFAULT_DAILY?'（建議）':''}</option>)}</select></label>
+      <label>今日單字每天看幾個<select value={chosenDailyCount(state.notes)} onChange={e=>update(prev=>({...prev,notes:{...prev.notes,[countKey]:e.target.value}}))}>{DAILY_CHOICES.map(n=><option key={n} value={n}>{n} 個{n===DEFAULT_DAILY?'（建議）':''}</option>)}</select></label>
       <label>英文朗讀速度<select value={s.speechRate} onChange={e=>set('speechRate',Number(e.target.value))}>{[...new Set([0.65,0.8,0.9,1,1.15,s.speechRate])].sort((a,b)=>a-b).map(n=><option key={n} value={n}>{n} 倍速</option>)}</select></label>
     </Panel>
     <Panel icon={Telescope} title="我的出發點" hint="記下出發的原因與實習安排">
@@ -359,7 +403,7 @@ export default function Settings(props: PageProps) {
         </div>
       </div> : <button type="button" disabled={!whyDraft || whySaving || restoring} onClick={()=>void saveWhy()}>儲存出發的原因</button>}
       {status('why')}
-      <label>已確認的基護實習時段<input aria-label="已確認的基護實習時段" value={s.internshipSeason} onChange={e=>set('internshipSeason',e.target.value)} /></label>
+      <label>已確認的基護實習時段<input aria-label="已確認的基護實習時段" maxLength={50000} value={s.internshipSeason} onChange={e=>set('internshipSeason',e.target.value)} /></label>
       <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={officeDraft?.text ?? s.officeReply}
         readOnly={officeSaving || restoring} placeholder="有確切梯次或報到日期時，可以記在這裡。"
         onChange={e=>{
@@ -384,23 +428,29 @@ export default function Settings(props: PageProps) {
     <Panel icon={Bot} title="交給其他 AI" hint="複製進度和教法，讓別的 AI 接著教">
       <AIHandoff state={state} update={update} />
     </Panel>
-    <Panel icon={GraduationCap} title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings regularDays={s.regularDays} school={state.school} onChange={edit=>update(prev=>({...prev,school:edit(prev.school)}))}/></Panel>
+    <Panel icon={GraduationCap} title="學校與課表" hint="課程、學分與讀書時段"><SchoolSettings school={state.school}
+      onChange={edit=>update(prev=>({...prev,school:edit(prev.school)}))}
+      onSave={async edit=>{
+        if (restorePending.current) throw new Error('進度正在還原，請等還原完成再儲存。')
+        await updateStoreNow(prev=>({...prev,school:edit(prev.school)}))
+      }}/></Panel>
     </section>
     <section className="set-group set-data" aria-labelledby="set-data-heading">
       <h2 id="set-data-heading">單字與資料</h2>
     <Panel icon={BookA} title="匯入我的單字表" hint={'已匯入 '+state.customWords.length+' 個單字'}>
       <p>每行一個單字，可接中文和級別。支援貼上文字、逗號分隔檔與試算表複製的欄位。</p>
-      <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text}
+      <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text} readOnly={wordSaving || restoring}
         onPaste={cancelWordRead} onCompositionStart={cancelWordRead} onChange={e=>editWordText(e.target.value)} /></label>
-      <label>這一批單字<select value={wordMode} onChange={e=>setWordMode(e.target.value as 'learn' | 'known')}><option value="learn">加入想學的清單</option><option value="known">已經認得，略過新字練習</option></select></label>
+      <label>這一批單字<select value={wordMode} disabled={wordSaving || restoring} onChange={e=>setWordMode(e.target.value as 'learn' | 'known')}><option value="learn">加入想學的清單</option><option value="known">已經認得，略過新字練習</option></select></label>
       <input type="file" ref={wordInput} hidden accept=".csv,.tsv,.txt,text/plain,text/csv" onChange={e=>{void readWordFile(e.target.files?.[0]);e.target.value=''}}/>
-      <div className="set-actions"><button type="button" onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" disabled={!!wordFile} onClick={saveVocabulary}>匯入單字</button></div>
+      <div className="set-actions"><button type="button" disabled={wordSaving || restoring} onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" disabled={!!wordFile || wordSaving || restoring} onClick={()=>void saveVocabulary()}>{wordSaving ? '儲存中……' : '匯入單字'}</button></div>
       {wordFile ? <p role="status" className="set-status">正在讀取 <b style={{overflowWrap:'anywhere'}}>{wordFile.name}</b>……你仍可改寫或選另一份檔案。</p> : status('words')}
     </Panel>
     {!(["exam","internship"].includes(activePeriod(today,s.periods))) && <Panel icon={ListChecks} title="第 1、2 級單字快篩" hint="認得的單字直接略過"><VocabScreen {...props} /></Panel>}
     <Panel icon={Flag} title="我標記的題目" hint={'共 '+state.flagged.length+' 題'}>{state.flagged.length?<div className="set-list">{state.flagged.map(id=><div key={id}><span>題號 {id}<small>{quizBank.find(q=>q.id===id)?.en}</small></span><button type="button" onClick={()=>update(prev=>({...prev,flagged:prev.flagged.filter(item=>item!==id)}))}>取消標記</button></div>)}</div>:<p>練習時按「這題怪怪的」，題號就會留在這裡。</p>}</Panel>
     <Panel icon={DatabaseBackup} title="備份與還原" hint="把進度存成檔案，換手機也帶得走">
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
+      <p>進度備份包含你填寫的學籍、作答紀錄、送批後保存的作文原稿，以及已儲存的程度測驗口說逐字稿。</p>
       {(()=>{const mb=JSON.stringify(state).length/1e6; const folder=archiveFolderUrl(); return <p className={mb>3.5?'set-warn':undefined}>進度檔約 {mb<0.1?'不到 0.1':mb.toFixed(1)} MB。實際可用空間依瀏覽器和裝置而異。{
         driveConnected()&&cloudArchive()?<>較早的複習紀錄、每天的小紀錄和舊課的批改全文，在雲端確認收到後才會從這台整理。封存遇到暫時斷線時，連線恢復後會再試。{folder&&<> <a href={folder} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</>
         :driveConnected()?'舊紀錄會先留在這台。請依上方「雲端硬碟」的步驟更新雲端小程式。支援封存的版本會先將紀錄存進雲端硬碟，再從這台整理掉。'
@@ -414,7 +464,7 @@ export default function Settings(props: PageProps) {
           <p>還原會用這份備份的課表、學習紀錄和設定取代目前進度。</p>
         </>}
         <div className="set-actions">
-          {backup.phase==='ready' && <button type="button" disabled={restoring || officeSaving || whySaving} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button>}
+          {backup.phase==='ready' && <button type="button" disabled={restoring || officeSaving || whySaving || wordSaving || periodSaving} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button>}
           <button type="button" disabled={restoring} onClick={cancelBackup}>取消</button>
         </div>
       </div>}{status('backup')}

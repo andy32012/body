@@ -88,7 +88,7 @@ export function mergeEvidenceRecords(older: Evidence[], newer: Evidence[]) {
 export function addEvidence(notes: Record<string, string>, unit: number, ev: Evidence) {
   const entry = { ...ev, attemptId: ev.attemptId ?? newEvidenceId() }
   const list = mergeEvidenceRecords(readEvidence(notes, unit), [entry])
-  return { ...notes, [evidenceKey(unit)]: JSON.stringify(list.slice(-40)) }
+  return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }
 export function setEvidenceLevel(notes: Record<string, string>, unit: number, index: number, level: Level) {
   const list = readEvidence(notes, unit)
@@ -100,11 +100,11 @@ export function setEvidenceLevel(notes: Record<string, string>, unit: number, in
 /** How Claude's check of a 待確認 answer reads: a 「判定：對」 or 「判定：錯」 line and a 「原因：」 line that says why.
  *  Anything else (「對不起，…」, a bare 「對。」, no reason) is not a verdict. */
 export function teacherVerdict(reply: string): 'right' | 'wrong' | 'unclear' {
-  const v = reply.match(/^\s*判定[：:]\s*(對|錯)\s*[。.]?\s*$/m)?.[1]
+  const v = reply.match(/^[ \t　]*判定[：:][ \t　]*(對|錯)[ \t　]*[。.]?[ \t　]*$/m)?.[1]
   return v && teacherReason(reply) ? (v === '對' ? 'right' : 'wrong') : 'unclear'
 }
 /** The 原因 line of Claude's check. */
-export const teacherReason = (reply: string) => reply.match(/^\s*原因[：:]\s*(.+)$/m)?.[1].trim() ?? ''
+export const teacherReason = (reply: string) => reply.match(/^[ \t　]*原因[：:]([^\r\n]*)/m)?.[1].trim() ?? ''
 /** Which 待確認 answer a check was sent for: the item and the exact answer, so a reply never lands on another one. */
 export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer' | 'attemptId' | 'reviewedAt' | 'wrong'>
 export const pendingRef = (e: Evidence): PendingRef => ({
@@ -204,7 +204,8 @@ function englishForm(text: string) {
     alternateVerbs.set(words.length + 1, (inferred ? first : second) + quotes)
     words.push(subject, (inferred ? second : first) + quotes)
   }
-  return { words, alternateVerbs, commas }
+  const question = /[?？][?？!！]*[\s"'’”»）)\]]*$/.test(text)
+  return { words, alternateVerbs, commas, question }
 }
 type EnglishForm = ReturnType<typeof englishForm>
 
@@ -221,13 +222,14 @@ export function normalizeEnglish(t: string) {
 /** Whether an answer is still the text that was checked (by Claude, or before the answer was shown). Case, spacing,
  *  curly quotes, contractions and how a statement ends (. or !) may differ; every other mark counts: taking the commas
  *  out of "My sister, who is a nurse, lives in Taipei." changes what it says, and so does turning a question into a
- *  statement, so the earlier check no longer applies. (Matching an answer with the reference is looser: normalizeEnglish.) */
-const checkedForm = (t: string) => base(t).replace(/\s+/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim().replace(/[.!]+$/, '').trim()
+ *  statement, so the earlier check no longer applies. Matching an answer with the reference still allows other wording
+ *  to be checked on its own. */
+const checkedForm = (t: string) => base(t).replace(/？/g, '?').replace(/\s+/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim().replace(/[.!]+$/, '').trim()
 export const sameEnglish = (a: string, b: string) => checkedForm(a) === checkedForm(b)
 export function matchesReference(answer: string, refs: readonly string[], requireSameCommas = false) {
   if (!answer.trim()) return false
   const form = englishForm(answer)
-  return matchingReferences(form, refs).some(ref => requireSameCommas
+  return matchingReferences(form, refs).filter(ref => ref.question === form.question).some(ref => requireSameCommas
     ? ref.commas.length === form.commas.length && ref.commas.every((position, i) => position === form.commas[i])
     : missingCommas(ref, form).length === 0 && !addedClauseComma(ref, form))
 }
@@ -263,11 +265,19 @@ function missingCommas(ref: EnglishForm, answer: EnglishForm): ('before' | 'afte
 function matchingReferences(answer: EnglishForm, refs: readonly string[]) {
   return refs.map(englishForm).filter(ref => wordsMatch(ref, answer))
 }
+/** Show why a word-for-word answer does not match without revealing any of the reference words. */
+export function questionMarkNote(answer: string, refs: readonly string[]): string | null {
+  if (!answer.trim()) return null
+  const form = englishForm(answer)
+  const matching = matchingReferences(form, refs)
+  if (!matching.length || matching.some(ref => ref.question === form.question)) return null
+  return form.question ? '字都對，但這句是在陳述。拿掉句尾的問號。' : '字都對，但這句是在提問。請在句尾加上問號。'
+}
 /** Said when the words match a reference but the clause commas do not, so he knows why it is not counted as right. */
 export function clauseCommaNote(answer: string, refs: readonly string[]): string | null {
   if (!answer.trim()) return null
   const form = englishForm(answer)
-  const matching = matchingReferences(form, refs)
+  const matching = matchingReferences(form, refs).filter(ref => ref.question === form.question)
     .map(ref => ({ missing: missingCommas(ref, form), added: addedClauseComma(ref, form) }))
   if (!matching.length || matching.some(issue => issue.missing.length === 0 && !issue.added)) return null
   const [{ missing, added }] = matching
@@ -308,15 +318,15 @@ export function compareWithReference(answer: string, refs: readonly string[]) {
   return best ? { ref: best.ref, words: best.words, missing: best.missing, same: false } : null
 }
 
-/** Nothing written is 「未作答」: it leaves no evidence, whichever button was pressed. */
-export const answered = (answer?: string) => !!answer?.trim()
+/** An English answer needs a letter or a number. Spaces or punctuation alone are still 「未作答」. */
+export const answered = (answer = '') => /[\p{Script=Latin}\p{N}]/u.test(answer)
 
 /** One standard for every place an answer is written — the lesson, the checkpoint, recall, review and redo:
  *  nothing written → 未作答 (null); hints or the answer seen → 有提示完成; Claude's first check or an exact match → 當次獨立完成;
  *  a self-marked "correct" with neither → 自評完成・待確認. 「不會」 leaves no evidence. 「穩了」 needs 當次獨立完成 later, on another item. */
 export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; answer?: string; references: readonly string[]; firstVerdict?: Verdict; checkedText?: string }): Level | null {
   if (a.rating === 'again' || !answered(a.answer)) return null
-  if (a.rating === 'correct' && clauseCommaNote(a.answer ?? '', a.references)) return 'pending'
+  if (a.rating === 'correct' && (questionMarkNote(a.answer ?? '', a.references) || clauseCommaNote(a.answer ?? '', a.references))) return 'pending'
   if (a.revealed || a.rating === 'minor') return 'assisted'
   // Fixed after Claude pointed at a problem: the feedback helped, even if the result now matches the reference.
   if (a.firstVerdict && a.firstVerdict !== 'good') return 'assisted'

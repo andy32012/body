@@ -55,7 +55,7 @@ export function mergeCorrectionFollowUps(older: readonly CorrectionFollowUp[], n
 }
 
 /** The store can resolve a failed lock request without calling its updater. The paid reply must remain available. */
-export async function requireCorrectionSave(write: (applied: () => void) => void | Promise<void>) {
+export async function requireCorrectionSave(write: (applied: () => void) => void | Promise<unknown>) {
   let applied = false
   await write(() => { applied = true })
   if (!applied) throw new Error('無法寫入批改紀錄。')

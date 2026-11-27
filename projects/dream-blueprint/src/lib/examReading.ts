@@ -1,7 +1,7 @@
 import type { ReadBand, ReadLevel } from './reading'
 import { baseForms } from './story'
 import { levelEntry, wordKey } from './vocab'
-import { bestExamAttempt, examRatio, type ExamAttempt, type ExamRecord } from './examKeys'
+import { bestExamAttempt, examGrade, examRatio, hasExamSubmission, mergeExamRecords, type ExamAttempt, type ExamRecord } from './examKeys'
 
 /** Reading passages from Taiwan's public exams (會考, 學測, 指考 and the civil-service exams), with the official answers,
  *  placed on the same steps as the graded reading (A1–B2, 簡單／中等／難). Official exam papers are not protected by
@@ -87,15 +87,16 @@ export function examPassed(r: ExamRecord | null): boolean {
 }
 export function saveExamRead(notes: Record<string, string>, id: string, attempt: ExamAttempt & { picks: number[] }) {
   const old = readExamRecord(notes, id)
-  const oldBest = old ? bestExamAttempt(old) : undefined
-  const practice = !!old && old.day === attempt.day
+  if (old && hasExamSubmission(old, attempt.day)) {
+    return { ...notes, [examReadKey(id)]: JSON.stringify({ ...old, tries: (old.tries ?? 0) + 1 }) }
+  }
   const now = { ...attempt, at: Math.max(Date.now(), (old?.at ?? 0) + 1) }
-  const best = !practice && (!oldBest || examRatio(now) > examRatio(oldBest)) ? now : oldBest
-  const rec: ExamRecord = { ...now, tries: (old?.tries ?? 0) + 1, best, ...(practice ? { practice: true } : {}) }
+  const next: ExamRecord = { ...now, tries: (old?.tries ?? 0) + 1, best: examGrade(now), firstByDay: [examGrade(now)] }
+  const rec = old ? mergeExamRecords(old, next) : next
   return { ...notes, [examReadKey(id)]: JSON.stringify(rec) }
 }
 
-export { correctedKeys, rescoreExams } from './examKeys'
+export { correctedKeys, hasExamSubmission, rescoreExams } from './examKeys'
 
 export function readExamPlace(notes: Record<string, string>): ExamPlace | null {
   try {

@@ -15,6 +15,7 @@
 .tr-head small { color: var(--practice-secondary); font-size: .82rem; font-variant-numeric: tabular-nums; }
 .tr-bar { height: 4px; border-radius: 99px; background: var(--practice-inset); overflow: hidden; }
 .tr-bar i { display: block; height: 100%; background: var(--practice-accent); transition: width .2s ease; }
+.tr-drill-storage { border: 0; margin: 0; min-inline-size: 0; padding: 0; }
 @media (prefers-reduced-motion: reduce) { .tr-bar i { transition: none; } }
 .tr-from { font-size: .88rem; color: var(--practice-secondary); }
 .tr-write .pr-question { margin-top: .2rem; }

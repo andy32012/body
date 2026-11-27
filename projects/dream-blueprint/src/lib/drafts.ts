@@ -23,7 +23,7 @@ export function draftVersions(id: string): DraftVersion[] {
     keys.push(legacyPrefix + id)
     return keys.flatMap(key => {
       const text = localStorage.getItem(key)
-      return text ? [{ key, text }] : []
+      return text === null ? [] : [{ key, text }]
     })
   } catch { return [] }
 }
@@ -52,21 +52,21 @@ export function savedDraftTexts(prefix: string) {
 export function hasDraft(id: string) {
   return !!pending.get(id)?.text.trim() || draftVersions(id).some(v => v.text.trim())
 }
-export function readDraft(id: string) {
+export function readDraft(id: string, initial = '') {
   const unsaved = pending.get(id)
   if (unsaved) return unsaved.text
   const versions = draftVersions(id)
   const current = versions.find(v => v.key === editing.get(id)?.key) ?? versions[0]
   editing.set(id, current)
-  return current?.text ?? ''
+  return current?.text ?? initial
 }
 /** Revisions have immutable keys. Simultaneous writers can retire their shared base without
  * deleting one another's subsequent edits, including in browsers without Web Locks. */
-function replaceDraft(id: string, text: string, replaced: DraftVersion[]) {
+function replaceDraft(id: string, text: string, replaced: DraftVersion[], keepBlank = false) {
   const warned = hasUnsavedDrafts()
   try {
     let next: DraftVersion | undefined
-    if (text.trim()) {
+    if (keepBlank || text.trim()) {
       const token = globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)
       next = { key: revisionKey(id) + Date.now().toString(36) + '-' + token, text }
       localStorage.setItem(next.key, text)
@@ -85,9 +85,9 @@ function announceChange(id: string, warned: boolean) {
   if (warned !== hasUnsavedDrafts()) listeners.forEach(listener => listener())
   window.dispatchEvent(new CustomEvent(draftChange, { detail: id }))
 }
-export function writeDraft(id: string, text: string) {
+export function writeDraft(id: string, text: string, keepBlank = false) {
   const base = editing.get(id)
-  replaceDraft(id, text, base ? [base] : [])
+  replaceDraft(id, text, base ? [base] : [], keepBlank)
 }
 export const clearDraft = (id: string) => writeDraft(id, '')
 
@@ -110,8 +110,8 @@ export function captureDraftCleanup(id: string, text: string) {
 }
 
 /** Only retire the alternatives actually shown to the learner. A later edit keeps its own revision. */
-export function chooseDraft(id: string, text: string, displayed: DraftVersion[]) {
-  replaceDraft(id, text, displayed)
+export function chooseDraft(id: string, text: string, displayed: DraftVersion[], keepBlank = false) {
+  replaceDraft(id, text, displayed, keepBlank)
 }
 export function watchDraft(id: string, refresh: () => void) {
   const prefix = revisionKey(id)

@@ -2139,7 +2139,7 @@
   ],
   "guess": {
    "en": "centipede",
-   "zh": "蜈蚣（一百隻腳）"
+   "zh": "蜈蚣（字面是「百足」，實際腿數依種類而異）"
   }
  },
  {
@@ -2464,7 +2464,7 @@
    {
     "en": "remember",
     "zh": "記得",
-    "how": "re 再＋member 記"
+    "how": "和 memory 同源，來自表示「記起」的拉丁語 rememorari"
    },
    {
     "en": "memorize",

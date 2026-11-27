@@ -67,6 +67,7 @@ export const themeKey = (id: string) => 'theme.' + id
 /** One review, saved under theme.<run id>: the latest round, and the first one (the real test; later rounds are practice). */
 export interface ThemeResult {
   day: string; correct: number; total: number
+  roundId?: string
   /** Units with a question answered wrong, in course order. */
   missed: number[]
   /** The questions answered wrong, as "unit.index", so another round brings them first. */
@@ -84,12 +85,12 @@ export function readThemeResult(notes: Record<string, string>, id: string): Them
   } catch { return null }
 }
 /** Saves a finished round of questions. A new round starts a new set of sentences; the first round stays as it was. */
-export function saveThemeResult(notes: Record<string, string>, id: string, items: readonly ThemeItem[], rights: readonly boolean[], day: string) {
+export function saveThemeResult(notes: Record<string, string>, id: string, items: readonly ThemeItem[], rights: readonly boolean[], day: string, roundId?: string) {
   const old = readThemeResult(notes, id)
   const wrongAt = items.flatMap((x, i) => rights[i] === false ? [x] : [])
   const correct = rights.filter(Boolean).length
   const result: ThemeResult = {
-    day, correct, total: items.length,
+    day, correct, total: items.length, roundId,
     missed: [...new Set(wrongAt.map(x => x.unit))].sort((a, b) => a - b),
     wrong: wrongAt.map(x => x.unit + '.' + x.index),
     tries: (old ? old.tries ?? 1 : 0) + 1,

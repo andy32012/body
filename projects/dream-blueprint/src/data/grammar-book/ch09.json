@@ -104,7 +104,7 @@
   "points": [
    {
     "t": "短的字加 -er／-est",
-    "p": "一個音節：tall → taller → tallest、nice → nicer → nicest；短母音＋一個子音要重複字尾：big → bigger、hot → hotter。",
+    "p": "單音節形容詞通常加 -er／-est，例如 tall → taller → tallest。以 e 結尾只加 -r／-st（nice → nicer → nicest）。像 big、hot 這類短母音加一個子音字母結尾的字會雙寫，例如 big → bigger → biggest。字尾 w、x 照原樣，例如 low → lower → lowest、lax → laxer → laxest。",
     "ex": [
      {
       "en": "Today is hotter than yesterday.",

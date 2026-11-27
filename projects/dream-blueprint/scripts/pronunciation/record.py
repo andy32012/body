@@ -6,7 +6,7 @@ A pool of candidate pairs is recorded until it has three clear pairs more than t
 some); --all records every candidate.
 usage: record.py <f|m> [--all] [lesson id ...]"""
 import argparse, os, sys, time
-from course import parse, clips, slug, HERE, read_json, write_json
+from course import parse, clips, slug, HERE, read_json
 
 parser = argparse.ArgumentParser(description='Record pronunciation lessons in one voice family.')
 parser.add_argument('voice_family', choices=('f', 'm'))
@@ -23,9 +23,8 @@ if not selected:
     parser.error('the course has no lessons to record')
 
 # Selection errors should be reported before loading the models or touching the recording directory.
-import soundfile as sf
-from lib import SilentTake, phonemes, speak, check
-from recorded_take import read_take
+from lib import ORDER, SilentTake, phonemes, speak, check
+from recorded_take import read_take, save_take
 
 G = args.voice_family
 VOICES = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_adam', 'am_fenrir', 'am_michael', 'am_puck']}[G]
@@ -55,20 +54,21 @@ def take(s, voice):
     for speed in (base, base + 0.12, base - 0.1):
         try:
             x, sr = speak(ph, voice, speed)
+            res = check(c, x, sr)
         except SilentTake as error:
             print(f' {s} | {voice} {speed:g}: {error}', flush=True)
             continue
-        res = check(c, x, sr)
-        if best is None or res['value'] > best[1]['value']: best = (x, res, speed)
-        if res['grade'] == 'strict': break
+        rank = (ORDER[res['grade']], res['value'])
+        if best is None or rank > (ORDER[best[1]['grade']], best[1]['value']):
+            best = (x, res, speed, sr)
+        if res['grade'] == 'strict':
+            break
     if best is None:
         return None
-    x, res, speed = best
-    os.makedirs(folder, exist_ok=True)
-    sf.write(wav_path, x, sr, subtype='PCM_16')
+    x, res, speed, sr = best
     rec = {'text': c['text'], 'phonemes': ph, 'others': c['others'], 'speed': round(speed, 2), 'secs': round(len(x) / sr, 2), **res}
     takes.setdefault(s, {})[voice] = rec
-    write_json(LOG, takes)
+    save_take(wav_path, x, sr, LOG, takes)
     made += 1
     return rec
 
@@ -87,7 +87,7 @@ for l in selected:
             sa, sb = slug(a), slug(b)
             paired |= {sa, sb}
             attempts = {}
-            for voice in VOICES[:3]:
+            for voice in VOICES:
                 ra, rb = take(sa, voice), take(sb, voice)
                 attempts[voice] = (ra, rb)
                 if ra and rb and ra['grade'] == rb['grade'] == 'strict': break

@@ -2,26 +2,29 @@ import DraftVersions from './DraftVersions'
 import AskWhy from './AskWhy'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, ChevronLeft, Mic, Pause, Play, Square, Volume2 } from 'lucide-react'
-import type { PageProps } from '../lib/store'
+import { updateStoreNow, type PageProps } from '../lib/store'
 import type { Energy, Period } from '../lib/progress'
 import { PracticeCover } from './PracticeCover'
 import { Translation } from './Translation'
 import CorrectBox, { correctionBlocked, useCorrectionBlocked, useCorrectionPending, type Result } from './CorrectBox'
-import { correctionKey, correctionOrder, readCorrection, requireCorrectionSave, storeCorrection, type CorrectionSubmission } from '../lib/correctionHistory'
+import { correctionKey, correctionOrder, readCorrection, storeCorrection, type CorrectionSubmission } from '../lib/correctionHistory'
 import StuckButton from './StuckButton'
 import { Transcript, useDialogueVoice } from './LessonParts'
 import { answered, judgeExpress, judgeWritten, levelNames, type Level, type Verdict } from '../lib/evidence'
 import { readHints, sentenceFrame, writeHint } from '../lib/lesson'
-import { clearDraft, readDraft, transcriptLanding, writeDraft } from '../lib/drafts'
+import { captureDraftCleanup, readDraft, transcriptLanding, writeDraft } from '../lib/drafts'
 import { tutorKey } from '../lib/tutor'
 import { openaiKey } from '../lib/voice'
-import { addSayCard } from '../lib/sayCards'
+import { transcribe } from '../lib/speech'
+import { addSayCards } from '../lib/sayCards'
 import { useTaskContext } from '../lib/taskContext'
-import { completePart, countSentences, judgeReview, judgeSpeak, openVerdict, partNames, partSteps, readTopic, reviewFrom, speakGoals, withCheck, writeTopic, type ItemResult, type OpenCheck, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence, retellTask } from '../lib/topics'
+import { completePart, countSentences, judgeReview, judgeSpeak, listenStage, openVerdict, partNames, partSteps, readTopic, reviewFrom, speakGoals, writeTopic, type ItemResult, type ListenRecord, type ListenStage, type OpenCheck, type ReadSkill, type SpeakRecord, type SpeakTask, type Topic, type TopicPart, type TopicRecord, type TopicSentence, retellTask } from '../lib/topics'
 import './lesson.css'
 import './topic.css'
 
-type Save = (patch: Partial<TopicRecord> | ((r: TopicRecord, notes: Record<string, string>) => Partial<TopicRecord>)) => void
+type Patch = Partial<TopicRecord> | ((record: TopicRecord, notes: Record<string, string>) => Partial<TopicRecord>)
+type Save = (patch: Patch) => void
+type Next = (patch?: Patch, afterSave?: () => void, stay?: boolean) => Promise<void>
 type Update = PageProps['update']
 const ratingOf = { good: 'correct', small: 'minor', again: 'again' } as const
 const levelText = (l: Level | null | undefined) => l ? levelNames[l] : '未作答'
@@ -51,24 +54,55 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
   const [step, setStep] = useState(() => Math.min(startStep, steps.length - 1))
   const [finished, setFinished] = useState(false)
   const [sessionId] = useState(() => 'topic-' + topic.id + '-' + part + '-' + Date.now().toString(36))
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const transition = useRef(false)
+  const mounted = useRef(false)
   const rec = readTopic(state.notes, topic.id)
   const rate = state.settings.speechRate
   useEffect(() => {
-    update(prev => readTopic(prev.notes, topic.id).done[part] ? prev
-      : { ...prev, notes: writeTopic(prev.notes, topic.id, { cur: { part, step, day: date } }) })
+    mounted.current = true
+    update(prev => {
+      const current = readTopic(prev.notes, topic.id)
+      return current.done[part] || current.cur ? prev
+        : { ...prev, notes: writeTopic(prev.notes, topic.id, { cur: { part, step, day: date } }) }
+    })
+    return () => { mounted.current = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step])
+  }, [])
   const save: Save = patch => update(prev => ({
     ...prev, notes: writeTopic(prev.notes, topic.id, typeof patch === 'function' ? patch(readTopic(prev.notes, topic.id), prev.notes) : patch),
   }))
-  function next() {
-    window.scrollTo?.({ top: 0, behavior: 'smooth' })
-    if (step + 1 < steps.length) { setStep(step + 1); return }
-    update(prev => completePart(prev, topic, part, date, energy, period, sessionId))
-    setFinished(true)
+  const next: Next = async (patch = {}, afterSave, stay = false) => {
+    if (transition.current) return
+    transition.current = true
+    setSaving(true)
+    setSaveError('')
+    try {
+      const last = step + 1 === steps.length
+      await updateStoreNow(prev => {
+        const current = readTopic(prev.notes, topic.id)
+        if (current.done[part] || (current.cur && (current.cur.part !== part || current.cur.step !== step))) {
+          throw new Error('另一個分頁或裝置已更新這堂課。請回「今天」再打開，草稿仍在。')
+        }
+        const change = typeof patch === 'function' ? patch(current, prev.notes) : patch
+        const staged = { ...prev, notes: writeTopic(prev.notes, topic.id, { ...change, cur: { part, step: stay || last ? step : step + 1, day: date } }) }
+        return last && !stay ? completePart(staged, topic, part, date, energy, period, sessionId) : staged
+      })
+      afterSave?.()
+      if (!mounted.current || stay) return
+      if (last) setFinished(true)
+      else setStep(step + 1)
+      window.scrollTo?.({ top: 0, behavior: 'smooth' })
+    } catch (error) {
+      if (mounted.current) setSaveError(error instanceof Error ? error.message : '這次沒有存成功。草稿仍在，請再試一次。')
+    } finally {
+      transition.current = false
+      if (mounted.current) setSaving(false)
+    }
   }
   const now = steps[step][0]
-  const shared = { topic, rec, save, onNext: next, rate, date, notes: state.notes, update }
+  const shared = { topic, rec, save, onNext: next, saving, rate, date, notes: state.notes, update }
   return <section className="practice-page topic-page">
     <PracticeCover title={'生活主題 ' + topic.n + '：' + topic.title}>
       <button type="button" className="pr-back" onClick={() => navigate('today')}><ChevronLeft size={16} aria-hidden="true" />回今天</button>
@@ -76,7 +110,7 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
     <div className="pr-pane pr-session tl-session">
       <div className="pr-session-meta">
         <span>第 {'ABC'.indexOf(part) + 1} 次（共 3 次）· {partNames[part]}</span>
-        {!finished && <button type="button" className="pr-link tl-skip" onClick={onSkip}>今天先上文法課</button>}
+        {!finished && <button type="button" className="pr-link tl-skip" disabled={saving} onClick={onSkip}>今天先上文法課</button>}
       </div>
       {!finished && <ol className="ls-steps" aria-label="這次的步驟" style={{ gridTemplateColumns: 'repeat(' + steps.length + ', minmax(0, 1fr))' }}>
         {steps.map(([id, name], i) => {
@@ -86,8 +120,9 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
           </li>
         })}
       </ol>}
+      {saveError && <p className="tu-error" role="alert">{saveError}</p>}
       {finished ? <TopicDone topic={topic} part={part} rec={rec} navigate={navigate} />
-        : now === 'goal' ? <GoalStep topic={topic} onNext={next} />
+        : now === 'goal' ? <GoalStep topic={topic} onNext={next} saving={saving} />
         : now === 'words' ? <WordsStep {...shared} />
         : now === 'pattern' ? <SentenceItems {...shared} sentences={topic.practice} label="句型練習" doneLabel="下一步：聽"
           preparation={(first: boolean) => <GrammarBox topic={topic} open={first} rate={rate} />} />
@@ -98,14 +133,14 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
         : <SentenceItems {...shared} sentences={topic.review.practice} label="換情境" doneLabel="下一步：說"
           intro={<p className="tl-situation">{topic.review.situation}</p>}
           preparation={() => <p className="ls-help">這次不先看規則：先自己寫，真的卡住再看提示（看了就記成有提示完成）。</p>}
-          onAllDone={results => save(r => ({ review: { ...r.review, level: judgeReview(results) } }))} />}
+          onAllDone={results => r => ({ review: { ...r.review, level: judgeReview(results) } })} />}
     </div>
   </section>
 }
 
-type StepProps = { topic: Topic; rec: TopicRecord; save: Save; onNext: () => void; rate: number; date: string; notes: Record<string, string>; update: Update }
+type StepProps = { topic: Topic; rec: TopicRecord; save: Save; onNext: Next; saving: boolean; rate: number; date: string; notes: Record<string, string>; update: Update }
 
-function GoalStep({ topic, onNext }: { topic: Topic; onNext: () => void }) {
+function GoalStep({ topic, onNext, saving }: Pick<StepProps, 'topic' | 'onNext' | 'saving'>) {
   const ready = useReady()
   return <section className="tl-goal">
     <div className="pr-label">這個主題的目標</div>
@@ -117,7 +152,7 @@ function GoalStep({ topic, onNext }: { topic: Topic; onNext: () => void }) {
       <li><b>第 3 次・換情境</b>隔幾天，換一個情境再用一次，先不看提示</li>
     </ol>
     <p className="ls-help">每一題分開記：自己做到、有提示完成，還是自評待確認。看了提示也沒關係，紀錄會照實寫。</p>
-    <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (ready()) onNext() }}>開始</button></div>
+    <div className="pr-actions"><button type="button" className="pr-main" disabled={saving} onClick={() => { if (ready()) void onNext() }}>開始</button></div>
   </section>
 }
 
@@ -140,7 +175,7 @@ function Questions({ items, picks, onPick, checked, disabled, source, passage }:
 }
 const allPicked = (picks: (number | undefined)[], n: number) => picks.filter(p => p !== undefined).length >= n
 
-function WordsStep({ topic, rec, save, onNext, rate }: StepProps) {
+function WordsStep({ topic, rec, save, onNext, rate, saving }: StepProps) {
   const say = useSay(rate)
   const ready = useReady()
   const [picks, setPicks] = useState<(number | undefined)[]>([])
@@ -166,13 +201,14 @@ function WordsStep({ topic, rec, save, onNext, rate }: StepProps) {
       </li>)}
     </ul>
     <h3 className="tl-h">在這句裡是什麼意思？</h3>
-    <Questions items={qs} picks={picks} checked={checked} source="生活主題的單字" onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
+    <Questions items={qs} picks={rec.words?.picks ?? picks} checked={checked} source="生活主題的單字" onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
     {!checked ? <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!allPicked(picks, qs.length)}
-        onClick={() => save(r => r.words ? {} : { words: { correct: qs.filter((q, i) => picks[i] === q.answer).length, total: qs.length } })}>對答案</button>
+        onClick={() => save(r => r.words ? {} : { words: { correct: qs.filter((q, i) => picks[i] === q.answer).length, total: qs.length,
+          picks: picks.filter((choice): choice is number => choice !== undefined) } })}>對答案</button>
     </div> : <>
       <p className="tl-score">第一次就選對 {rec.words!.correct} / {rec.words!.total}{rec.words!.correct < rec.words!.total ? '：同一個字在不同句子裡意思會變，看整句再決定。' : ''}</p>
-      <div className="pr-actions"><button type="button" className="pr-main" onClick={onNext}>下一步：句型</button></div>
+      <div className="pr-actions"><button type="button" className="pr-main" disabled={saving} onClick={() => void onNext()}>下一步：句型</button></div>
     </>}
   </section>
 }
@@ -191,9 +227,9 @@ function GrammarBox({ topic, open, rate }: { topic: Topic; open: boolean; rate: 
 }
 
 /** Sentences written from Chinese, one at a time, judged the same way as everywhere else. */
-function SentenceItems({ sentences, rec, save, notes, update, date, label, doneLabel, intro, preparation, onAllDone, onNext }: StepProps & {
+function SentenceItems({ topic, sentences, rec, notes, update, date, label, doneLabel, intro, preparation, onAllDone, onNext, saving }: StepProps & {
   sentences: TopicSentence[]; label: string; doneLabel: string; intro?: ReactNode
-  preparation?: (first: boolean) => ReactNode; onAllDone?: (levels: (Level | null)[]) => void
+  preparation?: (first: boolean) => ReactNode; onAllDone?: (levels: (Level | null)[]) => Patch
 }) {
   const results = rec.items ?? {}
   const index = sentences.findIndex(s => !results[s.id])
@@ -205,7 +241,9 @@ function SentenceItems({ sentences, rec, save, notes, update, date, label, doneL
       return <li key={s.id} data-level={r?.level ?? 'none'}><span>{s.zh}</span><b>{r?.level ? levelNames[r.level] : r?.rating === 'again' ? '不會（之後再複習）' : '未作答'}</b></li>
     })}</ul>
     <p className="ls-help">這些句子都會進複習卡，隔幾天再出現。</p>
-    <div className="pr-actions"><button type="button" className="pr-main" onClick={() => { if (!ready()) return; onAllDone?.(sentences.map(s => results[s.id]?.level ?? null)); onNext() }}>{doneLabel}</button></div>
+    <div className="pr-actions"><button type="button" className="pr-main" disabled={saving} onClick={() => {
+      if (ready()) void onNext(onAllDone?.(sentences.map(s => results[s.id]?.level ?? null)))
+    }}>{doneLabel}</button></div>
   </section>
   const s = sentences[index]
   return <>
@@ -219,23 +257,26 @@ function SentenceItems({ sentences, rec, save, notes, update, date, label, doneL
         const blank = !answered(info.answer)
         const result: ItemResult = {
           level: judgeWritten({ rating, revealed, answer: info.answer, references: s.reference, firstVerdict: info.firstVerdict, checkedText: info.checkedText }),
-          rating, revealed: revealed || blank,
+          rating, revealed: revealed || blank, attempted: !blank,
         }
         // The first mark is the record: a second tap cannot replace it.
-        save(r => r.items?.[s.id] ? {} : { items: { ...r.items, [s.id]: result } })
+        return updateStoreNow(prev => {
+          const current = readTopic(prev.notes, topic.id)
+          if (current.items?.[s.id]) throw new Error('這一句已有正式紀錄，草稿仍在。')
+          return { ...prev, notes: writeTopic(prev.notes, topic.id, { items: { ...current.items, [s.id]: result } }) }
+        }).then(() => true)
       }} />
   </>
 }
 
-type ListenSub = 'gist' | 'details' | 'text' | 'shadow' | 'retell'
 /** Five steps: the gist without the text → details (still no text) → the transcript → shadowing → retelling.
  *  What was understood from listening alone is saved before the text appears; later plays are kept apart. */
-function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: StepProps) {
+function ListenStep({ topic, rec, save, onNext, rate, notes, saving }: StepProps) {
   const L = topic.listen
   const voice = useDialogueVoice(rate)
   const ready = useReady()
   const saved = rec.listen ?? {}
-  const [sub, setSub] = useState<ListenSub>(() => saved.noVoice || saved.details !== undefined ? 'text' : saved.gist !== undefined ? 'details' : 'gist')
+  const [sub, setSub] = useState<ListenStage>(() => listenStage(saved))
   // Complete plays only: started-then-stopped or failed plays do not count as having listened.
   const [startedPlays, setStarted] = useState(0)
   const [unsure, setUnsure] = useState(!!saved.unsure)
@@ -250,10 +291,15 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
   const [showZh, setShowZh] = useState(false)
   const [noVoice, setNoVoice] = useState(!!saved.noVoice)
   const [shadowed, setShadowed] = useState<number[]>([])
+  const [recording, setRecording] = useState(false)
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false }
+  }, [])
   const before = sub === 'gist' || sub === 'details'
   function noAudio() {
-    setNoVoice(true); setSub('text')
-    save(r => ({ listen: { ...r.listen, noVoice: true } }))
+    go('text', { noVoice: true }, () => setNoVoice(true))
   }
   useEffect(() => { if (voice.status === 'error' && before) noAudio() }, [voice.status])  // eslint-disable-line react-hooks/exhaustive-deps
   function playAll() {
@@ -266,7 +312,20 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
   </button>
   const unsureLink = before && !open && startedPlays > 0 && voice.playing === null &&
     <button type="button" className="pr-link" onClick={() => { setUnsure(true); save(r => ({ listen: { ...r.listen, unsure: true } })) }}>播完了，但題目沒有打開？</button>
-  const go = (s: ListenSub) => { voice.stop(); setSub(s); window.scrollTo?.({ top: 0, behavior: 'smooth' }) }
+  function go(stage: ListenStage, patch: Partial<ListenRecord> = {}, afterSave?: () => void) {
+    voice.stop()
+    void onNext(r => {
+      if (r.listen?.stage && r.listen.stage !== sub) {
+        throw new Error('另一個分頁或裝置已更新聽力步驟。請回「今天」再繼續。')
+      }
+      return { listen: { ...r.listen, ...patch, stage } }
+    }, () => {
+      if (!mounted.current) return
+      setSub(stage)
+      afterSave?.()
+      window.scrollTo?.({ top: 0, behavior: 'smooth' })
+    }, true)
+  }
   return <section className="ls-listen tl-listen">
     <div className="pr-label">聽 · {L.scene}</div>
     <ol className="tl-substeps" aria-label="聽力的五個步驟">
@@ -278,7 +337,7 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <h2 className="pr-question">先只聽，不看字</h2>
       <p className="ls-help">完整聽一到兩次，先抓他們在做什麼。聽不懂的字先猜。</p>
       {play}
-      <Questions items={[{ ...L.gist, en: true }]} picks={[gistPick]} checked={saved.gist !== undefined} disabled={!open} source="生活主題的聽力（大意）" passage={L.dialogue.map(d => d.en).join(' / ')}
+      <Questions items={[{ ...L.gist, en: true }]} picks={[saved.gist !== undefined ? saved.gistPick ?? gistPick : gistPick]} checked={saved.gist !== undefined} disabled={!open} source="生活主題的聽力（大意）" passage={L.dialogue.map(d => d.en).join(' / ')}
         onPick={(_, j) => { if (ready() && open) setGistPick(j) }} />
       {!open && <p className="ls-help ls-need">先按「播放對話」完整聽一次，題目才能作答。中途停掉不算聽完。</p>}
       {unsureLink}
@@ -286,11 +345,11 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       {saved.gist === undefined
         ? <button type="button" className="pr-main" disabled={gistPick === undefined} onClick={() => {
           setGistAt(voice.completed)
-          save(r => r.listen?.gist !== undefined ? {} : { listen: { ...r.listen, gist: gistPick === L.gist.answer, plays: voice.completed } })
+          save(r => r.listen?.gist !== undefined ? {} : { listen: { ...r.listen, gist: gistPick === L.gist.answer, gistPick, plays: voice.completed } })
         }}>確定</button>
         : <>
           <p className="tl-score">{saved.gist ? '✓ 大意聽懂了。' : '✗ 這次大意沒抓到，沒關係，下一步再聽一次細節。'}</p>
-          <button type="button" className="pr-main" onClick={() => go('details')}>下一步：聽細節</button>
+          <button type="button" className="pr-main" disabled={saving} onClick={() => go('details')}>下一步：聽細節</button>
         </>}
     </>}
 
@@ -298,16 +357,17 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <h2 className="pr-question">再聽一次，回答細節</h2>
       <p className="ls-help">還是不看字。可以用剛剛聽到的回答，也可以再完整聽一次，再聽的次數會另外記。</p>
       {play}
-      <Questions items={L.details.map(q => ({ ...q, en: true }))} picks={picks} checked={saved.details !== undefined} source="生活主題的聽力（細節）" passage={L.dialogue.map(d => d.en).join(' / ')}
+      <Questions items={L.details.map(q => ({ ...q, en: true }))} picks={saved.details !== undefined ? saved.detailPicks ?? picks : picks} checked={saved.details !== undefined} source="生活主題的聽力（細節）" passage={L.dialogue.map(d => d.en).join(' / ')}
         onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
       {saved.details === undefined
         ? <button type="button" className="pr-main" disabled={!allPicked(picks, L.details.length)} onClick={() => {
           voice.stop()
-          save(r => r.listen?.details !== undefined ? {} : { listen: { ...r.listen, details: L.details.filter((q, i) => picks[i] === q.answer).length, total: L.details.length, replays } })
+          save(r => r.listen?.details !== undefined ? {} : { listen: { ...r.listen, details: L.details.filter((q, i) => picks[i] === q.answer).length,
+            detailPicks: picks.filter((choice): choice is number => choice !== undefined), total: L.details.length, replays } })
         }}>對答案</button>
         : <>
           <p className="tl-score">{saved.unsure && !saved.plays ? '播放沒有確認，' : '只聽（不看字）：'}細節答對 {saved.details} / {saved.total}，完整聽了 {saved.plays ?? 0} 次{(saved.replays ?? 0) > 0 ? '，答細節前又聽了 ' + saved.replays + ' 次' : ''}。</p>
-          <button type="button" className="pr-main" onClick={() => { save(r => ({ listen: { ...r.listen, transcript: true } })); go('text') }}>下一步：看逐字稿</button>
+          <button type="button" className="pr-main" disabled={saving} onClick={() => go('text', { transcript: true })}>下一步：看逐字稿</button>
         </>}
     </>}
 
@@ -318,7 +378,7 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <Transcript lines={L.dialogue} playing={voice.playing} showZh={showZh} onPlayLine={i => voice.play(L.dialogue, i, true)} />
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={() => { if (!saved.transcript) save(r => ({ listen: { ...r.listen, transcript: true } })); go('shadow') }}>下一步：跟讀</button>
+        <button type="button" className="pr-main" disabled={saving} onClick={() => go('shadow', { transcript: true })}>下一步：跟讀</button>
       </div>
     </>}
 
@@ -327,69 +387,101 @@ function ListenStep({ topic, rec, save, onNext, rate, notes, update, date }: Ste
       <p className="ls-help">先聽一句，再照同樣的速度和語氣唸出聲。這裡不評發音，只記你有沒有跟讀；想聽自己的聲音可以錄音。</p>
       <ol className="tl-shadow">
         {L.shadow.map(i => <li key={i}>
-          <button type="button" className="ls-line-play" aria-label={'播放：' + L.dialogue[i].en} onClick={() => voice.play(L.dialogue, i, true)}><Volume2 size={14} /></button>
+          <button type="button" className="ls-line-play" disabled={recording} aria-label={'播放：' + L.dialogue[i].en} onClick={() => voice.play(L.dialogue, i, true)}><Volume2 size={14} /></button>
           <p lang="en">{L.dialogue[i].en}</p>
           <label className="tl-check"><input type="checkbox" checked={shadowed.includes(i)} onChange={e => setShadowed(e.target.checked ? [...shadowed, i] : shadowed.filter(x => x !== i))} />唸了</label>
         </li>)}
       </ol>
-      <Recorder />
-      <button type="button" className="pr-main" onClick={() => { save(r => ({ listen: { ...r.listen, shadowed: shadowed.length >= L.shadow.length } })); go('retell') }}>下一步：重述</button>
+      <Recorder disabled={saving} onBusy={active => { if (active) voice.stop(); setRecording(active) }} />
+      <button type="button" className="pr-main" disabled={recording || saving} onClick={() => go('retell', { shadowed: shadowed.length >= L.shadow.length })}>下一步：重述</button>
     </>}
 
-    {sub === 'retell' && <Retell topic={topic} rec={rec} save={save} notes={notes} update={update} date={date} onDone={level => {
-      save(r => ({ listen: { ...r.listen, retell: level } })); onNext()
-    }} />}
+    {sub === 'retell' && <Retell topic={topic} rec={rec} save={save} notes={notes} saving={saving} onNext={onNext} />}
   </section>
 }
 
-/** Help and Claude's first check for an open answer, kept in the record so a reload does not reset them.
- *  The check belongs to the exact text Claude saw: after a "good", an edited answer is unchecked again. */
-function useOpenTask(rec: TopicRecord, key: string, save: Save) {
-  const [check, setCheck] = useState<OpenCheck>(() => rec.open?.[key] ?? { help: [] })
-  const sent = useRef('')
-  const keep = (next: OpenCheck) => { setCheck(next); save(r => ({ open: { ...r.open, [key]: next } })) }
+/** The first check supplies the help verdict, while each recent draft keeps its own feedback. */
+function useTopicGrade({ topic, rec, save, notes }: Pick<StepProps, 'topic' | 'rec' | 'save' | 'notes'>, key: string, gradeKey: string, text: string) {
+  const check = rec.open?.[key] ?? { help: [] }
+  const [run, setRun] = useState(0)
+  const graded = readCorrection(notes, gradeKey, text)
+  const grading = useCorrectionPending(gradeKey)
+  const blocked = useCorrectionBlocked(gradeKey)
+  function verdictFor(answer: string, checked = check, currentNotes = notes) {
+    if (checked.firstVerdict && checked.firstVerdict !== 'good') return checked.firstVerdict
+    const matching = readCorrection(currentNotes, gradeKey, answer)
+    if (matching?.answer === answer.trim()) return matching.result.verdict
+    // New records identify the exact submitted answer. The punctuation-insensitive fallback is for old scores only.
+    return checked.firstSubmission || matching ? undefined : openVerdict(checked, answer)
+  }
   return {
-    help: check.help, firstVerdict: check.firstVerdict,
-    /** The text was edited after Claude's 「good」 and nobody has checked the edited one. */
-    stale: (text: string) => check.firstVerdict === 'good' && openVerdict(check, text) === undefined,
-    /** Remember what was sent, so the reply is tied to that text. */
-    send(text: string) { sent.current = text },
-    /** The verdict that counts for this text (see openVerdict). */
-    verdictFor: (text: string) => openVerdict(check, text),
+    check, run, graded, grading, blocked, gradeKey, verdictFor,
+    reset() { setRun(0) },
+    submit() {
+      if (text.trim() && !correctionBlocked(gradeKey)) setRun(n => n + 1)
+    },
     addHelp(kind: string) {
       if (check.help.includes(kind)) return
-      keep({ ...check, help: [...check.help, kind] })
+      save(current => {
+        const latest = current.open?.[key] ?? { help: [] }
+        return { open: { ...current.open, [key]: { ...latest, help: [...new Set([...latest.help, kind])] } } }
+      })
     },
-    setVerdict(v: Verdict, text = sent.current) { keep(withCheck(check, v, text)) },
+    saveGrade(result: Result, answer: string, submission: CorrectionSubmission) {
+      return updateStoreNow(prev => {
+        const topicRecord = readTopic(prev.notes, topic.id)
+        const history = storeCorrection(prev.notes, gradeKey, { ...submission, answer, result })
+        const latest = readCorrection(history, gradeKey, '')
+        const open = topicRecord.open?.[key] ?? { help: [] }
+        const first = !open.firstVerdict || (open.firstSubmission && correctionOrder(submission, open.firstSubmission) < 0)
+        const next: OpenCheck = {
+          ...open,
+          ...(first ? { firstVerdict: result.verdict, checkedText: answer, firstSubmission: submission } : {}),
+          ...(latest?.id === submission.id ? { latestVerdict: result.verdict, latestText: answer } : {}),
+        }
+        return { ...prev, notes: writeTopic(history, topic.id, { open: { ...topicRecord.open, [key]: next } }) }
+      })
+    },
   }
 }
 
-function Retell({ topic, rec, save, onDone }: Pick<StepProps, 'topic' | 'rec' | 'save' | 'notes' | 'update' | 'date'> & { onDone: (level: Level | null) => void }) {
+function Retell({ topic, rec, save, onNext, notes, saving }: Pick<StepProps, 'topic' | 'rec' | 'save' | 'notes' | 'onNext' | 'saving'>) {
   const L = topic.listen
   const key = 'topic-retell-' + topic.id
-  const open = useOpenTask(rec, 'retell', save)
   const [text, setText] = useState(() => readDraft(key))
-  const [run, setRun] = useState(0)
+  const open = useTopicGrade({ topic, rec, save, notes }, 'retell', correctionKey('topic-retell.' + topic.id), text)
+  const locked = saving || open.blocked
   const ready = useReady()
+  function showDraft(value: string) { open.reset(); setText(value) }
+  function done(skipped: boolean) {
+    if (!ready() || correctionBlocked(open.gradeKey) || (!skipped && !text.trim())) return
+    void onNext((current, notes) => {
+      const checked = current.open?.retell ?? { help: [] }
+      const level = skipped ? null : judgeExpress({ answered: true, help: checked.help, firstVerdict: open.verdictFor(text, checked, notes) })
+      return { listen: { ...current.listen, retell: level } }
+    }, skipped ? undefined : captureDraftCleanup(key, text))
+  }
   useTaskContext({ label: '重述對話：' + topic.title, detail: ['重述題：' + L.retell, '對話：' + L.dialogue.map(l => l.who + ': ' + l.en).join(' / '), '參考說法（不要直接給他）：' + L.retellSample].join('\n'), draft: text, onHelp: () => open.addHelp('claude') })
   return <>
     <h2 className="pr-question">不看稿，用兩三句說出重點</h2>
     <p className="ls-help">{L.retell}</p>
     <label className="pr-field">我的重述（先說出來，再打下來）
-      <textarea lang="en" rows={3} value={text} spellCheck={false} autoComplete="off" onChange={e => { setText(e.target.value); writeDraft(key, e.target.value) }} />
+      <textarea lang="en" rows={3} value={text} spellCheck={false} autoComplete="off" readOnly={locked} onChange={e => { showDraft(e.target.value); writeDraft(key, e.target.value) }} />
     </label>
-    <DraftVersions id={key} text={text} onChoose={setText} />
+    <DraftVersions id={key} text={text} onChoose={showDraft} disabled={locked} />
     <div className="ls-helps" role="group" aria-label="需要幫忙時打開">
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
-    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={retellTask(topic)} reference={L.retellSample} answer={text} selfFix
-      onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)} />
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={locked || !text.trim()} onClick={open.submit}>{open.graded ? '請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
+    {open.grading && !open.run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一題。</p>}
+    <CorrectBox key={open.run ? 'grading' : open.graded?.id ?? 'ungraded'} run={open.run} mode="open" rubric="gept-paragraph" zh={retellTask(topic)} reference={L.retellSample} answer={text} selfFix
+      restore={!open.run && open.graded ? { ...open.graded, showFull: false } : undefined}
+      backgroundGrade={{ id: open.gradeKey, save: open.saveGrade }} onReveal={() => open.addHelp('sample')} />
     <div className="pr-actions">
-      <button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { clearDraft(key); onDone(judgeExpress({ answered: true, help: open.help, firstVerdict: open.verdictFor(text) })) }}>完成聽力</button>
-      <button type="button" className="pr-link" onClick={() => onDone(null)}>先跳過重述</button>
+      <button type="button" className="pr-main" disabled={locked || !text.trim()} onClick={() => done(false)}>完成聽力</button>
+      <button type="button" className="pr-link" disabled={locked} onClick={() => done(true)}>先跳過重述</button>
     </div>
-    {text.trim() && !open.verdictFor(text) && <p className="ls-help">{open.stale(text) ? '你在 Claude 看過之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 看就完成，會先記成「自評完成・待確認」。' : '還沒連接 Claude：對照對話自己檢查，會記成「自評完成・待確認」。'}</p>}
+    {!locked && text.trim() && !open.verdictFor(text) && <p className="ls-help">{open.check.firstVerdict === 'good' ? '你在 Claude 看過之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 看就完成，會先記成「自評完成・待確認」。' : '還沒連接 Claude：對照對話自己檢查，會記成「自評完成・待確認」。'}</p>}
   </>
 }
 
@@ -400,7 +492,7 @@ const readTips: Record<ReadSkill, string> = {
   推論: '推論題的答案沒有直接寫，要用文章給的資訊推出來。',
   有沒有提供: '文章沒寫的就選「沒有說」，不要用自己的常識補。',
 }
-function ReadStep({ topic, rec, save, onNext }: StepProps) {
+function ReadStep({ topic, rec, save, onNext, saving }: StepProps) {
   const R = topic.read
   const ready = useReady()
   const [picks, setPicks] = useState<(number | undefined)[]>([])
@@ -413,43 +505,37 @@ function ReadStep({ topic, rec, save, onNext }: StepProps) {
       <strong lang="en">{R.title}</strong>
       {R.lines.map(l => <p key={l.en}><span lang="en">{l.en}</span>{checked && showZh && <span className="ls-zh">{l.zh}</span>}</p>)}
     </article>
-    <Questions items={R.questions.map(q => ({ ...q, tag: q.skill, en: true }))} picks={picks} checked={checked} source="生活主題的閱讀" passage={R.title + '：' + R.lines.map(l => l.en).join(' ')}
+    <Questions items={R.questions.map(q => ({ ...q, tag: q.skill, en: true }))} picks={rec.read?.picks ?? picks} checked={checked} source="生活主題的閱讀" passage={R.title + '：' + R.lines.map(l => l.en).join(' ')}
       onPick={(i, j) => { if (!ready()) return; const p = [...picks]; p[i] = j; setPicks(p) }} />
     {!checked ? <div className="pr-actions">
       <button type="button" className="pr-main" disabled={!allPicked(picks, R.questions.length)} onClick={() => {
         const missed = R.questions.filter((q, i) => picks[i] !== q.answer).map(q => q.skill)
-        save(r => r.read ? {} : { read: { correct: R.questions.length - missed.length, total: R.questions.length, missed } })
+        save(r => r.read ? {} : { read: { correct: R.questions.length - missed.length, total: R.questions.length, missed,
+          picks: picks.filter((choice): choice is number => choice !== undefined) } })
       }}>對答案</button>
     </div> : <>
       <p className="tl-score">第一次答對 {rec.read!.correct} / {rec.read!.total}</p>
       {[...new Set(rec.read!.missed)].map(k => <p key={k} className="ls-help tl-tip"><b>{k}</b>{readTips[k]}</p>)}
       <div className="pr-actions">
         <button type="button" className="pr-link" onClick={() => setShowZh(!showZh)}>{showZh ? '隱藏中文' : '看中文'}</button>
-        <button type="button" className="pr-main" onClick={onNext}>完成第 1 次</button>
+        <button type="button" className="pr-main" disabled={saving} onClick={() => void onNext()}>完成第 1 次</button>
       </div>
     </>}
   </section>
 }
 
-async function transcribe(blob: Blob) {
-  const form = new FormData()
-  form.append('file', blob, 'speaking.webm')
-  form.append('model', 'gpt-4o-mini-transcribe')
-  form.append('language', 'en')
-  const res = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + openaiKey() }, body: form })
-  if (!res.ok) throw new Error('轉文字失敗（' + res.status + '）')
-  return ((await res.json()).text as string) || ''
-}
 /** Optional: record yourself and listen back. The clip stays on this screen. Each press asks for the microphone once;
  *  leaving the step (or skipping it) while the permission is still pending cancels that request, so a late permission
  *  never starts a recording nobody can see, and every microphone track it got is stopped. */
-function Recorder({ onClip }: { onClip?: (blob: Blob) => void }) {
+function Recorder({ disabled, onClip, onBusy }: { disabled?: boolean; onClip?: (blob: Blob) => void; onBusy?: (busy: boolean) => void }) {
   const [recording, setRecording] = useState(false)
   const [requesting, setRequesting] = useState(false)
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
+  const occupied = useRef(false)
+  const playback = useRef<HTMLAudioElement>(null)
   const asking = useRef(0)
   const alive = useRef(true)
   useEffect(() => {
@@ -462,11 +548,20 @@ function Recorder({ onClip }: { onClip?: (blob: Blob) => void }) {
   }, [])
   useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') return null
+  function finishRequest(media: MediaStream | null) {
+    media?.getTracks().forEach(t => t.stop())
+    if (stream.current === media) stream.current = null
+    occupied.current = false
+    if (!alive.current) return
+    setRecording(false); setRequesting(false); onBusy?.(false)
+  }
   async function toggle() {
-    if (recording) { recorder.current?.stop(); return }
-    if (requesting) return
+    if (recorder.current?.state === 'recording') { recorder.current.stop(); return }
+    if (disabled || occupied.current) return
+    occupied.current = true
+    playback.current?.pause()
     const mine = ++asking.current
-    setError(''); setRequesting(true)
+    setError(''); setRequesting(true); onBusy?.(true)
     let media: MediaStream | null = null
     try {
       media = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -475,23 +570,30 @@ function Recorder({ onClip }: { onClip?: (blob: Blob) => void }) {
       stream.current = media
       const chunks: Blob[] = []
       const r = new MediaRecorder(media)
-      r.ondataavailable = e => chunks.push(e.data)
+      let failed = false
+      r.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
+      r.onerror = () => {
+        failed = true
+        finishRequest(media)
+        if (alive.current && asking.current === mine) setError('錄音中斷。請再錄一次，或直接說完後打下來。')
+      }
       r.onstop = () => {
-        media?.getTracks().forEach(t => t.stop())
-        if (stream.current === media) stream.current = null
+        if (asking.current !== mine || failed) return
+        finishRequest(media)
         if (!alive.current) return
         const blob = new Blob(chunks, { type: r.mimeType })
-        setUrl(URL.createObjectURL(blob)); setRecording(false); onClip?.(blob)
+        if (!blob.size) { setError('沒有收到錄音。請再錄一次，或直接說完後打下來。'); return }
+        setUrl(URL.createObjectURL(blob)); onClip?.(blob)
       }
-      recorder.current = r; r.start(); setRecording(true)
+      recorder.current = r; r.start(); setRecording(true); setRequesting(false)
     } catch {
-      media?.getTracks().forEach(t => t.stop()); if (stream.current === media) stream.current = null
+      finishRequest(media)
       if (alive.current && asking.current === mine) setError('麥克風被擋住了，直接說出來就好。')
-    } finally { if (alive.current && asking.current === mine) setRequesting(false) }
+    }
   }
   return <div className="tl-rec">
-    <button type="button" className="ls-play" onClick={toggle} disabled={requesting}>{recording ? <><Square size={14} />停止錄音</> : requesting ? '等麥克風允許……' : <><Mic size={14} />{url ? '重錄' : '錄音（選用）'}</>}</button>
-    {url && <audio controls src={url} />}
+    <button type="button" className="ls-play" onClick={toggle} disabled={requesting || (!!disabled && !recording)}>{recording ? <><Square size={14} />停止錄音</> : requesting ? '等麥克風允許……' : <><Mic size={14} />{url ? '重錄' : '錄音（選用）'}</>}</button>
+    {url && !recording && !requesting && <audio ref={playback} controls src={url} />}
     {error && <p className="ls-help">{error}</p>}
   </div>
 }
@@ -501,21 +603,22 @@ const modeChoice: Record<SpeakMode, string> = { recorded: '說出來了，也有
 const modeNames: Record<SpeakMode, string> = { recorded: '說出來了（有錄音，自己聽過）', spoken: '說出來了（沒有錄音）', typed: '只用打字，不算口說' }
 /** A speaking task: conditions only, say it (optionally record), then type what you said.
  *  Feedback comes from the transcript, so pronunciation is 未評估; one or two goals for next time. */
-function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepProps & { part: TopicPart; task: SpeakTask }) {
-  const open = useOpenTask(rec, part + '-speak', save)
+function SpeakStep({ topic, rec, save, onNext, notes, date, part, task, saving }: StepProps & { part: TopicPart; task: SpeakTask }) {
   const draftKey = 'topic-speak-' + topic.id + '-' + part
   const [text, setText] = useState(() => readDraft(draftKey))
+  const open = useTopicGrade({ topic, rec, save, notes }, part + '-speak', correctionKey('topic-speak.' + topic.id + '.' + part), text)
+  const locked = saving || open.blocked
   // How it was done: out loud with a recording, out loud without one, or typed only (typing is not speaking).
   const [mode, setMode] = useState<SpeakMode | null>(null)
   const [clip, setClip] = useState<Blob>()
   const how: SpeakMode | null = clip && !mode ? 'recorded' : mode
   const [busy, setBusy] = useState('')
+  const [recording, setRecording] = useState(false)
+  const waitingForTranscript = busy === '轉文字中……'
   const [met, setMet] = useState<boolean[]>(() => task.conditions.map(() => false))
-  const [run, setRun] = useState(0)
-  const [feedback, setFeedback] = useState<{ checkedText: string; fixes: Result['fixes'] }>()
-  const [submitted, setSubmitted] = useState<SpeakRecord | null>(null)
-  const done = submitted ?? (part === 'C' ? rec.review?.speak : rec.speak)
+  const done = part === 'C' ? rec.review?.speak : rec.speak
   const ready = useReady()
+  function showDraft(value: string) { open.reset(); setText(value) }
   useTaskContext({
     label: '口說：' + task.situation,
     detail: ['口說情境：' + task.situation, '要做到：' + task.conditions.join('；'), '這是他說完後打下來的文字稿，只看內容和文法，不評發音。', '參考說法（不要直接給他）：' + task.sample].join('\n'),
@@ -527,41 +630,53 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
   const textNow = useRef(text)
   textNow.current = text
   const transcribing = useRef(0)
+  const request = useRef<AbortController | undefined>(undefined)
   const alive = useRef(true)
-  useEffect(() => { alive.current = true; return () => { alive.current = false; transcribing.current++ } }, [])
+  useEffect(() => { alive.current = true; return () => { alive.current = false; transcribing.current++; request.current?.abort() } }, [])
   const [offered, setOffered] = useState('')
   // A new recording makes the earlier one's pending transcript (and any waiting choice) out of date.
   const clipNow = useRef(clip)
   useEffect(() => {
     if (clipNow.current === clip) return
-    clipNow.current = clip; transcribing.current++; setOffered('')
+    clipNow.current = clip; transcribing.current++; request.current?.abort(); setOffered('')
     setBusy(b => b === '轉文字中……' ? '' : b)
   }, [clip])
   async function toText() {
-    if (!clip) return
+    if (!clip || request.current || locked || recording) return
     const mine = ++transcribing.current, before = textNow.current, from = clip
+    const controller = new AbortController()
+    request.current = controller
+    const timeout = window.setTimeout(() => controller.abort(), 45_000)
     setBusy('轉文字中……'); setOffered('')
     try {
-      const t = await transcribe(from)
+      const t = await transcribe(from, controller.signal)
       if (!alive.current || transcribing.current !== mine) return
+      if (controller.signal.aborted) { setBusy('轉文字超過等候時間，可以再試一次。'); return }
       const land = transcriptLanding(before, textNow.current, t)
-      if (land === 'fill') { setText(t); writeDraft(draftKey, t) } else if (land === 'offer') setOffered(t)
-      setBusy('')
-    } catch (e) { if (alive.current && transcribing.current === mine) setBusy(e instanceof Error ? e.message : String(e)) }
+      if (land === 'fill' && !correctionBlocked(open.gradeKey)) { showDraft(t); writeDraft(draftKey, t) }
+      else if (land !== 'none') setOffered(t)
+      setBusy(land === 'none' ? '這段錄音沒有辨識出文字。可以再錄，或自己打下來。' : '')
+    } catch (e) {
+      if (alive.current && transcribing.current === mine) setBusy(controller.signal.aborted ? '轉文字超過等候時間，可以再試一次。' : e instanceof Error ? e.message : String(e))
+    } finally {
+      clearTimeout(timeout)
+      if (request.current === controller) request.current = undefined
+    }
   }
   function finish() {
-    if (!ready() || !how) return
-    transcribing.current++
-    const verdict = open.verdictFor(text)
-    const textLevel = text.trim() ? judgeExpress({ answered: true, help: open.help, firstVerdict: verdict }) : null
-    const level = how === 'typed' ? null : judgeSpeak({ said: true, transcript: text, help: open.help, firstVerdict: verdict })
+    if (!ready() || !how || correctionBlocked(open.gradeKey) || recording || request.current || (how === 'typed' && !text.trim())) return
     const unmet = task.conditions.filter((_, i) => !met[i])
-    const fixes = feedback?.checkedText === text.trim() ? feedback.fixes : []
-    const record: SpeakRecord = { level, textLevel, mode: how, help: open.help, ...(verdict ? { firstVerdict: verdict } : {}), recorded: !!clip, goals: speakGoals(fixes, unmet) }
-    if (part === 'C') save(r => ({ review: { level: r.review?.level ?? null, speak: record } }))
-    else save({ speak: record })
-    clearDraft(draftKey)
-    setSubmitted(record)
+    void onNext((current, currentNotes) => {
+      if (part === 'C' ? current.review?.speak : current.speak) throw new Error('這一題已有儲存的口說紀錄，未清除你的草稿。')
+      const check = current.open?.[part + '-speak'] ?? { help: [] }
+      const verdict = open.verdictFor(text, check, currentNotes)
+      const textLevel = text.trim() ? judgeExpress({ answered: true, help: check.help, firstVerdict: verdict }) : null
+      const level = how === 'typed' ? null : judgeSpeak({ said: true, transcript: text, help: check.help, firstVerdict: verdict })
+      const feedback = readCorrection(currentNotes, open.gradeKey, text)
+      const fixes = feedback?.answer === text.trim() ? feedback.result.fixes : []
+      const record: SpeakRecord = { level, textLevel, mode: how, help: check.help, ...(verdict ? { firstVerdict: verdict } : {}), recorded: !!clip, goals: speakGoals(fixes, unmet) }
+      return part === 'C' ? { review: { ...current.review, level: current.review?.level ?? null, speak: record } } : { speak: record }
+    }, captureDraftCleanup(draftKey, text), true)
   }
   if (done) return <section className="tl-speak-done">
     <div className="pr-label">說 · 這次的紀錄</div>
@@ -574,7 +689,7 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
       <li data-level="none"><span>發音</span><b>未評估（只看文字稿，沒有聽你的聲音）</b></li>
     </ul>
     <div className="tl-goals"><strong>下次的目標</strong><ol>{done.goals.map(g => <li key={g}>{g}</li>)}</ol></div>
-    <div className="pr-actions"><button type="button" className="pr-main" onClick={onNext}>{part === 'C' ? '完成第 3 次' : '下一步：寫訊息'}</button></div>
+    <div className="pr-actions"><button type="button" className="pr-main" disabled={saving} onClick={() => void onNext()}>{part === 'C' ? '完成第 3 次' : '下一步：寫訊息'}</button></div>
   </section>
   return <section className="tl-speak">
     <div className="pr-label">說 · {part === 'C' ? '換個情境' : '用英文完成一件事'}</div>
@@ -583,27 +698,29 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
     <div className="tl-conditions"><strong>要做到</strong><ul>{task.conditions.map(c => <li key={c}>{c}</li>)}</ul></div>
     {task.followUps?.length ? <p className="ls-help">對方可能接著問：<span lang="en">{task.followUps.join(' ／ ')}</span>（也試著回答）</p> : null}
     <p className="ls-help">先想 30 秒，再開口說。可以錄音聽自己，也可以直接說。</p>
-    <Recorder onClip={setClip} />
-    {clip && openaiKey() && <div className="pr-actions"><button type="button" className="pr-link" disabled={!!busy && busy.endsWith('……')} onClick={toText}>把錄音轉成文字</button>{busy && <small role="status">{busy}</small>}</div>}
+    <Recorder disabled={locked || waitingForTranscript} onClip={setClip} onBusy={setRecording} />
+    {clip && openaiKey() && <div className="pr-actions"><button type="button" className="pr-link" disabled={locked || waitingForTranscript || recording} onClick={toText}>把錄音轉成文字</button>{busy && <small role="status">{busy}</small>}</div>}
     <label className="pr-field">{openaiKey() ? '你剛剛說的（打下來，或錄音後按「把錄音轉成文字」）' : '你剛剛說的（照著打下來）'}
-      <textarea lang="en" rows={4} value={text} spellCheck={false} autoComplete="off" placeholder="照你說的寫，不用先改好" onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} />
+      <textarea lang="en" rows={4} value={text} spellCheck={false} autoComplete="off" readOnly={locked} placeholder="照你說的寫，不用先改好" onChange={e => { showDraft(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
-    <DraftVersions id={draftKey} text={text} onChoose={setText} />
+    <DraftVersions id={draftKey} text={text} onChoose={showDraft} disabled={locked} />
     {offered && <section className="pr-reference" aria-live="polite"><small>錄音轉好的文字（你在等的時候改過框裡的字，所以沒有直接換掉）</small><p lang="en">{offered}</p>
-      <div className="pr-actions"><button type="button" className="pr-link" onClick={() => { setText(offered); writeDraft(draftKey, offered); setOffered('') }}>換成這段辨識結果</button>
+      <div className="pr-actions"><button type="button" className="pr-link" disabled={locked} onClick={() => { showDraft(offered); writeDraft(draftKey, offered); setOffered('') }}>換成這段辨識結果</button>
         <button type="button" className="pr-link" onClick={() => setOffered('')}>不用，留我改的</button></div></section>}
     <div className="ls-helps" role="group" aria-label="卡住了再打開">
       <span>卡住了？</span>
-      <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>句型提示</button>
+      <button type="button" aria-pressed={open.check.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>句型提示</button>
       <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
-    {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points[0]}</p>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(n => n + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 照評分表看文字稿'}</button></div>}
-    <CorrectBox run={run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
+    {open.check.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points[0]}</p>}
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={locked || !text.trim() || waitingForTranscript || recording} onClick={open.submit}>{open.graded ? '請 Claude 再批一次' : '請 Claude 照評分表看文字稿'}</button></div>}
+    {open.grading && !open.run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一題。</p>}
+    <CorrectBox key={open.run ? 'grading' : open.graded?.id ?? 'ungraded'} run={open.run} mode="open" rubric="gept-speak-elementary" zh={'口說情境：' + task.situation + '。要做到：' + task.conditions.join('；') + '（這是說完後打下來的文字稿，不評發音）'}
       reference={task.sample} words={[topic.grammar.title]} answer={text} selfFix
+      restore={!open.run && open.graded ? { ...open.graded, showFull: false } : undefined}
+      backgroundGrade={{ id: open.gradeKey, save: open.saveGrade }}
       onReveal={() => open.addHelp('sample')}
-      onResult={(v, _n, r, sentText) => { open.setVerdict(v, sentText); setFeedback({ checkedText: sentText, fixes: r.fixes }) }}
-      onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
+      onSave={cards => updateStoreNow(prev => addSayCards(prev, cards, date, 'lesson'))} />
     <fieldset className="tl-selfcheck"><legend>說完後勾一下：我有做到</legend>
       {task.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
     </fieldset>
@@ -613,124 +730,88 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
         <input type="radio" name={'how-' + part} checked={how === m} disabled={m === 'recorded' && !clip} onChange={() => setMode(m)} />{modeChoice[m]}</label>)}
     </fieldset>
     <div className="pr-actions">
-      <button type="button" className="pr-main" disabled={!how || (how === 'typed' && !text.trim())} onClick={finish}>完成這題</button>
-      <button type="button" className="pr-link" onClick={() => { if (!ready()) return; const record: SpeakRecord = { level: null, help: open.help, goals: speakGoals([], task.conditions) }; if (part === 'C') save(r => ({ review: { level: r.review?.level ?? null, speak: record } })); else save({ speak: record }); onNext() }}>先跳過</button>
+      <button type="button" className="pr-main" disabled={locked || waitingForTranscript || recording || !how || (how === 'typed' && !text.trim())} onClick={finish}>完成這題</button>
+      <button type="button" className="pr-link" disabled={locked || waitingForTranscript || recording} onClick={() => {
+        if (!ready() || recording || request.current || correctionBlocked(open.gradeKey)) return
+        void onNext(current => {
+          const record: SpeakRecord = { level: null, help: current.open?.[part + '-speak']?.help ?? [], goals: speakGoals([], task.conditions) }
+          return part === 'C' ? { review: { ...current.review, level: current.review?.level ?? null, speak: record } } : { speak: record }
+        })
+      }}>先跳過</button>
     </div>
     {how === 'typed' && <p className="ls-help">只用打字的話，內容和文法照樣記，但不算口說。下次試著先說出來再打。</p>}
     {how && how !== 'typed' && !text.trim() && <p className="ls-help">沒有文字稿就沒辦法確認內容，這題會記成「自評完成・待確認」。打下來再請 Claude 看，才能確認。</p>}
-    {text.trim() && !open.verdictFor(text) && <p className="ls-help">{open.stale(text) ? '你在 Claude 看過之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 看就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照條件自己檢查，會記成「自評完成・待確認」。'}</p>}
+    {!locked && text.trim() && !open.verdictFor(text) && <p className="ls-help">{open.check.firstVerdict === 'good' ? '你在 Claude 看過之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 看就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照條件自己檢查，會記成「自評完成・待確認」。'}</p>}
   </section>
 }
 
 /** A 3–5 sentence message; the frame, the model answer or asking Claude count as help. */
-function WriteStep({ topic, rec, save, onNext, update, date, notes }: StepProps) {
+function WriteStep({ topic, rec, save, onNext, date, notes, saving }: StepProps) {
   const W = topic.write
-  const check = rec.open?.write ?? { help: [] }
-  const gradeKey = correctionKey('topic-write.' + topic.id)
-  function verdictFor(answer: string, checked: OpenCheck, currentNotes: Record<string, string>) {
-    // After correction, the first mistake still counts as help. Otherwise, find the feedback for the selected draft.
-    if (checked.firstVerdict && checked.firstVerdict !== 'good') return checked.firstVerdict
-    const graded = readCorrection(currentNotes, gradeKey, answer)
-    return graded?.answer === answer.trim() ? graded.result.verdict : openVerdict(checked, answer)
-  }
-  function addHelp(kind: string) {
-    if (check.help.includes(kind)) return
-    save(current => {
-      const latest = current.open?.write ?? { help: [] }
-      return { open: { ...current.open, write: { ...latest, help: [...new Set([...latest.help, kind])] } } }
-    })
-  }
   const draftKey = 'topic-write-' + topic.id
   const [text, setText] = useState(() => readDraft(draftKey))
-  const [run, setRun] = useState(0)
-  const graded = readCorrection(notes, gradeKey, text)
-  const grading = useCorrectionPending(gradeKey)
-  const blocked = useCorrectionBlocked(gradeKey)
-  function showDraft(value: string) {
-    setRun(0)
-    setText(value)
-  }
-  function submit() {
-    if (!text.trim() || correctionBlocked(gradeKey)) return
-    setRun(r => r + 1)
-  }
-  function saveGrade(result: Result, answer: string, submission: CorrectionSubmission) {
-    return requireCorrectionSave(applied => update(prev => {
-      const topicRecord = readTopic(prev.notes, topic.id)
-      const history = storeCorrection(prev.notes, gradeKey, { ...submission, answer, result })
-      // A slower response from a second tab still has its own text and feedback, but cannot replace the newest check.
-      const latest = readCorrection(history, gradeKey, '')
-      const open = topicRecord.open?.write ?? { help: [] }
-      const first = !open.firstVerdict || (open.firstSubmission && correctionOrder(submission, open.firstSubmission) < 0)
-      const next: OpenCheck = {
-        ...open,
-        ...(first ? { firstVerdict: result.verdict, checkedText: answer, firstSubmission: submission } : {}),
-        ...(latest?.id === submission.id ? { latestVerdict: result.verdict, latestText: answer } : {}),
-      }
-      applied()
-      return {
-        ...prev, notes: writeTopic(history, topic.id, {
-          open: { ...topicRecord.open, write: next },
-        }),
-      }
-    }))
-  }
+  const open = useTopicGrade({ topic, rec, save, notes }, 'write', correctionKey('topic-write.' + topic.id), text)
+  const { check } = open
+  const locked = saving || open.blocked
   const ready = useReady()
   const n = countSentences(text)
   const enough = n >= W.minSentences
   const inRange = enough && n <= 5
   const [met, setMet] = useState<boolean[]>(() => W.conditions.map(() => false))
+  function showDraft(value: string) {
+    open.reset()
+    setText(value)
+    if (value.trim() !== text.trim()) setMet(W.conditions.map(() => false))
+  }
   const firstSentence = W.sample.match(/^[^.?!]+[.?!]/)?.[0] ?? W.sample
   useTaskContext({
     label: '寫訊息：' + W.task,
     detail: ['寫一則 3–5 句的訊息：' + W.task, '要寫到：' + W.conditions.join('；'), '這個主題的句型：' + topic.grammar.title, '參考寫法（不要直接給他）：' + W.sample, '他要寫自己的內容；幫他想內容或句型就好，不要替他寫整段。'].join('\n'),
     draft: text,
-    onHelp: () => addHelp('claude'),
+    onHelp: () => open.addHelp('claude'),
   })
   return <section className="tl-write">
     <div className="pr-label">寫訊息 · {W.minSentences}–5 句</div>
     <h2 className="pr-question">{W.task}</h2>
     <div className="tl-conditions"><strong>要寫到</strong><ul>{W.conditions.map(c => <li key={c}>{c}</li>)}</ul></div>
     <label className="pr-field">我的訊息
-      <textarea lang="en" rows={5} value={text} spellCheck={false} autoComplete="off" readOnly={blocked} placeholder="寫你自己的內容" onChange={e => { showDraft(e.target.value); writeDraft(draftKey, e.target.value) }} />
+      <textarea lang="en" rows={5} value={text} spellCheck={false} autoComplete="off" readOnly={locked} placeholder="寫你自己的內容" onChange={e => { showDraft(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
-    <DraftVersions id={draftKey} text={text} onChoose={showDraft} disabled={blocked} />
+    <DraftVersions id={draftKey} text={text} onChoose={showDraft} disabled={locked} />
     <p className="tl-count" data-ok={inRange}>已寫 {n} 句{!enough ? '，要 ' + W.minSentences + '–5 句' : n > 5 ? '：訊息最多 5 句，挑最重要的留下' : ''}（只算長度，兩個字以上才算一句；文法和意思要另外檢查）</p>
     <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
       <span>卡住了？一層一層打開：</span>
-      <button type="button" aria-pressed={check.help.includes('cue')} onClick={() => { if (ready()) addHelp('cue') }}>① 用哪個句型</button>
-      <button type="button" aria-pressed={check.help.includes('frame')} onClick={() => { if (ready()) addHelp('frame') }}>② 句架</button>
-      <StuckButton onUse={() => addHelp('claude')} />
+      <button type="button" aria-pressed={check.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>① 用哪個句型</button>
+      <button type="button" aria-pressed={check.help.includes('frame')} onClick={() => { if (ready()) open.addHelp('frame') }}>② 句架</button>
+      <StuckButton onUse={() => open.addHelp('claude')} />
     </div>
     {check.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
     {check.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={blocked || !text.trim()} onClick={submit}>{graded ? '請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
-    {grading && !run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一題。</p>}
-    <CorrectBox key={run ? 'grading' : graded?.id ?? 'ungraded'} run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
-      restore={!run && graded ? { ...graded, showFull: false } : undefined} backgroundGrade={{ id: gradeKey, save: saveGrade }}
-      onReveal={() => addHelp('sample')}
-      onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={locked || !text.trim()} onClick={open.submit}>{open.graded ? '請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
+    {open.grading && !open.run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一題。</p>}
+    <CorrectBox key={open.run ? 'grading' : open.graded?.id ?? 'ungraded'} run={open.run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
+      restore={!open.run && open.graded ? { ...open.graded, showFull: false } : undefined} backgroundGrade={{ id: open.gradeKey, save: open.saveGrade }}
+      onReveal={() => open.addHelp('sample')}
+      onSave={cards => updateStoreNow(prev => addSayCards(prev, cards, date, 'lesson'))} />
     <fieldset className="tl-selfcheck"><legend>寫完勾一下：我有寫到</legend>
-      {W.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
+      {W.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} disabled={saving} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
     </fieldset>
     <div className="pr-actions">
-      <button type="button" className="pr-main" disabled={blocked || !inRange} onClick={() => {
-        if (correctionBlocked(gradeKey) || !ready()) return
-        save((current, currentNotes) => {
+      <button type="button" className="pr-main" disabled={locked || !inRange} onClick={() => {
+        if (correctionBlocked(open.gradeKey) || !ready()) return
+        void onNext((current, currentNotes) => {
           const latest = current.open?.write ?? { help: [] }
-          const verdict = verdictFor(text, latest, currentNotes)
+          const verdict = open.verdictFor(text, latest, currentNotes)
           return { write: { level: judgeExpress({ answered: true, help: latest.help, firstVerdict: verdict }), sentences: n,
-            covered: met.filter(Boolean).length, help: latest.help, ...(verdict ? { firstVerdict: verdict } : {}) } }
-        })
-        clearDraft(draftKey); onNext()
+            answer: text.trim(), covered: met.filter(Boolean).length, help: latest.help, ...(verdict ? { firstVerdict: verdict } : {}) } }
+        }, captureDraftCleanup(draftKey, text))
       }}>完成第 2 次</button>
-      <button type="button" className="pr-link" disabled={blocked} onClick={() => {
-        if (correctionBlocked(gradeKey) || !ready()) return
-        save(current => ({ write: { level: null, sentences: n, help: current.open?.write?.help ?? [] } }))
-        onNext()
+      <button type="button" className="pr-link" disabled={locked} onClick={() => {
+        if (correctionBlocked(open.gradeKey) || !ready()) return
+        void onNext(current => ({ write: { level: null, sentences: n, help: current.open?.write?.help ?? [] } }))
       }}>先跳過</button>
     </div>
-    {!blocked && inRange && !verdictFor(text, check, notes) && <p className="ls-help">{check.firstVerdict === 'good' ? '你在 Claude 批改之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 批改就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照「要寫到」自己檢查，會記成「自評完成・待確認」。'}</p>}
+    {!locked && inRange && !open.verdictFor(text) && <p className="ls-help">{check.firstVerdict === 'good' ? '你在 Claude 批改之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 批改就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照「要寫到」自己檢查，會記成「自評完成・待確認」。'}</p>}
   </section>
 }
 
@@ -763,6 +844,10 @@ function TopicDone({ topic, part, rec, navigate }: { topic: Topic; part: TopicPa
     <div className="pr-label">第 {'ABC'.indexOf(part) + 1} 次完成</div>
     <h2 className="pr-question">{topic.title}：{partNames[part]}</h2>
     <ul className="tl-levels">{lines.map(([k, v], i) => <li key={i}><span>{k}</span><b>{v}</b></li>)}</ul>
+    {part === 'B' && rec.write?.answer && <details className="pr-tools">
+      <summary>看我交出的訊息</summary>
+      <p className="tu-corrected" lang="en">{rec.write.answer}</p>
+    </details>}
     {goals?.length ? <div className="tl-goals"><strong>下次說的時候</strong><ol>{goals.map(g => <li key={g}>{g}</li>)}</ol></div> : null}
     <p className={'ls-goal' + (stable ? ' tl-stable' : '')}><small>接下來</small>{nextLine}</p>
     <div className="pr-actions">

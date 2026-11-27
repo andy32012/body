@@ -4729,19 +4729,30 @@
     "en": "Yesterday he said he would come today.",
     "alt": [
      "He said yesterday that he would come today.",
-     "Yesterday he said that he would come today."
+     "Yesterday he said that he would come today.",
+     "Yesterday he said he will come today.",
+     "He said yesterday that he will come today.",
+     "Yesterday he said that he will come today."
     ]
    },
    {
     "zh": "她告訴我她是護理師。",
-    "en": "She told me that she was a nurse."
+    "en": "She told me that she was a nurse.",
+    "alt": [
+     "She told me she was a nurse.",
+     "She told me that she is a nurse.",
+     "She told me she is a nurse."
+    ]
    },
    {
     "zh": "他告訴我他很喜歡那份工作。",
     "en": "He told me that he liked the job.",
     "alt": [
      "He told me he liked the job.",
-     "He told me that he really liked the job."
+     "He told me that he really liked the job.",
+     "He told me that he likes the job.",
+     "He told me he likes the job.",
+     "He told me that he really likes the job."
     ]
    },
    {
@@ -4749,7 +4760,10 @@
     "en": "She told us that she would be late.",
     "alt": [
      "She told us she would be late.",
-     "She told us that she would come a little late."
+     "She told us that she would come a little late.",
+     "She told us that she will be late.",
+     "She told us she will be late.",
+     "She told us that she will come a little late."
     ]
    },
    {

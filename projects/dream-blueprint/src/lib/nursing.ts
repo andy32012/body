@@ -8,6 +8,7 @@ export type NurseLevel = 'A2' | 'B1' | 'B2'
 export interface NurseListening {
   id: string; title: string; scene: string; level: NurseLevel; accent: Accent
   you: string; emma: string; dialogue: PackLine[]; questions: PackQuestion[]; words: { en: string; zh: string }[]
+  handoff?: { colleague: string; baseline: string; examples: string[] }
 }
 export interface NurseWord { en: string; zh: string; area: string; ex: string; exZh: string }
 
@@ -113,12 +114,20 @@ export function nurseInstructions(l: NurseListening) {
   return [
     'Today you are helping him practise English for his clinical work with a short role-play, inside a friendly chat.',
     `Scene: ${l.title}. In Chinese: ${l.scene}.`,
-    `You play ${l.emma}. He plays ${l.you}. Stay in your role until the end.`,
+    l.handoff
+      ? `He plays ${l.you} throughout. Start as ${l.emma}. Once he has oriented the patient and asked when the change began, announce a handoff and switch to ${l.handoff.colleague}. Stay in the colleague role for the rest of the scene.`
+      : `You play ${l.emma}. He plays ${l.you}. Stay in your role until the end.`,
+    ...(l.handoff ? [
+      `In the handoff, let him ask whether the confusion is new and when it began. Share this when asked: ${l.handoff.baseline}`,
+      `Ask him to report what has changed, what he plans to check, and who he will notify. If he needs help, use these prompts and let him answer in his own words: ${l.handoff.examples.join(' / ')}`,
+    ] : []),
     `Here is the dialogue he listened to, as a guide only (do not read it to him, and let the scene go a little differently): ${l.dialogue.map(d => d.who + ': ' + d.en).join(' / ')}`,
     `Useful words for him: ${l.words.map(w => w.en).join(', ')}.`,
     `Start the scene yourself with one line as ${l.emma}. Keep your lines short and natural, and ask one thing at a time so he has to answer, explain or check.`,
     'If he says something unsafe for a patient or the meaning is wrong, step out of the role for one sentence, say the safer or clearer version, and ask him to say it again.',
     'You hear him through speech recognition, so do not comment on his pronunciation.',
-    'After about eight of his turns, end the scene and tell him in two sentences what he did well and one useful sentence to remember.',
+    l.handoff
+      ? 'Aim for about eight of his turns and finish after both parts. Give a brief prompt if he misses a step. End with two sentences on what he did well and one useful sentence to remember.'
+      : 'After about eight of his turns, end the scene and tell him in two sentences what he did well and one useful sentence to remember.',
   ].join('\n')
 }

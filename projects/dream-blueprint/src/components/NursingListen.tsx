@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { PageProps } from '../lib/store'
+import { updateStoreNow, type PageProps } from '../lib/store'
+import type { SaveActivity } from '../lib/activitySave'
 import { bestListen, logSkill } from '../lib/bridge'
 import { listenPassed, nurseLevels, nurseLevelsOpen, heardWell, nextNurseListening, nurseLastKey, nurseListenKey, nursePreviewKey, nurseReviewPassed, nurseSpeakKey, readNurseListen, saveNurseListen, type NurseListening } from '../lib/nursing'
 import { levelTarget } from '../lib/unlock'
@@ -7,11 +8,15 @@ import { PackListen } from './UnitPack'
 
 const levelNames = { A2: '基礎', B1: '中級', B2: '中高級' } as const
 /** #library/nlisten/<id> opens that dialogue. */
-const idFromHash = () => location.hash.startsWith('#library/nlisten/') ? decodeURIComponent(location.hash.split('/')[2] ?? '') || undefined : undefined
+function idFromHash() {
+  const [page, mode, id] = location.hash.split('/')
+  if (page !== '#library' || mode !== 'nlisten' || !id) return undefined
+  try { return decodeURIComponent(id) || undefined } catch { return undefined }
+}
 
 /** Nurse–patient dialogues: listen without the text, answer, then the transcript and its Chinese open (the same player
  *  as a unit's listening). After that he can act the scene out with Emma. */
-export default function NursingListen({ state, update, onActivity, date }: Pick<PageProps, 'state' | 'update'> & { onActivity: PageProps['update']; date: string }) {
+export default function NursingListen({ state, onSavedActivity, date }: Pick<PageProps, 'state'> & { onSavedActivity: SaveActivity; date: string }) {
   const [all, setAll] = useState<NurseListening[] | null>(null)
   const [failed, setFailed] = useState(false)
   const [currentId, setCurrentId] = useState<string | undefined>(idFromHash)
@@ -23,7 +28,13 @@ export default function NursingListen({ state, update, onActivity, date }: Pick<
   }, [])
   useEffect(() => {
     // A link or bookmark to another dialogue on the same page: show that one (the title follows the address).
-    const on = () => { const id = idFromHash(); if (id) { setCurrentId(id); setShownId(null); setRoundDone(false) } }
+    const on = () => {
+      const [page, mode] = location.hash.split('/')
+      if (page !== '#library' || mode !== 'nlisten') return
+      setCurrentId(idFromHash())
+      setShownId(null)
+      setRoundDone(false)
+    }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
@@ -90,9 +101,11 @@ export default function NursingListen({ state, update, onActivity, date }: Pick<
     <PackListen key={l.id} l={l} rate={state.settings.speechRate} last={last}
       review={{
         alreadyRead: Boolean(state.notes[previewKey]),
-        onPreview: () => update(prev => prev.notes[previewKey] ? prev : { ...prev, notes: { ...prev.notes, [previewKey]: date } }),
+        onPreview: async () => {
+          await updateStoreNow(prev => prev.notes[previewKey] ? prev : { ...prev, notes: { ...prev.notes, [previewKey]: date } })
+        },
       }}
-      onSave={(r, byEar) => onActivity(prev => ({ ...prev, notes: logSkill({
+      onSave={(r, byEar) => onSavedActivity(prev => ({ ...prev, notes: logSkill({
         ...prev.notes,
         [nurseListenKey(l.id)]: JSON.stringify(saveNurseListen(prev.notes, l.id, { ...r, day: date }, byEar)),
         [nurseLastKey]: JSON.stringify({ id: l.id, title: l.title, you: l.you, day: date }),

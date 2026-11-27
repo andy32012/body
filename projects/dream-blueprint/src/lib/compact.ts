@@ -1,4 +1,7 @@
 import { addDays, daysBetween, reviewBonus, type ReviewEvent } from './progress'
+import { effectiveReviews, mergeReviewEvents, reviewEventKey } from './reviewMerge'
+import { legacyRecordId } from './recordId'
+import { packDayLessons, unpackDayLessons, type LessonRecord } from './lesson'
 
 /**
  * Keeps the saved progress small. The whole progress lives in one browser storage slot that holds about 5 MB, and
@@ -16,6 +19,7 @@ import { addDays, daysBetween, reviewBonus, type ReviewEvent } from './progress'
 export const archiveKey = 'review.archive'
 /** The day old records were last sent to the Drive archive. */
 export const lastArchiveKey = 'archive.last'
+const archivedNotesKey = 'archive.day-notes'
 export interface ReviewArchive {
   /** Review lines from before this day have been folded in. */
   before: string
@@ -39,6 +43,8 @@ interface ReviewRows {
   cards: string[]
   /** Day → pairs of card index and gap with the two review flags in its low bits. */
   days: Record<string, number[]>
+  /** Metadata aligned with the old pairs, which remain readable by clients without timestamps. */
+  attempts?: Record<string, Record<number, [at: number, id: string]>>
 }
 const empty: ReviewArchive = { before: '', total: 0, delayed: 0, recalled: 0, bonus: {} }
 const isCount = (v: unknown): v is DayCount => Array.isArray(v) && v.length === 3 && v.every(n => Number.isInteger(n) && n >= 0)
@@ -66,17 +72,15 @@ export function readArchive(notes: Record<string, string>): ReviewArchive {
   } catch { return empty }
 }
 const countLines = (events: readonly ReviewEvent[]): DayCount => {
-  const delayed = events.filter(e => e.gap >= 4 && !e.shownAnswer)
-  return [events.length, delayed.length, delayed.filter(e => e.remembered).length]
+  const counted = effectiveReviews(events)
+  const delayed = counted.filter(e => e.gap >= 4 && !e.shownAnswer)
+  return [counted.length, delayed.length, delayed.filter(e => e.remembered).length]
 }
 /** Archives from before review identities were retained can only supply totals. */
 function dayParts(a: ReviewArchive): { base?: ReviewArchive['base']; days: Record<string, DayCount> } {
   if (a.days) return { base: a.base, days: a.rows ? a.legacyDays ?? {} : a.days }
   return { base: a.total || a.delayed || a.recalled ? { before: a.before, total: a.total, delayed: a.delayed, recalled: a.recalled } : undefined, days: {} }
 }
-export const reviewEventKey = (event: ReviewEvent) =>
-  JSON.stringify([event.day, event.id, event.gap, event.remembered, event.shownAnswer])
-
 function* archivedEvents(day: string, rows?: ReviewRows): Generator<ReviewEvent> {
   if (!rows) return
   const row = rows.days[day]
@@ -85,7 +89,11 @@ function* archivedEvents(day: string, rows?: ReviewRows): Generator<ReviewEvent>
     const id = rows.cards[row[i]]
     const code = row[i + 1]
     if (typeof id !== 'string' || !Number.isSafeInteger(code) || code < 0) continue
-    yield { id, day, gap: Math.floor(code / 4), remembered: !!(code & 1), shownAnswer: !!(code & 2) }
+    const attempt = rows.attempts?.[day]?.[i / 2]
+    const tracked = Array.isArray(attempt) && Number.isSafeInteger(attempt[0]) && attempt[0] >= 0 &&
+      typeof attempt[1] === 'string' && attempt[1]
+    yield { id, day, gap: Math.floor(code / 4), remembered: !!(code & 1), shownAnswer: !!(code & 2),
+      ...(tracked ? { at: attempt[0], attempt: attempt[1] } : {}) }
   }
 }
 
@@ -119,15 +127,13 @@ export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readon
   const rows: ReviewRows = { cards, days: {} }
   for (const day of [...foldedDays].sort()) {
     if (!isDate(day) || day < cut || day >= before) continue
-    const byId = new Map<string, ReviewEvent>()
-    for (const source of [archivedEvents(day, x.rows), archivedEvents(day, y.rows), liveByDay.get(day) ?? []]) {
-      for (const event of source) byId.set(reviewEventKey(event), event)
-    }
-    if (!byId.size) continue
-    const lines = [...byId.keys()].sort().map(key => byId.get(key)!)
+    const lines = mergeReviewEvents([
+      ...archivedEvents(day, x.rows), ...archivedEvents(day, y.rows), ...(liveByDay.get(day) ?? []),
+    ]).sort((a, b) => reviewEventKey(a).localeCompare(reviewEventKey(b)))
+    if (!lines.length) continue
     days[day] = fullerDay(days[day], countLines(lines))
     const points = reviewBonus(lines, day)
-    if (points > (bonus[day] ?? 0)) bonus[day] = points
+    bonus[day] = legacyDays[day] ? Math.max(bonus[day] ?? 0, points) : points
     const row: number[] = []
     for (const event of lines) {
       let index = cardIndex.get(event.id)
@@ -135,6 +141,10 @@ export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readon
         index = cards.length
         cardIndex.set(event.id, index)
         cards.push(event.id)
+      }
+      if (event.at !== undefined && event.attempt) {
+        const attempts = ((rows.attempts ??= {})[day] ??= {})
+        attempts[row.length / 2] = [event.at, event.attempt]
       }
       row.push(index, event.gap * 4 + Number(event.remembered) + 2 * Number(event.shownAnswer))
     }
@@ -159,7 +169,7 @@ export function bonusOn(s: { reviewEvents: readonly ReviewEvent[]; notes: Record
 /** All-time delayed-recall totals (history page): archived ones plus the lines still kept. */
 export function delayedRecall(s: { reviewEvents: readonly ReviewEvent[]; notes: Record<string, string> }) {
   const a = readArchive(s.notes)
-  const delayed = s.reviewEvents.filter(e => e.gap >= 4 && !e.shownAnswer)
+  const delayed = effectiveReviews(s.reviewEvents).filter(e => e.gap >= 4 && !e.shownAnswer)
   return { delayed: a.delayed + delayed.length, recalled: a.recalled + delayed.filter(e => e.remembered).length }
 }
 
@@ -174,9 +184,45 @@ const dayOnly = [
   `^review\\.sentences\\.${DATE}$`,
   `^plan\\.${DATE}\\..+$`,
   `^vocab-screen\\.${DATE}$`,
+  `^daily-count\\.items\\.(?:vocab-screen|word-part\\.day|review\\.sentences)\\.${DATE}$`,
   `^progress\\.(?:(?:review|checkpoint)\\.)?${DATE}$`,
 ].map(p => new RegExp(p))
 const lessonRecord = new RegExp(`^lesson\\.${DATE}$`)
+const dayNoteDate = (key: string) => dayOnly.map(pattern => pattern.exec(key)?.[1]).find(Boolean)
+type ArchiveReceipts = Set<string>
+const noteVersion = (key: string, value: string) => legacyRecordId(JSON.stringify([key, value]))
+
+export function archiveReceipts(...copies: Record<string, string>[]): ArchiveReceipts {
+  const receipts = new Set<string>()
+  for (const notes of copies) {
+    for (const receipt of (notes[archivedNotesKey] ?? '').split(' ')) {
+      if (/^legacy-[0-9a-z]{1,13}$/.test(receipt)) receipts.add(receipt)
+    }
+  }
+  return receipts
+}
+
+function saveArchiveReceipts(notes: Record<string, string>, receipts: ArchiveReceipts) {
+  if (receipts.size) notes[archivedNotesKey] = [...receipts].sort().join(' ')
+}
+
+/** A receipt covers only the archived version. A late edit, even on an older date, still needs its own archive. */
+export function removeArchivedNotes(notes: Record<string, string>, receipts: ArchiveReceipts) {
+  if (!receipts.size) return false
+  let changed = false
+  for (const [key, value] of Object.entries(notes)) {
+    if (dayNoteDate(key) && receipts.has(noteVersion(key, value))) {
+      delete notes[key]
+      changed = true
+    }
+  }
+  return changed
+}
+
+export function mergeArchiveReceipts(notes: Record<string, string>, receipts: ArchiveReceipts, last: string | undefined) {
+  saveArchiveReceipts(notes, receipts)
+  if (last && isDate(last)) notes[lastArchiveKey] = last
+}
 
 /** How long details are kept, in days. Big progress gets the short windows. */
 const shortWindowSize = 3_000_000
@@ -196,17 +242,24 @@ export interface Batch {
   lessons: Record<string, string>
 }
 
-/** A finished lesson without the long correction texts and per-sentence details, or null if it stays as it is. */
+/** Keep the learner's answers while moving older feedback and hints out of the live progress. */
+function slimLesson(rec: LessonRecord): LessonRecord {
+  if (rec.slim) return rec
+  const { recalls, records, hints: _hints, ...rest } = rec
+  const e = rec.express
+  const others = e?.others?.map(o => ({ first: o.first, lastAnswer: o.lastAnswer, finalAnswer: o.finalAnswer }))
+  const express = e ? { first: e.first, lastAnswer: e.lastAnswer, finalAnswer: e.finalAnswer, corrections: e.corrections ?? 0,
+    help: e.help ?? [], fixed: e.fixed, revealed: e.revealed, ...(others ? { others } : {}) } : undefined
+  const keepAnswers = (attempts: LessonRecord['records']) => attempts?.filter(a => typeof a.answer === 'string')
+  return { ...rest, ...(express ? { express } : {}), records: keepAnswers(records), recalls: keepAnswers(recalls), slim: true }
+}
+
+/** A date is eligible only when each lesson on it is finished. */
 function slim(value: string): string | null {
   try {
-    const rec = JSON.parse(value) as { steps?: string[]; express?: Record<string, unknown>; slim?: boolean } & Record<string, unknown>
-    if (!Array.isArray(rec.steps) || !rec.steps.includes('done') || rec.slim) return null
-    const { recalls: _r, records: _s, hints: _h, ...rest } = rec
-    const e = rec.express
-    // His own sentences stay (another device's too); Claude's full feedback is what leaves.
-    const others = Array.isArray(e?.others) ? (e.others as { first?: unknown; lastAnswer?: unknown }[]).map(o => ({ first: o?.first, lastAnswer: o?.lastAnswer })) : undefined
-    const express = e ? { first: e.first, lastAnswer: e.lastAnswer, corrections: e.corrections ?? 0, help: e.help ?? [], fixed: e.fixed, revealed: e.revealed, ...(others ? { others } : {}) } : undefined
-    return JSON.stringify({ ...rest, ...(express ? { express } : {}), slim: true })
+    const records = unpackDayLessons(JSON.parse(value))
+    if (!records.length || records.some(r => !r.steps.includes('done')) || records.every(r => r.slim)) return null
+    return JSON.stringify(packDayLessons(records.map(slimLesson)))
   } catch { return null /* an unreadable record is left as it is */ }
 }
 
@@ -215,12 +268,11 @@ export function oldDetails(state: Compactable, today: string, size = JSON.string
   const upTo = { events: addDays(today, -w.events), dayNotes: addDays(today, -w.dayNotes), lessons: addDays(today, -w.lessons) }
   const notes: Record<string, string> = {}
   const lessons: Record<string, string> = {}
-  const active = state.notes['lesson.active']
   for (const [k, v] of Object.entries(state.notes)) {
-    const day = dayOnly.map(rx => rx.exec(k)?.[1]).find(Boolean)
+    const day = dayNoteDate(k)
     if (day) { if (day < upTo.dayNotes) notes[k] = v; continue }
     const m = lessonRecord.exec(k)
-    if (m && m[1] < upTo.lessons && m[1] !== active && slim(v) !== null) lessons[k] = v
+    if (m && m[1] < upTo.lessons && slim(v) !== null) lessons[k] = v
   }
   return { upTo, events: state.reviewEvents.filter(e => e.day < upTo.events), notes, lessons }
 }
@@ -248,18 +300,30 @@ export function applyBatch<S extends Compactable>(state: S, batch: Batch, archiv
   }
   let changed: Record<string, string> | null = null
   const edit = () => (changed ??= { ...notes })
-  for (const [k, v] of Object.entries(batch.notes)) if (notes[k] === v) delete edit()[k]
+  const archivedNotes = Object.entries(batch.notes)
+  for (const [k, v] of archivedNotes) if (notes[k] === v) delete edit()[k]
+  if (archivedOn && archivedNotes.length) {
+    const receipts = archiveReceipts(notes)
+    for (const [key, value] of archivedNotes) receipts.add(noteVersion(key, value))
+    saveArchiveReceipts(edit(), receipts)
+  }
   for (const [k, v] of Object.entries(batch.lessons)) {
     const s = notes[k] === v ? slim(v) : null
     if (s !== null) edit()[k] = s
   }
   if (changed) notes = changed
-  if (archivedOn && notes[lastArchiveKey] !== archivedOn) notes = { ...notes, [lastArchiveKey]: archivedOn }
+  if (archivedOn && (notes[lastArchiveKey] ?? '') < archivedOn) notes = { ...notes, [lastArchiveKey]: archivedOn }
   return notes === state.notes && reviewEvents === state.reviewEvents ? state : { ...state, notes, reviewEvents }
 }
 
 /** Run when progress is loaded. `keepUnarchived` (Drive connected): leave old details for the Drive archive. */
 export function compactState<S extends Compactable>(state: S, today: string, size?: number, keepUnarchived = false): S {
+  const receipts = archiveReceipts(state.notes)
+  if (receipts.size) {
+    // A previous site version may have restored a note while retaining its archive receipt.
+    const notes = { ...state.notes }
+    if (removeArchivedNotes(notes, receipts)) state = { ...state, notes }
+  }
   if (keepUnarchived) return state
   return applyBatch(state, oldDetails(state, today, size))
 }

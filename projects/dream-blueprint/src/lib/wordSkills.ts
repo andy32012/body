@@ -71,6 +71,7 @@ const irregularTable = 'be:am,is,are,was,were,been,being;have:has,had,having;do:
   + 'wake:woke,woken;wear:wore,worn;win:won;begin:began,begun;sing:sang,sung;swim:swam,swum;ring:rang,rung;'
   + 'grow:grew,grown;throw:threw,thrown;blow:blew,blown;draw:drew,drawn;fly:flew,flown;show:showed,shown;'
   + 'forget:forgot,forgotten;hide:hid,hidden;bite:bit,bitten;steal:stole,stolen;spend:spent;build:built;lend:lent;'
+  + 'bleed:bled;tear:tore,torn;'
   + 'mean:meant;hear:heard;hurt:hurt;cut:cut;hit:hit;let:let;set:set;shut:shut;cost:cost;quit:quit;spread:spread;'
   + 'lie:lay,lain,lying;lay:laid;die:dying;tie:tying;sell:sold;shoot:shot;sweep:swept;weep:wept;feed:fed;lead:led;'
   + 'light:lit;slide:slid;stick:stuck;strike:struck;swing:swung;dig:dug;hang:hung;shake:shook,shaken;forgive:forgave,forgiven;'

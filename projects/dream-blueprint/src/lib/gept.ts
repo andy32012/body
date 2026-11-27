@@ -47,8 +47,13 @@ type GeptReading = { r?: number; rp?: number[] }
 export interface GeptRecord extends GeptReading {
   d?: string; q?: number; best?: number; p?: number; rr?: number; rrIds?: number[]
   readAt?: number; readBest?: GeptReading; weakMarks?: string[]
-  /** Best result without question text during the answer. Null means recent checks were all assisted. */
+  /** Best result with a spoken answer to every question and no question text during the answers. */
   listeningBest?: number | null
+  /** The qualifying evidence for the most recent scored question round. Older grades did not record this. */
+  questionMode?: 'listening' | 'text' | 'partial'
+  questionAt?: number
+  questionId?: string
+  questionsComplete?: boolean
 }
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
   try {
@@ -67,6 +72,18 @@ function mergeListeningScores(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'l
   const best = Math.max(bestWithNoText(a), bestWithNoText(b))
   return { listeningBest: best >= 0 ? best : null }
 }
+function hasCompletedQuestions(r: GeptRecord) {
+  return r.questionsComplete ?? (r.q !== undefined && r.questionMode !== 'partial')
+}
+function mergeQuestions(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'q' | 'questionMode' | 'questionAt' | 'questionId' | 'questionsComplete'> {
+  const time = (b.questionAt ?? 0) - (a.questionAt ?? 0)
+  const newer = time > 0 || (time === 0 && (b.questionId ?? '') >= (a.questionId ?? ''))
+  const latest = b.q !== undefined && (a.q === undefined || newer) ? b : a
+  return {
+    q: latest.q, questionMode: latest.questionMode, questionAt: latest.questionAt, questionId: latest.questionId,
+    questionsComplete: hasCompletedQuestions(a) || hasCompletedQuestions(b),
+  }
+}
 export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: readonly string[]): Record<GeptLevel, boolean> {
   return { elementary: true, intermediate: elementaryIds.some(id => bestWithNoText(readGept(notes, 'elementary', id)) >= geptPass) }
 }
@@ -74,7 +91,9 @@ export function saveGept(notes: Record<string, string>, level: GeptLevel, id: st
   const old = readGept(notes, level, id)
   const best = Math.max(bestQ(old), bestQ(patch))
   const reading = hasReading(patch) ? { ...patch, readAt: Math.max(patch.readAt ?? Date.now(), (old.readAt ?? 0) + 1) } : patch
+  const questions = patch.q !== undefined && patch.questionAt === undefined ? { ...patch, questionAt: Date.now() } : patch
   return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...mergedRepeats(old, patch),
+    ...mergeQuestions(old, questions),
     ...mergeReading(old, reading), ...mergeMistakes(old, patch), ...mergeListeningScores(old, patch),
     ...(best >= 0 ? { best } : {}) }) }
 }
@@ -92,6 +111,7 @@ export function mergeGeptRecords(a: GeptRecord, b: GeptRecord): GeptRecord {
   const bestPicture = Math.max(a.p ?? -1, b.p ?? -1)
   return {
     ...a, ...b, ...mergedRepeats(a, b),
+    ...mergeQuestions(a, b),
     ...(best >= 0 ? { best } : {}),
     ...(bestPicture >= 0 ? { p: bestPicture } : {}),
     ...mergeReading(a, b),
@@ -136,7 +156,7 @@ export function geptRoundDone(r: GeptRecord, level: GeptLevel, set: { repeat?: r
   const bestPieces = r.readBest?.rp ?? r.rp ?? []
   const read = bestPieces.length >= pieces && bestPieces.every(x => x >= readPieceDone)
   const repeated = level !== 'elementary' || (r.rr ?? 0) >= (set.repeat?.length ?? 0)
-  return read && repeated && r.q !== undefined && (level === 'elementary' || r.p !== undefined)
+  return read && repeated && hasCompletedQuestions(r) && (level === 'elementary' || r.p !== undefined)
 }
 
 /** The official 全民英檢 speaking tables (see rubrics.ts), with what a transcript can and can't show. */
@@ -165,7 +185,7 @@ const format = (perItem: string, questionCards = false) => [
 /** Claude's instructions for the 回答問題 part; the answers go in the message. */
 export function questionsPrompt(level: GeptLevel) {
   return [
-    `你是全民英檢${geptLevels[level].name}口說的練習評分員，學生是玄燁（台灣護理系學生）。下面是他「回答問題」的逐字稿：每題的題目和他說的話（語音辨識的結果，可能有辨識錯的字，明顯是辨識錯的不要扣分；沒說話就是空白）。`,
+    `你是全民英檢${geptLevels[level].name}口說的練習評分員，學生是玄燁（台灣護理系學生）。下面是他「回答問題」的逐字稿：每題的題目和他說的話（語音辨識的結果，可能有辨識錯的字，明顯是辨識錯的不要扣分）。尚未回答、辨識未完成或沒有辨識到文字，代表該題沒有可評的回答。這些題可示範怎麼答，但不要編造學生的原話或為它們產生複習卡。`,
     ...rubric[level],
     format('[題] 題號 ||| 一句回饋：好的地方或更好的說法，可以附一句示範英文（每題一行）', true),
   ].join('\n')
@@ -196,17 +216,18 @@ export interface GeptFeedback { score?: number; why: string; items: { n: number;
 export function parseGeptFeedback(text: string, questionCards = false): GeptFeedback {
   const out: GeptFeedback = { why: '', items: [], good: '', fix: '', cards: [], rest: '' }
   const rest: string[] = []
+  let scoreSeen = false
   for (const raw of text.split('\n')) {
     const line = raw.trim()
     const m = line.match(/^\[(分數|題|好|改|卡)\]\s*(.*)$/)
     if (!m) { if (line) rest.push(line); continue }
     const parts = m[2].split('|||').map(p => p.trim())
     if (m[1] === '分數') {
-      // Only a score on the table: 0–5 in steps of .5, written first. A negative number, one in between (3.8) or no
-      // number at all (無法評分) is no score — not rounded into one.
-      const head = parts[0].match(/^(\d+(?:\.\d+)?)(?![\d.])/)
+      // A single score out of five in half-point steps. Do not accept the leading number of a fraction or range.
+      const head = parts[0].normalize('NFKC').match(/^([0-5](?:\.[05])?)(?:\s*級分)?$/)
       const n = head ? Number(head[1]) : NaN
-      if (Number.isFinite(n) && n >= 0 && n <= 5 && Number.isInteger(n * 2)) out.score = n
+      out.score = !scoreSeen && Number.isFinite(n) && n <= 5 ? n : undefined
+      scoreSeen = true
       out.why = parts[1] ?? ''
     } else if (m[1] === '題') {
       const n = Number((parts[0].match(/\d+/) ?? ['0'])[0])
@@ -216,7 +237,7 @@ export function parseGeptFeedback(text: string, questionCards = false): GeptFeed
     else if (out.cards.length < 3) {
       const numbered = questionCards && /^\d+$/.test(parts[0])
       const [wrong, en, zh, why, tag] = numbered ? parts.slice(1) : parts
-      if (wrong && en && why !== undefined) {
+      if (wrong && en && zh && why) {
         out.cards.push({ wrong, en, zh, why, ...(tag ? { tag } : {}), ...(numbered ? { question: Number(parts[0]) } : {}) })
       }
     }
@@ -234,7 +255,10 @@ export function geptFeedbackComplete(fb: GeptFeedback, count: number) {
     && !!fb.good.trim() && !!fb.fix.trim()
 }
 /** Questions Claude wrote for his own photo are used only together with its description (3–5 questions). */
-export const photoQuestionsComplete = (p: { questions: string[]; describe: string }) => p.questions.length >= 3 && !!p.describe.trim()
+export function photoQuestionsComplete(p: { questions: string[]; describe: string }) {
+  const distinct = new Set(p.questions.map(sayIdentity).filter(Boolean))
+  return p.questions.length >= 3 && distinct.size === p.questions.length && /[a-z]/i.test(p.describe)
+}
 
 export function parsePhotoQuestions(text: string) {
   const questions: string[] = []

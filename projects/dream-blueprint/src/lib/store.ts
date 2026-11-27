@@ -9,6 +9,7 @@ import { rescoreExams } from './examKeys'
 import { cloudBase, cloudScope, driveConnected, localStamp, setCloudBase } from './drive'
 import { nurseSkillKey } from './homographs'
 import { skillKey } from './wordSkills'
+import { stampPreferenceChanges } from './preferences'
 
 export type Page = 'today' | 'practice' | 'plan' | 'history' | 'rivals' | 'settings'
 const str = z.string().max(50000)
@@ -42,7 +43,7 @@ const schoolSchema = z.object({
 const sessions = z.array(z.object({
   id,day,energy,period,sentenceId:str,feedback:z.enum(['right','much','more']).optional(),
   words:stringList,rating:rating.optional(),advanced:z.boolean().optional(),
-  translations:z.array(z.object({sentenceId:id,rating,grammar:stringList,revealed:z.boolean(),verified:z.boolean().optional()})).optional(),
+  translations:z.array(z.object({sentenceId:id,rating,grammar:stringList,revealed:z.boolean(),verified:z.boolean().optional(),attempted:z.boolean().optional()})).optional(),
   spokenIds:stringList.optional(),
 }))
 const settingsSchema = z.object({
@@ -59,8 +60,8 @@ const schema = z.object({
   workload:z.object({extraWords:natural,lastAssessment:z.union([day,z.literal('')]),lastReduction:z.union([day,z.literal('')])}).default({extraWords:0,lastAssessment:'',lastReduction:''}),
   cards:z.array(z.object({id,box:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5),z.literal(6),z.literal(7),z.literal(8),z.literal(9),z.literal(10)]),lastDay:day,due:day,mastered:z.boolean(),
     // FSRS memory state (stability in days, difficulty 1–10); cards from before FSRS have none until their next review.
-    s:z.number().positive().max(100000).optional(),d:z.number().min(1).max(10).optional()})),
-  reviewEvents:z.array(z.object({id,day,gap:natural,remembered:z.boolean(),shownAnswer:z.boolean()})),
+    s:z.number().positive().max(100000).optional(),d:z.number().min(1).max(10).optional(),reviewedAt:natural.optional()})),
+  reviewEvents:z.array(z.object({id,day,gap:natural,remembered:z.boolean(),shownAnswer:z.boolean(),at:natural.optional(),attempt:id.optional()})),
   // Units come from the published course (42 + bridge units, more later); the cap only rejects nonsense.
   curriculum:z.object({unit:z.number().int().min(1).max(200),day:z.number().int().min(1).max(6),retry:natural,stableUnits:z.array(z.number().int().min(1).max(200))}),
   knownWords:stringList,learningWords:stringList,customWords:z.array(customWord),
@@ -83,7 +84,9 @@ function outside(range:PeriodRange,cut:PeriodRange):PeriodRange[] {
   if ((range.end && range.end < cut.start) || (cut.end && cut.end < range.start)) return [range]
   const parts:PeriodRange[] = []
   if (range.start < cut.start) parts.push({...range,end:addDays(cut.start,-1)})
-  if (cut.end && (!range.end || cut.end < range.end)) parts.push({...range,start:addDays(cut.end,1)})
+  if (cut.end && cut.end < '9999-12-31' && (!range.end || cut.end < range.end)) {
+    parts.push({...range,start:addDays(cut.end,1)})
+  }
   return parts
 }
 export function replacePeriod(ranges:readonly PeriodRange[],chosen:PeriodRange):PeriodRange[] {
@@ -361,8 +364,9 @@ export function readStoreForArchive() {
   })
 }
 /** Acknowledging the server version must not change which browser snapshot counts as saved. */
-export function recordCloudSave(version:number, sentModified:number, sentBase:number, sentScope?:string|null) {
+export function recordCloudSave(version:number, sentModified:number, sentBase:number, sentScope?:string|null, signal?:AbortSignal) {
   return withStoreLock(()=>{
+    signal?.throwIfAborted()
     const snapshot = currentSnapshot()
     const scope = cloudScope()
     if (dirty || unreadable || snapshot.storageError || currentCloudBase(scope)!==sentBase || modified<sentModified ||
@@ -372,9 +376,10 @@ export function recordCloudSave(version:number, sentModified:number, sentBase:nu
     return true
   })
 }
-export async function restoreBackup(raw:string, stamp?:number, options:{cloudBase?:number, expected?:AppState, scope?:string|null}={}) {
+export async function restoreBackup(raw:string, stamp?:number, options:{cloudBase?:number, expected?:AppState, scope?:string|null, signal?:AbortSignal}={}) {
   const state = importBackup(raw)
   return withStoreLock(()=>{
+    options.signal?.throwIfAborted()
     const {state:current} = currentSnapshot()
     if (options.scope!==undefined && options.scope!==cloudScope()) throw new Error('雲端連線已經切換，請再試一次。')
     if (options.expected && current!==options.expected)
@@ -385,9 +390,10 @@ export async function restoreBackup(raw:string, stamp?:number, options:{cloudBas
   })
 }
 /** A cloud pull may replace only the version it observed, after confirming it did not miss unsaved answers. */
-export async function replaceIfUnchanged(raw:string, stamp:number, seen:number, seenBase?:number, seenScope?:string|null):Promise<boolean> {
+export async function replaceIfUnchanged(raw:string, stamp:number, seen:number, seenBase?:number, seenScope?:string|null, signal?:AbortSignal):Promise<boolean> {
   const state=importBackup(raw)
   return withStoreLock(()=>{
+    signal?.throwIfAborted()
     const snapshot = currentSnapshot()
     const scope = cloudScope()
     if (dirty || unreadable || snapshot.storageError || modified!==seen || (seenBase!==undefined && currentCloudBase(scope)!==seenBase) ||
@@ -404,7 +410,7 @@ export function localModified() {
 export function updateStore(updater:(prev:AppState)=>AppState) {
   return withStoreLock(()=>{
     const prev = currentSnapshot().state
-    const state = updater(prev)
+    const state = stampPreferenceChanges(prev,updater(prev),Date.now())
     if (prev===state && !dirty) return
     try { persist(state) } catch (error) {
       dirty = true
@@ -417,10 +423,11 @@ export function updateStore(updater:(prev:AppState)=>AppState) {
   })
 }
 /** Run once against the latest local progress and resolve only after a successful browser save. */
-export function updateStoreNow(updater:(prev:AppState)=>AppState, stamp?:number):Promise<AppState> {
+export function updateStoreNow(updater:(prev:AppState)=>AppState, stamp?:number, options:{merged?:boolean}={}):Promise<AppState> {
   return withStoreLock(()=>{
     const {state:prev,storageError}=currentSnapshot()
-    const state=updater(prev)
+    const next=updater(prev)
+    const state=options.merged ? next : stampPreferenceChanges(prev,next,Date.now())
     return prev===state && !dirty && !storageError && stamp===undefined ? prev : persist(state,{stamp})
   })
 }

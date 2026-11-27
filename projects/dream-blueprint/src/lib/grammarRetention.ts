@@ -90,12 +90,13 @@ interface StarTry { day: string; sentenceId: string; rating: Rating; revealed: b
 /** 文法星圖 from the translations he wrote. 穩了: the latest answer for that grammar point was written alone and checked
  *  (Claude's first check or the exact reference), and another sentence with the same point was too, at least four days
  *  earlier — the same sentence twice is remembering a sentence, not the rule. 還常錯: the last two answers were not right. */
-export function grammarStars(sessions: readonly { day: string; translations?: readonly { sentenceId: string; rating: Rating; grammar: readonly string[]; revealed: boolean; verified?: boolean }[] }[]) {
+export function grammarStars(sessions: readonly { day: string; translations?: readonly { sentenceId: string; rating: Rating; grammar: readonly string[]; revealed: boolean; verified?: boolean; attempted?: boolean }[] }[]) {
   const logs = [...sessions].sort((a, b) => a.day.localeCompare(b.day));
   const history = new Map<string, StarTry[]>();
   const counts: Record<Rating, number> = { correct: 0, minor: 0, again: 0 };
   for (const session of logs)
     for (const t of session.translations ?? []) {
+      if (t.attempted === false) continue;
       counts[t.rating]++;
       for (const tag of new Set(t.grammar))
         history.set(tag, [...history.get(tag) ?? [], { day: session.day, sentenceId: t.sentenceId, rating: t.rating, revealed: t.revealed, verified: t.verified === true }]);

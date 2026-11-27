@@ -3,7 +3,7 @@ import levels from '../data/levels.json'
 export interface VocabularyWord { en: string; zh: string; level?: number }
 /** One form inside a merged entry: "he (him, his, himself)" → he / him / his / himself, each with its own meaning.
  *  Several spellings in `forms` are the same word (airplane / plane); separate items are different words or forms. */
-export interface WordForm { forms: string[]; zh: string; pos: string }
+export interface WordForm { forms: string[]; zh: string; pos: string; sensePos?: string[] }
 /** A word-table entry. `zh` lists meanings separated by 「；」; `sensePos` gives each of those meanings its part of speech. */
 export interface LevelEntry { en: string; level: number; zh: string; pos?: string; sensePos?: string[]; forms?: WordForm[] }
 
@@ -18,9 +18,20 @@ export function meaningLine(e: Pick<LevelEntry, 'zh' | 'pos' | 'sensePos'>) {
 }
 /** The forms of a merged entry, each on its own line: "him pron. 他（當受詞）". Empty for an ordinary word. */
 export const formLines = (e: Pick<LevelEntry, 'forms'>) =>
-  e.forms && e.forms.length > 1 ? e.forms.map(f => ({ en: f.forms.join(' / '), pos: f.pos, zh: f.zh })) : []
+  e.forms && e.forms.length > 1 ? e.forms.map(f => ({
+    en: f.forms.join(' / '),
+    pos: f.sensePos ? '' : f.pos,
+    zh: f.sensePos ? meaningLine(f) : f.zh,
+  })) : []
 
 const normalize = (value: string) => value.normalize('NFKC').trim().toLowerCase()
+
+/** Show the tapped form's own meaning before falling back to the parent entry's general definition. */
+export function meaningForForm(entry: LevelEntry, spelling: string) {
+  const sameWord = normalize(spelling).replace(/\.$/, '')
+  const forms = entry.forms?.filter(f => f.forms.some(form => normalize(form).replace(/\.$/, '') === sameWord))
+  return forms?.length ? [...new Set(forms.map(meaningLine))].join('；') : meaningLine(entry)
+}
 
 function spellings(label: string): string[] {
   return label.split('/').flatMap(raw => {
@@ -67,13 +78,24 @@ export const isKnownWord = (word: string, known: readonly string[]) =>
 const entryIndex = new Map((levels as LevelEntry[]).map(e => [normalize(e.en), e]))
 export const levelEntry = (word: string): LevelEntry | undefined => entryIndex.get(wordKey(word))
 
+const ambiguousSpellingCues = new Map([
+  ['big', '本題練以 b 開頭的字。'],
+  ['large', '本題練以 l 開頭的字。'],
+  ['begin', '本題練以 b 開頭的動詞。'],
+  ['start', '本題練以 s 開頭的動詞。'],
+])
+
 /** What a spelling drill asks for. A merged entry is asked one form at a time, with that form's own meaning,
  *  so "him" is practised as 他（當受詞）, not as any of he / him / his / himself. `turn` picks which form this time. */
-export function spellingTargets(word: { en: string; zh: string }, turn = 0): { en: string; zh: string; accept: string } {
-  const forms = levelEntry(word.en)?.forms
-  if (!forms || forms.length < 2) return { en: word.en, zh: word.zh, accept: forms?.[0]?.forms.join('/') ?? word.en }
+export function spellingTargets(word: { en: string; zh: string }, turn = 0): { en: string; zh: string; accept: string; cue?: string } {
+  const entry = levelEntry(word.en)
+  const forms = entry?.forms
+  if (!forms || forms.length < 2) {
+    const cue = ambiguousSpellingCues.get(normalize(word.en))
+    return { en: word.en, zh: word.zh, accept: forms?.[0]?.forms.join('/') ?? word.en, cue }
+  }
   const f = forms[Math.abs(turn) % forms.length]
-  return { en: f.forms[0], zh: f.zh + '（' + f.pos + '）', accept: f.forms.join('/') }
+  return { en: f.forms[0], zh: meaningLine(f), accept: f.forms.join('/') }
 }
 
 // A fixed interleaving keeps learners within their chosen level without alphabetic runs.

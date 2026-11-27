@@ -25,13 +25,14 @@ export const teachingRules = [
 ]
 
 /** Plain text another assistant can follow, built from what this device has recorded. */
-export function handoffText(state: AppState, today: string) {
+export function handoffText(state: AppState, today: string, audience: 'handoff' | 'assistant' = 'handoff') {
+  const detailed = audience === 'handoff'
   const { unit: unitId, day } = state.curriculum
   const finished = unitId > units.length
   const unit = units.find(u => u.id === unitId)
   const lesson = unit ? (day >= 6 ? null : unit.days[day - 1]) : null
   const checkpoint = unit && day >= 6 ? unit.checkpoint : []
-  const recent = state.sessions.flatMap(s => (s.translations ?? []).map(t => ({ ...t, day: s.day }))).slice(-10)
+  const recent = detailed ? state.sessions.flatMap(s => (s.translations ?? []).map(t => ({ ...t, day: s.day }))).slice(-10) : []
   const weak = new Map<string, number>()
   const solid = new Map<string, number>()
   // Solid only when written alone and checked; a self-marked "correct" nobody confirmed counts neither way.
@@ -42,7 +43,7 @@ export function handoffText(state: AppState, today: string) {
   const stable = state.curriculum.stableUnits.map(id => units.find(u => u.id === id)?.title).filter(Boolean)
   const lines = [
     '# 玄燁的英文進度（交接用）',
-    '請照這份接著教我英文。每次上完課，請把「目前進度」整段更新後給我，方便我下次貼給你或其他老師。',
+    detailed ? '請照這份接著教我英文。每次上完課，請把「目前進度」整段更新後給我，方便我下次貼給你或其他老師。' : null,
     '',
     '## 我是誰',
     '- 台灣人，護理系學生，目標去美國當註冊護理師（RN），之後要考雅思（IELTS）。',
@@ -55,18 +56,18 @@ export function handoffText(state: AppState, today: string) {
     levelLine(state),
     unit ? '- 這個單元的規則：' + unit.rule : null,
     packLine(state),
-    lesson ? '- 今天這句：「' + lesson.zh + '」（不要先給答案）' : null,
-    lesson && lesson.newWords.length ? '- 今天的新字：' + lesson.newWords.map(w => w.en + ' ' + w.zh).join('、') : null,
-    checkpoint.length ? '- 今天是小關卡，三句：' + checkpoint.map(s => '「' + s.zh + '」').join('、') + '。對兩句以上就過關，進下一個單元。' : null,
+    detailed && lesson ? '- 今天這句：「' + lesson.zh + '」（不要先給答案）' : null,
+    detailed && lesson && lesson.newWords.length ? '- 今天的新字：' + lesson.newWords.map(w => w.en + ' ' + w.zh).join('、') : null,
+    detailed && checkpoint.length ? '- 今天是小關卡，三句：' + checkpoint.map(s => '「' + s.zh + '」').join('、') + '。對兩句以上就過關，進下一個單元。' : null,
     stable.length ? '- 已過關的單元（沒看提示自己寫對）：' + stable.join('、') : null,
     assistedUnits(state.notes).length ? '- 做完但有看提示、之後要再確認：' + assistedUnits(state.notes).map(id => units.find(u => u.id === id)?.title).filter(Boolean).join('、') : null,
     '- 單字：已認得 ' + state.knownWords.length + ' 個，待學 ' + state.learningWords.length + ' 個。',
     '',
-    '## 最近做過的句子',
+    detailed ? '## 最近做過的句子' : null,
     ...(recent.length ? recent.map(t => {
       const s = byId.get(t.sentenceId)
       return '- ' + t.day + '「' + (s?.zh ?? t.sentenceId) + '」→ ' + (ratingNames[t.rating] ?? t.rating) + (t.revealed ? '（有看提示）' : '') + (s ? '；參考：' + s.reference[0] : '')
-    }) : ['- 這台裝置還沒有作答紀錄。']),
+    }) : detailed ? ['- 這台裝置還沒有作答紀錄。'] : []),
     '',
     '## 文法狀態',
     '- 比較穩：' + ([...solid.keys()].filter(g => !weak.has(g) && !topWeak(state.notes, today, 10).some(w => w.k === g)).join('、') || '還沒有足夠紀錄'),

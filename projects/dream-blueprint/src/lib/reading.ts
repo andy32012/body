@@ -1,5 +1,6 @@
 import { levelTarget, openSteps } from './unlock'
 import { unfinishedItems, writeUnfinished } from './unfinished'
+import { firstOfDay, isDatedGrade, mergeDailyGrades } from './firstDailyGrade'
 export { levelTarget } from './unlock'
 
 /** Graded reading from A1 up to IELTS-style passages. Each wrong answer asks why, so word, sentence,
@@ -9,7 +10,7 @@ export type ReadBand = 'easy' | 'mid' | 'hard'
 export interface ReadStep { level: ReadLevel; band: ReadBand }
 export type ReadStepKey = `${ReadLevel}-${ReadBand}`
 export type QType = 'main' | 'detail' | 'reference' | 'vocab' | 'evidence' | 'tfng' | 'heading'
-export interface ReadQuestion { type: QType; q: string; options: string[]; answer: number; why: string; evidence?: string }
+export interface ReadQuestion { type: QType; q: string; options: string[]; answer: number; why: string; evidence?: string; additional?: true; revision?: number }
 export interface ReadPassage { id: string; level: ReadLevel; band: ReadBand; title: string; topic: string; words: number; paras: string[]; zh: string; qs: ReadQuestion[]; ielts?: boolean
   /** Bridge-unit passages: the unit they belong to; held = the unseen test passage, never shown for browsing. */
   unit?: number; held?: boolean }
@@ -35,9 +36,10 @@ export const typeNames: Record<QType, string> = {
 export const readCauses = ['單字不認得', '句子看不懂', '找不到答案在哪', '題型不熟', '看太快']
 
 /** The latest attempt, plus `best`: the best attempt that counts. A redo on the same day comes right after seeing the
- *  answers, so it is practice and never replaces the record; a lower score later never erases a pass. */
-export interface ReadAttempt { day: string; correct: number; total: number; zh?: boolean }
-export interface ReadRecord { day: string; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean
+ *  answers, so it is practice and never replaces the record; a lower score on a later day never erases a pass. */
+export interface ReadAttempt { day: string; correct: number; total: number; zh?: boolean; at?: number }
+export interface ReadRecord { day: string; at?: number; picks: number[]; correct: number; total: number; causes?: Record<number, string>; zh?: boolean; tries: number; best?: ReadAttempt; practice?: boolean
+  firstByDay?: ReadAttempt[]; priorBest?: ReadAttempt; questionRevisions?: Record<number, number>
   /** New attempts identify the band edition. Retakes keep the earlier edition's best grade as evidence of access
    *  already earned; original records remain readable without converting or replacing any storage keys. */
   bandVersion?: 1; legacyBest?: ReadAttempt }
@@ -54,15 +56,40 @@ export function readRecord(notes: Record<string, string>, id: string): ReadRecor
 const clean = (a: ReadAttempt) => !a.zh && a.correct / Math.max(1, a.total) >= 0.7
 /** Whether attempt `a` beats `b`: passing (70%+, Chinese not opened) beats not passing, then the higher score. */
 export const betterRead = (a: ReadAttempt, b?: ReadAttempt) => !b || (clean(a) && !clean(b)) || (clean(a) === clean(b) && a.correct / Math.max(1, a.total) > b.correct / Math.max(1, b.total))
-const better = betterRead
-export function saveRead(notes: Record<string, string>, id: string, rec: Omit<ReadRecord, 'tries' | 'best' | 'practice' | 'bandVersion' | 'legacyBest'>) {
+const readGrade = ({ day, at, correct, total, zh }: ReadAttempt): ReadAttempt => ({ day, at, correct, total, ...(zh ? { zh: true } : {}) })
+const firstReadGrades = (record: ReadRecord) => Array.isArray(record.firstByDay)
+  ? record.firstByDay.filter(isDatedGrade) : record.practice ? [] : [readGrade(record)]
+const priorReadGrade = (record: ReadRecord) => {
+  if (record.firstByDay) return record.priorBest
+  return record.practice || record.best?.day !== record.day ? record.best : undefined
+}
+export const hasReadSubmission = (record: ReadRecord | null, day: string) =>
+  !!record && (record.day === day || firstReadGrades(record).some(grade => grade.day === day))
+const bestReadFrom = (grades: readonly ReadAttempt[], prior?: ReadAttempt) =>
+  grades.reduce<ReadAttempt | undefined>((best, grade) => betterRead(grade, best) ? grade : best, prior)
+export function mergeReadRecords(a: ReadRecord, b: ReadRecord): ReadRecord {
+  const formal = mergeDailyGrades(firstReadGrades(a), firstReadGrades(b))
+  const olderBest = priorReadGrade(a)
+  const newerBest = priorReadGrade(b)
+  const priorBest = olderBest && betterRead(olderBest, newerBest) ? olderBest : newerBest
+  const latest = a.day > b.day ? a : b.day > a.day ? b
+    : !!a.practice !== !!b.practice ? a.practice ? b : a
+    : a.at === b.at && JSON.stringify(a.picks) === JSON.stringify(b.picks) ? { ...a, ...b, causes: { ...a.causes, ...b.causes } }
+    : firstOfDay(a, b)
+  return { ...latest, firstByDay: formal, priorBest,
+    best: bestReadFrom(formal, priorBest), legacyBest: b.legacyBest ?? a.legacyBest, tries: Math.max(a.tries ?? 0, b.tries ?? 0) }
+}
+export function saveRead(notes: Record<string, string>, id: string,
+  rec: Omit<ReadRecord, 'at' | 'tries' | 'best' | 'practice' | 'bandVersion' | 'legacyBest' | 'firstByDay' | 'priorBest'>) {
   const old = readRecord(notes, id)
-  const oldBest: ReadAttempt | undefined = old?.best ?? (old ? { day: old.day, correct: old.correct, total: old.total, ...(old.zh ? { zh: true } : {}) } : undefined)
-  const practice = !!old && old.day === rec.day
-  const attempt: ReadAttempt = { day: rec.day, correct: rec.correct, total: rec.total, ...(rec.zh ? { zh: true } : {}) }
-  const best = !practice && better(attempt, oldBest) ? attempt : oldBest ?? attempt
-  const legacyBest = old?.bandVersion === 1 ? old.legacyBest : oldBest
-  return { ...notes, [readKey(id)]: JSON.stringify({ ...rec, tries: (old?.tries ?? 0) + 1, best, bandVersion: 1, ...(legacyBest ? { legacyBest } : {}), ...(practice ? { practice: true } : {}) }) }
+  if (old && hasReadSubmission(old, rec.day)) {
+    return { ...notes, [readKey(id)]: JSON.stringify({ ...old, tries: (old.tries ?? 0) + 1 }) }
+  }
+  const at = Math.max(Date.now(), (old?.at ?? 0) + 1)
+  const grade = readGrade({ ...rec, at })
+  const legacyBest = old?.bandVersion === 1 ? old.legacyBest : old && (old.best ?? readGrade(old))
+  const next: ReadRecord = { ...rec, at, tries: (old?.tries ?? 0) + 1, best: grade, firstByDay: [grade], bandVersion: 1, legacyBest: legacyBest ?? undefined }
+  return { ...notes, [readKey(id)]: JSON.stringify(old ? mergeReadRecords(old, next) : next) }
 }
 /** A passage is passed at 70% or better without opening the Chinese, on an attempt that counts. */
 export const passed = (r: ReadRecord | null) => !!r && clean(r.best ?? r)
@@ -174,16 +201,15 @@ function shuffled<T>(xs: readonly T[], rnd: () => number) {
 /** A question as shown: options in their shown order, `answer` in that order; `from` is its place in the data and
  *  `optionFrom[i]` the data index of shown option i. */
 export interface ShownQuestion extends ReadQuestion { from: number; optionFrom: number[] }
-/** The passage as shown. In the data the right answers of many passages go A, B, C… in turn and the True/False/Not
- *  Given answers come in the same order, so the first answer gave the others away. Options are shuffled (True / False /
- *  Not Given keep their order) and the True/False/Not Given statements swap places among themselves. Answers are still
- *  saved by the data's own order, so old records read the same. */
+/** Options are shuffled except for True / False / Not Given. Those statements swap places among themselves.
+ *  Additional statements stay at the end and out of the original shuffle, so existing in-progress answers
+ *  keep the same question and option positions. Completed answers are saved in the data's own order. */
 export function shownPassage(p: ReadPassage): Omit<ReadPassage, 'qs'> & { qs: ShownQuestion[] } {
   const rnd = seeded(p.id)
-  const tf = p.qs.map((q, i) => q.type === 'tfng' ? i : -1).filter(i => i >= 0)
+  const tf = p.qs.flatMap((q, i) => q.type === 'tfng' && !q.additional ? [i] : [])
   const tfOrder = shuffled(tf, rnd)
   return { ...p, qs: p.qs.map((q0, i) => {
-    const from = q0.type === 'tfng' ? tfOrder[tf.indexOf(i)] : i
+    const from = q0.type === 'tfng' && !q0.additional ? tfOrder[tf.indexOf(i)] : i
     const q = p.qs[from]
     const optionFrom = q.type === 'tfng' ? q.options.map((_, j) => j) : shuffled(q.options.map((_, j) => j), rnd)
     return { ...q, options: optionFrom.map(j => q.options[j]), answer: optionFrom.indexOf(q.answer), from, optionFrom }
@@ -196,14 +222,32 @@ export function savedPicks(shown: readonly ShownQuestion[], picks: readonly numb
   return out
 }
 /** Saved answers (data order) as shown, to show an earlier attempt again. */
-export function shownPicks(shown: readonly ShownQuestion[], saved: readonly number[]) {
-  return shown.map(q => saved[q.from] === undefined || saved[q.from] < 0 ? undefined : q.optionFrom.indexOf(saved[q.from])) as number[]
+export function shownPicks(shown: readonly ShownQuestion[], saved: readonly number[], revisions?: Record<number, number>) {
+  return shown.map(q => {
+    if (!usesCurrentQuestion(q, q.from, revisions)) return undefined
+    const index = q.optionFrom.indexOf(saved[q.from])
+    return index < 0 ? undefined : index
+  }) as number[]
 }
 export function savedCauses(shown: readonly ShownQuestion[], causes: Record<number, string>) {
   return Object.fromEntries(Object.entries(causes).map(([k, c]) => [String(shown[Number(k)]?.from ?? k), c]))
 }
+/** Question versions are indexed in the data order even when the learner saw them shuffled. */
+export function savedQuestionRevisions(questions: readonly (ReadQuestion & { from?: number })[]) {
+  const stamps = questions.flatMap((q, i) => q.revision ? [[q.from ?? i, q.revision] as const] : [])
+  return stamps.length ? Object.fromEntries(stamps) : undefined
+}
+export function usesCurrentQuestion(question: ReadQuestion, from: number, revisions?: Record<number, number>) {
+  return (question.revision ?? 0) === (revisions?.[from] ?? 0)
+}
+/** Resume to the first revised question that had a displayed answer, keeping the unaffected prefix and its causes. */
+export function prepareReadingDraft(p: ReadingProgress, questions: readonly ShownQuestion[]): ReadingProgress {
+  const first = questions.findIndex((q, i) => i < p.picks.length && !usesCurrentQuestion(q, q.from, p.questionRevisions))
+  if (first < 0) return p
+  return { ...p, picks: p.picks.slice(0, first), causes: Object.fromEntries(Object.entries(p.causes ?? {}).filter(([index]) => Number(index) < first)) }
+}
 /** The answers so far, in display order, saved separately for every passage. */
-export interface ReadingProgress { id: string; picks: number[]; causes?: Record<number, string>; zh?: boolean; updatedAt?: number }
+export interface ReadingProgress { id: string; picks: number[]; causes?: Record<number, string>; zh?: boolean; updatedAt?: number; questionRevisions?: Record<number, number> }
 export const readingProgressKey = (set: string) => 'reading.progress.' + set
 export function listReadingProgress(notes: Record<string, string>, set: string): ReadingProgress[] {
   return unfinishedItems(notes, readingProgressKey(set), (value): value is ReadingProgress => {
@@ -217,6 +261,10 @@ export function readReadingProgress(notes: Record<string, string>, set: string, 
 export function saveReadingProgress(notes: Record<string, string>, set: string, p: ReadingProgress | null, id = p?.id ?? readReadingProgress(notes, set)?.id) {
   return id ? writeUnfinished(notes, readingProgressKey(set), id, p) : notes
 }
+/** Match the draft and completed record seen by the question that is still on screen. */
+export function readingVersion(notes: Record<string, string>, set: string, id: string, recordKey: string) {
+  return JSON.stringify([readReadingProgress(notes, set, id), notes[recordKey]])
+}
 /** Which question types and causes go wrong most, across everything read. */
 export function readSummary(all: readonly ReadPassage[], notes: Record<string, string>) {
   const types: Partial<Record<QType, { right: number; total: number }>> = {}
@@ -226,13 +274,15 @@ export function readSummary(all: readonly ReadPassage[], notes: Record<string, s
     const r = readRecord(notes, p.id)
     if (!r) continue
     done++
+    if (r.practice) continue // Older releases kept the practice answers but could no longer recover their formal choices.
     p.qs.forEach((q, i) => {
-      if (i >= r.picks.length) return // Added questions were never answered in an older record.
+      if (i >= r.picks.length || !usesCurrentQuestion(q, i, r.questionRevisions)) return
       const t = types[q.type] ??= { right: 0, total: 0 }
       t.total++
       if (r.picks[i] === q.answer) t.right++
+      const c = r.causes?.[i]
+      if (c) causes[c] = (causes[c] ?? 0) + 1
     })
-    for (const c of Object.values(r.causes ?? {})) causes[c] = (causes[c] ?? 0) + 1
   }
   const weakest = (Object.entries(types) as [QType, { right: number; total: number }][])
     .filter(([, v]) => v.total >= 2).sort((a, b) => a[1].right / a[1].total - b[1].right / b[1].total)[0]

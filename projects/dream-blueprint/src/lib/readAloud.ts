@@ -28,11 +28,12 @@ const contractions: Record<string, string[]> = {
 export function spokenWords(token: string): string[] {
   const t = token.toLowerCase().replace(/[’‘`]/g, "'").replace(/^[^a-z0-9']+|[^a-z0-9']+$/g, '')
   if (!t) return []
-  if (contractions[t]) return contractions[t]
+  if (Object.hasOwn(contractions, t)) return contractions[t]
   if (/^\d+$/.test(t) && Number(t) < 1000) return numberWords(Number(t))
   return t.split(/[-–—/]/).map(p => p.replace(/'s$/, '').replace(/[^a-z0-9]/g, '')).filter(Boolean)
 }
 const heardWords = (text: string) => text.split(/\s+/).flatMap(spokenWords)
+export const hasReadingWords = (text: string) => text.split(/\s+/).some(token => spokenWords(token).length > 0)
 
 /** Longest common subsequence of the two word lists: which target words have a partner in what was heard, in order. */
 function matched(target: string[], heard: string[]): boolean[] {

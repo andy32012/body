@@ -2,29 +2,35 @@ import type { AppState } from './store'
 import { correctionPrefix, mergeCorrections, readCorrections } from './correctionHistory'
 import { memoryDeletedKey, memoryNoteKey, memoryTimesKey, mergeMemoryNotes } from './memory'
 import { mergeWeakNotes, weakKey, weakRemovedKey } from './weakPoints'
-import { archiveKey, mergeArchives, readArchive, reviewEventKey } from './compact'
-import { isClosedRun, mergeHints, mergeLessonRecords, mergeRunProgress, type HintUse, type LessonRecord, type RunProgress } from './lesson'
+import { archiveKey, archiveReceipts, lastArchiveKey, mergeArchiveReceipts, mergeArchives, readArchive, removeArchivedNotes } from './compact'
+import { mergeReviewCard, mergeReviewEvents } from './reviewMerge'
+import { isClosedRun, mergeHints, mergeLessonRecords, mergeReviewSlots, mergeRunProgress, type HintUse, type LessonRecord, type RunProgress } from './lesson'
 import { mergeMoved, movedKey, readMoved, settleWords } from './wordStates'
-import { betterRead, type ReadAttempt } from './reading'
+import { mergeReadRecords, type ReadRecord } from './reading'
 import { betterListen, mergeHeld, type HeldRecord, type ListenAttempt } from './bridge'
 import { mergeCertificates } from './cefr'
-import { bestExamAttempt, examRatio, type ExamRecord } from './examKeys'
+import { mergeExamRecords, type ExamRecord } from './examKeys'
 import { mergeGeptRecords, type GeptRecord } from './gept'
 import { mergeEvidenceRecords, readEvidence } from './evidence'
 import { backgroundPinPrefix, mergeBackgroundPin } from './backgroundPin'
 import { mergeUnfinished } from './unfinished'
-import { mergeStory, type StoryRecord } from './story'
-import type { TopicRecord } from './topics'
+import { mergeStory, storyLevelKey } from './story'
+import { mergeTopicListening, mergeTopicOpen, type TopicPart, type TopicRecord } from './topics'
 import { isPronRecordKey, mergePron, type PronRecord } from './pronunciation'
 import { isInitialWordCard, isSortedKey, mergeSortedWords, reconcileDailyCounts, scheduledWordCard } from './dailyWords'
 import { wordKey } from './vocab'
+import { reconcileIdentifiedCounts } from './dailyCounts'
 import { legacyKey as legacyBaselineKey, mergeBaselineResults, resultsKey as baselineResultsKey } from './baseline'
 import { readWriteRecord } from './writing'
+import { mergePreferences } from './preferences'
+import { mergeMockEntries, mockKey } from './ieltsMock'
+import { isPlanMarkKey, mergeGoalMove, mergeTaskMark } from './dailyPlan'
+import { isCaseResultKey, mergeCaseRecords } from './scenarios'
 
 /**
  * 「兩份合併」: when two devices both changed the progress since they last synced, keep everything from both instead of
  * choosing one. Lessons, sessions, review cards and lines, words, weak points and notes from either side all stay; the
- * course position is the one further along within the most recent retry; settings follow the copy changed last.
+ * course position is the one further along within the most recent retry; preferences follow their own edit history.
  */
 type Notes = Record<string, string>
 const unionBy = <T>(a: readonly T[], b: readonly T[], key: (x: T) => string) => {
@@ -39,25 +45,15 @@ const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) ? v : 0
 const earliest = (...days: unknown[]) => days.filter((d): d is string => typeof d === 'string' && !!d).sort()[0]
 /** read.*, write.*, nurse.listen.*, bridge.listen.*, story.<passage>, topic.<id>: see mergeNote. Null for anything else. */
 function mergePractice(key: string, a: unknown, b: unknown): string | null {
+  if (key.startsWith('story.') && key !== storyLevelKey) return JSON.stringify(mergeStory(a, b))
   if (!isObj(a) || !isObj(b)) return null
-  if (key.startsWith('exam.read.') && typeof a.correct === 'number' && typeof b.correct === 'number') {
-    const first = bestExamAttempt(a as unknown as ExamRecord)
-    const second = bestExamAttempt(b as unknown as ExamRecord)
-    const best = first && (!second || examRatio(first) > examRatio(second)
-      || (examRatio(first) === examRatio(second) && first.picks && !second.picks)) ? first : second
-    const latest = String(a.day) > String(b.day) ||
-      (a.day === b.day && typeof a.at === 'number' && typeof b.at === 'number' && a.at > b.at) ? a : b
-    return JSON.stringify({ ...latest, best, tries: Math.max(num(a.tries), num(b.tries)) })
-  }
+  if (key.startsWith('exam.read.') && typeof a.correct === 'number' && typeof b.correct === 'number' && typeof a.day === 'string' && typeof b.day === 'string')
+    return JSON.stringify(mergeExamRecords(a as unknown as ExamRecord, b as unknown as ExamRecord))
   if (key.startsWith('gept.speak.')) return JSON.stringify(mergeGeptRecords(a as GeptRecord, b as GeptRecord))
   if (/^bridge\.held\.\d+$/.test(key)) return JSON.stringify(mergeHeld(a as HeldRecord, b as HeldRecord))
   if (isPronRecordKey(key)) return JSON.stringify(mergePron(a as PronRecord, b as PronRecord))
-  if (/^read\./.test(key) && typeof a.correct === 'number' && typeof b.correct === 'number') {
-    const bestOf = (r: Record<string, unknown>) => (isObj(r.best) ? r.best : { day: r.day, correct: r.correct, total: r.total, ...(r.zh ? { zh: true } : {}) }) as unknown as ReadAttempt
-    const ba = bestOf(a), bb = bestOf(b)
-    const legacyBest = b.legacyBest ?? a.legacyBest
-    return JSON.stringify({ ...b, best: betterRead(ba, bb) ? ba : bb, tries: Math.max(num(a.tries), num(b.tries)), ...(legacyBest ? { legacyBest } : {}) })
-  }
+  if (/^read\./.test(key) && typeof a.correct === 'number' && typeof b.correct === 'number' && typeof a.day === 'string' && typeof b.day === 'string')
+    return JSON.stringify(mergeReadRecords(a as unknown as ReadRecord, b as unknown as ReadRecord))
   if (/^write\./.test(key) && (typeof a.day === 'string' || typeof b.day === 'string')) {
     const older = readWriteRecord(a)
     const newer = readWriteRecord(b)
@@ -66,11 +62,13 @@ function mergePractice(key: string, a: unknown, b: unknown): string | null {
     const earlierCheck = older?.last?.submittedAt ?? 0
     const laterCheck = newer?.last?.submittedAt ?? 0
     // A device can save an older answer later if its grading request took longer.
-    const keepEarlier = laterCheck > 0 && earlierCheck > laterCheck
+    const keepEarlier = !!older?.last && (!newer?.last || earlierCheck > laterCheck)
+    const selfReview = !newer?.selfReview || (older?.selfReview && older.selfReview.at > newer.selfReview.at)
+      ? older?.selfReview : newer.selfReview
     const day = typeof a.day === 'string' && (typeof b.day !== 'string' || a.day > b.day) ? a.day : b.day
     return JSON.stringify({ ...a, ...b, day, last: keepEarlier ? older?.last : newer?.last ?? older?.last,
       ...(keepEarlier ? { words: a.words } : {}), best: bests.length ? Math.max(...bests) : undefined,
-      tries: Math.max(num(a.tries), num(b.tries)), ...(self ? { self } : {}) })
+      tries: Math.max(num(a.tries), num(b.tries)), self, selfReview })
   }
   if (/^(nurse|bridge)\.listen\./.test(key) && typeof a.correct === 'number' && typeof b.correct === 'number') {
     const bestOf = (r: Record<string, unknown>) => (isObj(r.best) ? r.best : { day: r.day, correct: r.correct, total: r.total, heard: !!r.heard }) as unknown as ListenAttempt
@@ -81,20 +79,38 @@ function mergePractice(key: string, a: unknown, b: unknown): string | null {
     return JSON.stringify({ ...b, best: betterListen(ba, bb) ? ba : bb, plays: Math.max(num(a.plays), num(b.plays)),
       ...(reviewBest ? { reviewBest } : {}) })
   }
-  if (key.startsWith('story.')) return JSON.stringify(mergeStory(a as StoryRecord, b as StoryRecord))
   if (/^topic\./.test(key) && isObj(a.done) && isObj(b.done)) {
     const done: Record<string, string> = {}
     for (const p of new Set([...Object.keys(a.done), ...Object.keys(b.done)])) { const day = earliest(a.done[p], b.done[p]); if (day) done[p] = day }
-    const open = isObj(a.open) || isObj(b.open) ? { ...(isObj(a.open) ? a.open : {}), ...(isObj(b.open) ? b.open : {}) } : undefined
+    const older = a as unknown as TopicRecord
+    const newer = b as unknown as TopicRecord
+    const open = mergeTopicOpen(older.open, newer.open)
     const items = isObj(a.items) || isObj(b.items) ? { ...(isObj(a.items) ? a.items : {}), ...(isObj(b.items) ? b.items : {}) } : undefined
+    if (items && isObj(a.items)) for (const [id, answer] of Object.entries(a.items)) {
+      const current = items[id]
+      if (isObj(answer) && answer.attempted === true && isObj(current) && current.attempted === false) items[id] = answer
+    }
     const earlierReview = isObj(a.review) ? a.review as NonNullable<TopicRecord['review']> : undefined
     const laterReview = isObj(b.review) ? b.review as NonNullable<TopicRecord['review']> : undefined
     const hasAnswer = (review?: TopicRecord['review']) => !!review?.speak && (!!review.speak.mode || !!review.speak.level)
     const speak = hasAnswer(earlierReview) && !hasAnswer(laterReview) ? earlierReview?.speak : laterReview?.speak ?? earlierReview?.speak
     const review = laterReview || earlierReview ? { level: laterReview?.level ?? earlierReview?.level ?? null, speak } : undefined
-    // Where to continue: the newer copy's place, unless that part is already finished on either device.
-    const cur = [b.cur, a.cur].find(c => isObj(c) && typeof c.part === 'string' && !done[c.part])
-    const out: Record<string, unknown> = { ...a, ...b, done, ...(open ? { open } : {}), ...(items ? { items } : {}), ...(review ? { review } : {}) }
+    const completed = (part: TopicPart) => {
+      const before = older.done[part], after = newer.done[part]
+      return before && (!after || before < after) ? older : after ? newer : undefined
+    }
+    const understood = completed('A')
+    const expressed = completed('B')
+    const places = [newer.cur, older.cur].filter((entry): entry is NonNullable<TopicRecord['cur']> => !!entry && !done[entry.part])
+    const cur = places.sort((left, right) => left.part === right.part ? right.step - left.step : 0)[0]
+    const out: Record<string, unknown> = {
+      ...a, ...b, done, open, items, review,
+      words: understood?.words ?? newer.words ?? older.words,
+      listen: understood?.listen ?? mergeTopicListening(older.listen, newer.listen),
+      read: understood?.read ?? newer.read ?? older.read,
+      speak: expressed?.speak ?? newer.speak ?? older.speak,
+      write: expressed?.write ?? newer.write ?? older.write,
+    }
     if (cur) out.cur = cur; else delete out.cur
     return JSON.stringify(out)
   }
@@ -105,10 +121,14 @@ function mergePractice(key: string, a: unknown, b: unknown): string | null {
 export function mergeNote(key: string, older: string, newer: string, words?: Pick<AppState, 'knownWords' | 'learningWords'>): string {
   if (isSortedKey(key)) return JSON.stringify(mergeSortedWords(older, newer, words))
   if (older === newer) return newer
+  if (key === mockKey) return mergeMockEntries(older, newer)
+  if (isPlanMarkKey(key)) return mergeTaskMark(older, newer)
+  if (key.startsWith('move.plan.') || key.startsWith('move.plan-custom.')) return mergeGoalMove(older, newer)
   if (key.startsWith(correctionPrefix)) return JSON.stringify(mergeCorrections(readCorrections(older), readCorrections(newer)))
   if (key === weakKey || key === weakRemovedKey) return mergeWeakNotes({ [key]: older }, { [key]: newer })[key] ?? newer
   if (key.startsWith(backgroundPinPrefix)) return mergeBackgroundPin(older, newer)
   if (/^(reading\.progress\.(?:general|unit|nursing|exam)|case\.progress)\./.test(key)) return mergeUnfinished(older, newer)
+  if (isCaseResultKey(key)) return mergeCaseRecords(older, newer)
   if (/^evidence\.\d+$/.test(key)) {
     const unit = Number(key.slice('evidence.'.length))
     return JSON.stringify(mergeEvidenceRecords(readEvidence({ [key]: older }, unit), readEvidence({ [key]: newer }, unit)))
@@ -151,6 +171,8 @@ export function mergeNote(key: string, older: string, newer: string, words?: Pic
   // When words last moved between 認得 and 還不熟: the later move of each word.
   if (key === movedKey) return JSON.stringify(mergeMoved(readMoved({ [key]: older }), readMoved({ [key]: newer })))
   if (/^progress\.(?:(?:review|checkpoint)\.)?\d{4}-\d{2}-\d{2}$/.test(key)) {
+    if (key.startsWith('progress.review.') && (isRunProgress(a) || isClosedRun(a)) && (isRunProgress(b) || isClosedRun(b)))
+      return JSON.stringify(mergeReviewSlots(a, b))
     if (isRunProgress(a) && isRunProgress(b)) return JSON.stringify(mergeRunProgress(a, b))
     if (isClosedRun(a) && (isClosedRun(b) || isRunProgress(b)))
       return a.updatedAt >= (b.updatedAt ?? 0) ? older : newer
@@ -216,40 +238,60 @@ export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean
   }
   const ahead = compareCourse(older.curriculum, newer.curriculum) > 0 ? older : newer
   const moved = mergeMoved(readMoved(older.notes), readMoved(newer.notes))
-  const known = unionBy(older.knownWords, newer.knownWords, w => w)
-  const learning = unionBy(older.learningWords, newer.learningWords, w => w)
+  const known = unionBy(older.knownWords.map(wordKey), newer.knownWords.map(wordKey), w => w)
+  const learning = unionBy(older.learningWords.map(wordKey), newer.learningWords.map(wordKey), w => w)
   const words = settleWords(known, learning, moved, newer)
   const initiallyKnown = new Set(known.map(wordKey))
   const disputed = new Set(learning.map(wordKey).filter(k => initiallyKnown.has(k)))
   const finalKnown = new Set(words.knownWords.map(wordKey))
-  const events = unionBy(older.reviewEvents, newer.reviewEvents, reviewEventKey)
-  const actualReviews = new Set(events.map(e => e.id + '@' + e.day))
-  const isStarter = (card: AppState['cards'][number]) => isInitialWordCard(card) && !actualReviews.has(card.id + '@' + card.lastDay)
+  const events = mergeReviewEvents([...older.reviewEvents, ...newer.reviewEvents])
   const cards = new Map<string, AppState['cards'][number]>()
-  for (const c of [...older.cards, ...newer.cards]) {
-    const had = cards.get(c.id)
-    const orderedLater = !had || c.lastDay > had.lastDay || (c.lastDay === had.lastDay && c.due >= had.due)
-    if (had && c.id.startsWith('word:') && disputed.has(wordKey(c.id.slice(5))) && isStarter(had) !== isStarter(c)) {
-      if (!isStarter(c)) cards.set(c.id, c)
-    } else if (orderedLater) cards.set(c.id, c)
+  const actuallyReviewed = new Set<string>()
+  const isStarter = (card: AppState['cards'][number], reviewed: boolean) => !reviewed && isInitialWordCard(card)
+  for (const source of [older, newer]) {
+    const recorded = new Set(source.reviewEvents.map(e => e.id + '@' + e.day))
+    for (const card of source.cards) {
+      const had = cards.get(card.id)
+      const didReview = card.reviewedAt !== undefined || recorded.has(card.id + '@' + card.lastDay)
+      const hadReview = actuallyReviewed.has(card.id)
+      const competingWord = had && card.id.startsWith('word:') && disputed.has(wordKey(card.id.slice(5)))
+      const hadStarter = had ? isStarter(had, hadReview) : false
+      const starter = isStarter(card, didReview)
+      const selected = !had ? card : competingWord && hadStarter !== starter ? (starter ? had : card)
+        : mergeReviewCard(had, card, hadReview, didReview)
+      if (selected === card) {
+        if (didReview) actuallyReviewed.add(card.id)
+        else actuallyReviewed.delete(card.id)
+      }
+      cards.set(card.id, !selected.mastered && (had?.mastered || card.mastered) ? { ...selected, mastered: true } : selected)
+    }
   }
   for (const [id, card] of cards) {
     if (!id.startsWith('word:')) continue
     const key = wordKey(id.slice(5))
-    if (!disputed.has(key) || !isStarter(card)) continue
+    if (!disputed.has(key) || !isStarter(card, actuallyReviewed.has(id))) continue
     const move = Object.hasOwn(moved, key) ? moved[key] : undefined
     const schedule = scheduledWordCard(key, finalKnown.has(key), move?.[1] ?? card.lastDay)
     if (schedule) cards.set(id, { ...schedule, id })
     else cards.delete(id)
   }
-  const notes: Notes = { ...older.notes }
-  for (const [k, v] of Object.entries(newer.notes)) notes[k] = k in older.notes ? mergeNote(k, older.notes[k], v, words) : v
+  const receipts = archiveReceipts(older.notes, newer.notes)
+  const olderNotes: Notes = { ...older.notes }, newerNotes: Notes = { ...newer.notes }
+  removeArchivedNotes(olderNotes, receipts)
+  removeArchivedNotes(newerNotes, receipts)
+  const notes: Notes = { ...olderNotes }
+  for (const [k, v] of Object.entries(newerNotes)) notes[k] = Object.hasOwn(olderNotes, k) ? mergeNote(k, olderNotes[k], v, words) : v
   const merged: Notes = {
     ...notes,
     ...mergeCertificates(older.notes, newer.notes),
     ...mergeWeakNotes(older.notes, newer.notes),
   }
-  reconcileDailyCounts(merged)
+  reconcileDailyCounts(merged, olderNotes, newerNotes)
+  reconcileIdentifiedCounts(merged, olderNotes, newerNotes)
+  // A remaining daily word list can regenerate the same count, which may already be archived.
+  removeArchivedNotes(merged, receipts)
+  const lastArchive = [older.notes[lastArchiveKey], newer.notes[lastArchiveKey]].filter(day => /^\d{4}-\d{2}-\d{2}$/.test(day)).sort().at(-1)
+  mergeArchiveReceipts(merged, receipts, lastArchive)
   if (memoryNoteKey in notes || memoryDeletedKey in notes || memoryTimesKey in notes)
     Object.assign(merged, mergeMemoryNotes(newer.notes, older.notes))
   if (baselineResultsKey in merged || legacyBaselineKey in merged)
@@ -261,10 +303,12 @@ export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean
   const archive = archiveKey in older.notes || archiveKey in newer.notes ? mergeArchives(readArchive(older.notes), readArchive(newer.notes), events) : null
   if (archive) merged[archiveKey] = JSON.stringify(archive)
   const before = archive?.before ?? ''
+  const preferences = mergePreferences(older, newer, merged)
   return {
     ...newer,
+    ...preferences,
     startedDay: [mine.startedDay, theirs.startedDay].sort()[0],
-    school: mergeSchool(older.school, newer.school),
+    school: mergeSchool(older.school, preferences.school),
     sessions: [...sessions.values()].sort((a, b) => a.day.localeCompare(b.day)),
     cards: [...cards.values()],
     reviewEvents: events.filter(e => !before || e.day >= before).sort((a, b) => a.day.localeCompare(b.day)),
@@ -274,6 +318,5 @@ export function mergeStates(mine: AppState, theirs: AppState, mineNewer: boolean
     // Flags are cleared one by one in Settings: the copy changed last decides.
     flagged: newer.flagged,
     checks,
-    notes: merged,
   }
 }

@@ -1,7 +1,8 @@
 import ScenePhoto from "../components/ScenePhoto";
-import { useState } from "react";
-import type { PageProps } from "../lib/store";
+import { useRef, useState } from "react";
+import { updateStoreNow, type AppState, type PageProps } from "../lib/store";
 import { dayKey } from "../lib/progress";
+import { goalDestination, goalMarkKey, goalMoveKey, readTaskMark, writeGoalMove, writeTaskMark } from "../lib/dailyPlan";
 import { schoolToday, makeSchoolId } from "../lib/school";
 import { originalPlan, planEnd, projectCalendar } from "../lib/projection";
 import { readTopic, topics as lifeTopics } from "../lib/topics";
@@ -33,6 +34,8 @@ function monthTitle(month: string) {
   return Number(month.slice(0, 4)) + " 年 " + Number(month.slice(5)) + " 月";
 }
 type Goal = { id: string; source: string; track: Track; text: string };
+const goalDone = (state: AppState, id: string) =>
+  readTaskMark(state.notes[goalMarkKey(id)])?.done ?? Boolean(state.checks[id]);
 // A month can leave a track empty (the dream track during the licensing exam, say): no goal then.
 const baseGoals: Goal[] = plan.months.flatMap((m) =>
   tracks.flatMap((track) => m[track] ? [{
@@ -48,16 +51,23 @@ const firstMonth = plan.months[0].month;
 const lastMonth = planEnd.slice(0, 7);
 const monthFormat = /^\d{4}-(?:0[1-9]|1[0-2])$/;
 const calendarMonth = (value: string) => monthFormat.test(value) && value >= firstMonth && value <= lastMonth;
+const calendarDate = (value: string) =>
+  /^\d{4}-\d{2}-(?:0[1-9]|[12]\d|3[01])$/.test(value) &&
+  calendarMonth(value.slice(0, 7)) && asDate(value).getDate() === Number(value.slice(-2));
 const firstMoveMonth = (source: string) => calendarMonth(source) ? shiftMonth(source, 1) : firstMonth;
 const canMoveTo = (source: string, destination: string) =>
   calendarMonth(destination) && (!calendarMonth(source) || destination > source);
-export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (tab: PlanTab) => void }) {
-  const { state, update, navigate, tab, onTabChange } = props;
+export default function Plan(props: PageProps & {
+  tab: PlanTab;
+  selectedDate?: string;
+  onTabChange: (tab: PlanTab, date: string, replaceDate?: boolean) => void;
+}) {
+  const { state, update, navigate, tab, selectedDate, onTabChange } = props;
   const today = dayKey();
   const thisMonth = today.slice(0, 7);
   const initialMonth = thisMonth < firstMonth ? firstMonth : thisMonth > lastMonth ? lastMonth : thisMonth;
-  const [month, setMonth] = useState(initialMonth);
-  const [selected, setSelected] = useState(() => initialMonth === thisMonth ? today : initialMonth + "-01");
+  const selected = selectedDate && calendarDate(selectedDate) ? selectedDate : initialMonth === thisMonth ? today : initialMonth + "-01";
+  const month = selected.slice(0, 7);
   const [expanded, setExpanded] = useState<number | null>(
     Number(today.slice(0, 4)),
   );
@@ -65,8 +75,11 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
   const [custom, setCustom] = useState("");
   const [track, setTrack] = useState<Track>("school");
   const [lastMove, setLastMove] = useState<{ key: string; destination: string; message: string }>();
+  const [goalMessage, setGoalMessage] = useState("");
+  const [savingGoal, setSavingGoal] = useState(false);
+  const goalPending = useRef(false);
   const [replanSource, setReplanSource] = useState(
-    initialMonth === firstMonth ? initialMonth : shiftMonth(initialMonth, -1),
+    month === firstMonth ? month : shiftMonth(month, -1),
   );
   const [replanTo, setReplanTo] = useState(
     firstMoveMonth(replanSource),
@@ -111,12 +124,12 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
     },
   );
   const goals = [...baseGoals, ...customGoals];
-  const where = (goal: Goal) => state.notes["move." + goal.id] || goal.source;
+  const where = (goal: Goal) => goalDestination(state.notes[goalMoveKey(goal.id)]) || goal.source;
   const recovering = !calendarMonth(replanSource);
   const earliestMove = firstMoveMonth(replanSource);
   const canSelectMoveMonth = earliestMove <= lastMonth;
   const openGoals = goals.filter(
-    (g) => where(g) === replanSource && (recovering || !state.checks[g.id]),
+    (g) => where(g) === replanSource && (recovering || !goalDone(state, g.id)),
   );
   const sourceMonths = [
     ...new Set([
@@ -128,31 +141,63 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
     .reverse();
   function switchMonth(next: string) {
     if (!calendarMonth(next)) return;
-    setMonth(next);
-    setSelected(next === thisMonth ? today : next + "-01");
+    onTabChange("calendar", next === thisMonth ? today : next + "-01");
   }
-  function toggle(id: string) {
-    update((s) => ({ ...s, checks: { ...s.checks, [id]: !s.checks[id] } }));
+  function markGoal(id: string, done: boolean) {
+    const key = goalMarkKey(id);
+    update((s) => goalDone(s, id) === done ? s : {
+      ...s, checks: { ...s.checks, [id]: done }, notes: { ...s.notes, [key]: writeTaskMark(s.notes[key], done) },
+    });
+  }
+  async function saveGoal(change: (state: AppState) => AppState, afterSave: () => void) {
+    if (goalPending.current) return;
+    goalPending.current = true;
+    setSavingGoal(true);
+    setLastMove(undefined);
+    setGoalMessage("");
+    let changed = false;
+    try {
+      await updateStoreNow((current) => {
+        const next = change(current);
+        changed = next !== current;
+        return next;
+      });
+      if (changed) afterSave();
+      else setGoalMessage("這個目標已更新，請重新選取。");
+    } catch {
+      setGoalMessage("尚未存好，請再試一次。");
+    } finally {
+      goalPending.current = false;
+      setSavingGoal(false);
+    }
   }
   function moveGoal(goal: Goal, destination: string) {
     if (destination !== "removed" && !canMoveTo(replanSource, destination)) return;
-    const key = "move." + goal.id;
-    update((s) => (s.notes[key] || goal.source) === replanSource
-      ? { ...s, notes: { ...s.notes, [key]: destination } }
-      : s);
-    setLastMove({
-      key,
-      destination,
-      message: destination === "removed"
-        ? "已從月計畫移除「" + goal.text + "」。"
-        : "已排到 " + monthTitle(destination) + "。",
-    });
+    const key = goalMoveKey(goal.id);
+    void saveGoal(
+      (s) => (goalDestination(s.notes[key]) || goal.source) === replanSource && (recovering || !goalDone(s, goal.id))
+        ? { ...s, notes: { ...s.notes, [key]: writeGoalMove(s.notes[key], destination) } }
+        : s,
+      () => setLastMove({
+        key,
+        destination,
+        message: destination === "removed"
+          ? "已從月計畫移除「" + goal.text + "」。"
+          : "已排到 " + monthTitle(destination) + "。",
+      }),
+    );
   }
   function addGoal() {
-    if (!custom.trim()) return;
+    const text = custom.trim();
+    if (!text) return;
     const id = "plan-custom." + month + "." + track + "." + makeSchoolId();
-    update((s) => ({ ...s, notes: { ...s.notes, [id]: custom.trim() } }));
-    setCustom("");
+    void saveGoal(
+      (s) => ({ ...s, notes: { ...s.notes, [id]: text } }),
+      () => {
+        setCustom("");
+        setGoalMessage("已新增至 " + monthTitle(month) + "。");
+      },
+    );
   }
   const replanDue =
     !state.checks["replan." + thisMonth] &&
@@ -169,8 +214,8 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
       <label className="pl-goal" key={id}>
         <input
           type="checkbox"
-          checked={Boolean(state.checks[id])}
-          onChange={() => toggle(id)}
+          checked={goalDone(state, id)}
+          onChange={(event) => markGoal(id, event.target.checked)}
         />
         <span className={"pl-track " + track}>{trackNames[track]}</span>
         <span>{text}</span>
@@ -207,7 +252,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
           <button
             key={key}
             aria-pressed={tab === key}
-            onClick={() => onTabChange(key)}
+            onClick={() => { if (key !== tab) onTabChange(key, selected); }}
           >
             {label}
           </button>
@@ -215,7 +260,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
       </div>
       {tab === "rivals" && <Rivals {...props} />}
       {tab === "exam" && <ExamMap state={state} update={props.update} />}
-      {tab === "levels" && <LevelLadder state={state} update={update} />}
+      {tab === "levels" && <LevelLadder state={state} />}
       {tab === "map" && (
         <>
           <Roadmap {...props} />
@@ -245,7 +290,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                   <span>
                     {
                       tracks.filter(
-                        (t) => state.checks["plan." + y.year + "." + t],
+                        (t) => goalDone(state, "plan." + y.year + "." + t),
                       ).length
                     }{" "}
                     / 3
@@ -263,10 +308,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                         .map((m) => (
                           <button
                             key={m.month}
-                            onClick={() => {
-                              switchMonth(m.month);
-                              onTabChange("calendar");
-                            }}
+                            onClick={() => switchMonth(m.month)}
                           >
                             {Number(m.month.slice(-2))} 月
                           </button>
@@ -340,7 +382,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                     aria-label={
                       entry.day + " " + (completed ? "已練習" : entry.label)
                     }
-                    onClick={() => setSelected(entry.day)}
+                    onClick={() => onTabChange("calendar", entry.day, true)}
                   >
                     <b>{Number(entry.day.slice(-2))}</b>
                     <small>
@@ -407,7 +449,12 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
             {goals
               .filter((g) => where(g) === month)
               .map((g) => goalRow(g.id, g.track, g.text))}
-            {goals.some((g) => where(g) === month && g.track === "english" && mockGoal(g.text)) && <IeltsMockLog state={state} update={update} />}
+            {goals.some((g) => where(g) === month && g.track === "english" && mockGoal(g.text)) && <IeltsMockLog state={state} />}
+            {goals.some((g) => where(g) === month && /NCLEX.*(?:題|考試計畫)/i.test(g.text)) && <p className="pl-planning-note">
+              <a href="https://www.nclex.com/prepare.page" target="_blank" rel="noreferrer">NCLEX-RN 官方病例樣題與操作預覽 ↗</a>
+              {" · "}
+              <a href="https://www.nclex.com/test-plans" target="_blank" rel="noreferrer">NCSBN 最新 RN 考試計畫 ↗</a>
+            </p>}
             <details className="pl-add">
               <summary>新增這個月的目標</summary>
               <form
@@ -420,6 +467,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                   目標類別
                   <select
                     value={track}
+                    disabled={savingGoal}
                     onChange={(e) => setTrack(e.target.value as Track)}
                   >
                     {tracks.map((t) => (
@@ -433,12 +481,13 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                   目標內容
                   <input
                     value={custom}
+                    disabled={savingGoal}
                     maxLength={180}
                     onChange={(e) => setCustom(e.target.value)}
                     required
                   />
                 </label>
-                <button>加入</button>
+                <button disabled={savingGoal}>{savingGoal ? "儲存中……" : "加入"}</button>
               </form>
             </details>
           </section>
@@ -516,12 +565,12 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
                     </span>
                     <div>
                       <button
-                        disabled={!canMoveTo(replanSource, replanTo)}
+                        disabled={savingGoal || !canMoveTo(replanSource, replanTo)}
                         onClick={() => moveGoal(g, replanTo)}
                       >
                         {recovering ? "移回月計畫" : "順延"}
                       </button>
-                      <button onClick={() => moveGoal(g, "removed")}>
+                      <button disabled={savingGoal} onClick={() => moveGoal(g, "removed")}>
                         移除
                       </button>
                     </div>
@@ -543,7 +592,7 @@ export default function Plan(props: PageProps & { tab: PlanTab; onTabChange: (ta
             )}
           </section>
           <p role="status" className="pl-status">
-            {lastMove && state.notes[lastMove.key] === lastMove.destination ? lastMove.message : ""}
+            {goalMessage || (lastMove && goalDestination(state.notes[lastMove.key]) === lastMove.destination ? lastMove.message : "")}
           </p>
         </>
       )}
