@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import writing from '../src/data/writing.json' with { type: 'json' }
-import { chartKind, chartText, checksFor, essayKind, gradePrompt, isProcessChart, isTableChart, migrateWritingProgress, taskOneOutlines, type ProcessChart, type TableChart, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writeTaskOpen, writingMigrationKey, writingTaskPages, type WriteStage } from '../src/lib/writing.ts'
+import { chartKind, chartText, checksFor, essayKind, gradePrompt, isLayoutChart, isProcessChart, isTableChart, migrateWritingProgress, taskOneOutlines, type ProcessChart, type TableChart, readWrite, rubricFor, sentenceParts, stagesOpen, suggestedStage, wordCount, writeKey, writeTaskOpen, writingMigrationKey, writingTaskPages, type WriteStage } from '../src/lib/writing.ts'
 import { createInitialState, exportBackup, importBackup } from '../src/lib/store.ts'
 import { packUnits } from '../src/lib/bridge.ts'
 
@@ -64,6 +64,16 @@ test('題目 id 不重複、範文達字數；數字暖身有可畫的小圖表'
     assert.ok(t.chart?.title.trim(), t.id + ' 圖表標題')
     const c = t.chart
     if (isTableChart(c) || isProcessChart(c)) continue
+    // A map or floor plan (IELTS Task 1): the same grid before and after, every place named.
+    if (isLayoutChart(c)) {
+      assert.equal(c.panels.length, 2, t.id + ' 地圖有前後兩張')
+      const width = c.panels[0].rows[0]?.length ?? 0
+      for (const panel of c.panels) {
+        assert.ok(panel.label.trim() && panel.rows.length >= 2 && width >= 2, t.id + ' 每張圖有標題和格子')
+        assert.ok(panel.rows.length === c.panels[0].rows.length && panel.rows.every(r => r.length === width && r.every(cell => cell.trim())), t.id + ' 兩張圖的格子對得上')
+      }
+      continue
+    }
     assert.ok(c.points.length >= 3, t.id + ' 圖表數據')
     assert.ok(c.points.every(p => p.label.trim() && Number.isFinite(p.value)), t.id)
     assert.equal(new Set(c.points.map(p => p.label)).size, c.points.length, t.id + ' 圖表標籤不能重複')
@@ -206,7 +216,7 @@ test('批改包含這一階教過的文法，但仍只照官方評分表', () =>
 
 /** Every 完整文法 chapter learned (all drills done), so the ladder's own step-by-step rule can be tested on its own. */
 function allGrammar(notes: Record<string, string>) {
-  for (const [ch, n] of Object.entries(bookPlan.sections)) for (let k = 1; k <= n; k++) notes = { ...notes, ['gbook.' + ch + '-' + k]: JSON.stringify({ marks: { 0: true, 1: true, 2: true } }) }
+  for (const [ch, n] of Object.entries(bookPlan.sections)) for (let k = 1; k <= n; k++) notes = { ...notes, ['gbook.' + ch + '-' + k]: JSON.stringify({ marks: { 0: 1, 1: 1, 2: 1 } }) }
   return notes
 }
 test('新使用者完整走十三階（文法都讀完）：每階過兩題才開下一階，不因舊階段名稱跳過新階段', () => {

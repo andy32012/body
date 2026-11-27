@@ -77,7 +77,7 @@ test('紀錄：同一天重做是練習，不蓋掉紀錄；之後考差了，�
   assert.ok(notes[examReadKey('ex-cap-113-8')] && !notes[readKey('ex-cap-113-8')], '用自己的 exam.read. 紀錄')
   notes = saveExamRead(notes, 'ex-cap-113-8', { day: '2026-11-26', picks: [1, 1, 1], correct: 1, total: 3 })
   let r = readExamRecord(notes, 'ex-cap-113-8')!
-  assert.equal(r.practice, true)
+  assert.deepEqual([r.correct, r.tries], [3, 2], '同一天重做只多算一次嘗試，第一次的作答原封不動')
   assert.equal(r.best?.correct, 3)
   notes = saveExamRead(notes, 'ex-cap-113-8', { day: '2026-12-01', picks: [1, 1, 1], correct: 1, total: 3 })
   r = readExamRecord(notes, 'ex-cap-113-8')!

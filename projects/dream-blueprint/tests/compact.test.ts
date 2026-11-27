@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { applyBatch, archiveKey, archiveOld, bonusOn, compactState, delayedRecall, lastArchiveKey, oldDetails, readArchive, windows } from '../src/lib/compact.ts'
+import { applyBatch, archiveKey, archiveOld, archiveRowDays, bonusOn, compactState, delayedRecall, lastArchiveKey, oldDetails, readArchive, windows } from '../src/lib/compact.ts'
 import { addDays, dayKey, newCard, reviewBonus, reviewCard, type ReviewCard, type ReviewEvent } from '../src/lib/progress.ts'
 import { createInitialState, exportBackup, importBackup, type AppState } from '../src/lib/store.ts'
 import { seasonHistory } from '../src/lib/rivals.ts'
@@ -136,8 +136,29 @@ test('用很多年：每天 20 個新字、上一課、複習到上限，三年�
   }
   const mb = sizes.map(n => +(n / 1e6).toFixed(2))
   t.diagnostic('進度檔大小（第 1、2、3 年）：' + mb.join(' → ') + ' MB')
-  assert.ok(mb[2] < 2.5, '三年後 ' + mb.join(' → ') + ' MB')
-  assert.ok(mb[2] - mb[1] < 0.6, '每年只多一點點：' + mb.join(' → ') + ' MB')
+  // Each review now carries its time and attempt (so two devices never count it twice); that costs about 0.6 MB, once.
+  // What must never come back is growth without end: the archive once kept every review and passed 5 MB in two years.
+  assert.ok(mb[2] < 3, '三年後 ' + mb.join(' → ') + ' MB')
+  assert.ok(mb[2] - mb[1] < 0.4, '每年只多一點點：' + mb.join(' → ') + ' MB')
+})
+
+test('封存的複習：只有最近 30 天留下每一筆的身分，更早的只留每天的總數，封存不會越存越大', () => {
+  const events: ReviewEvent[] = []
+  for (let d = 0; d < 400; d++) {
+    const day = addDays('2026-01-01', d)
+    for (let i = 0; i < 20; i++) events.push({ ...ev('word:w' + ((d * 20 + i) % 3000), day, 5, i % 4 !== 0), at: Date.parse(day) + i, attempt: day + '-' + i })
+  }
+  const s = { reviewEvents: events, notes: {} as Record<string, string> }
+  const c = compactState(s, '2027-03-01')
+  const a = readArchive(c.notes)
+  const kept = Object.keys((a as { rows?: { days: Record<string, number[]> } }).rows?.days ?? {})
+  assert.ok(kept.length <= archiveRowDays, '只留 ' + archiveRowDays + ' 天的身分，實際 ' + kept.length)
+  assert.ok(kept.every(day => day >= addDays(a.before, -archiveRowDays)), '留的是最近的那幾天')
+  assert.deepEqual(delayedRecall(c), delayedRecall(s), '總數一筆都沒少')
+  assert.ok(c.notes[archiveKey].length < 120_000, '封存大小 ' + c.notes[archiveKey].length)
+  // Merging with another device that still has the same lines counts them once.
+  const again = compactState({ reviewEvents: [...c.reviewEvents, ...events.filter(e => e.day >= addDays(a.before, -archiveRowDays))], notes: c.notes }, '2027-03-01')
+  assert.deepEqual(delayedRecall(again), delayedRecall(s), '同一筆不重複算')
 })
 
 // ── With Google Drive connected: nothing is thrown away. Old details go to the Drive archive first.

@@ -78,7 +78,7 @@ test('閱讀：同一天重做是練習，不會蓋掉第一次；之後分數�
   let notes = saveRead({}, 'a1-x', { day: '2026-11-20', picks: [0, 0, 1], correct: 1, total: 3 })
   notes = saveRead(notes, 'a1-x', { day: '2026-11-20', picks: [1, 1, 1], correct: 3, total: 3 })
   let r = readRecord(notes, 'a1-x')!
-  assert.equal(r.practice, true)
+  assert.deepEqual([r.correct, r.picks, r.tries], [1, [0, 0, 1], 2], '同一天重做只多算一次嘗試，第一次的作答原封不動')
   assert.equal(passed(r), false, '剛看過答案重做的滿分不算')
   notes = saveRead(notes, 'a1-x', { day: '2026-11-22', picks: [1, 1, 1], correct: 3, total: 3 })
   r = readRecord(notes, 'a1-x')!

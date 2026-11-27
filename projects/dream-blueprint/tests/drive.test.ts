@@ -61,10 +61,10 @@ test('連上後要用哪一份：新裝置直接載入雲端，兩邊都改過�
 })
 
 test('連續存兩次（第一次還沒回來就又改了）：不會把自己存的那份當成另一台，同步不會暫停', async () => {
-  const { saveDriveState, cloudConflict, cloudBase } = await import('../src/lib/drive')
+  const { saveDriveState, cloudConflict } = await import('../src/lib/drive')
   store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
   store.set('dream-blueprint.cloud-cas', '1')
-  store.set('dream-blueprint.cloud-base', '1000')
+  store.set('dream-blueprint.cloud-guarded', '1')
   store.delete('dream-blueprint.cloud-conflict')
   // The script: refuses a save whose base is not what the cloud holds now (unless it is a chosen overwrite), slowly.
   let cloudAt = 1000
@@ -72,17 +72,27 @@ test('連續存兩次（第一次還沒回來就又改了）：不會把自己�
   globalThis.fetch = (async (_u: string, init?: { body?: string }) => {
     const b = JSON.parse(init?.body ?? '{}')
     await new Promise(r => setTimeout(r, 20))
-    if (b.type !== 'state') return { json: async () => ({ ok: true }) }
-    if (!b.snapshot && b.base !== cloudAt) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloudAt }) }
+    // A current script says what it can do in every answer (it checks the starting copy under its lock: guarded).
+    const caps = { cas: true, archive: true, atomic: true, guarded: true, scriptVersion: 9 }
+    if (b.type !== 'state') return { json: async () => ({ ok: true, ...caps }) }
+    if (!b.snapshot && b.base !== cloudAt) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloudAt, ...caps }) }
     cloudAt = b.savedAt
-    return { json: async () => ({ ok: true, state: true }) }
+    return { json: async () => ({ ok: true, state: true, ...caps }) }
   }) as typeof fetch
   Object.assign(globalThis, { window: { dispatchEvent() {} } })
   try {
-    await Promise.all([saveDriveState('{"a":1}', 2000), saveDriveState('{"a":2}', 3000)])
+    // Saves go one at a time. Each says which cloud copy it started from: two sent together from the same copy do not
+    // both land — the second is told the cloud moved on (stale, an answer, not a failure), and the cloud keeps the first.
+    const [first, late] = await Promise.all([
+      saveDriveState({ state: '{"a":1}', modified: 2000, base: 1000 }),
+      saveDriveState({ state: '{"a":2}', modified: 3000, base: 1000 }),
+    ])
+    assert.deepEqual([first.kind, late.kind, late.savedAt], ['saved', 'stale', 2000])
+    assert.equal(cloudAt, 2000)
+    // Starting from the copy just saved (what the sync does next, after merging), the second change goes up.
+    const next = await saveDriveState({ state: '{"a":2}', modified: 3000, base: first.savedAt })
+    assert.deepEqual([next.kind, cloudAt], ['saved', 3000], '最後那份存上去了')
     assert.equal(cloudConflict(), null, '沒有暫停同步')
-    assert.equal(cloudAt, 3000, '最後那份存上去了')
-    assert.equal(cloudBase(), 3000)
   } finally { globalThis.fetch = realFetch }
 })
 
@@ -94,10 +104,11 @@ function fakeScript(start: { at: number; state: string }) {
   globalThis.fetch = (async (_u: string, init?: { body?: string }) => {
     const b = JSON.parse(init?.body ?? '{}')
     await new Promise(r => setTimeout(r, b.delay ?? 5))
-    if (b.type !== 'state') return { json: async () => ({ ok: true }) }
-    if (!b.snapshot && typeof b.base === 'number' && cloud.at > b.base) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloud.at }) }
+    const caps = { cas: true, archive: true, atomic: true, guarded: true, scriptVersion: 9 }
+    if (b.type !== 'state') return { json: async () => ({ ok: true, ...caps }) }
+    if (!b.snapshot && typeof b.base === 'number' && cloud.at > b.base) return { json: async () => ({ ok: false, error: 'stale', savedAt: cloud.at, ...caps }) }
     cloud.at = b.savedAt; cloud.state = b.state
-    return { json: async () => ({ ok: true, state: true }) }
+    return { json: async () => ({ ok: true, state: true, ...caps }) }
   }) as typeof fetch
   Object.assign(globalThis, { window: { dispatchEvent() {} } })
   return { cloud, restore: () => { globalThis.fetch = realFetch } }
@@ -107,6 +118,7 @@ test('同一個瀏覽器兩個分頁：舊分頁慢回來的存檔被拒絕時�
   const { saveDriveState, cloudConflict } = await import('../src/lib/drive')
   store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
   store.set('dream-blueprint.cloud-cas', '1')
+  store.set('dream-blueprint.cloud-guarded', '1')
   store.delete('dream-blueprint.cloud-conflict')
   store.set('dream-blueprint.cloud-own', JSON.stringify([5000]))
   const fake = fakeScript({ at: 5000, state: '{"answers":1}' })
@@ -115,7 +127,8 @@ test('同一個瀏覽器兩個分頁：舊分頁慢回來的存檔被拒絕時�
     fake.cloud.at = 5200; fake.cloud.state = '{"answers":2}'
     store.set('dream-blueprint.cloud-own', JSON.stringify([5000, 5200]))
     // This tab's old snapshot (one answer, started from 5000) arrives late.
-    await saveDriveState('{"answers":1}', 5100, 5000)
+    const late = await saveDriveState({ state: '{"answers":1}', modified: 5100, base: 5000 })
+    assert.deepEqual([late.kind, late.savedAt], ['stale', 5200], '舊分頁被告知雲端已經更新，要先合併')
     assert.equal(fake.cloud.state, '{"answers":2}', '雲端留著兩筆作答的新進度')
     assert.equal(fake.cloud.at, 5200, '版本沒有倒退')
     assert.equal(cloudConflict(), null)
@@ -123,20 +136,20 @@ test('同一個瀏覽器兩個分頁：舊分頁慢回來的存檔被拒絕時�
 })
 
 test('手機和電腦時鐘不一樣：時鐘慢的那台存上去的版本也比它接手的那一版新，另一台看得出雲端變了（審核 R030）', async () => {
-  const { saveDriveState, cloudBase, syncDecision, saveVersion } = await import('../src/lib/drive')
+  const { saveDriveState, syncDecision, saveVersion } = await import('../src/lib/drive')
   assert.equal(saveVersion(1500, 2000), 2001, '時鐘慢：比接手的版本大一')
   assert.equal(saveVersion(3000, 2000), 3000, '時鐘正常：照時間')
   store.set('dream-blueprint.drive', JSON.stringify({ url, token }))
   store.set('dream-blueprint.cloud-cas', '1')
+  store.set('dream-blueprint.cloud-guarded', '1')
   store.delete('dream-blueprint.cloud-conflict')
   store.set('dream-blueprint.cloud-own', '[]')
-  store.set('dream-blueprint.cloud-base', '2000')
   const fake = fakeScript({ at: 2000, state: '{"from":"A"}' })
   try {
     // Device B (clock behind) continues from A's 2000 and saves at its own time 1500.
-    await saveDriveState('{"from":"B"}', 1500)
+    const saved = await saveDriveState({ state: '{"from":"B"}', modified: 1500, base: 2000 })
     assert.ok(fake.cloud.at > 2000, '雲端版本往前進，不會變成 1500')
-    assert.equal(cloudBase(), fake.cloud.at)
+    assert.deepEqual([saved.kind, saved.savedAt], ['saved', fake.cloud.at], '這台記下的雲端版本就是存上去的那一份')
     // Device A still thinks the cloud is at 2000: it sees the change and does not just push over it.
     assert.equal(syncDecision(fake.cloud.at, 2000, 2000), 'pull')
     assert.equal(syncDecision(fake.cloud.at, 2000, 2100), 'conflict')

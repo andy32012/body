@@ -121,7 +121,9 @@ test('臨床情境：四步、記錄錯的原因，錯過的之後再出現', as
 test('上到一半的課：關掉再開、隔天回來都接得回原本的步驟', async () => {
   const { updateLesson, activeLesson, resumeTarget, resumePhase, moveLesson, lessonKey, activeKey, sentenceFrame } = await import('../src/lib/lesson.ts')
   let notes = updateLesson({}, '2026-11-21', 1, 2, { phase: 'write', hints: { 'u1-d2': { h: 3, r: true } } }, 'listen')
-  assert.equal(notes[activeKey], '2026-11-21')
+  // The pointer names the day and which lesson of it (two lessons on one day stay apart).
+  assert.ok(notes[activeKey].startsWith('2026-11-21'), notes[activeKey])
+  assert.equal(activeLesson(notes)?.date, '2026-11-21')
   assert.equal(resumePhase(activeLesson(notes)!.rec), 'write')
   // Core not saved: continues only while the curriculum still points at it.
   assert.ok(resumeTarget(notes, { unit: 1, day: 2 }, '2026-11-22'))
@@ -289,15 +291,18 @@ test('閱讀和寫作：建議程度、過關條件、批改格式', async () =>
 })
 
 test('配對 QR：要對的配對碼、10 分鐘內才打得開', async () => {
-  const { seal, open, randomCode } = await import('../src/lib/pairing.ts')
+  const { seal, open, randomCode, normalizePairCode } = await import('../src/lib/pairing.ts')
   const code = randomCode()
-  assert.match(code, /^\d{6}$/)
+  // 26 letters and digits (130 bits): a six-digit code could be guessed offline from a copied link.
+  assert.match(code, /^[0-9A-HJKMNP-TV-Z]{26}$/)
+  assert.equal(normalizePairCode(code.toLowerCase().match(/.{1,5}/g)!.join(' ')), code, '照畫面五個一組、打小寫也可以')
+  assert.equal(normalizePairCode('123456'), null)
   const t = 1_800_000_000_000
   const p = await seal({ claude: 'sk-ant-test', model: 'claude-sonnet-5-5' }, code, t)
   assert.ok(!p.includes('sk-ant'), '連結裡看不到金鑰')
   const ok = await open(p, code, t + 60_000)
   assert.ok(ok.ok && ok.keys.claude === 'sk-ant-test' && ok.keys.model === 'claude-sonnet-5-5')
-  const wrong = await open(p, code === '000000' ? '111111' : '000000', t)
+  const wrong = await open(p, randomCode(), t)
   assert.deepEqual(wrong, { ok: false, reason: 'code' })
   assert.deepEqual(await open(p, code, t + 11 * 60_000), { ok: false, reason: 'expired' })
   assert.deepEqual(await open('garbage!!', code, t), { ok: false, reason: 'broken' })
@@ -326,13 +331,17 @@ test('小關卡或複習日做到一半重新整理：記得做到第幾句、�
   const { readRunProgress, saveRunProgress, runProgressKey } = await import('../src/lib/lesson.ts')
   const day = '2026-11-26'
   const records = [{ sentenceId: 'u3-c1', rating: 'correct' as const, grammar: [], revealed: false, verified: true }]
-  let notes = saveRunProgress({}, day, { unit: 3, day: 6, pos: 1, records, levels: ['independent'] })
-  assert.deepEqual(readRunProgress(notes, day, 3, 6)?.pos, 1)
-  assert.equal(readRunProgress(notes, day, 4, 1), null, '別的單元、別天的不會拿來用')
-  assert.equal(readRunProgress(notes, '2026-11-27', 3, 6), null)
-  notes = saveRunProgress(notes, day, null)
-  assert.equal(notes[runProgressKey(day)], undefined, '做完就清掉')
-  assert.equal(readRunProgress({ [runProgressKey(day)]: 'x' }, day, 3, 6), null)
+  let notes = saveRunProgress({}, day, false, { unit: 3, day: 6, pos: 1, records, levels: ['independent'] })
+  assert.deepEqual(readRunProgress(notes, day, false, 3, 6)?.pos, 1)
+  assert.equal(readRunProgress(notes, day, false, 4, 1), null, '別的單元、別天的不會拿來用')
+  assert.equal(readRunProgress(notes, '2026-11-27', false, 3, 6), null)
+  notes = saveRunProgress(notes, day, false, null)
+  assert.equal(readRunProgress(notes, day, false, 3, 6), null, '做完就不再接續')
+  assert.equal(JSON.parse(notes[runProgressKey(day, false)]).closed, true, '留下做完的記號，另一台的舊進度不會把它變回來')
+  assert.equal(readRunProgress({ [runProgressKey(day, false)]: 'x' }, day, false, 3, 6), null)
+  // A half-done checkpoint saved by the earlier version (one key per day) still continues.
+  const legacy = { [runProgressKey(day)]: JSON.stringify({ unit: 3, day: 6, pos: 2, records, levels: ['independent', null] }) }
+  assert.equal(readRunProgress(legacy, day, false, 3, 6)?.pos, 2)
 })
 
 test('換個說法寫到一半離開：老師第一次的判定和看過答案都留在今天的課裡，兩台合併也不會不見（稽核 CUR-06）', async () => {

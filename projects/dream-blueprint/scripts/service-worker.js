@@ -139,6 +139,12 @@ function cleanUnusedReleases() {
         continue;
       }
       if (await caches.match(shell, cacheName)) previous.push(name);
+      // No release ever finished here (an install that was interrupted): nothing can need it.
+      else await caches.delete(name);
+    }
+    // Caches this site used before releases were kept apart, or that no current code reads, are leftovers.
+    for (const name of await caches.keys()) {
+      if (name.startsWith(prefix) && !name.startsWith(corePrefix) && name !== galleryName && name !== soundName) await caches.delete(name);
     }
     // Keep the last complete release as well. An old worker's interrupted addAll could leave an empty cache.
     for (const name of previous) {

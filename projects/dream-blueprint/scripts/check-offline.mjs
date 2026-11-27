@@ -42,16 +42,24 @@ async function browserHarness() {
       return buckets.get(name);
     },
     async keys() { return [...buckets.keys()]; },
-    async delete(key) { return buckets.delete(key); }
+    async delete(key) { return buckets.delete(key); },
+    async match(key, options = {}) {
+      for (const name of options.cacheName ? [options.cacheName] : [...buckets.keys()]) {
+        const hit = await buckets.get(name)?.match(key);
+        if (hit) return hit;
+      }
+    }
   };
   const context = {
     self: {
       registration: { scope },
-      clients: { claim: async () => {controls.claimed = true;} },
+      clients: { claim: async () => {controls.claimed = true;}, matchAll: async () => [] },
       skipWaiting: async () => {controls.skipWaiting = true;},
       addEventListener: (type, fn) => listeners.set(type, fn)
     },
-    caches: cacheStorage, URL, Request, Response, AbortSignal, fetch: network
+    caches: cacheStorage, URL, Request, Response, Headers, AbortSignal, AbortController, fetch: network,
+    // A browser worker has these too: the worker checks each saved file against its hash in the offline list.
+    crypto: globalThis.crypto, TextEncoder, TextDecoder, setTimeout, clearTimeout, console
   };
   const workerSource = (await read("sw.js")).toString();
   vm.runInNewContext(workerSource, context);
@@ -87,7 +95,10 @@ test("子目錄安裝、核心離線與更新不連帶刪除其他網站及圖�
   }
   const html = (await read("index.html")).toString();
   assert.match(html, /href="\.\/manifest.webmanifest"/);
-  assert.match(html, /src="\.\/register-sw.js"/);
+  // The page registers the worker itself (no separate file), from this folder, and never through the HTTP cache.
+  assert.match(html, /new URL\("\.\/sw\.js", document\.baseURI\)/);
+  assert.match(html, /navigator\.serviceWorker\.register\(scriptUrl, \{ updateViaCache: "none" \}\)/);
+  assert.match(html, /<meta name="dream-release" content="[0-9a-f]{16}">/);
   assert.ok(html.includes('rel="license" href="./publication.html"'));
   const app = await browserHarness();
   const unrelated = "dream-blueprint:https://example.test/other/:old";
@@ -95,6 +106,9 @@ test("子目錄安裝、核心離線與更新不連帶刪除其他網站及圖�
   await app.caches.open(prefix + "old");
   await app.dispatch("install");
   assert.equal(app.requests.filter(url => url.includes("/cosmos/") && /\.(webp|png|jpeg|jpg|avif)/.test(url)).length, 0);
+  // A new release waits until he presses 更新 (the page sends ACTIVATE_UPDATE), so an open practice is never cut off.
+  assert.equal(app.controls.skipWaiting, false);
+  await app.message("ACTIVATE_UPDATE");
   assert.equal(app.controls.skipWaiting, true);
   await app.dispatch("activate");
   const names = await app.caches.keys();
@@ -126,61 +140,90 @@ test("重新開啟時讀取最新網頁，斷網或收到錯誤頁時仍保留�
   assert.equal(await (await app.request("./", "navigate")).text(), installed);
 });
 
-test("切換版本會等到離開目前頁面，讓進行中的練習保留原始輸入", async () => {
-  const windowEvents = new Map(), workerEvents = new Map();
-  const controller = { postMessage() {} };
-  const installed = "assets/index-current.js";
-  const worker = {
+test("新版等他按「更新」才換：練習中換頁不會重新整理；按了才切換，其他分頁不跟著重新整理", async () => {
+  const html = (await read("index.html")).toString();
+  const inline = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const version = html.match(/<meta name="dream-release" content="([0-9a-f]{16})">/)[1];
+  const workerEvents = new Map(), windowEvents = new Map(), registrationEvents = new Map();
+  const controller = { posted: [], postMessage(message) { this.posted.push(message); } };
+  const registration = { waiting: null, installing: null, addEventListener: (name, handler) => registrationEvents.set(name, handler), update: async () => {} };
+  const registered = [];
+  const serviceWorker = {
     controller,
-    register: async () => ({}),
-    ready: Promise.resolve(),
+    register: async (url, options) => { registered.push([String(url), options]); return registration; },
+    ready: Promise.resolve(registration),
     addEventListener: (name, handler) => workerEvents.set(name, handler)
   };
-  let reloads = 0;
+  let reloads = 0, answer = false;
   const shown = [];
-  vm.runInNewContext((await read("register-sw.js")).toString(), {
-    Date,
-    URL,
-    navigator: { serviceWorker: worker },
+  const element = () => {
+    const handlers = new Map();
+    return { id: "", handlers, disabled: false, setAttribute() {}, addEventListener: (name, handler) => handlers.set(name, handler), remove() { this.removed = true; } };
+  };
+  const button = () => shown.find(node => node.id === "dream-update" && !node.removed);
+  vm.runInNewContext(inline, {
+    URL, Date, Promise, clearTimeout,
+    navigator: { serviceWorker, onLine: true },
     window: {
       isSecureContext: true,
       addEventListener: (name, handler) => windowEvents.set(name, handler),
+      removeEventListener() {},
       setInterval() {},
       setTimeout() {},
+      confirm: () => answer,
       location: { reload() { reloads++; } }
     },
     document: {
-      currentScript: { src: scope + "register-sw.js" },
-      querySelector: () => ({ src: scope + installed }),
+      baseURI: scope + "index.html",
+      visibilityState: "visible",
+      querySelector: selector => selector.includes("dream-release") ? { content: version } : null,
       addEventListener() {},
       body: { appendChild: node => shown.push(node) },
-      getElementById: () => shown[0] ?? null,
-      createElement: () => ({ setAttribute() {}, addEventListener() {} })
+      getElementById: id => shown.find(node => node.id === id && !node.removed) ?? null,
+      createElement: () => element()
     },
     performance: { getEntriesByType: () => [] }
   });
   await new Promise(resolve => setImmediate(resolve));
-  const announce = script => workerEvents.get("message")({ source: controller, data: {type: "APP_SHELL", script} });
-  const navigate = (from, to) => windowEvents.get("hashchange")({oldURL: scope + from, newURL: scope + to});
-  announce(installed);
-  navigate("#today", "#practice/normal");
-  assert.equal(shown.length, 0, "同一版不出現更新按鈕");
-  announce("assets/index-next.js");
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(shown.length, 1, "新版本好了：出現「點一下更新」");
-  announce("assets/index-next.js");
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(shown.length, 1, "按鈕只出現一個");
+  // (Objects made inside the page's sandbox are compared as JSON.)
+  assert.equal(JSON.stringify(registered), JSON.stringify([[scope + "sw.js", { updateViaCache: "none" }]]), "從這個資料夾登記，而且不走 HTTP 快取");
+  assert.ok(controller.posted.some(m => m.type === "PRIME_COVER" && m.version === version), "告訴離線程式這一頁是哪一版");
+  // The worker answers with its own version: the same one shows nothing.
+  workerEvents.get("message")({ source: controller, data: { type: "APP_SHELL", version } });
+  assert.equal(button(), undefined, "同一版不出現更新按鈕");
+  // A newer release finished installing and is waiting.
+  const waiting = { posted: [], postMessage(message) { this.posted.push(message); } };
+  registration.waiting = waiting;
+  registrationEvents.get("updatefound")();
+  assert.match(button()?.textContent ?? "", /新版已就緒/, "出現更新按鈕");
+  assert.equal(windowEvents.has("hashchange"), false, "換頁不會自己切換版本");
+  assert.equal(reloads, 0, "正在做的練習不會被重新整理");
+  // Not done yet with the practice: nothing happens.
+  button().handlers.get("click")();
+  assert.deepEqual([waiting.posted.length, reloads], [0, 0], "還沒做完就不切換");
+  // Done: the waiting release takes over, and only this page reloads once it does.
+  answer = true;
+  button().handlers.get("click")();
+  assert.equal(JSON.stringify(waiting.posted), JSON.stringify([{ type: "ACTIVATE_UPDATE" }]));
+  assert.equal(button().disabled, true);
+  serviceWorker.controller = waiting;
   workerEvents.get("controllerchange")();
-  navigate("#practice/normal", "#practice/high");
-  assert.equal(reloads, 0);
-  navigate("#practice/high", "#today");
   assert.equal(reloads, 1);
-  // Inside the practice library: another kind of practice switches; another task of the same kind does not.
-  navigate("#library/writing/t1-101", "#library/writing/t1-102");
-  assert.equal(reloads, 1, "同一種練習換題不切換");
-  navigate("#library/reading", "#library/writing");
-  assert.equal(reloads, 2, "換到另一種練習就換新版");
+  // In another open tab (it never pressed 更新) the switch does not reload the page, so its answers stay.
+  const otherShown = [];
+  let otherReloads = 0;
+  const otherEvents = new Map();
+  vm.runInNewContext(inline, {
+    URL, Date, Promise, clearTimeout,
+    navigator: { serviceWorker: { ...serviceWorker, controller, addEventListener: (name, handler) => otherEvents.set(name, handler) }, onLine: true },
+    window: { isSecureContext: true, addEventListener() {}, removeEventListener() {}, setInterval() {}, setTimeout() {}, confirm: () => true, location: { reload() { otherReloads++; } } },
+    document: { baseURI: scope + "index.html", visibilityState: "visible", querySelector: () => ({ content: version }), addEventListener() {},
+      body: { appendChild: node => otherShown.push(node) }, getElementById: () => null, createElement: () => element() },
+    performance: { getEntriesByType: () => [] }
+  });
+  await new Promise(resolve => setImmediate(resolve));
+  otherEvents.get("controllerchange")();
+  assert.equal(otherReloads, 0);
 });
 
 test("換新版以後，還開著的舊頁面要讀舊版的教材檔，也讀得到（稽核 R-08）", async () => {
@@ -188,13 +231,20 @@ test("換新版以後，還開著的舊頁面要讀舊版的教材檔，也讀�
   // The release before: one of its lesson files is no longer published.
   const oldCore = prefix + "core-older";
   const oldFile = scope + "assets/writing-OLD123.js";
-  await (await app.caches.open(prefix + "core-oldest")).put(scope + "assets/x.js", new Response("x"));
-  await (await app.caches.open(oldCore)).put(oldFile, new Response("old writing"));
+  // Two earlier complete releases (each has its page); the newer of them is the one just replaced.
+  const oldest = await app.caches.open(prefix + "core-oldest");
+  await oldest.put(scope + "index.html", new Response("oldest page"));
+  await oldest.put(scope + "assets/x.js", new Response("x"));
+  const older = await app.caches.open(oldCore);
+  await older.put(scope + "index.html", new Response("older page"));
+  await older.put(oldFile, new Response("old writing"));
+  await app.caches.open(prefix + "core-broken");
   await app.dispatch("install");
   await app.dispatch("activate");
   const names = await app.caches.keys();
   assert.ok(names.includes(oldCore), "剛被換掉的那一版先留著");
   assert.ok(!names.includes(prefix + "core-oldest"), "更早的版本清掉");
+  assert.ok(!names.includes(prefix + "core-broken"), "沒裝完的空殼也清掉");
   app.controls.offline = true;
   assert.equal(await (await app.request("assets/writing-OLD123.js")).text(), "old writing");
 });

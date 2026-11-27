@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { addWeak, easeWeak, normalizeLabel, readWeak, removeWeak, takeWeakLines, topWeak, unitLabels, weakLines, weakLinesEn, weakKey } from '../src/lib/weakPoints.ts'
+import { addWeak, easeWeak, mergeWeakNotes, normalizeLabel, readWeak, removeWeak, takeWeakLines, topWeak, unitLabels, weakLines, weakLinesEn, weakKey } from '../src/lib/weakPoints.ts'
 import { emmaInstructions, emmaStudy } from '../src/lib/emmaPrompt.ts'
 import { emmaLevel } from '../src/lib/cefr.ts'
 import { parseSpeakFeedback, speakFeedbackPrompt } from '../src/lib/speakFeedback.ts'
@@ -39,7 +39,9 @@ test('弱點清單：同一種錯累加、例句留最新三句；寫對一次�
   notes = easeWeak(easeWeak(easeWeak(notes, '現在進行式'), '現在進行式'), '現在進行式')
   assert.equal(readWeak(notes).length, 0)
   notes = addWeak(notes, 'the', day)
-  assert.equal(removeWeak(notes, 'the')[weakKey], '[]', '可以自己刪掉')
+  const removed = removeWeak(notes, 'the')
+  assert.equal(readWeak(removed).length, 0, '可以自己刪掉')
+  assert.ok(JSON.parse(removed[weakKey]).every((w: { n: number }) => w.n === 0), '清單裡只剩歸零的（留著讓另一台的舊紀錄不會把它變回來）')
 })
 
 test('弱點排名：越常錯越前面，三週沒再錯就減半，太久沒錯的不再給老師看', () => {
@@ -170,7 +172,7 @@ test('Emma feedback counts only when every required line came back', async () =>
   assert.equal(speakFeedbackOk(parseSpeakFeedback('[用了] 1 ||| I am eating.\n[卡] I go yesterday ||| I went yesterday ||| 我昨天去了 ||| 過去的事'), false), false)
   assert.equal(speakFeedbackOk(parseSpeakFeedback('Great job today! Keep going.'), false), false)
   // IELTS Part 2: the three judged lines and the fixed line about fluency and pronunciation.
-  const part2 = parseSpeakFeedback(['內容和連貫：有回答到題目；可以多講一個例子。', '詞彙：用了 crowded；可以換掉重複的 good。', '文法：時態大多對；過去式還會漏。', '流暢度和發音：只看逐字稿沒辦法評估，要聽錄音。'].join('\n'))
+  const part2 = parseSpeakFeedback(['內容和連貫：有回答到題目；可以多講一個例子。', '詞彙：用了 crowded；可以換掉重複的 good。', '文法範圍與正確度：時態大多對；過去式還會漏。', '流暢度和發音：只看逐字稿沒辦法評估，要聽錄音。'].join('\n'))
   assert.equal(speakFeedbackOk(part2, true), true)
   assert.equal(speakFeedbackOk(parseSpeakFeedback('內容和連貫：有回答到題目。'), true), false)
 })
@@ -191,4 +193,17 @@ test('weak points do not show the textbook answer of items still being practised
   assert.doesNotMatch(weakLines(notes, '2026-11-26', 5, false).join('；'), /I am a nurse\./)
   assert.match(weakLines(notes, '2026-11-26', 5, false).join('；'), /I went yesterday\./)
   assert.match(weakLines(notes, '2026-11-26', 5, false).join('；'), /I is a nurse\./)
+})
+
+test('同一種錯記了很多次，清單也不會越存越長；兩台合併時同一次錯只算一次', () => {
+  let notes: Record<string, string> = {}
+  for (let i = 0; i < 200; i++) notes = addWeak(notes, '現在進行式', '2026-11-20', { w: 'I eating ' + i, r: 'I am eating.' })
+  const [item] = readWeak(notes)
+  assert.equal(item.n, 200, '次數一次都沒少')
+  assert.ok(notes[weakKey].length < 2000, '舊的錯誤只留總數：' + notes[weakKey].length)
+  // The other device synced these, then each side added its own mistake.
+  const phone = addWeak(notes, '現在進行式', '2026-11-21', { w: 'She cooking', r: 'She is cooking.' }, 'speak')
+  const tablet = addWeak(notes, '現在進行式', '2026-11-21', { w: 'They playing', r: 'They are playing.' }, 'write')
+  const merged = mergeWeakNotes(phone, tablet)
+  assert.equal(readWeak(merged)[0].n, 202, '兩台各一次，加上原本的 200 次')
 })

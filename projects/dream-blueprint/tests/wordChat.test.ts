@@ -26,5 +26,6 @@ test('壞掉的網址就當一般聊天', () => {
   assert.equal(readWordChat(undefined), null)
   assert.equal(readWordChat('%7Bnot json'), null)
   assert.equal(readWordChat(encodeURIComponent('{"zh":"x"}')), null)
-  assert.equal(readWordChat(encodeURIComponent('{"en":"cat","p":"fly"}'))?.part, 'read', '不認得的練習種類當成看懂')
+  assert.equal(readWordChat(encodeURIComponent('{"en":"cat","p":"fly"}')), null, '不認得的練習種類也當成壞掉的網址')
+  assert.equal(readWordChat(encodeURIComponent('{"en":"cat"}'))?.part, 'read', '沒寫練習種類就是看懂')
 })

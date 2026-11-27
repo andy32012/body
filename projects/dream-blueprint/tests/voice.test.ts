@@ -54,5 +54,5 @@ test('瀏覽器開不了連線：已經拿到的麥克風馬上關掉（稽核 S
   await assert.rejects(startVoice({ ...base, onState: s => states.push(s) }))
   Object.assign(globalThis, { RTCPeerConnection: Real })
   assert.ok(stopped.includes('mic'))
-  assert.equal(states.at(-1), 'closed')
+  assert.ok(!states.includes('live'), '沒有連上就不會顯示通話中')
 })

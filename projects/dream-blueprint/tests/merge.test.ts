@@ -52,7 +52,11 @@ test('兩份合併：電腦上了第 2 天、iPad 今天做了別的，合起來
 
 test('同一張卡、同一筆紀錄兩邊都有：留比較新的，不重複', () => {
   assert.equal(mergeNote('review.sentences.2026-11-25', '2', '1'), '2', '次數取大的')
-  assert.equal(mergeNote('evidence.1', JSON.stringify([{ a: 1 }]), JSON.stringify([{ a: 1 }, { a: 2 }])), JSON.stringify([{ a: 1 }, { a: 2 }]))
+  // Evidence merges by submission: one written on both devices once, one written on either kept.
+  const e1 = { day: '2026-11-24', level: 'assisted', source: 'pattern', skill: 'write', item: 'u1-d1', attemptId: 'a1' }
+  const e2 = { day: '2026-11-25', level: 'independent', source: 'pattern', skill: 'write', item: 'u1-d2', attemptId: 'a2' }
+  assert.deepEqual(JSON.parse(mergeNote('evidence.1', JSON.stringify([e1]), JSON.stringify([e1, e2]))), [e1, e2])
+  assert.deepEqual(JSON.parse(mergeNote('evidence.1', JSON.stringify([e2]), JSON.stringify([e1]))), [e2, e1])
   assert.equal(mergeNote('x', 'old', 'new'), 'new')
   const a = createInitialState('2026-11-13'), b = structuredClone(a)
   a.cards = [{ ...newCard('word:cat', '2026-11-20'), due: '2026-11-22' }]

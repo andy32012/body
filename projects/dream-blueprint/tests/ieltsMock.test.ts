@@ -10,10 +10,15 @@ test('a full mock is saved with its date, four bands, timing and redo, newest fi
   const list = readMocks(notes)
   assert.equal(list.length, 2)
   assert.equal(list[0].day, '2030-12-07')
-  assert.deepEqual(list[1], { day: '2030-11-02', listening: 6, reading: 6.5, writing: 5.5, speaking: 6, timed: true, redo: false })
+  const { at, id, ...first } = list[1] as typeof list[1] & { at?: number; id?: string }
+  assert.deepEqual(first, { day: '2030-11-02', listening: 6, reading: 6.5, writing: 5.5, speaking: 6, timed: true, redo: false })
+  assert.ok(Number.isSafeInteger(at) && typeof id === 'string' && id, '每一次模考有自己的編號和時間，兩台裝置合併不會重複或互蓋')
   // Impossible bands are dropped, not stored.
-  notes = addMock(notes, { day: '2031-01-04', listening: 9.7, reading: 6.25, timed: true, redo: false })
-  assert.deepEqual(readMocks(notes)[0], { day: '2031-01-04', timed: true, redo: false })
+  notes = addMock(notes, { day: '2031-01-04', listening: 9.7, reading: 6.25, writing: 6, timed: true, redo: false })
+  const { at: _at, id: _id, ...third } = readMocks(notes)[0] as ReturnType<typeof readMocks>[0] & { at?: number; id?: string }
+  assert.deepEqual(third, { day: '2031-01-04', writing: 6, timed: true, redo: false })
+  // A mock with no possible band at all is not a record.
+  assert.equal(readMocks(addMock(notes, { day: '2031-02-01', listening: 9.7, timed: true, redo: false })).length, 3)
   // Broken saved data reads as no mocks.
   assert.deepEqual(readMocks({ 'ielts.mocks': '{oops' }), [])
 })

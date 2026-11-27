@@ -650,7 +650,7 @@
    },
    {
     "t": "主詞是 he／she／it（一個人、一個東西），動詞加 s",
-    "p": "這叫「第三人稱單數」。I、you、we、they 都不用加。",
+    "p": "這叫「第三人稱單數」。I、you、we、they 都不用加。否定句用 do not（don't）或 does not（doesn't）：I、you、we、they 配 do not，he、she、it 配 does not，後面的動詞回到原形（she works → she does not work，does 已經表示第三人稱單數，work 不再加 s）。",
     "ex": [
      {
       "en": "She works in a hospital.",
@@ -659,6 +659,14 @@
      {
       "en": "The nurse checks the patient.",
       "zh": "護理師檢查病人。"
+     },
+     {
+      "en": "She works in the morning. She does not work at night.",
+      "zh": "她早上工作。她晚上不工作。"
+     },
+     {
+      "en": "They do not visit on Sundays.",
+      "zh": "他們週日不來訪。"
      }
     ]
    },
@@ -673,20 +681,6 @@
      {
       "en": "She has a fever.",
       "zh": "她發燒。"
-     }
-    ]
-   },
-   {
-    "t": "否定用 do not 或 does not，後面的動詞用原形",
-    "p": "I、you、we、they 配 do not（don't）。he、she、it 配 does not（doesn't）。看 she works 變成 she does not work：does 已經表示第三人稱單數，work 不再加 s。",
-    "ex": [
-     {
-      "en": "She works in the morning. She does not work at night.",
-      "zh": "她早上工作。她晚上不工作。"
-     },
-     {
-      "en": "They do not visit on Sundays.",
-      "zh": "他們週日不來訪。"
      }
     ]
    }
@@ -5661,7 +5655,7 @@
      "would",
      "will"
     ],
-    "why": "用 would 是時態退移。現在還沒到今晚，用 will 保留原時態也成立。"
+    "why": "用 would 是時態退移。現在還沒到今晚，保留提示的原形 will（原時態）也成立。"
    },
    {
     "k": "choose",

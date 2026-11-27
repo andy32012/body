@@ -51,7 +51,7 @@ test('寫作階梯（文法都讀完）：前一階做完兩題才打開下一�
   const stages = writing.stages as WriteStage[]
   // Every 完整文法 chapter learned, so this tests the step-by-step rule alone (the grammar lock: tests/writing.test.ts).
   const grammar: Record<string, string> = {}
-  for (let ch = 1; ch <= 41; ch++) for (let k = 1; k <= 30; k++) grammar['gbook.' + ch + '-' + k] = JSON.stringify({ marks: { 0: true, 1: true, 2: true } })
+  for (let ch = 1; ch <= 41; ch++) for (let k = 1; k <= 30; k++) grammar['gbook.' + ch + '-' + k] = JSON.stringify({ marks: { 0: 1, 1: 1, 2: 1 } })
   const done = (ids: string[], best = 5) => ({ ...grammar, ...Object.fromEntries(ids.map(id => [writeKey(id), JSON.stringify({ day: '2026-11-24', words: 40, tries: 1, best })])) })
   assert.equal(stagesOpen(stages, {}, 1).basic, false, '第一章還沒讀，第一階也先鎖著')
   const start = stagesOpen(stages, grammar, 1)

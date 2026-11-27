@@ -43,7 +43,10 @@ test('閱讀教材分十二小級：各小級篇數、題數、字數與欄位�
     assert.ok(Math.abs(p.words - wordCount(p.paras.join(' '))) <= 5, p.id + ' 字數應算對')
     if (p.id.startsWith('n-')) continue // Nursing keeps its own shorter passages and six-question practice.
     const [low, high, minQuestions, maxQuestions] = ranges[p.level][p.band]
-    assert.ok(p.qs.length >= minQuestions && p.qs.length <= maxQuestions, p.id + ' 題數要符合小級')
+    // Extra true/false questions (additional) come after the passage's own set and do not count toward the band.
+    const core = p.qs.filter(q => !q.additional)
+    assert.ok(core.length >= minQuestions && core.length <= maxQuestions, p.id + ' 題數要符合小級')
+    assert.ok(p.qs.slice(0, core.length).every(q => !q.additional), p.id + ' 加的題目接在原本那幾題後面')
     if (!old.has(p.id)) {
       const words = wordCount(p.paras.join(' '))
       assert.ok(words >= low && words <= high, p.id + ' 新文章 ' + words + ' 字，應在 ' + low + '–' + high)
@@ -70,7 +73,12 @@ test('舊文章與原題逐題原封不動，新題只能接在最後，舊答�
         'br45-held': [0, 0, 0, 0, 1, 2, 1, 2], 'a1-easy-blue-bag': [0, 1, 2, 0], 'a1-mid-rainy-hall': [1, 2, 0, 1, 2],
         'b2-hard-warning-model': [0, 1, 0, 2, 2, 1, 0, 2, 1, 0], 'n-a2-night-shift': [1, 1, 1, 0, 2, 2],
         // 2026-11-26-audit-gpt1 (CPR depth limit and AED hand-off; two questions added after the old six)
-        'n-b1-cpr': [2, 2, 1, 0, 0, 1] }
+        'n-b1-cpr': [2, 2, 1, 0, 0, 1],
+        // 2026-11-27-reading-revisions (question wording made exact; the Apgar passage follows the AAP/ACOG statement)
+        'a2-message': [1, 2, 0, 1, 2, 2], 'b2-semmelweis': [1, 0, 0, 2, 1, 0, 1, 2, 2], 'br43-held': [1, 0, 0, 0, 1, 2, 2, 2],
+        'br47-r1': [0, 0, 0, 0, 1, 2, 1, 2], 'br48-held': [0, 0, 1, 0, 1, 2, 2, 1, 2],
+        // 2026-11-27-clinical-language
+        'n-b2-nclex': [1, 0, 1, 0, 2, 2] }
       assert.ok(answers[p.id], p.id + ' 修正的文章要在這裡記下原本的答案位置')
       assert.deepEqual(p.qs.slice(0, answers[p.id].length).map(q => q.answer), answers[p.id], p.id + ' 修正後答案位置不變')
       continue
@@ -201,12 +209,16 @@ test('閱讀題的答案位置不會有規律：選項顯示時打散（每次�
     // All right, saved in the data's order: exactly the data's answers; and read back as shown.
     const right = shown.qs.map(q => q.answer)
     assert.deepEqual(savedPicks(shown.qs, right), p.qs.map(q => q.answer))
-    assert.deepEqual(shownPicks(shown.qs, p.qs.map(q => q.answer)), right)
+    // A record keeps the revision of each question it answered (questionRevisions); one saved now has today's.
+    const revisions = Object.fromEntries(p.qs.flatMap((q, i) => q.revision ? [[i, q.revision]] : []))
+    assert.deepEqual(shownPicks(shown.qs, p.qs.map(q => q.answer), revisions), right)
+    if (Object.keys(revisions).length) assert.ok(shownPicks(shown.qs, p.qs.map(q => q.answer)).includes(undefined), p.id + ' 改過的題目不拿舊版的作答來顯示')
     assert.deepEqual(Object.keys(savedCauses(shown.qs, { 0: '看太快' })), [String(shown.qs[0].from)])
     const mc = (qs: readonly { type: string; answer: number; options: string[] }[]) => qs.filter(q => q.type !== 'tfng')
     if (cyclic(mc(p.qs).map(q => q.answer), mc(p.qs).map(q => q.options.length))) before++
     if (cyclic(mc(shown.qs).map(q => q.answer), mc(shown.qs).map(q => q.options.length))) after++
-    const tf = shown.qs.filter(q => q.type === 'tfng').map(q => q.options[q.answer])
+    // The passage's own true/false set (an extra question added after it keeps its place).
+    const tf = shown.qs.filter(q => q.type === 'tfng' && !p.qs[q.from].additional).map(q => q.options[q.answer])
     if (tf.length === 3) { const k = p.level + '-' + p.band; tfOrders.set(k, (tfOrders.get(k) ?? new Set()).add(tf.join(','))) }
   }
   assert.ok(before > 60, '原本的資料有規律（這個測試量得到）')

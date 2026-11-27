@@ -26,7 +26,7 @@ test('給 Claude 的評分表：每一級的描述都在，還有「描述全部
     assert.match(p, /不可以用自己的標準/)
     assert.ok(p.includes(r.source.name))
   }
-  assert.match(rubricPrompt(rubrics['ielts-task2']), /20 個字以下/)
+  assert.match(rubricPrompt(rubrics['ielts-task2']), /只有 20 字或更少，四項都是 band 1/)
   assert.match(rubricPrompt(rubrics['gept-speak-elementary']), /只評語法和字彙/)
 })
 

@@ -37,6 +37,9 @@ function connect(base: number, local: number) {
   store.set('dream-blueprint.cloud-base', String(base))
   store.set('dream-blueprint.modified', String(local))
   store.delete('dream-blueprint.cloud-conflict')
+  // The saved progress carries its own edit time and the cloud copy it started from (written together, never apart).
+  const saved = store.get(STORAGE_KEY)
+  if (saved) store.set(STORAGE_KEY, JSON.stringify({ ...JSON.parse(saved), storageModified: local, storageCloud: { scope: url, base } }))
 }
 
 test('自己合併的時候剛好做完一步：那一步不會被合併蓋掉，雲端也有', async () => {

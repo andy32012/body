@@ -134,7 +134,7 @@ export function readWriteRecord(value: unknown): WriteRecord | null {
   const r = { ...value } as WriteRecord
   if (!(typeof r.best === 'number' && r.best >= 0 && r.best <= 9)) r.best = undefined
   if (!r.selfReview || typeof r.selfReview.draft !== 'string' || !r.selfReview.draft ||
-    !Number.isSafeInteger(r.selfReview.at) || r.selfReview.at <= 0) r.selfReview = undefined
+    !Number.isSafeInteger(r.selfReview.at) || r.selfReview.at <= 0) delete r.selfReview
   if (r.last && !(Array.isArray(r.last.criteria) && r.last.criteria.every(c => c && typeof c.name === 'string' && typeof c.score === 'number'))) r.last = undefined
   if (r.last?.scores !== undefined && !(r.last.rubric && r.last.rubric in rubrics && Array.isArray(r.last.scores) && r.last.scores.length
     && r.last.scores.every(x => x && typeof x.name === 'string' && validRubricScore(rubrics[r.last!.rubric!], x.score)))) r.last = undefined

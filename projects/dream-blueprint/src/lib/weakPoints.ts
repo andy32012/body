@@ -16,6 +16,8 @@ interface WeakHistory {
   day: string
   at?: number
   afterRemoval?: string
+  /** The time of the last event folded into `base`: events up to it are already counted there. */
+  foldedAt?: number
   events: WeakEvent[]
 }
 export interface WeakItem {
@@ -105,7 +107,7 @@ function readWeakRecords(notes: Record<string, string>): WeakItem[] {
         lastAt: isTime(x.lastAt) ? x.lastAt : undefined,
         ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [],
         history: x.history && Number.isSafeInteger(x.history.base) && x.history.base >= 0 && isDay(x.history.day) && Array.isArray(x.history.events)
-          ? { ...x.history, events: x.history.events.filter(isEvent) } : undefined,
+          ? { ...x.history, foldedAt: isTime(x.history.foldedAt) ? x.history.foldedAt : undefined, events: x.history.events.filter(isEvent) } : undefined,
       }))
   } catch { return [] }
 }
@@ -113,8 +115,24 @@ export function readWeak(notes: Record<string, string>): WeakItem[] {
   const today = dayKey()
   return readWeakRecords(notes).filter(item => item.n > 0).sort((a, b) => weakScore(b, today) - weakScore(a, today)).slice(0, MAX_ITEMS)
 }
+/** The whole list stays within one note's length: first the extra examples of the points touched longest ago go, then
+ *  points already at zero, then those points themselves. Recent mistakes always stay. */
+export const WEAK_NOTE_LIMIT = 30000
 function write(notes: Record<string, string>, list: WeakItem[]) {
-  return { ...notes, [weakKey]: JSON.stringify(list) }
+  let kept = list
+  let json = JSON.stringify(kept)
+  for (let i = kept.length - 1; json.length > WEAK_NOTE_LIMIT && i >= 0; i--) {
+    if (kept[i].ex.length <= 1) continue
+    kept = kept.map((item, j) => j === i ? { ...item, ex: item.ex.slice(0, 1) } : item)
+    json = JSON.stringify(kept)
+  }
+  while (json.length > WEAK_NOTE_LIMIT && kept.some(item => item.n <= 0)) {
+    const zero = kept.map(item => item.n <= 0).lastIndexOf(true)
+    kept = kept.filter((_, j) => j !== zero)
+    json = JSON.stringify(kept)
+  }
+  while (json.length > WEAK_NOTE_LIMIT && kept.length) { kept = kept.slice(0, -1); json = JSON.stringify(kept) }
+  return { ...notes, [weakKey]: json }
 }
 
 /** How weak a point is today: each miss counts, and the count halves every three weeks without a new miss. */
@@ -135,6 +153,16 @@ function historyOf(item: WeakItem): WeakHistory {
 function countEvents(base: number, events: readonly WeakEvent[]) {
   return events.reduce((n, event) => Math.max(0, n + event[3]), base)
 }
+/** Each point keeps only its latest events by ID (enough for two devices that sync to count each mistake once); older
+ *  ones are folded into `base`. Keeping every event made the list grow without end. */
+const MAX_EVENTS = 8
+function foldHistory(history: WeakHistory): WeakHistory {
+  const extra = history.events.length - MAX_EVENTS
+  if (extra <= 0) return history
+  const folded = history.events.slice(0, extra), last = folded[folded.length - 1]
+  return { ...history, base: countEvents(history.base, folded), day: last[2] > history.day ? last[2] : history.day, at: last[1],
+    foldedAt: last[1], events: history.events.slice(extra) }
+}
 function historyAfterRemoval(item: WeakItem, mark: string | undefined): WeakHistory {
   const history = historyOf(item)
   if (!mark) return history
@@ -147,14 +175,18 @@ function historyAfterRemoval(item: WeakItem, mark: string | undefined): WeakHist
   }
 }
 function mergeHistories(first: WeakHistory, second: WeakHistory): WeakHistory {
-  // Only backups made before event IDs existed need the conservative baseline count.
-  const base = second.base >= first.base ? second : first
+  // A history that folded old events counts everything up to `foldedAt` in its base; the one folded further wins and
+  // only later events are added. Only backups made before event IDs existed need the conservative baseline count.
+  const folded = [first, second].filter(h => h.foldedAt !== undefined).sort((a, b) => b.foldedAt! - a.foldedAt!)[0]
+  const base = folded ?? (second.base >= first.base ? second : first)
+  const cutoff = base.foldedAt
   const events = new Map<string, WeakEvent>()
   for (const event of [...first.events, ...second.events]) {
+    if (cutoff !== undefined && event[1] <= cutoff) continue
     const current = events.get(event[0])
     if (!current || event[1] < current[1]) events.set(event[0], event)
   }
-  return { ...base, events: [...events.values()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])) }
+  return foldHistory({ ...base, events: [...events.values()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])) })
 }
 
 /** Records a mistake. Labels outside the list are ignored, so a teacher cannot fill the list with free text. */
@@ -169,8 +201,8 @@ export function addWeak(notes: Record<string, string>, rawLabel: string, day: st
   if (history.events.some(event => event[0] === eventId))
     return example ? refreshWeakExample(notes, k, example, src) : notes
   const lastAt = nextWeakTime(old, removed)
-  const nextHistory: WeakHistory = { ...history, ...(removed ? { afterRemoval: removed } : {}),
-    events: [...history.events, [eventId ?? nextEventId(), lastAt, day, 1]] }
+  const nextHistory: WeakHistory = foldHistory({ ...history, ...(removed ? { afterRemoval: removed } : {}),
+    events: [...history.events, [eventId ?? nextEventId(), lastAt, day, 1]] })
   const item: WeakItem = old
     ? { ...old, n: countEvents(nextHistory.base, nextHistory.events), last: day > old.last ? day : old.last, lastAt, history: nextHistory,
       ex: [...ex, ...old.ex.filter(e => !ex.some(x => squash(x.w) === squash(e.w)))].slice(0, 3) }
@@ -202,7 +234,7 @@ export function easeWeak(notes: Record<string, string>, rawLabel: string) {
   if (!old) return notes
   const mark = readRemoved(notes)[k]
   const history = historyAfterRemoval(old, mark)
-  const next: WeakHistory = { ...history, events: [...history.events, [nextEventId(), nextWeakTime(old, mark), dayKey(), -1]] }
+  const next: WeakHistory = foldHistory({ ...history, events: [...history.events, [nextEventId(), nextWeakTime(old, mark), dayKey(), -1]] })
   return write(notes, list.map(i => i === old ? { ...i, n: countEvents(next.base, next.events), history: next } : i))
 }
 
@@ -264,7 +296,7 @@ export function mergeWeakNotes(older: Record<string, string>, newer: Record<stri
       lastAt: lastAt || undefined, ex: [...examples.values()].slice(0, 3) })
   }
   return {
-    ...(weakKey in older || weakKey in newer ? { [weakKey]: JSON.stringify([...items.values()]) } : {}),
+    ...(weakKey in older || weakKey in newer ? { [weakKey]: write({}, [...items.values()])[weakKey] } : {}),
     ...(removed.size ? { [weakRemovedKey]: JSON.stringify(Object.fromEntries(removed)) } : {}),
   }
 }

@@ -48,7 +48,8 @@ function roundIds(value: unknown) {
 function normalizeStory(raw: unknown): StoryRecord {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
   const value = raw as Record<string, unknown>
-  return {
+  // Fields that are missing or unreadable are left out (not kept as undefined), so a record reads back as it was saved.
+  return withoutUndefined({
     ...value,
     r: recordDay(value.r), l: recordDay(value.l), d: recordDay(value.d), lt: recordDay(value.lt),
     q: wordScore(value.q), qDay: recordDay(value.qDay), zh: recordFlag(value.zh),
@@ -59,8 +60,10 @@ function normalizeStory(raw: unknown): StoryRecord {
     dDoneRound: roundId(value.dDoneRound) ? value.dDoneRound : undefined,
     dClosedRounds: roundIds(value.dClosedRounds), dReviewedRounds: roundIds(value.dReviewedRounds),
     dWritten: recordFlag(value.dWritten),
-  }
+  })
 }
+const withoutUndefined = (record: StoryRecord): StoryRecord =>
+  Object.fromEntries(Object.entries(record).filter(([, v]) => v !== undefined)) as StoryRecord
 
 export function readStory(notes: Record<string, string>, id: string): StoryRecord {
   try {

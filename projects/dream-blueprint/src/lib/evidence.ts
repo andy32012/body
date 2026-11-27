@@ -86,8 +86,12 @@ export function mergeEvidenceRecords(older: Evidence[], newer: Evidence[]) {
   })
 }
 export function addEvidence(notes: Record<string, string>, unit: number, ev: Evidence) {
+  const existing = readEvidence(notes, unit)
+  // The very same work saved again (same day, kind, item, level and answer, not checked yet) is one submission, not two.
+  if (!ev.attemptId && existing.some(e => e.day === ev.day && e.source === ev.source && e.skill === ev.skill && e.item === ev.item
+    && e.level === ev.level && e.answer === ev.answer && e.reviewedAt === undefined && !e.wrong)) return notes
   const entry = { ...ev, attemptId: ev.attemptId ?? newEvidenceId() }
-  const list = mergeEvidenceRecords(readEvidence(notes, unit), [entry])
+  const list = mergeEvidenceRecords(existing, [entry])
   return { ...notes, [evidenceKey(unit)]: JSON.stringify(list) }
 }
 export function setEvidenceLevel(notes: Record<string, string>, unit: number, index: number, level: Level) {

@@ -88,9 +88,11 @@ test('待確認的答案請 Claude 看：照「判定：對／錯」加「原因
   assert.equal(e.prompt, '我是護理師。')
   assert.equal(bestLevel(readEvidence(wrong, 1)), null, '說錯的不算任何完成')
   // Rewritten right: done with help. Rewritten wrong again: the new answer and reason replace the old.
-  const again = checkPending(wrong, 1, ref, wrongBecause('少了 a'), 'I am nurse.')
+  // Each check is sent for the answer as it is now (after the first check: with its reason), as the page does.
+  const again = checkPending(wrong, 1, pendingRef(e), wrongBecause('少了 a'), 'I am nurse.')
   assert.deepEqual([readEvidence(again, 1)[0].answer, readEvidence(again, 1)[0].wrong], ['I am nurse.', '少了 a'])
-  const fixed = readEvidence(checkPending(again, 1, { ...ref, answer: 'I am nurse.' }, right, 'I am a nurse.'), 1)[0]
+  assert.equal(checkPending(wrong, 1, ref, right), wrong, '舊版（第一次批改前）的批改不會落在已經批過的答案上')
+  const fixed = readEvidence(checkPending(again, 1, pendingRef(readEvidence(again, 1)[0]), right, 'I am a nurse.'), 1)[0]
   assert.equal(fixed.level, 'assisted')
   assert.equal(fixed.answer, undefined)
   assert.equal(fixed.wrong, undefined)
@@ -106,13 +108,18 @@ test('待確認的批改落在送出的那一題、那一版答案：清單順�
   const right = '判定：對\n原因：沒問題。'
   const sentA = pendingRef(a)
   let notes = addEvidence(addEvidence({}, 1, a), 1, b)
-  notes = addEvidence(notes, 1, { ...a })
-  assert.deepEqual(readEvidence(notes, 1).map(x => x.item), ['b', 'a'], 'A 重新存過，排到後面去了')
+  assert.equal(addEvidence(notes, 1, { ...a }), notes, '一模一樣的作答再存一次不會多一筆')
+  // The list moved meanwhile (another device's copy arrived in another order).
+  notes = { ...notes, 'evidence.1': JSON.stringify(readEvidence(notes, 1).reverse()) }
+  assert.deepEqual(readEvidence(notes, 1).map(x => x.item), ['b', 'a'])
   const after = readEvidence(checkPending(notes, 1, sentA, right), 1)
   assert.equal(after.find(x => x.item === 'b')!.level, 'pending', 'B 沒有被改到')
   assert.equal(after.find(x => x.item === 'a')!.level, 'independent', '批改落在送出的 A')
+  // A written again in other words is another submission: the check of the first words lands only on them.
   const changed = addEvidence(notes, 1, { ...a, answer: 'I am nurse.' })
-  assert.equal(checkPending(changed, 1, sentA, right), changed, 'A 的答案已經改了：舊答案的批改不落地')
+  const landed = readEvidence(checkPending(changed, 1, sentA, right), 1)
+  assert.equal(landed.find(x => x.answer === 'I am nurse.')?.level, 'pending', '後來另寫的答案不會被舊答案的批改改到')
+  assert.equal(landed.filter(x => x.item === 'a' && x.level === 'independent').length, 1)
 })
 
 test('換個說法自己按「看答案」：用看答案前寫的判；還沒寫就看、看完照抄不算完成', () => {

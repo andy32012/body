@@ -9,15 +9,20 @@ const items = [q('e1', 'vocabulary'), q('e2', 'vocabulary'), q('n1', 'nursing'),
 test('英文和護理分開，各自記住做到第幾題', () => {
   let notes: Record<string, string> = {}
   assert.equal(nextQuizItem(items, 'english', notes, '2026-11-21')?.item.id, 'e1')
-  assert.equal(nextQuizItem(items, 'nursing', notes, '2026-11-21')?.item.id, 'n1')
-  notes = advanceQuiz(notes, 'nursing')
+  const n1 = nextQuizItem(items, 'nursing', notes, '2026-11-21')!
+  assert.equal(n1.item.id, 'n1')
+  // Moving on passes the question just answered (its place in the list, so skipped ones are not asked again).
+  notes = advanceQuiz(notes, 'nursing', n1.index, n1.total)
   assert.equal(nextQuizItem(items, 'nursing', notes, '2026-11-21')?.item.id, 'n2')
   assert.equal(nextQuizItem(items, 'english', notes, '2026-11-21')?.item.id, 'e1')
 })
 test('答錯的題目會記下原因，隔一天先回來；重做答對就離開待重做', () => {
   let notes = recordQuizAnswer({}, items[2], 0, '2026-11-21', true)
-  notes = advanceQuiz(notes, 'nursing')
-  notes = recordQuizCause(notes, 'n1', '看不懂英文')
+  notes = advanceQuiz(notes, 'nursing', 0, 2)
+  // The reason goes on that very answer (its time); a newer answer of the same question is not given an old reason.
+  const answeredAt = readQuizRecord(notes, 'n1')!.at
+  assert.throws(() => recordQuizCause(notes, 'n1', '看不懂英文', answeredAt - 1))
+  notes = recordQuizCause(notes, 'n1', '看不懂英文', answeredAt)
   const rec = readQuizRecord(notes, 'n1')
   assert.deepEqual([rec?.correct, rec?.misses, rec?.zh, rec?.causes], [false, 1, true, ['看不懂英文']])
   assert.equal(nextQuizItem(items, 'nursing', notes, '2026-11-21')?.retry, false)

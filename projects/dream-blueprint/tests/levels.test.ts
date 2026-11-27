@@ -28,27 +28,35 @@ test('全民英檢及格線：聽讀合計 160、單項 72；說寫初級寫 70 
   assert.ok(!swPass('gept-a2', [90, 79]))
 })
 
-test('升級關卡：報名後就能先讀下一段；沒過要再報名；兩半可以分開考過', () => {
+// A result counts from its test day on, so each test sets its own "today" after the dates it uses.
+const at = (t: { mock: { timers: { enable: (o: { apis: ['Date']; now: number }) => void } } }, day: string) =>
+  t.mock.timers.enable({ apis: ['Date'], now: Date.parse(day + 'T04:00:00Z') })
+
+test('升級關卡：報名後就能先讀下一段；沒過要再報名；兩半可以分開考過', t => {
+  at(t, '2027-10-01')
   let notes: Record<string, string> = {}
   assert.equal(unitGate(notes, 28), null, 'A1→A2 這一段不用等')
   assert.equal(unitGate(notes, 29)?.to, 'A2', '單元 29 要等全民英檢初級')
   assert.equal(firstLockedUnit(notes, 3), 29)
-  notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both' })
+  // 初級 is taken in two stages (聽讀, then 說寫); it has no one-day test.
+  notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'lr' })
   assert.equal(certStatus(notes, 'A2').state, 'waiting')
   assert.equal(unitGate(notes, 29), null, '報名了，等成績也能先讀')
   assert.equal(firstLockedUnit(notes, 3), 41, '下一個關卡在單元 41')
-  notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both', lr: [90, 85], sw: [65, 85] })
+  notes = saveAttempt(notes, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'lr', lr: [90, 85] })
+  notes = saveAttempt(notes, 'A2', { id: 'b', exam: 'gept-a2', date: '2027-06-12', parts: 'sw', sw: [65, 85] })
   assert.equal(certStatus(notes, 'A2').state, 'partial', '聽讀過、寫作 65 沒過')
   assert.equal(unitGate(notes, 32)?.to, 'A2', '沒過就要再報名才接著上')
-  notes = saveAttempt(notes, 'A2', { id: 'b', exam: 'gept-a2', date: '2027-06-12', parts: 'sw' })
+  notes = saveAttempt(notes, 'A2', { id: 'c', exam: 'gept-a2', date: '2027-09-18', parts: 'w' })
   assert.equal(unitGate(notes, 32), null)
-  notes = saveAttempt(notes, 'A2', { id: 'b', exam: 'gept-a2', date: '2027-06-12', parts: 'sw', sw: [75, 82] })
-  assert.deepEqual([certStatus(notes, 'A2').state, certStatus(notes, 'A2').passedOn], ['passed', '2027-06-12'])
+  notes = saveAttempt(notes, 'A2', { id: 'c', exam: 'gept-a2', date: '2027-09-18', parts: 'w', writing: 75 })
+  assert.deepEqual([certStatus(notes, 'A2').state, certStatus(notes, 'A2').passedOn], ['passed', '2027-09-18'])
   assert.equal(officialLevel(notes), 'A2')
   assert.equal(unitGate(notes, 41)?.to, 'B1')
 })
 
-test('其他證照、雅思和跳級：證照上寫到哪一級就算哪一級', () => {
+test('其他證照、雅思和跳級：證照上寫到哪一級就算哪一級', t => {
+  at(t, '2031-12-01')
   let notes = saveAttempt({}, 'B1', { id: 'm', exam: 'gept-b1', date: '2027-08-15', parts: 'both', lr: [88, 90], sw: [82, 80] })
   assert.equal(officialLevel(notes), 'B1', '沒考初級，直接考過中級也算 B1')
   assert.equal(unitGate(notes, 29), null)
@@ -90,7 +98,8 @@ test('舊的預設（週二、四、六 30 分鐘）換成週一到六 1.5 小�
   assert.deepEqual(mine.settings.regularDays, [1, 3, 5], '自己設的上課日不動')
 })
 
-test('全民英檢一日考不溯及既往：不會跟之前考過的聽讀合成一張通過；一日考沒過的那半，之後補考可以合併', () => {
+test('全民英檢一日考不溯及既往：不會跟之前考過的聽讀合成一張通過；一日考沒過的那半，之後補考可以合併', t => {
+  at(t, '2028-06-01')
   // Staged 聽讀 85/85 first; later a one-day test with 聽讀 60/60 and 說寫 90/90: no certificate (LTTC).
   let notes = saveAttempt({}, 'B1', { id: 'lr', exam: 'gept-b1', date: '2027-03-01', parts: 'lr', lr: [85, 85] })
   notes = saveAttempt(notes, 'B1', { id: 'day', exam: 'gept-b1', date: '2027-09-01', parts: 'both', lr: [60, 60], sw: [90, 90] })
@@ -103,10 +112,12 @@ test('全民英檢一日考不溯及既往：不會跟之前考過的聽讀合�
   assert.deepEqual([certStatus(later, 'B1').state, certStatus(later, 'B1').passedOn], ['passed', '2027-12-01'])
 })
 
-test('證照：沒登錄成績不說「證照上是 A1」；雅思超過兩年就不再打勾', async () => {
+test('證照：沒登錄成績不說「證照上是 A1」；雅思超過兩年就不再打勾', async t => {
+  at(t, '2028-01-01')
   const { certifiedLevel, visaCurrent } = await import('../src/lib/cefr.ts')
   assert.equal(certifiedLevel({}), null, '還沒有證照')
-  assert.equal(certifiedLevel(saveAttempt({}, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'both' })), null, '只有報名也還沒有')
+  assert.equal(certifiedLevel(saveAttempt({}, 'A2', { id: 'a', exam: 'gept-a2', date: '2027-04-17', parts: 'lr' })), null, '只有報名也還沒有')
+  assert.equal(certifiedLevel(saveAttempt({}, 'B1', { id: 'f', exam: 'gept-b1', date: '2028-03-01', parts: 'both', lr: [88, 90], sw: [82, 80] })), null, '還沒到考試那天，成績不算')
   assert.equal(certifiedLevel(saveAttempt({}, 'B1', { id: 'm', exam: 'gept-b1', date: '2027-08-15', parts: 'both', lr: [88, 90], sw: [82, 80] })), 'B1')
   const v = visaScreen(saveAttempt({}, 'C1', { id: 'j', exam: 'ielts', date: '2024-11-26', band: { overall: 6.5, speaking: 7 } }))!
   assert.equal(v.until, '2026-11-26')
@@ -134,14 +145,17 @@ test('Mrs、Ms 沒有句點也查得到太太、女士，不會被當成 Mr 的�
   assert.equal(lookupWord('Mr.', { words: [] })?.en, 'Mr./Mister')
 })
 
-test('全民英檢兩階段要在兩年內：聽讀和說寫隔太久不算；一日考不能接以前的成績；只差一項可以只考那一項（稽核 CUR-03）', () => {
+test('全民英檢兩階段要在兩年內：聽讀和說寫隔太久不算；一日考不能接以前的成績；只差一項可以只考那一項（稽核 CUR-03）', t => {
+  at(t, '2026-08-01')
   const save = (list: Parameters<typeof saveAttempt>[2][]) => list.reduce((n, a) => saveAttempt(n, 'A2', a), {} as Record<string, string>)
+  // The one-day test is 中級／中高級 only.
+  const saveB1 = (list: Parameters<typeof saveAttempt>[2][]) => list.reduce((n, a) => saveAttempt(n, 'B1', a), {} as Record<string, string>)
   // 1. 聽讀 2020, 說寫 2026: more than two years apart.
   const far = save([{ id: 'a', exam: 'gept-a2', date: '2020-01-01', parts: 'lr', lr: [80, 80] }, { id: 'b', exam: 'gept-a2', date: '2026-01-01', parts: 'sw', sw: [80, 80] }])
   assert.notEqual(certStatus(far, 'A2').state, 'passed')
   // 2. A one-day test does not join a 聽讀 passed before it.
-  const oneDay = save([{ id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'lr', lr: [80, 80] }, { id: 'b', exam: 'gept-a2', date: '2026-06-01', parts: 'both', lr: [60, 60], sw: [80, 80] }])
-  assert.notEqual(certStatus(oneDay, 'A2').state, 'passed')
+  const oneDay = saveB1([{ id: 'a', exam: 'gept-b1', date: '2026-01-01', parts: 'lr', lr: [80, 80] }, { id: 'b', exam: 'gept-b1', date: '2026-06-01', parts: 'both', lr: [60, 60], sw: [80, 80] }])
+  assert.notEqual(certStatus(oneDay, 'B1').state, 'passed')
   // 3. 寫作 passed, 口說 not: later only 口說, within the two years.
   const retake = save([
     { id: 'a', exam: 'gept-a2', date: '2025-01-01', parts: 'lr', lr: [80, 80] },
@@ -155,13 +169,15 @@ test('全民英檢兩階段要在兩年內：聽讀和說寫隔太久不算；�
   const late = saveAttempt(retake, 'A2', { id: 'c', exam: 'gept-a2', date: '2027-03-01', parts: 's', speaking: 80 })
   assert.notEqual(certStatus(late, 'A2').state, 'passed')
   // A one-day test all passed; one whose 聽讀 failed counts once 聽讀 is passed later and the missing part is taken.
-  assert.equal(certStatus(save([{ id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'both', lr: [80, 80], sw: [80, 80] }]), 'A2').state, 'passed')
-  const day = save([
-    { id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'both', lr: [60, 60], sw: [80, 60] },
-    { id: 'b', exam: 'gept-a2', date: '2026-03-01', parts: 'lr', lr: [80, 80] },
+  assert.equal(certStatus(saveB1([{ id: 'a', exam: 'gept-b1', date: '2026-01-01', parts: 'both', lr: [80, 80], sw: [80, 80] }]), 'B1').state, 'passed')
+  const day = saveB1([
+    { id: 'a', exam: 'gept-b1', date: '2026-01-01', parts: 'both', lr: [60, 60], sw: [80, 60] },
+    { id: 'b', exam: 'gept-b1', date: '2026-03-01', parts: 'lr', lr: [80, 80] },
   ])
-  assert.deepEqual([certStatus(day, 'A2').state, certStatus(day, 'A2').w], ['partial', true])
-  assert.equal(certStatus(saveAttempt(day, 'A2', { id: 'c', exam: 'gept-a2', date: '2026-07-01', parts: 's', speaking: 85 }), 'A2').state, 'passed')
+  assert.deepEqual([certStatus(day, 'B1').state, certStatus(day, 'B1').w], ['partial', true])
+  assert.equal(certStatus(saveAttempt(day, 'B1', { id: 'c', exam: 'gept-b1', date: '2026-07-01', parts: 's', speaking: 85 }), 'B1').state, 'passed')
+  // 初級 has no one-day test: a sitting an older version saved that way is not a pass (enter the two stages instead).
+  assert.notEqual(certStatus(save([{ id: 'a', exam: 'gept-a2', date: '2026-01-01', parts: 'both', lr: [80, 80], sw: [80, 80] }]), 'A2').state, 'passed')
   // A sitting waiting for scores (only 口說 booked) is waiting, not a zero.
   assert.equal(certStatus(saveAttempt(retake, 'A2', { id: 'c', exam: 'gept-a2', date: '2026-01-01', parts: 's' }), 'A2').state, 'waiting')
 })

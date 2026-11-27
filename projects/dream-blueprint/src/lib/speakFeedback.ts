@@ -33,7 +33,8 @@ export function parseSpeakFeedback(text: string): SpeakFeedback {
     if (!m) { if (line) rest.push(line); continue }
     const parts = m[2].split('|||').map(field)
     if (m[1] === '用了') {
-      const n = /^\d+$/.test(parts[0]) ? Number(parts[0]) : NaN
+      // "3" as asked, or "3 次" as Claude often writes it; anything else ("三", "-5") is not a count.
+      const n = /^\d+\s*次?$/.test(parts[0]) ? Number(parts[0].match(/\d+/)![0]) : NaN
       const example = field(parts[1])
       const noExample = /^(無|none)$/i.test(example)
       if (Number.isSafeInteger(n) && parts.length === 2 && (n === 0 ? noExample : !!example && !noExample)) {

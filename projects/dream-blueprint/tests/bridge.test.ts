@@ -81,11 +81,13 @@ test('橋接寫作：不搶寫作階梯的建議，第一個評分項目寫出�
   assert.equal(suggestedStage(stages, all), 'task2', '全部做完時建議還是停在 Task 2，不跳到橋接段落')
   const task = bridgeStage.tasks[0]
   const crit = criteriaFor(bridgeStage, task)
-  assert.match(crit[0], /用到這一課的文法（敘事時態/)
-  // 橋接段落照全民英檢中級英文作文給分；這一課的文法是要求之一，Claude 可以只寫括號前的簡稱。
+  // R048: each bridge task names its own pattern in the prompt; the first criterion checks that one, not every pattern of
+  // the unit (br43a does not have to use used to). The unit's grammar stays in the hints.
+  assert.equal(crit[0], '用對本題指定的句型')
+  // 橋接段落照全民英檢中級英文作文給分；本題指定的句型是要求之一。
   assert.equal(rubricFor(bridgeStage).id, 'gept-essay')
   assert.deepEqual(checksFor(bridgeStage, task), crit)
-  const reply = JSON.stringify({ scores: [{ name: '整篇', score: 4, reason: '符合第 4 級' }], checks: [{ name: '用到這一課的文法', ok: true }, { name: '內容回答了題目每一點', ok: true }, { name: '句子之間接得順', ok: false }, { name: '文法和用字正確', ok: false }], next: '' })
+  const reply = JSON.stringify({ scores: [{ name: '整篇', score: 4, reason: '符合第 4 級' }], checks: [{ name: '用對本題指定的句型', ok: true }, { name: '內容回答了題目每一點', ok: true }, { name: '句子之間接得順', ok: false }, { name: '文法和用字正確', ok: false }], next: '' })
   const graded = parseGrade(reply, rubricFor(bridgeStage), scoredParts(bridgeStage, task), crit)
   assert.equal(graded?.checks?.[0].name, crit[0])
   assert.deepEqual(graded?.checks?.map(c => c.ok), [true, true, false, false])

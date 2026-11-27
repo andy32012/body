@@ -14,7 +14,8 @@ import { packDayLessons, unpackDayLessons, type LessonRecord } from './lesson'
  * Progress that is already big gets shorter windows, to make more space when old details can be removed.
  *
  * With Google Drive connected nothing is thrown away: the old details are first saved into the Drive archive folder
- * (cloud script v4, `archiveOld`), and only the items that arrived there are removed here (`applyBatch`).
+ * (cloud script v4, `archiveOld`), and only the items that arrived there are removed here (`applyBatch`). Until then
+ * they stay on the device — unless the progress passes 3.5 MB, when it is tidied anyway so saving keeps working.
  */
 export const archiveKey = 'review.archive'
 /** The day old records were last sent to the Drive archive. */
@@ -100,6 +101,11 @@ function* archivedEvents(day: string, rows?: ReviewRows): Generator<ReviewEvent>
 const fullerDay = (a: DayCount | undefined, b: DayCount): DayCount => !a ? b
   : [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.max(a[2], b[2])]
 
+/** How many folded days keep each review's identity (`rows`). Devices fold the same recent days, so a review folded on
+ *  both still counts once; older days keep only their day totals. Keeping every review forever made the archive grow by
+ *  about 1.7 MB a year and the saved progress pass the browser's 5 MB within two years. */
+export const archiveRowDays = 30
+
 /** Folded reviews from the two archives and reviews still kept on either device, with duplicate reviews counted once. */
 export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readonly ReviewEvent[]): ReviewArchive {
   const px = dayParts(x), py = dayParts(y)
@@ -125,6 +131,7 @@ export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readon
   const cards: string[] = []
   const cardIndex = new Map<string, number>()
   const rows: ReviewRows = { cards, days: {} }
+  const rowCut = isDate(before) ? addDays(before, -archiveRowDays) : ''
   for (const day of [...foldedDays].sort()) {
     if (!isDate(day) || day < cut || day >= before) continue
     const lines = mergeReviewEvents([
@@ -134,6 +141,10 @@ export function mergeArchives(x: ReviewArchive, y: ReviewArchive, events: readon
     days[day] = fullerDay(days[day], countLines(lines))
     const points = reviewBonus(lines, day)
     bonus[day] = legacyDays[day] ? Math.max(bonus[day] ?? 0, points) : points
+    // Only days that had a bonus are written down (a missing day reads as 0).
+    if (!bonus[day]) delete bonus[day]
+    // An older day keeps its totals only, like the archives written before identities were kept.
+    if (day < rowCut) { legacyDays[day] = days[day]; continue }
     const row: number[] = []
     for (const event of lines) {
       let index = cardIndex.get(event.id)
@@ -226,6 +237,9 @@ export function mergeArchiveReceipts(notes: Record<string, string>, receipts: Ar
 
 /** How long details are kept, in days. Big progress gets the short windows. */
 const shortWindowSize = 3_000_000
+/** Past this size old details are tidied even while they wait for the Drive archive, so the browser slot (about 5 MB)
+ *  never fills up and saving keeps working. */
+export const EMERGENCY = 3_500_000
 export function windows(size: number) {
   return size > shortWindowSize ? { events: 30, dayNotes: 21, lessons: 45 } : { events: 60, dayNotes: 45, lessons: 120 }
 }
@@ -251,7 +265,9 @@ function slimLesson(rec: LessonRecord): LessonRecord {
   const express = e ? { first: e.first, lastAnswer: e.lastAnswer, finalAnswer: e.finalAnswer, corrections: e.corrections ?? 0,
     help: e.help ?? [], fixed: e.fixed, revealed: e.revealed, ...(others ? { others } : {}) } : undefined
   const keepAnswers = (attempts: LessonRecord['records']) => attempts?.filter(a => typeof a.answer === 'string')
-  return { ...rest, ...(express ? { express } : {}), records: keepAnswers(records), recalls: keepAnswers(recalls), slim: true }
+  const keptRecords = keepAnswers(records), keptRecalls = keepAnswers(recalls)
+  return { ...rest, ...(express ? { express } : {}), ...(keptRecords?.length ? { records: keptRecords } : {}),
+    ...(keptRecalls?.length ? { recalls: keptRecalls } : {}), slim: true }
 }
 
 /** A date is eligible only when each lesson on it is finished. */
@@ -268,11 +284,13 @@ export function oldDetails(state: Compactable, today: string, size = JSON.string
   const upTo = { events: addDays(today, -w.events), dayNotes: addDays(today, -w.dayNotes), lessons: addDays(today, -w.lessons) }
   const notes: Record<string, string> = {}
   const lessons: Record<string, string> = {}
+  // The lesson being taken stays whole. `lesson.active` is its date, or its date followed by `~` and the lesson.
+  const active = /^\d{4}-\d{2}-\d{2}/.exec(state.notes['lesson.active'] ?? '')?.[0]
   for (const [k, v] of Object.entries(state.notes)) {
     const day = dayNoteDate(k)
     if (day) { if (day < upTo.dayNotes) notes[k] = v; continue }
     const m = lessonRecord.exec(k)
-    if (m && m[1] < upTo.lessons && slim(v) !== null) lessons[k] = v
+    if (m && m[1] < upTo.lessons && m[1] !== active && slim(v) !== null) lessons[k] = v
   }
   return { upTo, events: state.reviewEvents.filter(e => e.day < upTo.events), notes, lessons }
 }
@@ -324,8 +342,9 @@ export function compactState<S extends Compactable>(state: S, today: string, siz
     const notes = { ...state.notes }
     if (removeArchivedNotes(notes, receipts)) state = { ...state, notes }
   }
-  if (keepUnarchived) return state
-  return applyBatch(state, oldDetails(state, today, size))
+  const current = size ?? JSON.stringify(state).length
+  if (keepUnarchived && current <= EMERGENCY) return state
+  return applyBatch(state, oldDetails(state, today, current))
 }
 
 /** Sends the old details to the Drive archive about once a week (sooner when the progress is big). Returns what

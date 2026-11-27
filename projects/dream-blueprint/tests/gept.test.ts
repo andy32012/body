@@ -93,7 +93,9 @@ test('練習紀錄：每一回記日期和分數', () => {
   let notes: Record<string, string> = {}
   notes = saveGept(notes, 'intermediate', 'i1', { d: '2026-11-24', q: 3.5 })
   notes = saveGept(notes, 'intermediate', 'i1', { p: 4 })
-  assert.deepEqual(readGept(notes, 'intermediate', 'i1'), { d: '2026-11-24', q: 3.5, best: 3.5, p: 4 }, '問答也記最好的一次')
+  const { questionAt, ...rec } = readGept(notes, 'intermediate', 'i1') as Record<string, unknown>
+  assert.deepEqual(rec, { d: '2026-11-24', q: 3.5, best: 3.5, p: 4, questionsComplete: true }, '問答也記最好的一次')
+  assert.ok(Number.isSafeInteger(questionAt), '問答記下作答時間，兩台裝置合併時分得出先後')
   assert.deepEqual(readGept(notes, 'elementary', 'e1'), {})
 })
 

@@ -34,7 +34,7 @@ test('拼字練習一次問一個字形，用那個字形自己的中文', async
   const he = { en: 'he (him, his, himself)', zh: '他' }
   const targets = [0, 1, 2, 3].map(t => spellingTargets(he, t))
   assert.deepEqual(targets.map(t => t.en), ['he', 'him', 'his', 'himself'])
-  assert.equal(targets[1].zh, '他（當受詞）（pron.）')
+  assert.equal(targets[1].zh, 'pron. 他（當受詞）')
   // 問的是受格，就只有 him 算對。
   assert.equal(spellingMatches('him', targets[1].accept), true)
   assert.equal(spellingMatches('his', targets[1].accept), false)
