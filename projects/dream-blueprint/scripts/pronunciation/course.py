@@ -6,6 +6,9 @@ same places. Besides the word itself such an item has derived clips, cut from on
 A `P<n>` line is a pool of candidate minimal pairs for a lesson, in order of preference; the lesson keeps n of them: the first n
 whose recordings came out clearly distinct in both voices (chosen.json, written by choose.py)."""
 import json, re, sys, os
+from shutil import copy2
+from tempfile import mkdtemp
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHOSEN = os.path.join(HERE, 'chosen.json')
@@ -17,6 +20,44 @@ def read_json(path):
 def write_json(path, data):
     with open(path, 'w', encoding='utf-8') as output:
         json.dump(data, output, ensure_ascii=False, indent=1)
+
+
+def publish_recording_files(files, staging):
+    """Publish prepared files, restoring earlier replacements if a later one fails."""
+    previous = []
+    for index, (source, target) in enumerate(files):
+        saved = None
+        if target.exists() or target.is_symlink():
+            saved = staging / f'previous-{index}'
+            copy2(target, saved, follow_symlinks=False)
+        previous.append((source, target, saved))
+    published = []
+    try:
+        for source, target, saved in previous:
+            source.replace(target)
+            published.append((target, saved))
+    except OSError as publish_error:
+        failed_to_restore = []
+        for target, saved in reversed(published):
+            try:
+                if saved is None:
+                    target.unlink(missing_ok=True)
+                else:
+                    saved.replace(target)
+            except OSError:
+                failed_to_restore.append((target, saved))
+        if failed_to_restore:
+            recovery = Path(mkdtemp(prefix='pronunciation-recovery-'))
+            details = []
+            for target, saved in failed_to_restore:
+                if saved is None:
+                    details.append(f'{target} had no prior file')
+                else:
+                    recovered = recovery / saved.name
+                    copy2(saved, recovered, follow_symlinks=False)
+                    details.append(f'{target} has its previous version at {recovered}')
+            raise RuntimeError('Publication failed and some files could not be restored:\n - ' + '\n - '.join(details)) from publish_error
+        raise
 
 # How a clip is stored in a pack: 24 kHz mono mp3 at 96 kbit/s, no tags (a clip starts with an audio frame).
 # At 48 kbit/s the recogniser's lead for some close pairs (guess/gas, tree/three, ban/van) shrank to nothing; at 96 it holds.
@@ -38,8 +79,10 @@ def derived(item):
     n, t = len(item['kk']), item['text']
     return [t + '~slow'] + [f'{t}~{i}' for i in range(1, n + 1)] + [f'{t}~1-{j}' for j in range(2, n)]
 
-def parse(path=os.path.join(HERE, 'course.txt')):
-    chosen = read_json(CHOSEN)['pairs'] if os.path.exists(CHOSEN) else {}
+def parse(path=os.path.join(HERE, 'course.txt'), *, chosen_pairs=None):
+    chosen = chosen_pairs
+    if chosen is None:
+        chosen = read_json(CHOSEN)['pairs'] if os.path.exists(CHOSEN) else {}
     lessons = []
     cur = None
     for raw in open(path, encoding='utf-8'):

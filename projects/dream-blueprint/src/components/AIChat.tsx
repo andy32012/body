@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUp, X } from 'lucide-react'
-import { askTutor, personaText, tutorKey, tutorPersona, type TutorTurn } from '../lib/tutor'
-import { askDetail, askEvent, askedAbout, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
+import { askTutor, isTutorCredentialStorageKey, personaText, tutorKey, tutorKeyChange, tutorPersona, type TutorTurn } from '../lib/tutor'
+import { askClaude, askDetail, askEvent, askedAbout, captureTaskHelp, currentTask, taskPrompt, useCurrentTask } from '../lib/taskContext'
+import { appendChatExchange, clearChatHistory, createChatExchange, emptyChat, exchangeTurns, isChatChange, readChatHistory, type ChatTurn } from '../lib/chatHistory'
 import { extractMemory, memoryPrompt, useMemory } from '../lib/memory'
 import { driveLog } from '../lib/drive'
 import { useModal } from '../lib/modal'
@@ -39,45 +40,88 @@ function Typed({ text, animate, onTick }: { text: string; animate: boolean; onTi
   return <>{text.slice(0, n).split('\n').map((line, j) => line.trim() ? <p key={j}>{line.replace(/\*\*/g, '')}</p> : null)}{n < text.length && <PencilCaret />}</>
 }
 
-/** A conversation with Claude. `opening` is sent automatically when the panel opens. */
-const loadTurns = (key?: string): TutorTurn[] => {
-  if (!key) return []
-  try { const v = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(v) ? v : [] } catch { return [] }
-}
-const saveTurns = (key: string | undefined, turns: TutorTurn[]) => {
-  if (!key) return
-  try { localStorage.setItem(key, JSON.stringify(turns.slice(-40))) } catch { /* private mode */ }
+function loadHistory(key?: string) {
+  try { return key ? readChatHistory(key) : undefined } catch { return undefined }
 }
 
-type ChatAsk = { text: string; system: string; onSend?: () => void }
+function watchConnection(refresh: () => void) {
+  const onStorage = (event: StorageEvent) => { if (isTutorCredentialStorageKey(event.key)) refresh() }
+  window.addEventListener('storage', onStorage)
+  window.addEventListener(tutorKeyChange, refresh)
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener(tutorKeyChange, refresh)
+  }
+}
+const useConnected = () => useSyncExternalStore(watchConnection, () => !!tutorKey(), () => false)
+const mergeTurns = (stored: ChatTurn[], unsaved: ChatTurn[]) =>
+  [...new Map([...stored, ...unsaved].map(turn => [turn.id, turn])).values()].slice(-40)
+
+type ChatAsk = { id: string; text: string; system: string; label?: string; onSend?: () => void }
 type ChatQuestion = { text: string; system: string; opening?: boolean }
 type FailedQuestion = { question: ChatQuestion; error: string }
 type ChatDraft = { text: string; failed: FailedQuestion[] }
 
-export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist, introCards = [], ask, onAskConsumed, onGoToSettings, alwaysSuggest = false, recovery }:
+// A pairing dialog or page can remount the assistant. Keep original prompts in this tab's memory.
+let heldQuestions: ChatAsk[] = []
+let questionSerial = 0
+
+/** A conversation with Claude. `opening` is sent from the word button that opened the panel. */
+export function AIChat({ system, opening, placeholder = '有問題就問我', suggestions = [], persist, introCards = [], ask, onAskConsumed, deferred = [], onDeferred, onGoToSettings, alwaysSuggest = false, recovery }:
   { system: string | (() => string); opening?: string; placeholder?: string; suggestions?: string[]; persist?: string; introCards?: string[]
     /** A one-time request from a button outside the chat, with the context captured when it was pressed. */
     ask?: ChatAsk; onAskConsumed?: (ask: ChatAsk) => void; onGoToSettings: () => void; alwaysSuggest?: boolean
+    deferred?: ChatAsk[]; onDeferred?: (ask: ChatAsk, send: boolean) => void
     recovery?: RefObject<ChatDraft> }) {
   const memory = useMemory()
-  const [turns, setTurns] = useState<TutorTurn[]>(() => loadTurns(persist))
+  const [history, setHistory] = useState(() => loadHistory(persist) ?? emptyChat)
+  const { turns } = history
+  const generation = useRef(history.generation)
+  const unsaved = useRef<ChatTurn[]>([])
+  const [notice, setNotice] = useState('')
   const [draft, setDraft] = useState<ChatDraft>(() => recovery?.current ?? { text: '', failed: [] })
   const [pending, setPending] = useState<ChatQuestion | null>(null)
   const busy = pending !== null
-  const [openingIndex, setOpeningIndex] = useState(-1)
+  const [openingId, setOpeningId] = useState('')
   const end = useRef<HTMLDivElement>(null)
   const started = useRef(false)
   const request = useRef<AbortController | null>(null)
   const consumed = useRef<ChatAsk | null>(null)
-  const [fresh, setFresh] = useState(-1)
-  const connected = !!tutorKey()
+  const [fresh, setFresh] = useState('')
+  const connected = useConnected()
 
   // Closing the sheet drops ownership before an old response can update history, memory or the optional Drive log.
-  useLayoutEffect(() => () => {
+  function stopRequest() {
     const controller = request.current
     request.current = null
     controller?.abort()
-  }, [])
+  }
+  useLayoutEffect(() => stopRequest, [])
+  function showHistory(saved: typeof history) {
+    if (saved.generation !== generation.current) {
+      generation.current = saved.generation
+      unsaved.current = []
+      stopRequest()
+      setPending(null)
+      setFresh('')
+      setNotice('這段對話已清空。')
+    }
+    const next = { ...saved, turns: mergeTurns(saved.turns, unsaved.current) }
+    setHistory(next)
+    return next
+  }
+  useLayoutEffect(() => {
+    if (!persist) return
+    const refresh = () => {
+      const latest = loadHistory(persist)
+      if (latest) showHistory(latest)
+    }
+    const onStorage = (event: StorageEvent) => { if (isChatChange(persist, event.key)) refresh() }
+    window.addEventListener('storage', onStorage)
+    refresh()
+    return () => window.removeEventListener('storage', onStorage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persist])
   // Keep the floating assistant's draft available if the learner closes it to fix their Claude settings.
   useLayoutEffect(() => {
     if (recovery) recovery.current = draft
@@ -85,9 +129,14 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
 
   async function submit(question: ChatQuestion, fromInput: boolean, retry?: FailedQuestion) {
     if (request.current) return
+    const saved = loadHistory(persist)
+    const base = saved ? showHistory(saved) : history
     const controller = new AbortController()
     request.current = controller
-    const next: TutorTurn[] = [...turns, { role: 'user', content: question.text }]
+    const next: TutorTurn[] = [
+      ...base.turns.map(({ role, content }) => ({ role, content })),
+      { role: 'user', content: question.text },
+    ]
     setPending(question)
     if (fromInput) setDraft(d => ({ ...d, text: '' }))
     try {
@@ -95,12 +144,29 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
       if (request.current !== controller) return
       if (!raw.trim()) throw new Error('Claude 沒有回傳文字，請再試一次。')
       const { clean, remember, forget } = extractMemory(raw)
+      const entry = createChatExchange(question.text, clean || '這次沒有可顯示的回覆。')
+      const exchange = exchangeTurns(entry)
+      if (persist) {
+        try {
+          if (!appendChatExchange(persist, base.generation, entry)) {
+            const latest = loadHistory(persist)
+            if (latest) showHistory(latest)
+            return
+          }
+          const latest = readChatHistory(persist)
+          showHistory(latest)
+          if (latest.generation !== base.generation) return
+        } catch {
+          unsaved.current = mergeTurns(unsaved.current, exchange)
+          setHistory(previous => ({ ...previous, turns: mergeTurns(previous.turns, exchange) }))
+          setNotice('瀏覽器未能確認這則對話已儲存。回覆目前仍可在這裡查看。')
+        }
+      } else {
+        setHistory(previous => ({ ...previous, turns: [...previous.turns, ...exchange] }))
+      }
       if (remember.length || forget.length) memory.update(remember, forget)
-      const done: TutorTurn[] = [...next, { role: 'assistant', content: clean || '這次沒有可顯示的回覆。' }]
-      setTurns(done)
-      saveTurns(persist, done)
-      setFresh(done.length - 1)
-      if (question.opening) setOpeningIndex(turns.length)
+      setFresh(exchange[1].id)
+      if (question.opening) setOpeningId(exchange[0].id)
       if (retry) setDraft(d => ({ ...d, failed: d.failed.filter(f => f !== retry) }))
       driveLog('問問 Claude', [{ role: 'user', text: question.text }, { role: 'Claude', text: clean }])
     } catch (error) {
@@ -122,12 +188,22 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
     options.ask?.onSend?.()
     void submit({ text: q, system: prompt, opening: options.opening }, options.fromInput ?? false)
   }
+  function sendDeferred(question: ChatAsk) {
+    if (request.current || !tutorKey()) return
+    onDeferred?.(question, true)
+    send(question.text, { ask: question })
+  }
+  function clearHistory() {
+    if (!persist || request.current) return
+    try { showHistory(clearChatHistory(persist)) }
+    catch { setNotice('瀏覽器未能清空這段對話，請再試一次。') }
+  }
   useEffect(() => {
     if (opening && connected && !started.current) { started.current = true; send(opening, { opening: true }) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    if (!ask || !connected || busy || request.current || consumed.current === ask) return
+    if (!ask || !connected || !tutorKey() || busy || request.current || consumed.current === ask) return
     consumed.current = ask
     onAskConsumed?.(ask)
     send(ask.text, { ask })
@@ -137,6 +213,7 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
 
   if (!connected) return <div className="ai-empty">
     <p>還沒連接 Claude。到「設定 → 連接 Claude」貼上 API 金鑰，這裡就能用了。</p>
+    {deferred.length > 0 && <p>這個分頁會保留原題。設定好後再開「問問 Claude」，就能確認送出。</p>}
     <a className="ai-go" href="#settings" onClick={e => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       e.preventDefault()
@@ -147,15 +224,23 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
   return <div className="ai-chat">
     <div className="ai-log">
       {turns.length === 0 && draft.failed.length === 0 && !busy && <SketchIntro text={tutorPersona() === 'teacher' ? '你好' : '嗨～哥哥'} />}
-      {turns.map((t, index) => {
-        if (index === openingIndex) return null
-        return <div key={index} className={'ai-msg ai-' + t.role}>
-          {t.role === 'assistant' ? <><Spark size={18} /><div className="ai-text"><Typed text={t.content} animate={index === fresh} onTick={() => end.current?.scrollIntoView({ block: 'nearest' })} /></div></>
+      {turns.map(t => {
+        if (t.id === openingId) return null
+        return <div key={t.id} className={'ai-msg ai-' + t.role}>
+          {t.role === 'assistant' ? <><Spark size={18} /><div className="ai-text"><Typed text={t.content} animate={t.id === fresh} onTick={() => end.current?.scrollIntoView({ block: 'nearest' })} /></div></>
             : <p>{t.content}</p>}
         </div>
       })}
       {pending && !pending.opening && <div className="ai-msg ai-user"><p>{pending.text}</p></div>}
       {busy && <Thinking />}
+      {deferred.map(question => <div className="ai-failed" key={question.id}>
+        <small>{question.label ?? '連接 Claude 前保留的問題'}</small>
+        <div className="ai-msg ai-user"><p>{question.text}</p></div>
+        <div className="ai-suggest">
+          <button type="button" disabled={busy} onClick={() => sendDeferred(question)}>送出這個問題</button>
+          <button type="button" onClick={() => onDeferred?.(question, false)}>移除這則問題</button>
+        </div>
+      </div>)}
       {draft.failed.map((f, i) => pending === f.question ? null : <div className="ai-failed" key={i}>
         <div className="ai-msg ai-user"><p>{f.question.text}</p></div>
         <p className="ai-error" role="alert">{f.error}</p>
@@ -164,7 +249,8 @@ export function AIChat({ system, opening, placeholder = '有問題就問我', su
           <button type="button" disabled={busy} onClick={() => setDraft(d => ({ ...d, failed: d.failed.filter(other => other !== f) }))}>移除這則問題</button>
         </div>
       </div>)}
-      {persist && turns.length > 0 && !busy && <button type="button" className="ai-clear" onClick={() => { setTurns([]); saveTurns(persist, []) }}>清空這段對話（記住的事不會刪）</button>}
+      {notice && <p className="ai-error" role="status">{notice}</p>}
+      {persist && turns.length > 0 && !busy && <button type="button" className="ai-clear" onClick={clearHistory}>清空這段對話（記住的事不會刪）</button>}
       {!busy && (alwaysSuggest || turns.length <= (opening ? 2 : 0)) && suggestions.length > 0 && <div className="ai-suggest">
         {suggestions.map(s => <button type="button" key={s} onClick={() => send(s)}>{s}</button>)}
       </div>}
@@ -213,19 +299,29 @@ const wordSystem = [
 
 /** Small "問 AI" button for any word; opens a short teacher-style explanation. */
 export function AskWord({ en, zh, label = '問問 Claude' }: { en: string; zh?: string; label?: string }) {
-  const [open, setOpen] = useState(false)
+  const [word, setWord] = useState<{ en: string; zh?: string }>()
+  const question = (entry: { en: string; zh?: string }) => '請教我這個單字：' + entry.en + (entry.zh ? '（' + entry.zh + '）' : '')
+  function openWord() {
+    if (!tutorKey()) {
+      askClaude(question({ en, zh }), { general: true, hidden: wordSystem })
+      return
+    }
+    // Keep the conversation on the selected word if the page moves to a different card.
+    setWord({ en, zh })
+  }
+  const closeWord = () => setWord(undefined)
   return <>
     {/* Just the pet: 問問 Claude on every word reads as clutter. A word used as its own button keeps its text. */}
     {label === '問問 Claude' || label === '問'
-      ? <button type="button" className="ask-word ask-pet" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en} title="問問 Claude">
+      ? <button type="button" className="ask-word ask-pet" onClick={e => { e.stopPropagation(); openWord() }} aria-label={'問問 Claude：' + en} title="問問 Claude">
           <PetIcon />
         </button>
-      : <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); setOpen(true) }} aria-label={'問問 Claude：' + en}>
+      : <button type="button" className="ask-word" onClick={e => { e.stopPropagation(); openWord() }} aria-label={'問問 Claude：' + en}>
           <PetIcon size={16} />{label}
         </button>}
-    {open && <AISheet title={<><span lang="en">{en}</span>{zh ? <small> · {zh}</small> : null}</>} onClose={() => setOpen(false)}>
-      <AIChat system={personaText() + '\n\n' + wordSystem} opening={'請教我這個單字：' + en + (zh ? '（' + zh + '）' : '')}
-        onGoToSettings={() => goToTutorSettings(() => setOpen(false))}
+    {word && <AISheet title={<><span lang="en">{word.en}</span>{word.zh ? <small> · {word.zh}</small> : null}</>} onClose={closeWord}>
+      <AIChat system={personaText() + '\n\n' + wordSystem} opening={question(word)}
+        onGoToSettings={() => goToTutorSettings(closeWord)}
         placeholder="例如：可以再給我一個例句嗎？" suggestions={['再給我一個例句', '怎麼記比較好？', '跟它很像的字是什麼？']} />
     </AISheet>}
   </>
@@ -257,6 +353,8 @@ function useTyping() {
 export function AIAssistant({ progress }: { progress: string }) {
   const [open, setOpen] = useState(false)
   const [ask, setAsk] = useState<ChatAsk>()
+  const [deferred, setDeferred] = useState(() => heldQuestions)
+  const [resumed, setResumed] = useState<ChatAsk>()
   const recovery = useRef<ChatDraft>({ text: '', failed: [] })
   const typing = useTyping()
   const pet = usePet(typing)
@@ -273,6 +371,12 @@ export function AIAssistant({ progress }: { progress: string }) {
   // 「只問單字或別的」: the task on screen stays out of the question and its record (back on for the next task).
   const [general, setGeneral] = useState(false)
   const hiddenNow = useRef('')
+  function hold(question: ChatAsk) {
+    if (!heldQuestions.includes(question)) {
+      heldQuestions = [...heldQuestions, question]
+      setDeferred(heldQuestions)
+    }
+  }
   useEffect(() => { setGeneral(false); hiddenNow.current = '' }, [task?.label])
   useEffect(() => {
     const on = (e: Event) => {
@@ -281,15 +385,19 @@ export function AIAssistant({ progress }: { progress: string }) {
       const hidden = d.hidden ?? ''
       setOpen(true)
       setGeneral(standalone)
+      setResumed(undefined)
       hiddenNow.current = hidden
       // A button starts one question. Bind its subject before a route or the visible task can change.
-      if (d.text.trim() && tutorKey()) {
+      if (d.text.trim()) {
         const subject = standalone ? null : currentTask()
-        const onSend = subject?.onHelp ? () => {
-          const active = currentTask()
-          if (active && active.label === subject.label && active.detail === subject.detail) active.onHelp?.()
-        } : undefined
-        setAsk({ text: d.text, system: base + '\n' + [hidden, taskPrompt(subject)].filter(Boolean).join('\n'), onSend })
+        const question = { id: String(++questionSerial), text: d.text, label: subject?.label,
+          system: base + '\n' + [hidden, taskPrompt(subject)].filter(Boolean).join('\n'),
+          onSend: standalone ? undefined : captureTaskHelp() }
+        if (tutorKey()) setAsk(question)
+        else {
+          hold(question)
+          setAsk(undefined)
+        }
       } else {
         setAsk(undefined)
       }
@@ -297,10 +405,18 @@ export function AIAssistant({ progress }: { progress: string }) {
     window.addEventListener(askEvent, on)
     return () => window.removeEventListener(askEvent, on)
   }, [base])
-  const openChat = () => { setGeneral(false); hiddenNow.current = ''; setAsk(undefined); setOpen(true) }
-  const closeChat = () => { setAsk(undefined); setOpen(false) }
+  const openChat = () => { setGeneral(false); hiddenNow.current = ''; setAsk(undefined); setResumed(undefined); setOpen(true) }
+  const closeChat = () => {
+    if (ask && !tutorKey()) hold(ask)
+    setAsk(undefined)
+    setOpen(false)
+  }
+  const openSettings = () => {
+    if (ask) hold(ask)
+    goToTutorSettings(closeChat)
+  }
   // Read the latest draft at the time of a typed follow-up.
-  const system = () => base + '\n' + [hiddenNow.current, askedAbout(currentTask(), general).prompt].filter(Boolean).join('\n')
+  const system = () => resumed?.system ?? base + '\n' + [hiddenNow.current, askedAbout(currentTask(), general).prompt].filter(Boolean).join('\n')
   return <>
     <div className={'ai-fab' + (typing ? ' compact' : '') + (pet.big ? ' showing' : '')}>
       <button type="button" className="ai-pet-btn" aria-label={typing ? '問問 Claude' : '小怪獸：點一下看牠表演'} title={typing ? '問問 Claude' : '摸摸小怪獸'}
@@ -313,14 +429,21 @@ export function AIAssistant({ progress }: { progress: string }) {
       <button type="button" className="ai-fab-label" onClick={openChat}>問問 Claude</button>
     </div>
     {open && <AISheet title="問問 Claude" onClose={closeChat}>
-      {task && <p className="ai-task"><b>{general ? '先不帶這題' : '正在協助'}</b><span>{task.label}</span></p>}
-      {task?.onHelp && <p className="ai-task-note">{general ? '現在問的不會帶這一題，也不影響這題的紀錄。' : '問這一題會記成「有提示完成」（跟按「我卡住了」一樣）；要正式批改，用題目下面的批改按鈕。'}
+      {resumed ? <p className="ai-task"><b>正在協助</b><span>{resumed.label ?? '先前保留的問題'}</span>
+        <button type="button" className="pr-link" onClick={() => setResumed(undefined)}>結束原題追問</button></p>
+        : task && <p className="ai-task"><b>{general ? '先不帶這題' : '正在協助'}</b><span>{task.label}</span></p>}
+      {!resumed && task?.onHelp && <p className="ai-task-note">{general ? '現在問的不會帶這一題，也不影響這題的紀錄。' : '問這一題會記成「有提示完成」（跟按「我卡住了」一樣）；要正式批改，用題目下面的批改按鈕。'}
         <button type="button" className="pr-link" onClick={() => setGeneral(!general)}>{general ? '改回問這一題' : '只問單字或別的'}</button></p>}
-      <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} ask={ask} alwaysSuggest={!!task} recovery={recovery}
+      <AIChat system={system} persist="dream-blueprint.assistant-chat" introCards={progressCards(progress)} ask={ask} deferred={deferred} alwaysSuggest={!resumed && !!task} recovery={recovery}
         onAskConsumed={sent => setAsk(pending => pending === sent ? undefined : pending)}
-        onGoToSettings={() => goToTutorSettings(closeChat)}
-        suggestions={task && !general ? ['我卡住了，給我一點提示就好', '幫我看我寫的哪裡怪', '這題要用哪個文法？'] : []}
-        placeholder={task && !general ? '問這一題' + (task.onHelp ? '' : '，或問別的') : '問單字、文法，或叫我出一句中翻英'} />
+        onDeferred={(question, send) => {
+          heldQuestions = heldQuestions.filter(item => item !== question)
+          setDeferred(heldQuestions)
+          if (send) setResumed(question)
+        }}
+        onGoToSettings={openSettings}
+        suggestions={!resumed && task && !general ? ['我卡住了，給我一點提示就好', '幫我看我寫的哪裡怪', '這題要用哪個文法？'] : []}
+        placeholder={resumed ? '接著問原來的問題' : task && !general ? '問這一題' + (task.onHelp ? '' : '，或問別的') : '問單字、文法，或叫我出一句中翻英'} />
     </AISheet>}
   </>
 }

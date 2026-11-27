@@ -47,6 +47,8 @@ type GeptReading = { r?: number; rp?: number[] }
 export interface GeptRecord extends GeptReading {
   d?: string; q?: number; best?: number; p?: number; rr?: number; rrIds?: number[]
   readAt?: number; readBest?: GeptReading; weakMarks?: string[]
+  /** Best result without question text during the answer. Null means recent checks were all assisted. */
+  listeningBest?: number | null
 }
 export function readGept(notes: Record<string, string>, level: GeptLevel, id: string): GeptRecord {
   try {
@@ -58,15 +60,23 @@ export function readGept(notes: Record<string, string>, level: GeptLevel, id: st
  *  open it stays open: a later, lower try of the same round does not lock it again. */
 export const geptPass = 4
 const bestQ = (r: GeptRecord) => Math.max(r.best ?? -1, r.q ?? -1)
+// Older records never stored whether the question text was visible. Retain their earned unlocks.
+const bestWithNoText = (r: GeptRecord) => r.listeningBest === undefined ? bestQ(r) : (r.listeningBest ?? -1)
+function mergeListeningScores(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'listeningBest'> {
+  if (a.listeningBest === undefined && b.listeningBest === undefined) return {}
+  const best = Math.max(bestWithNoText(a), bestWithNoText(b))
+  return { listeningBest: best >= 0 ? best : null }
+}
 export function geptLevelsOpen(notes: Record<string, string>, elementaryIds: readonly string[]): Record<GeptLevel, boolean> {
-  return { elementary: true, intermediate: elementaryIds.some(id => bestQ(readGept(notes, 'elementary', id)) >= geptPass) }
+  return { elementary: true, intermediate: elementaryIds.some(id => bestWithNoText(readGept(notes, 'elementary', id)) >= geptPass) }
 }
 export function saveGept(notes: Record<string, string>, level: GeptLevel, id: string, patch: GeptRecord) {
   const old = readGept(notes, level, id)
   const best = Math.max(bestQ(old), bestQ(patch))
   const reading = hasReading(patch) ? { ...patch, readAt: Math.max(patch.readAt ?? Date.now(), (old.readAt ?? 0) + 1) } : patch
   return { ...notes, [geptKey(level, id)]: JSON.stringify({ ...old, ...patch, ...mergedRepeats(old, patch),
-    ...mergeReading(old, reading), ...mergeMistakes(old, patch), ...(best >= 0 ? { best } : {}) }) }
+    ...mergeReading(old, reading), ...mergeMistakes(old, patch), ...mergeListeningScores(old, patch),
+    ...(best >= 0 ? { best } : {}) }) }
 }
 
 function mergedRepeats(a: GeptRecord, b: GeptRecord): Pick<GeptRecord, 'rr' | 'rrIds'> {
@@ -86,6 +96,7 @@ export function mergeGeptRecords(a: GeptRecord, b: GeptRecord): GeptRecord {
     ...(bestPicture >= 0 ? { p: bestPicture } : {}),
     ...mergeReading(a, b),
     ...mergeMistakes(a, b),
+    ...mergeListeningScores(a, b),
   }
 }
 
@@ -141,13 +152,13 @@ const rubric: Record<GeptLevel, string[]> = {
   ],
 }
 
-const format = (perItem: string) => [
+const format = (perItem: string, questionCards = false) => [
   '照固定格式回覆，每種一行，不要寫其他文字，不要用 Markdown：',
   '[分數] 0 到 5 的數字（可以有 .5） ||| 一句繁體中文的理由',
   perItem,
   '[好] 一句這次做得最好的地方',
   '[改] 一句最該改進的地方，具體說怎麼改',
-  '[卡] 他說錯的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因 ||| 弱點名稱（最多 3 行，挑最值得記住的；沒有錯就不要寫）',
+  '[卡] ' + (questionCards ? '題號 ||| ' : '') + '他實際說錯的原句 ||| 正確自然的英文 ||| 這句的中文意思 ||| 一句繁體中文原因 ||| 弱點名稱（最多 3 行，挑最值得記住的；沒有錯就不要寫）',
   '弱點名稱照抄這份清單裡最符合的一個：' + weakLabelPrompt(),
 ].join('\n')
 
@@ -156,7 +167,7 @@ export function questionsPrompt(level: GeptLevel) {
   return [
     `你是全民英檢${geptLevels[level].name}口說的練習評分員，學生是玄燁（台灣護理系學生）。下面是他「回答問題」的逐字稿：每題的題目和他說的話（語音辨識的結果，可能有辨識錯的字，明顯是辨識錯的不要扣分；沒說話就是空白）。`,
     ...rubric[level],
-    format('[題] 題號 ||| 一句回饋：好的地方或更好的說法，可以附一句示範英文（每題一行）'),
+    format('[題] 題號 ||| 一句回饋：好的地方或更好的說法，可以附一句示範英文（每題一行）', true),
   ].join('\n')
 }
 
@@ -180,9 +191,9 @@ export const photoQuestionsPrompt = [
   '不要寫其他文字。',
 ].join('\n')
 
-export interface GeptFeedback { score?: number; why: string; items: { n: number; text: string }[]; good: string; fix: string; cards: { wrong: string; en: string; zh: string; why: string; tag?: string }[]; rest: string }
+export interface GeptFeedback { score?: number; why: string; items: { n: number; text: string }[]; good: string; fix: string; cards: { wrong: string; en: string; zh: string; why: string; tag?: string; question?: number }[]; rest: string }
 
-export function parseGeptFeedback(text: string): GeptFeedback {
+export function parseGeptFeedback(text: string, questionCards = false): GeptFeedback {
   const out: GeptFeedback = { why: '', items: [], good: '', fix: '', cards: [], rest: '' }
   const rest: string[] = []
   for (const raw of text.split('\n')) {
@@ -202,8 +213,13 @@ export function parseGeptFeedback(text: string): GeptFeedback {
       if (n && parts[1]) out.items.push({ n, text: parts.slice(1).join(' ') })
     } else if (m[1] === '好') out.good = parts.join(' ')
     else if (m[1] === '改') out.fix = parts.join(' ')
-    else if (parts.length >= 4 && parts[0] && parts[1] && out.cards.length < 3)
-      out.cards.push({ wrong: parts[0], en: parts[1], zh: parts[2], why: parts[3], ...(parts[4] ? { tag: parts[4] } : {}) })
+    else if (out.cards.length < 3) {
+      const numbered = questionCards && /^\d+$/.test(parts[0])
+      const [wrong, en, zh, why, tag] = numbered ? parts.slice(1) : parts
+      if (wrong && en && why !== undefined) {
+        out.cards.push({ wrong, en, zh, why, ...(tag ? { tag } : {}), ...(numbered ? { question: Number(parts[0]) } : {}) })
+      }
+    }
   }
   out.rest = rest.join('\n')
   return out

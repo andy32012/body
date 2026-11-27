@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, RotateCcw, Volume2, X } from 'lucide-react'
 import type { PageProps } from '../lib/store'
-import { activePeriod, addDays, newCard, reviewEnergy } from '../lib/progress'
+import { activePeriod, reviewEnergy } from '../lib/progress'
 import RotatingPhoto from './RotatingPhoto'
 import { AskWord } from './AIChat'
 import UseWord from './UseWord'
@@ -12,7 +12,7 @@ import { paintSky, seedOf } from '../lib/starfield'
 import { useModal } from '../lib/modal'
 import { meaningLine, wordKey } from '../lib/vocab'
 import { speakEnglishResult } from '../lib/tts'
-import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, currentWordChoice, dailyQueue, dailyWordPhoto, doneKey, moreKey, newWordPlan, officialByKey, readSorted, recordSorted, spotCheck } from '../lib/dailyWords'
+import { DAILY_CHOICES, DEFAULT_DAILY, changeSorted, countKey, currentWordChoice, dailyQueue, dailyWordPhoto, doneKey, moreKey, newWordPlan, officialByKey, readDailyDone, readSorted } from '../lib/dailyWords'
 import './daily-word.css'
 
 type Props = Pick<PageProps, 'state' | 'update'> & { today: string; onClose: () => void }
@@ -23,7 +23,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
   // New words adapt to the review they cause: cards piling up, a heavy week ahead, or poor recall slow them down.
   const plan = newWordPlan(state, today, quiet, reviewEnergy(today, state.settings.periods))
   const target = plan.target
-  const done = Number(state.notes[doneKey(today)] || 0)
+  const done = readDailyDone(state.notes, today)
   const queue = useMemo(() => dailyQueue(state.knownWords, state.learningWords),
     [state.knownWords, state.learningWords])
   const current = done < target ? queue[0] : undefined
@@ -69,16 +69,10 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
     const key = wordKey(current.en)
     update(prev => {
       if ([...prev.knownWords, ...prev.learningWords].some(w => wordKey(w) === key)) return prev
-      const id = 'word:' + key
+      const next = changeSorted(prev, key, known, today)
       return {
-        ...prev,
-        knownWords: known ? [...prev.knownWords, key] : prev.knownWords,
-        learningWords: known ? prev.learningWords : [...prev.learningWords, key],
-        cards: prev.cards.some(c => c.id === id) ? prev.cards
-          : !known ? [...prev.cards, newCard(id, today)]
-          : spotCheck(key) ? [...prev.cards, { id, box: 4 as const, lastDay: today, due: addDays(today, 14), mastered: false }]
-          : prev.cards,
-        notes: recordSorted({ ...prev.notes, [doneKey(today)]: String(Number(prev.notes[doneKey(today)] || 0) + 1) }, today, key, known),
+        ...next,
+        notes: { ...next.notes, [doneKey(today)]: String(readDailyDone(prev.notes, today) + 1) },
       }
     })
     setReveal(false)
@@ -115,7 +109,7 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
 
       {word ? <>
         <div className="daily-word-body">
-          <span className="daily-word-meta">第 {word.level} 級{past ? ' · 今天第 ' + (done - back + 1) + ' 個 · 你選了「' + (past.known ? '認得' : '還不熟') + '」' : ''}</span>
+          <span className="daily-word-meta">第 {word.level} 級{past ? ' · 今天第 ' + (sorted.length - back + 1) + ' 個 · 你選了「' + (past.known ? '認得' : '還不熟') + '」' : ''}</span>
           <strong className="daily-word-term" lang="en">{word.en}</strong>
           {visibleForms
             ? grouped
@@ -145,9 +139,9 @@ export default function DailyWord({ state, update, today, onClose }: Props) {
           </div>}
           <div className="daily-word-steps">
           <button type="button" className="daily-word-back" disabled={back >= sorted.length} onClick={stepBack} aria-label="上一個單字"><ArrowLeft size={14} />上一個</button>
-          <div className="daily-word-progress" role="progressbar" aria-label="今天的單字" aria-valuemin={0} aria-valuemax={target} aria-valuenow={done}
-            aria-valuetext={'看完 ' + done + ' 個，共 ' + target + ' 個，現在是第 ' + (done + 1) + ' 個'}>
-            {Array.from({ length: target }, (_, i) => <i key={i} aria-hidden="true" className={past && i === done - back ? 'look' : i < done ? 'done' : i === done && !past ? 'now' : ''} />)}
+          <div className="daily-word-progress" role="progressbar" aria-label="今天的單字" aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(done, target)}
+            aria-valuetext={'看完 ' + done + ' 個，今日目標 ' + target + ' 個，現在是第 ' + (past ? sorted.length - back + 1 : done + 1) + ' 個'}>
+            {Array.from({ length: target }, (_, i) => <i key={i} aria-hidden="true" className={past && i === sorted.length - back ? 'look' : i < done ? 'done' : i === done && !past ? 'now' : ''} />)}
           </div>
           {back > 0 && <button type="button" className="daily-word-back" onClick={stepForward} aria-label="下一個單字">下一個<ArrowRight size={14} /></button>}
           </div>

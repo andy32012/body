@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { BookA, BookOpen, Bot, CalendarDays, ChevronDown, Crosshair, DatabaseBackup, Flag, GraduationCap, KeyRound, Brain, ListChecks, Moon, Sun, Telescope, Trophy, type LucideIcon } from 'lucide-react'
 import ScenePhoto from '../components/ScenePhoto'
 import SchoolSettings from '../components/SchoolSettings'
@@ -102,10 +102,11 @@ import { DAILY_CHOICES, DEFAULT_DAILY, countKey } from '../lib/dailyWords'
 
 type SettingsData = AppState['settings']
 type PeriodType = SettingsData['periods'][number]['type']
-type OfficeDraft = { base: string; text: string }
+type TextDraft = { base: string; text: string }
 class OfficeReplyChanged extends Error {
   constructor(readonly saved: string) { super('系辦回覆已在別處更新。') }
 }
+class DepartureReasonChanged extends Error {}
 type BackupSelection = { name: string; id: number } & (
   { phase: 'reading' } | { phase: 'ready'; raw: string; exportedAt?: number; modifiedAt: number }
 )
@@ -126,24 +127,49 @@ export default function Settings(props: PageProps) {
   const s = state.settings
   const set = <K extends keyof SettingsData,>(key: K, value: SettingsData[K]) => update(prev => ({...prev, settings: {...prev.settings, [key]: value}}))
   const today = dayKey()
-  const [officeDraft, setOfficeDraft] = useState<OfficeDraft | null>(null)
+  const [officeDraft, setOfficeDraft] = useState<TextDraft | null>(null)
   const [officeConflict, setOfficeConflict] = useState<OfficeReplyChanged | null>(null)
   const [officeSaving, setOfficeSaving] = useState(false)
-  const [why, setWhy] = useState(s.why)
+  const [whyDraft, setWhyDraft] = useState<TextDraft | null>(null)
+  const [whySaving, setWhySaving] = useState(false)
+  const whyConflict = whyDraft && whyDraft.base !== s.why && whyDraft.text.trim() !== s.why
   const [period, setPeriod] = useState<PeriodType>('exam')
   const [start, setStart] = useState(dayKey())
   const [end, setEnd] = useState(dayKey())
   const [text, setText] = useState('')
+  const [wordFile, setWordFile] = useState<File | null>(null)
   const [wordMode, setWordMode] = useState<'learn' | 'known'>('learn')
   const [backup, setBackup] = useState<BackupSelection | null>(null)
   const [restoring, setRestoring] = useState(false)
   const [result, setResult] = useState({area:'', msg:''})
   const announce = (area:string,msg:string) => setResult({area,msg})
+  const clearStatus = (area:string) => setResult(current => current.area === area ? {area:'',msg:''} : current)
   const status = (area:string) => result.area === area && result.msg ? <p role="status" className="set-status">{result.msg}</p> : null
   const wordInput = useRef<HTMLInputElement>(null)
+  const wordRead = useRef(0)
   const backupInput = useRef<HTMLInputElement>(null)
   const backupRead = useRef(0)
   const restorePending = useRef(false)
+
+  useLayoutEffect(() => () => { wordRead.current++ }, [])
+
+  async function saveWhy(approved = whyDraft?.base) {
+    if (!whyDraft || whySaving || restorePending.current) return
+    const why = whyDraft.text.trim()
+    setWhySaving(true)
+    try {
+      await updateStoreNow(prev => {
+        if (prev.settings.why === why) return prev
+        if (prev.settings.why !== approved) throw new DepartureReasonChanged()
+        return {...prev, settings: {...prev.settings, why}}
+      })
+      setWhyDraft(null)
+      announce('why','已儲存出發的原因。')
+    } catch (error) {
+      if (!(error instanceof DepartureReasonChanged))
+        announce('why',error instanceof Error ? error.message : '出發原因儲存失敗，請再試一次。')
+    } finally { setWhySaving(false) }
+  }
 
   async function saveOffice(approved = officeDraft?.base) {
     if (!officeDraft || officeSaving || restorePending.current) return
@@ -165,12 +191,12 @@ export default function Settings(props: PageProps) {
   }
 
   async function confirmRestore() {
-    if (backup?.phase !== 'ready' || backup.id !== backupRead.current || restorePending.current || officeSaving) return
+    if (backup?.phase !== 'ready' || backup.id !== backupRead.current || restorePending.current || officeSaving || whySaving) return
     restorePending.current = true
     setRestoring(true)
     try {
-      const restored = await restoreBackup(backup.raw,undefined,{expected:getSnapshot().state})
-      setWhy(restored.settings.why)
+      await restoreBackup(backup.raw,undefined,{expected:getSnapshot().state})
+      setWhyDraft(null)
       setOfficeDraft(null)
       setOfficeConflict(null)
       setBackup(null)
@@ -187,6 +213,7 @@ export default function Settings(props: PageProps) {
     announce('period','已加入時期，當天會自動切換。')
   }
   function saveVocabulary() {
+    if (wordFile) return
     try {
       const parsed = parseVocabulary(text)
       update(prev => {
@@ -225,10 +252,30 @@ export default function Settings(props: PageProps) {
   }
   async function readWordFile(file: File | undefined) {
     if (!file) return
+    const id = ++wordRead.current
+    setWordFile(file)
+    clearStatus('words')
     try {
-      setText(await file.text())
+      const contents = await file.text()
+      if (id !== wordRead.current) return
+      setText(contents)
       announce('words','已讀取檔案，可檢查內容再匯入。')
-    } catch (e) { announce('words', e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。') }
+    } catch (e) {
+      if (id === wordRead.current) announce('words', e instanceof Error ? e.message : '讀取檔案時遇到問題，請再選一次。')
+    } finally {
+      if (id === wordRead.current) setWordFile(null)
+    }
+  }
+
+  function cancelWordRead() {
+    wordRead.current++
+    setWordFile(null)
+    clearStatus('words')
+  }
+
+  function editWordText(value: string) {
+    cancelWordRead()
+    setText(value)
   }
 
   async function selectBackup(file: File | undefined) {
@@ -297,8 +344,21 @@ export default function Settings(props: PageProps) {
       <label>英文朗讀速度<select value={s.speechRate} onChange={e=>set('speechRate',Number(e.target.value))}>{[...new Set([0.65,0.8,0.9,1,1.15,s.speechRate])].sort((a,b)=>a-b).map(n=><option key={n} value={n}>{n} 倍速</option>)}</select></label>
     </Panel>
     <Panel icon={Telescope} title="我的出發點" hint="記下出發的原因與實習安排">
-      <label>為什麼出發<textarea rows={3} maxLength={50000} value={why} onChange={e=>setWhy(e.target.value)} placeholder="用一到三句話，留給累了的自己。" /></label>
-      <button type="button" onClick={()=>{set('why',why.trim()); announce('why','已儲存出發的原因。')}}>儲存出發的原因</button>{status('why')}
+      <label>為什麼出發<textarea rows={3} maxLength={50000} value={whyDraft?.text ?? s.why} readOnly={whySaving || restoring}
+        onChange={e=>{
+          const text = e.target.value
+          setWhyDraft(text === s.why ? null : {base:whyDraft?.base ?? s.why,text})
+          clearStatus('why')
+        }} placeholder="用一到三句話，留給累了的自己。" /></label>
+      {whyConflict ? <div className="set-restore">
+        <p role="status">出發原因已在別處更新。上方是你正在編輯的文字，下方是目前已存的版本。</p>
+        <label>目前已存的出發原因<textarea rows={3} readOnly value={s.why}/></label>
+        <div className="set-actions">
+          <button type="button" disabled={whySaving || restoring} onClick={()=>{setWhyDraft(null);clearStatus('why')}}>使用已存版本</button>
+          <button type="button" disabled={whySaving || restoring} onClick={()=>void saveWhy(s.why)}>儲存我編輯的版本</button>
+        </div>
+      </div> : <button type="button" disabled={!whyDraft || whySaving || restoring} onClick={()=>void saveWhy()}>儲存出發的原因</button>}
+      {status('why')}
       <label>已確認的基護實習時段<input aria-label="已確認的基護實習時段" value={s.internshipSeason} onChange={e=>set('internshipSeason',e.target.value)} /></label>
       <label>系辦補充（選填）<textarea rows={3} maxLength={50000} value={officeDraft?.text ?? s.officeReply}
         readOnly={officeSaving || restoring} placeholder="有確切梯次或報到日期時，可以記在這裡。"
@@ -330,19 +390,21 @@ export default function Settings(props: PageProps) {
       <h2 id="set-data-heading">單字與資料</h2>
     <Panel icon={BookA} title="匯入我的單字表" hint={'已匯入 '+state.customWords.length+' 個單字'}>
       <p>每行一個單字，可接中文和級別。支援貼上文字、逗號分隔檔與試算表複製的欄位。</p>
-      <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text} onChange={e=>setText(e.target.value)} /></label>
+      <label>單字清單<textarea rows={4} placeholder={'student,學生,1\npatient,病人'} value={text}
+        onPaste={cancelWordRead} onCompositionStart={cancelWordRead} onChange={e=>editWordText(e.target.value)} /></label>
       <label>這一批單字<select value={wordMode} onChange={e=>setWordMode(e.target.value as 'learn' | 'known')}><option value="learn">加入想學的清單</option><option value="known">已經認得，略過新字練習</option></select></label>
       <input type="file" ref={wordInput} hidden accept=".csv,.tsv,.txt,text/plain,text/csv" onChange={e=>{void readWordFile(e.target.files?.[0]);e.target.value=''}}/>
-      <div className="set-actions"><button type="button" onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" onClick={saveVocabulary}>匯入單字</button></div>{status('words')}
+      <div className="set-actions"><button type="button" onClick={()=>wordInput.current?.click()}>從檔案讀取</button><button type="button" disabled={!!wordFile} onClick={saveVocabulary}>匯入單字</button></div>
+      {wordFile ? <p role="status" className="set-status">正在讀取 <b style={{overflowWrap:'anywhere'}}>{wordFile.name}</b>……你仍可改寫或選另一份檔案。</p> : status('words')}
     </Panel>
     {!(["exam","internship"].includes(activePeriod(today,s.periods))) && <Panel icon={ListChecks} title="第 1、2 級單字快篩" hint="認得的單字直接略過"><VocabScreen {...props} /></Panel>}
     <Panel icon={Flag} title="我標記的題目" hint={'共 '+state.flagged.length+' 題'}>{state.flagged.length?<div className="set-list">{state.flagged.map(id=><div key={id}><span>題號 {id}<small>{quizBank.find(q=>q.id===id)?.en}</small></span><button type="button" onClick={()=>update(prev=>({...prev,flagged:prev.flagged.filter(item=>item!==id)}))}>取消標記</button></div>)}</div>:<p>練習時按「這題怪怪的」，題號就會留在這裡。</p>}</Panel>
     <Panel icon={DatabaseBackup} title="備份與還原" hint="把進度存成檔案，換手機也帶得走">
       <p>進度存在目前的瀏覽器。換手機或清除瀏覽器資料前，請先下載備份。</p>
-      {(()=>{const mb=JSON.stringify(state).length/1e6; const folder=archiveFolderUrl(); return <p className={mb>3.5?'set-warn':undefined}>進度檔大小：{mb<0.1?'不到 0.1':mb.toFixed(1)} MB（手機的瀏覽器大約能存 5 MB）。{
-        driveConnected()&&cloudArchive()?<>兩個月以前的複習紀錄、幾週前的每天小紀錄、四個月前上完的課的批改全文，會先存進你雲端硬碟的「夢想藍圖・封存」資料夾，雲端說收到了才從這台拿掉，一筆都不會丟。{folder&&<> <a href={folder} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</>
+      {(()=>{const mb=JSON.stringify(state).length/1e6; const folder=archiveFolderUrl(); return <p className={mb>3.5?'set-warn':undefined}>進度檔約 {mb<0.1?'不到 0.1':mb.toFixed(1)} MB。實際可用空間依瀏覽器和裝置而異。{
+        driveConnected()&&cloudArchive()?<>較早的複習紀錄、每天的小紀錄和舊課的批改全文，在雲端確認收到後才會從這台整理。封存遇到暫時斷線時，連線恢復後會再試。{folder&&<> <a href={folder} target="_blank" rel="noreferrer">打開封存資料夾</a></>}</>
         :driveConnected()?'舊紀錄會先留在這台。請依上方「雲端硬碟」的步驟更新雲端小程式。支援封存的版本會先將紀錄存進雲端硬碟，再從這台整理掉。'
-        :'兩個月以前的複習紀錄會整理成統計，每天的小紀錄幾週後清掉，所以會一直維持在安全範圍。連上雲端硬碟的話，整理掉之前會先存一份到雲端。'}{mb>3.5?' 現在偏大了，請跟 Claude 說要把進度改存到 IndexedDB。':''}</p>})()}
+        :'兩個月以前的複習紀錄會整理成統計，每天的小紀錄和較早的批改全文會定期整理。連上雲端硬碟後，舊紀錄會先等雲端封存。'}{mb>3.5?' 這份進度已經偏大。若畫面提示最近的更動未儲存，請在關閉前先下載備份。':''}</p>})()}
       <input type="file" ref={backupInput} hidden accept=".json,application/json" onChange={e=>{void selectBackup(e.target.files?.[0]);e.target.value=''}}/>
       <div className="set-actions"><button type="button" onClick={download}>下載備份</button><button type="button" disabled={restoring} onClick={()=>backupInput.current?.click()}>選擇備份檔</button></div>
       {backup && <div className="set-restore set-backup-selection">
@@ -352,7 +414,7 @@ export default function Settings(props: PageProps) {
           <p>還原會用這份備份的課表、學習紀錄和設定取代目前進度。</p>
         </>}
         <div className="set-actions">
-          {backup.phase==='ready' && <button type="button" disabled={restoring || officeSaving} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button>}
+          {backup.phase==='ready' && <button type="button" disabled={restoring || officeSaving || whySaving} onClick={()=>void confirmRestore()}>{restoring?'還原中':'確認還原'}</button>}
           <button type="button" disabled={restoring} onClick={cancelBackup}>取消</button>
         </div>
       </div>}{status('backup')}

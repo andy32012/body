@@ -1,12 +1,13 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Camera, Check, Mic, Square, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import data from '../data/gept-speaking.json'
 import { geptLevelsOpen, geptPass, geptRoundDone, readSeconds, speakRubric, answerSeconds, geptFeedbackComplete, geptLevels, parseGeptFeedback, parsePhotoQuestions, photoQuestionsComplete, photoQuestionsPrompt, picturePrompt, questionsPrompt, readGept, saveGept, type GeptElementarySet, type GeptFeedback, type GeptIntermediateSet, type GeptLevel, type GeptPart, type GeptPicture, type GeptRecord, repeatCounts, geptMistakeId, newGeptAttempt } from '../lib/gept'
 import { engineNames, listen, listenEngine, type Listening } from '../lib/speech'
 import { speakEnglish, speakEnglishTwice } from '../lib/tts'
+import { AudioActivityContext, useAudioActivity } from '../lib/audioActivity'
 import { askTutor, askTutorImage, tutorKey } from '../lib/tutor'
-import { addSayCard } from '../lib/sayCards'
+import { addSayCard, sayIdentity } from '../lib/sayCards'
 import { addWeak, normalizeLabel, refreshWeakExample } from '../lib/weakPoints'
 import { logSkill } from '../lib/bridge'
 import { dayKey } from '../lib/progress'
@@ -20,26 +21,48 @@ import './gept.css'
 
 const elementary = data.elementary as GeptElementarySet[]
 const intermediate = data.intermediate as GeptIntermediateSet[]
+const elementaryIds = elementary.map(set => set.id)
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms))
 const levels: GeptLevel[] = ['elementary', 'intermediate']
-type Grading = { attempt: string; feedback: GeptFeedback }
+type Grading = { feedback: GeptFeedback } & ({ attempt: string } | { recordings: (Recording | undefined)[] })
 type Save = (patch: GeptRecord, grading?: Grading) => void
 type SaveScore = (score?: number, grading?: Grading) => void
+type SaveQuestions = (score?: number, grading?: Grading, listenedOnly?: boolean) => void
+
+function mistakeRecording(grading: Grading, card: GeptFeedback['cards'][number]) {
+  if ('attempt' in grading) return grading.attempt
+  const fragment = sayIdentity(card.wrong)
+  if (!fragment) return undefined
+  const matches = (recording?: Recording) =>
+    !!recording && (' ' + sayIdentity(recording.text) + ' ').includes(' ' + fragment + ' ')
+  const cited = card.question === undefined ? undefined : grading.recordings[card.question - 1]
+  if (cited && matches(cited)) return cited.id
+  const found = grading.recordings.filter(matches)
+  return found.length === 1 ? found[0]?.id : undefined
+}
 
 /** 全民英檢口說練習: the parts of the test one by one, with honest checks (see lib/gept.ts). */
 export default function GeptSpeaking({ state, update }: PageProps) {
   // 中級 opens once a 初級 round's 回答問題 reached 4 級分 (the official pass level); until then it stays locked.
-  const levelOpen = geptLevelsOpen(state.notes, elementary.map(s => s.id))
-  // The A1→A2 units prepare for 初級; from the A2→B1 units on, 中級 — if it is open.
-  const [chosen, setLevel] = useState<GeptLevel>(() => state.curriculum.unit > 28 && levelOpen.intermediate ? 'intermediate' : 'elementary')
-  const level: GeptLevel = levelOpen[chosen] ? chosen : 'elementary'
+  const levelOpen = geptLevelsOpen(state.notes, elementaryIds)
   const setsOf = (l: GeptLevel): { id: string }[] => l === 'elementary' ? elementary : intermediate
   // The first set not practised yet, chosen once: finishing a part must not switch the page to the next set.
   const firstOpen = (l: GeptLevel) => (setsOf(l).find(s => !readGept(state.notes, l, s.id).d) ?? setsOf(l)[0]).id
-  const sets = setsOf(level)
-  const [setId, setSetId] = useState(() => firstOpen(level))
+  const [selection, setSelection] = useState(() => {
+    const level: GeptLevel = state.curriculum.unit > 28 && levelOpen.intermediate ? 'intermediate' : 'elementary'
+    return { level, setId: firstOpen(level) }
+  })
   // Parts stay open once started, so a result is still there after moving on to the next part.
   const [open, setOpen] = useState<GeptPart[]>([])
+  const level: GeptLevel = levelOpen[selection.level] ? selection.level : 'elementary'
+  const sets = setsOf(level)
+  const setId = selection.level === level && sets.some(s => s.id === selection.setId) ? selection.setId : firstOpen(level)
+  // A backup can lock the previous level. Adopt a valid set and close its old controls together.
+  if (selection.level !== level || selection.setId !== setId) {
+    setSelection({ level, setId })
+    setOpen([])
+  }
+  const audio = useAudioActivity()
   const info = geptLevels[level]
   const engine = listenEngine()
   const rate = state.settings.speechRate
@@ -49,12 +72,12 @@ export default function GeptSpeaking({ state, update }: PageProps) {
 
   function chooseLevel(next: GeptLevel) {
     if (level === next || !levelOpen[next]) return
-    setLevel(next)
-    setSetId(firstOpen(next))
+    setSelection({ level: next, setId: firstOpen(next) })
     setOpen([])
   }
 
   const save: Save = (patch, grading) => update(prev => {
+    if (level === 'intermediate' && !geptLevelsOpen(prev.notes, elementaryIds).intermediate) return prev
     let next = prev
     const known = new Set(readGept(prev.notes, level, setId).weakMarks ?? [])
     const added: string[] = []
@@ -63,12 +86,14 @@ export default function GeptSpeaking({ state, update }: PageProps) {
       const tag = c.tag ? normalizeLabel(c.tag) : null
       next = addSayCard(next, { zh: c.zh, en: c.en, wrong: c.wrong, why: c.why, from: 'gept', ...(tag ? { tag } : {}) }, today, 'g' + i)
       if (!tag || !grading) continue
-      const mark = geptMistakeId(grading.attempt, c.wrong)
+      const source = mistakeRecording(grading, c)
+      if (!source) continue
+      const mark = geptMistakeId(source, c.wrong)
       const example = { w: c.wrong, r: c.en }
       if (known.has(mark)) {
         next = { ...next, notes: refreshWeakExample(next.notes, tag, example, 'gept') }
       } else {
-        next = { ...next, notes: addWeak(next.notes, tag, today, example, 'gept') }
+        next = { ...next, notes: addWeak(next.notes, tag, today, example, 'gept', mark) }
         known.add(mark)
         added.push(mark)
       }
@@ -79,7 +104,7 @@ export default function GeptSpeaking({ state, update }: PageProps) {
 
   const el = level === 'elementary' ? elementary.find(s => s.id === setId) ?? elementary[0] : null
   const mid = level === 'intermediate' ? intermediate.find(s => s.id === setId) ?? intermediate[0] : null
-  return <div className="gp-page">
+  return <AudioActivityContext.Provider value={audio}><div className="gp-page">
     <section className="gp-head">
       <a className="gp-back" href="#speaking">← 回到 Emma</a>
       <h1>全民英檢口說練習</h1>
@@ -99,7 +124,7 @@ export default function GeptSpeaking({ state, update }: PageProps) {
             e.preventDefault()
             chooseLevel(next)
             document.getElementById(tabsId + '-' + next)?.focus()
-          }}>{geptLevels[l].name}{levelOpen[l] ? <small>{geptLevels[l].cefr}</small> : <LockLine text={'初級回答問題拿到 ' + geptPass + ' 級分才打開'} />}</button>)}
+          }}>{geptLevels[l].name}{levelOpen[l] ? <small>{geptLevels[l].cefr}</small> : <LockLine text={'初級回答問題只聽題拿到 ' + geptPass + ' 級分才打開'} />}</button>)}
       </div>
     </section>
     {levels.map(l => <div key={l} id={tabsId + '-panel-' + l} role="tabpanel" aria-labelledby={tabsId + '-' + l}
@@ -107,7 +132,7 @@ export default function GeptSpeaking({ state, update }: PageProps) {
       <div className="gp-sets" role="group" aria-label="題組">
         {sets.map((s, i) => {
           const rec = readGept(state.notes, level, s.id)
-          return <button key={s.id} type="button" aria-pressed={s.id === setId} onClick={() => { setSetId(s.id); setOpen([]) }}>
+          return <button key={s.id} type="button" aria-pressed={s.id === setId} onClick={() => { setSelection({ level, setId: s.id }); setOpen([]) }}>
             {/* ✓ only when every part of the round was done (each read-aloud piece, the repeated sentences); one part started is said as such. */}
             第 {i + 1} 回{geptRoundDone(rec, level, level === 'elementary' ? elementary.find(e => e.id === s.id) ?? {} : {}, level === 'elementary' ? 2 : intermediate.find(m => m.id === s.id)?.passages.length ?? 2) ? ' ✓' : rec.d ? <small>做過一部分</small> : ''}{rec.q !== undefined ? <small>問答 {rec.q}</small> : null}
           </button>
@@ -119,7 +144,8 @@ export default function GeptSpeaking({ state, update }: PageProps) {
       {engine && <p className="gp-small">語音辨識：{engineNames[engine]}{tutorKey() ? '' : '。還沒連接 Claude，所以只會有逐字稿、沒有參考分（設定 → 連接 Claude）。'}</p>}
     </section>
 
-    {info.parts.map(p => <section key={setId + p.part} className="gp-part" aria-label={p.name}>
+    {audio.busy && <p className="gp-small" role="status">語音練習進行中，請等播放或收音結束後再使用其他部分的音訊。</p>}
+    {info.parts.map(p => <section key={level + ':' + setId + ':' + p.part} className="gp-part" aria-label={p.name}>
       <header><h2>{p.name}</h2><small>{p.how}</small></header>
       {!open.includes(p.part) ? <button type="button" className="gp-open" disabled={!engine} onClick={() => setOpen(o => [...o, p.part])}>開始這一部分</button>
         : p.part === 'repeat' && el ? <RepeatPart key={setId} sentences={el.repeat} rate={rate}
@@ -127,11 +153,12 @@ export default function GeptSpeaking({ state, update }: PageProps) {
             onRepeated={id => { if (!record.rrIds?.includes(id)) save({ rrIds: [id] }) }} />
         : p.part === 'read' ? <ReadPart key={setId} texts={el ? [el.readSentences.join(' '), el.readPassage] : mid!.passages} lists={el ? [el.readSentences] : []} level={level} rate={rate}
             onRead={(whole, pieces) => save({ r: Math.round(whole * 100), rp: pieces.map(x => Math.round(x * 100)) })} />
-        : p.part === 'questions' ? <QuestionsPart key={setId} level={level} questions={(el ?? mid)!.questions} rate={rate} onScore={(score, fb) => save({ ...(score !== undefined ? { q: score } : {}) }, fb)} />
+        : p.part === 'questions' ? <QuestionsPart key={setId} level={level} questions={(el ?? mid)!.questions} rate={rate}
+            onScore={(score, fb, listenedOnly) => save(score !== undefined ? { q: score, listeningBest: listenedOnly ? score : null } : {}, fb)} />
         : p.part === 'picture' && mid ? <PicturePart key={setId} picture={mid.picture} rate={rate} onScore={(score, fb) => save({ ...(score !== undefined ? { p: score } : {}) }, fb)} />
         : null}
     </section>)}</>}</div>)}
-  </div>
+  </div></AudioActivityContext.Provider>
 }
 
 /** 複誦: record each recognised sentence once and retain older totals without guessing the sentence IDs. */
@@ -151,17 +178,24 @@ function RepeatItem({ n, text, rate, done, onSaid }: { n: number; text: string; 
   const [playing, setPlaying] = useState(false)
   const [error, setError] = useState('')
   const signal = useSectionSignal()
+  const audio = useContext(AudioActivityContext)
   async function play() {
+    const release = audio?.acquire(signal)
+    if (audio && !release) return
     setPlaying(true); setError('')
-    const finished = await speakEnglishTwice(text, rate, 700, signal)
-    if (signal.aborted) return
-    setPlaying(false)
-    if (finished === 'played') setPlayed(true)
-    else setError(playbackMessage(finished))
+    try {
+      const finished = await speakEnglishTwice(text, rate, 700, signal)
+      if (signal.aborted) return
+      if (finished === 'played') setPlayed(true)
+      else setError(playbackMessage(finished))
+    } finally {
+      release?.()
+      if (!signal.aborted) setPlaying(false)
+    }
   }
   return <li>
     <div className="gp-row">
-      <button type="button" className="gp-play" disabled={playing} onClick={() => void play()}><Volume2 size={14} />{playing ? '播放中……' : played ? '第 ' + n + ' 句：再聽兩次' : '第 ' + n + ' 句：聽兩次'}</button>
+      <button type="button" className="gp-play" disabled={playing || audio?.busy} onClick={() => void play()}><Volume2 size={14} />{playing ? '播放中……' : played ? '第 ' + n + ' 句：再聽兩次' : '第 ' + n + ' 句：聽兩次'}</button>
       {done && <span className="gp-done"><Check size={14} aria-hidden="true" />這句完成了</span>}
     </div>
     {error && <p className="gp-warn" role="alert">{error}</p>}
@@ -215,22 +249,22 @@ function ReadPart({ texts, lists, level, rate, onRead }: { texts: string[]; list
 /** Ending a part cancels only its own playback, microphone and pending request. */
 function useSectionSignal() {
   const [leaving] = useState(() => new AbortController())
-  useEffect(() => () => leaving.abort(), [leaving])
+  useLayoutEffect(() => () => leaving.abort(), [leaving])
   return leaving.signal
 }
 
 type Recording = { id: string; text: string }
-type Answer = ({ kind: 'recorded' } & Recording) | { kind: 'failed' }
+type Answer = ({ kind: 'recorded'; sawText: boolean } & Recording) | { kind: 'failed' | 'silent' }
 const hasTranscript = (text: string) => /[\p{L}\p{N}]/u.test(text)
 const playbackMessage = (result: 'failed' | 'aborted') => result === 'failed' ? '這台裝置沒有播完，請再試一次。' : '播放中斷了，請再試一次。'
 function answerText(answer: Answer | undefined) {
   if (!answer) return '（尚未回答）'
   if (answer.kind === 'failed') return '（這次沒有完成語音辨識）'
-  return answer.text || '（沒有聽到聲音）'
+  return answer.kind === 'recorded' ? answer.text : '（沒有辨識到可批改的文字）'
 }
 
 /** 回答問題: ten questions (中級) or seven (初級), one after another; Claude scores them together at the end. */
-function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; questions: string[]; rate: number; onScore: SaveScore }) {
+function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; questions: string[]; rate: number; onScore: SaveQuestions }) {
   const [at, setAt] = useState(0)
   const [phase, setPhase] = useState<'ready' | 'playing' | 'playback-failed' | 'opening-mic' | 'answering' | 'working' | 'between' | 'scoring' | 'done'>('ready')
   const [answers, setAnswers] = useState<(Answer | undefined)[]>([])
@@ -242,11 +276,13 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
   const session = useRef<Listening | null>(null)
   const asking = useRef(false)
   const scoring = useRef(false)
+  const revealed = useRef(new Set<number>())
   const signal = useSectionSignal()
+  const audio = useContext(AudioActivityContext)
 
   function remember(k: number, answer: Answer) {
     setAnswers(previous => {
-      if (answer.kind === 'failed' && previous[k]?.kind === 'recorded') return previous
+      if (answer.kind !== 'recorded' && previous[k]?.kind === 'recorded') return previous
       const next = [...previous]
       next[k] = answer
       return next
@@ -254,8 +290,11 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
   }
 
   async function ask(k: number, readQuestion = false) {
-    if (asking.current || signal.aborted) return
+    if (asking.current || scoring.current || signal.aborted) return
+    const release = audio?.acquire(signal)
+    if (audio && !release) return
     asking.current = true
+    if (readQuestion) revealed.current.add(k)
     setAt(k); setError(''); setShow(readQuestion); setTextPractice(readQuestion)
     const secs = answerSeconds(level, k)
     let timer: ReturnType<typeof setInterval> | undefined
@@ -273,6 +312,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       setPhase('opening-mic')
       const s = await listen({ maxMs: secs * 1000, signal })
       if (signal.aborted) return
+      if (release) void s.captured.then(release)
       session.current = s
       const end = Date.now() + secs * 1000
       setLeft(secs); setPhase('answering')
@@ -284,44 +324,54 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
           setPhase('working')
         }
       }, 250)
-      const text = await s.done
+      const text = (await s.done).trim()
       if (signal.aborted) return
-      remember(k, { kind: 'recorded', text, id: newGeptAttempt() })
+      remember(k, hasTranscript(text) ? { kind: 'recorded', text, id: newGeptAttempt(), sawText: revealed.current.has(k) } : { kind: 'silent' })
+      revealed.current.add(k) // The review screen displays the prompt after the recording.
       setPhase('between')
     } catch (e) {
       if (signal.aborted) return
       setError(e instanceof Error ? e.message : String(e))
       remember(k, { kind: 'failed' })
+      revealed.current.add(k)
       setPhase('between')
-    } finally { clearInterval(timer); session.current = null; asking.current = false }
+    } finally { clearInterval(timer); session.current = null; asking.current = false; release?.() }
   }
   /** Back (or forward) to a question already answered, without asking it again: its answer shows, to keep or answer
    *  again. The set is scored once, when he asks for the result. */
-  function view(k: number) { setAt(k); setError(''); setShow(true); setTextPractice(false); setPhase('between') }
-  const answeredAll = questions.every((_, j) => answers[j]?.kind === 'recorded')
-  const anySpoken = answers.some(a => a?.kind === 'recorded' && a.text.trim())
+  function view(k: number) {
+    revealed.current.add(k)
+    setAt(k); setError(''); setShow(true); setTextPractice(false); setPhase('between')
+  }
+  const answeredAll = questions.every((_, j) => answers[j] && answers[j]?.kind !== 'failed')
+  const anySpoken = answers.some(a => a?.kind === 'recorded' && hasTranscript(a.text))
+  const listenedOnly = !answers.some(a => a?.kind === 'recorded' && a.sawText)
+  function showResults() {
+    questions.forEach((_, i) => revealed.current.add(i))
+    setPhase('done')
+  }
   async function score() {
-    if (scoring.current || signal.aborted) return
+    if (scoring.current || asking.current || signal.aborted) return
     setError('')
     setFb(null)
     if (!tutorKey() || !anySpoken) {
       if (anySpoken) onScore(undefined)
-      setPhase('done')
+      showResults()
       return
     }
     scoring.current = true
     setPhase('scoring')
     try {
       const sent = questions.map((q, j) => (j + 1) + '. 題目：' + q + '\n他說：' + answerText(answers[j])).join('\n')
-      const result = parseGeptFeedback(await askTutor(questionsPrompt(level), [{ role: 'user', content: sent }], signal))
+      const result = parseGeptFeedback(await askTutor(questionsPrompt(level), [{ role: 'user', content: sent }], signal), true)
       if (signal.aborted) return
       // Only a complete check is scored (and can open 中級); otherwise his answers stay and the same ones can go again.
       if (geptFeedbackComplete(result, questions.length)) {
-        const attempt = JSON.stringify(questions.map((_, j) => {
+        const recordings = questions.map((_, j) => {
           const answer = answers[j]
-          return answer?.kind === 'recorded' ? answer.id : null
-        }))
-        setFb(result); onScore(result.score, { attempt, feedback: result })
+          return answer?.kind === 'recorded' ? answer : undefined
+        })
+        setFb(result); onScore(result.score, { recordings, feedback: result }, listenedOnly)
       }
       else { setFb(null); setError(incomplete); onScore(undefined) }
     } catch (e) {
@@ -331,7 +381,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       }
     } finally {
       scoring.current = false
-      if (!signal.aborted) setPhase('done')
+      if (!signal.aborted) showResults()
     }
   }
 
@@ -340,7 +390,7 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
   return <div className="gp-run">
     {phase === 'ready' && <>
       <p className="gp-small">按開始後，每題會念兩次（題目不會出現），念完就開始計時回答：{level === 'intermediate' ? '第 1–5 題 15 秒、第 6–10 題 30 秒' : '每題 15 秒'}。可以提早按「說完了」。</p>
-      <button type="button" className="gp-open" onClick={() => void ask(0)}><Mic size={15} />開始第 1 題</button>
+      <button type="button" className="gp-open" disabled={audio?.busy} onClick={() => void ask(0)}><Mic size={15} />開始第 1 題</button>
     </>}
     {phase !== 'ready' && phase !== 'done' && phase !== 'scoring' && <div className="gp-q">
       <small>第 {at + 1} / {questions.length} 題 · {textPractice ? '文字練習 · ' : ''}回答時間 {secs} 秒</small>
@@ -352,12 +402,12 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       {phase === 'playback-failed' ? <>
         <p className="gp-warn" role="alert">{error}</p>
         <div className="gp-row">
-          <button type="button" className="gp-open" onClick={() => void ask(at)}>重播這一題</button>
-          <button type="button" className="gp-link" onClick={() => void ask(at, true)}>改用文字練習</button>
+          <button type="button" className="gp-open" disabled={audio?.busy} onClick={() => void ask(at)}>重播這一題</button>
+          <button type="button" className="gp-link" disabled={audio?.busy} onClick={() => void ask(at, true)}>改用文字練習</button>
           {at > 0 && <button type="button" className="gp-link" onClick={() => view(at - 1)}>上一題（第 {at} 題）</button>}
         </div>
       </> : show || phase === 'between' ? <p className="gp-qtext" lang="en">{questions[at]}</p>
-        : <button type="button" className="gp-link" onClick={() => setShow(true)}>聽不懂，看題目文字（考試時看不到）</button>}
+        : phase !== 'working' && <button type="button" className="gp-link" onClick={() => { revealed.current.add(at); setShow(true); setTextPractice(true) }}>聽不懂，看題目文字（這題算文字練習）</button>}
       {phase === 'between' && <>
         <p className="gp-said"><small>你說的（語音辨識）：</small><span lang={answer?.kind === 'recorded' && answer.text ? 'en' : undefined}>{answerText(answer)}</span></p>
         {error && <p className="gp-warn" role="alert">{error}</p>}
@@ -365,11 +415,11 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
           {at + 1 < questions.length
             ? answers[at + 1] !== undefined
               ? <button type="button" className="gp-open" onClick={() => view(at + 1)}>查看下一題（第 {at + 2} 題）</button>
-              : <button type="button" className="gp-open" onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
+              : <button type="button" className="gp-open" disabled={audio?.busy} onClick={() => void ask(at + 1)}>下一題（第 {at + 2} 題）</button>
             : <button type="button" className="gp-open" onClick={() => void score()}>看結果</button>}
           {answeredAll && at + 1 < questions.length && <button type="button" className="gp-link" onClick={() => void score()}>都答完了，看結果</button>}
           {at > 0 && <button type="button" className="gp-link" onClick={() => view(at - 1)}>上一題（第 {at} 題）</button>}
-          <button type="button" className={at + 1 < questions.length ? 'gp-link' : 'gp-link gp-retry'} onClick={() => void ask(at, textPractice)}>這題重答</button>
+          <button type="button" className={at + 1 < questions.length ? 'gp-link' : 'gp-link gp-retry'} disabled={audio?.busy} onClick={() => void ask(at, textPractice)}>這題重答</button>
         </div>
       </>}
     </div>}
@@ -378,10 +428,11 @@ function QuestionsPart({ level, questions, rate, onScore }: { level: GeptLevel; 
       {error && <p className="gp-warn" role="alert">{error}</p>}
       {fb ? <FeedbackView fb={fb} items={questions} answers={answers} rubric={speakRubric[level]} /> : <Transcripts items={questions} answers={answers} />}
       {!anySpoken && <p className="gp-small">這回沒有辨識到可批改的回答，可以回題目重錄。</p>}
+      {level === 'elementary' && !listenedOnly && <p className="gp-small">這回有回答是在看過題目文字後錄的，參考分只用於練習。可以從第 1 題重做，回答前只聽題來取得中級解鎖分數。</p>}
       {!fb && anySpoken && tutorKey() && <button type="button" className="gp-open" onClick={() => void score()}>用同樣的回答，請 Claude 再批一次</button>}
       <div className="gp-row">
         <button type="button" className="gp-link" onClick={() => view(0)}>回去看每一題、改答案（改完再看一次結果）</button>
-        <button type="button" className="gp-link" onClick={() => { setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
+        <button type="button" className="gp-link" onClick={() => { revealed.current.clear(); setAnswers([]); setFb(null); setPhase('ready') }}>整個部分重做一次</button>
       </div>
     </>}
   </div>
@@ -399,6 +450,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
   const session = useRef<Listening | null>(null)
   const scoring = useRef(false)
   const signal = useSectionSignal()
+  const audio = useContext(AudioActivityContext)
   const file = useRef<HTMLInputElement>(null)
   const zoom = useRef<HTMLButtonElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
@@ -423,13 +475,17 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     }
   }
   async function begin() {
-    setError(''); setSaid(null); setFb(null); setPhase('prep'); skip.current = false
-    for (let s = 30; s > 0 && !skip.current; s--) { if (signal.aborted) return; setLeft(s); await wait(1000) }
     if (signal.aborted) return
+    const release = audio?.acquire(signal)
+    if (audio && !release) return
+    setError(''); setSaid(null); setFb(null); setPhase('prep'); skip.current = false
     let timer: ReturnType<typeof setInterval> | undefined
     try {
+      for (let s = 30; s > 0 && !skip.current; s--) { if (signal.aborted) return; setLeft(s); await wait(1000) }
+      if (signal.aborted) return
       const s = await listen({ maxMs: 90000, signal })
       if (signal.aborted) return
+      if (release) void s.captured.then(release)
       session.current = s
       const end = Date.now() + 90000
       setLeft(90); setPhase('talking')
@@ -454,7 +510,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       if (!tutorKey()) { setPhase('done'); onScore(undefined); return }
       await grade(recording)
     } catch (e) { if (!signal.aborted) { setError(e instanceof Error ? e.message : String(e)); setPhase('done') } }
-    finally { clearInterval(timer); session.current = null }
+    finally { clearInterval(timer); session.current = null; release?.() }
   }
   /** Claude grades what he said against the same picture he looked at: his own photo goes along with its description. */
   async function grade(recording: Recording) {
@@ -474,6 +530,12 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       if (!signal.aborted) setPhase('done')
     }
   }
+  async function playSample() {
+    const release = audio?.acquire(signal)
+    if (audio && !release) return
+    try { await speakEnglish(describe, rate, signal) }
+    finally { release?.() }
+  }
 
   return <div className="gp-run">
     <button ref={zoom} type="button" className="gp-picture" onClick={() => dialog.current?.showModal()}
@@ -489,7 +551,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
     </dialog>
     <ol className="gp-sentences" lang="en">{questions.map(q => <li key={q}>{q}</li>)}</ol>
     {phase === 'ready' && <div className="gp-row">
-      <button type="button" className="gp-open" onClick={() => void begin()}>開始：先看 30 秒</button>
+      <button type="button" className="gp-open" disabled={audio?.busy} onClick={() => void begin()}>開始：先看 30 秒</button>
       {tutorKey() && <button type="button" className="gp-link" onClick={() => file.current?.click()}><Camera size={14} />換成我自己的照片</button>}
       <input ref={file} type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) void pickPhoto(f) }} />
     </div>}
@@ -509,7 +571,7 @@ function PicturePart({ picture, rate, onScore }: { picture: GeptPicture; rate: n
       {!fb && said && tutorKey() && <button type="button" className="gp-open" onClick={() => void grade(said)}>用同樣的描述，請 Claude 再批一次</button>}
       <div className="gp-row">
         <button type="button" className="gp-link" onClick={() => setPhase('ready')}>再說一次</button>
-        <button type="button" className="gp-link" onClick={() => void speakEnglish(describe, rate, signal)}><Volume2 size={14} />聽一段示範描述</button>
+        <button type="button" className="gp-link" disabled={audio?.busy} onClick={() => void playSample()}><Volume2 size={14} />聽一段示範描述</button>
       </div>
     </>}
   </div>
@@ -529,7 +591,7 @@ function FeedbackView({ fb, items, answers, rubric }: { fb: GeptFeedback; items:
     })}</ol>
     {fb.good && <p className="gp-good">做得好：{fb.good}</p>}
     {fb.fix && <p className="gp-fix">先改這個：{fb.fix}</p>}
-    {fb.cards.length > 0 && <div className="gp-cards"><small>這些修正已經加進複習，也記進「我的弱點」：</small>
+    {fb.cards.length > 0 && <div className="gp-cards"><small>這些修正會加入複習。能對回原作答、有分類的錯句會記進「我的弱點」。</small>
       {fb.cards.map((c, i) => <p key={i}><s lang="en">{c.wrong}</s> → <b lang="en">{c.en}</b><span>{c.zh}・{c.why}</span></p>)}</div>}
     {fb.rest && <p className="gp-small">{fb.rest}</p>}
   </div>

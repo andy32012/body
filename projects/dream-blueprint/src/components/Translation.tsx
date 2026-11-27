@@ -35,6 +35,8 @@ export function Translation({
   hideTags = false,
   initialAnswer = "",
   alreadyMarked = false,
+  draftKey = sentence.id,
+  legacyHint,
 }: {
   preparation?: ReactNode;
   label?: string;
@@ -47,8 +49,10 @@ export function Translation({
   onHint?: (use: HintUse) => void;
   initialAnswer?: string;
   alreadyMarked?: boolean;
+  draftKey?: string;
+  legacyHint?: HintUse;
 }) {
-  const [answer, setAnswer] = useState(() => readDraft(sentence.id) || initialAnswer);
+  const [answer, setAnswer] = useState(() => readDraft(draftKey) || initialAnswer);
   const [hint, setHintLevel] = useState(() => saved?.h ?? 0);
   const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState("");
@@ -77,6 +81,8 @@ export function Translation({
     onHint?.(next);
   }
   const verdictStale = !!firstVerdict && checkedText !== undefined && !sameEnglish(checkedText, answer);
+  const commaNote = hint >= 1 ? clauseCommaNote(answer, sentence.reference) : null;
+  const acceptedByClaude = latest?.v === "good" && sameEnglish(latest.text, answer) && !commaNote;
   useTaskContext({
     label: (checkpoint ? "小關卡" : "中翻英") + "：" + sentence.zh,
     detail: ["題目（中翻英）：" + sentence.zh, "這題練的文法：" + sentence.grammar.join("、"), "課本提示：" + sentence.hints.join(" ／ "),
@@ -104,14 +110,14 @@ export function Translation({
   }
   const setSeenHint = (r: boolean) => record(hint, r);
   function submit(mark: Mark) {
-    if (!ready() || submitted.current) return;
+    if (!ready() || submitted.current || (mark === "good" && commaNote)) return;
     const revealed = seenHint || hint >= 2 || askedHelp;
     submitted.current = true;
     if (onMark(mark, revealed, { answer, firstVerdict, checkedText }) === false) {
       submitted.current = false;
       return;
     }
-    clearDraft(sentence.id);
+    clearDraft(draftKey);
     noteWeak(mark, revealed);
   }
   async function copyAnswer() {
@@ -148,11 +154,18 @@ export function Translation({
           spellCheck={false}
           rows={3}
           value={answer}
-          onChange={(e) => { setAnswer(e.target.value); writeDraft(sentence.id, e.target.value); }}
+          onChange={(e) => { setAnswer(e.target.value); writeDraft(draftKey, e.target.value); }}
           placeholder="把想到的英文寫在這裡"
         />
       </label>
-      <DraftVersions id={sentence.id} text={answer} onChoose={setAnswer} />
+      <DraftVersions id={draftKey} text={answer} onChoose={setAnswer}
+        legacyId={draftKey === sentence.id || alreadyMarked ? undefined : sentence.id}
+        onChooseLegacy={() => {
+          // The old hint log was shared. Never assume a restored answer was written without any of its saved help.
+          if (!legacyHint) return;
+          if (legacyHint.c) setAskedHelp(true);
+          record(legacyHint.h, legacyHint.r, firstVerdict, askedHelp || legacyHint.c);
+        }} />
       {hint === 0 && (
         <div className="pr-actions">
           <button className="pr-main" onClick={() => { setSendNow(keyed); setHint(1); }}>
@@ -224,7 +237,7 @@ export function Translation({
           )}
         </section>
       )}
-      {hint >= 1 && latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark && (
+      {hint >= 1 && acceptedByClaude && !selfMark && (
         <div className="pr-actions pr-next-step">
           <button className="pr-main" onClick={() => submit("good")}>
             Claude 說對了，下一步 →
@@ -232,13 +245,13 @@ export function Translation({
           <button className="pr-link" onClick={() => setSelfMark(true)}>我想自己評</button>
         </div>
       )}
-      {hint >= 1 && !(latest?.v === "good" && sameEnglish(latest.text, answer) && !selfMark) && (
+      {hint >= 1 && !(acceptedByClaude && !selfMark) && (
         <fieldset className="pr-marks">
           <legend>我的自評（按一個就到下一步）</legend>
           {marks.map(([mark, label]) => (
             <button
               key={mark}
-              disabled={mark !== "again" && !answered(answer)}
+              disabled={mark !== "again" && (!answered(answer) || (mark === "good" && !!commaNote))}
               onClick={() => submit(mark)}
             >
               {label}
@@ -248,13 +261,13 @@ export function Translation({
           {answered(answer) && (
             <p className="pr-mark-note">
               {/* The same rule as the saved record (judgeWritten): any hint, frame, reference or 我卡住了 means help. */}
-              {seenHint || hint >= 2 || askedHelp ? "這題看過提示、句架或參考句（或問過 Claude 怎麼寫）：按「對了」會記成有提示完成。"
+              {commaNote ? commaNote + " 逗號修好後就能按「對了」。"
+                : seenHint || hint >= 2 || askedHelp ? "這題看過提示、句架或參考句（或問過 Claude 怎麼寫）：按「對了」會記成有提示完成。"
                 : firstVerdict === "good" && verdictStale ? (matchesReference(answer, sentence.reference) ? "你在 Claude 確認之後改了答案，改過的跟參考答案一樣：按「對了」仍記成當次獨立完成。" : "你在 Claude 確認之後又改了答案：改過的這一版還沒人確認，按「對了」會記成「自評完成・待確認」。")
                 : firstVerdict === "good" ? "Claude 確認意思和文法都對：按「對了」會記成當次獨立完成。"
                 : firstVerdict === "changed" ? "Claude 說意思跟題目不一樣：改好之後也只算有提示完成。"
                 : firstVerdict ? "Claude 指出要改的地方：照著改好，這次記成有提示完成。"
                 : matchesReference(answer, sentence.reference) ? "跟參考答案一樣，已確認：按「對了」會記成當次獨立完成。"
-                : clauseCommaNote(answer, sentence.reference) ? "逗號還沒加好（看上面的說明）：加好再按「對了」；不加的話先記成「自評完成・待確認」。"
                 : "寫法跟參考答案不完全一樣，可能也對。沒有人確認前，按「對了」會先記成「自評完成・待確認」，之後可以請 Claude 看。意思如果變了，請按「小錯」。"}
             </p>
           )}

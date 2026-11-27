@@ -1,5 +1,5 @@
 import AskWhy from './AskWhy'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Pause, Play, Volume2 } from 'lucide-react'
 import type { PageProps } from '../lib/store'
 import type { Passage } from '../lib/passages'
@@ -8,12 +8,13 @@ import { useTapGuard } from '../lib/tapGuard'
 import { logSkill } from '../lib/bridge'
 import { useDialogueVoice } from './LessonParts'
 import { LookedUp, TapWords, useLookup } from './WordLookup'
-import { storyLevelsOpen, dictationPatch, dictationScore, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey, storyProgress,
-  storyTabs, type StoryTab } from '../lib/story'
+import { advanceDictation, dictationRound, dictationScore, meaningQuestions, nextStory, readStory, saveStory, splitSentences, storyLevelKey,
+  storyLevelsOpen, storyProgress, storyTabs, type StoryRecord, type StoryTab } from '../lib/story'
+import { speakEnglishResult } from '../lib/tts'
 import { openAt } from '../lib/unlock'
 import './story.css'
 
-type Props = Pick<PageProps, 'state' | 'update'> & { onActivity: PageProps['update']; date: string; initialTab?: StoryTab }
+type Props = Pick<PageProps, 'state' | 'update'> & { onActivity: PageProps['update']; onSavedActivity: PageProps['update']; date: string; initialTab?: StoryTab }
 const tabNotes: Record<StoryTab, string> = {
   read: '讀一段短文，不會的字點一下看意思，讀完考幾個字。',
   listen: '先不看字完整聽一次，再打開文字一句一句跟著念。',
@@ -36,12 +37,13 @@ function Sentences({ list, playing, onPlay, onWord, picked, detail, detailLine }
   </ol>
 }
 
-export default function StoryLibrary({ state, update, onActivity, date, initialTab = 'read' }: Props) {
+export default function StoryLibrary({ state, update, onActivity, onSavedActivity, date, initialTab = 'read' }: Props) {
   const [all, setAll] = useState<Passage[]>()
   const [failed, setFailed] = useState(false)
   const [tab, setTab] = useState<StoryTab>(initialTab)
   const [skipped, setSkipped] = useState<string[]>([])
   const [currentId, setCurrentId] = useState<string>()
+  const [dictationVersion, setDictationVersion] = useState(0)
   const stored = Math.min(6, Math.max(1, Number(state.notes[storyLevelKey]) || 1))
   useEffect(() => {
     let alive = true
@@ -89,7 +91,8 @@ export default function StoryLibrary({ state, update, onActivity, date, initialT
       : tab === 'read' ? <StoryRead key={passage.id} passage={passage} all={all} state={state} onActivity={onActivity} date={date} onNext={next} />
       : tab === 'listen' ? <StoryListen key={passage.id} passage={passage} state={state} onActivity={onActivity} date={date} onNext={next}
           onDictate={() => chooseTab('dictate', true)} />
-      : <StoryDictate key={passage.id} passage={passage} state={state} onActivity={onActivity} date={date} onNext={next} />}
+      : <StoryDictate key={passage.id + '/' + dictationVersion} passage={passage} state={state} onActivity={onSavedActivity} date={date} onNext={next}
+          onResume={() => setDictationVersion(n => n + 1)} />}
   </div>
 }
 
@@ -220,44 +223,94 @@ function StoryListen({ passage, state, onActivity, date, onNext, onDictate }: Pa
   </>
 }
 
-function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
+function StoryDictate({ passage, state, onActivity, date, onNext, onResume }: PartProps & { onResume: () => void }) {
   const sentences = useMemo(() => splitSentences(passage.en ?? ''), [passage])
-  const lines = useMemo(() => sentences.map(en => ({ who: '', en, zh: '' })), [sentences])
-  const voice = useDialogueVoice(state.settings.speechRate)
   const [resume] = useState(() => readStory(state.notes, passage.id))
   const start = resume.dn !== undefined && resume.dn > 0 && resume.dn < sentences.length ? resume.dn : 0
+  const [round] = useState(() => dictationRound(passage.id, resume, start))
+  const cursor = useRef({ at: start, stamp: resume.dAt, round })
   const [at, setAt] = useState(start)
   const [text, setText] = useState('')
   const [plays, setPlays] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const [playError, setPlayError] = useState('')
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'failed' | 'changed'>('idle')
+  const [totalScore, setTotalScore] = useState<[number, number]>([0, 0])
+  const playback = useRef<AbortController | null>(null)
+  const saving = useRef(false)
+  const active = useRef(false)
   const [early, setEarly] = useState(false)
-  const [noVoice, setNoVoice] = useState(!('speechSynthesis' in window))
   const [results, setResults] = useState<ReturnType<typeof dictationScore>[]>([])
-  const [summary, setSummary] = useState<[number, number] | null>(null)
-  useEffect(() => { if (voice.status === 'error') setNoVoice(true) }, [voice.status])
+  const [summary, setSummary] = useState(false)
+  useLayoutEffect(() => {
+    active.current = true
+    return () => {
+      active.current = false
+      playback.current?.abort()
+      playback.current = null
+    }
+  }, [])
   const checked = results[at - start]
   const sentence = sentences[at]
   useTaskContext({ label: '聽寫：' + label(passage), detail: '他正在做聽寫（聽一句、寫一句）。現在這一句：' + (sentence ?? '') + '\n他對答案前不要把句子說出來。', draft: text })
-  function play() {
-    if (!voice.play(lines, at, true)) { setNoVoice(true); return }
-    setPlays(n => n + 1)
+  function stopPlay() {
+    const current = playback.current
+    playback.current = null
+    current?.abort()
+    setPlaying(false)
   }
-  function check(written = text) {
-    voice.stop()
-    setResults(list => [...list, dictationScore(written, sentence)])
+  async function play() {
+    if (playback.current) { stopPlay(); return }
+    const request = new AbortController()
+    playback.current = request
+    setPlaying(true)
+    setPlayError('')
+    const result = await speakEnglishResult(sentence, state.settings.speechRate, request.signal)
+    if (playback.current !== request) return
+    playback.current = null
+    setPlaying(false)
+    if (result === 'played') setPlays(n => n + 1)
+    else setPlayError(result === 'aborted' ? '播放中斷，請再聽一次。' : '這一句未能播完。請重播，或換一個支援英文語音的瀏覽器。')
   }
-  function done(list: typeof results, stop = false) {
-    // Stopped early: remember where, the passage is not done yet. The last sentence done: the whole passage counts.
-    const patch = dictationPatch(resume, start, list, stop, date)
-    onActivity(prev => {
-      const dAt = Math.max(Date.now(), (readStory(prev.notes, passage.id).dAt ?? 0) + 1)
-      return { ...prev, notes: logSkill(saveStory(prev.notes, passage.id, { ...patch, dAt }), 'listen', date) }
-    })
+  async function check(written = text) {
+    if (!plays || saving.current || cursor.current.at !== at || saveStatus === 'changed') return
+    stopPlay()
+    saving.current = true
+    setSaveStatus('saving')
+    const result = dictationScore(written, sentence)
+    const finish = at + 1 === sentences.length
+    let attempted = false
+    let saved: StoryRecord | undefined
+    try {
+      await onActivity(prev => {
+        attempted = true
+        saved = advanceDictation(readStory(prev.notes, passage.id), cursor.current, result, finish, date)
+        if (!saved) return prev
+        return { ...prev, notes: logSkill(saveStory(prev.notes, passage.id, saved), 'listen', date) }
+      })
+    } catch {
+      attempted = false
+      saved = undefined
+    } finally {
+      saving.current = false
+      if (active.current) {
+        if (saved) {
+          cursor.current = { at: at + 1, stamp: saved.dAt, round }
+          setText(written)
+          setTotalScore(saved.dqp ?? saved.dq ?? [0, 0])
+          setResults(list => [...list, result])
+          setSaveStatus('idle')
+        } else setSaveStatus(attempted ? 'changed' : 'failed')
+      }
+    }
+  }
+  function done(stop = false) {
+    stopPlay()
     setEarly(stop)
-    setSummary(patch.dqp ?? patch.dq ?? [0, 0])
+    setSummary(true)
   }
-  if (noVoice) return <div className="pr-hint"><strong>這台裝置現在沒辦法播放語音</strong><p>聽寫要聽得到聲音才能做。先做「閱讀」，或換一個有英文語音的瀏覽器再試。</p></div>
   if (summary) {
-    const [right, total] = summary
+    const [right, total] = totalScore
     return <div className="pr-hint">
       <strong>{early ? '這輪已寫了 ' + (start + results.length) + ' / ' + sentences.length + ' 句，下次從第 ' + (start + results.length + 1) + ' 句接著寫' : '這段聽寫完成'}：{total} 個字寫對 {right} 個（{Math.round(right / Math.max(1, total) * 100)}%）</strong>
       {start > 0 && <p>這次接著寫的句子</p>}
@@ -268,14 +321,20 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
   }
   return <section className="st-dictate">
     <small>{label(passage)} · 第 {at + 1} / {sentences.length} 句{start && at === start ? '（上次寫到這裡，接著寫）' : ''}</small>
-    <button type="button" className="ls-play" onClick={play}><Play size={16} fill="currentColor" />{plays ? '再聽一次' : '播放這一句'}{plays ? '（聽了 ' + plays + ' 次）' : ''}</button>
+    <button type="button" className="ls-play" disabled={saveStatus === 'saving'} onClick={play}>
+      {playing ? <><Pause size={16} />停止</> : <><Play size={16} fill="currentColor" />{plays ? '再聽一次' : '播放這一句'}</>}
+      {plays ? '（完整聽了 ' + plays + ' 次）' : ''}</button>
+    {playError && <p className="ls-help" role="status">{playError}</p>}
     <label className="pr-field">我聽到的
-      <textarea lang="en" rows={3} value={text} readOnly={!!checked} autoCapitalize="sentences" autoComplete="off" autoCorrect="off" spellCheck={false}
+      <textarea lang="en" rows={3} value={text} readOnly={!!checked || saveStatus === 'saving'} autoCapitalize="sentences" autoComplete="off" autoCorrect="off" spellCheck={false}
         onChange={e => setText(e.target.value)} placeholder="聽幾次都可以，聽到什麼寫什麼" />
     </label>
-    {!checked && <div className="pr-actions">
-      <button type="button" className="pr-main" disabled={!plays || !text.trim()} onClick={() => check()}>對答案</button>
-      <button type="button" className="pr-link" disabled={!plays} onClick={() => { setText(''); check('') }}>這句聽不出來，看答案</button>
+    {saveStatus === 'changed' && <div className="pr-hint"><p role="status">這段聽寫已從另一個分頁或裝置更新。</p>
+      <button type="button" className="pr-link" onClick={onResume}>接續已儲存的進度</button></div>}
+    {saveStatus === 'failed' && <p className="ls-help" role="status">這次聽寫進度無法寫入，請再按一次對答案。</p>}
+    {!checked && saveStatus !== 'changed' && <div className="pr-actions">
+      <button type="button" className="pr-main" disabled={saveStatus === 'saving' || !plays || !text.trim()} onClick={() => check()}>{saveStatus === 'saving' ? '儲存中…' : '對答案'}</button>
+      <button type="button" className="pr-link" disabled={saveStatus === 'saving' || !plays} onClick={() => check('')}>這句聽不出來，看答案</button>
     </div>}
     {checked && <div className="pr-reference st-check">
       <small>原句</small>
@@ -288,9 +347,9 @@ function StoryDictate({ passage, state, onActivity, date, onNext }: PartProps) {
       {checked.right !== checked.total && <AskWhy label="問 Claude 我聽錯在哪" q={{ source: '聽寫', stem: '聽一句英文，把聽到的寫下來', picked: text, answer: sentence, right: false }} />}
       <div className="pr-actions">
         {at + 1 < sentences.length
-          ? <button type="button" className="pr-main" onClick={() => { setAt(at + 1); setText(''); setPlays(0) }}>下一句</button>
-          : <button type="button" className="pr-main" onClick={() => done(results)}>看整段結果</button>}
-        {at + 1 < sentences.length && results.length >= 2 && <button type="button" className="pr-link" onClick={() => done(results, true)}>今天寫到這裡（下次接著寫）</button>}
+          ? <button type="button" className="pr-main" onClick={() => { stopPlay(); setAt(at + 1); setText(''); setPlays(0); setPlayError('') }}>下一句</button>
+          : <button type="button" className="pr-main" onClick={() => done()}>看整段結果</button>}
+        {at + 1 < sentences.length && <button type="button" className="pr-link" onClick={() => done(true)}>今天寫到這裡（下次接著寫）</button>}
       </div>
     </div>}
   </section>

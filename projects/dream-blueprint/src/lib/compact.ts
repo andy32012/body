@@ -8,11 +8,10 @@ import { addDays, daysBetween, reviewBonus, type ReviewEvent } from './progress'
  *  - notes that only matter on their own day (today's words, today's plan ticks, today's hint use…) go after a few weeks;
  *  - finished lessons older than a few months keep what he wrote but drop the long correction texts.
  * Nothing else is touched: sessions, cards, evidence, weak points, memory and every record that has its own date stay.
- * Progress that is already big gets shorter windows, so the slot never fills up.
+ * Progress that is already big gets shorter windows, to make more space when old details can be removed.
  *
  * With Google Drive connected nothing is thrown away: the old details are first saved into the Drive archive folder
- * (cloud script v4, `archiveOld`), and only the items that arrived there are removed here (`applyBatch`). Until then
- * they stay on the device — unless the progress passes 3.5 MB, when it is tidied anyway so saving keeps working.
+ * (cloud script v4, `archiveOld`), and only the items that arrived there are removed here (`applyBatch`).
  */
 export const archiveKey = 'review.archive'
 /** The day old records were last sent to the Drive archive. */
@@ -180,11 +179,10 @@ const dayOnly = [
 const lessonRecord = new RegExp(`^lesson\\.${DATE}$`)
 
 /** How long details are kept, in days. Big progress gets the short windows. */
+const shortWindowSize = 3_000_000
 export function windows(size: number) {
-  return size > 3_000_000 ? { events: 30, dayNotes: 21, lessons: 45 } : { events: 60, dayNotes: 45, lessons: 120 }
+  return size > shortWindowSize ? { events: 30, dayNotes: 21, lessons: 45 } : { events: 60, dayNotes: 45, lessons: 120 }
 }
-/** Above this size old details are tidied even when they could not reach the Drive archive yet. */
-export const EMERGENCY = 3_500_000
 
 type Compactable = { reviewEvents: ReviewEvent[]; notes: Record<string, string> }
 /** The old details that would leave this device: what goes into the Drive archive, and what `applyBatch` removes. */
@@ -261,17 +259,18 @@ export function applyBatch<S extends Compactable>(state: S, batch: Batch, archiv
 }
 
 /** Run when progress is loaded. `keepUnarchived` (Drive connected): leave old details for the Drive archive. */
-export function compactState<S extends Compactable>(state: S, today: string, size = JSON.stringify(state).length, keepUnarchived = false): S {
-  if (keepUnarchived && size <= EMERGENCY) return state
+export function compactState<S extends Compactable>(state: S, today: string, size?: number, keepUnarchived = false): S {
+  if (keepUnarchived) return state
   return applyBatch(state, oldDetails(state, today, size))
 }
 
 /** Sends the old details to the Drive archive about once a week (sooner when the progress is big). Returns what
  *  arrived there, for `applyBatch`; null when nothing was due or the cloud did not confirm it kept them. */
-export async function archiveOld(state: Compactable, today: string, send: (file: string) => Promise<boolean>, size = JSON.stringify(state).length): Promise<Batch | null> {
+export async function archiveOld(state: Compactable, today: string, send: (file: string) => Promise<boolean>,
+  size = JSON.stringify(state).length, storageFull = false): Promise<Batch | null> {
   const last = state.notes[lastArchiveKey]
-  if (last && last <= today && daysBetween(last, today) < 7 && size <= 3_000_000) return null
-  const batch = oldDetails(state, today, size)
+  if (!storageFull && last && last <= today && daysBetween(last, today) < 7 && size <= shortWindowSize) return null
+  const batch = oldDetails(state, today, storageFull ? Math.max(size, shortWindowSize + 1) : size)
   if (!batchSize(batch)) return null
   const file = JSON.stringify({ app: '夢想藍圖', kind: '舊紀錄', note: '從手機整理掉之前先存在這裡的舊紀錄（複習紀錄、每天的小紀錄、舊課的批改全文）。', savedOn: today, ...batch })
   return (await send(file)) ? batch : null

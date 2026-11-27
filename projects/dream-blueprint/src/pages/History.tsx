@@ -124,7 +124,7 @@ function TopicHistory({ state }: { state: PageProps["state"] }) {
   </section>;
 }
 
-export default function History({ state, update }: PageProps) {
+export default function History({ state }: PageProps) {
   const today = dayKey();
   const { sessions, cards, settings } = state;
   const days = new Set(sessions.map(s => s.day)).size;
@@ -152,7 +152,7 @@ export default function History({ state, update }: PageProps) {
     <div className="history-grid">
     <PracticeCalendar sessions={sessions} today={today} />
     <WeeklyChart sessions={sessions} today={today} />
-    <EvidencePanel state={state} update={update} />
+    <EvidencePanel state={state} />
     <GrammarHistory sessions={sessions} />
     <TopicHistory state={state} />
     {state.curriculum.stableUnits.length>0 && <section className="history-section"><h2>單元回想</h2><p className="history-note">隔三個單元回想舊句。連續兩次想不起來的單元會優先複習。</p>{state.curriculum.stableUnits.map(id=><span key={id} className="history-chip">單元 {id} · {getRetentionStatus(state.notes,id)}</span>)}</section>}

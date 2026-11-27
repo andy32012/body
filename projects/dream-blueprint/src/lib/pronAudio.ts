@@ -92,7 +92,7 @@ function playRecording(audio: HTMLAudioElement, url: string, rate: number, signa
 /** Plays the recorded clips of one lesson. Clips are loaded when the lesson opens, so a tap can start the sound at once
  *  (iPad and iPhone only allow sound that starts inside the tap). Until a voice has loaded, or when it cannot be loaded,
  *  the device's own English voice reads the text instead. */
-export function usePronPlayer(lessonId: string) {
+export function usePronPlayer(lessonId: string, canPlay?: () => boolean) {
   const [clips, setClips] = useState<Clips>({})
   const [missing, setMissing] = useState<PronVoice[]>([])
   const [now, setNow] = useState<Take | null>(null)
@@ -134,6 +134,7 @@ export function usePronPlayer(lessonId: string) {
 
   /** A cancelled play leaves no result. A listening question counts only when its clip reaches the end. */
   async function play(queue: Take[], rate = 1): Promise<PlaybackResult> {
+    if (canPlay && !canPlay()) return 'aborted'
     stop()
     setPlaybackFailed(false)
     setDeviceVoice(false)

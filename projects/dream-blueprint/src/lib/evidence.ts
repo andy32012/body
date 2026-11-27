@@ -106,8 +106,20 @@ export function teacherVerdict(reply: string): 'right' | 'wrong' | 'unclear' {
 /** The 原因 line of Claude's check. */
 export const teacherReason = (reply: string) => reply.match(/^\s*原因[：:]\s*(.+)$/m)?.[1].trim() ?? ''
 /** Which 待確認 answer a check was sent for: the item and the exact answer, so a reply never lands on another one. */
-export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer' | 'attemptId'>
-export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.source, item: e.item, answer: e.answer, attemptId: e.attemptId })
+export type PendingRef = Pick<Evidence, 'day' | 'source' | 'item' | 'answer' | 'attemptId' | 'reviewedAt' | 'wrong'>
+export const pendingRef = (e: Evidence): PendingRef => ({
+  day: e.day, source: e.source, item: e.item, answer: e.answer, attemptId: e.attemptId,
+  reviewedAt: e.reviewedAt, wrong: e.wrong,
+})
+export const pendingReviewId = (unit: number, ref: PendingRef) => legacyRecordId(JSON.stringify([
+  unit, ref.attemptId ?? [ref.day, ref.source, ref.item], ref.answer, ref.reviewedAt, ref.wrong,
+]))
+function samePendingAnswer(e: Evidence, ref: PendingRef) {
+  return e.level === 'pending' && e.answer === ref.answer && e.reviewedAt === ref.reviewedAt && e.wrong === ref.wrong &&
+    (ref.attemptId ? e.attemptId === ref.attemptId : e.day === ref.day && e.source === ref.source && e.item === ref.item)
+}
+export const stillPending = (notes: Record<string, string>, unit: number, ref: PendingRef) =>
+  readEvidence(notes, unit).some(e => samePendingAnswer(e, ref))
 /** A 待確認 answer after Claude's check. Right the first time → done alone; right after a rewrite (it was wrong before)
  *  → done with help. Wrong → still not done, with the reason, the question and his answer kept so he can rewrite it.
  *  Unclear → nothing changes. The check lands on the answer it was sent for, found by its item and answer (the list may
@@ -115,8 +127,7 @@ export const pendingRef = (e: Evidence): PendingRef => ({ day: e.day, source: e.
 export function checkPending(notes: Record<string, string>, unit: number, ref: PendingRef, reply: string, rewrite?: string) {
   const verdict = teacherVerdict(reply)
   const list = readEvidence(notes, unit)
-  const index = list.findIndex(e => e.level === 'pending' && e.answer === ref.answer &&
-    (ref.attemptId ? e.attemptId === ref.attemptId : e.day === ref.day && e.source === ref.source && e.item === ref.item))
+  const index = list.findIndex(e => samePendingAnswer(e, ref))
   const e = list[index]
   if (!e || verdict === 'unclear') return notes
   const reviewedAt = Math.max(Date.now(), (e.reviewedAt ?? 0) + 1)
@@ -218,10 +229,19 @@ export function matchesReference(answer: string, refs: readonly string[], requir
   const form = englishForm(answer)
   return matchingReferences(form, refs).some(ref => requireSameCommas
     ? ref.commas.length === form.commas.length && ref.commas.every((position, i) => position === form.commas[i])
-    : missingCommas(ref, form).length === 0)
+    : missingCommas(ref, form).length === 0 && !addedClauseComma(ref, form))
 }
 
 const relativeWords = new Set(['who', 'whom', 'which', 'whose', 'where'])
+const relativePrepositions = new Set(['about', 'at', 'by', 'for', 'from', 'in', 'of', 'on', 'through', 'to', 'with'])
+function clauseStartsAt(words: string[], at: number) {
+  return relativeWords.has(words[at]) ||
+    (relativePrepositions.has(words[at]) && (words[at + 1] === 'which' || words[at + 1] === 'whom'))
+}
+/** A comma inserted at a relative clause's start changes which person or thing the reference specifies. */
+function addedClauseComma(ref: EnglishForm, answer: EnglishForm) {
+  return answer.commas.some(at => at > 0 && !ref.commas.includes(at) && (clauseStartsAt(ref.words, at) || ref.words[at] === 'that'))
+}
 /** The commas of a non-restrictive clause in a reference (", who is a nurse," / ", which made…") that the answer leaves
  *  out. Without them it is a different sentence (all my sisters vs the one sister), so the words alone are not enough.
  *  Each is "before" (the comma before who / which) or "after" (the one closing the clause). */
@@ -232,11 +252,11 @@ function missingCommas(ref: EnglishForm, answer: EnglishForm): ('before' | 'afte
   const present = new Set(answer.commas)
   const missing: ('before' | 'after')[] = []
   ref.commas.forEach((at, i) => {
-    if (!relativeWords.has(ref.words[at])) return
+    if (!clauseStartsAt(ref.words, at)) return
     if (!present.has(at)) missing.push('before')
     // The clause closes at the next comma, if the sentence goes on after it.
     const close = ref.commas[i + 1]
-    if (close !== undefined && !relativeWords.has(ref.words[close]) && !present.has(close)) missing.push('after')
+    if (close !== undefined && !clauseStartsAt(ref.words, close) && !present.has(close)) missing.push('after')
   })
   return missing
 }
@@ -247,11 +267,13 @@ function matchingReferences(answer: EnglishForm, refs: readonly string[]) {
 export function clauseCommaNote(answer: string, refs: readonly string[]): string | null {
   if (!answer.trim()) return null
   const form = englishForm(answer)
-  const matching = matchingReferences(form, refs).map(ref => missingCommas(ref, form))
-  if (!matching.length || matching.some(missing => missing.length === 0)) return null
-  const [missing] = matching
+  const matching = matchingReferences(form, refs)
+    .map(ref => ({ missing: missingCommas(ref, form), added: addedClauseComma(ref, form) }))
+  if (!matching.length || matching.some(issue => issue.missing.length === 0 && !issue.added)) return null
+  const [{ missing, added }] = matching
+  if (added) return '字都對，但關係子句前多了逗號。這裡要靠子句指出是哪個人或哪件事，拿掉把子句隔開的逗號。'
   const where = missing.includes('before') && missing.includes('after') ? '前後兩個逗號'
-    : missing.includes('before') ? 'who／which／whose／where 前面的逗號' : '補充說明結束的那個逗號'
+    : missing.includes('before') ? '關係詞前面的逗號' : '補充說明結束的那個逗號'
   return '字都對，但少了' + where + '：補充說明（非限定關係子句）要用逗號隔開，拿掉逗號意思就變了（例如 my sister who is a nurse 聽起來像你有好幾個姊姊）。'
 }
 
@@ -294,6 +316,7 @@ export const answered = (answer?: string) => !!answer?.trim()
  *  a self-marked "correct" with neither → 自評完成・待確認. 「不會」 leaves no evidence. 「穩了」 needs 當次獨立完成 later, on another item. */
 export function judgeWritten(a: { rating: 'correct' | 'minor' | 'again'; revealed: boolean; answer?: string; references: readonly string[]; firstVerdict?: Verdict; checkedText?: string }): Level | null {
   if (a.rating === 'again' || !answered(a.answer)) return null
+  if (a.rating === 'correct' && clauseCommaNote(a.answer ?? '', a.references)) return 'pending'
   if (a.revealed || a.rating === 'minor') return 'assisted'
   // Fixed after Claude pointed at a problem: the feedback helped, even if the result now matches the reference.
   if (a.firstVerdict && a.firstVerdict !== 'good') return 'assisted'

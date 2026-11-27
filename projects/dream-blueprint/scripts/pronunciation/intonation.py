@@ -6,14 +6,24 @@ The synthesiser lets its voice fall at the end of almost everything, yes/no ques
 Every result is measured again (pitch at the end, harmonics-to-noise ratio, and the words as the recogniser hears them).
 Writes the takes into out/<f|m>.json and the choices into intonation.json.
 usage: intonation.py <lesson id>"""
-import os, sys
+import argparse, sys
 from math import isfinite
-import numpy as np, soundfile as sf
-from course import parse, clips, slug, HERE, read_json, write_json
-from lib import phonemes, tts, shape, check
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from course import parse, clips, slug, HERE, read_json, write_json, publish_recording_files
+
+parser = argparse.ArgumentParser(description='Record all rising and falling clips in an intonation lesson.')
+parser.add_argument('lesson_id')
+args = parser.parse_args()
+course = parse()
+lesson = next((l for l in course if l['id'] == args.lesson_id), None)
+if not lesson or not any(it['label'].endswith(('↗', '↘')) for it in lesson['items']):
+    parser.error(f'{args.lesson_id!r} is not an intonation lesson')
+
+import soundfile as sf
+from lib import SilentTake, phonemes, tts, shape, check
 from pitchwork import final_move, first_clause, rising_end, harmonicity
 
-LESSON = sys.argv[1]
 VOICES = {'f': ['af_bella', 'af_heart', 'af_sarah', 'af_kore'], 'm': ['am_michael', 'am_adam', 'am_fenrir', 'am_puck']}
 RISE, FALL = 3.0, -1.5      # semitones between the end of the sentence and the stretch before it
 
@@ -35,10 +45,17 @@ def falling(c, ph, g):
     for voice in VOICES[g]:
         for speed in (0.9, 1.0, 0.82):
             x, sr = tts.create(ph, voice=voice, speed=speed, lang='en-us', is_phonemes=True)
-            x = shape(x, sr)
+            try:
+                x = shape(x, sr)
+            except SilentTake as error:
+                seen.append(f'{voice} {speed}: {error}')
+                continue
             move = final_move(x, sr, g)
-            seen.append(f'{voice} {speed}: {move:+.1f}' if move is not None else f'{voice} {speed}: ?')
-            if move is None or move > FALL: continue
+            if move is None or not isfinite(move):
+                seen.append(f'{voice} {speed}: no measurable final pitch movement')
+                continue
+            seen.append(f'{voice} {speed}: {move:+.1f}')
+            if move > FALL: continue
             res = check(c, x, sr)
             if res['grade'] == 'strict': return voice, speed, x, sr, res, f'falls {move:+.1f} st (as synthesised)', seen
             seen[-1] += ' (words not clear)'
@@ -50,11 +67,20 @@ def rising(c, ph, g):
     for voice in VOICES[g]:
         for speed in (0.9, 1.0):
             x, sr = tts.create(clause + ', ' + clause + '.', voice=voice, speed=speed, lang='en-us', is_phonemes=True)
-            part = first_clause(shape(x, sr), sr)
+            try:
+                x = shape(x, sr)
+            except SilentTake as error:
+                seen.append(f'{voice} {speed}: {error}')
+                continue
+            part = first_clause(x, sr)
             if part is None: seen.append(f'{voice} {speed}: no pause to cut at'); continue
             y, start = rising_end(part, sr, g)
             if y is None: seen.append(f'{voice} {speed}: no voicing'); continue
-            y = shape(y, sr)
+            try:
+                y = shape(y, sr)
+            except SilentTake as error:
+                seen.append(f'{voice} {speed}: resynthesis: {error}')
+                continue
             move = final_move(y, sr, g)
             if move is None or not isfinite(move):
                 seen.append(f'{voice} {speed}: no measurable final pitch movement')
@@ -76,27 +102,51 @@ def rising(c, ph, g):
             seen[-1] += f" (words not clear: {res.get('heard')!r})"
     return None, seen
 
-lesson = next(l for l in parse() if l['id'] == LESSON)
-all_clips = clips(parse())
-choice_path = os.path.join(HERE, 'intonation.json')
-choice = read_json(choice_path) if os.path.exists(choice_path) else {}
+all_clips = clips(course)
+output = Path(HERE) / 'out'
+choice_path = Path(HERE) / 'intonation.json'
+choice = read_json(choice_path) if choice_path.exists() else {}
+logs = {g: read_json(output / (g + '.json')) for g in 'fm'}
+produced = {}
+missing = 0
+directions = expected(lesson)
 for g in 'fm':
-    log_path = os.path.join(HERE, 'out', g + '.json')
-    takes = read_json(log_path)
-    for text, want in expected(lesson).items():
+    for text, want in directions.items():
         s = slug(text)
         c = all_clips[s]
         ph = phonemes(c)
         got = (rising if want == 'rise' else falling)(c, ph, g)
         if got[0] is None:
             print(f'{g} NO TAKE {want:4} {text!r}: {got[1]}', flush=True)
+            missing += 1
             continue
         voice, speed, x, sr, res, pitch, seen = got
-        folder = os.path.join(HERE, 'out', g, voice)
-        os.makedirs(folder, exist_ok=True)
-        sf.write(os.path.join(folder, s + '.wav'), x, sr, subtype='PCM_16')
-        takes.setdefault(s, {})[voice] = {'text': text, 'phonemes': ph, 'others': c['others'], 'speed': speed, 'secs': round(len(x) / sr, 2), **res, 'pitch': pitch}
+        produced[Path(g) / voice / (s + '.wav')] = (x, sr)
+        logs[g].setdefault(s, {})[voice] = {'text': text, 'phonemes': ph, 'others': c['others'], 'speed': speed, 'secs': round(len(x) / sr, 2), **res, 'pitch': pitch}
         choice.setdefault(g, {})[s] = voice
-        write_json(log_path, takes)
-        write_json(choice_path, choice)
         print(f'{g} ok {voice} {speed} | {text!r} | {pitch} | tried {len(seen)}', flush=True)
+
+if missing:
+    sys.exit(f'{missing} required takes had no qualified candidate. Previous recordings and choices kept.')
+
+# Prepare the complete set before replacing any previous output.
+with TemporaryDirectory(prefix='.intonation-', dir=output) as temporary:
+    staged = Path(temporary)
+    for name, (audio, rate) in produced.items():
+        path = staged / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        sf.write(path, audio, rate, subtype='PCM_16')
+    for g, takes in logs.items():
+        write_json(staged / (g + '.json'), takes)
+    write_json(staged / choice_path.name, choice)
+    files = []
+    for name in produced:
+        path = output / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        files.append((staged / name, path))
+    for g in logs:
+        filename = g + '.json'
+        files.append((staged / filename, output / filename))
+    files.append((staged / choice_path.name, choice_path))
+    publish_recording_files(files, staged)
+print(f'Saved all {len(produced)} takes.')

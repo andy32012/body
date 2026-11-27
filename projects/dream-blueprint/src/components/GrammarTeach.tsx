@@ -75,16 +75,18 @@ const drillInstruction = (drill: Drill) => drill.k === 'choose' ? '' : drill.ins
   (drill.k === 'fix' ? '這句有一個地方錯了，改成正確的句子。' : '')
 
 /** One drill with feedback. Report the first try and the first successful correction separately. */
-export function DrillCard({ drill, onDone, onCorrected }: {
-  drill: Drill; onDone?: (right: boolean, said: string) => void; onCorrected?: () => void
+export function DrillCard({ drill, onDone, onCorrected, onSkip }: {
+  drill: Drill; onDone?: (right: boolean, said: string) => void; onCorrected?: () => void; onSkip?: () => void
 }) {
   // Start from the sentence to edit so only the requested part needs retyping on a phone.
   const [text, setText] = useState(drill.k === 'fix' ? drill.q : '')
   const [missed, setMissed] = useState<number[]>([])
   const [result, setResult] = useState<boolean | null>(null)
+  const [skipped, setSkipped] = useState(false)
   const [solved, setSolved] = useState(false)
   const [said, setSaid] = useState('')
-  const untouched = drill.k === 'fix' ? text.trim() === drill.q : !text.trim()
+  const untouched = (drill.k === 'fix' ? text.trim() === drill.q : !text.trim()) ||
+    (!!onSkip && !/[\p{L}\p{N}]/u.test(text))
   const instruction = drillInstruction(drill)
   const stem = instruction ? instruction + '\n' + drill.q : (drill.k === 'fill' ? '填空：' : '') + drill.q
   function check(answer: string | number) {
@@ -97,7 +99,7 @@ export function DrillCard({ drill, onDone, onCorrected }: {
     if (right) setSolved(true)
     else if (typeof answer === 'number') setMissed(m => [...m, answer])
   }
-  const gaveUp = result === false && !said.trim() || (drill.k === 'fix' && said.trim() === drill.q)
+  const gaveUp = (skipped && result === null) || (result === false && !said.trim()) || (drill.k === 'fix' && said.trim() === drill.q)
   return <div className="gm-drill" data-kind={drill.k}>
     {instruction && <p className="gm-ask">{instruction}</p>}
     <p className={drill.k === 'fix' && !drill.instruction ? 'gm-q gm-wrong' : 'gm-q'} lang="en">{drill.q}</p>
@@ -116,11 +118,14 @@ export function DrillCard({ drill, onDone, onCorrected }: {
       </label>
       {!solved && <div className="pr-actions">
         <button type="submit" className="pr-main" disabled={untouched}>{result === null ? '對答案' : '改好了，再對一次'}</button>
-        {/* A way on without an answer: it counts as missed and comes back later, like any wrong answer. */}
-        {result === null && <button type="button" className="pr-link" onClick={() => check(drill.k === 'fix' ? drill.q : '')}>不會，先跳過</button>}
+        {result === null && !skipped && <button type="button" className="pr-link" onClick={() => {
+          if (!onSkip) { check(drill.k === 'fix' ? drill.q : ''); return }
+          setSkipped(true)
+          onSkip()
+        }}>不會，先跳過</button>}
       </div>}
     </form>}
-    {result !== null && (solved ? <div className="gm-feedback" data-ok={result} role="status">
+    {(result !== null || skipped) && (solved ? <div className="gm-feedback" data-ok={true} role="status">
       <strong>{result ? '對了' : onCorrected ? '這次改對了（保留首次的作答紀錄）' : '這次改對了'}</strong>
       <p lang="en">{drillAnswer(drill)}</p>
       {drill.k === 'fix' && drill.accept.length > 1 && <small>也可以寫：<span lang="en">{drill.accept.slice(1).join('／')}</span></small>}
@@ -128,7 +133,8 @@ export function DrillCard({ drill, onDone, onCorrected }: {
       <AskWhy q={{ source: '文法小練習', stem,
         options: drill.k === 'choose' ? drill.options : undefined, picked: said, answer: drillAnswer(drill), right: true }} />
     </div> : <div className="gm-feedback" data-ok={false} role="status">
-      <strong>{gaveUp ? onDone ? '先跳過了，這題之後會再出現' : '先跳過了，這題可以隨時再試' : '還沒對'}</strong>
+      <strong>{gaveUp ? onSkip ? '先跳過了，填答後才會計入這一節的進度'
+        : onDone ? '先跳過了，這題之後會再出現' : '先跳過了，這題可以隨時再試' : '還沒對'}</strong>
       {!gaveUp && <small>{drill.k === 'choose' ? '劃掉的不是答案，再選一次。' : '看看上面的講解，找出哪裡不一樣再改一次。'}</small>}
       <AskWhy label="問 Claude 提示（不會直接給答案）" q={{ source: '文法小練習', stem,
         options: drill.k === 'choose' ? drill.options : undefined, picked: gaveUp ? '' : said, answer: drillAnswer(drill), right: false }} />
@@ -152,14 +158,17 @@ export function GrammarDrills({ unit, indices, onSave, date, done, after }: { un
   })} />
 }
 /** Any list of drills, one at a time (a course unit's, or a section's three in 完整文法). */
-export function DrillRun({ drills, indices, onAnswer, onCorrected, done, after, title = '小練習：先認得，再寫', missed = '還沒改對的題目之後會再出現。' }: { drills: Drill[]; indices: number[]
+export function DrillRun({ drills, indices, onAnswer, onCorrected, done, after, allowUnansweredSkip, title = '小練習：先認得，再寫', missed = '還沒改對的題目之後會再出現。' }: { drills: Drill[]; indices: number[]
   onAnswer: (index: number, right: boolean, said: string) => void; onCorrected: (index: number) => void
+  allowUnansweredSkip?: boolean
   done?: string; after?: ReactNode; title?: string
   /** What happens to the drills missed (in a lesson they come back on later days). */
   missed?: string }) {
   const [at, setAt] = useState(0)
   const [answered, setAnswered] = useState(false)
   const [rights, setRights] = useState<boolean[]>([])
+  const [skipped, setSkipped] = useState(false)
+  const [skipCount, setSkipCount] = useState(0)
   const [corrected, setCorrected] = useState(0)
   const index = indices[at]
   const drill = drills[index]
@@ -172,20 +181,24 @@ export function DrillRun({ drills, indices, onAnswer, onCorrected, done, after, 
     const right = rights.filter(Boolean).length
     return <div className="gm-drills gm-drills-done" role="status">
       <strong>第一次 {rights.length} 題答對 {right} 題{corrected > 0 ? ' · 當場訂正 ' + corrected + ' 題' : ''}</strong>
-      <p>{right + corrected < rights.length ? missed : '這輪都答對了。'}{done ?? ''}</p>
+      <p>{skipCount > 0 ? `略過 ${skipCount} 題，回來填答才會計入這一節的進度。`
+        : right + corrected < rights.length ? missed : '這輪都答對了。'}{done ?? ''}</p>
       {after}
     </div>
   }
   return <div className="gm-drills">
     <div className="gm-drills-head"><strong>{title}</strong><small>{drillNames[drill.k]} · 第 {at + 1} / {indices.length} 題</small></div>
-    <DrillCard key={index} drill={drill} onDone={(right, said) => {
+    <DrillCard key={index} drill={drill} onSkip={allowUnansweredSkip ? () => setSkipped(true) : undefined} onDone={(right, said) => {
       setAnswered(true); setRights(r => [...r, right])
       onAnswer(index, right, said)
     }} onCorrected={() => {
       setCorrected(n => n + 1)
       onCorrected(index)
     }} />
-    {answered && <button type="button" className="pr-main gm-next" onClick={() => { setAt(at + 1); setAnswered(false) }}>{at + 1 < indices.length ? '下一題' : '看結果'}</button>}
+    {(answered || skipped) && <button type="button" className="pr-main gm-next" onClick={() => {
+      if (skipped && !answered) setSkipCount(n => n + 1)
+      setAt(at + 1); setAnswered(false); setSkipped(false)
+    }}>{at + 1 < indices.length ? '下一題' : '看結果'}</button>}
   </div>
 }
 

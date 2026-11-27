@@ -81,29 +81,52 @@ function cleanFixes(v: unknown): WriteFeedback['fixes'] {
 /** The requirements' lines as the page can show them: a name, a yes / no and a comment in words. */
 const cleanChecks = (v: unknown): CheckLine[] => Array.isArray(v) ? v.flatMap(c => c && typeof c === 'object' && typeof c.name === 'string' && typeof c.ok === 'boolean'
   ? [{ name: c.name, ok: c.ok, comment: str(c.comment) ?? '' }] : []) : []
-/** Saved records from before scores were checked may hold an impossible best (e.g. band 99) or a broken last
- *  feedback: they are dropped, never counted or shown. A best above 5 on a 1–5 stage is dropped by taskDone. Text a
- *  check saved in another shape (an object where words belong) is dropped too, so the page can always show it. */
+
+function mixesZero(scores: readonly { score: number }[]) {
+  return scores.some(line => line.score === 0) && scores.some(line => line.score > 0)
+}
+
+export function mixedIeltsScores(f: WriteFeedback) {
+  return mixesZero(f.scores ?? f.criteria)
+}
+
+/** Old records only kept the highest total and the latest report. Exclude a highest
+ *  score matching the incorrect total that was stored with a mixed report. New mixed
+ *  reports never have a band and valid scores earned on other attempts can stay. */
+function discardMixedBest(r: WriteRecord, ielts: boolean) {
+  return ielts && !!r.last && typeof r.last.band === 'number' && r.best === r.last.band && mixedIeltsScores(r.last)
+}
+
+/** Normalize older grades for both display and sync, keeping any feedback the page can show. */
+export function readWriteRecord(value: unknown): WriteRecord | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const r = { ...value } as WriteRecord
+  if (!(typeof r.best === 'number' && r.best >= 0 && r.best <= 9)) r.best = undefined
+  if (r.last && !(Array.isArray(r.last.criteria) && r.last.criteria.every(c => c && typeof c.name === 'string' && typeof c.score === 'number'))) r.last = undefined
+  if (r.last?.scores !== undefined && !(r.last.rubric && r.last.rubric in rubrics && Array.isArray(r.last.scores) && r.last.scores.length
+    && r.last.scores.every(x => x && typeof x.name === 'string' && validRubricScore(rubrics[r.last!.rubric!], x.score)))) r.last = undefined
+  if (r.last) {
+    const l = r.last
+    r.last = { ...l, fixes: cleanFixes(l.fixes), next: str(l.next) ?? '', summary: str(l.summary), revised: str(l.revised),
+      ...(l.scores ? { scores: l.scores.map(x => ({ ...x, reason: str(x.reason) ?? '' })) } : {}),
+      ...(l.checks !== undefined ? { checks: cleanChecks(l.checks) } : {}),
+      ...(l.unchecked !== undefined ? { unchecked: Array.isArray(l.unchecked) ? l.unchecked.filter((x): x is string => typeof x === 'string') : [] } : {}),
+      ...(l.answer !== undefined ? { answer: str(l.answer) } : {}),
+      submittedAt: typeof l.submittedAt === 'number' && l.submittedAt > 0 && Number.isSafeInteger(l.submittedAt) ? l.submittedAt : undefined,
+      criteria: l.criteria.map(c => ({ ...c, comment: str(c.comment) ?? '' })) }
+  }
+  if (r.last && (r.last.rubric === 'ielts-task1' || r.last.rubric === 'ielts-task2' || typeof r.last.band === 'number')
+    && mixedIeltsScores(r.last)) {
+    if (discardMixedBest(r, true)) r.best = undefined
+    r.last.band = undefined
+  }
+  return r
+}
+
 export function readWrite(notes: Record<string, string>, id: string): WriteRecord | null {
   try {
     const v = notes[writeKey(id)]
-    if (!v) return null
-    const r = JSON.parse(v) as WriteRecord
-    if (typeof r.best === 'number' && !(r.best >= 0 && r.best <= 9)) r.best = undefined
-    if (r.last && !(Array.isArray(r.last.criteria) && r.last.criteria.every(c => c && typeof c.name === 'string' && typeof c.score === 'number'))) r.last = undefined
-    if (r.last?.scores !== undefined && !(r.last.rubric && r.last.rubric in rubrics && Array.isArray(r.last.scores) && r.last.scores.length
-      && r.last.scores.every(x => x && typeof x.name === 'string' && validRubricScore(rubrics[r.last!.rubric!], x.score)))) r.last = undefined
-    if (r.last) {
-      const l = r.last
-      r.last = { ...l, fixes: cleanFixes(l.fixes), next: str(l.next) ?? '', summary: str(l.summary), revised: str(l.revised),
-        ...(l.scores ? { scores: l.scores.map(x => ({ ...x, reason: str(x.reason) ?? '' })) } : {}),
-        ...(l.checks !== undefined ? { checks: cleanChecks(l.checks) } : {}),
-        ...(l.unchecked !== undefined ? { unchecked: Array.isArray(l.unchecked) ? l.unchecked.filter((x): x is string => typeof x === 'string') : [] } : {}),
-        ...(l.answer !== undefined ? { answer: str(l.answer) } : {}),
-        submittedAt: typeof l.submittedAt === 'number' && l.submittedAt > 0 && Number.isSafeInteger(l.submittedAt) ? l.submittedAt : undefined,
-        criteria: l.criteria.map(c => ({ ...c, comment: str(c.comment) ?? '' })) }
-    }
-    return r
+    return v ? readWriteRecord(JSON.parse(v)) : null
   } catch { return null }
 }
 const squash = (s: string) => s.toLowerCase().replace(/[\s&＆·・,，.。]+/g, '').replace(/and/g, '')
@@ -120,6 +143,7 @@ export function matchCriterion(name: string, criteria: readonly string[]) {
 /** The score a check is recorded with: the IELTS band, or on the early stages a 0–5 figure — the 全民英檢 level, or the
  *  share of the 單句寫作 points (5 of 6 → 4.2) — so 3.5 is the same bar everywhere (七成，初級寫作的通過標準). */
 export function scoreOf(f: WriteFeedback, ielts: boolean) {
+  if (ielts && mixedIeltsScores(f)) return undefined
   if (f.rubric && f.scores?.length) {
     const r = rubrics[f.rubric]
     if (r.id.startsWith('ielts')) return ieltsOverall(f.scores.map(s => s.score))
@@ -128,15 +152,14 @@ export function scoreOf(f: WriteFeedback, ielts: boolean) {
   if (ielts && typeof f.band === 'number') return f.band
   return f.criteria.length ? f.criteria.reduce((a, c) => a + c.score, 0) / f.criteria.length : 0
 }
-/** The score a check counts toward 過關 with: none when the piece is shorter than the task asks (the scores still show,
- *  but a too-short piece never passes). */
+/** Only a valid result that meets the word target counts toward 過關. */
 export function countedBest(f: WriteFeedback, ielts: boolean, words: number, task: WriteTask): number | undefined {
   return words >= task.min ? scoreOf(f, ielts) : undefined
 }
 /** A task counts as done when checked feedback reached 3.5 / 5 (or IELTS 5.5): 全民英檢 4 級分, or seven tenths of the
  *  單句寫作 points. Ticking every point yourself is 自評完成, not done. */
 export function taskDone(r: WriteRecord | null, ielts: boolean) {
-  return !!r && typeof r.best === 'number' && r.best <= (ielts ? 9 : 5) && r.best >= (ielts ? 5.5 : 3.5)
+  return !!r && typeof r.best === 'number' && r.best <= (ielts ? 9 : 5) && r.best >= (ielts ? 5.5 : 3.5) && !discardMixedBest(r, ielts)
 }
 export const selfChecked = (r: WriteRecord | null) => !!r && (r.self ?? 0) >= 1 && typeof r.best !== 'number'
 /** Continue from the furthest stage already practised or preserved during the upgrade, so added earlier steps do not
@@ -254,7 +277,7 @@ const wholePieceNames = new Set([
  *  position), the same part twice, or a score without its reason. A whole-piece table (全民英檢 整篇) takes its usual
  *  wording (整篇、整體…) but not another table's criterion (Task Response means the wrong table was used). The
  *  stage's requirements are matched by name only; those Claude didn't answer are listed in `unchecked`. Only text is kept
- *  where the page shows words. The IELTS band is worked out here from the four criteria. */
+ *  where the page shows words. An IELTS reply with mixed zero and positive scores keeps the feedback, with no overall band. */
 export function parseGrade(text: string, rubric: Rubric, parts: readonly string[], checks: readonly string[] = []): WriteFeedback | null {
   try {
     const j = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1))
@@ -277,7 +300,7 @@ export function parseGrade(text: string, rubric: Rubric, parts: readonly string[
     })
     const unchecked = checks.filter(name => !checkLines.some(c => c.name === name))
     return { rubric: rubric.id, scores, checks: checkLines, ...(unchecked.length ? { unchecked } : {}), criteria: [],
-      band: rubric.id.startsWith('ielts') ? ieltsOverall(scores.map(x => x.score)) : undefined,
+      band: rubric.id.startsWith('ielts') && !mixesZero(scores) ? ieltsOverall(scores.map(x => x.score)) : undefined,
       next: str(j.next) ?? '', summary: str(j.summary), fixes: cleanFixes(j.fixes).slice(0, 8), revised: str(j.revised) }
   } catch { return null }
 }

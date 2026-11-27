@@ -5,14 +5,17 @@ import { compareWithReference, normalizeEnglish } from './evidence'
 import { doneKey, type Passage } from './passages'
 import { levelEntry, meaningLine } from './vocab'
 import { levelDone, openSteps } from './unlock'
+import { legacyRecordId } from './recordId'
 
 export type StoryTab = 'read' | 'listen' | 'dictate'
 export const storyTabs: [StoryTab, string][] = [['read', '閱讀'], ['listen', '聽力'], ['dictate', '聽寫']]
 /** r, l, d: the day it was read, listened to, written from dictation. q: meaning questions right / asked.
  *  dq: dictation words right / total. zh: the Chinese was opened before the questions. u: how much was understood by ear (1–3). */
 export interface StoryRecord { r?: string; l?: string; d?: string; q?: [number, number]; dq?: [number, number]; zh?: boolean; u?: 1 | 2 | 3
-  /** Dictation stopped early: the next sentence and current round's score, independent of past completion (`d`). */
-  dn?: number; dqp?: [number, number]; dAt?: number
+  /** Active dictation round: next sentence, score so far, and the last dictation edit. */
+  dn?: number; dqp?: [number, number]; dAt?: number; dRound?: string
+  /** Latest finished round. The completion day (`d`) still counts toward level progress. */
+  dDoneAt?: number; dDoneRound?: string
   /** Played but not heard to the end (no voice, or the play failed): read along from the text that day; not listening. */
   lt?: string }
 const field: Record<StoryTab, 'r' | 'l' | 'd'> = { read: 'r', listen: 'l', dictate: 'd' }
@@ -26,18 +29,33 @@ export function saveStory(notes: Record<string, string>, id: string, patch: Stor
   return { ...notes, [storyKey(id)]: JSON.stringify({ ...readStory(notes, id), ...patch }) }
 }
 
-/** Retain completed modes from either device and the active dictation from the latest dictation-specific change. */
+function completedAt(record: StoryRecord) {
+  if (!record.dq) return 0
+  if (record.dDoneAt) return record.dDoneAt
+  // Older saves used the same time for both a partial edit and a completed score.
+  if (record.dn === undefined && record.dAt) return record.dAt
+  return record.d ? Date.parse(record.d + 'T00:00:00Z') || 0 : 0
+}
+
+/** A newer reading or listening activity cannot replace the most recent completed dictation score. */
 export function mergeStory(older: StoryRecord, newer: StoryRecord): StoryRecord {
   const out = { ...older, ...newer }
   for (const field of ['r', 'l', 'd'] as const) {
     const a = older[field], b = newer[field]
     out[field] = a && b ? (a < b ? a : b) : a ?? b
   }
+  const result = !newer.dq || (older.dq && completedAt(older) > completedAt(newer)) ? older : newer
+  out.dq = result.dq
+  out.dDoneAt = completedAt(result) || undefined
+  out.dDoneRound = result.dDoneRound
+
   const newerHasDictation = newer.dn !== undefined || !!newer.d
-  const dictation = (older.dAt ?? 0) > (newer.dAt ?? 0) || !newerHasDictation ? older : newer
-  out.dn = dictation.dn
-  out.dqp = dictation.dqp
-  out.dAt = dictation.dAt
+  const latest = (older.dAt ?? 0) > (newer.dAt ?? 0) || !newerHasDictation ? older : newer
+  const closed = latest.dRound !== undefined && (latest.dRound === older.dDoneRound || latest.dRound === newer.dDoneRound)
+  out.dn = closed ? undefined : latest.dn
+  out.dqp = closed ? undefined : latest.dqp
+  out.dRound = closed ? undefined : latest.dRound
+  out.dAt = latest.dAt
   return out
 }
 
@@ -220,6 +238,21 @@ export function dictationPatch(before: StoryRecord, start: number, parts: readon
   const [right, total] = dictationTotal(parts)
   const sum: [number, number] = [sofar[0] + right, sofar[1] + total]
   return stop ? { dn: start + parts.length, dqp: sum } : { d: day, dq: sum, dn: undefined, dqp: undefined }
+}
+
+export function dictationRound(id: string, record: StoryRecord, start: number) {
+  if (start > 0) return record.dRound ?? legacyRecordId(JSON.stringify([id, record.dAt, start, record.dqp]))
+  return globalThis.crypto?.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
+}
+
+/** Add just the sentence being checked, using the live saved subtotal for this round. */
+export function advanceDictation(before: StoryRecord, cursor: { at: number; stamp?: number; round: string },
+  result: { right: number; total: number }, finish: boolean, day: string): StoryRecord | undefined {
+  if (cursor.stamp !== before.dAt || (cursor.at > 0 && cursor.at !== before.dn)) return
+  const dAt = Math.max(Date.now(), (before.dAt ?? 0) + 1, completedAt(before) + 1)
+  const patch = dictationPatch(before, cursor.at, [result], !finish, day)
+  if (!finish) return { ...patch, dAt, dRound: cursor.round }
+  return { ...patch, dAt, dRound: undefined, dDoneAt: dAt, dDoneRound: cursor.round }
 }
 /** Whole-passage dictation result from its sentences. */
 export const dictationTotal = (parts: readonly { right: number; total: number }[]): [number, number] =>

@@ -66,7 +66,13 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   const memory = useMemory()
   // Lessons stay tied to the day they belong to, including when an older lesson is resumed.
   const [courseDate] = useState(() => lessonDate ?? dayKey())
-  const [lesson] = useState(() => lessonMode && (!lessonDate || readLessonRecord(state.notes, courseDate)) ? emmaLesson(state, courseDate) : null)
+  const [lesson, setLesson] = useState(() => lessonMode && (!lessonDate || readLessonRecord(state.notes, courseDate)) ? emmaLesson(state, courseDate) : null)
+  useEffect(() => {
+    // The lesson can arrive just after navigation, from a queued local save or from sync.
+    if (lessonMode && lessonDate && !lesson && readLessonRecord(state.notes, courseDate)) {
+      setLesson(emmaLesson(state, courseDate))
+    }
+  }, [courseDate, lesson, lessonDate, lessonMode, state])
   // "t1-B": role-play the speaking situation of a life topic.
   const [topic] = useState(() => {
     const [id, part] = (topicMode ?? '').split('-')
@@ -101,7 +107,8 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
     return () => { alive = false }
   }, [nurseMode])
   const nurse = nurseLoad.status === 'ready' ? nurseLoad.value : null
-  const sceneUnavailable = (packMode !== undefined && !packTask) || (nurseMode !== undefined && !nurse)
+  const lessonUnavailable = lessonMode && !lesson
+  const sceneUnavailable = lessonUnavailable || (packMode !== undefined && !packTask) || (nurseMode !== undefined && !nurse)
   const packStatus = packRef ? packLoad.status : 'missing'
   const nurseStatus = nurseMode ? nurseLoad.status : 'missing'
   // From a word card: chat about that word; Emma knows the list, the drill and the other words of the round.
@@ -158,6 +165,7 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   }, [lesson])
   const [key, setKey] = useState(openaiKey())
   const [settings, setSettings] = useState(!openaiKey())
+  const [keyError, setKeyError] = useState('')
   const [voice, setVoice] = useState(voiceName())
   const [guard, setGuard] = useState(echoGuard)
   const [status, setStatus] = useState<'idle' | 'connecting' | 'live' | 'closed'>('idle')
@@ -179,7 +187,12 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
   useEffect(() => () => { setup.current?.abort(); session.current?.stop() }, [])
   // Keys that arrive from the computer (QR pairing) fill in here without a reload.
   useEffect(() => {
-    const on = () => { setKey(openaiKey()); if (openaiKey()) setSettings(false) }
+    const on = () => {
+      const pairedKey = openaiKey()
+      setKey(pairedKey)
+      setKeyError('')
+      if (pairedKey) setSettings(false)
+    }
     window.addEventListener('dream-blueprint:keys', on)
     return () => window.removeEventListener('dream-blueprint:keys', on)
   }, [])
@@ -194,6 +207,17 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
     return () => clearInterval(t)
   }, [status])
   useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }) }, [lines])
+
+  function saveVoiceKey() {
+    const value = key.trim()
+    if (!setOpenaiKey(value)) {
+      setKeyError('這台裝置無法儲存 OpenAI 金鑰。欄位內容已保留，請檢查瀏覽器的儲存設定或釋出空間後再試。')
+      return
+    }
+    setKey(value)
+    setKeyError('')
+    if (value) setSettings(false)
+  }
 
   async function start() {
     if (sceneUnavailable || setup.current || (attempt && pending.current.has(attempt.id))) return
@@ -383,6 +407,12 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           {lessonDate && <a href={'#practice/resume-' + lessonDate}>回這堂課</a>}
           <a href="#speaking">改回一般聊天</a>
         </div>}
+        {lessonUnavailable && <div className="sp-lesson">
+          <strong role="status">{lessonDate ? '這台裝置找不到 ' + courseDate + ' 的每日課紀錄' : '目前找不到可接續的每日課'}</strong>
+          <span>可返回英文練習選課。若紀錄從另一台裝置同步過來，這頁會接上原本的口說練習。</span>
+          <a href="#library">回到英文練習</a>
+          <a href="#speaking">前往一般聊天</a>
+        </div>}
 
         {packMode !== undefined && <div className="sp-lesson">
           <small>{packRef ? '單元 ' + packRef.unit + ' · 口說任務 ' + (packRef.i + 1) : '單元口說任務'}{pack && packRef ? ' · ' + unitTitle(packRef.unit).split(/[：（]/)[0] : ''}</small>
@@ -443,19 +473,20 @@ export default function Speaking({ state, update, lessonMode = false, lessonDate
           <span>Emma 知道你在複習這個字，會找你用它說幾句；想問意思、用法，或這一輪的其他字{wordChat.others.length ? '（' + wordChat.others.join('、') + '）' : ''}，直接問她。</span>
           <a href={wordChatBack(wordChat)}>回到{wordChat.where}</a>
         </div>}
-        {!card && !lesson && !topic && packMode === undefined && nurseMode === undefined && !wordChat && <div className="sp-links">
+        {!card && !lessonMode && !topic && packMode === undefined && nurseMode === undefined && !wordChat && <div className="sp-links">
           <a className="sp-ielts-link" href="#speaking/gept">練全民英檢口說（朗讀、回答問題、看圖敘述）→</a>
           <a className="sp-ielts-link" href="#speaking/ielts">練雅思口說 Part 2 →</a>
         </div>}
 
         {settings && <div className="sp-settings">
-          <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></label>
+          <label>OpenAI 金鑰<input type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => { setKey(e.target.value); setKeyError('') }} placeholder="sk-..." /></label>
           <label>聲音<select value={voice} onChange={e => { setVoice(e.target.value); setVoiceName(e.target.value) }}>
             {voices.map(v => <option key={v} value={v}>{v}</option>)}
           </select></label>
           <label className="sp-check"><input type="checkbox" checked={guard} onChange={e => { setGuard(e.target.checked); setEchoGuard(e.target.checked) }} />
             <span>防回音：{NAME} 說話的時候先不收你的聲音<small>用喇叭時開著，她才不會聽到自己的聲音就停下來。戴耳機、想在她說話時插話，再關掉。</small></span></label>
-          <button type="button" onClick={() => { setOpenaiKey(key); if (key.trim()) setSettings(false) }}>儲存</button>
+          <button type="button" onClick={saveVoiceKey}>儲存</button>
+          {keyError && <small role="alert">{keyError}</small>}
           <small>語音用 OpenAI GPT-Live-1.1，說話中每分鐘約 US$0.05。金鑰只存在這台裝置。</small>
           <PairPaste need="voice" />
         </div>}

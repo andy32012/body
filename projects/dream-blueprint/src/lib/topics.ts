@@ -4,6 +4,7 @@ import type { AppState } from './store'
 import { judgeCheckpoint, judgeExpress, levelNames, sameEnglish, type Level, type Verdict } from './evidence'
 import { courseMovedOn, readLessonRecord } from './lesson'
 import { isKnownWord, levelEntry, wordKey } from './vocab'
+import type { CorrectionSubmission } from './correctionHistory'
 
 /** Life topics: each one is three short sessions on different days.
  *  A 理解 — words in context, the pattern, listening (gist → details → transcript → shadow → retell) and reading;
@@ -85,7 +86,14 @@ export interface TopicRecord {
   open?: Record<string, OpenCheck>
 }
 /** An open task's help and checks: the first check (with the text it saw) and the latest one (with its text). */
-export interface OpenCheck { help: string[]; firstVerdict?: Verdict; checkedText?: string; latestVerdict?: Verdict; latestText?: string }
+export interface OpenCheck {
+  help: string[]
+  firstVerdict?: Verdict
+  checkedText?: string
+  firstSubmission?: CorrectionSubmission
+  latestVerdict?: Verdict
+  latestText?: string
+}
 /** The verdict that counts for the text in the box now. The first check stays the first (a wrong first try is fixed with
  *  help, however good the rewrite). After a first 「good」, an edited text counts only once Claude has checked that very
  *  text: then its own verdict counts; an edit nobody checked is unchecked (待確認). */

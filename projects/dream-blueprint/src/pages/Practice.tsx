@@ -14,7 +14,7 @@ import words from "../data/words.json";
 import SpeechPractice from "../components/SpeechPractice";
 import NursingListen from "../components/NursingListen";
 import NursingWords from "../components/NursingWords";
-import type { PageProps, Session } from "../lib/store";
+import { updateStoreNow, type AppState, type PageProps, type Session } from "../lib/store";
 import {
   activePeriod,
   dayKey,
@@ -65,6 +65,7 @@ import type { LibraryMode } from "../lib/library";
 import type { StoryTab } from "../lib/story";
 import {
   heardKey,
+  mergeHintUse,
   readHeard,
   readHints,
   readLessonRecord,
@@ -267,18 +268,34 @@ function PracticeSession({
     if (guided) return;
     const progress = { unit: run?.unit ?? current.unit, day: run?.day ?? current.day, pos: at, retry: run?.retry ?? retry, review: current.review,
       items: current.items.map((s) => s.id), records: list, levels: [...checkpointLevels.current], phase,
-      answers: { ...runAnswers.current }, spoken: spokenIds };
+      answers: { ...runAnswers.current }, spoken: spokenIds, scopedHints: run ? !!run.scopedHints : true };
     update((prev) => ({ ...prev, notes: saveRunProgress(prev.notes, date, current.review, progress) }));
   };
-  const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id] : readHints(state.notes, date)[id];
+  // The short review can continue at the same sentence even after the course moves to a different unit.
+  const practiceScope = current.review ? "review." + date : ["checkpoint", date, current.unit, current.day, retry].join(".");
+  const practiceAnswerKey = (id: string) => "practice." + practiceScope + "." + id;
+  const practiceHints = guided ? {} : readHints(state.notes, date);
+  function olderHint(id: string): HintUse | undefined {
+    const hint = practiceHints[id];
+    if (!hint) return;
+    // The old key cannot identify the checked answer, but keep the known exposure to help.
+    return { h: hint.h, r: hint.r || hint.h >= 2 || !!(hint.v && hint.v !== "good"), c: hint.c };
+  }
+  const hintFor = (id: string): HintUse | undefined => guided ? lessonRecord?.hints?.[id]
+    : practiceHints[practiceAnswerKey(id)] ?? (run && !run.scopedHints ? olderHint(id) : undefined);
   const saveHint = (id: string) => (use: HintUse) => {
     if (guided) update((prev) => {
       const rec = readLessonRecord(prev.notes, lessonDate);
       return { ...prev, notes: updateLesson(prev.notes, lessonDate, current.unit, current.day, { ...lessonIdentity, hints: { ...(rec?.hints ?? {}), [id]: use } }) };
     });
-    else update((prev) => ({ ...prev, notes: writeHint(prev.notes, date, id, use) }));
+    else update((prev) => {
+      const key = practiceAnswerKey(id);
+      const previous = readHints(prev.notes, date)[key];
+      return { ...prev, notes: writeHint(prev.notes, date, key, previous ? mergeHintUse(previous, use) : use) };
+    });
   };
   const item = current.items[pos];
+  const expressionId = [lessonDate, current.unit, current.day, lessonIdentity.sentenceId].join("/");
   function backSentence() {
     if (pos === 0 || !settled()) return;
     keepRun(pos - 1, records, "write");
@@ -616,10 +633,12 @@ function PracticeSession({
         })()}
         {live && lessonData && phase === "express" && (
           <LessonExpress
-            lessonId={[lessonDate, current.unit, current.day, lessonIdentity.sentenceId].join("/")}
+            key={expressionId}
+            lessonId={expressionId}
             lesson={lessonData}
             prompt={promptFor(lessonData, current.day)}
-            draftKey={"express." + current.unit + "." + current.day}
+            draftKey={"express." + expressionId}
+            legacyDraftKey={"express." + current.unit + "." + current.day}
             pattern={current.title}
             saved={lessonRecord?.express}
             onRecord={recordExpression}
@@ -698,6 +717,8 @@ function PracticeSession({
                 key={item.id}
                 sentence={item}
                 checkpoint={current.checkpoint}
+                draftKey={guided ? undefined : practiceAnswerKey(item.id)}
+                legacyHint={olderHint(item.id)}
                 initialAnswer={runAnswers.current[item.id]}
                 alreadyMarked={records.some(r => r.sentenceId === item.id)}
                 saved={hintFor(item.id)}
@@ -930,9 +951,9 @@ export function PracticeLibrary({ state, update, navigate, mode }: PageProps & {
   const energy = shortReview ? "low" : reviewEnergy(today, state.settings.periods);
   const id = "library-" + today;
   // Opening the library never counts as a practice session. Save only on an answer or a recall.
-  const record: PageProps["update"] = (apply) =>
-    update((prev) => {
-      const exists = prev.sessions.some((s) => s.id === id);
+  const withActivity = (apply: (prev: AppState) => AppState) =>
+    (prev: AppState) => {
+      if (prev.sessions.some((s) => s.id === id)) return apply(prev);
       const baseline: Session = {
         id,
         day: today,
@@ -944,10 +965,10 @@ export function PracticeLibrary({ state, update, navigate, mode }: PageProps & {
         translations: [],
         spokenIds: [],
       };
-      return apply(
-        exists ? prev : { ...prev, sessions: [...prev.sessions, baseline] },
-      );
-    });
+      const started = { ...prev, sessions: [...prev.sessions, baseline] };
+      const next = apply(started);
+      return next === started ? prev : next;
+    };
   return (
     <div className="practice-page">
       <Extras
@@ -955,7 +976,8 @@ export function PracticeLibrary({ state, update, navigate, mode }: PageProps & {
         mode={mode}
         state={state}
         update={update}
-        onActivity={record}
+        onActivity={apply => update(withActivity(apply))}
+        onSavedActivity={async apply => { await updateStoreNow(withActivity(apply)); }}
         navigate={navigate}
         energy={energy}
         date={today}
@@ -974,12 +996,14 @@ function Extras({
   date,
   sessionId,
   onActivity = update,
+  onSavedActivity,
 }: PageProps & {
   mode: LibraryMode;
   energy: Energy;
   date: string;
   sessionId: string;
   onActivity?: PageProps["update"];
+  onSavedActivity: PageProps["update"];
 }) {
   // #library/story/listen opens the graded passages on that tab.
   const storyFromHash = (): StoryTab => {
@@ -1304,7 +1328,7 @@ function Extras({
       )}
       {mode === "grammar" && <GrammarHome hash={grammarHash} state={state} onActivity={onActivity} date={date} />}
       {mode === "theme" && <ThemeReview state={state} onActivity={onActivity} date={date} sessionId={sessionId} />}
-      {mode === "story" && <StoryLibrary state={state} update={update} onActivity={onActivity} date={date} initialTab={storyTab} />}
+      {mode === "story" && <StoryLibrary state={state} update={update} onActivity={onActivity} onSavedActivity={onSavedActivity} date={date} initialTab={storyTab} />}
       {mode === "sound" && <Pronunciation state={state} onActivity={onActivity} update={update} date={date} />}
       {mode === "reading" && <ReadingPath key="reading" state={state} onActivity={onActivity} date={date} />}
       {mode === "nlisten" && <NursingListen state={state} update={update} onActivity={onActivity} date={date} />}

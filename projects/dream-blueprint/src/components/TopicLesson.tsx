@@ -6,7 +6,8 @@ import type { PageProps } from '../lib/store'
 import type { Energy, Period } from '../lib/progress'
 import { PracticeCover } from './PracticeCover'
 import { Translation } from './Translation'
-import CorrectBox, { type Result } from './CorrectBox'
+import CorrectBox, { correctionBlocked, useCorrectionBlocked, useCorrectionPending, type Result } from './CorrectBox'
+import { correctionKey, correctionOrder, readCorrection, requireCorrectionSave, storeCorrection, type CorrectionSubmission } from '../lib/correctionHistory'
 import StuckButton from './StuckButton'
 import { Transcript, useDialogueVoice } from './LessonParts'
 import { answered, judgeExpress, judgeWritten, levelNames, type Level, type Verdict } from '../lib/evidence'
@@ -20,7 +21,7 @@ import { completePart, countSentences, judgeReview, judgeSpeak, openVerdict, par
 import './lesson.css'
 import './topic.css'
 
-type Save = (patch: Partial<TopicRecord> | ((r: TopicRecord) => Partial<TopicRecord>)) => void
+type Save = (patch: Partial<TopicRecord> | ((r: TopicRecord, notes: Record<string, string>) => Partial<TopicRecord>)) => void
 type Update = PageProps['update']
 const ratingOf = { good: 'correct', small: 'minor', again: 'again' } as const
 const levelText = (l: Level | null | undefined) => l ? levelNames[l] : '未作答'
@@ -58,7 +59,7 @@ export default function TopicLesson({ state, update, navigate, topic, part, star
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step])
   const save: Save = patch => update(prev => ({
-    ...prev, notes: writeTopic(prev.notes, topic.id, typeof patch === 'function' ? patch(readTopic(prev.notes, topic.id)) : patch),
+    ...prev, notes: writeTopic(prev.notes, topic.id, typeof patch === 'function' ? patch(readTopic(prev.notes, topic.id), prev.notes) : patch),
   }))
   function next() {
     window.scrollTo?.({ top: 0, behavior: 'smooth' })
@@ -622,12 +623,58 @@ function SpeakStep({ topic, rec, save, onNext, update, date, part, task }: StepP
 }
 
 /** A 3–5 sentence message; the frame, the model answer or asking Claude count as help. */
-function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
+function WriteStep({ topic, rec, save, onNext, update, date, notes }: StepProps) {
   const W = topic.write
-  const open = useOpenTask(rec, 'write', save)
+  const check = rec.open?.write ?? { help: [] }
+  const gradeKey = correctionKey('topic-write.' + topic.id)
+  function verdictFor(answer: string, checked: OpenCheck, currentNotes: Record<string, string>) {
+    // After correction, the first mistake still counts as help. Otherwise, find the feedback for the selected draft.
+    if (checked.firstVerdict && checked.firstVerdict !== 'good') return checked.firstVerdict
+    const graded = readCorrection(currentNotes, gradeKey, answer)
+    return graded?.answer === answer.trim() ? graded.result.verdict : openVerdict(checked, answer)
+  }
+  function addHelp(kind: string) {
+    if (check.help.includes(kind)) return
+    save(current => {
+      const latest = current.open?.write ?? { help: [] }
+      return { open: { ...current.open, write: { ...latest, help: [...new Set([...latest.help, kind])] } } }
+    })
+  }
   const draftKey = 'topic-write-' + topic.id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [run, setRun] = useState(0)
+  const graded = readCorrection(notes, gradeKey, text)
+  const grading = useCorrectionPending(gradeKey)
+  const blocked = useCorrectionBlocked(gradeKey)
+  function showDraft(value: string) {
+    setRun(0)
+    setText(value)
+  }
+  function submit() {
+    if (!text.trim() || correctionBlocked(gradeKey)) return
+    setRun(r => r + 1)
+  }
+  function saveGrade(result: Result, answer: string, submission: CorrectionSubmission) {
+    return requireCorrectionSave(applied => update(prev => {
+      const topicRecord = readTopic(prev.notes, topic.id)
+      const history = storeCorrection(prev.notes, gradeKey, { ...submission, answer, result })
+      // A slower response from a second tab still has its own text and feedback, but cannot replace the newest check.
+      const latest = readCorrection(history, gradeKey, '')
+      const open = topicRecord.open?.write ?? { help: [] }
+      const first = !open.firstVerdict || (open.firstSubmission && correctionOrder(submission, open.firstSubmission) < 0)
+      const next: OpenCheck = {
+        ...open,
+        ...(first ? { firstVerdict: result.verdict, checkedText: answer, firstSubmission: submission } : {}),
+        ...(latest?.id === submission.id ? { latestVerdict: result.verdict, latestText: answer } : {}),
+      }
+      applied()
+      return {
+        ...prev, notes: writeTopic(history, topic.id, {
+          open: { ...topicRecord.open, write: next },
+        }),
+      }
+    }))
+  }
   const ready = useReady()
   const n = countSentences(text)
   const enough = n >= W.minSentences
@@ -638,42 +685,52 @@ function WriteStep({ topic, rec, save, onNext, update, date }: StepProps) {
     label: '寫訊息：' + W.task,
     detail: ['寫一則 3–5 句的訊息：' + W.task, '要寫到：' + W.conditions.join('；'), '這個主題的句型：' + topic.grammar.title, '參考寫法（不要直接給他）：' + W.sample, '他要寫自己的內容；幫他想內容或句型就好，不要替他寫整段。'].join('\n'),
     draft: text,
-    onHelp: () => open.addHelp('claude'),
+    onHelp: () => addHelp('claude'),
   })
   return <section className="tl-write">
     <div className="pr-label">寫訊息 · {W.minSentences}–5 句</div>
     <h2 className="pr-question">{W.task}</h2>
     <div className="tl-conditions"><strong>要寫到</strong><ul>{W.conditions.map(c => <li key={c}>{c}</li>)}</ul></div>
     <label className="pr-field">我的訊息
-      <textarea lang="en" rows={5} value={text} spellCheck={false} autoComplete="off" placeholder="寫你自己的內容" onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} />
+      <textarea lang="en" rows={5} value={text} spellCheck={false} autoComplete="off" readOnly={blocked} placeholder="寫你自己的內容" onChange={e => { showDraft(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
-    <DraftVersions id={draftKey} text={text} onChoose={setText} />
+    <DraftVersions id={draftKey} text={text} onChoose={showDraft} disabled={blocked} />
     <p className="tl-count" data-ok={inRange}>已寫 {n} 句{!enough ? '，要 ' + W.minSentences + '–5 句' : n > 5 ? '：訊息最多 5 句，挑最重要的留下' : ''}（只算長度，兩個字以上才算一句；文法和意思要另外檢查）</p>
     <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
       <span>卡住了？一層一層打開：</span>
-      <button type="button" aria-pressed={open.help.includes('cue')} onClick={() => { if (ready()) open.addHelp('cue') }}>① 用哪個句型</button>
-      <button type="button" aria-pressed={open.help.includes('frame')} onClick={() => { if (ready()) open.addHelp('frame') }}>② 句架</button>
-      <StuckButton onUse={() => open.addHelp('claude')} />
+      <button type="button" aria-pressed={check.help.includes('cue')} onClick={() => { if (ready()) addHelp('cue') }}>① 用哪個句型</button>
+      <button type="button" aria-pressed={check.help.includes('frame')} onClick={() => { if (ready()) addHelp('frame') }}>② 句架</button>
+      <StuckButton onUse={() => addHelp('claude')} />
     </div>
-    {open.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
-    {open.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
-    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => { open.send(text); setRun(r => r + 1) }}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
-    <CorrectBox run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
-      onReveal={() => open.addHelp('sample')} onResult={(v, _n, _r, sentText) => open.setVerdict(v, sentText)}
+    {check.help.includes('cue') && <p className="ls-help">{topic.grammar.title}：{topic.grammar.points.join(' ')}</p>}
+    {check.help.includes('frame') && <p className="pr-frame" lang="en">{sentenceFrame(firstSentence)}</p>}
+    {tutorKey() && <div className="pr-actions"><button type="button" className="pr-main" disabled={blocked || !text.trim()} onClick={submit}>{graded ? '請 Claude 再批一次' : '請 Claude 批改'}</button></div>}
+    {grading && !run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一題。</p>}
+    <CorrectBox key={run ? 'grading' : graded?.id ?? 'ungraded'} run={run} mode="open" rubric="gept-paragraph" zh={W.task + '（要寫到：' + W.conditions.join('；') + '）'} reference={W.sample} words={[topic.grammar.title]} answer={text} selfFix
+      restore={!run && graded ? { ...graded, showFull: false } : undefined} backgroundGrade={{ id: gradeKey, save: saveGrade }}
+      onReveal={() => addHelp('sample')}
       onSave={card => update(prev => addSayCard(prev, { ...card, from: 'lesson' }, date))} />
     <fieldset className="tl-selfcheck"><legend>寫完勾一下：我有寫到</legend>
       {W.conditions.map((c, i) => <label key={c} className="tl-check"><input type="checkbox" checked={met[i]} onChange={e => setMet(met.map((m, j) => j === i ? e.target.checked : m))} />{c}</label>)}
     </fieldset>
     <div className="pr-actions">
-      <button type="button" className="pr-main" disabled={!inRange} onClick={() => {
-        if (!ready()) return
-        const verdict = open.verdictFor(text)
-        save({ write: { level: judgeExpress({ answered: true, help: open.help, firstVerdict: verdict }), sentences: n, covered: met.filter(Boolean).length, help: open.help, ...(verdict ? { firstVerdict: verdict } : {}) } })
+      <button type="button" className="pr-main" disabled={blocked || !inRange} onClick={() => {
+        if (correctionBlocked(gradeKey) || !ready()) return
+        save((current, currentNotes) => {
+          const latest = current.open?.write ?? { help: [] }
+          const verdict = verdictFor(text, latest, currentNotes)
+          return { write: { level: judgeExpress({ answered: true, help: latest.help, firstVerdict: verdict }), sentences: n,
+            covered: met.filter(Boolean).length, help: latest.help, ...(verdict ? { firstVerdict: verdict } : {}) } }
+        })
         clearDraft(draftKey); onNext()
       }}>完成第 2 次</button>
-      <button type="button" className="pr-link" onClick={() => { if (!ready()) return; save({ write: { level: null, sentences: n, help: open.help } }); onNext() }}>先跳過</button>
+      <button type="button" className="pr-link" disabled={blocked} onClick={() => {
+        if (correctionBlocked(gradeKey) || !ready()) return
+        save(current => ({ write: { level: null, sentences: n, help: current.open?.write?.help ?? [] } }))
+        onNext()
+      }}>先跳過</button>
     </div>
-    {inRange && !open.verdictFor(text) && <p className="ls-help">{open.stale(text) ? '你在 Claude 批改之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 批改就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照「要寫到」自己檢查，會記成「自評完成・待確認」。'}</p>}
+    {!blocked && inRange && !verdictFor(text, check, notes) && <p className="ls-help">{check.firstVerdict === 'good' ? '你在 Claude 批改之後改了內容：改過的這一版還沒人確認，會記成「自評完成・待確認」。' : tutorKey() ? '沒請 Claude 批改就完成，會記成「自評完成・待確認」。' : '還沒連接 Claude：對照「要寫到」自己檢查，會記成「自評完成・待確認」。'}</p>}
   </section>
 }
 

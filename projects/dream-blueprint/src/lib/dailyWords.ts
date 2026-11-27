@@ -23,7 +23,8 @@ export const seenKey = (day: string) => 'daily-word.seen.' + day
 export const moreKey = (day: string) => 'daily-word.more.' + day
 /** Today's sorted words in order, so the card can step back to the word before. */
 export const sortedKey = (day: string) => 'daily-word.sorted.' + day
-export const isSortedKey = (key: string) => /^daily-word\.sorted\.\d{4}-\d{2}-\d{2}$/.test(key)
+const sortedDayPattern = /^daily-word\.sorted\.(\d{4}-\d{2}-\d{2})$/
+export const isSortedKey = (key: string) => sortedDayPattern.test(key)
 export interface SortedWord { k: string; known: boolean }
 export const officialByKey = new Map(officialWords.map(w => [wordKey(w.en), w]))
 
@@ -54,6 +55,16 @@ export function mergeSortedWords(older?: string, newer?: string, lists?: WordLis
 export function readSorted(notes: Record<string, string>, day: string): SortedWord[] {
   return mergeSortedWords(notes[sortedKey(day)])
 }
+export function readDailyDone(notes: Record<string, string>, day: string) {
+  const count = Number(notes[doneKey(day)])
+  return Math.max(Number.isSafeInteger(count) ? count : 0, readSorted(notes, day).length)
+}
+export function reconcileDailyCounts(notes: Record<string, string>) {
+  for (const key of Object.keys(notes)) {
+    const day = sortedDayPattern.exec(key)?.[1]
+    if (day) notes[doneKey(day)] = String(readDailyDone(notes, day))
+  }
+}
 /** Adds a word to today's order; a word already there keeps its place and takes the new choice. */
 export function recordSorted(notes: Record<string, string>, day: string, k: string, known: boolean) {
   const list = readSorted(notes, day)
@@ -62,6 +73,16 @@ export function recordSorted(notes: Record<string, string>, day: string, k: stri
 }
 
 type Sortable = { knownWords: string[]; learningWords: string[]; cards: ReviewCard[]; notes: Record<string, string> }
+export function scheduledWordCard(key: string, known: boolean, day: string): ReviewCard | undefined {
+  const id = 'word:' + key
+  if (!known) return newCard(id, day)
+  if (spotCheck(key)) return { id, box: 4, lastDay: day, due: addDays(day, 14), mastered: false }
+}
+/** An unreviewed word card has the initial one-day or two-week interval. */
+export function isInitialWordCard(card: ReviewCard) {
+  if (card.mastered || card.s !== undefined || card.d !== undefined) return false
+  return (card.box === 1 && card.due === addDays(card.lastDay, 1)) || (card.box === 4 && card.due === addDays(card.lastDay, 14))
+}
 /** Changes the choice for a word sorted today, after stepping back to it.
  *  還不熟 → 認得: the new card made today goes away (a spot check, as for any 認得, may still bring it back in two weeks).
  *  認得 → 還不熟: the word becomes a new card for tomorrow, replacing a two-week spot check. The day's count stays the same. */
@@ -69,11 +90,10 @@ export function changeSorted<S extends Sortable>(prev: S, k: string, known: bool
   const id = 'word:' + k
   const others = (list: string[]) => list.filter(w => wordKey(w) !== k)
   let cards = prev.cards
-  if (known) {
-    cards = cards.filter(c => !(c.id === id && c.box === 1 && c.lastDay === day))
-    if (spotCheck(k) && !cards.some(c => c.id === id)) cards = [...cards, { id, box: 4 as const, lastDay: day, due: addDays(day, 14), mastered: false }]
-  } else {
-    cards = cards.some(c => c.id === id) ? cards.map(c => c.id === id ? newCard(id, day) : c) : [...cards, newCard(id, day)]
+  if (!cards.some(c => c.id === id && !isInitialWordCard(c))) {
+    cards = cards.filter(c => c.id !== id)
+    const scheduled = scheduledWordCard(k, known, day)
+    if (scheduled) cards.push(scheduled)
   }
   return {
     ...prev,

@@ -79,6 +79,13 @@ export function bookRoute(index: BookIndex, hash: string): BookRoute {
 
 export const bookKey = (id: string) => 'gbook.' + id
 export const readBook = (notes: Record<string, string>, id: string): GrammarRecord => readMarks(notes, bookKey(id))
-export const saveBookDrill = (notes: Record<string, string>, id: string, index: number, right: boolean, day: string) => saveMark(notes, bookKey(id), index, right, day)
-/** Practised: every one of its three drills answered at least once. */
-export const sectionDone = (notes: Record<string, string>, id: string, drills = 3) => Object.keys(readBook(notes, id).marks).length >= drills
+export const saveBookDrill = (notes: Record<string, string>, id: string, index: number, right: boolean, day: string) => saveMark(notes, bookKey(id), index, right, day, true)
+/** Older records prove correct or corrected work. An old 0 could be either a real answer or a skip. */
+export function sectionDone(notes: Record<string, string>, id: string, drills = 3) {
+  const { marks, answered } = readBook(notes, id)
+  for (let i = 0; i < drills; i++) {
+    if (marks[i] === 1 || marks[i] === 2) continue
+    if (marks[i] !== 0 || !Array.isArray(answered) || !answered.includes(i)) return false
+  }
+  return true
+}

@@ -5,7 +5,7 @@ import type { PageProps } from '../lib/store'
 import { askTutor, ClaudeIncomplete, tutorKey } from '../lib/tutor'
 import { hasDraft, readDraft, savedDraftTexts, writeDraft } from '../lib/drafts'
 import { useTaskContext } from '../lib/taskContext'
-import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteRecord, type WriteStage } from '../lib/writing'
+import { chartKind, chartText, checksFor, bookChapter, bookMissing, countedBest, essayKind, essays, firstUndone, gradePrompt, mixedIeltsScores, nextWritingTask, parseGrade, readWrite, rubricFor, scoredParts, selfChecked, stageChapters, stagesOpen, stageTarget, suggestedStage, taskDone, taskNeighbors, wordCount, writeKey, writeTaskOpen, writingTaskPages, taskOneOutlines, type WriteFeedback, type WriteRecord, type WriteStage } from '../lib/writing'
 import { logSkill, packUnits } from '../lib/bridge'
 import { chapterReady, type BookIndex } from '../lib/grammarBook'
 import { LockLine } from './Locked'
@@ -36,10 +36,12 @@ function Graded({ fb, short }: { fb: WriteFeedback; short?: { words: number; min
   const ielts = r.id.startsWith('ielts')
   const got = scores.reduce((a, s) => a + s.score, 0), full = r.max * scores.length
   const ok = passes(r, scores.length ? got / scores.length : 0)
+  const total = ielts ? (fb.band === undefined ? null : 'IELTS 練習估計 ' + fb.band)
+    : r.id === 'gept-sentence' ? got + ' / ' + full + ' 分' : got + ' / 5 級分'
   return <>
-    <div className="wl-fb-head"><strong>Claude 批改</strong><span className="wl-band">{ielts ? 'IELTS 練習估計 ' + fb.band : r.id === 'gept-sentence' ? got + ' / ' + full + ' 分' : got + ' / 5 級分'}</span></div>
-    <p className="wl-pass" data-ok={ok && !short}>照「{r.title}」官方評分表給分{r.pass ? (ok ? (short ? '：分數有到練習目標（' + r.pass.note + '）' : '：✓ 達到這裡的練習目標（' + r.pass.note + '）') : '：還沒到這裡的練習目標（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>
-    {short && <p className="wl-pass" data-ok={false}>這一版只有 {short.words} 字，題目要至少 {short.min} 字：分數照常給你看，但這次不算過關。</p>}
+    <div className="wl-fb-head"><strong>Claude 批改</strong>{total !== null && <span className="wl-band">{total}</span>}</div>
+    {total !== null && <p className="wl-pass" data-ok={ok && !short}>照「{r.title}」官方評分表給分{r.pass ? (ok ? (short ? '：分數有到練習目標（' + r.pass.note + '）' : '：✓ 達到這裡的練習目標（' + r.pass.note + '）') : '：還沒到這裡的練習目標（' + r.pass.note + '）') : '：四項平均，照雅思的方式進位'}</p>}
+    {short && <p className="wl-pass" data-ok={false}>這一版只有 {short.words} 字，題目要至少 {short.min} 字。{total !== null ? '分數照常給你看，但這次不算過關。' : '可以補足字數再送批。'}</p>}
     {fb.summary && <p>{fb.summary}</p>}
     <ul className="wl-scores">{scores.map((s, i) => <li key={s.name}>
       <span className="wl-score" data-level={levelOf(s.score, r.max)}>{s.score}{ielts ? '' : ' / ' + r.max}</span>
@@ -165,10 +167,20 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
   const checks = checksFor(stage, task)
   // Without Claude he ticks the stage's requirements himself (or each required sentence / IELTS criterion).
   const selfList = checks.length ? checks : parts
-  useTaskContext(openStage[stage.id] ? { label: '寫作 ' + stage.name + '：' + task.zh, detail: '寫作題：' + task.prompt + '（' + task.zh + '）\n評分表：' + rubric.title + '（官方）' + (checks.length ? '\n這一階的要求：' + checks.join('；') : '') + '\n幫他想內容、結構或句型，不要替他寫整段。', draft: text } : null)
+  const prompt = task.prompt + (task.chart ? '\n圖表資料：' + chartText(task.chart) : '')
+  useTaskContext(openStage[stage.id] ? {
+    label: '寫作 ' + stage.name + '：' + task.zh,
+    detail: [
+      '寫作題：' + prompt,
+      '中文要求：' + task.zh,
+      '評分表：' + rubric.title + '（官方）',
+      ...(checks.length ? ['這一階的要求：' + checks.join('；')] : []),
+      '幫他想內容、結構或句型，不要替他寫整段。',
+    ].join('\n'),
+    draft: text,
+  } : null)
   const kind = stage.id === 'task2' ? essayKind(task.prompt) : null
   const outline = kind ? essays[kind].outline : stage.id === 'task1' ? taskOneOutlines[chartKind(task.chart) ?? 'trend'] : outlines[stage.id]
-  const prompt = task.prompt + (task.chart ? '\n圖表資料：' + chartText(task.chart) : '')
   const sentencePoints = rubric.id === 'gept-sentence' ? rubric.max * parts.length : 0
 
   async function save(patch: Partial<WriteRecord>, id = task.id, count = words, day = date) {
@@ -391,6 +403,7 @@ function Ladder({ state, onActivity, date, initialTask, stages, index }: LadderP
         <ul className="wl-crit">{fb.criteria.map(c => <li key={c.name}><span className="wl-score" data-level={stage.ielts ? (c.score >= 6.5 ? 'hi' : c.score >= 5.5 ? 'mid' : 'lo') : (c.score >= 4 ? 'hi' : c.score >= 3 ? 'mid' : 'lo')}>{stage.ielts ? c.score : c.score >= 4 ? '做到' : '要改'}</span>
           <div><b>{c.name}</b><small>{c.comment}</small></div></li>)}</ul>
       </>}
+      {stage.ielts && mixedIeltsScores(fb) && <p className="wl-pass" data-ok={false}>這次批改同時給了 0 分和其他分數。各項評語已保留，本次評分不計入過關。可以重新批改確認。</p>}
       {fb.next && <p className="wl-next"><b>下一版只改這件事：</b>{fb.next}</p>}
       {fb.fixes.length > 0 && <details><summary>文法和用字（{fb.fixes.length}）</summary><ul className="tu-fixes">{fb.fixes.map((f, i) => <li key={i}><span lang="en"><s>{f.wrong || '（漏寫）'}</s> → <b>{f.right}</b></span><small>{f.why}</small></li>)}</ul></details>}
       {fb.revised && <button type="button" className="pr-link" onClick={() => setShowRevised(!showRevised)}>{showRevised ? '收起修改版' : '看修改後的全文（先自己改過再看）'}</button>}

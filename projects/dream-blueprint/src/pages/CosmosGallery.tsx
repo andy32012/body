@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, ChevronDown, Expand, LoaderCircle, Pin, RotateCw, WifiOff, X } from 'lucide-react'
 import { useSceneFeature } from '../components/ScenePhoto'
 import { readBackgroundPin, setBackgroundPin } from '../lib/backgroundPin'
@@ -236,10 +236,10 @@ export default function CosmosGallery(props:GalleryProps) {
   const feature = useSceneFeature()
   const [category,setCategory] = useState('')
   const [selected,setSelected] = useState<AstroPhoto | undefined>(() => photos.find(photo => photo.id === props.initialPhotoId))
-  useEffect(() => {
-    if (!props.initialPhotoId) return
+  useLayoutEffect(() => {
     const requested = photos.find(photo => photo.id === props.initialPhotoId)
-    if (requested) {setCategory('');setSelected(requested)}
+    if (requested) setCategory('')
+    setSelected(requested)
   }, [props.initialPhotoId])
   const collection = feature ? [feature, ...photos.filter(photo => photo.id !== feature.id)] : photos
   const group = category ? photos.filter(photo => photo.category === category) : collection

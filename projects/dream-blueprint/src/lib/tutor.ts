@@ -24,7 +24,12 @@ function write(name: string, value: string) {
   } catch { return false }
 }
 export const tutorKey = () => read(KEY)
-export const setTutorKey = (value: string) => write(KEY, value.trim())
+export const tutorKeyChange = 'dream-blueprint:claude-key-changed'
+export const setTutorKey = (value: string) => {
+  const saved = write(KEY, value.trim())
+  if (saved) globalThis.window?.dispatchEvent(new Event(tutorKeyChange))
+  return saved
+}
 export const tutorModel = () => read(MODEL) || tutorModels[0].id
 export const setTutorModel = (value: string) => write(MODEL, value)
 export const isTutorCredentialStorageKey = (key: string | null) => key === null || key === KEY || key === MODEL

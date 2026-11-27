@@ -32,6 +32,16 @@ function settle() {
 }
 
 export function currentTask() { return current }
+/** A queued question can mark help only on the exercise whose button opened it. */
+export function captureTaskHelp() {
+  const id = owner
+  const task = current
+  if (!id || !task?.onHelp) return undefined
+  return () => {
+    const latest = open.get(id)?.ctx
+    if (latest?.label === task.label && latest.detail === task.detail) latest.onHelp?.()
+  }
+}
 export function useCurrentTask() {
   return useSyncExternalStore(f => { subs.add(f); return () => { subs.delete(f) } }, () => current, () => null)
 }

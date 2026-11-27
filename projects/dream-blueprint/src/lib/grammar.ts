@@ -50,7 +50,7 @@ export function drillAnswer(d: Drill) {
 
 /** 1 = right the first time, 0 = wrong the first time and not yet fixed, 2 = wrong at first, right on a later try. */
 export type DrillMark = 0 | 1 | 2
-export interface GrammarRecord { marks: Record<string, DrillMark>; day?: string }
+export interface GrammarRecord { marks: Record<string, DrillMark>; day?: string; answered?: number[] }
 export const grammarKey = (unit: number) => 'gram.' + unit
 /** The drill marks kept under a note key (gram.<unit> for a course unit, gbook.<section> for the grammar book). */
 export function readMarks(notes: Record<string, string>, key: string): GrammarRecord {
@@ -60,12 +60,14 @@ export function readMarks(notes: Record<string, string>, key: string): GrammarRe
   } catch { return { marks: {} } }
 }
 /** The first try is what counts; a later right answer only turns a miss into "fixed later". */
-export function saveMark(notes: Record<string, string>, key: string, index: number, right: boolean, day: string) {
+export function saveMark(notes: Record<string, string>, key: string, index: number, right: boolean, day: string, trackAnswer = false) {
   const rec = readMarks(notes, key)
   const old = rec.marks[index]
   const next: DrillMark = old === undefined ? (right ? 1 : 0) : old === 0 && right ? 2 : old
-  if (next === old) return notes
-  return { ...notes, [key]: JSON.stringify({ marks: { ...rec.marks, [index]: next }, day }) }
+  const hasAnswer = Array.isArray(rec.answered) && rec.answered.includes(index)
+  if (next === old && (!trackAnswer || hasAnswer)) return notes
+  const answered = trackAnswer && !hasAnswer ? [...(Array.isArray(rec.answered) ? rec.answered : []), index] : rec.answered
+  return { ...notes, [key]: JSON.stringify({ marks: { ...rec.marks, [index]: next }, day, answered }) }
 }
 export const readGrammar = (notes: Record<string, string>, unit: number) => readMarks(notes, grammarKey(unit))
 export const saveDrill = (notes: Record<string, string>, unit: number, index: number, right: boolean, day: string) => saveMark(notes, grammarKey(unit), index, right, day)

@@ -8,13 +8,15 @@ import { logSkill } from '../lib/bridge'
 import { chunkClips, hasQuiz, nextPron, PASS, pronLessons, pronOpen, pronPassed, pronProgress, quizFor, readPron, readVoice, savePron, stressParts, voiceKey, voiceNames,
   type PronItem, type PronLesson, type PronQuestion, type PronVoice, type VoiceChoice } from '../lib/pronunciation'
 import { offlinePacks, usePronPlayer, type PackProgress, type Take } from '../lib/pronAudio'
+import { AudioActivityContext, useAudioActivity } from '../lib/audioActivity'
+import { stopSpeaking } from '../lib/tts'
 import { LockLine } from './Locked'
 import './pron.css'
 
 type Props = Pick<PageProps, 'state'> & { onActivity: PageProps['update']; date: string
   /** Saves a setting without counting the day as practice (choosing a voice is not practising). */
   update?: PageProps['update'] }
-type Player = ReturnType<typeof usePronPlayer>
+type Player = ReturnType<typeof usePronPlayer> & { blocked: boolean }
 /** Size of all the sound packs together (pack.py prints it). */
 const PACKS_MB = 10.5
 const number = (l: PronLesson) => pronLessons.indexOf(l) + 1
@@ -154,7 +156,15 @@ function SaveAll() {
 }
 
 function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Props & { lesson: PronLesson; onBack: () => void; onOpen: (id: string) => void }) {
-  const player = usePronPlayer(lesson.id)
+  const audio = useAudioActivity()
+  const player: Player = { ...usePronPlayer(lesson.id, () => !audio.isBusy()), blocked: audio.busy }
+  function beginRecording(signal: AbortSignal) {
+    const release = audio.acquire(signal)
+    if (!release) return
+    player.stop()
+    stopSpeaking()
+    return release
+  }
   const choice = readVoice(state.notes)
   const [slow, setSlow] = useState(false)
   const rate = slow ? 0.7 : 1
@@ -189,7 +199,8 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       </div>
     </div>
     <p className="pn-status" role="status">
-      {player.playbackFailed ? '這次發音沒有播完。請再按播放重試，也可以換另一個聲音。'
+      {audio.busy ? '目前正在使用音訊。完成後就能播放發音示範。'
+        : player.playbackFailed ? '這次發音沒有播完。請再按播放重試，也可以換另一個聲音。'
         : player.loading ? '正在準備發音…'
         : player.missing.length ? '錄好的' + player.missing.map(v => voiceNames[v]).join('、') + '現在下載不到，先用這台裝置的語音念（連上網路再打開這一堂就有）。'
         : player.deviceVoice ? '剛才那一下用的是這台裝置的語音；現在錄好的發音準備好了。'
@@ -207,9 +218,9 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       <small className="pn-hint">{lesson.kind === 'chunks' ? '點一小段聽那一段；點整個字聽正常速度。每個都跟著念出聲。' : '點一個字聽一次，跟著念出聲。'}{lesson.pairs ? '「比一比」會把兩個連著念，聽它們差在哪。' : ''}</small>
       {lesson.pairs && <ul className="pn-pairs">
         {lesson.pairs.map(([a, b]) => <li key={a + b} data-long={a.includes(' ') || undefined}>
-          <Word text={a} on={speaking(a)} onSay={() => say([a])} />
-          <Word text={b} on={speaking(b)} onSay={() => say([b])} />
-          <button type="button" className="pn-both" aria-label={'比一比：' + a + '、' + b} onClick={() => say([a, b])}>比一比</button>
+          <Word text={a} on={speaking(a)} disabled={audio.busy} onSay={() => say([a])} />
+          <Word text={b} on={speaking(b)} disabled={audio.busy} onSay={() => say([b])} />
+          <button type="button" className="pn-both" aria-label={'比一比：' + a + '、' + b} disabled={audio.busy} onClick={() => say([a, b])}>比一比</button>
         </li>)}
       </ul>}
       {lesson.kind === 'chunks' && lesson.items && <ul className="pn-chunk-list">
@@ -218,7 +229,7 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
       {lesson.kind !== 'chunks' && lesson.items && <ul className="pn-items" data-kind={lesson.kind}>
         {lesson.items.map(item => <li key={item.label + item.text}>
           <span className="pn-label" lang="en">{lesson.kind === 'stress' ? <Stress label={item.label} /> : item.label}</span>
-          <Word text={item.text} on={speaking(item.text)} onSay={() => say([item.text])} />
+          <Word text={item.text} on={speaking(item.text)} disabled={audio.busy} onSay={() => say([item.text])} />
           <small>{item.note}</small>
         </li>)}
       </ul>}
@@ -235,15 +246,18 @@ function Lesson({ lesson, state, onActivity, update, date, onBack, onOpen }: Pro
 
     {lesson.sentences && <section className="pn-sec" aria-label="跟著念句子">
       <h4><i aria-hidden="true">{hasQuiz(lesson) ? 4 : 3}</i>放進句子裡，跟著念</h4>
-      <Shadow lesson={lesson} speaking={speaking} onSay={t => say([t])} saidOn={rec.s} today={date} onDone={() => finish({ s: date }, true)} />
+      <AudioActivityContext.Provider value={audio}>
+        <Shadow lesson={lesson} speaking={speaking} onSay={t => say([t])} saidOn={rec.s} today={date} onDone={() => finish({ s: date }, true)}
+          audioBusy={audio.busy} beginRecording={beginRecording} />
+      </AudioActivityContext.Provider>
     </section>}
 
     {passed && following && <button type="button" className="pr-main pn-next" onClick={() => onOpen(following.id)}>下一堂：{following.title}</button>}
   </>
 }
 
-function Word({ text, on, onSay }: { text: string; on: boolean; onSay: () => void }) {
-  return <button type="button" className="pn-word" lang="en" data-on={on} aria-label={'聽：' + text} onClick={onSay}><Volume2 size={14} aria-hidden="true" /><span>{text}</span></button>
+function Word({ text, on, onSay, disabled }: { text: string; on: boolean; onSay: () => void; disabled: boolean }) {
+  return <button type="button" className="pn-word" lang="en" data-on={on} aria-label={'聽：' + text} disabled={disabled} onClick={onSay}><Volume2 size={14} aria-hidden="true" /><span>{text}</span></button>
 }
 /** A long word cut into syllables. Every piece can be heard on its own; two buttons walk through the word:
  *  piece by piece and then together, or growing by one piece at a time. All of it comes from one slow recording. */
@@ -259,19 +273,19 @@ function Chunks({ item, player, choice, rate }: { item: PronItem; player: Player
   const lit = (i: number) => now === clips.pieces[i] || now === clips.slow || now === item.text || clips.grown.some((g, j) => now === g && i <= j + 1)
   return <li className="pn-chunk-card">
     <div className="pn-chunk-top">
-      <Word text={item.text} on={now === item.text} onSay={() => player.play(whole, rate)} />
+      <Word text={item.text} on={now === item.text} disabled={player.blocked} onSay={() => player.play(whole, rate)} />
       <small>{item.note}</small>
     </div>
     <div className="pn-chunks" role="group" aria-label={item.text + ' 的每一段'}>
-      {parts.map((p, i) => <button key={i} type="button" className="pn-chunk" lang="en" disabled={!voice} data-stress={i === stressed} data-on={lit(i)}
+      {parts.map((p, i) => <button key={i} type="button" className="pn-chunk" lang="en" disabled={!voice || player.blocked} data-stress={i === stressed} data-on={lit(i)}
         aria-label={'聽第 ' + (i + 1) + ' 段：' + p + (i === stressed ? '（重音）' : '')} onClick={() => player.play(one(clips.pieces[i]), rate)}>
         <b>{i === stressed ? p.toUpperCase() : p}</b><small>[{item.kk?.[i]}]</small>
       </button>)}
     </div>
     {voice ? <div className="pn-chunk-actions">
-      <button type="button" onClick={() => player.play([...clips.pieces.flatMap(one), ...one(clips.slow), ...whole], rate)}>一段一段念，再合起來</button>
-      <button type="button" onClick={() => player.play([...one(clips.pieces[0]), ...clips.grown.flatMap(one), ...one(clips.slow), ...whole], rate)}>慢慢加長</button>
-      <button type="button" onClick={() => player.play(one(clips.slow), rate)}>慢速</button>
+      <button type="button" disabled={player.blocked} onClick={() => player.play([...clips.pieces.flatMap(one), ...one(clips.slow), ...whole], rate)}>一段一段念，再合起來</button>
+      <button type="button" disabled={player.blocked} onClick={() => player.play([...one(clips.pieces[0]), ...clips.grown.flatMap(one), ...one(clips.slow), ...whole], rate)}>慢慢加長</button>
+      <button type="button" disabled={player.blocked} onClick={() => player.play(one(clips.slow), rate)}>慢速</button>
     </div> : !player.loading && <small className="pn-hint">小段的聲音要連上網路下載；現在只能聽整個字。</small>}
   </li>
 }
@@ -345,7 +359,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
     <small className="pn-count">第 {at + 1} / {questions.length} 題</small>
     <p className="gm-ask">{q.prompt}</p>
     {q.show && <p className="pn-show" lang="en">{q.show}</p>}
-    <button type="button" className="ls-play" onClick={() => hear(q, voice)}><Volume2 size={16} />{noSound ? '重試播放' : plays ? '再聽一次' : '播放'}</button>
+    <button type="button" className="ls-play" disabled={player.blocked} onClick={() => hear(q, voice)}><Volume2 size={16} />{noSound ? '重試播放' : plays ? '再聽一次' : '播放'}</button>
     <div className="pr-options gm-options pn-options" data-count={q.options.length}>
       {q.options.map((o, i) => <button key={i + o} type="button" lang="en" disabled={answered || heardQ !== at}
         className={!answered ? undefined : i === q.answer ? 'gm-right' : i === picked ? 'gm-miss' : undefined} onClick={() => choose(i)}>{o}</button>)}
@@ -358,7 +372,7 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
       {q.why && <small>{q.why}</small>}
       {picked !== q.answer && <AskWhy label="問 Claude 這兩個音怎麼分" q={{ source: '發音課聽辨（電腦語音念的，他用聽的選）', stem: q.prompt + (q.show ? '：' + q.show : ''), options: q.options, picked: picked === null ? '' : q.options[picked], answer: q.options[q.answer], right: false }} />}
       {q.compare && <div className="pn-compare"><small>再比一次：</small>
-        {q.compare.map(t => <Word key={t} text={t} on={player.now?.text === t} onSay={() => player.play([{ text: t, voice }], rate)} />)}
+        {q.compare.map(t => <Word key={t} text={t} on={player.now?.text === t} disabled={player.blocked} onSay={() => player.play([{ text: t, voice }], rate)} />)}
       </div>}
     </div>}
     {answered && <button type="button" className="pr-main gm-next" onClick={next}>{at + 1 < questions.length ? '下一題' : '看結果'}</button>}
@@ -366,8 +380,11 @@ function Quiz({ lesson, player, choice, rate, best, onDone }: { lesson: PronLess
 }
 
 /** The lesson's sentences: listen, say each one aloud (recording yourself is optional), tick it. All ticked = a speaking day. */
-function Shadow({ lesson, speaking, onSay, saidOn, today, onDone }: { lesson: PronLesson; speaking: (t: string) => boolean; onSay: (t: string) => void
-  saidOn?: string; today: string; onDone: () => void }) {
+function Shadow({ lesson, speaking, onSay, saidOn, today, onDone, audioBusy, beginRecording }: {
+  lesson: PronLesson; speaking: (t: string) => boolean; onSay: (t: string) => void
+  saidOn?: string; today: string; onDone: () => void; audioBusy: boolean
+  beginRecording: (signal: AbortSignal) => (() => void) | undefined
+}) {
   const list = lesson.sentences ?? []
   const [said, setSaid] = useState<boolean[]>(() => list.map(() => false))
   const [finished, setFinished] = useState(false)
@@ -380,8 +397,8 @@ function Shadow({ lesson, speaking, onSay, saidOn, today, onDone }: { lesson: Pr
     <small className="pn-hint">先聽，再自己念出聲，念過就打勾。可以錄下來跟示範比一比（錄音只留在這個畫面），或按「念念看，幫我比對」看哪些字語音辨識沒聽出來。</small>
     <ol className="pn-lines">
       {list.map((s, i) => <li key={s.en} data-on={speaking(s.en)}>
-        <button type="button" className="st-say" aria-label={'聽這一句：' + s.en} onClick={() => onSay(s.en)}><Volume2 size={14} /></button>
-        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder /><ReadAloudCheck text={s.en} compact maxMs={20000} /></div>
+        <button type="button" className="st-say" aria-label={'聽這一句：' + s.en} disabled={audioBusy} onClick={() => onSay(s.en)}><Volume2 size={14} /></button>
+        <div><p lang="en">{s.en}</p><small>{s.zh}</small><Recorder audioBusy={audioBusy} beginRecording={beginRecording} /><ReadAloudCheck text={s.en} compact maxMs={20000} /></div>
         <button type="button" className="pn-tick" aria-pressed={said[i]} aria-label={(said[i] ? '取消：' : '我念過了：') + s.en} onClick={() => tick(i)}>
           {said[i] ? <Check size={14} strokeWidth={3} /> : '念了'}</button>
       </li>)}
@@ -392,45 +409,64 @@ function Shadow({ lesson, speaking, onSay, saidOn, today, onDone }: { lesson: Pr
 }
 
 /** Optional: record yourself and listen back. The clip stays on this screen. */
-function Recorder() {
+function Recorder({ audioBusy, beginRecording }: {
+  audioBusy: boolean; beginRecording: (signal: AbortSignal) => (() => void) | undefined
+}) {
   const [recording, setRecording] = useState(false)
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const recorder = useRef<MediaRecorder | null>(null)
-  // Left this screen while the browser was still asking for the microphone: the late permission records nothing.
-  const alive = useRef(true)
-  const asking = useRef(false)
-  useEffect(() => { alive.current = true; return () => { alive.current = false; if (recorder.current?.state === 'recording') recorder.current.stop() } }, [])
+  const request = useRef<AbortController | null>(null)
+  const microphone = useRef<MediaStream | null>(null)
+  useEffect(() => () => {
+    request.current?.abort()
+    request.current = null
+    if (recorder.current?.state === 'recording') recorder.current.stop()
+    microphone.current?.getTracks().forEach(t => t.stop())
+  }, [])
   useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
   const supported = useMemo(() => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== 'undefined', [])
   if (!supported) return null
   async function toggle() {
-    if (recording) { recorder.current?.stop(); return }
-    if (asking.current) return
-    asking.current = true
+    if (recorder.current?.state === 'recording') { recorder.current.stop(); return }
+    if (request.current) return
+    const controller = new AbortController()
+    const release = beginRecording(controller.signal)
+    if (!release) return
+    request.current = controller
+    function finish() {
+      if (request.current !== controller) return false
+      microphone.current?.getTracks().forEach(t => t.stop())
+      microphone.current = null
+      request.current = null
+      recorder.current = null
+      release?.()
+      setRecording(false)
+      return true
+    }
+    const failed = () => {
+      if (finish()) setError('錄音開不起來或意外中斷。請確認麥克風，再錄一次。')
+    }
     setError('')
-    let stream: MediaStream | null = null
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      if (!alive.current) { stream.getTracks().forEach(t => t.stop()); return }
-      const got = stream
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Permission can come back after the lesson closed.
+      if (controller.signal.aborted) { stream.getTracks().forEach(t => t.stop()); return }
+      microphone.current = stream
       const chunks: Blob[] = []
-      const r = new MediaRecorder(got)
+      const r = new MediaRecorder(stream)
       r.ondataavailable = e => chunks.push(e.data)
+      r.onerror = failed
       r.onstop = () => {
-        got.getTracks().forEach(t => t.stop())
-        if (!alive.current) return
-        setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType }))); setRecording(false)
+        if (finish()) setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType })))
       }
       recorder.current = r; r.start(); setRecording(true)
     } catch {
-      // The microphone opened but the recording could not start: close it again.
-      stream?.getTracks().forEach(t => t.stop())
-      if (alive.current) setError('錄音開不起來（麥克風被擋住或這個瀏覽器不能錄），直接念出來就好。')
-    } finally { asking.current = false }
+      failed()
+    }
   }
   return <div className="pn-rec">
-    <button type="button" className="pr-link" onClick={toggle}>{recording ? <><Square size={13} />停止錄音</> : <><Mic size={13} />{url ? '重錄' : '錄自己的聲音'}</>}</button>
+    <button type="button" className="pr-link" disabled={audioBusy && !recording} onClick={toggle}>{recording ? <><Square size={13} />停止錄音</> : <><Mic size={13} />{url ? '重錄' : '錄自己的聲音'}</>}</button>
     {url && <audio controls src={url} />}
     {error && <small role="alert">{error}</small>}
   </div>

@@ -32,7 +32,10 @@ def phonemes(c):
 def speak(ph, voice, speed):
     x, sr = tts.create(ph, voice=voice, speed=speed, lang='en-us', is_phonemes=True)
     # 16-bit steps, as the take will be saved: what is graded is exactly what is packed
-    return (np.round(shape(x, sr) * 32767) / 32767).astype(np.float32), sr
+    x = (np.round(shape(x, sr) * 32767) / 32767).astype(np.float32)
+    if not np.any(x):
+        raise SilentTake('silent waveform after 16-bit conversion')
+    return x, sr
 
 # ── words that differ by one sound
 CMU = cmudict.dict()
@@ -91,21 +94,34 @@ def transcribe(audio):
     segs, _ = asr.transcribe(audio, language='en', beam_size=5, condition_on_previous_text=False)
     return ' '.join(s.text.strip() for s in segs).strip()
 
+class SilentTake(ValueError):
+    """The synthesiser returned no usable waveform for this candidate."""
+
+
 def shape(x, sr):
     """Trim silence, leave a short lead and tail, bring every clip to the same loudness."""
     x = x.astype(np.float32)
-    win = int(sr * 0.01)
+    if x.ndim != 1 or not x.size or sr <= 0 or not np.isfinite(x).all():
+        raise SilentTake('empty or invalid waveform')
+    win = min(len(x), max(1, int(sr * 0.01)))
     env = np.sqrt(np.convolve(x * x, np.ones(win) / win, mode='same'))
     loud = np.where(env > 0.006 * env.max())[0]      # low enough to keep a quiet f or th at the start and a released t at the end
-    a, b = max(0, loud[0] - int(sr * 0.06)), min(len(x), loud[-1] + int(sr * 0.2))
+    if not loud.size:
+        raise SilentTake('silent waveform')
+    a = max(0, loud[0] - int(sr * 0.06))
+    b = min(len(x), loud[-1] + max(1, int(sr * 0.2)))
     x = x[a:b].copy()
     voiced = env[a:b] > 0.1 * env.max()
     rms = np.sqrt(np.mean(x[voiced] ** 2)) if voiced.any() else np.sqrt(np.mean(x ** 2))
     x *= 0.1 / max(rms, 1e-6)
     peak = np.abs(x).max()
     if peak > 0.94: x *= 0.94 / peak
-    fade = int(sr * 0.012)
-    x[:fade] *= np.linspace(0, 1, fade); x[-fade:] *= np.linspace(1, 0, fade)
+    fade = min(len(x) // 2, int(sr * 0.012))
+    if fade:
+        x[:fade] *= np.linspace(0, 1, fade)
+        x[-fade:] *= np.linspace(1, 0, fade)
+    if not np.any(x):
+        raise SilentTake('silent waveform after fades')
     return x
 
 # ── grading a take

@@ -173,8 +173,7 @@ export function readBackup(raw:string):{state:AppState; exportedAt?:number} {
   applyContentUpdates(state)
   // The 2026-11 midterms actually ended on 11/19; the old default ran to 11/23.
   for (const r of state.settings.periods) if (r.type==='exam'&&r.start==='2026-11-13'&&r.end==='2026-11-23') r.end='2026-11-19'
-  // Old details leave this device so the saved progress stays well under the browser's ~5 MB (compact.ts). With Google
-  // Drive connected they wait here until they are safely in the Drive archive.
+  // While Drive is connected, only the confirmed archive operation can remove old details.
   return {state:compactState(state,dayKey(),undefined,driveConnected()),
     exportedAt:Number.isFinite(exportedAt) ? exportedAt : undefined}
 }
@@ -351,6 +350,14 @@ export function readStoreForCloud() {
     const snapshot = currentSnapshot()
     const scope = cloudScope()
     return {state:snapshot.state,modified,base:currentCloudBase(scope),scope,persisted:!dirty && !unreadable && !snapshot.storageError}
+  })
+}
+/** An unsaved edit may fill browser storage. Allow archiving it if our version of the underlying save is still current. */
+export function readStoreForArchive() {
+  return withStoreLock(()=>{
+    const {state,storageError} = currentSnapshot()
+    if (unreadable || (!dirty && storageError) || !matchesStored(loaded,readStored())) return null
+    return {state,storageFull:dirty}
   })
 }
 /** Acknowledging the server version must not change which browser snapshot counts as saved. */

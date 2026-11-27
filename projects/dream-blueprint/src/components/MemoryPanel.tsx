@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import { QrCode } from 'lucide-react'
 import { useMemory } from '../lib/memory'
 import {
-  appsScriptCode, appsScriptVersion, archiveFolderUrl, cloudArchive, cloudConflict, cloudScope, cloudScriptVersion, cloudStatus,
+  appsScriptCode, appsScriptVersion, archiveConnectionProblem, archiveFolderUrl, cloudArchive, cloudConflict, cloudScope, cloudScriptVersion, cloudStatus,
   connectDrive, disconnectDrive, driveConfig, driveLogsOn, driveReadyEvent, driveStorageChanged, importSyncCode, loadHistory, setDriveLogs, syncCode, syncLink, type HistoryEntry,
 } from '../lib/drive'
 import { keepThisCopy, mergeWithCloud, restoreVersion, settleProgress, stamp, takeCloudCopy } from '../lib/cloudSync'
@@ -72,6 +72,7 @@ export default function MemoryPanel() {
   const [conflict, setConflict] = useState(cloudConflict())
   const [logs, setLogs] = useState(driveLogsOn())
   const [busy, setBusy] = useState(false)
+  const archiveProblem = archiveConnectionProblem()
   useEffect(() => {
     const on = () => { setConflict(cloudConflict()); setDrive(driveConfig()) }
     const storage = (e: StorageEvent) => { if (driveStorageChanged(e)) on() }
@@ -138,6 +139,10 @@ export default function MemoryPanel() {
         </div>
       </div>}
       {(() => { const c = cloudStatus(); return c ? <p className={c.ok ? 'set-ok' : 'set-warn'}>{c.message}（{stamp(c.at)}）</p> : <p>學習進度還沒同步過。</p> })()}
+      {archiveProblem && <div className="set-warn" role="status">
+        <p>{archiveProblem} 舊紀錄仍保留在這台。</p>
+        <button type="button" disabled={busy} onClick={() => void connect()}>重新確認雲端連線</button>
+      </div>}
       {drive.sheet && <p><a href={drive.sheet} target="_blank" rel="noreferrer">打開雲端硬碟裡的試算表</a></p>}
       <label className="set-check"><input type="checkbox" checked={logs} onChange={e => { setDriveLogs(e.target.checked); setLogs(e.target.checked) }} />
         這台裝置也把對話逐字稿（問問 Claude、英文口說）存進試算表的「對話紀錄」（預設關）</label>
@@ -150,7 +155,7 @@ export default function MemoryPanel() {
       <textarea readOnly rows={2} value={syncCode()} aria-label="同步碼" onFocus={e => e.target.select()} />
       <CloudHistory key={cloudScope(drive)} onStatus={setStatus} />
       <details className="set-details">
-        <summary>{cloudScriptVersion() >= appsScriptVersion ? `雲端小程式 v${appsScriptVersion}` : `更新雲端小程式到 v${appsScriptVersion}（對話純文字與歷史快照保護）`}</summary>
+        <summary>{cloudScriptVersion() >= appsScriptVersion ? `雲端小程式 v${appsScriptVersion}` : `更新雲端小程式到 v${appsScriptVersion}（同步、對話與封存）`}</summary>
         <ol>
           <li>打開 script.google.com 裡原本的「夢想藍圖」專案，把程式碼全部換成下面這段，按儲存。</li>
           <li>如果舊專案尚未設定同步密鑰，在函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。已設定過的專案可直接更新部署。</li>
@@ -167,7 +172,9 @@ export default function MemoryPanel() {
       <label className="set-field">已經在別台裝置連過？貼上同步碼<input value={code} onChange={e => setCode(e.target.value)} placeholder="同步碼" /></label>
       <div className="set-actions"><button type="button" disabled={busy || !code.trim()} onClick={() => void connect(() => importSyncCode(code))}>用同步碼連接</button></div>
       <details className="set-details">
-        <summary>還沒有雲端小程式？</summary>
+        <summary>查看雲端小程式 v{appsScriptVersion}（新設定或更新部署）</summary>
+        <p>已有專案時，把下方程式碼貼回原專案。從「部署 → 管理部署作業」編輯原部署，選「新版本」並部署，沿用原網址和同步密鑰。</p>
+        <p>第一次設定：</p>
         <ol>
           <li>到 script.google.com 開一個新專案，把下面的程式碼全部貼上，按儲存。</li>
           <li>上面的函式選單選「setupHistory」，按「執行」，照畫面允許存取雲端硬碟。到執行記錄複製「同步密鑰」並貼到上方。</li>

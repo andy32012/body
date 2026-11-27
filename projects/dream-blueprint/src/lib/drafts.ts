@@ -6,10 +6,10 @@ const revisionPrefix = 'dream-blueprint.draft-version.'
 const revisionKey = (id: string) => revisionPrefix + encodeURIComponent(id) + '/'
 export interface DraftVersion { key: string; text: string }
 const editing = new Map<string, DraftVersion | undefined>()
-const pending = new Map<string, string>()
+const pending = new Map<string, { text: string }>()
 const draftChange = 'dream-draft-change'
 const listeners = new Set<() => void>()
-const hasUnsavedDrafts = () => [...pending.values()].some(text => text.trim().length > 0)
+const hasUnsavedDrafts = () => [...pending.values()].some(draft => !!draft.text.trim())
 function subscribe(listener: () => void) {
   listeners.add(listener)
   return () => { listeners.delete(listener) }
@@ -46,14 +46,15 @@ export function savedDraftTexts(prefix: string) {
       collect(id, localStorage.getItem(key))
     }
   } catch { /* Pending drafts are still available in this tab. */ }
-  for (const [id, text] of pending) if (id.startsWith(prefix)) collect(id, text)
+  for (const [id, draft] of pending) if (id.startsWith(prefix)) collect(id, draft.text)
   return texts
 }
 export function hasDraft(id: string) {
-  return !!pending.get(id)?.trim() || draftVersions(id).some(v => v.text.trim())
+  return !!pending.get(id)?.text.trim() || draftVersions(id).some(v => v.text.trim())
 }
 export function readDraft(id: string) {
-  if (pending.has(id)) return pending.get(id)!
+  const unsaved = pending.get(id)
+  if (unsaved) return unsaved.text
   const versions = draftVersions(id)
   const current = versions.find(v => v.key === editing.get(id)?.key) ?? versions[0]
   editing.set(id, current)
@@ -76,8 +77,11 @@ function replaceDraft(id: string, text: string, replaced: DraftVersion[]) {
     editing.set(id, next)
     pending.delete(id)
   } catch {
-    pending.set(id, text)
+    pending.set(id, { text })
   }
+  announceChange(id, warned)
+}
+function announceChange(id: string, warned: boolean) {
   if (warned !== hasUnsavedDrafts()) listeners.forEach(listener => listener())
   window.dispatchEvent(new CustomEvent(draftChange, { detail: id }))
 }
@@ -86,6 +90,24 @@ export function writeDraft(id: string, text: string) {
   replaceDraft(id, text, base ? [base] : [])
 }
 export const clearDraft = (id: string) => writeDraft(id, '')
+
+/** Bind later cleanup to the draft revision that was submitted, even if the same text is typed again. */
+export function captureDraftCleanup(id: string, text: string) {
+  const version = editing.get(id)
+  const unsaved = pending.get(id)
+  return () => {
+    if ((unsaved?.text ?? version?.text) !== text) return
+    const current = pending.get(id)
+    if (current && current !== unsaved && editing.get(id) === version) return
+    const warned = hasUnsavedDrafts()
+    try {
+      if (version && localStorage.getItem(version.key) === version.text) localStorage.removeItem(version.key)
+    } catch { /* Leave the saved draft available if cleanup fails. */ }
+    if (editing.get(id) === version) editing.delete(id)
+    if (current === unsaved) pending.delete(id)
+    announceChange(id, warned)
+  }
+}
 
 /** Only retire the alternatives actually shown to the learner. A later edit keeps its own revision. */
 export function chooseDraft(id: string, text: string, displayed: DraftVersion[]) {
@@ -103,7 +125,7 @@ export function watchDraft(id: string, refresh: () => void) {
 }
 
 export function downloadUnsavedDrafts() {
-  const drafts = [...pending.entries()].filter(([, text]) => text.trim()).map(([id, text]) => id + '\n' + text)
+  const drafts = [...pending.entries()].filter(([, draft]) => draft.text.trim()).map(([id, draft]) => id + '\n' + draft.text)
   if (!drafts.length) return
   const file = new Blob([drafts.join('\n\n')], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(file)

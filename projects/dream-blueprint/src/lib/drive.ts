@@ -6,7 +6,9 @@
 import { memoryTimes, type MemoryRecords } from './memory'
 
 const KEY = 'dream-blueprint.drive'
+const deployUrl = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/
 type Drive = { url: string; token: string; sheet?: string; generation?: string; settled?: boolean }
+export class CloudConnectionError extends Error {}
 
 function read(): Drive | null {
   try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && v.url && v.token ? v : null } catch { return null }
@@ -61,7 +63,7 @@ function rememberCapabilities(json: { url?: string; cas?: boolean; archive?: boo
   if (!current || !sameConnection(d)) return
   if (json.url && json.url !== current.sheet) write({ ...current, sheet: json.url })
   if (json.cas) markCas()
-  if (json.archive) markArchive(typeof json.folder === 'string' ? json.folder : '')
+  rememberArchive(d, json.archive === true, json.folder)
   if (json.atomic) markAtomic()
   try {
     const guarded = localStorage.getItem(GUARDED) === '1'
@@ -80,32 +82,39 @@ function rememberCapabilities(json: { url?: string; cas?: boolean; archive?: boo
 
 async function post(body: object, d = read()) {
   if (!d) return null
-  const res = await fetch(d.url, { method: 'POST', body: JSON.stringify({ ...body, token: d.token }) })
-  const json = await res.json()
+  if (!deployUrl.test(d.url)) throw new CloudConnectionError('請到設定填入 Apps Script 部署的網頁應用程式網址。')
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 45000)
+  const json = await fetch(d.url, { method: 'POST', body: JSON.stringify({ ...body, token: d.token }), signal: controller.signal })
+    .then(res => {
+      if ([401, 403, 404, 410].includes(res.status)) {
+        throw new CloudConnectionError('無法存取這個雲端部署。請確認部署網址，以及「誰可以存取」是否選為「所有人」。')
+      }
+      return res.json()
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) throw new Error('雲端硬碟等候逾時，請稍後再試。')
+      throw error
+    }).finally(() => clearTimeout(timeout))
   // "stale" is an answer, not a failure: the cloud has a newer snapshot than the one this device started from.
-  if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。'
-    : json.error === 'setup' ? '請先在 Apps Script 執行 setupHistory，再用執行記錄裡的同步密鑰連接。'
-    : json.error === 'write' ? '雲端這次沒有存完整，雲端還是原本那一份'
+  if (!json.ok && json.error === 'token') throw new CloudConnectionError('雲端硬碟拒絕連線：同步碼不對。')
+  if (!json.ok && json.error === 'setup') throw new CloudConnectionError('請先在 Apps Script 執行 setupHistory，再用執行記錄裡的同步密鑰連接。')
+  if (!json.ok && json.error !== 'stale') throw new Error(json.error === 'write' ? '雲端這次沒有存完整，雲端還是原本那一份'
     : json.error === 'history' ? '雲端硬碟沒辦法先留一份備份，這次先不蓋掉雲端那份'
     : '雲端硬碟回傳錯誤')
   await withStoreLock(() => rememberCapabilities(json, d))
   return json
 }
-/** Reads go by POST so the sync token is never in a URL; an older script that only reads by GET still works. */
+/** Earlier scripts without a POST read need to be updated before the browser can sync. */
 async function get(type: 'state' | 'memory', d = read()) {
   if (!d) return null
   const json = await post({ type: type + '-get' }, d)
-  if (json && (type === 'state' ? 'state' in json : Array.isArray(json.notes))) return json
-  const res = await fetch(d.url + (type === 'state' ? '?type=state&' : '?') + 'token=' + encodeURIComponent(d.token))
-  const old = await res.json()
-  if (!old.ok) throw new Error(old.error === 'token' ? '雲端硬碟拒絕連線：同步碼不對。' : '雲端硬碟回傳錯誤')
-  await withStoreLock(() => rememberCapabilities(old, d))
-  return old
+  if (json && (type === 'state' ? json.state === null || typeof json.state === 'string' : Array.isArray(json.notes))) return json
+  throw new CloudConnectionError(`這個早期部署需要更新。請到設定複製雲端小程式 v${appsScriptVersion}，貼回原專案並更新原部署，原網址和密鑰可繼續使用。`)
 }
 
 export async function connectDrive(url: string, token: string) {
   const clean = url.trim()
-  if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(clean)) throw new Error('網址格式不對，要是 https://script.google.com/macros/s/…/exec')
+  if (!deployUrl.test(clean)) throw new Error('網址格式不對，要是 https://script.google.com/macros/s/…/exec')
   const previous = read()
   const key = token.trim()
   const same = previous?.url === clean && previous.token === key
@@ -162,7 +171,15 @@ export function setDriveLogs(on: boolean) { try { on ? localStorage.setItem(LOGS
 export function driveLog(source: string, rows: { role: string; text: string }[]) {
   const clean = rows.filter(r => r.text.trim())
   if (!read() || !clean.length || !driveLogsOn()) return
-  post({ type: 'log', source, rows: clean.map(r => ({ role: r.role === 'user' ? '玄燁' : r.role, text: r.text })) }).catch(() => { /* best effort */ })
+  // Older scripts only save 5,000 UTF-16 units per row. Even before updating, send every part.
+  const parts = clean.flatMap(({ role, text }) => {
+    const name = role === 'user' ? '玄燁' : role
+    if (text.length <= 5000) return [{ role: name, text }]
+    // With the Unicode flag, 2,500 code points fit inside 5,000 UTF-16 units and keep surrogate pairs together.
+    const chunks = text.match(/[\s\S]{1,2500}/gu) ?? []
+    return chunks.map((chunk, i) => ({ role: name + '（' + (i + 1) + '/' + chunks.length + '）', text: chunk }))
+  })
+  post({ type: 'log', source, rows: parts }).catch(() => { /* best effort */ })
 }
 
 const STATUS = 'dream-blueprint.cloud-status'
@@ -185,6 +202,8 @@ const SCRIPT_VERSION = 'dream-blueprint.cloud-script-version'
 export function cloudGuarded() { try { return localStorage.getItem(GUARDED) === '1' } catch { return false } }
 export function cloudScriptVersion() { try { return Number(localStorage.getItem(SCRIPT_VERSION)) || 0 } catch { return 0 } }
 function resetCloudTracking() {
+  archiveCapability = null
+  archiveFailure = null
   try {
     for (const key of [BASE, CONFLICT, CAS, HISTORY, ARCHIVE, ATOMIC, GUARDED, SCRIPT_VERSION, STATUS]) localStorage.removeItem(key)
   } catch { /* optional */ }
@@ -235,20 +254,47 @@ export async function addHistory(state: string, savedAt: number, label: string, 
 }
 /** Whether the deployed script keeps old records in the Drive archive folder (v4); the value is that folder's link once known. */
 const ARCHIVE = 'dream-blueprint.cloud-archive'
-function markArchive(folder: string) {
-  try { if (folder || localStorage.getItem(ARCHIVE) === null) localStorage.setItem(ARCHIVE, folder || '1') } catch { /* optional */ }
+let archiveCapability: { scope: string | null; enabled: boolean; folder: string } | null = null
+let archiveFailure: { scope: string; message: string } | null = null
+export function archiveConnectionProblem() {
+  return archiveFailure?.scope === readyCloudScope() ? archiveFailure.message : ''
 }
-export function cloudArchive() { try { return !!localStorage.getItem(ARCHIVE) } catch { return false } }
+export function noteArchiveConnectionProblem(scope: string, message: string) {
+  if (scope !== readyCloudScope()) return
+  archiveFailure = message ? { scope, message } : null
+  window.dispatchEvent(new Event('dream-blueprint:cloud'))
+}
+function rememberArchive(d: Drive, enabled: boolean, reportedFolder?: string) {
+  const scope = cloudScope(d)
+  const folder = (typeof reportedFolder === 'string' && reportedFolder)
+    || (archiveCapability?.scope === scope && archiveCapability.folder) || ''
+  archiveCapability = { scope, enabled, folder }
+  try {
+    if (!enabled) localStorage.removeItem(ARCHIVE)
+    else if (folder || localStorage.getItem(ARCHIVE) === null) localStorage.setItem(ARCHIVE, folder || '1')
+  } catch { /* The current page can still use the observed capability at quota. */ }
+}
+function currentArchiveCapability() {
+  const scope = cloudScope()
+  if (!scope) return ''
+  const observed = archiveCapability?.scope === scope ? archiveCapability : null
+  if (observed?.enabled === false) return ''
+  if (observed?.folder) return observed.folder
+  try { return localStorage.getItem(ARCHIVE) || (observed ? '1' : '') } catch { return observed ? '1' : '' }
+}
+export function cloudArchive() { return !!currentArchiveCapability() }
 /** Whether the deployed script saves safely (v5): the new copy is written apart and checked before it replaces the old. */
 const ATOMIC = 'dream-blueprint.cloud-atomic'
 function markAtomic() { try { localStorage.setItem(ATOMIC, '1') } catch { /* optional */ } }
 export function cloudAtomic() { try { return localStorage.getItem(ATOMIC) === '1' } catch { return false } }
-export function archiveFolderUrl() { try { const v = localStorage.getItem(ARCHIVE) || ''; return v.startsWith('https://') ? v : '' } catch { return '' } }
-/** Saves old records as a file in the Drive archive folder. True only when the script confirms it kept them
- *  (an older script answers ok without keeping anything). */
+export function archiveFolderUrl() { const v = currentArchiveCapability(); return v.startsWith('https://') ? v : '' }
+/** Complete only after the script confirms the file for the original account. */
 export async function archiveToDrive(file: string, d: Drive) {
-  if (!sameConnection(d)) return false
-  try { const json = await post({ type: 'archive-add', data: file }, d); return json?.archived === true && sameConnection(d) } catch { return false }
+  if (!sameConnection(d)) throw new Error('雲端連線已經切換。')
+  const json = await post({ type: 'archive-add', data: file }, d)
+  if (!sameConnection(d)) throw new Error('雲端連線已經切換。')
+  if (json?.archived !== true) throw new CloudConnectionError(`這個部署未確認封存，請更新到 v${appsScriptVersion}。`)
+  return true
 }
 
 /** What to do when the app opens: take the cloud copy, push this one, or stop because both changed. Pure, for testing. */
@@ -356,13 +402,14 @@ export const clearSyncLink = () => { takenSync = null }
 /** Sent once a device that connected while the app was open has settled which progress it uses: autosave may start. */
 export const driveReadyEvent = 'dream-blueprint:drive-ready'
 
-export const appsScriptVersion = 7
+export const appsScriptVersion = 8
 export const appsScriptCode = `// 夢想藍圖・雲端記憶 v${appsScriptVersion}（貼到 script.google.com 的專案，部署成網頁應用程式）
 // v2：存進度前會檢查雲端是不是已經有另一台裝置存的新版本，不會互相蓋掉；刪掉的記憶也會同步刪除。
 // v3：每次蓋掉雲端的進度之前，最多每小時把舊的那份存進雲端硬碟的「夢想藍圖・歷史版本」資料夾，留最新 30 份，可以在網站還原。
 // v4：手機要整理掉的舊紀錄（兩個月前的複習紀錄、幾週前的每日小紀錄、四個月前上完的課的批改全文）先存進雲端硬碟的「夢想藍圖・封存」資料夾，存好了手機才拿掉；封存的檔案不會被刪。
 // v5：存進度時先寫到另一張工作表，整份讀回來確認一模一樣才換過去用；存到一半失敗（斷線、逾時），雲端還是原本完整的那份。要先留備份時，備份沒存成功就不蓋掉。
 // v7：對話欄位以文字寫入；歷史清理只處理這個專案已標記的快照。
+// v8：長對話分段完整保存，封存請求重送時辨認相同的資料，讀取與寫入都使用 POST。
 // 擁有者在編輯器執行 setupHistory 設定同步密鑰。進度在鎖內比對版本，並由雲端發行新版號。
 // setupHistory 保留原有密鑰與資料夾。第一次設定請從 Apps Script 執行記錄複製密鑰，再部署。
 function props(){return PropertiesService.getScriptProperties()}
@@ -528,13 +575,52 @@ function readVersion(id){
   return d?{ok:true,state:d.state,savedAt:d.savedAt}:{ok:false,error:'missing'};
 }
 function logText(value){return SpreadsheetApp.newRichTextValue().setText(value).build()}
-function doGet(e){
-  var lock=LockService.getScriptLock();lock.waitLock(20000);
-  try{
-    var denied=accessError(e.parameter.token);
-    if(denied)return out({ok:false,error:denied});
-    return out(e.parameter.type==='state'?readState():readMemory());
-  }finally{lock.releaseLock()}
+function transcriptParts(text){
+  var parts=[],start=0;
+  while(start<text.length){
+    var end=Math.min(start+5000,text.length);
+    // Keep a surrogate pair in one row if it straddles this cell's boundary.
+    var left=text.charCodeAt(end-1),right=text.charCodeAt(end);
+    if(left>=0xD800&&left<=0xDBFF&&right>=0xDC00&&right<=0xDFFF)end--;
+    parts.push(text.slice(start,end));
+    start=end;
+  }
+  return parts;
+}
+function appendTranscript(ss,source,rows){
+  var sh=ss.getSheetByName('對話紀錄'),now=new Date();
+  var first=sh.getLastRow()+1,body=[],dates=[];
+  var label=logText(String(source||''));
+  rows.forEach(function(row){
+    var role=String(row.role||''),parts=transcriptParts(String(row.text||''));
+    parts.forEach(function(text,index){
+      var who=parts.length===1?role:role+'（'+(index+1)+'/'+parts.length+'）';
+      body.push([label,logText(who),logText(text)]);
+      dates.push([now]);
+    });
+  });
+  if(!body.length)return;
+  var max=sh.getMaxRows(),last=first+body.length-1;
+  if(last>max)sh.insertRowsAfter(max,last-max);
+  sh.getRange(first,2,body.length,3).setRichTextValues(body);
+  sh.getRange(first,1,dates.length,1).setValues(dates);
+}
+function archiveData(data){
+  var folder=archiveFolder(),day=JSON.parse(data).savedOn;
+  if(typeof day!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(day))day=Utilities.formatDate(new Date(),Session.getScriptTimeZone(),'yyyy-MM-dd');
+  var digest=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,data,Utilities.Charset.UTF_8);
+  var name='舊紀錄-'+day+'-'+Utilities.base64EncodeWebSafe(digest).replace(/=+$/,'')+'.json';
+  // A timed-out reply may already have created this file. Reuse an intact copy of the same batch.
+  var same=folder.getFilesByName(name);
+  while(same.hasNext()){
+    var file=same.next();
+    if(!file.isTrashed()&&file.getMimeType()===MimeType.PLAIN_TEXT&&file.getBlob().getDataAsString()===data)return folder.getUrl();
+  }
+  folder.createFile(name,data,MimeType.PLAIN_TEXT);
+  return folder.getUrl();
+}
+function doGet(){
+  return out({ok:false,error:'post-required'});
 }
 function doPost(e){
   var d=JSON.parse((e.postData&&e.postData.contents)||'{}');
@@ -549,13 +635,8 @@ function doPost(e){
     if(d.type==='history-get')return out(readVersion(d.id));
     if(d.type==='history-add'&&typeof d.state==='string'&&d.state){keepVersion(String(d.label||'saved').replace(/[^a-z-]/g,''),d.state,Number(d.savedAt)||0);return out({ok:true,added:true})}
     // Old records the phone is about to tidy away: kept as a file in the archive folder, never trashed.
-    if(d.type==='archive-add'&&typeof d.data==='string'&&d.data){var af=archiveFolder();af.createFile(stampName('舊紀錄',Date.now()),d.data,MimeType.PLAIN_TEXT);return out({ok:true,archived:true,folder:af.getUrl()})}
-    if(d.type==='log'&&Array.isArray(d.rows)&&d.rows.length){
-      var sh=ss.getSheetByName('對話紀錄'),now=new Date(),first=sh.getLastRow()+1,source=logText(String(d.source||''));
-      var body=d.rows.map(function(r){return [source,logText(String(r.role||'')),logText(String(r.text||'').slice(0,5000))]});
-      sh.getRange(first,2,body.length,3).setRichTextValues(body);
-      sh.getRange(first,1,body.length,1).setValues(body.map(function(){return [now]}));
-    }
+    if(d.type==='archive-add'&&typeof d.data==='string'&&d.data)return out({ok:true,archived:true,folder:archiveData(d.data)});
+    if(d.type==='log'&&Array.isArray(d.rows)&&d.rows.length)appendTranscript(ss,d.source,d.rows);
     if(d.type==='memory')return out(mergeMemory(d));
     if(d.type==='state'&&typeof d.state==='string'){
       var old=readState();

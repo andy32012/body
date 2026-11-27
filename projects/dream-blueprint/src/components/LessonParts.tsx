@@ -1,9 +1,10 @@
 import DraftVersions from './DraftVersions'
 import OwnCheck from './OwnCheck'
 import AskWhy from './AskWhy'
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, Pause, Play, Volume2 } from 'lucide-react'
-import CorrectBox from './CorrectBox'
+import CorrectBox, { correctionBlocked, useCorrectionBlocked, useCorrectionPending } from './CorrectBox'
+import { mergeCorrectionFollowUps, requireCorrectionSave, type CorrectionSubmission } from '../lib/correctionHistory'
 import TutorChat from './TutorChat'
 import { sameEnglish } from '../lib/evidence'
 import StuckButton from './StuckButton'
@@ -321,22 +322,11 @@ export function ChartView({ chart }: { chart: WriteChart }) {
   return <MiniChart chart={chart} />
 }
 
-const pendingExpressions = new Set<string>()
-const expressionListeners = new Set<() => void>()
-function subscribeExpressions(listener: () => void) {
-  expressionListeners.add(listener)
-  return () => { expressionListeners.delete(listener) }
-}
-function markExpressionPending(lessonId: string, pending: boolean) {
-  if (pending) pendingExpressions.add(lessonId)
-  else pendingExpressions.delete(lessonId)
-  expressionListeners.forEach(listener => listener())
-}
-
 /** Say it your own way (no Chinese sentence to translate), get it corrected, fix it, try again. */
-export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
+export function LessonExpress({ lessonId, lesson, prompt, draftKey, legacyDraftKey, pattern, saved, onRecord, onSave, onSpeak, onFinish }: {
   /** The open task is today's (promptFor), not always the unit's first. */
   lessonId: string; lesson: Lesson; prompt: LessonPrompt; draftKey: string; pattern: string; saved?: ExpressRecord
+  legacyDraftKey?: string
   onRecord: (apply: (rec: ExpressRecord) => ExpressRecord, corrected: boolean) => void | Promise<void>
   onSave: (card: SayCard) => void; onSpeak: () => void; onFinish: (answer: string, rec: ExpressRecord) => void
 }) {
@@ -365,13 +355,16 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, sav
   const [previous, setPrevious] = useState<CorrectionResult>()
   // While Claude checks, the answer and the button wait: the check belongs to the text that was sent.
   const [checking, setChecking] = useState(false)
-  const pending = useSyncExternalStore(subscribeExpressions, () => pendingExpressions.has(lessonId), () => false)
-  const waiting = checking || pending
+  const requestId = 'lesson-grade:' + lessonId
+  const pending = useCorrectionPending(requestId)
+  const blocked = useCorrectionBlocked(requestId)
+  const waiting = checking || blocked
   const submission = useRef<ExpressRecord | undefined>(undefined)
-  const waitingForGrade = pending || !!submission.current
+  const submitted = submission.current
+  const waitingForGrade = blocked || !!submitted
   /** The first answer is kept the moment it is sent, so a failed request still leaves a record. */
   function submit() {
-    if (!answer.trim() || submission.current || pendingExpressions.has(lessonId)) return
+    if (!answer.trim() || submission.current || correctionBlocked(requestId)) return
     setPrevious(rec.last)
     const first = { first: answer, firstHelp: [...rec.help] }
     submission.current = rec.first ? rec : { ...rec, ...first }
@@ -381,22 +374,22 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, sav
     }
     setRun(n => n + 1)
   }
-  function result(r: CorrectionResult, sent: string) {
-    const submitted = submission.current
-    if (!submitted) return
+  function result(r: CorrectionResult, sent: string, grade: CorrectionSubmission) {
+    if (!submitted) throw new Error('找不到原作答的紀錄。')
     const isFirst = !submitted.firstResult && (submitted.first ?? sent).trim() === sent.trim()
     const fixed = submitted.corrections > 0 && issuesFixed(r, submitted.last)
     const next: ExpressRecord = {
-      ...submitted, corrections: submitted.corrections + 1, lastAnswer: sent, last: r, fixed,
+      ...submitted, corrections: submitted.corrections + 1, lastAnswer: sent, last: r, lastGradeId: grade.id, fixed,
       ...(isFirst ? { firstResult: r } : {}),
     }
-    return onRecord(current => {
+    return requireCorrectionSave(applied => onRecord(current => {
+      applied()
       const sameAnswer = !current.first || current.first === submitted.first
       if (!sameAnswer || current.corrections !== submitted.corrections || current.lastAnswer !== submitted.lastAnswer)
         return mergeExpress(current, next)
       return { ...next, help: [...new Set([...next.help, ...current.help])],
-        revealed: next.revealed || current.revealed, others: current.others }
-    }, true)
+        revealed: next.revealed || current.revealed, others: current.others, discussion: current.discussion }
+    }, true))
   }
   function finish() {
     const next = !rec.first && answer.trim() ? { ...rec, first: answer, firstHelp: [...rec.help] } : rec
@@ -415,7 +408,7 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, sav
       <textarea lang="en" rows={4} value={answer} spellCheck={false} autoComplete="off" placeholder="不用翻譯，想到什麼就寫什麼" readOnly={waiting}
         onChange={e => { setAnswer(e.target.value); writeDraft(draftKey, e.target.value) }} />
     </label>
-    <DraftVersions id={draftKey} text={answer} onChoose={setAnswer} disabled={waiting} />
+    <DraftVersions id={draftKey} text={answer} onChoose={setAnswer} disabled={waiting} legacyId={legacyDraftKey} />
     <div className="ls-helps" role="group" aria-label="需要幫忙時一層一層打開">
       <span>卡住了？一層一層打開：</span>
       <button type="button" aria-pressed={sees('zh')} onClick={() => help('zh')}>① 要做什麼</button>
@@ -432,12 +425,16 @@ export function LessonExpress({ lessonId, lesson, prompt, draftKey, pattern, sav
     </div>
     {!keyed && <p className="ls-help">還沒連接 Claude，先自己檢查：有沒有用到「{pattern}」？主詞和動詞對得上嗎？這次會記成「自評完成・待確認」。</p>}
     {pending && !checking && <p role="status" className="ls-help">Claude 正在批改這份作答，回覆會保存在這一堂。</p>}
-    <CorrectBox key={run ? 'checking' : 'saved-' + rec.corrections + '-' + (rec.lastAnswer ?? '')} run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
-      restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last } : undefined}
+    <CorrectBox key={run ? 'checking' : 'saved-' + (rec.lastGradeId ?? rec.corrections + '-' + (rec.lastAnswer ?? ''))} run={run} mode="open" rubric="gept-paragraph" zh={p.en + '（' + p.zh + '）'} reference={p.sample} words={[pattern]} answer={answer}
+      restore={!run && rec.last && rec.lastAnswer ? { answer: rec.lastAnswer, result: rec.last, id: rec.lastGradeId } : undefined}
       previous={previous} selfFix={!corrected || !rec.revealed}
       onReveal={() => { if (!rec.revealed) onRecord(current => ({ ...current, revealed: true }), false) }}
+      discussion={{ id: lessonId, saved: rec.discussion, save: turn => requireCorrectionSave(applied => onRecord(current => {
+        applied()
+        return { ...current, discussion: mergeCorrectionFollowUps(current.discussion ?? [], [turn]) }
+      }, false)) }}
       onSave={onSave} onBusy={busy => { if (!busy) submission.current = undefined; setChecking(busy) }}
-      backgroundGrade={{ save: result, waiting: busy => markExpressionPending(lessonId, busy) }} />
+      backgroundGrade={{ id: requestId, save: result }} />
     {corrected && !rec.fixed && !good && <p className="ls-help ls-fixnote">照上面的提示把你的句子改好，再按「改好了，請 Claude 再批一次」，會告訴你上次的問題哪些改好了。寫錯的句子按「加入複習」，之後會再出現。</p>}
     {rec.fixed && <p className="ls-help ls-fixnote">上次的問題都改好了。</p>}
     <button type="button" className={corrected || !keyed || sees('sample') ? 'pr-main ls-finish' : 'pr-link ls-finish'} disabled={waitingForGrade} onClick={finish}>{good ? 'Claude 說寫得好，完成今天這一堂 →' : '完成今天這一堂'}</button>

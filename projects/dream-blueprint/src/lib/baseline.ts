@@ -148,8 +148,14 @@ export function setResultFeedback(notes: Record<string, string>, at: string | { 
   list[i] = { ...list[i], [part]: { ...list[i][part], feedback } }
   return { ...notes, [resultsKey]: JSON.stringify(list) }
 }
-export const nextForm = (results: readonly BaselineResult[]): FormId => order[results.length % order.length]
-/** Whether the next form has already been done (there are only three, so the fourth check reuses A). */
+/** Keep all attempts in the history. Choose by the forms completed, not by the number of submissions. */
+export function nextForm(results: readonly BaselineResult[]): FormId {
+  const unseen = order.find(form => !formSeen(results, form))
+  if (unseen) return unseen
+  const last = order.indexOf(results.at(-1)?.form ?? 'A')
+  return order[(last + 1) % order.length]
+}
+/** Whether this form's questions have already been used. */
 export const formSeen = (results: readonly BaselineResult[], form: FormId) => results.some(r => (r.form ?? 'A') === form)
 /** Score of one section: null when nothing was answered (缺測), otherwise the number right. */
 export function sectionScore(qs: readonly Q[], answers: readonly (number | undefined)[]): number | null {

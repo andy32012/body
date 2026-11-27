@@ -1,50 +1,113 @@
 import { useRef, useState } from 'react'
 import curriculum from '../data/curriculum.json'
-import type { PageProps } from '../lib/store'
+import { readStoreForCloud, updateStoreNow, type PageProps } from '../lib/store'
 import { askTutor, tutorKey } from '../lib/tutor'
-import { bestLevel, checkPending, levelNames, pendingRef, readEvidence, sourceNames, teacherReason, teacherVerdict, unitsWithEvidence, type Evidence, type PendingRef } from '../lib/evidence'
+import { bestLevel, checkPending, levelNames, pendingRef, pendingReviewId, readEvidence, sourceNames, stillPending, teacherReason, teacherVerdict, unitsWithEvidence, type Evidence, type PendingRef } from '../lib/evidence'
+import { claimReview, closeReview, receiveReview, reviewTimeout, type ReviewReply } from '../lib/pendingReview'
 
-const CHECK = '你是英文老師。判斷學生的英文是否正確表達了題目的意思（文法正確、意思對就算對，不必跟參考答案一樣）。只回兩行：第一行「判定：對」或「判定：錯」；第二行「原因：」後面用繁體中文一句話說為什麼（對也要說為什麼對）。'
+const CHECK = '你是英文老師。判斷學生的英文是否正確表達了題目的意思（文法正確、意思對就算對，不必跟參考答案一樣）。關係子句的逗號若改變了原意，要判錯。只回兩行：第一行「判定：對」或「判定：錯」；第二行「原因：」後面用繁體中文一句話說為什麼（對也要說為什麼對）。'
 
-type PendingReview = { ref: PendingRef; reply: string; rewrite?: string }
-type ApplyReview = (review: PendingReview) => Promise<'applied' | 'outdated' | 'retry'>
+type PendingReview = ReviewReply & { token: string }
+type ApplyReview = (ref: PendingRef, review: ReviewReply) => Promise<'applied' | 'outdated' | 'retry'>
+const uncertain = '上一次批改中斷，無法確認是否計費。如果要再次送出，請按「確認重新送出」。'
 
-function Pending({ e, onCheck }: { e: Evidence; onCheck: ApplyReview }) {
+function Pending({ unit, e, onCheck }: { unit: number; e: Evidence; onCheck: ApplyReview }) {
   const checking = useRef(false)
   const [busy, setBusy] = useState(false)
   const [review, setReview] = useState<PendingReview | null>(null)
   const [outdated, setOutdated] = useState(false)
+  const [confirm, setConfirm] = useState(false)
   const [msg, setMsg] = useState('')
   const [text, setText] = useState(e.answer ?? '')
   const rewriting = !!e.wrong
+  const ref = pendingRef(e)
+  const id = pendingReviewId(unit, ref)
+
+  function showOutdated() {
+    setOutdated(true)
+    setMsg('這份作答已變更。請重新開啟學習紀錄查看最新結果。')
+  }
+
+  async function requestReview(): Promise<PendingReview | null> {
+    const claim = await claimReview(id, confirm, !!tutorKey())
+    setConfirm(false)
+    if (claim.state === 'busy') {
+      setMsg('另一個分頁正在處理這份批改。若原分頁已關閉，等兩分半後再查看。')
+      return null
+    }
+    if (claim.state === 'confirm') {
+      setConfirm(true)
+      setMsg(uncertain)
+      return null
+    }
+    if (claim.state === 'unconfigured') {
+      setMsg('尚未收到這份作答的批改。連接 Claude 後可以送出。')
+      return null
+    }
+    if (claim.state === 'received') return { ...claim.value, token: claim.token }
+    const { token } = claim
+    let sent = false
+    try {
+      const latest = await readStoreForCloud()
+      if (!latest.persisted || Date.now() + reviewTimeout >= claim.until) {
+        await closeReview(id, token)
+        setMsg('目前無法確認這份作答已在瀏覽器儲存。請先儲存學習進度，再回來批改。')
+        return null
+      }
+      if (!stillPending(latest.state.notes, unit, ref)) {
+        await closeReview(id, token)
+        showOutdated()
+        return null
+      }
+      if (!tutorKey()) {
+        await closeReview(id, token)
+        setMsg('目前沒有 Claude 金鑰。連接 Claude 後可以送出。')
+        return null
+      }
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), reviewTimeout)
+      const answer = rewriting ? text.trim() : ref.answer ?? ''
+      sent = true
+      let reply: string
+      try {
+        reply = (await askTutor(CHECK, [{ role: 'user', content: '題目：' + (e.prompt ?? '') + '\n參考：' + (e.ref ?? '') + '\n學生：' + answer }], controller.signal)).trim()
+      } finally { clearTimeout(timer) }
+      if (teacherVerdict(reply) === 'unclear') {
+        await closeReview(id, token)
+        setMsg('Claude 已回覆，但沒有照格式提供「判定：對／錯」和原因。再次按下批改會送出新請求。')
+        return null
+      }
+      const value = { reply, rewrite: rewriting ? answer : undefined }
+      const received = await receiveReview(id, token, value).catch(() => Date.now() < claim.until)
+      if (!received) { showOutdated(); return null }
+      return { ...value, token }
+    } catch {
+      await closeReview(id, token, sent).catch(() => {})
+      if (sent) setConfirm(true)
+      setMsg(sent ? uncertain : '目前無法確認學習進度。請重新開啟學習紀錄後再試。')
+      return null
+    }
+  }
+
   async function ask() {
     if (checking.current || outdated) return
     checking.current = true
     setBusy(true); setMsg('')
-    let checked = review
     let applied = false
     try {
-      if (!checked) {
-        const answer = rewriting ? text.trim() : e.answer ?? ''
-        const ref = pendingRef(e)
-        const reply = (await askTutor(CHECK, [{ role: 'user', content: '題目：' + (e.prompt ?? '') + '\n參考：' + (e.ref ?? '') + '\n學生：' + answer }])).trim()
-        if (teacherVerdict(reply) === 'unclear') {
-          setMsg('Claude 這次沒有照格式回答（要先寫「判定：對／錯」，再寫原因），再按一次。')
-          return
-        }
-        checked = { ref, reply, rewrite: rewriting ? answer : undefined }
-        setReview(checked)
-      }
-      const result = await onCheck(checked)
+      const checked = review ?? await requestReview()
+      if (!checked) return
+      setReview(checked)
+      const result = await onCheck(ref, checked)
       applied = result === 'applied'
+      if (result !== 'retry') void closeReview(id, checked.token).catch(() => {})
       if (result === 'outdated') {
-        setOutdated(true)
-        setMsg('這份作答已變更。請重新開啟學習紀錄查看最新結果。')
+        showOutdated()
       } else if (result === 'retry') {
         setMsg('批改已收到，暫時無法套用。按「重試儲存批改」可以保留這次結果。')
       }
     } catch {
-      setMsg(checked ? '批改已收到，暫時無法套用。請重試儲存。' : '沒連上 Claude，等一下再試。')
+      setMsg('瀏覽器無法保存或讀取批改。請允許這個網站使用瀏覽器儲存空間，再回來查看。')
     } finally {
       // Once the verdict is applied, the updated evidence removes or replaces this row.
       if (!applied) {
@@ -64,16 +127,17 @@ function Pending({ e, onCheck }: { e: Evidence; onCheck: ApplyReview }) {
       </label>
     </>}
     {msg && <small role="status">{msg}</small>}
-    {outdated ? null : review || tutorKey()
-      ? <button type="button" disabled={busy || (!review && rewriting && !text.trim())} onClick={ask}>
-        {busy ? review ? '儲存批改中…' : '確認中…' : review ? '重試儲存批改' : rewriting ? '改好了，請 Claude 再看' : '請 Claude 看看'}
+    {!outdated && (
+      <button type="button" disabled={busy || (!review && !!tutorKey() && rewriting && !text.trim())} onClick={ask}>
+        {busy ? review ? '儲存批改中…' : '確認中…' : review ? '重試儲存批改' : !tutorKey() ? '查看已收到的批改'
+          : confirm ? '確認重新送出' : rewriting ? '改好了，請 Claude 再看' : '請 Claude 看看'}
       </button>
-      : <small>連接 Claude 之後可以在這裡確認。</small>}
+    )}
   </div>
 }
 
 /** Per unit: the strongest evidence so far, written and listening kept apart, plus answers still waiting to be checked. */
-export default function EvidencePanel({ state, update }: Pick<PageProps, 'state' | 'update'>) {
+export default function EvidencePanel({ state }: Pick<PageProps, 'state'>) {
   const units = unitsWithEvidence(state.notes)
   const [notice, setNotice] = useState<{ unit: number; attemptId?: string; after: number; text: string } | null>(null)
   return <section className="history-section history-evidence">
@@ -94,13 +158,15 @@ export default function EvidencePanel({ state, update }: Pick<PageProps, 'state'
         </div>
         {showNotice && <small role="status">{notice.text}</small>}
         {pending.map(({ e, i }) => <Pending key={(e.attemptId ?? i) + ':' + (e.reviewedAt ?? e.wrong ?? '')}
-          e={e} onCheck={async ({ ref, reply, rewrite }) => {
+          unit={u} e={e} onCheck={async (ref, { reply, rewrite }) => {
             const result: { status: Awaited<ReturnType<ApplyReview>> } = { status: 'retry' }
-            await update(prev => {
-              const notes = checkPending(prev.notes, u, ref, reply, rewrite)
-              result.status = notes === prev.notes ? 'outdated' : 'applied'
-              return notes === prev.notes ? prev : { ...prev, notes }
-            })
+            try {
+              await updateStoreNow(prev => {
+                const notes = checkPending(prev.notes, u, ref, reply, rewrite)
+                result.status = notes === prev.notes ? 'outdated' : 'applied'
+                return notes === prev.notes ? prev : { ...prev, notes }
+              })
+            } catch { return 'retry' }
             if (result.status === 'applied') setNotice(teacherVerdict(reply) === 'right'
               ? { unit: u, attemptId: ref.attemptId, after: e.reviewedAt ?? 0, text: 'Claude：對。' + teacherReason(reply) }
               : null)

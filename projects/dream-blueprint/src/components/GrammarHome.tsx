@@ -9,7 +9,8 @@ import { readDraft, writeDraft } from '../lib/drafts'
 import { tutorKey } from '../lib/tutor'
 import { reached } from '../lib/unlock'
 import { DrillRun, ExplainBody, GrammarBook } from './GrammarTeach'
-import CorrectBox from './CorrectBox'
+import CorrectBox, { useCorrectionBlocked, useCorrectionPending } from './CorrectBox'
+import { correctionKey, readCorrection, requireCorrectionSave, storeCorrection } from '../lib/correctionHistory'
 import { PetIcon } from './PixelPet'
 import './grammar.css'
 import './grammar-book.css'
@@ -117,6 +118,14 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
   const draftKey = 'gbook-' + id
   const [text, setText] = useState(() => readDraft(draftKey))
   const [run, setRun] = useState(0)
+  function showDraft(value: string) {
+    setRun(0)
+    setText(value)
+  }
+  const gradeKey = correctionKey('grammar.' + id)
+  const graded = readCorrection(state.notes, gradeKey, text)
+  const grading = useCorrectionPending(gradeKey)
+  const blocked = useCorrectionBlocked(gradeKey)
   const [round, setRound] = useState(0)
   useTaskContext({
     label: '完整文法：' + name,
@@ -137,20 +146,26 @@ function SectionView({ index, id, state, onActivity, date }: Omit<Props, 'hash'>
       : content === null ? <GrammarLoadError section />
       : <>
         <ExplainBody steps={content.points} table={content.table} mistakes={content.mistakes} rate={state.settings.speechRate} />
-        <DrillRun key={round} drills={content.drills} indices={content.drills.map((_, i) => i)} title="小練習（3 題）" onAnswer={onSave} onCorrected={i => onSave(i, true)} missed="還沒改對的題目可以按「這三題再做一次」再練一遍。"
+        <DrillRun key={round} drills={content.drills} indices={content.drills.map((_, i) => i)} title="小練習（3 題）" allowUnansweredSkip onAnswer={onSave} onCorrected={i => onSave(i, true)} missed="還沒改對的題目可以按「這三題再做一次」再練一遍。"
           after={<div className="pr-actions"><button type="button" className="pr-link" onClick={() => setRound(round + 1)}>這三題再做一次</button></div>} />
         <section className="gb-try">
           <strong>自己造一句</strong>
           <p>用「{section.title}」寫一句英文，Claude 照全民英檢初級「單句寫作」批改，告訴你哪裡要改。</p>
           <label className="pr-field">我的句子
-            <textarea lang="en" rows={2} value={text} spellCheck={false} autoComplete="off" autoCapitalize="off"
-              onChange={e => { setText(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder="例如照上面的例句換幾個字" />
+            <textarea lang="en" rows={2} value={text} spellCheck={false} autoComplete="off" autoCapitalize="off" readOnly={blocked}
+              onChange={e => { showDraft(e.target.value); writeDraft(draftKey, e.target.value) }} placeholder="例如照上面的例句換幾個字" />
           </label>
-          <DraftVersions id={draftKey} text={text} onChoose={setText} />
-          {tutorKey() ? <div className="pr-actions"><button type="button" className="pr-main" disabled={!text.trim()} onClick={() => setRun(run + 1)}>{run ? '改好了，請 Claude 再批一次' : '請 Claude 批改'}</button></div>
+          <DraftVersions id={draftKey} text={text} onChoose={showDraft} disabled={blocked} />
+          {tutorKey() ? <div className="pr-actions"><button type="button" className="pr-main" disabled={blocked || !text.trim()} onClick={() => setRun(r => r + 1)}>{graded ? '請 Claude 再批一次' : '請 Claude 批改'}</button></div>
             : <p className="ls-help">還沒連接 Claude：到「設定 → 連接 Claude」貼上金鑰，就能請它批改。</p>}
-          <CorrectBox run={run} mode="open" rubric="gept-sentence" selfFix zh={'用這一節的文法「' + name + '」自己寫一句英文'}
-            reference={content.points[0]?.ex[0]?.en} words={[section.title]} answer={text} />
+          {grading && !run && <p role="status" className="ls-help">Claude 正在批改，回覆會留在這一節。</p>}
+          <CorrectBox key={run ? 'grading' : graded?.id ?? 'ungraded'} run={run} mode="open" rubric="gept-sentence" selfFix zh={'用這一節的文法「' + name + '」自己寫一句英文'}
+            reference={content.points[0]?.ex[0]?.en} words={[section.title]} answer={text}
+            restore={!run && graded ? { ...graded, showFull: false } : undefined}
+            backgroundGrade={{ id: gradeKey, save: (result, answer, submission) => requireCorrectionSave(applied => onActivity(prev => {
+              applied()
+              return { ...prev, notes: storeCorrection(prev.notes, gradeKey, { ...submission, result, answer }) }
+            })) }} />
         </section>
       </>}
     <div className="pr-actions"><button type="button" className="ask-word gb-ask" onClick={openClaude}><PetIcon size={18} />問 Claude 老師</button></div>

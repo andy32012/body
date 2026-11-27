@@ -1,3 +1,5 @@
+import { mergeCorrectionFollowUps, type CorrectionFollowUp } from './correctionHistory'
+
 /** The guided 30-minute lesson: recall → listen → pattern → express → fix → done.
  *  Content per unit lives in data/lessons.json (dialogue, questions, ten variations, an open task for each day). */
 export interface LessonLine { who: string; en: string; zh: string }
@@ -83,6 +85,8 @@ export function issuesFixed(r: CorrectionResult, previous?: CorrectionResult): b
 /** The open task: first answer and its feedback are kept apart from the corrected try. */
 export interface ExpressRecord {
   first?: string; firstResult?: CorrectionResult; lastAnswer?: string; last?: CorrectionResult; corrections: number; help: string[]
+  /** Identifies the latest graded submission even if an identical answer has been graded more than once. */
+  lastGradeId?: string
   /** Help layers already open when the first answer was submitted. */
   firstHelp?: string[]
   /** Saw the full correction before rewriting. */
@@ -91,6 +95,8 @@ export interface ExpressRecord {
   fixed?: boolean
   /** The same task answered on another device the same day (kept by 「兩份合併」, so neither sentence is lost). */
   others?: ExpressAnswer[]
+  /** Each question and answer is tied to the specific correction it discusses. */
+  discussion?: CorrectionFollowUp[]
 }
 export type ExpressAnswer = Pick<ExpressRecord, 'first' | 'firstResult' | 'lastAnswer' | 'last'>
 
@@ -142,11 +148,13 @@ export function mergeExpress(older?: ExpressRecord, newer?: ExpressRecord): Expr
   if ((other.first || other.lastAnswer) && (other.first !== main.first || other.lastAnswer !== main.lastAnswer)) kept.push(otherAnswer)
   const seen = new Set<string>()
   const others = kept.filter(o => { const k = JSON.stringify([o.first ?? '', o.lastAnswer ?? '']); if (seen.has(k)) return false; seen.add(k); return true })
+  const discussion = mergeCorrectionFollowUps(main.discussion ?? [], other.discussion ?? [])
   return {
     ...main,
     help: unique([...(main.help ?? []), ...(other.help ?? [])]),
     ...(main.revealed || other.revealed ? { revealed: true } : {}),
     ...(others.length ? { others } : {}),
+    ...(discussion.length ? { discussion } : {}),
   }
 }
 /** One day's lesson record from two devices (「兩份合併」): every step, answer and the open task's sentences from both,
@@ -235,6 +243,8 @@ export interface RunProgress {
   answers?: Record<string, string>
   spoken?: string[]
   updatedAt?: number
+  /** New runs store hints by activity. Older saved runs may still need their original hint history. */
+  scopedHints?: boolean
 }
 export const runProgressKey = (date: string, review?: boolean) =>
   review === undefined ? 'progress.' + date : 'progress.' + (review ? 'review.' : 'checkpoint.') + date

@@ -10,10 +10,19 @@ import { dayKey, daysBetween } from './progress'
 export const weakKey = 'weak.v1'
 export type WeakSource = 'tutor' | 'self' | 'drill' | 'speak' | 'write' | 'review' | 'gept'
 export interface WeakExample { w: string; r: string; src: WeakSource }
+type WeakEvent = [id: string, at: number, day: string, delta: -1 | 1]
+interface WeakHistory {
+  base: number
+  day: string
+  at?: number
+  afterRemoval?: string
+  events: WeakEvent[]
+}
 export interface WeakItem {
   k: string; n: number; first: string; last: string; lastAt?: number; ex: WeakExample[]
   /** An older date-only deletion this device had already observed before the mistake came back. */
   afterRemoval?: string
+  history?: WeakHistory
 }
 
 /** English names of the course's grammar, for Emma (her instructions are in English). Unit number → name. */
@@ -81,7 +90,11 @@ export function normalizeLabel(raw: string, allowPrefix = true): string | null {
   return prefix ?? null
 }
 
-export function readWeak(notes: Record<string, string>): WeakItem[] {
+const isDay = (value: unknown): value is string => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+const isTime = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value > 0
+const isEvent = (value: unknown): value is WeakEvent =>
+  Array.isArray(value) && value.length === 4 && typeof value[0] === 'string' && isTime(value[1]) && isDay(value[2]) && (value[3] === -1 || value[3] === 1)
+function readWeakRecords(notes: Record<string, string>): WeakItem[] {
   try {
     const list = JSON.parse(notes[weakKey] || '[]') as unknown
     if (!Array.isArray(list)) return []
@@ -89,22 +102,19 @@ export function readWeak(notes: Record<string, string>): WeakItem[] {
       .map(x => ({
         ...x,
         first: typeof x.first === 'string' ? x.first : x.last,
-        lastAt: Number.isSafeInteger(x.lastAt) ? x.lastAt : undefined,
+        lastAt: isTime(x.lastAt) ? x.lastAt : undefined,
         ex: Array.isArray(x.ex) ? x.ex.filter(e => e && typeof e.w === 'string' && typeof e.r === 'string') : [],
+        history: x.history && Number.isSafeInteger(x.history.base) && x.history.base >= 0 && isDay(x.history.day) && Array.isArray(x.history.events)
+          ? { ...x.history, events: x.history.events.filter(isEvent) } : undefined,
       }))
   } catch { return [] }
 }
-/** The list stays under 30,000 characters (it was sized when each saved note was capped at 50,000; the cap is now the
- *  whole progress size) by dropping the examples of the weakest points first, then those points. */
+export function readWeak(notes: Record<string, string>): WeakItem[] {
+  const today = dayKey()
+  return readWeakRecords(notes).filter(item => item.n > 0).sort((a, b) => weakScore(b, today) - weakScore(a, today)).slice(0, MAX_ITEMS)
+}
 function write(notes: Record<string, string>, list: WeakItem[]) {
-  let kept = list
-  let json = JSON.stringify(kept)
-  for (let i = kept.length - 1; json.length > 30000 && i >= 0; i--) {
-    kept = kept.map((item, j) => j === i ? { ...item, ex: item.ex.slice(0, 1) } : item)
-    json = JSON.stringify(kept)
-  }
-  while (json.length > 30000 && kept.length) { kept = kept.slice(0, -1); json = JSON.stringify(kept) }
-  return { ...notes, [weakKey]: json }
+  return { ...notes, [weakKey]: JSON.stringify(list) }
 }
 
 /** How weak a point is today: each miss counts, and the count halves every three weeks without a new miss. */
@@ -116,30 +126,63 @@ const MAX_ITEMS = 30
 const clip = (s: string, n = 140) => s.trim().replace(/\s+/g, ' ').slice(0, n)
 const removalTime = (mark: string | undefined) => Number(mark?.split('@')[1]) || 0
 const nextWeakTime = (item: WeakItem | undefined, mark: string | undefined) =>
-  Math.max(Date.now(), (item?.lastAt ?? 0) + 1, removalTime(mark) + 1)
+  Math.max(Date.now(), (item?.lastAt ?? 0) + 1, (item?.history?.events.at(-1)?.[1] ?? 0) + 1, removalTime(mark) + 1)
+const nextEventId = () => globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)
+
+function historyOf(item: WeakItem): WeakHistory {
+  return item.history ?? { base: item.n, day: item.last, at: item.lastAt, afterRemoval: item.afterRemoval, events: [] }
+}
+function countEvents(base: number, events: readonly WeakEvent[]) {
+  return events.reduce((n, event) => Math.max(0, n + event[3]), base)
+}
+function historyAfterRemoval(item: WeakItem, mark: string | undefined): WeakHistory {
+  const history = historyOf(item)
+  if (!mark) return history
+  const at = removalTime(mark)
+  const after = (day: string, time?: number) => at && time ? time > at : day > mark.slice(0, 10) || history.afterRemoval === mark
+  return {
+    ...history,
+    base: after(history.day, history.at) ? history.base : 0,
+    events: history.events.filter(event => after(event[2], event[1])),
+  }
+}
+function mergeHistories(first: WeakHistory, second: WeakHistory): WeakHistory {
+  // Only backups made before event IDs existed need the conservative baseline count.
+  const base = second.base >= first.base ? second : first
+  const events = new Map<string, WeakEvent>()
+  for (const event of [...first.events, ...second.events]) {
+    const current = events.get(event[0])
+    if (!current || event[1] < current[1]) events.set(event[0], event)
+  }
+  return { ...base, events: [...events.values()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])) }
+}
 
 /** Records a mistake. Labels outside the list are ignored, so a teacher cannot fill the list with free text. */
-export function addWeak(notes: Record<string, string>, rawLabel: string, day: string, example?: { w: string; r: string }, src: WeakSource = 'tutor') {
+export function addWeak(notes: Record<string, string>, rawLabel: string, day: string, example?: { w: string; r: string }, src: WeakSource = 'tutor', eventId?: string) {
   const k = normalizeLabel(rawLabel)
   if (!k) return notes
   const removed = readRemoved(notes)[k]
-  const list = readWeak(notes).filter(item => item.k !== k || weakAfterRemoval(item, removed))
+  const list = readWeakRecords(notes).filter(item => item.k !== k || weakAfterRemoval(item, removed))
   const ex = example && example.r.trim() ? [{ w: clip(example.w) || '（沒寫）', r: clip(example.r), src }] : []
   const old = list.find(i => i.k === k)
+  const history = old ? historyAfterRemoval(old, removed) : { base: 0, day, events: [] }
+  if (history.events.some(event => event[0] === eventId))
+    return example ? refreshWeakExample(notes, k, example, src) : notes
   const lastAt = nextWeakTime(old, removed)
+  const nextHistory: WeakHistory = { ...history, ...(removed ? { afterRemoval: removed } : {}),
+    events: [...history.events, [eventId ?? nextEventId(), lastAt, day, 1]] }
   const item: WeakItem = old
-    ? { ...old, n: old.n + 1, last: day > old.last ? day : old.last, lastAt, ex: [...ex, ...old.ex.filter(e => !ex.some(x => squash(x.w) === squash(e.w)))].slice(0, 3) }
-    : { k, n: 1, first: day, last: day, lastAt, ex }
-  if (removed && !removalTime(removed)) item.afterRemoval = removed
+    ? { ...old, n: countEvents(nextHistory.base, nextHistory.events), last: day > old.last ? day : old.last, lastAt, history: nextHistory,
+      ex: [...ex, ...old.ex.filter(e => !ex.some(x => squash(x.w) === squash(e.w)))].slice(0, 3) }
+    : { k, n: 1, first: day, last: day, lastAt, ex, history: nextHistory }
+  if (removed) item.afterRemoval = removed
   const rest = list.filter(i => i.k !== k)
-  const next = [item, ...rest]
-  if (next.length > MAX_ITEMS) next.splice(0, next.length, ...next.sort((a, b) => weakScore(b, day) - weakScore(a, day)).slice(0, MAX_ITEMS))
-  return write(notes, next)
+  return write(notes, [item, ...rest])
 }
 
 /** Refreshes the correction for an existing example without counting the same attempt twice. */
 export function refreshWeakExample(notes: Record<string, string>, label: string, example: { w: string; r: string }, src: WeakSource) {
-  const list = readWeak(notes)
+  const list = readWeakRecords(notes)
   const item = list.find(x => x.k === label)
   if (!item || !weakAfterRemoval(item, readRemoved(notes)[label])) return notes
   const w = clip(example.w) || '（沒寫）', r = clip(example.r)
@@ -154,15 +197,18 @@ export function refreshWeakExample(notes: Record<string, string>, label: string,
 export function easeWeak(notes: Record<string, string>, rawLabel: string) {
   const k = normalizeLabel(rawLabel)
   if (!k) return notes
-  const list = readWeak(notes)
-  const old = list.find(i => i.k === k)
+  const list = readWeakRecords(notes)
+  const old = list.find(i => i.k === k && i.n > 0)
   if (!old) return notes
-  return write(notes, old.n <= 1 ? list.filter(i => i.k !== k) : list.map(i => i.k === k ? { ...i, n: i.n - 1 } : i))
+  const mark = readRemoved(notes)[k]
+  const history = historyAfterRemoval(old, mark)
+  const next: WeakHistory = { ...history, events: [...history.events, [nextEventId(), nextWeakTime(old, mark), dayKey(), -1]] }
+  return write(notes, list.map(i => i === old ? { ...i, n: countEvents(next.base, next.events), history: next } : i))
 }
 
 /** Deleted by the learner. A new mistake of the same kind starts it again from one. */
 export function removeWeak(notes: Record<string, string>, label: string, day = dayKey()) {
-  const list = readWeak(notes)
+  const list = readWeakRecords(notes)
   const item = list.find(i => i.k === label)
   if (!item) return notes
   const removed = readRemoved(notes)
@@ -190,6 +236,37 @@ export function weakAfterRemoval(item: WeakItem, mark: string | undefined) {
   const removedAt = removalTime(mark)
   if (removedAt && item.lastAt) return item.lastAt > removedAt
   return (!removedAt && item.afterRemoval === mark) || item.last > mark.slice(0, 10)
+}
+
+export function mergeWeakNotes(older: Record<string, string>, newer: Record<string, string>) {
+  const removed = new Map(Object.entries(readRemoved(older)))
+  for (const [label, mark] of Object.entries(readRemoved(newer))) {
+    removed.set(label, laterWeakRemoval(removed.get(label), mark))
+  }
+  const items = new Map<string, WeakItem>()
+  for (const item of [...readWeakRecords(older), ...readWeakRecords(newer)]) {
+    const mark = removed.get(item.k)
+    if (!weakAfterRemoval(item, mark)) continue
+    const previous = items.get(item.k)
+    const remaining = historyAfterRemoval(item, mark)
+    const history = previous ? mergeHistories(historyOf(previous), remaining) : remaining
+    const examples = new Map<string, WeakExample>()
+    const unfiltered = historyOf(item)
+    const hasOldExamples = remaining.base !== unfiltered.base || remaining.events.length !== unfiltered.events.length
+    for (const sample of [...(hasOldExamples ? [] : item.ex), ...(previous?.ex ?? [])]) {
+      const signature = squash(sample.w)
+      if (!examples.has(signature)) examples.set(signature, sample)
+    }
+    const lastAt = Math.max(item.lastAt ?? 0, previous?.lastAt ?? 0)
+    const first = previous && previous.first < item.first ? previous.first : item.first
+    const last = previous && previous.last > item.last ? previous.last : item.last
+    items.set(item.k, { ...item, n: countEvents(history.base, history.events), history, first, last,
+      lastAt: lastAt || undefined, ex: [...examples.values()].slice(0, 3) })
+  }
+  return {
+    ...(weakKey in older || weakKey in newer ? { [weakKey]: JSON.stringify([...items.values()]) } : {}),
+    ...(removed.size ? { [weakRemovedKey]: JSON.stringify(Object.fromEntries(removed)) } : {}),
+  }
 }
 
 /** The strongest weak points now. Points that faded below half a miss are not shown. */

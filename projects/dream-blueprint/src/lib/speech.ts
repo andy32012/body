@@ -29,6 +29,8 @@ export const engineNames: Record<ListenEngine, string> = { openai: 'OpenAI èªžéŸ
 
 export interface Listening {
   engine: ListenEngine
+  /** Resolves when the microphone stops, before any upload and transcription finish. */
+  captured: Promise<void>
   /** The words heard, once listening has stopped (and, with OpenAI, the recording has been transcribed). */
   done: Promise<string>
   /** Time spent listening, frozen when recording ends, before any upload or transcription. */
@@ -68,7 +70,12 @@ async function recordAndTranscribe(maxMs?: number, signal?: AbortSignal): Promis
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }) }
   catch (e) { throw micError(e) }
   // Every way this can fail once the microphone is open closes it again.
-  const release = () => stream.getTracks().forEach(t => t.stop())
+  let captureEnded: () => void
+  const captured = new Promise<void>(resolve => { captureEnded = resolve })
+  const release = () => {
+    stream.getTracks().forEach(t => t.stop())
+    captureEnded()
+  }
   if (signal?.aborted) { release(); throw new DOMException('ended', 'AbortError') }
   const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find(t => MediaRecorder.isTypeSupported?.(t)) ?? ''
   let recorder: MediaRecorder
@@ -105,7 +112,7 @@ async function recordAndTranscribe(maxMs?: number, signal?: AbortSignal): Promis
   }
   if (maxMs) timer = setTimeout(stop, maxMs)
   return {
-    engine: 'openai', done, stop,
+    engine: 'openai', captured, done, stop,
     get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
     get recording() { return stoppedAt === undefined },
     cancel() { request.abort(); stop(); release() },
@@ -198,8 +205,9 @@ async function browserListen(maxMs?: number, onPartial?: (text: string) => void)
     try { r.stop() } catch { /* already stopped */ }
   }
   if (maxMs) timer = setTimeout(stop, maxMs)
+  const captured = done.then(() => undefined, () => undefined)
   return {
-    engine: 'browser', done, stop,
+    engine: 'browser', captured, done, stop,
     get durationMs() { return (stoppedAt ?? performance.now()) - startedAt },
     get recording() { return stoppedAt === undefined },
     cancel() {
